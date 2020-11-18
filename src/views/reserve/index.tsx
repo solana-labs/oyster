@@ -14,8 +14,8 @@ export const ReserveView = () => {
   const reserve = lendingReserve?.info;
   
   const name = useTokenName(reserve?.liquidityMint);
-  const tokenBalance = useUserBalance(reserve?.liquidityMint);
-  const collateralBalance = useUserBalance(reserve?.collateralMint);
+  const { balance: tokenBalance } = useUserBalance(reserve?.liquidityMint);
+  const { balance: collateralBalance } = useUserBalance(reserve?.collateralMint);
 
   return <div style={{ display: 'flex', justifyContent: 'space-around' }}>
     <TokenIcon mintAddress={reserve?.liquidityMint} />

@@ -10,8 +10,8 @@ import { useAccount, useMint } from "../../contexts/accounts";
 
 export const LendingReserveItem = (props: { reserve: LendingReserve, address: PublicKey }) => {
   const name = useTokenName(props.reserve.liquidityMint);
-  const tokenBalance = useUserBalance(props.reserve.liquidityMint);
-  const collateralBalance = useUserBalance(props.reserve.collateralMint);
+  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
+  const { balance: collateralBalance } = useUserBalance(props.reserve.collateralMint);
 
   const collateralSupply = useAccount(props.reserve.collateralSupply);
   const liquiditySupply = useAccount(props.reserve.liquiditySupply);

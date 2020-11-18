@@ -6,13 +6,18 @@ import { useUserAccounts } from "./useUserAccounts";
 
 export function useUserBalance(mint?: PublicKey) {
   const { userAccounts } = useUserAccounts();
-
   const mintInfo = useMint(mint);
-
-  return useMemo(() =>
-    convert(userAccounts
+  const accounts = useMemo(() => {
+    return userAccounts
       .filter(acc => mint?.equals(acc.info.mint))
+      .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
+  }, [userAccounts]);
+
+  const balance = useMemo(() =>
+    convert(accounts
       .reduce((res, item) => res += item.info.amount.toNumber(), 0)
       , mintInfo),
-    [userAccounts]);
+    [accounts, mintInfo]);
+
+  return { balance, accounts };
 }

@@ -9,8 +9,8 @@ import { PublicKey } from "@solana/web3.js";
 
 export const ReserveItem = (props: { reserve: LendingReserve, address: PublicKey }) => {
   const name = useTokenName(props.reserve.liquidityMint);
-  const tokenBalance = useUserBalance(props.reserve.liquidityMint);
-  const collateralBalance = useUserBalance(props.reserve.collateralMint);
+  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
+  const { balance: collateralBalance } = useUserBalance(props.reserve.collateralMint);
 
   return <div style={{ display: 'flex', justifyContent: 'space-around' }}>
     <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>

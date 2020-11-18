@@ -46,10 +46,11 @@ export const uint64 = (property = "uint64"): unknown => {
 
   layout.encode = (num: BN, buffer: Buffer, offset: number) => {
     const a = num.toArray().reverse();
-    const b = Buffer.from(a);
+    let b = Buffer.from(a);
     if (b.length !== 8) {
       const zeroPad = Buffer.alloc(8);
       b.copy(zeroPad);
+      b = zeroPad;
     }
 
     return _encode(b, buffer, offset);
