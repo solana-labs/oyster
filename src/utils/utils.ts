@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { MintInfo } from "@solana/spl-token";
 
 import { TokenAccount } from "./../models";
+import { PublicKey } from "@solana/web3.js";
 
 export interface KnownToken {
   tokenSymbol: string;
@@ -61,9 +62,10 @@ export function getTokenName(
 
 export function getTokenIcon(
   map: KnownTokenMap,
-  mintAddress: string
+  mintAddress: string | PublicKey,
 ): string | undefined {
-  return map.get(mintAddress)?.icon;
+  const address = typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58();
+  return map.get(address)?.icon;
 }
 
 export function isKnownMint(map: KnownTokenMap, mintAddress: string) {

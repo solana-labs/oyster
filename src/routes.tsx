@@ -4,7 +4,10 @@ import { WalletProvider } from "./contexts/wallet";
 import { ConnectionProvider } from "./contexts/connection";
 import { AccountsProvider } from "./contexts/accounts";
 import { MarketProvider } from "./contexts/market";
+import { LendingProvider } from "./contexts/lending";
 import { AppLayout } from "./components/Layout";
+
+import { DepositList } from './views/deposit/list/list';
 
 export function Routes() {
   return (
@@ -14,9 +17,11 @@ export function Routes() {
           <WalletProvider>
             <AccountsProvider>
               <MarketProvider>
-                <AppLayout>
-                  <Route exact path="/" />
-                </AppLayout>
+                <LendingProvider>
+                  <AppLayout>
+                    <Route exact path="/" component={() => <DepositList />} />
+                  </AppLayout>
+                </LendingProvider>
               </MarketProvider>
             </AccountsProvider>
           </WalletProvider>

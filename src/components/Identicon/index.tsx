@@ -3,13 +3,15 @@ import React, { useEffect, useRef } from "react";
 import Jazzicon from "jazzicon";
 import bs58 from "bs58";
 import "./style.less";
+import { PublicKey } from "@solana/web3.js";
 
 export const Identicon = (props: {
-  address?: string;
+  address?: string | PublicKey;
   style?: React.CSSProperties;
   className?: string;
 }) => {
-  const { address, style } = props;
+  const { style, className } = props; 
+  const address = typeof props.address === 'string' ? props.address : props.address?.toBase58();
   const ref = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export const Identicon = (props: {
         )
       );
     }
-  }, [address, style, props.className]);
+  }, [address, style, className]);
 
   return (
     <div className="identicon-wrapper" ref={ref as any} style={props.style} />

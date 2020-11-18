@@ -8,6 +8,16 @@ export class AccountUpdateEvent {
   }
 }
 
+export class CacheUpdateEvent {
+  static type = "CacheUpdate";
+  id: string;
+  parser: any;
+  constructor(id: string, parser: any) {
+    this.id = id;
+    this.parser = parser;
+  }
+}
+
 export class MarketUpdateEvent {
   static type = "MarketUpdate";
   ids: Set<string>;
@@ -31,11 +41,21 @@ export class EventEmitter {
     return () => this.emitter.removeListener(AccountUpdateEvent.type, callback);
   }
 
+  onCache(callback: (args: CacheUpdateEvent) => void) {
+    this.emitter.on(CacheUpdateEvent.type, callback);
+
+    return () => this.emitter.removeListener(CacheUpdateEvent .type, callback);
+  }
+
   raiseAccountUpdated(id: string) {
     this.emitter.emit(AccountUpdateEvent.type, new AccountUpdateEvent(id));
   }
 
   raiseMarketUpdated(ids: Set<string>) {
     this.emitter.emit(MarketUpdateEvent.type, new MarketUpdateEvent(ids));
+  }
+
+  raiseCacheUpdated(id: string, parser: any) {
+    this.emitter.emit(CacheUpdateEvent.type, new CacheUpdateEvent(id, parser));
   }
 }
