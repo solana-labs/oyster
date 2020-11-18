@@ -1,6 +1,6 @@
 import React from "react";
 import { useWallet } from "../../contexts/wallet";
-import { shortenAddress } from "../../utils/utils";
+import { formatNumber, shortenAddress } from "../../utils/utils";
 import { Identicon } from "../Identicon";
 import { useNativeAccount } from "../../contexts/accounts";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -13,10 +13,12 @@ export const CurrentUserBadge = (props: {}) => {
     return null;
   }
 
+  // should use SOL ◎ ?
+
   return (
     <div className="wallet-wrapper">
       <span>
-        {((account?.lamports || 0) / LAMPORTS_PER_SOL).toFixed(6)} SOL
+        {formatNumber.format(((account?.lamports || 0) / LAMPORTS_PER_SOL))} SOL
       </span>
       <div className="wallet-key">
         {shortenAddress(`${wallet.publicKey}`)}

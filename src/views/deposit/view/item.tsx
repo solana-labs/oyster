@@ -13,7 +13,7 @@ export const ReserveItem = (props: { reserve: LendingReserve, address: PublicKey
   const collateralBalance = useUserBalance(props.reserve.collateralMint);
 
   return <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-    <span><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
+    <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
     <div>{formatNumber.format(tokenBalance)} {name}</div>
     <div>{formatNumber.format(collateralBalance)} {name}</div>
     <div>--</div>

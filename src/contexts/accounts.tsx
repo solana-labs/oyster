@@ -5,7 +5,6 @@ import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { programIds, WRAPPED_SOL_MINT } from "./../constants/ids";
 import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
-import { notify } from "./../utils/notifications";
 import { chunks } from "./../utils/utils";
 import { EventEmitter } from "./../utils/eventEmitter";
 
@@ -107,6 +106,7 @@ export const cache = {
       return query;
     }
 
+    // TODO: refactor to use multiple accounts query with flush like behavior
     query = connection.getAccountInfo(id).then((data) => {
       if (!data) {
         throw new Error("Account not found");
@@ -395,13 +395,10 @@ export function useMint(key?: string | PublicKey) {
       .query(connection, id, MintParser)
       .then(acc => setMint(acc.info as any))
       .catch((err) =>
-        notify({
-          message: err.message,
-          type: "error",
-        })
+        console.log(err)
       );
 
-    const dispose = accountEmitter.onAccount((e) => {
+    const dispose = cache.emitter.onCache((e) => {
       const event = e;
       if (event.id === id) {
         cache.query(connection, id, MintParser).then(mint => setMint(mint.info as any));
@@ -428,10 +425,7 @@ export function useAccount(pubKey?: PublicKey) {
         }
 
         const acc = await cache.query(connection, key, TokenAccountParser).catch((err) =>
-          notify({
-            message: err.message,
-            type: "error",
-          })
+          console.log(err)
         );
         if (acc) {
           setAccount(acc);
@@ -443,7 +437,7 @@ export function useAccount(pubKey?: PublicKey) {
 
     query();
 
-    const dispose = accountEmitter.onAccount((e) => {
+    const dispose = cache.emitter.onCache((e) => {
       const event = e;
       if (event.id === key) {
         query();
