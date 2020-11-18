@@ -49,9 +49,13 @@ export function shortenAddress(address: string, chars = 4): string {
 
 export function getTokenName(
   map: KnownTokenMap,
-  mintAddress: string,
+  mintAddress?: string,
   shorten = true
 ): string {
+  if(!mintAddress) {
+    return 'N/A';
+  }
+
   const knownSymbol = map.get(mintAddress)?.tokenSymbol;
   if (knownSymbol) {
     return knownSymbol;
@@ -62,9 +66,13 @@ export function getTokenName(
 
 export function getTokenIcon(
   map: KnownTokenMap,
-  mintAddress: string | PublicKey,
+  mintAddress?: string | PublicKey,
 ): string | undefined {
   const address = typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58();
+  if(!address) {
+    return;
+  }
+
   return map.get(address)?.icon;
 }
 

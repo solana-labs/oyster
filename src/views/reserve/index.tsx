@@ -1,14 +1,15 @@
 import React, { useMemo } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../../hooks';
-import { LendingReserve, LendingReserveParser } from "../../../models/lending";
-import { TokenIcon } from "../../../components/TokenIcon";
-import { formatNumber } from "../../../utils/utils";
+import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
+import { LendingReserve, LendingReserveParser } from "../../models/lending";
+import { TokenIcon } from "../../components/TokenIcon";
+import { formatNumber } from "../../utils/utils";
 import { Button } from "antd";
 import { useParams } from "react-router-dom";
-import { useAccount } from "../../../contexts/accounts";
+import { useAccount } from "../../contexts/accounts";
 
-export const DepositAddView = () => {
+export const ReserveView = () => {
   const { id } = useParams<{ id: string }>();
+  
   const lendingReserve = useLendingReserve(id);
   const reserve = lendingReserve?.info;
   

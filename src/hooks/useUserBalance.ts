@@ -4,7 +4,7 @@ import { useMint } from "../contexts/accounts";
 import { convert } from "../utils/utils";
 import { useUserAccounts } from "./useUserAccounts";
 
-export function useUserBalance(mint: PublicKey) {
+export function useUserBalance(mint?: PublicKey) {
   const { userAccounts } = useUserAccounts();
 
   const mintInfo = useMint(mint);

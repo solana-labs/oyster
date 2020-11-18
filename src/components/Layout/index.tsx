@@ -6,7 +6,8 @@ import {
   PieChartOutlined,
   GithubOutlined,
   BankOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  HomeOutlined
 } from '@ant-design/icons';
 
 import BasicLayout, { DefaultFooter, PageContainer } from '@ant-design/pro-layout';
@@ -34,15 +35,42 @@ export const AppLayout = (props: any) => {
         ]}
         menuContentRender={() => {
           return <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item key="1" icon={<BankOutlined />}>
-              Deposit
-          </Menu.Item>
-            <Menu.Item key="2" icon={<LogoutOutlined />}>
-              Borrow
-          </Menu.Item>
-            <Menu.Item key="3" icon={<PieChartOutlined />}>
-              Dashboard
-          </Menu.Item>
+            <Menu.Item key="1" icon={<HomeOutlined />}>
+              <Link
+                to={{
+                  pathname: "/",
+                }}
+              >
+                Home
+            </Link>
+            </Menu.Item>
+            <Menu.Item key="2" icon={<PieChartOutlined />}>
+              <Link
+                to={{
+                  pathname: "/dashboard",
+                }}
+              >
+                Dashboard
+            </Link>
+            </Menu.Item>
+            <Menu.Item key="3" icon={<BankOutlined />}>
+              <Link
+                to={{
+                  pathname: "/deposit",
+                }}
+              >
+                Deposit
+            </Link>
+            </Menu.Item>
+            <Menu.Item key="4" icon={<LogoutOutlined />}>
+              <Link
+                to={{
+                  pathname: "/borrow",
+                }}
+              >
+                Borrow
+            </Link>
+            </Menu.Item>
           </Menu>
         }}
       >

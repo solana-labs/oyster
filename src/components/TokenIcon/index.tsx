@@ -5,7 +5,7 @@ import { useConnectionConfig } from "../../contexts/connection";
 import { PublicKey } from "@solana/web3.js";
 
 export const TokenIcon = (props: {
-  mintAddress: string | PublicKey;
+  mintAddress?: string | PublicKey;
   style?: React.CSSProperties;
   className?: string;
 }) => {
