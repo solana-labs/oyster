@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
+import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance, useCollateralBalance } from './../../hooks';
 import { LendingReserve, LendingReserveParser } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber } from "../../utils/utils";
@@ -19,7 +19,7 @@ export const DepositInfoLine = (props: {
   address: PublicKey }) => {
   const name = useTokenName(props.reserve.liquidityMint);
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useUserBalance(props.reserve.collateralMint);
+  const { balance: collateralBalance } = useCollateralBalance(props.reserve);
 
   return <Card className={props.className} bodyStyle={{ display: 'flex', justifyContent: 'space-around',  }} >
     <div className="deposit-info-line-item ">

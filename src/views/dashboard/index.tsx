@@ -8,7 +8,7 @@ import { Button } from "antd";
 export const DashboardView = () => {
   const { reserveAccounts } = useLendingReserves();
 
-  return <div>
+  return <div className="flexColumn">
     DASHBOARD: 
     TODO:
     1. Add deposits

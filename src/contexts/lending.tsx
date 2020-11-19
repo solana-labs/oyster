@@ -1,8 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useConnection } from "./connection";
 import { LENDING_PROGRAM_ID } from "./../constants/ids";
-import { LendingReserveLayout, LendingMarketLayout, LendingMarket, LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser } from "./../models/lending";
-import { cache, getMultipleAccounts } from "./accounts";
+import { LendingReserveLayout, LendingMarketLayout, LendingMarket, LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser, LendingReserve } from "./../models/lending";
+import { cache, getMultipleAccounts, ParsedAccount } from "./accounts";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 import { isForInStatement } from "typescript";
 
@@ -52,14 +52,10 @@ export const useLending = () => {
 
       console.log(accounts);
 
-      const toQuery = accounts
-        .map(
-          (p) =>
-            [
-              // TODO: add dependent accounts ....
-            ].filter((p) => p) as string[]
-        )
-        .flat();
+      const toQuery = [
+        ...accounts.filter(acc => (acc?.info as LendingReserve).lendingMarket !== undefined)
+        .map(acc => (acc?.info as LendingReserve).collateralMint.toBase58())
+      ].flat().filter((p) => p) as string[];
 
       // This will pre-cache all accounts used by pools
       // All those accounts are updated whenever there is a change

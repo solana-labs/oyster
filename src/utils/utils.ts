@@ -52,7 +52,7 @@ export function getTokenName(
   mintAddress?: string,
   shorten = true
 ): string {
-  if(!mintAddress) {
+  if (!mintAddress) {
     return 'N/A';
   }
 
@@ -69,7 +69,7 @@ export function getTokenIcon(
   mintAddress?: string | PublicKey,
 ): string | undefined {
   const address = typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58();
-  if(!address) {
+  if (!address) {
     return;
   }
 
@@ -162,11 +162,21 @@ export const formatUSD = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
-export const formatNumber = new Intl.NumberFormat("en-US", {
+const numberFormater = new Intl.NumberFormat("en-US", {
   style: "decimal",
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+export const formatNumber = {
+  format: (val?: number) => {
+    if (!val) {
+      return '--';
+    }
+
+    return numberFormater.format(val);
+  }
+}
 
 export const formatPct = new Intl.NumberFormat("en-US", {
   style: "percent",

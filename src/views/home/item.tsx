@@ -24,10 +24,11 @@ export const LendingReserveItem = (props: { reserve: LendingReserve, address: Pu
 
   return <Link to={`/reserve/${props.address.toBase58()}`}>
     <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+      <div className="home-item">
         <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
         <div>{formatNumber.format(totalLiquidity)} {name}</div>
         <div>{totalBorrows} {name}</div>
+        <div>--</div>
         <div>--</div>
       </div>
 

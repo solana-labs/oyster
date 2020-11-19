@@ -4,7 +4,7 @@ import { useMint } from "../contexts/accounts";
 import { fromLamports } from "../utils/utils";
 import { useUserAccounts } from "./useUserAccounts";
 
-export function useUserBalance(mint?: PublicKey) {
+export function useUserBalance(mint?: PublicKey, inLamports = false) {
   const { userAccounts } = useUserAccounts();
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
@@ -13,11 +13,11 @@ export function useUserBalance(mint?: PublicKey) {
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
   }, [userAccounts]);
 
-  const balance = useMemo(() =>
-    fromLamports(accounts
-      .reduce((res, item) => res += item.info.amount.toNumber(), 0)
-      , mintInfo),
-    [accounts, mintInfo]);
+  const balance = useMemo(() => {
+    const result =  accounts
+      .reduce((res, item) => res += item.info.amount.toNumber(), 0);
+    return inLamports ? result : fromLamports(result , mintInfo);
+  },[accounts, mintInfo]);
 
   return { balance, accounts };
 }

@@ -7,7 +7,7 @@ import { Button } from "antd";
 
 export const BorrowView = () => {
 
-  return <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+  return <div className="flexColumn">
     Borrow
   </div>;
 }

@@ -57,10 +57,10 @@ export const DepositAdd = (props: { className?: string, reserve: LendingReserve,
 
   const bodyStyle: React.CSSProperties = { 
     display: 'flex', 
+    flex: 1,
     justifyContent: 'center', 
-    width: '100%', 
+    alignItems: 'center',
     height: '100%',
-    alignItems: 'center'
   };
 
   return <Card className={props.className} bodyStyle={bodyStyle}>

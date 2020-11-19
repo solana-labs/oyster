@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useTokenName, useUserAccounts, useUserBalance } from '../../../hooks';
+import { useCollateralBalance, useTokenName, useUserAccounts, useUserBalance } from '../../../hooks';
 import { LendingReserve } from "../../../models/lending";
 import { TokenIcon } from "../../../components/TokenIcon";
 import { formatNumber } from "../../../utils/utils";
@@ -10,18 +10,20 @@ import { PublicKey } from "@solana/web3.js";
 export const ReserveItem = (props: { reserve: LendingReserve, address: PublicKey }) => {
   const name = useTokenName(props.reserve.liquidityMint);
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useUserBalance(props.reserve.collateralMint);
+  const { balance: collateralBalance } = useCollateralBalance(props.reserve);
 
   return <Link to={`/deposit/${props.address.toBase58()}`}>
     <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+      <div className="deposit-item">
         <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
         <div>{formatNumber.format(tokenBalance)} {name}</div>
         <div>{formatNumber.format(collateralBalance)} {name}</div>
         <div>--</div>
-        <Button>
-          <span>Deposit</span>
-        </Button>
+        <div>
+          <Button>
+            <span>Deposit</span>
+          </Button>
+        </div>
       </div>
     </Card>
   </Link>;

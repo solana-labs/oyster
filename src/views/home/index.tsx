@@ -5,14 +5,15 @@ import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber } from "../../utils/utils";
 import { Button } from "antd";
 import { LendingReserveItem } from "./item";
+import './itemStyle.less';
 
 export const HomeView = () => {
   const { reserveAccounts } = useLendingReserves();
 
   // TODO: add total Liquidity amount ...
 
-  return <div>
-    <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+  return <div className="flexColumn">
+    <div className="home-item home-header">
       <div>Asset</div>
       <div>Market Size</div>
       <div>Total Borrowed</div>

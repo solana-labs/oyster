@@ -10,33 +10,36 @@ import { NumericInput } from "../../components/Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { deposit } from './../../actions/deposit';
+import { PublicKey } from "@solana/web3.js";
 import './style.less';
 
-import { DepositAdd } from './../../components/DepositAdd';
-import { UserLendingCard } from './../../components/UserLendingCard';
-import { ReserveStatus } from './../../components/ReserveStatus';
-
-export const ReserveView = () => {
+export const ReserveStatus = (props: { className?: string, reserve: LendingReserve, address: PublicKey }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const { id } = useParams<{ id: string }>();
-  const lendingReserve = useLendingReserve(id);
-  const reserve = lendingReserve?.info;
+  const [value, setValue] = useState('');
 
-  if (!reserve || !lendingReserve) {
-    return null;
-  }
+  const reserve = props.reserve;
+  const address = props.address;
 
-  return <div className="reserve-overview">
-    <div className="reserve-overview-container">
-      <ReserveStatus
-        className="reserve-overview-item reserve-overview-item-left"
-        reserve={reserve}
-        address={lendingReserve.pubkey} />
-      <UserLendingCard
-        className="reserve-overview-item reserve-overview-item-right"
-        reserve={reserve}
-        address={lendingReserve.pubkey} />
+  const name = useTokenName(reserve?.liquidityMint);
+  const { balance: tokenBalance, accounts: fromAccounts } = useUserBalance(reserve?.liquidityMint);
+
+
+  const bodyStyle: React.CSSProperties = { 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  };
+
+  return <Card className={props.className} 
+    title={
+      <>Reserve Status &amp; Configuration</>
+    }
+  bodyStyle={bodyStyle}>
+
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
+      TODO: Reserve Status - add chart
     </div>
-  </div>;
+  </Card >;
 }
