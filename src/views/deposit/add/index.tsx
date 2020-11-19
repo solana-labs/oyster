@@ -32,6 +32,8 @@ export const DepositAddView = () => {
 
       console.log(`utlization: ${reserve.maxUtilizationRate}`)
       console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
+      console.log(`totalBorrows: ${reserve.totalBorrows.toString()}`)
+      console.log(`totalLiquidity: ${reserve.totalLiquidity.toString()}`)
       console.log(`lendingMarket: ${reserve.lendingMarket.toBase58()}`);
 
       const lendingMarket = await cache.get(reserve.lendingMarket);
@@ -43,8 +45,6 @@ export const DepositAddView = () => {
       console.log(`collateralMint: ${reserve.collateralMint.toBase58()}`);
     })();
   }, [lendingReserve])
-
-  console.log(fromAccounts);
 
   const onDeposit = useCallback(() => {
     if (!lendingReserve || !reserve) {
@@ -58,7 +58,7 @@ export const DepositAddView = () => {
       lendingReserve.pubkey,
       connection,
       wallet);
-  }, [value, reserve, fromAccounts]);
+  }, [value, reserve, fromAccounts, lendingReserve]);
 
   return <Card title={(
     <h2 style={{ display: 'flex', alignItems: 'center', width: 400 }}>

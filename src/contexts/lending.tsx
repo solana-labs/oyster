@@ -4,6 +4,7 @@ import { LENDING_PROGRAM_ID } from "./../constants/ids";
 import { LendingReserveLayout, LendingMarketLayout, LendingMarket, LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser } from "./../models/lending";
 import { cache, getMultipleAccounts } from "./accounts";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { isForInStatement } from "typescript";
 
 export interface LendingContextState {
 
@@ -32,19 +33,21 @@ export const useLending = () => {
   const connection = useConnection();
   const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
 
+  const processAccount = useCallback((item) => {
+    if (isLendingReserve(item.account)) {
+      return cache.add(item.pubkey.toBase58(), item.account, LendingReserveParser); 
+    } else if (isLendingMarket(item.account)) {
+      return cache.add(item.pubkey.toBase58(), item.account, LendingMarketParser); 
+    }
+  }, []);
+
   // initial query
   useEffect(() => {
     setLendingAccounts([]);
 
     const queryLendingAccounts = async () => {
       const accounts = (await connection.getProgramAccounts(LENDING_PROGRAM_ID))
-        .map((item) => {
-          if (isLendingReserve(item.account)) {
-            return cache.add(item.pubkey.toBase58(), item.account, LendingReserveParser); 
-          } else if (isLendingMarket(item.account)) {
-            return cache.add(item.pubkey.toBase58(), item.account, LendingMarketParser); 
-          }
-        })
+        .map(processAccount)
         .filter(item => item !== undefined);
 
       console.log(accounts);
@@ -86,16 +89,11 @@ export const useLending = () => {
       LENDING_PROGRAM_ID,
       async (info) => {
         const id = (info.accountId as unknown) as string;
-        if (info.accountInfo.data.length === LendingReserveLayout.span) {
-          const account = info.accountInfo;
-          const updated = {
-            data: LendingReserveLayout.decode(account.data),
-            account: account,
-            pubkey: new PublicKey(id),
-          };
-
-          // TODO: update cache and raise events
-        }
+        const item = {
+          pubkey: new PublicKey(id),
+          account: info.accountInfo,
+        };
+        processAccount(item);
       },
       "singleGossip"
     );
