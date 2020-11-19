@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
+import { useCollateralBalance, useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
 import { LendingReserve, LendingReserveParser } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAccount, useMint } from "../../contexts/accounts";
 import { PublicKey } from "@solana/web3.js";
 
@@ -16,8 +16,13 @@ export const UserLendingCard = (props: {
   address: PublicKey,
 }) => {
   const reserve = props.reserve;
+  const address = props.address;
+
   const name = useTokenName(reserve?.liquidityMint);
   const liquidityMint = useMint(props.reserve.liquidityMint);
+
+  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
+  const { balance: collateralBalance } = useCollateralBalance(props.reserve);
 
   const totalLiquidity = fromLamports(props.reserve.totalLiquidity.toNumber(), liquidityMint);
 
@@ -78,7 +83,7 @@ export const UserLendingCard = (props: {
         Wallet balance:
         </Text>
       <div className="card-cell ">
-        {formatNumber.format(totalLiquidity)} {name}
+        {formatNumber.format(tokenBalance)} {name}
       </div>
     </div>
 
@@ -87,8 +92,23 @@ export const UserLendingCard = (props: {
         You already deposited:
         </Text>
       <div className="card-cell ">
-        {formatNumber.format(totalLiquidity)} {name}
+        {formatNumber.format(collateralBalance)} {name}
       </div>
+    </div>
+
+    <div className="card-row" style={{ marginTop: 20, justifyContent: 'space-evenly' }}>
+      <Link to={`/deposit/${address}`}>
+        <Button>Deposit</Button>
+      </Link>
+      <Link to={`/borrow/${address}`}>
+        <Button disabled={true}>Borrow</Button>
+      </Link>
+      <Link to={`/withdraw/${address}`}>
+        <Button disabled={true}>Withdraw</Button>
+      </Link>
+      <Link to={`/repay/${address}`}>
+        <Button disabled={true}>Repay</Button>
+      </Link>
     </div>
 
  

@@ -54,7 +54,10 @@ export const useLending = () => {
 
       const toQuery = [
         ...accounts.filter(acc => (acc?.info as LendingReserve).lendingMarket !== undefined)
-        .map(acc => (acc?.info as LendingReserve).collateralMint.toBase58())
+        .map(acc => [
+          (acc?.info as LendingReserve).collateralMint.toBase58(),
+          (acc?.info as LendingReserve).liquidityMint.toBase58(),
+        ])
       ].flat().filter((p) => p) as string[];
 
       // This will pre-cache all accounts used by pools
