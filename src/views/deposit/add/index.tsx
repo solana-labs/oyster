@@ -3,7 +3,7 @@ import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from
 import { LendingReserve, LendingReserveParser } from "../../../models/lending";
 import { TokenIcon } from "../../../components/TokenIcon";
 import { formatNumber } from "../../../utils/utils";
-import { Button } from "antd";
+import { Button, Card } from "antd";
 import { useParams } from "react-router-dom";
 import { cache, useAccount } from "../../../contexts/accounts";
 import { NumericInput } from "../../../components/Input/numeric";
@@ -26,16 +26,17 @@ export const DepositAddView = () => {
   useEffect(() => {
     (async () => {
       const reserve = lendingReserve?.info;
-      if(!reserve) {
+      if (!reserve) {
         return;
       }
 
       console.log(`utlization: ${reserve.maxUtilizationRate}`)
+      console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
       console.log(`lendingMarket: ${reserve.lendingMarket.toBase58()}`);
-    
+
       const lendingMarket = await cache.get(reserve.lendingMarket);
       console.log(`lendingMarket quote: ${lendingMarket?.info.quoteMint.toBase58()}`);
-    
+
       console.log(`liquiditySupply: ${reserve.liquiditySupply.toBase58()}`);
       console.log(`liquidityMint: ${reserve.liquidityMint.toBase58()}`);
       console.log(`collateralSupply: ${reserve.collateralSupply.toBase58()}`);
@@ -43,8 +44,10 @@ export const DepositAddView = () => {
     })();
   }, [lendingReserve])
 
+  console.log(fromAccounts);
+
   const onDeposit = useCallback(() => {
-    if(!lendingReserve || !reserve) {
+    if (!lendingReserve || !reserve) {
       return;
     }
 
@@ -57,24 +60,27 @@ export const DepositAddView = () => {
       wallet);
   }, [value, reserve, fromAccounts]);
 
-  return <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
-    <TokenIcon mintAddress={reserve?.liquidityMint} />
-    <NumericInput value={value}
-      onChange={(val: any) => {
-        setValue(val);
-      }}
-      style={{
-        fontSize: 20,
-        boxShadow: "none",
-        borderColor: "transparent",
-        outline: "transpaernt",
-      }}
-      placeholder="0.00"
-    />
-    <div>{name}</div>
+  return <Card title={(
+    <h2 style={{ display: 'flex', alignItems: 'center', width: 400 }}>
+      <TokenIcon mintAddress={reserve?.liquidityMint} style={{ width: 40, height: 40 }} /> Deposit {name}
+    </h2>
+  )}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
 
-    <Button onClick={onDeposit} disabled={fromAccounts.length === 0}>Deposit</Button>
+      <NumericInput value={value}
+        onChange={(val: any) => {
+          setValue(val);
+        }}
+        style={{
+          fontSize: 20,
+          boxShadow: "none",
+          borderColor: "transparent",
+          outline: "transpaernt",
+        }}
+        placeholder="0.00"
+      />
 
-    ADD: {id}
-  </div>;
+      <Button type="primary" onClick={onDeposit} disabled={fromAccounts.length === 0}>Deposit</Button>
+    </div>
+  </Card >;
 }

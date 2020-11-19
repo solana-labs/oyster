@@ -12,9 +12,19 @@ import {
 
 import BasicLayout, { DefaultFooter, PageContainer } from '@ant-design/pro-layout';
 import { AppBar } from "./../AppBar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const AppLayout = (props: any) => {
+  const location = useLocation();
+
+  console.log(location.pathname)
+  const defaultKey = ({
+    '/dashboard': '2',
+    '/deposit': '3',
+    '/borrow': '4'
+
+  } as any)[location.pathname] || '1'
+
   return (
     <div className="App">
       <div className="Banner">
@@ -34,7 +44,7 @@ export const AppLayout = (props: any) => {
           <div title="Fork"><GithubOutlined /></div>
         ]}
         menuContentRender={() => {
-          return <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+          return <Menu theme="dark" defaultSelectedKeys={[defaultKey]} mode="inline">
             <Menu.Item key="1" icon={<HomeOutlined />}>
               <Link
                 to={{
@@ -44,7 +54,7 @@ export const AppLayout = (props: any) => {
                 Home
             </Link>
             </Menu.Item>
-            <Menu.Item key="2" icon={<PieChartOutlined />}>
+            <Menu.Item key="2" icon={<PieChartOutlined />} >
               <Link
                 to={{
                   pathname: "/dashboard",

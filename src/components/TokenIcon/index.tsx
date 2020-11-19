@@ -18,13 +18,13 @@ export const TokenIcon = (props: {
         alt="Token icon"
         className={props.className}
         key={icon}
-        width="20"
-        height="20"
+        width={props.style?.width || '20'}
+        height={props.style?.height || '20'}
         src={icon}
         style={{
           marginRight: "0.5rem",
           marginTop: "0.11rem",
-          borderRadius: "1rem",
+          borderRadius: "10rem",
           backgroundColor: "white",
           backgroundClip: "padding-box",
           ...props.style,

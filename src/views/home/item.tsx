@@ -19,14 +19,15 @@ export const LendingReserveItem = (props: { reserve: LendingReserve, address: Pu
 
   console.log(liquidityMint);
 
-  return <Link to={`/reserve/${props.address.toBase58()}`}><Card>
-    <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-      <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
-      <div>{formatNumber.format(tokenBalance)} {name}</div>
-      <div>{formatNumber.format(collateralBalance)} {name}</div>
-      <div>--</div>
-    </div>
+  return <Link to={`/reserve/${props.address.toBase58()}`}>
+    <Card>
+      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+        <span style={{ display: 'flex' }}><TokenIcon mintAddress={props.reserve.liquidityMint} />{name}</span>
+        <div>{formatNumber.format(tokenBalance)} {name}</div>
+        <div>{formatNumber.format(collateralBalance)} {name}</div>
+        <div>--</div>
+      </div>
 
-  </Card>
+    </Card>
   </Link>;
 }

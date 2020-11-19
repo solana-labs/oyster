@@ -26,8 +26,8 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.publicKey("dexMarket"),
     BufferLayout.u8("maxUtilizationRate"),
 
-    Layout.uint128("cumulative_borrow_rate"),
-    Layout.uint128("total_borrows"),
+    Layout.uint128("cumulativeBorrowRate"),
+    Layout.uint128("totalBorrows"),
 
     Layout.uint64("totalLiquidity"),
     Layout.uint64("collateralMintSupply"),
@@ -53,6 +53,12 @@ export interface LendingReserve {
 
   maxUtilizationRate: number;
   dexMarketPriceUpdatedSlot: BN;
+
+  cumulativeBorrowRate: BN;
+  totalBorrows: BN;
+
+  totalLiquidity: BN;
+  collateralMintSupply: BN;
 
   // Layout.uint128("cumulative_borrow_rate"),
   // Layout.uint128("total_borrows"),
@@ -114,7 +120,9 @@ export const initReserveInstruction = (
     { pubkey: liquiditySupply, isSigner: false, isWritable: true },
     { pubkey: collateralMint, isSigner: false, isWritable: true },
     { pubkey: collateralSupply, isSigner: false, isWritable: true },
-    { pubkey: lendingMarket, isSigner: false, isWritable: true },
+
+    // NOTE: Why lending market needs to be a signer?
+    { pubkey: lendingMarket, isSigner: true, isWritable: true },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
@@ -180,3 +188,44 @@ export const depositInstruction = (
     data,
   });
 };
+
+export const withdrawInstruction = (
+  collateralAmount: number | BN,
+  from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
+  to: PublicKey, // Collateral output SPL Token account,
+  reserveAccount: PublicKey,
+  collateralMint: PublicKey,
+  reserveSupply: PublicKey,
+  reserveAuthority: PublicKey,
+): TransactionInstruction => {
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8("instruction"),
+    Layout.uint64("collateralAmount"),
+  ]);
+
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: 3, // Withdraw instruction
+      collateralAmount: new BN(collateralAmount),
+    },
+    data
+  );
+
+  const keys = [
+    { pubkey: from, isSigner: false, isWritable: true },
+    { pubkey: to, isSigner: false, isWritable: true },
+    { pubkey: reserveAccount, isSigner: false, isWritable: true },
+    { pubkey: collateralMint, isSigner: false, isWritable: true },
+    { pubkey: reserveSupply, isSigner: false, isWritable: true },
+    { pubkey: reserveAuthority, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+  ];
+  return new TransactionInstruction({
+    keys,
+    programId: LENDING_PROGRAM_ID,
+    data,
+  });
+};
+

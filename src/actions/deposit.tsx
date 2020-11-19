@@ -11,12 +11,12 @@ import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import * as Layout from "./../utils/layout"; 
+import * as Layout from "./../utils/layout";
 import { depositInstruction, initReserveInstruction, LendingReserve } from "./../models/lending/reserve";
-import { AccountLayout, Token } from "@solana/spl-token";
+import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
-import { cache, GenericAccountParser } from "../contexts/accounts";
+import { cache, GenericAccountParser, MintParser, ParsedAccount } from "../contexts/accounts";
 import { TokenAccount } from "../models";
 import { isConstructorDeclaration } from "typescript";
 import { LendingMarketParser } from "../models/lending";
@@ -25,9 +25,9 @@ import { sign } from "crypto";
 export const deposit = async (
   from: TokenAccount,
   amount: number,
-  reserve: LendingReserve, 
+  reserve: LendingReserve,
   reserveAddress: PublicKey,
-  connection: Connection, 
+  connection: Connection,
   wallet: any) => {
 
   // TODO: customize ?
@@ -55,8 +55,8 @@ export const deposit = async (
     LENDING_PROGRAM_ID
   );
 
-  // TODO: ...
-  const amountLamports = amount;
+  const mint = (await cache.query(connection, reserve.liquidityMint, MintParser)) as ParsedAccount<MintInfo>;
+  const amountLamports = amount * Math.pow(10, mint?.info.decimals || 0);
 
   const fromAccount = ensureSplAccount(
     instructions,
@@ -78,9 +78,9 @@ export const deposit = async (
       amountLamports,
     )
   );
-  
+
   let toAccount: PublicKey;
-  if(isInitalized) {
+  if (isInitalized) {
     // get destination account
     toAccount = await findOrCreateAccountByMint(
       wallet.publicKey,
@@ -105,8 +105,8 @@ export const deposit = async (
     instructions.push(
       depositInstruction(
         amountLamports,
-        fromAccount, 
-        toAccount, 
+        fromAccount,
+        toAccount,
         authority,
         reserveAddress,
         reserve.liquiditySupply,
@@ -115,7 +115,6 @@ export const deposit = async (
     );
   } else {
     // TODO: finish reserve init
-
     instructions.push(initReserveInstruction(
       amountLamports,
       MAX_UTILIZATION_RATE,
@@ -129,24 +128,24 @@ export const deposit = async (
       reserve.lendingMarket,
       authority,
       reserve.dexMarket,
-    ))
+    ));
   }
 
   try {
-  let tx = await sendTransaction(
-    connection,
-    wallet,
-    instructions.concat(cleanupInstructions),
-    signers,
-    true
-  );
+    let tx = await sendTransaction(
+      connection,
+      wallet,
+      instructions.concat(cleanupInstructions),
+      signers,
+      true
+    );
 
-  notify({
-    message: "Funds deposited.",
-    type: "success",
-    description: `Transaction - ${tx}`,
-  });
-} catch {
-  // TODO:
-}
+    notify({
+      message: "Funds deposited.",
+      type: "success",
+      description: `Transaction - ${tx}`,
+    });
+  } catch {
+    // TODO:
+  }
 }
