@@ -38,4 +38,4 @@ export const LendingMarketParser = (pubKey: PublicKey, info: AccountInfo<Buffer>
 
 
 // TODO:
-// create instructions for init, deposit and withdraw
+// create instructions for init

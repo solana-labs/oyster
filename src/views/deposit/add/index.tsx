@@ -10,78 +10,38 @@ import { NumericInput } from "../../../components/Input/numeric";
 import { useConnection } from "../../../contexts/connection";
 import { useWallet } from "../../../contexts/wallet";
 import { deposit } from './../../../actions/deposit';
+import './style.less';
+
+import { DepositAdd } from './../../../components/DepositAdd';
+import { DepositInfoLine } from './../../../components/DepositInfoLine';
+import { SideReserveOverview, SideReserveOverviewMode } from './../../../components/SideReserveOverview';
 
 export const DepositAddView = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const { id } = useParams<{ id: string }>();
-  const [value, setValue] = useState('');
   const lendingReserve = useLendingReserve(id);
   const reserve = lendingReserve?.info;
 
-  const name = useTokenName(reserve?.liquidityMint);
-  const { balance: tokenBalance, accounts: fromAccounts } = useUserBalance(reserve?.liquidityMint);
-  // const collateralBalance = useUserBalance(reserve?.collateralMint);
+  if (!reserve || !lendingReserve) {
+    return null;
+  }
 
-  useEffect(() => {
-    (async () => {
-      const reserve = lendingReserve?.info;
-      if (!reserve) {
-        return;
-      }
-
-      console.log(`utlization: ${reserve.maxUtilizationRate}`)
-      console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
-      console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
-      console.log(`totalBorrows: ${reserve.totalBorrows.toString()}`)
-      console.log(`totalLiquidity: ${reserve.totalLiquidity.toString()}`)
-      console.log(`lendingMarket: ${reserve.lendingMarket.toBase58()}`);
-
-      const lendingMarket = await cache.get(reserve.lendingMarket);
-      console.log(`lendingMarket quote: ${lendingMarket?.info.quoteMint.toBase58()}`);
-
-      console.log(`liquiditySupply: ${reserve.liquiditySupply.toBase58()}`);
-      console.log(`liquidityMint: ${reserve.liquidityMint.toBase58()}`);
-      console.log(`collateralSupply: ${reserve.collateralSupply.toBase58()}`);
-      console.log(`collateralMint: ${reserve.collateralMint.toBase58()}`);
-    })();
-  }, [lendingReserve])
-
-  const onDeposit = useCallback(() => {
-    if (!lendingReserve || !reserve) {
-      return;
-    }
-
-    deposit(
-      fromAccounts[0],
-      parseFloat(value),
-      reserve,
-      lendingReserve.pubkey,
-      connection,
-      wallet);
-  }, [value, reserve, fromAccounts, lendingReserve]);
-
-  return <Card title={(
-    <h2 style={{ display: 'flex', alignItems: 'center', width: 400 }}>
-      <TokenIcon mintAddress={reserve?.liquidityMint} style={{ width: 40, height: 40 }} /> Deposit {name}
-    </h2>
-  )}>
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
-
-      <NumericInput value={value}
-        onChange={(val: any) => {
-          setValue(val);
-        }}
-        style={{
-          fontSize: 20,
-          boxShadow: "none",
-          borderColor: "transparent",
-          outline: "transpaernt",
-        }}
-        placeholder="0.00"
-      />
-
-      <Button type="primary" onClick={onDeposit} disabled={fromAccounts.length === 0}>Deposit</Button>
+  return <div className="deposit-add">
+    <DepositInfoLine 
+        className="deposit-add-item"
+        reserve={reserve}
+        address={lendingReserve.pubkey} />
+    <div className="deposit-add-container">
+      <DepositAdd
+        className="deposit-add-item deposit-add-item-left"
+        reserve={reserve}
+        address={lendingReserve.pubkey} />
+      <SideReserveOverview
+        className="deposit-add-item deposit-add-item-right"
+        reserve={reserve}
+        address={lendingReserve.pubkey}
+        mode={SideReserveOverviewMode.Deposit} />
     </div>
-  </Card >;
+  </div>;
 }

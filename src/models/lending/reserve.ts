@@ -24,7 +24,10 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     // TODO: replace u32 option with generic quivalent
     BufferLayout.u32('dexMarketOption'),
     Layout.publicKey("dexMarket"),
+
     BufferLayout.u8("maxUtilizationRate"),
+
+    BufferLayout.u8("collateralFactor"),
 
     Layout.uint128("cumulativeBorrowRate"),
     Layout.uint128("totalBorrows"),
@@ -46,13 +49,13 @@ export interface LendingReserve {
   liquidityMint: PublicKey;
   collateralSupply: PublicKey;
   collateralMint: PublicKey;
-  // TODO: replace u32 option with generic quivalent
+
   dexMarketOption: number;
   dexMarket: PublicKey;
   dexMarketPrice: BN; // what is precision on the price?
 
   maxUtilizationRate: number;
-  dexMarketPriceUpdatedSlot: BN;
+  // collateralFactor: number;
 
   cumulativeBorrowRate: BN;
   totalBorrows: BN;
