@@ -3,7 +3,7 @@ import { useConnection } from "./connection";
 import { useWallet } from "./wallet";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { programIds, WRAPPED_SOL_MINT } from "./../constants/ids";
-import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
+import { AccountLayout, u64, MintInfo, MintLayout, Token } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
 import { chunks } from "./../utils/utils";
 import { EventEmitter } from "./../utils/eventEmitter";
@@ -197,6 +197,15 @@ const UseNativeAccount = () => {
   const { wallet } = useWallet();
 
   const [nativeAccount, setNativeAccount] = useState<AccountInfo<Buffer>>();
+
+  const updateCache = useCallback((account) => {
+    const wrapped = wrapNativeAccount(wallet.publicKey, account);
+    if(wrapped !== undefined && wallet) {
+      cache.registerParser(wallet.publicKey.toBase58(), TokenAccountParser);
+      genericCache.set(wallet.publicKey.toBase58(), wrapped as TokenAccount);
+    }
+  }, [wallet]);
+
   useEffect(() => {
     if (!connection || !wallet?.publicKey) {
       return;
@@ -204,11 +213,13 @@ const UseNativeAccount = () => {
 
     connection.getAccountInfo(wallet.publicKey).then((acc) => {
       if (acc) {
+        updateCache(acc);
         setNativeAccount(acc);
       }
     });
     connection.onAccountChange(wallet.publicKey, (acc) => {
       if (acc) {
+        updateCache(acc);
         setNativeAccount(acc);
       }
     });
@@ -249,16 +260,12 @@ export function AccountsProvider({ children = null as any }) {
   const selectUserAccounts = useCallback(() => {
     return cache.byParser(TokenAccountParser).map(id => cache.get(id)).filter(
       (a) => a && a.info.owner.toBase58() === wallet.publicKey.toBase58()
-    ).map(a => a?.info as TokenAccount);
+    ).map(a => a as TokenAccount);
   }, [wallet]);
 
   useEffect(() => {
-    setUserAccounts(
-      [
-        wrapNativeAccount(wallet.publicKey, nativeAccount),
-        ...tokenAccounts,
-      ].filter((a) => a !== undefined) as TokenAccount[]
-    );
+    const accounts = selectUserAccounts().filter((a) => a !== undefined) as TokenAccount[];
+    setUserAccounts(accounts);
   }, [nativeAccount, wallet, tokenAccounts]);
 
   const publicKey = wallet?.publicKey;

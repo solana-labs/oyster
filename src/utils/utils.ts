@@ -89,7 +89,22 @@ export function chunks<T>(array: T[], size: number): T[][] {
   ).map((_, index) => array.slice(index * size, (index + 1) * size));
 }
 
-export function convert(
+export function toLamports(
+  account?: TokenAccount | number,
+  mint?: MintInfo
+): number {
+  if (!account) {
+    return 0;
+  }
+
+  const amount =
+    typeof account === "number" ? account : account.info.amount?.toNumber();
+
+  const precision = Math.pow(10, mint?.decimals || 0);
+  return (amount * precision);
+}
+
+export function fromLamports(
   account?: TokenAccount | number,
   mint?: MintInfo,
   rate: number = 1.0
@@ -136,7 +151,7 @@ export function formatTokenAmount(
   }
 
   return `${[prefix]}${format(
-    convert(account, mint, rate),
+    fromLamports(account, mint, rate),
     precision,
     abbr
   )}${suffix}`;

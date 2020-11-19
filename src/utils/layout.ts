@@ -52,7 +52,6 @@ export const uint64 = (property = "uint64"): unknown => {
       b.copy(zeroPad);
       b = zeroPad;
     }
-
     return _encode(b, buffer, offset);
   };
 

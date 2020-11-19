@@ -21,6 +21,7 @@ import { TokenAccount } from "../models";
 import { isConstructorDeclaration } from "typescript";
 import { LendingMarketParser } from "../models/lending";
 import { sign } from "crypto";
+import { fromLamports, toLamports } from "../utils/utils";
 
 export const deposit = async (
   from: TokenAccount,
@@ -56,7 +57,7 @@ export const deposit = async (
   );
 
   const mint = (await cache.query(connection, reserve.liquidityMint, MintParser)) as ParsedAccount<MintInfo>;
-  const amountLamports = amount * Math.pow(10, mint?.info.decimals || 0);
+  const amountLamports = toLamports(amount, mint?.info);
 
   const fromAccount = ensureSplAccount(
     instructions,
@@ -88,7 +89,7 @@ export const deposit = async (
       instructions,
       cleanupInstructions,
       accountRentExempt,
-      reserve.liquidityMint,
+      reserve.collateralMint,
       signers
     );
   } else {

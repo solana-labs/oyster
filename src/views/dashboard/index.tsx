@@ -9,6 +9,9 @@ export const DashboardView = () => {
   const { reserveAccounts } = useLendingReserves();
 
   return <div>
-    DASHBOARD
+    DASHBOARD: 
+    TODO:
+    1. Add deposits
+    2. Add obligations
   </div>;
 }

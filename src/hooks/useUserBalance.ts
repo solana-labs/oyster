@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 import { useMint } from "../contexts/accounts";
-import { convert } from "../utils/utils";
+import { fromLamports } from "../utils/utils";
 import { useUserAccounts } from "./useUserAccounts";
 
 export function useUserBalance(mint?: PublicKey) {
@@ -14,7 +14,7 @@ export function useUserBalance(mint?: PublicKey) {
   }, [userAccounts]);
 
   const balance = useMemo(() =>
-    convert(accounts
+    fromLamports(accounts
       .reduce((res, item) => res += item.info.amount.toNumber(), 0)
       , mintInfo),
     [accounts, mintInfo]);
