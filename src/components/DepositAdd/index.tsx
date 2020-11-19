@@ -75,6 +75,7 @@ export const DepositAdd = (props: { className?: string, reserve: LendingReserve,
           onChange={(val: any) => {
             setValue(val);
           }}
+          autoFocus={true}
           style={{
             fontSize: 20,
             boxShadow: "none",

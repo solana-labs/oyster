@@ -18,12 +18,15 @@ export const AppLayout = (props: any) => {
   const location = useLocation();
 
   console.log(location.pathname)
-  const defaultKey = ({
+  const paths: { [key: string]: string } = {
     '/dashboard': '2',
     '/deposit': '3',
     '/borrow': '4'
 
-  } as any)[location.pathname] || '1'
+  };
+
+  const current = [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) || '';
+  const defaultKey = paths[current] || "1";
 
   return (
     <div className="App">
