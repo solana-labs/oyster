@@ -32,6 +32,7 @@ export const DepositAddView = () => {
 
       console.log(`utlization: ${reserve.maxUtilizationRate}`)
       console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
+      console.log(`cumulativeBorrowRate: ${reserve.cumulativeBorrowRate.toString()}`)
       console.log(`totalBorrows: ${reserve.totalBorrows.toString()}`)
       console.log(`totalLiquidity: ${reserve.totalLiquidity.toString()}`)
       console.log(`lendingMarket: ${reserve.lendingMarket.toBase58()}`);
