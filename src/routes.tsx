@@ -10,10 +10,11 @@ import { AppLayout } from "./components/Layout";
 import { 
   HomeView,
   DepositView,
-  DepositAddView,
+  DepositReserveView,
   BorrowView,
   ReserveView,
   DashboardView,
+  BorrowReserveView,
  } from './views';
 
 export function Routes() {
@@ -31,8 +32,9 @@ export function Routes() {
                       <Route exact path="/dashboard" children={<DashboardView />} />
                       <Route path="/reserve/:id" children={<ReserveView />} />
                       <Route exact path="/deposit" component={() => <DepositView />} />
-                      <Route path="/deposit/:id" children={<DepositAddView />} />
+                      <Route path="/deposit/:id" children={<DepositReserveView />} />
                       <Route exact path="/borrow" children={<BorrowView />} />
+                      <Route path="/borrow/:id" children={<BorrowReserveView />} />
                     </Switch>
                   </AppLayout>
                 </LendingProvider>

@@ -50,8 +50,6 @@ export const useLending = () => {
         .map(processAccount)
         .filter(item => item !== undefined);
 
-      console.log(accounts);
-
       const toQuery = [
         ...accounts.filter(acc => (acc?.info as LendingReserve).lendingMarket !== undefined)
         .map(acc => [

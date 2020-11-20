@@ -101,7 +101,7 @@ export const UserLendingCard = (props: {
         <Button>Deposit</Button>
       </Link>
       <Link to={`/borrow/${address}`}>
-        <Button disabled={true}>Borrow</Button>
+        <Button>Borrow</Button>
       </Link>
       <Link to={`/withdraw/${address}`}>
         <Button disabled={true}>Withdraw</Button>
