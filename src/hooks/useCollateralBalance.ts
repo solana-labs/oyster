@@ -1,16 +1,19 @@
-import { PublicKey } from "@solana/web3.js";
-import { useMemo } from "react";
-import { useAccount, useMint } from "../contexts/accounts";
+import { useMint } from "../contexts/accounts";
 import { LendingReserve } from "../models/lending";
 import { fromLamports } from "../utils/utils";
-import { useUserAccounts } from "./useUserAccounts";
 import { useUserBalance } from "./useUserBalance";
 
 export function useCollateralBalance(reserve?: LendingReserve) {
   const mint = useMint(reserve?.collateralMint);
-  const { balance: nativeBalance, accounts  } = useUserBalance(reserve?.collateralMint, true);
+  const { balanceLamports, accounts } = useUserBalance(reserve?.collateralMint);
 
-  const balance = fromLamports((reserve?.totalLiquidity.toNumber() || 0) * (nativeBalance / (reserve?.collateralMintSupply.toNumber() || 1)), mint);
+  const collateralRatioLamports =
+    (reserve?.totalLiquidity.toNumber() || 0) *
+    (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
 
-  return { balance, accounts };
+  return {
+    balance: fromLamports(collateralRatioLamports, mint),
+    balanceLamports: collateralRatioLamports,
+    accounts
+  };
 }

@@ -1,11 +1,10 @@
-import React, { useMemo } from "react";
-import { useCollateralBalance, useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
-import { LendingReserve, LendingReserveParser } from "../../models/lending";
-import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
+import React from "react";
+import { useCollateralBalance, useTokenName, useUserBalance } from './../../hooks';
+import { LendingReserve } from "../../models/lending";
+import { formatNumber, fromLamports } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
-import { Link, useParams } from "react-router-dom";
-import { useAccount, useMint } from "../../contexts/accounts";
+import { Link } from "react-router-dom";
+import { useMint } from "../../contexts/accounts";
 import { PublicKey } from "@solana/web3.js";
 
 const { Text } = Typography;
@@ -24,7 +23,6 @@ export const UserLendingCard = (props: {
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
   const { balance: collateralBalance } = useCollateralBalance(props.reserve);
 
-  const totalLiquidity = fromLamports(props.reserve.totalLiquidity.toNumber(), liquidityMint);
 
   // TODO: calculate
   const borrowed = 0;

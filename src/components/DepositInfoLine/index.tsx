@@ -1,15 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance, useCollateralBalance } from './../../hooks';
-import { LendingReserve, LendingReserveParser } from "../../models/lending";
-import { TokenIcon } from "../../components/TokenIcon";
+import React, {  } from "react";
+import { useTokenName, useUserBalance, useCollateralBalance } from './../../hooks';
+import { LendingReserve } from "../../models/lending";
 import { formatNumber } from "../../utils/utils";
-import { Button, Card } from "antd";
-import { useParams } from "react-router-dom";
-import { cache, useAccount } from "../../contexts/accounts";
-import { NumericInput } from "../../components/Input/numeric";
-import { useConnection } from "../../contexts/connection";
-import { useWallet } from "../../contexts/wallet";
-import { deposit } from './../../actions/deposit';
+import { Card } from "antd";
 import './style.less';
 import { PublicKey } from "@solana/web3.js";
 

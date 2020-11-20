@@ -1,10 +1,9 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useConnection } from "./connection";
 import { LENDING_PROGRAM_ID } from "./../constants/ids";
-import { LendingReserveLayout, LendingMarketLayout, LendingMarket, LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser, LendingReserve } from "./../models/lending";
-import { cache, getMultipleAccounts, ParsedAccount } from "./accounts";
-import { AccountInfo, PublicKey } from "@solana/web3.js";
-import { isForInStatement } from "typescript";
+import { LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser, LendingReserve } from "./../models/lending";
+import { cache, getMultipleAccounts } from "./accounts";
+import { PublicKey } from "@solana/web3.js";
 
 export interface LendingContextState {
 
@@ -64,7 +63,6 @@ export const useLending = () => {
       await getMultipleAccounts(connection, toQuery, "single").then(
         ({ keys, array }) => {
           return array.map((obj, index) => {
-            const pubKey = new PublicKey(keys[index]);
             // TODO: add to cache
 
             return obj;
