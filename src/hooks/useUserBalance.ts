@@ -11,12 +11,12 @@ export function useUserBalance(mint?: PublicKey) {
     return userAccounts
       .filter(acc => mint?.equals(acc.info.mint))
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
-  }, [userAccounts]);
+  }, [userAccounts, mint]);
 
   const balanceLamports = useMemo(() => {
     return accounts
       .reduce((res, item) => res += item.info.amount.toNumber(), 0);
-  },[accounts, mintInfo]);
+  },[accounts]);
 
   return {
     balance: fromLamports(balanceLamports, mintInfo),

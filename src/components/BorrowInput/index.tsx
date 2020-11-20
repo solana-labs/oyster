@@ -1,18 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useCollateralBalance, useLendingReserve, useLendingReserves, useTokenName, useUserAccounts, useUserBalance } from '../../hooks';
+import React, { useCallback, useMemo, useState } from "react";
+import { useCollateralBalance, useLendingReserves, useTokenName, useUserBalance } from '../../hooks';
 import { LendingReserve, LendingReserveParser } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { formatNumber, getTokenName } from "../../utils/utils";
+import { getTokenName } from "../../utils/utils";
 import { Button, Card, Select } from "antd";
 import { useParams } from "react-router-dom";
-import { cache, ParsedAccount, useAccount } from "../../contexts/accounts";
+import { cache, ParsedAccount } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection, useConnectionConfig } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { borrow } from '../../actions';
 import { PublicKey } from "@solana/web3.js";
 import './style.less';
-import { Token } from "@solana/spl-token";
 
 const { Option } = Select;
 
@@ -55,7 +54,6 @@ const CollateralSelector = (props: {
 export const BorrowInput = (props: { className?: string, reserve: LendingReserve, address: PublicKey }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const { id } = useParams<{ id: string }>();
   const [value, setValue] = useState('');
 
   const borrowReserve = props.reserve;
@@ -71,25 +69,17 @@ export const BorrowInput = (props: { className?: string, reserve: LendingReserve
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveMint])
 
-  const collateral = useCollateralBalance(collateralReserve?.info);
 
   const name = useTokenName(borrowReserve?.liquidityMint);
   const {
-    balance: tokenBalance,
     accounts: fromAccounts
   } = useUserBalance(collateralReserve?.info.collateralMint);
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
-
-  if(collateral) {
-    debugger;
-  }
 
   const onBorrow = useCallback(() => {
     if (!collateralReserve) {
       return;
     }
-
-    debugger;
 
     borrow(
       fromAccounts[0],

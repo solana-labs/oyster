@@ -15,6 +15,8 @@ import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 import { EventEmitter } from "./../utils/eventEmitter";
 
+import { DexMarketParser } from "./../models/dex";
+
 export interface MarketsContextState {
   midPriceInUSD: (mint: string) => number;
   marketEmitter: EventEmitter;
@@ -39,7 +41,9 @@ export function MarketProvider({ children = null as any }) {
   ]);
 
   // TODO: identify which markets to query ...
-  const mints = useMemo(() => [] as PublicKey[], []);
+  const mints = useMemo(() => [
+    
+  ] as PublicKey[], []);
 
   const marketByMint = useMemo(() => {
     return [
@@ -107,24 +111,7 @@ export function MarketProvider({ children = null as any }) {
             if (market) {
               const programId = market.marketInfo.programId;
               const id = market.marketInfo.address;
-              cache.add(id, item, (id, acc) => {
-                const decoded = Market.getLayout(programId).decode(acc.data);
-
-                const details = {
-                  pubkey: id,
-                  account: {
-                    ...acc,
-                  },
-                  info: decoded,
-                } as ParsedAccountBase;
-
-                cache.registerParser(details.info.baseMint, MintParser);
-                cache.registerParser(details.info.quoteMint, MintParser);
-                cache.registerParser(details.info.bids, OrderBookParser);
-                cache.registerParser(details.info.asks, OrderBookParser);
-
-                return details;
-              });
+              cache.add(id, item, DexMarketParser);
             }
           }
 
@@ -256,19 +243,7 @@ export const useMidPriceInUSD = (mint: string) => {
   return { price, isBase: price === 1.0 };
 };
 
-const OrderBookParser = (id: PublicKey, acc: AccountInfo<Buffer>) => {
-  const decoded = Orderbook.LAYOUT.decode(acc.data);
 
-  const details = {
-    pubkey: id,
-    account: {
-      ...acc,
-    },
-    info: decoded,
-  } as ParsedAccountBase;
-
-  return details;
-};
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

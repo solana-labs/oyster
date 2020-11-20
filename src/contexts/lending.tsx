@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useConnection } from "./connection";
 import { LENDING_PROGRAM_ID } from "./../constants/ids";
 import { LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser, LendingReserve } from "./../models/lending";
-import { cache, getMultipleAccounts } from "./accounts";
+import { cache, getMultipleAccounts, MintParser, ParsedAccount } from "./accounts";
 import { PublicKey } from "@solana/web3.js";
+import { DexMarketParser } from "../models/dex";
 
 export interface LendingContextState {
 
@@ -51,20 +52,25 @@ export const useLending = () => {
 
       const toQuery = [
         ...accounts.filter(acc => (acc?.info as LendingReserve).lendingMarket !== undefined)
-        .map(acc => [
-          (acc?.info as LendingReserve).collateralMint.toBase58(),
-          (acc?.info as LendingReserve).liquidityMint.toBase58(),
-          (acc?.info as LendingReserve).dexMarket.toBase58(),
-        ])
-      ].flat().filter((p) => p) as string[];
+        .map(acc => acc as ParsedAccount<LendingReserve>)
+        .map(acc => {
+          const result = [
+            cache.registerParser(acc?.info.collateralMint.toBase58(), MintParser),
+            cache.registerParser(acc?.info.liquidityMint.toBase58(), MintParser),
+            // ignore dex if its not set
+            cache.registerParser(acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : '', DexMarketParser),
+        ].filter(_ => _);
+        return result;
+      })
+      ].flat() as string[];
 
       // This will pre-cache all accounts used by pools
       // All those accounts are updated whenever there is a change
       await getMultipleAccounts(connection, toQuery, "single").then(
         ({ keys, array }) => {
           return array.map((obj, index) => {
-            // TODO: add to cache
-
+            const address = keys[index];
+            cache.add(address, obj);
             return obj;
           }) as any[];
         }

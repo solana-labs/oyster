@@ -44,6 +44,31 @@ export function ensureSplAccount(
   return account;
 }
 
+export const DEFAULT_TEMP_MEM_SPACE = 65528;
+
+export function createTempMemoryAccount(
+  instructions: TransactionInstruction[], 
+  payer: PublicKey, 
+  signers: Account[],
+  space = DEFAULT_TEMP_MEM_SPACE) {
+  const account = new Account();
+  instructions.push(
+    SystemProgram.createAccount({
+      fromPubkey: payer,
+      newAccountPubkey: account.publicKey,
+      // 0 will evict/clost account since it cannot pay rent
+      lamports: 0,
+      space: space,
+      programId: TOKEN_PROGRAM_ID,
+    })
+  );
+
+  signers.push(account);
+
+  return account.publicKey;
+}
+
+
 export function createUninitializedAccount(
   instructions: TransactionInstruction[], 
   payer: PublicKey, 

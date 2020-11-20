@@ -42,6 +42,7 @@ export const DepositInput = (props: { className?: string, reserve: LendingReserv
       console.log(`liquidityMint: ${reserve.liquidityMint.toBase58()}`);
       console.log(`collateralSupply: ${reserve.collateralSupply.toBase58()}`);
       console.log(`collateralMint: ${reserve.collateralMint.toBase58()}`);
+      console.log(`dexMarket: ${reserve.dexMarket.toBase58()}`);
     })();
   }, [reserve])
 

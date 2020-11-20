@@ -12,16 +12,20 @@ import { notify } from "./../utils/notifications";
 import { ExplorerLink } from "../components/ExplorerLink";
 import LocalTokens from '../config/tokens.json';
 
-export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
+export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet" | "lending";
 
 export const ENDPOINTS = [
+  {
+    name: 'lending' as ENV,
+    endpoint: "https://tln.solana.com",
+  },
   {
     name: "mainnet-beta" as ENV,
     endpoint: "https://solana-api.projectserum.com/",
   },
   { name: "testnet" as ENV, endpoint: clusterApiUrl("testnet") },
   { name: "devnet" as ENV, endpoint: clusterApiUrl("devnet") },
-  { name: "localnet" as ENV, endpoint: "http://35.206.228.142:8899" },
+  { name: "localnet" as ENV, endpoint: "http://127.0.0.1:8899" },
 ];
 
 const DEFAULT = ENDPOINTS[0].endpoint;

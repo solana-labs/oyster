@@ -16,6 +16,7 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.uint64("lastUpdateSlot"),
     Layout.publicKey("lendingMarket"),
     Layout.publicKey("liquidityMint"),
+    BufferLayout.u8("liquidityMintDecimals"),
     Layout.publicKey("liquiditySupply"),
     Layout.publicKey("collateralMint"),
     Layout.publicKey("collateralSupply"),
@@ -23,9 +24,16 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     BufferLayout.u32('dexMarketOption'),
     Layout.publicKey("dexMarket"),
 
-    BufferLayout.u8("maxUtilizationRate"),
-
-    BufferLayout.u8("collateralFactor"),
+    BufferLayout.struct([
+      /// Max utilization rate as a percent
+      BufferLayout.u8("maxUtilizationRate"),
+      /// The ratio of the loan to the value of the collateral as a percent
+      BufferLayout.u8("loanToValueRatio"),
+      /// The percent discount the liquidator gets when buying collateral for an unhealthy obligation
+      BufferLayout.u8("liquidationBonus"),
+      /// The percent at which an obligation is considered unhealthy
+      BufferLayout.u8("liquidationThreshold"),
+    ], "config"),
 
     Layout.uint128("cumulativeBorrowRate"),
     Layout.uint128("totalBorrows"),
@@ -36,6 +44,8 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
 );
 
 export const isLendingReserve = (info: AccountInfo<Buffer>) => {
+  console.log(LendingReserveLayout.span);
+  console.log(info.data.length);
   return info.data.length === LendingReserveLayout.span;
 }
 

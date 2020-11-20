@@ -24,7 +24,7 @@ export interface ParsedAccountBase {
 export type AccountParser = (
   pubkey: PublicKey,
   data: AccountInfo<Buffer>
-) => ParsedAccountBase;
+) => ParsedAccountBase | undefined;
 
 export interface ParsedAccount<T> extends ParsedAccountBase {
   info: T;
@@ -47,7 +47,7 @@ export const MintParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
 };
 
 export const TokenAccountParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
-  const buffer = Buffer.from(info.data); 
+  const buffer = Buffer.from(info.data);
   const data = deserializeAccount(buffer);
 
   const details = {
@@ -130,6 +130,10 @@ export const cache = {
     cache.registerParser(id, deserialize);
     pendingCalls.delete(address);
     const account = deserialize(new PublicKey(address), obj);
+    if (!account) {
+      return;
+    }
+
     genericCache.set(address, account);
     cache.emitter.raiseCacheUpdated(address, deserialize);
     return account;
@@ -146,8 +150,8 @@ export const cache = {
   },
   byParser: (parser: AccountParser) => {
     const result: string[] = [];
-    for(const id of keyToAccountParser.keys()) {
-      if(keyToAccountParser.get(id) === parser) {
+    for (const id of keyToAccountParser.keys()) {
+      if (keyToAccountParser.get(id) === parser) {
         result.push(id);
       }
     }
@@ -155,8 +159,12 @@ export const cache = {
     return result;
   },
   registerParser: (pubkey: PublicKey | string, parser: AccountParser) => {
-    const address = typeof pubkey === 'string' ? pubkey : pubkey?.toBase58();
-    keyToAccountParser.set(address, parser);
+    if (pubkey) {
+      const address = typeof pubkey === 'string' ? pubkey : pubkey?.toBase58();
+      keyToAccountParser.set(address, parser);
+    }
+
+    return pubkey;
   },
 };
 
@@ -200,7 +208,7 @@ const UseNativeAccount = () => {
 
   const updateCache = useCallback((account) => {
     const wrapped = wrapNativeAccount(wallet.publicKey, account);
-    if(wrapped !== undefined && wallet) {
+    if (wrapped !== undefined && wallet) {
       cache.registerParser(wallet.publicKey.toBase58(), TokenAccountParser);
       genericCache.set(wallet.publicKey.toBase58(), wrapped as TokenAccount);
     }
@@ -352,7 +360,7 @@ export const getMultipleAccounts = async (
     .map(
       (a) =>
         a.array.map((acc) => {
-          if(!acc) {
+          if (!acc) {
             return;
           }
 

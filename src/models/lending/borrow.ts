@@ -48,12 +48,15 @@ export const borrowInstruction = (
 
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
+
+  memory: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
     Layout.uint64("collateralAmount"),
   ]);
 
+  debugger;
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
@@ -77,6 +80,7 @@ export const borrowInstruction = (
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: true },
     { pubkey: dexMarket, isSigner: false, isWritable: true },
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },
+    { pubkey: memory, isSigner: false, isWritable: true },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
