@@ -12,6 +12,7 @@ import * as BufferLayout from "buffer-layout";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import { sendTransaction } from "../../contexts/connection";
 import * as Layout from "./../../utils/layout";
+import { LendingInstruction } from './lending';
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
@@ -108,7 +109,7 @@ export const initReserveInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: 1, // Init reserve instruction
+      instruction: LendingInstruction.InitReserve, // Init reserve instruction
       liquidityAmount: new BN(liquidityAmount),
       maxUtilizationRate: maxUtilizationRate,
     },
@@ -169,7 +170,7 @@ export const depositInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: 2, // Deposit instruction
+      instruction: LendingInstruction.DepositReserveLiquidity, // Deposit instruction
       liquidityAmount: new BN(liquidityAmount),
     },
     data

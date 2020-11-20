@@ -19,27 +19,43 @@ export const BorrowInput = (props: { className?: string, reserve: LendingReserve
   const { id } = useParams<{ id: string }>();
   const [value, setValue] = useState('');
 
-  const reserve = props.reserve;
-  const address = props.address;
+  const borrowReserve = props.reserve;
+  const borrowReserveAddress = props.address;
 
-  const name = useTokenName(reserve?.liquidityMint);
-  const { balance: tokenBalance, accounts: fromAccounts } = useUserBalance(reserve?.liquidityMint);
+  const [collateralReserve, setCollateralReserve] = useState<LendingReserve>();
+
+  const collateralReserveAddress = useMemo(() => {
+    return cache.byParser(LendingReserveParser)
+      .find(acc => cache.get(acc) === collateralReserve);
+  }, [collateralReserve])
+
+  const name = useTokenName(borrowReserve?.liquidityMint);
+  const { 
+    balance: tokenBalance, 
+    accounts: fromAccounts 
+  } = useUserBalance(collateralReserve?.liquidityMint);
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
   const onBorrow = useCallback(() => {
+    if(!collateralReserve || !collateralReserveAddress) {
+      return;
+    }
+
     borrow(
       fromAccounts[0],
       parseFloat(value),
-      reserve,
-      address,
+      borrowReserve,
+      borrowReserveAddress,
+      collateralReserve,
+      new PublicKey(collateralReserveAddress),
       connection,
       wallet);
-  }, [value, reserve, fromAccounts, address]);
+  }, [value, borrowReserve, fromAccounts, borrowReserveAddress]);
 
-  const bodyStyle: React.CSSProperties = { 
-    display: 'flex', 
+  const bodyStyle: React.CSSProperties = {
+    display: 'flex',
     flex: 1,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
   };
@@ -51,7 +67,7 @@ export const BorrowInput = (props: { className?: string, reserve: LendingReserve
         How much would you like to borrow?
       </div>
       <div className="token-input">
-        <TokenIcon mintAddress={reserve?.liquidityMint} />
+        <TokenIcon mintAddress={borrowReserve?.liquidityMint} />
         <NumericInput value={value}
           onChange={(val: any) => {
             setValue(val);

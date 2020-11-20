@@ -55,6 +55,7 @@ export const useLending = () => {
         .map(acc => [
           (acc?.info as LendingReserve).collateralMint.toBase58(),
           (acc?.info as LendingReserve).liquidityMint.toBase58(),
+          (acc?.info as LendingReserve).dexMarket.toBase58(),
         ])
       ].flat().filter((p) => p) as string[];
 

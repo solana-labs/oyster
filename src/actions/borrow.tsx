@@ -1,33 +1,29 @@
 import {
   Account,
-  AccountInfo,
   Connection,
   PublicKey,
-  sendAndConfirmRawTransaction,
-  SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from "@solana/web3.js";
-import BN from "bn.js";
-import * as BufferLayout from "buffer-layout";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import * as Layout from "./../utils/layout";
-import { depositInstruction, initReserveInstruction, LendingReserve } from "./../models/lending/reserve";
-import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
+import { LendingReserve } from "./../models/lending/reserve";
+import { AccountLayout, MintInfo, MintLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
-import { cache, GenericAccountParser, MintParser, ParsedAccount } from "../contexts/accounts";
-import { TokenAccount } from "../models";
-import { isConstructorDeclaration } from "typescript";
-import { LendingMarketParser } from "../models/lending";
-import { sign } from "crypto";
-import { fromLamports, toLamports } from "../utils/utils";
+import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
+import { TokenAccount, LendingObligationLayout, borrowInstruction, LendingMarket } from "../models";
+import { toLamports } from "../utils/utils";
 
 export const borrow = async (
   from: TokenAccount,
   amount: number,
-  reserve: LendingReserve,
-  reserveAddress: PublicKey,
+
+  borrowReserve: LendingReserve,
+  borrowReserveAddress: PublicKey,
+
+  depositReserve: LendingReserve,
+  depositReserveAddress: PublicKey,
+
   connection: Connection,
   wallet: any) => {
 
@@ -37,9 +33,6 @@ export const borrow = async (
     type: "warn",
   });
 
-  const isInitalized = true; // TODO: finish reserve init
-
-  // user from account
   const signers: Account[] = [];
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
@@ -49,11 +42,11 @@ export const borrow = async (
   );
 
   const [authority] = await PublicKey.findProgramAddress(
-    [reserve.lendingMarket.toBuffer()], // which account should be authority
+    [depositReserve.lendingMarket.toBuffer()], // which account should be authority
     LENDING_PROGRAM_ID
   );
 
-  const mint = (await cache.query(connection, reserve.liquidityMint, MintParser)) as ParsedAccount<MintInfo>;
+  const mint = (await cache.query(connection, depositReserve.collateralMint, MintParser)) as ParsedAccount<MintInfo>;
   const amountLamports = toLamports(amount, mint?.info);
 
   const fromAccount = ensureSplAccount(
@@ -77,37 +70,77 @@ export const borrow = async (
     )
   );
 
-  let toAccount: PublicKey;
-  if (isInitalized) {
-    // get destination account
-    toAccount = await findOrCreateAccountByMint(
-      wallet.publicKey,
-      wallet.publicKey,
-      instructions,
-      cleanupInstructions,
-      accountRentExempt,
-      reserve.collateralMint,
-      signers
-    );
-  } else {
-    toAccount = createUninitializedAccount(
-      instructions,
-      wallet.publicKey,
-      accountRentExempt,
-      signers,
-    );
+  let toAccount = await findOrCreateAccountByMint(
+    wallet.publicKey,
+    wallet.publicKey,
+    instructions,
+    cleanupInstructions,
+    accountRentExempt,
+    borrowReserve.liquidityMint,
+    signers
+  );
+
+  const obligation = createUninitializedAccount(
+    instructions,
+    wallet.publicKey,
+    await connection.getMinimumBalanceForRentExemption(
+      LendingObligationLayout.span
+    ),
+    signers,
+  );
+
+  const obligationMint = createUninitializedAccount(
+    instructions,
+    wallet.publicKey,
+    await connection.getMinimumBalanceForRentExemption(
+      MintLayout.span
+    ),
+    signers,
+  );
+
+  const obligationTokenOutput = createUninitializedAccount(
+    instructions,
+    wallet.publicKey,
+    accountRentExempt,
+    signers,
+  );
+
+  const market = cache.get(depositReserve.lendingMarket) as ParsedAccount<LendingMarket>;
+  
+  
+  const dexMarketAddress = market.info.quoteMint.equals(borrowReserve.liquidityMint) ? 
+    borrowReserve.dexMarket : 
+    depositReserve.dexMarket;
+
+  const dexMarket = cache.get(dexMarketAddress);
+  if(!dexMarket) {
+    throw new Error(`Dex market doesn't exsists.`)
   }
+
+  const dexOrderBookSide = market.info.quoteMint.equals(borrowReserve.liquidityMint) ? 
+    dexMarket.info.bids : 
+    dexMarket.info.asks;
 
   // deposit  
   instructions.push(
-    depositInstruction(
+    borrowInstruction(
       amountLamports,
       fromAccount,
       toAccount,
+      depositReserveAddress,
+      depositReserve.liquiditySupply,
+      borrowReserveAddress,
+      borrowReserve.liquiditySupply,
+
+      obligation,
+      obligationMint,
+      obligationTokenOutput,
+      wallet.publicKey,
+
       authority,
-      reserveAddress,
-      reserve.liquiditySupply,
-      reserve.collateralMint,
+
+      dexMarketAddress,
+      dexOrderBookSide,
     )
   );
   try {

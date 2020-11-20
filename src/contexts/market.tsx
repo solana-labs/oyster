@@ -15,11 +15,6 @@ import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 import { EventEmitter } from "./../utils/eventEmitter";
 
-interface RecentPoolData {
-  pool_identifier: string;
-  volume24hA: number;
-}
-
 export interface MarketsContextState {
   midPriceInUSD: (mint: string) => number;
   marketEmitter: EventEmitter;
