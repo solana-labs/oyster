@@ -44,7 +44,7 @@ export class EventEmitter {
   onCache(callback: (args: CacheUpdateEvent) => void) {
     this.emitter.on(CacheUpdateEvent.type, callback);
 
-    return () => this.emitter.removeListener(CacheUpdateEvent .type, callback);
+    return () => this.emitter.removeListener(CacheUpdateEvent.type, callback);
   }
 
   raiseAccountUpdated(id: string) {

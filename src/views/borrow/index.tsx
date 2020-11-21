@@ -1,7 +1,7 @@
 import React from "react";
-import { useLendingReserves } from '../../hooks';
-import { BorrowItem } from './item';
-import './itemStyle.less';
+import { useLendingReserves } from "../../hooks";
+import { BorrowItem } from "./item";
+import "./itemStyle.less";
 
 export const BorrowView = () => {
   const { reserveAccounts } = useLendingReserves();
@@ -13,7 +13,9 @@ export const BorrowView = () => {
         <div>APY</div>
         <div>Action</div>
       </div>
-      {reserveAccounts.map(account => <BorrowItem reserve={account.info} address={account.pubkey} />)}
+      {reserveAccounts.map((account) => (
+        <BorrowItem reserve={account.info} address={account.pubkey} />
+      ))}
     </div>
   );
-}
+};

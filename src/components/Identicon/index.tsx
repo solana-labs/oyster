@@ -10,14 +10,17 @@ export const Identicon = (props: {
   style?: React.CSSProperties;
   className?: string;
 }) => {
-  const { style, className } = props; 
-  const address = typeof props.address === 'string' ? props.address : props.address?.toBase58();
+  const { style, className } = props;
+  const address =
+    typeof props.address === "string"
+      ? props.address
+      : props.address?.toBase58();
   const ref = useRef<HTMLDivElement>();
 
   useEffect(() => {
     if (address && ref.current) {
       ref.current.innerHTML = "";
-      ref.current.className = props.className || "";
+      ref.current.className = className || "";
       ref.current.appendChild(
         Jazzicon(
           style?.width || 16,

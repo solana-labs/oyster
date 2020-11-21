@@ -1,10 +1,13 @@
-import React, {  } from "react";
-import { useLendingReserve } from '../../hooks';
+import React from "react";
+import { useLendingReserve } from "../../hooks";
 import { useParams } from "react-router-dom";
-import './style.less';
+import "./style.less";
 
-import { BorrowInput } from '../../components/BorrowInput';
-import { SideReserveOverview, SideReserveOverviewMode } from '../../components/SideReserveOverview';
+import { BorrowInput } from "../../components/BorrowInput";
+import {
+  SideReserveOverview,
+  SideReserveOverviewMode,
+} from "../../components/SideReserveOverview";
 
 export const BorrowReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,17 +18,21 @@ export const BorrowReserveView = () => {
     return null;
   }
 
-  return <div className="borrow-reserve">
-    <div className="borrow-reserve-container">
-      <BorrowInput
-        className="borrow-reserve-item borrow-reserve-item-left"
-        reserve={reserve}
-        address={lendingReserve.pubkey} />
-      <SideReserveOverview
-        className="borrow-reserve-item borrow-reserve-item-right"
-        reserve={reserve}
-        address={lendingReserve.pubkey}
-        mode={SideReserveOverviewMode.Borrow} />
+  return (
+    <div className="borrow-reserve">
+      <div className="borrow-reserve-container">
+        <BorrowInput
+          className="borrow-reserve-item borrow-reserve-item-left"
+          reserve={reserve}
+          address={lendingReserve.pubkey}
+        />
+        <SideReserveOverview
+          className="borrow-reserve-item borrow-reserve-item-right"
+          reserve={reserve}
+          address={lendingReserve.pubkey}
+          mode={SideReserveOverviewMode.Borrow}
+        />
+      </div>
     </div>
-  </div>;
-}
+  );
+};

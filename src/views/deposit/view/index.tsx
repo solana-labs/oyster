@@ -1,7 +1,7 @@
 import React from "react";
-import { useLendingReserves } from '../../../hooks';
-import { ReserveItem } from './item';
-import './itemStyle.less';
+import { useLendingReserves } from "../../../hooks";
+import { ReserveItem } from "./item";
+import "./itemStyle.less";
 
 export const DepositView = () => {
   const { reserveAccounts } = useLendingReserves();
@@ -14,7 +14,9 @@ export const DepositView = () => {
         <div>APY</div>
         <div>Action</div>
       </div>
-      {reserveAccounts.map(account => <ReserveItem reserve={account.info} address={account.pubkey} />)}
+      {reserveAccounts.map((account) => (
+        <ReserveItem reserve={account.info} address={account.pubkey} />
+      ))}
     </div>
   );
 };

@@ -1,13 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { MINT_TO_MARKET } from "./../models/marketOverrides";
-import {
-  STABLE_COINS,
-} from "./../utils/utils";
+import { STABLE_COINS } from "./../utils/utils";
 import { useConnectionConfig } from "./connection";
-import {
-  cache,
-  getMultipleAccounts,
-} from "./accounts";
+import { cache, getMultipleAccounts } from "./accounts";
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from "@project-serum/serum";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
@@ -39,14 +34,10 @@ export function MarketProvider({ children = null as any }) {
   ]);
 
   // TODO: identify which markets to query ...
-  const mints = useMemo(() => [
-    
-  ] as PublicKey[], []);
+  const mints = useMemo(() => [] as PublicKey[], []);
 
   const marketByMint = useMemo(() => {
-    return [
-      ...new Set(mints).values(),
-    ].reduce((acc, key) => {
+    return [...new Set(mints).values()].reduce((acc, key) => {
       const mintAddress = key.toBase58();
 
       const SERUM_TOKEN = TOKEN_MINTS.find(
@@ -239,8 +230,6 @@ export const useMidPriceInUSD = (mint: string) => {
 
   return { price, isBase: price === 1.0 };
 };
-
-
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

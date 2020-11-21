@@ -7,7 +7,7 @@ import { MarketProvider } from "./contexts/market";
 import { LendingProvider } from "./contexts/lending";
 import { AppLayout } from "./components/Layout";
 
-import { 
+import {
   HomeView,
   DepositView,
   DepositReserveView,
@@ -17,7 +17,7 @@ import {
   BorrowReserveView,
   WithdrawView,
   FaucetView,
- } from './views';
+} from "./views";
 
 export function Routes() {
   return (
@@ -31,13 +31,27 @@ export function Routes() {
                   <AppLayout>
                     <Switch>
                       <Route exact path="/" component={() => <HomeView />} />
-                      <Route exact path="/dashboard" children={<DashboardView />} />
+                      <Route
+                        exact
+                        path="/dashboard"
+                        children={<DashboardView />}
+                      />
                       <Route path="/reserve/:id" children={<ReserveView />} />
-                      <Route exact path="/deposit" component={() => <DepositView />} />
-                      <Route path="/deposit/:id" children={<DepositReserveView />} />
+                      <Route
+                        exact
+                        path="/deposit"
+                        component={() => <DepositView />}
+                      />
+                      <Route
+                        path="/deposit/:id"
+                        children={<DepositReserveView />}
+                      />
                       <Route path="/withdraw/:id" children={<WithdrawView />} />
                       <Route exact path="/borrow" children={<BorrowView />} />
-                      <Route path="/borrow/:id" children={<BorrowReserveView />} />
+                      <Route
+                        path="/borrow/:id"
+                        children={<BorrowReserveView />}
+                      />
                       <Route exact path="/faucet" children={<FaucetView />} />
                     </Switch>
                   </AppLayout>

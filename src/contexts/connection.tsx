@@ -10,13 +10,18 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { setProgramIds } from "./../constants/ids";
 import { notify } from "./../utils/notifications";
 import { ExplorerLink } from "../components/ExplorerLink";
-import LocalTokens from '../config/tokens.json';
+import LocalTokens from "../config/tokens.json";
 
-export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet" | "lending";
+export type ENV =
+  | "mainnet-beta"
+  | "testnet"
+  | "devnet"
+  | "localnet"
+  | "lending";
 
 export const ENDPOINTS = [
   {
-    name: 'lending' as ENV,
+    name: "lending" as ENV,
     endpoint: "https://tln.solana.com",
   },
   {
@@ -88,7 +93,7 @@ export function ConnectionProvider({ children = undefined as any }) {
       .then((res) => {
         return res.json();
       })
-      .catch(err => [])
+      .catch((err) => [])
       .then((list: KnownToken[]) => {
         const knownMints = [...LocalTokens, ...list].reduce((map, item) => {
           map.set(item.mintAddress, item);

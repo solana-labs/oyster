@@ -1,14 +1,23 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useConnection } from "./connection";
 import { LENDING_PROGRAM_ID } from "./../constants/ids";
-import { LendingMarketParser, isLendingReserve, isLendingMarket, LendingReserveParser, LendingReserve } from "./../models/lending";
-import { cache, getMultipleAccounts, MintParser, ParsedAccount } from "./accounts";
+import {
+  LendingMarketParser,
+  isLendingReserve,
+  isLendingMarket,
+  LendingReserveParser,
+  LendingReserve,
+} from "./../models/lending";
+import {
+  cache,
+  getMultipleAccounts,
+  MintParser,
+  ParsedAccount,
+} from "./accounts";
 import { PublicKey } from "@solana/web3.js";
 import { DexMarketParser } from "../models/dex";
 
-export interface LendingContextState {
-
-}
+export interface LendingContextState {}
 
 const LendingContext = React.createContext<LendingContextState | null>(null);
 
@@ -17,14 +26,13 @@ export function LendingProvider({ children = null as any }) {
   return (
     <LendingContext.Provider
       value={{
-        accounts
+        accounts,
       }}
     >
       {children}
     </LendingContext.Provider>
   );
-};
-
+}
 
 export const useLending = () => {
   const connection = useConnection();
@@ -32,9 +40,17 @@ export const useLending = () => {
 
   const processAccount = useCallback((item) => {
     if (isLendingReserve(item.account)) {
-      return cache.add(item.pubkey.toBase58(), item.account, LendingReserveParser); 
+      return cache.add(
+        item.pubkey.toBase58(),
+        item.account,
+        LendingReserveParser
+      );
     } else if (isLendingMarket(item.account)) {
-      return cache.add(item.pubkey.toBase58(), item.account, LendingMarketParser); 
+      return cache.add(
+        item.pubkey.toBase58(),
+        item.account,
+        LendingMarketParser
+      );
     }
   }, []);
 
@@ -45,20 +61,32 @@ export const useLending = () => {
     const queryLendingAccounts = async () => {
       const accounts = (await connection.getProgramAccounts(LENDING_PROGRAM_ID))
         .map(processAccount)
-        .filter(item => item !== undefined);
+        .filter((item) => item !== undefined);
 
       const toQuery = [
-        ...accounts.filter(acc => (acc?.info as LendingReserve).lendingMarket !== undefined)
-        .map(acc => acc as ParsedAccount<LendingReserve>)
-        .map(acc => {
-          const result = [
-            cache.registerParser(acc?.info.collateralMint.toBase58(), MintParser),
-            cache.registerParser(acc?.info.liquidityMint.toBase58(), MintParser),
-            // ignore dex if its not set
-            cache.registerParser(acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : '', DexMarketParser),
-        ].filter(_ => _);
-        return result;
-      })
+        ...accounts
+          .filter(
+            (acc) => (acc?.info as LendingReserve).lendingMarket !== undefined
+          )
+          .map((acc) => acc as ParsedAccount<LendingReserve>)
+          .map((acc) => {
+            const result = [
+              cache.registerParser(
+                acc?.info.collateralMint.toBase58(),
+                MintParser
+              ),
+              cache.registerParser(
+                acc?.info.liquidityMint.toBase58(),
+                MintParser
+              ),
+              // ignore dex if its not set
+              cache.registerParser(
+                acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : "",
+                DexMarketParser
+              ),
+            ].filter((_) => _);
+            return result;
+          }),
       ].flat() as string[];
 
       // This will pre-cache all accounts used by pools
@@ -76,12 +104,10 @@ export const useLending = () => {
       return accounts;
     };
 
-    Promise.all([
-      queryLendingAccounts(),
-    ]).then((all) => {
+    Promise.all([queryLendingAccounts()]).then((all) => {
       setLendingAccounts(all.flat());
     });
-  }, [connection]);
+  }, [connection, processAccount]);
 
   useEffect(() => {
     const subID = connection.onProgramAccountChange(
@@ -100,7 +126,7 @@ export const useLending = () => {
     return () => {
       connection.removeProgramAccountChangeListener(subID);
     };
-  }, [connection, lendingAccounts]);
+  }, [connection, lendingAccounts, processAccount]);
 
   return { accounts: lendingAccounts };
 };

@@ -9,14 +9,16 @@ export function useUserBalance(mint?: PublicKey) {
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
     return userAccounts
-      .filter(acc => mint?.equals(acc.info.mint))
+      .filter((acc) => mint?.equals(acc.info.mint))
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
   }, [userAccounts, mint]);
 
   const balanceLamports = useMemo(() => {
-    return accounts
-      .reduce((res, item) => res += item.info.amount.toNumber(), 0);
-  },[accounts]);
+    return accounts.reduce(
+      (res, item) => (res += item.info.amount.toNumber()),
+      0
+    );
+  }, [accounts]);
 
   return {
     balance: fromLamports(balanceLamports, mintInfo),

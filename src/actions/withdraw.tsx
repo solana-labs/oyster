@@ -6,7 +6,10 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { LendingReserve, withdrawInstruction } from "./../models/lending/reserve";
+import {
+  LendingReserve,
+  withdrawInstruction,
+} from "./../models/lending/reserve";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
@@ -18,8 +21,8 @@ export const withdraw = async (
   reserve: LendingReserve,
   reserveAddress: PublicKey,
   connection: Connection,
-  wallet: any) => {
-
+  wallet: any
+) => {
   notify({
     message: "Withdrawing funds...",
     description: "Please review transactions to approve.",
@@ -50,7 +53,7 @@ export const withdraw = async (
       authority,
       wallet.publicKey,
       [],
-      amountLamports,
+      amountLamports
     )
   );
 
@@ -73,7 +76,7 @@ export const withdraw = async (
       reserveAddress,
       reserve.collateralMint,
       reserve.liquiditySupply,
-      authority,
+      authority
     )
   );
 
@@ -94,4 +97,4 @@ export const withdraw = async (
   } catch {
     // TODO:
   }
-}
+};

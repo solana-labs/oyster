@@ -32,15 +32,14 @@ export const uint64 = (property = "uint64"): unknown => {
   const _decode = layout.decode.bind(layout);
   const _encode = layout.encode.bind(layout);
 
-
   layout.decode = (buffer: Buffer, offset: number) => {
     const data = _decode(buffer, offset);
     return new BN(
       [...data]
         .reverse()
-        .map(i => `00${i.toString(16)}`.slice(-2))
-        .join(''),
-      16,
+        .map((i) => `00${i.toString(16)}`.slice(-2))
+        .join(""),
+      16
     );
   };
 
@@ -65,15 +64,14 @@ export const uint128 = (property = "uint128"): unknown => {
   const _decode = layout.decode.bind(layout);
   const _encode = layout.encode.bind(layout);
 
-
   layout.decode = (buffer: Buffer, offset: number) => {
     const data = _decode(buffer, offset);
     return new BN(
       [...data]
         .reverse()
-        .map(i => `00${i.toString(16)}`.slice(-2))
-        .join(''),
-      16,
+        .map((i) => `00${i.toString(16)}`.slice(-2))
+        .join(""),
+      16
     );
   };
 
@@ -88,7 +86,6 @@ export const uint128 = (property = "uint128"): unknown => {
 
     return _encode(b, buffer, offset);
   };
-
 
   return layout;
 };

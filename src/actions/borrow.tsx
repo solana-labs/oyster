@@ -9,11 +9,20 @@ import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, MintLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
-import { createTempMemoryAccount, createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
+import {
+  createTempMemoryAccount,
+  createUninitializedAccount,
+  ensureSplAccount,
+  findOrCreateAccountByMint,
+} from "./account";
 import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
-import { TokenAccount, LendingObligationLayout, borrowInstruction, LendingMarket } from "../models";
+import {
+  TokenAccount,
+  LendingObligationLayout,
+  borrowInstruction,
+  LendingMarket,
+} from "../models";
 import { toLamports } from "../utils/utils";
-import { DexMarketParser } from "../models/dex";
 
 export const borrow = async (
   from: TokenAccount,
@@ -26,8 +35,8 @@ export const borrow = async (
   depositReserveAddress: PublicKey,
 
   connection: Connection,
-  wallet: any) => {
-
+  wallet: any
+) => {
   notify({
     message: "Borrowing funds...",
     description: "Please review transactions to approve.",
@@ -48,23 +57,21 @@ export const borrow = async (
     await connection.getMinimumBalanceForRentExemption(
       LendingObligationLayout.span
     ),
-    signers,
+    signers
   );
 
   const obligationMint = createUninitializedAccount(
     instructions,
     wallet.publicKey,
-    await connection.getMinimumBalanceForRentExemption(
-      MintLayout.span
-    ),
-    signers,
+    await connection.getMinimumBalanceForRentExemption(MintLayout.span),
+    signers
   );
 
   const obligationTokenOutput = createUninitializedAccount(
     instructions,
     wallet.publicKey,
     accountRentExempt,
-    signers,
+    signers
   );
 
   let toAccount = await findOrCreateAccountByMint(
@@ -78,7 +85,9 @@ export const borrow = async (
   );
 
   // create all accounts in one transaction
-  let tx = await sendTransaction(connection, wallet, instructions, [...signers]);
+  let tx = await sendTransaction(connection, wallet, instructions, [
+    ...signers,
+  ]);
 
   notify({
     message: "Obligation accounts created",
@@ -101,7 +110,11 @@ export const borrow = async (
     LENDING_PROGRAM_ID
   );
 
-  const mint = (await cache.query(connection, depositReserve.collateralMint, MintParser)) as ParsedAccount<MintInfo>;
+  const mint = (await cache.query(
+    connection,
+    depositReserve.collateralMint,
+    MintParser
+  )) as ParsedAccount<MintInfo>;
   const amountLamports = toLamports(amount, mint?.info);
 
   const fromAccount = ensureSplAccount(
@@ -121,30 +134,36 @@ export const borrow = async (
       authority,
       wallet.publicKey,
       [],
-      amountLamports,
+      amountLamports
     )
   );
 
-  const market = cache.get(depositReserve.lendingMarket) as ParsedAccount<LendingMarket>;
-  
-  const dexMarketAddress = borrowReserve.dexMarketOption ? borrowReserve.dexMarket : depositReserve.dexMarket;
+  const market = cache.get(depositReserve.lendingMarket) as ParsedAccount<
+    LendingMarket
+  >;
+
+  const dexMarketAddress = borrowReserve.dexMarketOption
+    ? borrowReserve.dexMarket
+    : depositReserve.dexMarket;
   const dexMarket = cache.get(dexMarketAddress);
 
-  if(!dexMarket) {
-    throw new Error(`Dex market doesn't exsists.`)
+  if (!dexMarket) {
+    throw new Error(`Dex market doesn't exsists.`);
   }
 
-  const dexOrderBookSide = market.info.quoteMint.equals(depositReserve.liquidityMint) ? 
-    dexMarket?.info.bids : 
-    dexMarket?.info.asks
+  const dexOrderBookSide = market.info.quoteMint.equals(
+    depositReserve.liquidityMint
+  )
+    ? dexMarket?.info.bids
+    : dexMarket?.info.asks;
 
   const memory = createTempMemoryAccount(
     instructions,
     wallet.publicKey,
-    signers,
+    signers
   );
 
-  // deposit  
+  // deposit
   instructions.push(
     borrowInstruction(
       amountLamports,
@@ -165,7 +184,7 @@ export const borrow = async (
       dexMarketAddress,
       dexOrderBookSide,
 
-      memory,
+      memory
     )
   );
   try {
@@ -185,4 +204,4 @@ export const borrow = async (
   } catch {
     // TODO:
   }
-}
+};

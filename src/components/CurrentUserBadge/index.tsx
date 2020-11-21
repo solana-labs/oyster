@@ -18,13 +18,13 @@ export const CurrentUserBadge = (props: {}) => {
   return (
     <div className="wallet-wrapper">
       <span>
-        {formatNumber.format(((account?.lamports || 0) / LAMPORTS_PER_SOL))} SOL
+        {formatNumber.format((account?.lamports || 0) / LAMPORTS_PER_SOL)} SOL
       </span>
       <div className="wallet-key">
         {shortenAddress(`${wallet.publicKey}`)}
         <Identicon
-          address={wallet.publicKey.toBase58()}
-          style={{ marginLeft: "0.5rem", display: 'flex' }}
+          address={wallet.publicKey?.toBase58()}
+          style={{ marginLeft: "0.5rem", display: "flex" }}
         />
       </div>
     </div>

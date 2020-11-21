@@ -18,8 +18,8 @@ export const TokenIcon = (props: {
         alt="Token icon"
         className={props.className}
         key={icon}
-        width={props.style?.width || '20'}
-        height={props.style?.height || '20'}
+        width={props.style?.width || "20"}
+        height={props.style?.height || "20"}
         src={icon}
         style={{
           marginRight: "0.5rem",

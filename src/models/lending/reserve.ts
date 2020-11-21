@@ -9,7 +9,7 @@ import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import * as Layout from "./../../utils/layout";
-import { LendingInstruction } from './lending';
+import { LendingInstruction } from "./lending";
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
@@ -21,19 +21,22 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.publicKey("collateralMint"),
     Layout.publicKey("collateralSupply"),
     // TODO: replace u32 option with generic quivalent
-    BufferLayout.u32('dexMarketOption'),
+    BufferLayout.u32("dexMarketOption"),
     Layout.publicKey("dexMarket"),
 
-    BufferLayout.struct([
-      /// Max utilization rate as a percent
-      BufferLayout.u8("maxUtilizationRate"),
-      /// The ratio of the loan to the value of the collateral as a percent
-      BufferLayout.u8("loanToValueRatio"),
-      /// The percent discount the liquidator gets when buying collateral for an unhealthy obligation
-      BufferLayout.u8("liquidationBonus"),
-      /// The percent at which an obligation is considered unhealthy
-      BufferLayout.u8("liquidationThreshold"),
-    ], "config"),
+    BufferLayout.struct(
+      [
+        /// Max utilization rate as a percent
+        BufferLayout.u8("maxUtilizationRate"),
+        /// The ratio of the loan to the value of the collateral as a percent
+        BufferLayout.u8("loanToValueRatio"),
+        /// The percent discount the liquidator gets when buying collateral for an unhealthy obligation
+        BufferLayout.u8("liquidationBonus"),
+        /// The percent at which an obligation is considered unhealthy
+        BufferLayout.u8("liquidationThreshold"),
+      ],
+      "config"
+    ),
 
     Layout.uint128("cumulativeBorrowRate"),
     Layout.uint128("totalBorrows"),
@@ -47,7 +50,7 @@ export const isLendingReserve = (info: AccountInfo<Buffer>) => {
   console.log(LendingReserveLayout.span);
   console.log(info.data.length);
   return info.data.length === LendingReserveLayout.span;
-}
+};
 
 export interface LendingReserve {
   lastUpdateSlot: BN;
@@ -63,11 +66,11 @@ export interface LendingReserve {
   dexMarketPrice: BN; // what is precision on the price?
 
   config: {
-    maxUtilizationRate: number,
-    loanToValueRatio: number,
-    liquidationBonus: number,
-    liquidationThreshold: number,
-  }
+    maxUtilizationRate: number;
+    loanToValueRatio: number;
+    liquidationBonus: number;
+    liquidationThreshold: number;
+  };
   // collateralFactor: number;
 
   cumulativeBorrowRate: BN;
@@ -80,7 +83,10 @@ export interface LendingReserve {
   // Layout.uint128("total_borrows"),
 }
 
-export const LendingReserveParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+export const LendingReserveParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>
+) => {
   const buffer = Buffer.from(info.data);
   const data = LendingReserveLayout.decode(buffer);
 
@@ -110,12 +116,12 @@ export const initReserveInstruction = (
   lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
 
-  dexMarket: PublicKey, // TODO: optional
+  dexMarket: PublicKey // TODO: optional
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
     Layout.uint64("liquidityAmount"),
-    BufferLayout.u8("maxUtilizationRate")
+    BufferLayout.u8("maxUtilizationRate"),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
@@ -172,7 +178,7 @@ export const depositInstruction = (
   reserveAuthority: PublicKey,
   reserveAccount: PublicKey,
   reserveSupply: PublicKey,
-  collateralMint: PublicKey,
+  collateralMint: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -212,7 +218,7 @@ export const withdrawInstruction = (
   reserveAccount: PublicKey,
   collateralMint: PublicKey,
   reserveSupply: PublicKey,
-  authority: PublicKey,
+  authority: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -244,4 +250,3 @@ export const withdrawInstruction = (
     data,
   });
 };
-

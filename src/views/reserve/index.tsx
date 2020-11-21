@@ -1,10 +1,10 @@
-import React, {  } from "react";
-import { useLendingReserve } from './../../hooks';
+import React from "react";
+import { useLendingReserve } from "./../../hooks";
 import { useParams } from "react-router-dom";
-import './style.less';
+import "./style.less";
 
-import { UserLendingCard } from './../../components/UserLendingCard';
-import { ReserveStatus } from './../../components/ReserveStatus';
+import { UserLendingCard } from "./../../components/UserLendingCard";
+import { ReserveStatus } from "./../../components/ReserveStatus";
 
 export const ReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,16 +15,20 @@ export const ReserveView = () => {
     return null;
   }
 
-  return <div className="reserve-overview">
-    <div className="reserve-overview-container">
-      <ReserveStatus
-        className="reserve-overview-item reserve-overview-item-left"
-        reserve={reserve}
-        address={lendingReserve.pubkey} />
-      <UserLendingCard
-        className="reserve-overview-item reserve-overview-item-right"
-        reserve={reserve}
-        address={lendingReserve.pubkey} />
+  return (
+    <div className="reserve-overview">
+      <div className="reserve-overview-container">
+        <ReserveStatus
+          className="reserve-overview-item reserve-overview-item-left"
+          reserve={reserve}
+          address={lendingReserve.pubkey}
+        />
+        <UserLendingCard
+          className="reserve-overview-item reserve-overview-item-right"
+          reserve={reserve}
+          address={lendingReserve.pubkey}
+        />
+      </div>
     </div>
-  </div>;
-}
+  );
+};

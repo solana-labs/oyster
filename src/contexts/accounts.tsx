@@ -3,7 +3,7 @@ import { useConnection } from "./connection";
 import { useWallet } from "./wallet";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { programIds, WRAPPED_SOL_MINT } from "./../constants/ids";
-import { AccountLayout, u64, MintInfo, MintLayout, Token } from "@solana/spl-token";
+import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
 import { chunks } from "./../utils/utils";
 import { EventEmitter } from "./../utils/eventEmitter";
@@ -46,7 +46,10 @@ export const MintParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
   return details;
 };
 
-export const TokenAccountParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+export const TokenAccountParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>
+) => {
   const buffer = Buffer.from(info.data);
   const data = deserializeAccount(buffer);
 
@@ -118,8 +121,12 @@ export const cache = {
 
     return query;
   },
-  add: (id: PublicKey | string, obj: AccountInfo<Buffer>, parser?: AccountParser) => {
-    const address = typeof id === 'string' ? id : id?.toBase58();
+  add: (
+    id: PublicKey | string,
+    obj: AccountInfo<Buffer>,
+    parser?: AccountParser
+  ) => {
+    const address = typeof id === "string" ? id : id?.toBase58();
     const deserialize = parser ? parser : keyToAccountParser.get(address);
     if (!deserialize) {
       throw new Error(
@@ -160,7 +167,7 @@ export const cache = {
   },
   registerParser: (pubkey: PublicKey | string, parser: AccountParser) => {
     if (pubkey) {
-      const address = typeof pubkey === 'string' ? pubkey : pubkey?.toBase58();
+      const address = typeof pubkey === "string" ? pubkey : pubkey?.toBase58();
       keyToAccountParser.set(address, parser);
     }
 
@@ -172,7 +179,7 @@ export const useAccountsContext = () => {
   const context = useContext(AccountsContext);
 
   return context;
-}
+};
 
 function wrapNativeAccount(
   pubkey: PublicKey,
@@ -206,13 +213,16 @@ const UseNativeAccount = () => {
 
   const [nativeAccount, setNativeAccount] = useState<AccountInfo<Buffer>>();
 
-  const updateCache = useCallback((account) => {
-    const wrapped = wrapNativeAccount(wallet.publicKey, account);
-    if (wrapped !== undefined && wallet) {
-      cache.registerParser(wallet.publicKey.toBase58(), TokenAccountParser);
-      genericCache.set(wallet.publicKey.toBase58(), wrapped as TokenAccount);
-    }
-  }, [wallet]);
+  const updateCache = useCallback(
+    (account) => {
+      const wrapped = wrapNativeAccount(wallet.publicKey, account);
+      if (wrapped !== undefined && wallet) {
+        cache.registerParser(wallet.publicKey?.toBase58(), TokenAccountParser);
+        genericCache.set(wallet.publicKey?.toBase58(), wrapped as TokenAccount);
+      }
+    },
+    [wallet]
+  );
 
   useEffect(() => {
     if (!connection || !wallet?.publicKey) {
@@ -231,7 +241,7 @@ const UseNativeAccount = () => {
         setNativeAccount(acc);
       }
     });
-  }, [setNativeAccount, wallet, wallet.publicKey, connection]);
+  }, [setNativeAccount, wallet, wallet.publicKey, connection, updateCache]);
 
   return { nativeAccount };
 };
@@ -252,10 +262,9 @@ const precacheUserTokenAccounts = async (
   const accounts = await connection.getTokenAccountsByOwner(owner, {
     programId: programIds().token,
   });
-  accounts.value
-    .forEach((info) => {
-      cache.add(info.pubkey.toBase58(), info.account, TokenAccountParser);
-    });
+  accounts.value.forEach((info) => {
+    cache.add(info.pubkey.toBase58(), info.account, TokenAccountParser);
+  });
 };
 
 export function AccountsProvider({ children = null as any }) {
@@ -266,15 +275,21 @@ export function AccountsProvider({ children = null as any }) {
   const { nativeAccount } = UseNativeAccount();
 
   const selectUserAccounts = useCallback(() => {
-    return cache.byParser(TokenAccountParser).map(id => cache.get(id)).filter(
-      (a) => a && a.info.owner.toBase58() === wallet.publicKey.toBase58()
-    ).map(a => a as TokenAccount);
+    return cache
+      .byParser(TokenAccountParser)
+      .map((id) => cache.get(id))
+      .filter(
+        (a) => a && a.info.owner.toBase58() === wallet.publicKey?.toBase58()
+      )
+      .map((a) => a as TokenAccount);
   }, [wallet]);
 
   useEffect(() => {
-    const accounts = selectUserAccounts().filter((a) => a !== undefined) as TokenAccount[];
+    const accounts = selectUserAccounts().filter(
+      (a) => a !== undefined
+    ) as TokenAccount[];
     setUserAccounts(accounts);
-  }, [nativeAccount, wallet, tokenAccounts]);
+  }, [nativeAccount, wallet, tokenAccounts, selectUserAccounts]);
 
   const publicKey = wallet?.publicKey;
   useEffect(() => {
@@ -296,10 +311,7 @@ export function AccountsProvider({ children = null as any }) {
           if (info.accountInfo.data.length === AccountLayout.span) {
             const data = deserializeAccount(info.accountInfo.data);
 
-            if (
-              PRECACHED_OWNERS.has(data.owner.toBase58()) ||
-              !cache.get(id)
-            ) {
+            if (PRECACHED_OWNERS.has(data.owner.toBase58()) || !cache.get(id)) {
               cache.add(id, info.accountInfo, TokenAccountParser);
               setTokenAccounts(selectUserAccounts());
               accountEmitter.raiseAccountUpdated(id);
@@ -359,18 +371,20 @@ export const getMultipleAccounts = async (
   const array = result
     .map(
       (a) =>
-        a.array.map((acc) => {
-          if (!acc) {
-            return;
-          }
+        a.array
+          .map((acc) => {
+            if (!acc) {
+              return;
+            }
 
-          const { data, ...rest } = acc;
-          const obj = {
-            ...rest,
-            data: Buffer.from(data[0], "base64"),
-          } as AccountInfo<Buffer>;
-          return obj;
-        }).filter(_ => _) as AccountInfo<Buffer>[]
+            const { data, ...rest } = acc;
+            const obj = {
+              ...rest,
+              data: Buffer.from(data[0], "base64"),
+            } as AccountInfo<Buffer>;
+            return obj;
+          })
+          .filter((_) => _) as AccountInfo<Buffer>[]
     )
     .flat();
   return { keys, array };
@@ -412,15 +426,15 @@ export function useMint(key?: string | PublicKey) {
 
     cache
       .query(connection, id, MintParser)
-      .then(acc => setMint(acc.info as any))
-      .catch((err) =>
-        console.log(err)
-      );
+      .then((acc) => setMint(acc.info as any))
+      .catch((err) => console.log(err));
 
     const dispose = cache.emitter.onCache((e) => {
       const event = e;
       if (event.id === id) {
-        cache.query(connection, id, MintParser).then(mint => setMint(mint.info as any));
+        cache
+          .query(connection, id, MintParser)
+          .then((mint) => setMint(mint.info as any));
       }
     });
     return () => {
@@ -443,9 +457,9 @@ export function useAccount(pubKey?: PublicKey) {
           return;
         }
 
-        const acc = await cache.query(connection, key, TokenAccountParser).catch((err) =>
-          console.log(err)
-        );
+        const acc = await cache
+          .query(connection, key, TokenAccountParser)
+          .catch((err) => console.log(err));
         if (acc) {
           setAccount(acc);
         }

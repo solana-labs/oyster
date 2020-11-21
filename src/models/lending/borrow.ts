@@ -8,7 +8,7 @@ import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import * as Layout from "./../../utils/layout";
-import { LendingInstruction } from './lending';
+import { LendingInstruction } from "./lending";
 
 /// Borrow tokens from a reserve by depositing collateral tokens. The number of borrowed tokens
 /// is calculated by market price. The debt obligation is tokenized.
@@ -49,7 +49,7 @@ export const borrowInstruction = (
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
 
-  memory: PublicKey,
+  memory: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -59,7 +59,7 @@ export const borrowInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: LendingInstruction.BorrowReserveLiquidity, 
+      instruction: LendingInstruction.BorrowReserveLiquidity,
       collateralAmount: new BN(collateralAmount),
     },
     data
@@ -69,9 +69,17 @@ export const borrowInstruction = (
     { pubkey: from, isSigner: false, isWritable: true },
     { pubkey: to, isSigner: false, isWritable: true },
     { pubkey: depositReserve, isSigner: false, isWritable: true },
-    { pubkey: depositReserveCollateralSupply, isSigner: false, isWritable: true },
+    {
+      pubkey: depositReserveCollateralSupply,
+      isSigner: false,
+      isWritable: true,
+    },
     { pubkey: borrowReserve, isSigner: false, isWritable: true },
-    { pubkey: borrowReserveLiquiditySupply, isSigner: false, isWritable: false },
+    {
+      pubkey: borrowReserveLiquiditySupply,
+      isSigner: false,
+      isWritable: false,
+    },
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },

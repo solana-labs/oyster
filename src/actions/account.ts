@@ -1,8 +1,13 @@
 import { AccountLayout, Token } from "@solana/spl-token";
-import { Account, PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
+import {
+  Account,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT } from "../constants/ids";
 import { TokenAccount } from "../models";
-import { cache, TokenAccountParser } from './../contexts/accounts';
+import { cache, TokenAccountParser } from "./../contexts/accounts";
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -17,10 +22,11 @@ export function ensureSplAccount(
   }
 
   const account = createUninitializedAccount(
-    instructions, 
-    payer, 
-    amount, 
-    signers);
+    instructions,
+    payer,
+    amount,
+    signers
+  );
 
   instructions.push(
     Token.createInitAccountInstruction(
@@ -47,10 +53,11 @@ export function ensureSplAccount(
 export const DEFAULT_TEMP_MEM_SPACE = 65528;
 
 export function createTempMemoryAccount(
-  instructions: TransactionInstruction[], 
-  payer: PublicKey, 
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
   signers: Account[],
-  space = DEFAULT_TEMP_MEM_SPACE) {
+  space = DEFAULT_TEMP_MEM_SPACE
+) {
   const account = new Account();
   instructions.push(
     SystemProgram.createAccount({
@@ -68,12 +75,12 @@ export function createTempMemoryAccount(
   return account.publicKey;
 }
 
-
 export function createUninitializedAccount(
-  instructions: TransactionInstruction[], 
-  payer: PublicKey, 
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
   amount: number,
-  signers: Account[]) {
+  signers: Account[]
+) {
   const account = new Account();
   instructions.push(
     SystemProgram.createAccount({
@@ -96,21 +103,17 @@ export function createTokenAccount(
   accountRentExempt: number,
   mint: PublicKey,
   owner: PublicKey,
-  signers: Account[],
+  signers: Account[]
 ) {
   const account = createUninitializedAccount(
-    instructions, 
-    payer, 
+    instructions,
+    payer,
     accountRentExempt,
-    signers);
+    signers
+  );
 
   instructions.push(
-    Token.createInitAccountInstruction(
-      TOKEN_PROGRAM_ID,
-      mint,
-      account,
-      owner
-    )
+    Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, mint, account, owner)
   );
 
   return account;
@@ -128,15 +131,16 @@ export function findOrCreateAccountByMint(
   excluded?: Set<string>
 ): PublicKey {
   const accountToFind = mint.toBase58();
-  const account = cache.byParser(TokenAccountParser)
-    .map(id => cache.get(id))
+  const account = cache
+    .byParser(TokenAccountParser)
+    .map((id) => cache.get(id))
     .find(
-    (acc) =>
-      acc !== undefined &&
-      acc.info.mint.toBase58() === accountToFind &&
-      acc.info.owner.toBase58() === owner.toBase58() &&
-      (excluded === undefined || !excluded.has(acc.pubkey.toBase58()))
-  );
+      (acc) =>
+        acc !== undefined &&
+        acc.info.mint.toBase58() === accountToFind &&
+        acc.info.owner.toBase58() === owner.toBase58() &&
+        (excluded === undefined || !excluded.has(acc.pubkey.toBase58()))
+    );
   const isWrappedSol = accountToFind === WRAPPED_SOL_MINT.toBase58();
 
   let toAccount: PublicKey;
@@ -150,7 +154,7 @@ export function findOrCreateAccountByMint(
       accountRentExempt,
       mint,
       owner,
-      signers,
+      signers
     );
 
     if (isWrappedSol) {

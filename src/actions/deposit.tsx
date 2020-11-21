@@ -6,10 +6,18 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { depositInstruction, initReserveInstruction, LendingReserve } from "./../models/lending/reserve";
+import {
+  depositInstruction,
+  initReserveInstruction,
+  LendingReserve,
+} from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
-import { createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
+import {
+  createUninitializedAccount,
+  ensureSplAccount,
+  findOrCreateAccountByMint,
+} from "./account";
 import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
 import { TokenAccount } from "../models";
 import { toLamports } from "../utils/utils";
@@ -20,8 +28,8 @@ export const deposit = async (
   reserve: LendingReserve,
   reserveAddress: PublicKey,
   connection: Connection,
-  wallet: any) => {
-
+  wallet: any
+) => {
   // TODO: customize ?
   const MAX_UTILIZATION_RATE = 80;
 
@@ -47,7 +55,11 @@ export const deposit = async (
     LENDING_PROGRAM_ID
   );
 
-  const mint = (await cache.query(connection, reserve.liquidityMint, MintParser)) as ParsedAccount<MintInfo>;
+  const mint = (await cache.query(
+    connection,
+    reserve.liquidityMint,
+    MintParser
+  )) as ParsedAccount<MintInfo>;
   const amountLamports = toLamports(amount, mint?.info);
 
   const fromAccount = ensureSplAccount(
@@ -67,7 +79,7 @@ export const deposit = async (
       authority,
       wallet.publicKey,
       [],
-      amountLamports,
+      amountLamports
     )
   );
 
@@ -88,12 +100,12 @@ export const deposit = async (
       instructions,
       wallet.publicKey,
       accountRentExempt,
-      signers,
+      signers
     );
   }
 
   if (isInitalized) {
-    // deposit  
+    // deposit
     instructions.push(
       depositInstruction(
         amountLamports,
@@ -102,25 +114,27 @@ export const deposit = async (
         authority,
         reserveAddress,
         reserve.liquiditySupply,
-        reserve.collateralMint,
+        reserve.collateralMint
       )
     );
   } else {
     // TODO: finish reserve init
-    instructions.push(initReserveInstruction(
-      amountLamports,
-      MAX_UTILIZATION_RATE,
-      fromAccount,
-      toAccount,
-      reserveAddress,
-      reserve.liquidityMint,
-      reserve.liquiditySupply,
-      reserve.collateralMint,
-      reserve.collateralSupply,
-      reserve.lendingMarket,
-      authority,
-      reserve.dexMarket,
-    ));
+    instructions.push(
+      initReserveInstruction(
+        amountLamports,
+        MAX_UTILIZATION_RATE,
+        fromAccount,
+        toAccount,
+        reserveAddress,
+        reserve.liquidityMint,
+        reserve.liquiditySupply,
+        reserve.collateralMint,
+        reserve.collateralSupply,
+        reserve.lendingMarket,
+        authority,
+        reserve.dexMarket
+      )
+    );
   }
 
   try {
@@ -140,4 +154,4 @@ export const deposit = async (
   } catch {
     // TODO:
   }
-}
+};

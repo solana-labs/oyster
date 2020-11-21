@@ -53,7 +53,7 @@ export function getTokenName(
   shorten = true
 ): string {
   if (!mintAddress) {
-    return 'N/A';
+    return "N/A";
   }
 
   const knownSymbol = map.get(mintAddress)?.tokenSymbol;
@@ -66,9 +66,10 @@ export function getTokenName(
 
 export function getTokenIcon(
   map: KnownTokenMap,
-  mintAddress?: string | PublicKey,
+  mintAddress?: string | PublicKey
 ): string | undefined {
-  const address = typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58();
+  const address =
+    typeof mintAddress === "string" ? mintAddress : mintAddress?.toBase58();
   if (!address) {
     return;
   }
@@ -101,7 +102,7 @@ export function toLamports(
     typeof account === "number" ? account : account.info.amount?.toNumber();
 
   const precision = Math.pow(10, mint?.decimals || 0);
-  return (amount * precision);
+  return amount * precision;
 }
 
 export function fromLamports(
@@ -171,12 +172,12 @@ const numberFormater = new Intl.NumberFormat("en-US", {
 export const formatNumber = {
   format: (val?: number) => {
     if (!val) {
-      return '--';
+      return "--";
     }
 
     return numberFormater.format(val);
-  }
-}
+  },
+};
 
 export const formatPct = new Intl.NumberFormat("en-US", {
   style: "percent",

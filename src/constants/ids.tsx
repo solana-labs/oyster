@@ -12,7 +12,7 @@ export let LENDING_PROGRAM_ID = new PublicKey(
 );
 
 export const setProgramIds = (envName: string) => {
-  // Add dynamic program ids 
+  // Add dynamic program ids
 };
 
 export const programIds = () => {

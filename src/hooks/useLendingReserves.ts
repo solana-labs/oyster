@@ -1,14 +1,19 @@
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import { LendingReserve, LendingReserveParser } from "../models/lending";
-import { cache, ParsedAccount } from './../contexts/accounts';
+import { cache, ParsedAccount } from "./../contexts/accounts";
 
 const getLendingReserves = () => {
-  return cache.byParser(LendingReserveParser).map(id => cache.get(id)).filter(acc => acc !== undefined) as any[];
+  return cache
+    .byParser(LendingReserveParser)
+    .map((id) => cache.get(id))
+    .filter((acc) => acc !== undefined) as any[];
 };
 
 export function useLendingReserves() {
-  const [reserveAccounts, setReserveAccounts] = useState<ParsedAccount<LendingReserve>[]>([]);
+  const [reserveAccounts, setReserveAccounts] = useState<
+    ParsedAccount<LendingReserve>[]
+  >([]);
 
   useEffect(() => {
     setReserveAccounts(getLendingReserves());
@@ -22,7 +27,7 @@ export function useLendingReserves() {
     return () => {
       dispose();
     };
-  }, [setReserveAccounts])
+  }, [setReserveAccounts]);
 
   return {
     reserveAccounts,
@@ -30,8 +35,10 @@ export function useLendingReserves() {
 }
 
 export function useLendingReserve(address: string | PublicKey) {
-  const id = typeof address === 'string' ? address : address?.toBase58();
-  const [reserveAccount, setReserveAccount] = useState<ParsedAccount<LendingReserve>>();
+  const id = typeof address === "string" ? address : address?.toBase58();
+  const [reserveAccount, setReserveAccount] = useState<
+    ParsedAccount<LendingReserve>
+  >();
 
   useEffect(() => {
     setReserveAccount(cache.get(id));
@@ -45,7 +52,7 @@ export function useLendingReserve(address: string | PublicKey) {
     return () => {
       dispose();
     };
-  }, [setReserveAccount])
+  }, [id, setReserveAccount]);
 
   return reserveAccount;
 }

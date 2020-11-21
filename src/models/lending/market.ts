@@ -1,15 +1,9 @@
-import {
-  AccountInfo,
-  PublicKey,
-} from "@solana/web3.js";
+import { AccountInfo, PublicKey } from "@solana/web3.js";
 import * as BufferLayout from "buffer-layout";
 import * as Layout from "./../../utils/layout";
 
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-      BufferLayout.u8("isInitialized"),
-      Layout.publicKey("quoteMint"),
-  ]
+  [BufferLayout.u8("isInitialized"), Layout.publicKey("quoteMint")]
 );
 
 export interface LendingMarket {
@@ -19,9 +13,12 @@ export interface LendingMarket {
 
 export const isLendingMarket = (info: AccountInfo<Buffer>) => {
   return info.data.length === LendingMarketLayout.span;
-}
+};
 
-export const LendingMarketParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+export const LendingMarketParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>
+) => {
   const buffer = Buffer.from(info.data);
   const data = LendingMarketLayout.decode(buffer);
 
@@ -35,7 +32,6 @@ export const LendingMarketParser = (pubKey: PublicKey, info: AccountInfo<Buffer>
 
   return details;
 };
-
 
 // TODO:
 // create instructions for init
