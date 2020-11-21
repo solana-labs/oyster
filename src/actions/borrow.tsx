@@ -12,6 +12,8 @@ import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import {
   createTempMemoryAccount,
   createUninitializedAccount,
+  createUninitializedMint,
+  createUninitializedObligation,
   ensureSplAccount,
   findOrCreateAccountByMint,
 } from "./account";
@@ -51,7 +53,7 @@ export const borrow = async (
     AccountLayout.span
   );
 
-  const obligation = createUninitializedAccount(
+  const obligation = createUninitializedObligation(
     instructions,
     wallet.publicKey,
     await connection.getMinimumBalanceForRentExemption(
@@ -60,7 +62,7 @@ export const borrow = async (
     signers
   );
 
-  const obligationMint = createUninitializedAccount(
+  const obligationMint = createUninitializedMint(
     instructions,
     wallet.publicKey,
     await connection.getMinimumBalanceForRentExemption(MintLayout.span),
