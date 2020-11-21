@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useCollateralBalance, useLendingReserves, useTokenName, useUserBalance } from '../../hooks';
+import { useLendingReserves, useTokenName, useUserBalance } from '../../hooks';
 import { LendingReserve, LendingReserveParser } from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { getTokenName } from "../../utils/utils";
 import { Button, Card, Select } from "antd";
-import { useParams } from "react-router-dom";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection, useConnectionConfig } from "../../contexts/connection";

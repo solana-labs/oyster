@@ -1,11 +1,10 @@
-import React, { useMemo } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from './../../hooks';
-import { LendingReserve, LendingReserveParser } from "../../models/lending";
+import React from "react";
+import { useTokenName } from './../../hooks';
+import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
-import { Button, Card, Typography } from "antd";
-import { useParams } from "react-router-dom";
-import { useAccount, useMint } from "../../contexts/accounts";
+import { Card, Typography } from "antd";
+import { useMint } from "../../contexts/accounts";
 import { PublicKey } from "@solana/web3.js";
 
 const { Text } = Typography;

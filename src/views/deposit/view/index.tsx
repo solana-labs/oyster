@@ -1,10 +1,5 @@
 import React from "react";
-import { Input } from "antd";
-import { useLendingReserves, useTokenName } from '../../../hooks';
-import { LendingReserve } from "../../../models/lending";
-import { getTokenName } from "../../../utils/utils";
-import { useConnectionConfig } from "../../../contexts/connection";
-import { TokenIcon } from "../../../components/TokenIcon";
+import { useLendingReserves } from '../../../hooks';
 import { ReserveItem } from './item';
 import './itemStyle.less';
 

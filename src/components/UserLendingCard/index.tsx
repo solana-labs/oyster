@@ -1,7 +1,7 @@
 import React from "react";
 import { useCollateralBalance, useTokenName, useUserBalance } from './../../hooks';
 import { LendingReserve } from "../../models/lending";
-import { formatNumber, fromLamports } from "../../utils/utils";
+import { formatNumber } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { useMint } from "../../contexts/accounts";
@@ -18,7 +18,6 @@ export const UserLendingCard = (props: {
   const address = props.address;
 
   const name = useTokenName(reserve?.liquidityMint);
-  const liquidityMint = useMint(props.reserve.liquidityMint);
 
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
   const { balance: collateralBalance } = useCollateralBalance(props.reserve);

@@ -1,27 +1,18 @@
 import {
   Account,
-  AccountInfo,
   Connection,
   PublicKey,
-  sendAndConfirmRawTransaction,
-  SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from "@solana/web3.js";
-import BN from "bn.js";
-import * as BufferLayout from "buffer-layout";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import * as Layout from "./../utils/layout";
 import { depositInstruction, initReserveInstruction, LendingReserve } from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
-import { cache, GenericAccountParser, MintParser, ParsedAccount } from "../contexts/accounts";
+import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
 import { TokenAccount } from "../models";
-import { isConstructorDeclaration } from "typescript";
-import { LendingMarketParser } from "../models/lending";
-import { sign } from "crypto";
-import { fromLamports, toLamports } from "../utils/utils";
+import { toLamports } from "../utils/utils";
 
 export const deposit = async (
   from: TokenAccount,

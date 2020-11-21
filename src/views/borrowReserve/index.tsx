@@ -1,8 +1,6 @@
 import React, {  } from "react";
 import { useLendingReserve } from '../../hooks';
 import { useParams } from "react-router-dom";
-import { useConnection } from "../../contexts/connection";
-import { useWallet } from "../../contexts/wallet";
 import './style.less';
 
 import { BorrowInput } from '../../components/BorrowInput';

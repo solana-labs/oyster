@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useCollateralBalance, useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from '../../hooks';
-import { LendingReserve, LendingReserveParser } from "../../models/lending";
+import React, { useCallback, useState } from "react";
+import { useCollateralBalance, useTokenName, useUserBalance } from '../../hooks';
+import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
-import { useParams } from "react-router-dom";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
@@ -15,7 +14,6 @@ import { useMint } from "../../contexts/accounts";
 export const WithdrawInput = (props: { className?: string, reserve: LendingReserve, address: PublicKey }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const { id } = useParams<{ id: string }>();
   const [value, setValue] = useState('');
 
   const reserve = props.reserve;

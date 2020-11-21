@@ -12,9 +12,6 @@ export interface LendingContextState {
 
 const LendingContext = React.createContext<LendingContextState | null>(null);
 
-// TODO: 
-// query for lending program accounts ?
-
 export function LendingProvider({ children = null as any }) {
   const { accounts } = useLending();
   return (

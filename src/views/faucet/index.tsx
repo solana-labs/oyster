@@ -1,8 +1,4 @@
-import React, { useCallback, useMemo } from "react";
-import { useLendingReserves, useTokenName, useUserAccounts, useUserBalance } from '../../hooks';
-import { LendingReserve } from "../../models/lending";
-import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber } from "../../utils/utils";
+import React, { useCallback } from "react";
 import { Button, Card } from "antd";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
@@ -29,10 +25,10 @@ export const FaucetView = () => {
     <div className="flexColumn" style={{ flex: 1 }}>
       <Card title={'Faucet'} bodyStyle={bodyStyle} style={{ flex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
-          <div className="deposit-input-title" style={{ margin: 10, width: 400 }}>
+          <div className="deposit-input-title" style={{ margin: 10 }}>
             This Faucet will help you fund your accounts outside of Solana main network.
           </div>
-          <Button type="primary" style={{ width: 200 }} onClick={airdrop} >Give me SOL</Button>
+          <Button type="primary" onClick={airdrop} >Give me SOL</Button>
         </div>
       </Card>
     </div>

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import "./../../App.less";
-import GitHubButton from "react-github-btn";
 import { Menu } from 'antd';
 import {
   PieChartOutlined,
@@ -11,7 +10,7 @@ import {
   RocketOutlined
 } from '@ant-design/icons';
 
-import BasicLayout, { DefaultFooter, PageContainer } from '@ant-design/pro-layout';
+import BasicLayout, {  } from '@ant-design/pro-layout';
 import { AppBar } from "./../AppBar";
 import { Link, useLocation } from "react-router-dom";
 import { useConnectionConfig } from "../../contexts/connection";

@@ -1,18 +1,9 @@
 import {
-  AccountInfo,
-  Connection,
   PublicKey,
-  sendAndConfirmRawTransaction,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
-import { sendTransaction } from "../../contexts/connection";
 import * as Layout from "./../../utils/layout";
-import { LendingInstruction } from './lending';
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [

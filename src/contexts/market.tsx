@@ -7,8 +7,6 @@ import { useConnectionConfig } from "./connection";
 import {
   cache,
   getMultipleAccounts,
-  MintParser,
-  ParsedAccountBase,
 } from "./accounts";
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from "@project-serum/serum";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
@@ -109,7 +107,6 @@ export function MarketProvider({ children = null as any }) {
             const market = marketByMint.get(mintAddress);
 
             if (market) {
-              const programId = market.marketInfo.programId;
               const id = market.marketInfo.address;
               cache.add(id, item, DexMarketParser);
             }
