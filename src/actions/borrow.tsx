@@ -13,6 +13,7 @@ import {
   createTempMemoryAccount,
   createUninitializedAccount,
   createUninitializedMint,
+  createUninitializedObligation,
   ensureSplAccount,
   findOrCreateAccountByMint,
 } from "./account";
@@ -52,7 +53,7 @@ export const borrow = async (
     AccountLayout.span
   );
 
-  const obligation = createUninitializedAccount(
+  const obligation = createUninitializedObligation(
     instructions,
     wallet.publicKey,
     await connection.getMinimumBalanceForRentExemption(

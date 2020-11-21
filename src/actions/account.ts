@@ -5,8 +5,8 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT } from "../constants/ids";
-import { TokenAccount } from "../models";
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT } from "../constants/ids";
+import { LendingObligationLayout, TokenAccount } from "../models";
 import { cache, TokenAccountParser } from "./../contexts/accounts";
 
 export function ensureSplAccount(
@@ -67,6 +67,28 @@ export function createTempMemoryAccount(
       lamports: 0,
       space: space,
       programId: TOKEN_PROGRAM_ID,
+    })
+  );
+
+  signers.push(account);
+
+  return account.publicKey;
+}
+
+export function createUninitializedObligation(
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+  amount: number,
+  signers: Account[]
+) {
+  const account = new Account();
+  instructions.push(
+    SystemProgram.createAccount({
+      fromPubkey: payer,
+      newAccountPubkey: account.publicKey,
+      lamports: amount,
+      space: LendingObligationLayout.span,
+      programId: LENDING_PROGRAM_ID,
     })
   );
 
