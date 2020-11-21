@@ -374,7 +374,7 @@ export const getMultipleAccounts = async (
         a.array
           .map((acc) => {
             if (!acc) {
-              return;
+              return undefined;
             }
 
             const { data, ...rest } = acc;
