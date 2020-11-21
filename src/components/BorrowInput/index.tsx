@@ -16,7 +16,8 @@ import './style.less';
 const { Option } = Select;
 
 const CollateralSelector = (props: {
-  mint?: string,
+  reserve: LendingReserve;
+  mint?: string;
   onMintChange: (id: string) => void;
 }) => {
   const { reserveAccounts } = useLendingReserves();
@@ -37,7 +38,9 @@ const CollateralSelector = (props: {
       option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
   >
-    {reserveAccounts.map(reserve => {
+    {reserveAccounts
+    .filter(reserve => reserve.info !== props.reserve)
+    .map(reserve => {
       const mint = reserve.info.liquidityMint.toBase58();
       const address = reserve.pubkey.toBase58();
       const name = getTokenName(tokenMap, mint);
@@ -127,6 +130,7 @@ export const BorrowInput = (props: { className?: string, reserve: LendingReserve
         Select collateral account?
       </div>
       <CollateralSelector
+        reserve={borrowReserve}
         mint={collateralReserveMint}
         onMintChange={setCollateralReserveMint}
         />

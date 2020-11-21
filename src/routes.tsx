@@ -15,6 +15,8 @@ import {
   ReserveView,
   DashboardView,
   BorrowReserveView,
+  WithdrawView,
+  FaucetView,
  } from './views';
 
 export function Routes() {
@@ -33,8 +35,10 @@ export function Routes() {
                       <Route path="/reserve/:id" children={<ReserveView />} />
                       <Route exact path="/deposit" component={() => <DepositView />} />
                       <Route path="/deposit/:id" children={<DepositReserveView />} />
+                      <Route path="/withdraw/:id" children={<WithdrawView />} />
                       <Route exact path="/borrow" children={<BorrowView />} />
                       <Route path="/borrow/:id" children={<BorrowReserveView />} />
+                      <Route exact path="/faucet" children={<FaucetView />} />
                     </Switch>
                   </AppLayout>
                 </LendingProvider>

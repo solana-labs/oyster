@@ -5,3 +5,5 @@ export { DashboardView } from './dashboard';
 export { DepositView } from './deposit';
 export { DepositReserveView } from './depositReserve';
 export { ReserveView } from './reserve';
+export { WithdrawView } from './withdraw';
+export { FaucetView } from './faucet';

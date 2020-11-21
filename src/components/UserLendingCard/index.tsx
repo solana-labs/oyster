@@ -27,7 +27,7 @@ export const UserLendingCard = (props: {
   // TODO: calculate
   const borrowed = 0;
   const healthFactor = '--';
-  const ltv = 0.75;
+  const ltv = 0;
   const available = 0;
 
 
@@ -102,7 +102,7 @@ export const UserLendingCard = (props: {
         <Button>Borrow</Button>
       </Link>
       <Link to={`/withdraw/${address}`}>
-        <Button disabled={true}>Withdraw</Button>
+        <Button>Withdraw</Button>
       </Link>
       <Link to={`/repay/${address}`}>
         <Button disabled={true}>Repay</Button>

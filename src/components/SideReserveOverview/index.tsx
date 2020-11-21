@@ -28,13 +28,16 @@ export const SideReserveOverview = (props: {
 
   const totalLiquidity = fromLamports(props.reserve.totalLiquidity.toNumber(), liquidityMint);
 
+  debugger;
+
   // TODO: calculate
-  const utilizationRate = 0.5802;
   const depositApy = 0.048;
   const borrowApy = 0.048;
-  const maxLTV = 0.75;
-  const liquidiationThreshold = 0.8;
-  const liquidiationPenalty = 0.05;
+
+  const utilizationRate = reserve.config.loanToValueRatio / 100;
+  const liquidiationThreshold = reserve.config.maxUtilizationRate / 100;
+  const liquidiationPenalty = reserve.config.liquidationBonus / 100;
+  const maxLTV = liquidiationThreshold - liquidiationPenalty;
 
   let extraInfo: JSX.Element | null = null;
   if (mode === SideReserveOverviewMode.Deposit) {

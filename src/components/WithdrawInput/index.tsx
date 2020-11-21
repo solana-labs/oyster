@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from '../../hooks';
+import { useCollateralBalance, useLendingReserve, useTokenName, useUserAccounts, useUserBalance } from '../../hooks';
 import { LendingReserve, LendingReserveParser } from "../../models/lending";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
@@ -7,11 +7,12 @@ import { useParams } from "react-router-dom";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
-import { deposit } from '../../actions/deposit';
+import { withdraw } from '../../actions';
 import { PublicKey } from "@solana/web3.js";
 import './style.less';
+import { useMint } from "../../contexts/accounts";
 
-export const DepositInput = (props: { className?: string, reserve: LendingReserve, address: PublicKey }) => {
+export const WithdrawInput = (props: { className?: string, reserve: LendingReserve, address: PublicKey }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const { id } = useParams<{ id: string }>();
@@ -20,19 +21,25 @@ export const DepositInput = (props: { className?: string, reserve: LendingReserv
   const reserve = props.reserve;
   const address = props.address;
 
+  const liquidityMint = useMint(reserve?.liquidityMint);
   const name = useTokenName(reserve?.liquidityMint);
-  const { balance: tokenBalance, accounts: fromAccounts } = useUserBalance(reserve?.liquidityMint);
-  // const collateralBalance = useUserBalance(reserve?.collateralMint);
+  const { balanceLamports: collateralBalanceLamports, accounts: fromAccounts } = useUserBalance(reserve?.collateralMint);
+  const { 
+    balance: collateralBalanceInLiquidity 
+  } = useCollateralBalance(reserve);
 
-  const onDeposit = useCallback(() => {
-    deposit(
+  const onWithdraw = useCallback(() => {
+    withdraw(
       fromAccounts[0],
-      parseFloat(value),
+      Math.ceil(
+        collateralBalanceLamports * 
+        (parseFloat(value) / collateralBalanceInLiquidity)
+      ),
       reserve,
       address,
       connection,
       wallet);
-  }, [value, reserve, fromAccounts, address]);
+  }, [value, reserve, fromAccounts, address, liquidityMint]);
 
   const bodyStyle: React.CSSProperties = { 
     display: 'flex', 
@@ -45,8 +52,8 @@ export const DepositInput = (props: { className?: string, reserve: LendingReserv
   return <Card className={props.className} bodyStyle={bodyStyle}>
 
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
-      <div className="deposit-input-title">
-        How much would you like to deposit?
+      <div className="withdraw-input-title">
+        How much would you like to withdraw?
       </div>
       <div className="token-input">
         <TokenIcon mintAddress={reserve?.liquidityMint} />
@@ -66,7 +73,7 @@ export const DepositInput = (props: { className?: string, reserve: LendingReserv
         <div>{name}</div>
       </div>
 
-      <Button type="primary" onClick={onDeposit} disabled={fromAccounts.length === 0}>Deposit</Button>
+      <Button type="primary" onClick={onWithdraw} disabled={fromAccounts.length === 0}>Withdraw</Button>
     </div>
   </Card >;
 }

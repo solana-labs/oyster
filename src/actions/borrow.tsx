@@ -129,7 +129,6 @@ export const borrow = async (
   
   const dexMarketAddress = borrowReserve.dexMarketOption ? borrowReserve.dexMarket : depositReserve.dexMarket;
   const dexMarket = cache.get(dexMarketAddress);
-  debugger;
 
   if(!dexMarket) {
     throw new Error(`Dex market doesn't exsists.`)

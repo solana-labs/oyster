@@ -56,7 +56,6 @@ export const borrowInstruction = (
     Layout.uint64("collateralAmount"),
   ]);
 
-  debugger;
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {

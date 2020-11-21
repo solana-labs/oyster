@@ -62,7 +62,12 @@ export interface LendingReserve {
   dexMarket: PublicKey;
   dexMarketPrice: BN; // what is precision on the price?
 
-  maxUtilizationRate: number;
+  config: {
+    maxUtilizationRate: number,
+    loanToValueRatio: number,
+    liquidationBonus: number,
+    liquidationThreshold: number,
+  }
   // collateralFactor: number;
 
   cumulativeBorrowRate: BN;
@@ -177,7 +182,7 @@ export const depositInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: LendingInstruction.DepositReserveLiquidity, // Deposit instruction
+      instruction: LendingInstruction.DepositReserveLiquidity,
       liquidityAmount: new BN(liquidityAmount),
     },
     data
@@ -202,12 +207,12 @@ export const depositInstruction = (
 
 export const withdrawInstruction = (
   collateralAmount: number | BN,
-  from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
-  to: PublicKey, // Collateral output SPL Token account,
+  from: PublicKey, // Collateral input SPL Token account. $authority can transfer $liquidity_amount
+  to: PublicKey, // Liquidity output SPL Token account,
   reserveAccount: PublicKey,
   collateralMint: PublicKey,
   reserveSupply: PublicKey,
-  reserveAuthority: PublicKey,
+  authority: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -217,7 +222,7 @@ export const withdrawInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: 3, // Withdraw instruction
+      instruction: LendingInstruction.WithdrawReserveLiquidity,
       collateralAmount: new BN(collateralAmount),
     },
     data
@@ -229,7 +234,7 @@ export const withdrawInstruction = (
     { pubkey: reserveAccount, isSigner: false, isWritable: true },
     { pubkey: collateralMint, isSigner: false, isWritable: true },
     { pubkey: reserveSupply, isSigner: false, isWritable: true },
-    { pubkey: reserveAuthority, isSigner: false, isWritable: false },
+    { pubkey: authority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
