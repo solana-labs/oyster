@@ -27,8 +27,6 @@ export const SideReserveOverview = (props: {
 
   const totalLiquidity = fromLamports(props.reserve.totalLiquidity.toNumber(), liquidityMint);
 
-  debugger;
-
   // TODO: calculate
   const depositApy = 0.048;
   const borrowApy = 0.048;
