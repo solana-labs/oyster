@@ -59,7 +59,7 @@ export const borrowInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: LendingInstruction.BorrowReserveLiquidity,
+      instruction: LendingInstruction.BorrowLiquidity,
       collateralAmount: new BN(collateralAmount),
     },
     data
