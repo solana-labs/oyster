@@ -1,4 +1,4 @@
-import { AccountLayout, Token } from "@solana/spl-token";
+import { AccountLayout, MintLayout, Token } from "@solana/spl-token";
 import {
   Account,
   PublicKey,
@@ -66,6 +66,28 @@ export function createTempMemoryAccount(
       // 0 will evict/clost account since it cannot pay rent
       lamports: 0,
       space: space,
+      programId: TOKEN_PROGRAM_ID,
+    })
+  );
+
+  signers.push(account);
+
+  return account.publicKey;
+}
+
+export function createUninitializedMint(
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+  amount: number,
+  signers: Account[]
+) {
+  const account = new Account();
+  instructions.push(
+    SystemProgram.createAccount({
+      fromPubkey: payer,
+      newAccountPubkey: account.publicKey,
+      lamports: amount,
+      space: MintLayout.span,
       programId: TOKEN_PROGRAM_ID,
     })
   );
