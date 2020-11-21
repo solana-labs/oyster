@@ -22,7 +22,7 @@ import { LendingInstruction } from "./lending";
 ///   6. `[writable]` Obligation - uninitialized
 ///   7. `[writable]` Obligation token mint - uninitialized
 ///   8. `[writable]` Obligation token output - uninitialized
-///   9. `[]` Obligation token owner - uninitialized
+///   9. `[]` Obligation token owner
 ///   10 `[]` Derived lending market authority ($authority).
 ///   11 `[]` Dex market
 ///   12 `[]` Dex order book side // could be bid/ask
@@ -78,16 +78,16 @@ export const borrowInstruction = (
     {
       pubkey: borrowReserveLiquiditySupply,
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOwner, isSigner: false, isWritable: false },
-    { pubkey: lendingMarketAuthority, isSigner: false, isWritable: true },
-    { pubkey: dexMarket, isSigner: false, isWritable: true },
+    { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
+    { pubkey: dexMarket, isSigner: false, isWritable: false },
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },
-    { pubkey: memory, isSigner: false, isWritable: true },
+    { pubkey: memory, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
