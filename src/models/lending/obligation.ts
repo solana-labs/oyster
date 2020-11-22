@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { AccountInfo, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import * as Layout from "./../../utils/layout";
@@ -22,6 +22,10 @@ export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayo
   ]
 );
 
+export const isLendingObligation = (info: AccountInfo<Buffer>) => {
+  return info.data.length === LendingObligationLayout.span;
+};
+
 export interface LendingObligation {
   lastUpdateSlot: BN;
   collateralAmount: BN;
@@ -31,3 +35,23 @@ export interface LendingObligation {
   borrowReserve: PublicKey;
   tokenMint: PublicKey;
 }
+
+export const LendingObligationParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = LendingObligationLayout.decode(buffer);
+
+  console.log(data);
+
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: data,
+  };
+
+  return details;
+};

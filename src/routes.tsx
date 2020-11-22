@@ -8,15 +8,16 @@ import { LendingProvider } from "./contexts/lending";
 import { AppLayout } from "./components/Layout";
 
 import {
-  HomeView,
-  DepositView,
-  DepositReserveView,
-  BorrowView,
-  ReserveView,
-  DashboardView,
   BorrowReserveView,
-  WithdrawView,
+  BorrowView,
+  DashboardView,
+  DepositReserveView,
+  DepositView,
   FaucetView,
+  HomeView,
+  RepayReserveView,
+  ReserveView,
+  WithdrawView,
 } from "./views";
 
 export function Routes() {
@@ -51,6 +52,10 @@ export function Routes() {
                       <Route
                         path="/borrow/:id"
                         children={<BorrowReserveView />}
+                      />
+                      <Route
+                        path="/repay/:id"
+                        children={<RepayReserveView />}
                       />
                       <Route exact path="/faucet" children={<FaucetView />} />
                     </Switch>

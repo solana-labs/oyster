@@ -1,4 +1,8 @@
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import BN from "bn.js";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import { LendingInstruction } from "./lending";
@@ -32,7 +36,7 @@ export const liquidateInstruction = (
   authority: PublicKey,
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
-  memory: PublicKey,
+  memory: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -56,7 +60,11 @@ export const liquidateInstruction = (
     { pubkey: repayReserveLiquiditySupply, isSigner: false, isWritable: true },
 
     { pubkey: withdrawReserve, isSigner: false, isWritable: true },
-    { pubkey: withdrawReserveCollateralSupply, isSigner: false, isWritable: true },
+    {
+      pubkey: withdrawReserveCollateralSupply,
+      isSigner: false,
+      isWritable: true,
+    },
 
     { pubkey: obligation, isSigner: false, isWritable: true },
 

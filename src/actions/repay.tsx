@@ -8,23 +8,33 @@ import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import {
   LendingReserve,
-  withdrawInstruction,
 } from "./../models/lending/reserve";
+import {
+  repayInstruction,
+} from "./../models/lending/repay";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
-import { TokenAccount } from "../models";
+import { LendingObligation, TokenAccount } from "../models";
 
-export const withdraw = async (
+export const repay = async (
   from: TokenAccount, // CollateralAccount
   amountLamports: number, // in collateral token (lamports)
-  reserve: LendingReserve,
-  reserveAddress: PublicKey,
+
+  // which loan to repay
+  obligation: LendingObligation,
+
+  repayReserve: LendingReserve,
+  repayReserveAddress: PublicKey,
+
+  withdrawReserve: LendingReserve,
+  withdrawReserveAddress: PublicKey,
+
   connection: Connection,
   wallet: any
 ) => {
   notify({
-    message: "Withdrawing funds...",
+    message: "Repaing funds...",
     description: "Please review transactions to approve.",
     type: "warn",
   });
@@ -39,7 +49,7 @@ export const withdraw = async (
   );
 
   const [authority] = await PublicKey.findProgramAddress(
-    [reserve.lendingMarket.toBuffer()], 
+    [repayReserve.lendingMarket.toBuffer()], 
     LENDING_PROGRAM_ID
   );
 
@@ -64,21 +74,23 @@ export const withdraw = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    reserve.liquidityMint,
+    withdrawReserve.liquidityMint,
     signers
   );
 
-  instructions.push(
-    withdrawInstruction(
-      amountLamports,
-      fromAccount,
-      toAccount,
-      reserveAddress,
-      reserve.collateralMint,
-      reserve.liquiditySupply,
-      authority
-    )
-  );
+  // TODO: add obligation
+
+  // instructions.push(
+  //   repayInstruction(
+  //     amountLamports,
+  //     fromAccount,
+  //     toAccount,
+  //     reserveAddress,
+  //     reserve.collateralMint,
+  //     reserve.liquiditySupply,
+  //     authority
+  //   )
+  // );
 
   try {
     let tx = await sendTransaction(
@@ -90,7 +102,7 @@ export const withdraw = async (
     );
 
     notify({
-      message: "Funds deposited.",
+      message: "Funds repaid.",
       type: "success",
       description: `Transaction - ${tx}`,
     });

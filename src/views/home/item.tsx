@@ -20,7 +20,7 @@ export const LendingReserveItem = (props: {
     props.reserve.totalLiquidity.toNumber(),
     liquidityMint
   );
-  
+
   const totalBorrows = props.reserve.totalBorrows.toString();
 
   console.log(liquidityMint);

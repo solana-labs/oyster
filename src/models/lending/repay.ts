@@ -1,4 +1,8 @@
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import BN from "bn.js";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import { LendingInstruction } from "./lending";
@@ -55,12 +59,16 @@ export const repayInstruction = (
     { pubkey: repayReserveLiquiditySupply, isSigner: false, isWritable: true },
 
     { pubkey: withdrawReserve, isSigner: false, isWritable: false },
-    { pubkey: withdrawReserveCollateralSupply, isSigner: false, isWritable: true },
+    {
+      pubkey: withdrawReserveCollateralSupply,
+      isSigner: false,
+      isWritable: true,
+    },
 
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationInput, isSigner: false, isWritable: true },
-    
+
     { pubkey: authority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },

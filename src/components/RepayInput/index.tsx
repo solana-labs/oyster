@@ -1,28 +1,30 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTokenName, useUserBalance } from "../../hooks";
-import { LendingReserve, LendingReserveParser } from "../../models";
+import { LendingObligation, LendingReserve, LendingReserveParser } from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
-import { borrow } from "../../actions";
+import { repay } from "../../actions";
 import { PublicKey } from "@solana/web3.js";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
 
-export const BorrowInput = (props: {
+export const RepayInput = (props: {
   className?: string;
   reserve: LendingReserve;
+  obligation: LendingObligation;
   address: PublicKey;
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
 
-  const borrowReserve = props.reserve;
-  const borrowReserveAddress = props.address;
+  const repayReserve = props.reserve;
+  const repayReserveAddress = props.address;
+  const obligation  = props.obligation;
 
   const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
 
@@ -35,22 +37,23 @@ export const BorrowInput = (props: {
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveMint]);
 
-  const name = useTokenName(borrowReserve?.liquidityMint);
+  const name = useTokenName(repayReserve?.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
     collateralReserve?.info.collateralMint
   );
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
-  const onBorrow = useCallback(() => {
+  const onReoay = useCallback(() => {
     if (!collateralReserve) {
       return;
     }
 
-    borrow(
+    repay(
       fromAccounts[0],
       parseFloat(value),
-      borrowReserve,
-      borrowReserveAddress,
+      obligation,
+      repayReserve,
+      repayReserveAddress,
       collateralReserve.info,
       collateralReserve.pubkey,
       connection,
@@ -60,10 +63,11 @@ export const BorrowInput = (props: {
     connection,
     wallet,
     value,
+    obligation,
     collateralReserve,
-    borrowReserve,
+    repayReserve,
     fromAccounts,
-    borrowReserveAddress,
+    repayReserveAddress,
   ]);
 
   const bodyStyle: React.CSSProperties = {
@@ -83,11 +87,11 @@ export const BorrowInput = (props: {
           justifyContent: "space-around",
         }}
       >
-        <div className="borrow-input-title">
-          How much would you like to borrow?
+        <div className="repay-input-title">
+          How much would you like to repay?
         </div>
         <div className="token-input">
-          <TokenIcon mintAddress={borrowReserve?.liquidityMint} />
+          <TokenIcon mintAddress={repayReserve?.liquidityMint} />
           <NumericInput
             value={value}
             onChange={(val: any) => {
@@ -104,19 +108,19 @@ export const BorrowInput = (props: {
           />
           <div>{name}</div>
         </div>
-        <div className="borrow-input-title">Select collateral account?</div>
+        <div className="repay-input-title">Select collateral account?</div>
         <CollateralSelector
-          reserve={borrowReserve}
+          reserve={repayReserve}
           mint={collateralReserveMint}
           onMintChange={setCollateralReserveMint}
         />
 
         <Button
           type="primary"
-          onClick={onBorrow}
+          onClick={onReoay}
           disabled={fromAccounts.length === 0}
         >
-          Borrow
+          Repay
         </Button>
       </div>
     </Card>

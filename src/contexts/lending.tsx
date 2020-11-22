@@ -7,6 +7,8 @@ import {
   isLendingMarket,
   LendingReserveParser,
   LendingReserve,
+  isLendingObligation,
+  LendingObligationParser,
 } from "./../models/lending";
 import {
   cache,
@@ -50,6 +52,12 @@ export const useLending = () => {
         item.pubkey.toBase58(),
         item.account,
         LendingMarketParser
+      );
+    }else if (isLendingObligation(item.account)) {
+      return cache.add(
+        item.pubkey.toBase58(),
+        item.account,
+        LendingObligationParser,
       );
     }
   }, []);

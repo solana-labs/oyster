@@ -108,7 +108,7 @@ export const borrow = async (
   cleanupInstructions = [];
 
   const [authority] = await PublicKey.findProgramAddress(
-    [depositReserve.lendingMarket.toBuffer()], // which account should be authority
+    [depositReserve.lendingMarket.toBuffer()], 
     LENDING_PROGRAM_ID
   );
 

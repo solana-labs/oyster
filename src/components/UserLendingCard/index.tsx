@@ -115,7 +115,7 @@ export const UserLendingCard = (props: {
           <Button>Withdraw</Button>
         </Link>
         <Link to={`/repay/${address}`}>
-          <Button disabled={true}>Repay</Button>
+          <Button>Repay</Button>
         </Link>
       </div>
     </Card>
