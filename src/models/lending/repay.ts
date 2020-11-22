@@ -22,11 +22,15 @@ import * as Layout from "./../../utils/layout";
 ///   11 `[]` Token program id
 export const repayInstruction = (
   liquidityAmount: number | BN,
-  from: PublicKey, // Collateral input SPL Token account. $authority can transfer $liquidity_amount
-  to: PublicKey, // Liquidity output SPL Token account,
-  reserveAccount: PublicKey,
-  collateralMint: PublicKey,
-  reserveSupply: PublicKey,
+  from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
+  to: PublicKey, // Collateral output SPL Token account,
+  repayReserveAccount: PublicKey,
+  repayReserveLiquiditySupply: PublicKey,
+  withdrawReserve: PublicKey,
+  withdrawReserveCollateralSupply: PublicKey,
+  obligation: PublicKey,
+  obligationMint: PublicKey,
+  obligationInput: PublicKey,
   authority: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
@@ -46,9 +50,16 @@ export const repayInstruction = (
   const keys = [
     { pubkey: from, isSigner: false, isWritable: true },
     { pubkey: to, isSigner: false, isWritable: true },
-    { pubkey: reserveAccount, isSigner: false, isWritable: true },
-    { pubkey: collateralMint, isSigner: false, isWritable: true },
-    { pubkey: reserveSupply, isSigner: false, isWritable: true },
+
+    { pubkey: repayReserveAccount, isSigner: false, isWritable: true },
+    { pubkey: repayReserveLiquiditySupply, isSigner: false, isWritable: true },
+
+    { pubkey: withdrawReserve, isSigner: false, isWritable: false },
+    { pubkey: withdrawReserveCollateralSupply, isSigner: false, isWritable: true },
+
+    { pubkey: obligation, isSigner: false, isWritable: true },
+    { pubkey: obligationMint, isSigner: false, isWritable: true },
+    { pubkey: obligationInput, isSigner: false, isWritable: true },
     
     { pubkey: authority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
