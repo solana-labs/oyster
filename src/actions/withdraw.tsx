@@ -39,7 +39,7 @@ export const withdraw = async (
   );
 
   const [authority] = await PublicKey.findProgramAddress(
-    [reserve.lendingMarket.toBuffer()], 
+    [reserve.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID
   );
 

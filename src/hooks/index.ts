@@ -6,3 +6,4 @@ export * from "./useUserBalance";
 export * from "./useCollateralBalance";
 export * from "./useLendingObligations";
 export * from "./useUserObligations";
+export * from "./useUserObligationByReserve";

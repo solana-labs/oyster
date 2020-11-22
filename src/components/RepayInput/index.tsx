@@ -1,6 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTokenName, useUserBalance } from "../../hooks";
-import { LendingObligation, LendingReserve, LendingReserveParser } from "../../models";
+import {
+  LendingObligation,
+  LendingReserve,
+  LendingReserveParser,
+} from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
@@ -15,7 +19,7 @@ import "./style.less";
 export const RepayInput = (props: {
   className?: string;
   reserve: LendingReserve;
-  obligation: LendingObligation;
+  obligation?: string;
   address: PublicKey;
 }) => {
   const connection = useConnection();
@@ -24,7 +28,7 @@ export const RepayInput = (props: {
 
   const repayReserve = props.reserve;
   const repayReserveAddress = props.address;
-  const obligation  = props.obligation;
+  const obligation = props.obligation;
 
   const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
 
@@ -43,6 +47,13 @@ export const RepayInput = (props: {
   );
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
+  const { userObligations } = 
+
+  // TODO: 
+  if(!obligation) {
+
+  }
+
   const onReoay = useCallback(() => {
     if (!collateralReserve) {
       return;
@@ -51,7 +62,7 @@ export const RepayInput = (props: {
     repay(
       fromAccounts[0],
       parseFloat(value),
-      obligation,
+      obligation as any,
       repayReserve,
       repayReserveAddress,
       collateralReserve.info,

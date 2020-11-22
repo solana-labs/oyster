@@ -53,11 +53,11 @@ export const useLending = () => {
         item.account,
         LendingMarketParser
       );
-    }else if (isLendingObligation(item.account)) {
+    } else if (isLendingObligation(item.account)) {
       return cache.add(
         item.pubkey.toBase58(),
         item.account,
-        LendingObligationParser,
+        LendingObligationParser
       );
     }
   }, []);

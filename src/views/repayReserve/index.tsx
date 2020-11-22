@@ -12,12 +12,9 @@ import "./style.less";
 import { LendingObligation } from "../../models";
 
 export const RepayReserveView = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, obligation } = useParams<{ id: string, obligation?: string }>();
   const lendingReserve = useLendingReserve(id);
   const reserve = lendingReserve?.info;
-
-  // TODO: query for lending obligation
-  const ob: LendingObligation = {} as any;
 
   if (!reserve || !lendingReserve) {
     return null;
@@ -29,7 +26,7 @@ export const RepayReserveView = () => {
         <RepayInput
           className="repay-reserve-item repay-reserve-item-left"
           reserve={reserve}
-          obligation={ob}
+          obligation={obligation}
           address={lendingReserve.pubkey}
         />
         <SideReserveOverview

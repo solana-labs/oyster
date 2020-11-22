@@ -3,13 +3,21 @@ import { Button, Card } from "antd";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { notify } from "../../utils/notifications";
 
 export const FaucetView = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
 
   const airdrop = useCallback(() => {
-    connection.requestAirdrop(wallet.publicKey, 1 * LAMPORTS_PER_SOL);
+    connection
+      .requestAirdrop(wallet.publicKey, 2 * LAMPORTS_PER_SOL)
+      .then(() => {
+        notify({
+          message: "Account funded.",
+          type: "success",
+        });
+      });
   }, [wallet, connection]);
 
   const bodyStyle: React.CSSProperties = {

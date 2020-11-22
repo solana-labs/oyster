@@ -6,12 +6,8 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import {
-  LendingReserve,
-} from "./../models/lending/reserve";
-import {
-  repayInstruction,
-} from "./../models/lending/repay";
+import { LendingReserve } from "./../models/lending/reserve";
+import { repayInstruction } from "./../models/lending/repay";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
@@ -49,7 +45,7 @@ export const repay = async (
   );
 
   const [authority] = await PublicKey.findProgramAddress(
-    [repayReserve.lendingMarket.toBuffer()], 
+    [repayReserve.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID
   );
 
