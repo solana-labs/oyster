@@ -12,7 +12,7 @@ import "./style.less";
 import { LendingObligation } from "../../models";
 
 export const RepayReserveView = () => {
-  const { id, obligation } = useParams<{ id: string, obligation?: string }>();
+  const { id, obligation } = useParams<{ id: string; obligation?: string }>();
   const lendingReserve = useLendingReserve(id);
   const reserve = lendingReserve?.info;
 
