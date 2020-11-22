@@ -47,8 +47,6 @@ export const RepayInput = (props: {
   );
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
-  const { userObligations } = 
-
   // TODO: 
   if(!obligation) {
 
