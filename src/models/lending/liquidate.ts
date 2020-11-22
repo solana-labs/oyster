@@ -22,12 +22,17 @@ import * as Layout from "./../../utils/layout";
 ///   12 `[]` Token program id
 export const liquidateInstruction = (
   liquidityAmount: number | BN,
-  from: PublicKey, // Collateral input SPL Token account. $authority can transfer $liquidity_amount
-  to: PublicKey, // Liquidity output SPL Token account,
-  reserveAccount: PublicKey,
-  collateralMint: PublicKey,
-  reserveSupply: PublicKey,
-  authority: PublicKey
+  from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
+  to: PublicKey, // Collateral output SPL Token account,
+  repayReserveAccount: PublicKey,
+  repayReserveLiquiditySupply: PublicKey,
+  withdrawReserve: PublicKey,
+  withdrawReserveCollateralSupply: PublicKey,
+  obligation: PublicKey,
+  authority: PublicKey,
+  dexMarket: PublicKey,
+  dexOrderBookSide: PublicKey,
+  memory: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
@@ -37,7 +42,7 @@ export const liquidateInstruction = (
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: LendingInstruction.RepayOblogationLiquidity,
+      instruction: LendingInstruction.LiquidateObligation,
       collateralAmount: new BN(liquidityAmount),
     },
     data
@@ -46,11 +51,22 @@ export const liquidateInstruction = (
   const keys = [
     { pubkey: from, isSigner: false, isWritable: true },
     { pubkey: to, isSigner: false, isWritable: true },
-    { pubkey: reserveAccount, isSigner: false, isWritable: true },
-    { pubkey: collateralMint, isSigner: false, isWritable: true },
-    { pubkey: reserveSupply, isSigner: false, isWritable: true },
-    
+
+    { pubkey: repayReserveAccount, isSigner: false, isWritable: true },
+    { pubkey: repayReserveLiquiditySupply, isSigner: false, isWritable: true },
+
+    { pubkey: withdrawReserve, isSigner: false, isWritable: true },
+    { pubkey: withdrawReserveCollateralSupply, isSigner: false, isWritable: true },
+
+    { pubkey: obligation, isSigner: false, isWritable: true },
+
     { pubkey: authority, isSigner: false, isWritable: false },
+
+    { pubkey: dexMarket, isSigner: false, isWritable: false },
+    { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },
+
+    { pubkey: memory, isSigner: false, isWritable: false },
+
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
