@@ -13,7 +13,7 @@ import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
 import { LendingObligation, TokenAccount } from "../models";
 import { ParsedAccount } from "../contexts/accounts";
-import { decimalToLamports } from "../utils/utils";
+import { wadToLamports } from "../utils/utils";
 
 export const repay = async (
   from: TokenAccount, // CollateralAccount
@@ -76,7 +76,7 @@ export const repay = async (
     signers
   );
 
-  const loanRatio = amountLamports / decimalToLamports(obligation.info.borrowAmount)
+  const loanRatio = amountLamports / wadToLamports(obligation.info.borrowAmountWad)
     .toNumber();
   console.log(loanRatio);
 

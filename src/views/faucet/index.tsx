@@ -1,9 +1,11 @@
 import React, { useCallback } from "react";
-import { Button, Card } from "antd";
+import { Card } from "antd";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { notify } from "../../utils/notifications";
+import { ConnectButton } from "./../../components/ConnectButton";
+import { LABELS } from "../../constants";
 
 export const FaucetView = () => {
   const connection = useConnection();
@@ -14,7 +16,7 @@ export const FaucetView = () => {
       .requestAirdrop(wallet.publicKey, 2 * LAMPORTS_PER_SOL)
       .then(() => {
         notify({
-          message: "Account funded.",
+          message: LABELS.ACCOUNT_FUNDED,
           type: "success",
         });
       });
@@ -40,12 +42,11 @@ export const FaucetView = () => {
           }}
         >
           <div className="deposit-input-title" style={{ margin: 10 }}>
-            This Faucet will help you fund your accounts outside of Solana main
-            network.
+            {LABELS.FAUCET_INFO}
           </div>
-          <Button type="primary" onClick={airdrop}>
-            Give me SOL
-          </Button>
+          <ConnectButton type="primary" onClick={airdrop}>
+            {LABELS.GIVE_SOL}
+          </ConnectButton>
         </div>
       </Card>
     </div>

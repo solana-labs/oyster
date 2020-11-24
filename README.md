@@ -19,4 +19,5 @@ Any content produced by Solana, or developer resources that Solana provides, are
 - [] Add slider to borrow page (100% max collateral)
 - [] Add market size on front page
 - [] Add github link
+- [] Repay from reserve (add selection for obligation/loan)
 - [] 

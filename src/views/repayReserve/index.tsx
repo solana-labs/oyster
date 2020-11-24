@@ -12,11 +12,12 @@ import "./style.less";
 
 export const RepayReserveView = () => {
   const { reserve: reserveId, obligation: obligationId } = useParams<{
-    reserve: string;
+    reserve?: string;
     obligation?: string;
   }>();
-  const lendingReserve = useLendingReserve(reserveId);
+  
   const lendingObligation = useLendingObligation(obligationId);
+  const lendingReserve = useLendingReserve(obligationId ? lendingObligation?.info.borrowReserve : reserveId);
   const reserve = lendingReserve?.info;
 
   console.log([reserveId, obligationId]);

@@ -13,6 +13,7 @@ import { useWallet } from "../../contexts/wallet";
 import { withdraw } from "../../actions";
 import { PublicKey } from "@solana/web3.js";
 import "./style.less";
+import { LABELS } from "../../constants";
 
 export const WithdrawInput = (props: {
   className?: string;
@@ -76,7 +77,7 @@ export const WithdrawInput = (props: {
         }}
       >
         <div className="withdraw-input-title">
-          How much would you like to withdraw?
+          {LABELS.WITHDRAW_QUESTION}
         </div>
         <div className="token-input">
           <TokenIcon mintAddress={reserve?.liquidityMint} />
@@ -102,7 +103,7 @@ export const WithdrawInput = (props: {
           onClick={onWithdraw}
           disabled={fromAccounts.length === 0}
         >
-          Withdraw
+          {LABELS.WITHDRAW_ACTION}
         </Button>
       </div>
     </Card>

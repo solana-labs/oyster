@@ -4,6 +4,7 @@ import { MintInfo } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
+import { WAD, ZERO } from "../constants";
 
 export interface KnownToken {
   tokenSymbol: string;
@@ -106,9 +107,8 @@ export function toLamports(
   return amount * precision;
 }
 
-export function decimalToLamports(amount?: BN): BN {
-  // TODO: check math
-  return amount?.div(new BN(10).pow(new BN(18))) || new BN(0);
+export function wadToLamports(amount?: BN): BN {
+  return amount?.div(WAD) || ZERO;
 }
 
 export function fromLamports(

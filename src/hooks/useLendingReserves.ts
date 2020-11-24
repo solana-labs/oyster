@@ -34,14 +34,14 @@ export function useLendingReserves() {
   };
 }
 
-export function useLendingReserve(address: string | PublicKey) {
+export function useLendingReserve(address?: string | PublicKey) {
   const id = typeof address === "string" ? address : address?.toBase58();
   const [reserveAccount, setReserveAccount] = useState<
     ParsedAccount<LendingReserve>
   >();
 
   useEffect(() => {
-    setReserveAccount(cache.get(id));
+    setReserveAccount(cache.get(id || ''));
 
     const dispose = cache.emitter.onCache((args) => {
       if (args.id === id) {

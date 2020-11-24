@@ -11,6 +11,7 @@ import { borrow } from "../../actions";
 import { PublicKey } from "@solana/web3.js";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
+import { LABELS } from "../../constants";
 
 export const BorrowInput = (props: {
   className?: string;
@@ -84,7 +85,7 @@ export const BorrowInput = (props: {
         }}
       >
         <div className="borrow-input-title">
-          How much would you like to borrow?
+          {LABELS.BORROW_QUESTION}
         </div>
         <div className="token-input">
           <TokenIcon mintAddress={borrowReserve?.liquidityMint} />
@@ -104,7 +105,7 @@ export const BorrowInput = (props: {
           />
           <div>{name}</div>
         </div>
-        <div className="borrow-input-title">Select collateral account?</div>
+        <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={borrowReserve}
           mint={collateralReserveMint}
@@ -116,7 +117,7 @@ export const BorrowInput = (props: {
           onClick={onBorrow}
           disabled={fromAccounts.length === 0}
         >
-          Borrow
+          {LABELS.BORROW_ACTION}
         </Button>
       </div>
     </Card>

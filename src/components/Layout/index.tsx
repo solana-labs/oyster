@@ -14,6 +14,7 @@ import BasicLayout from "@ant-design/pro-layout";
 import { AppBar } from "./../AppBar";
 import { Link, useLocation } from "react-router-dom";
 import { useConnectionConfig } from "../../contexts/connection";
+import { LABELS } from "../../constants";
 
 export const AppLayout = (props: any) => {
   const { env } = useConnectionConfig();
@@ -36,11 +37,11 @@ export const AppLayout = (props: any) => {
     <div className="App">
       <div className="Banner">
         <div className="Banner-description">
-          Oyster Lending is unaudited software. Use at your own risk.
+          {LABELS.AUDIT_WARNING}
         </div>
       </div>
       <BasicLayout
-        title="Oyster Lending"
+        title={LABELS.APP_TITLE}
         navTheme="realDark"
         headerTheme="dark"
         theme="dark"
@@ -62,7 +63,7 @@ export const AppLayout = (props: any) => {
                     pathname: "/",
                   }}
                 >
-                  Home
+                  {LABELS.MENU_HOME}
                 </Link>
               </Menu.Item>
               <Menu.Item key="2" icon={<PieChartOutlined />}>
@@ -71,7 +72,7 @@ export const AppLayout = (props: any) => {
                     pathname: "/dashboard",
                   }}
                 >
-                  Dashboard
+                  {LABELS.MENU_DASHBOARD}
                 </Link>
               </Menu.Item>
               <Menu.Item key="3" icon={<BankOutlined />}>
@@ -80,7 +81,7 @@ export const AppLayout = (props: any) => {
                     pathname: "/deposit",
                   }}
                 >
-                  Deposit
+                  {LABELS.MENU_DEPOSIT}
                 </Link>
               </Menu.Item>
               <Menu.Item key="4" icon={<LogoutOutlined />}>
@@ -89,7 +90,7 @@ export const AppLayout = (props: any) => {
                     pathname: "/borrow",
                   }}
                 >
-                  Borrow
+                  {LABELS.MENU_BORROW}
                 </Link>
               </Menu.Item>
               {env !== "mainnet-beta" && (
@@ -99,7 +100,7 @@ export const AppLayout = (props: any) => {
                       pathname: "/faucet",
                     }}
                   >
-                    Faucet
+                    {LABELS.MENU_FAUCET}
                   </Link>
                 </Menu.Item>
               )}

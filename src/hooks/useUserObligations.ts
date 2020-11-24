@@ -26,7 +26,7 @@ export function useUserObligations() {
       )
       .map((ob) => {
         return {
-          oblication: ob,
+          obligation: ob,
           userAccounts: [...accountsByMint.get(ob.info.tokenMint.toBase58())],
 
           // TODO: add total borrowed amount?

@@ -3,7 +3,7 @@ import { useTokenName } from "../../hooks";
 import { LendingObligation, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
-  decimalToLamports,
+  wadToLamports,
   formatNumber,
   fromLamports,
 } from "../../utils/utils";
@@ -25,16 +25,16 @@ export const ObligationItem = (props: {
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
 
   const borrowAmount = fromLamports(
-    decimalToLamports(obligation.info.borrowAmount),
+    wadToLamports(obligation.info.borrowAmountWad),
     liquidityMint
   );
 
   return (
     <Link
-      to={`/repay/${borrowReserve?.pubkey.toBase58()}/${obligation.pubkey.toBase58()}`}
+      to={`/repay/loan/${obligation.pubkey.toBase58()}`}
     >
       <Card>
-        <div className="borrow-item">
+        <div className="dashboard-item">
           <span style={{ display: "flex" }}>
             <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
             {name}

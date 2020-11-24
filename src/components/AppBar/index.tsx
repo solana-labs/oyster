@@ -4,6 +4,7 @@ import { useWallet } from "../../contexts/wallet";
 import { CurrentUserBadge } from "../CurrentUserBadge";
 import { SettingOutlined } from "@ant-design/icons";
 import { Settings } from "../Settings";
+import { LABELS } from "../../constants";
 
 export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
   const { connected, wallet } = useWallet();
@@ -19,20 +20,20 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
             onClick={connected ? wallet.disconnect : wallet.connect}
             style={{ color: "#2abdd2" }}
           >
-            Connect
+            {LABELS.CONNECT_BUTTON}
           </Button>
         )}
         {connected && (
           <Popover
             placement="bottomRight"
-            title="Wallet public key"
+            title={LABELS.WALLET_TOOLTIP}
             trigger="click"
           ></Popover>
         )}
       </div>
       <Popover
         placement="topRight"
-        title="Settings"
+        title={LABELS.SETTINGS_TOOLTIP}
         content={<Settings />}
         trigger="click"
       >

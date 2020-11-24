@@ -54,7 +54,7 @@ export function Routes() {
                         children={<BorrowReserveView />}
                       />
                       <Route
-                        path="/repay/:reserve/:obligation"
+                        path="/repay/loan/:obligation"
                         children={<RepayReserveView />}
                       />
                       <Route

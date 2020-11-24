@@ -7,6 +7,7 @@ import {
 } from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
+import { WAD } from "../../constants";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import * as Layout from "./../../utils/layout";
 import { LendingInstruction } from "./lending";
@@ -26,20 +27,26 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
 
     BufferLayout.struct(
       [
-        /// Max utilization rate as a percent
-        BufferLayout.u8("maxUtilizationRate"),
+        /// Optimal utilization rate as a percent
+        BufferLayout.u8("optimalUtilizationRate"),
         /// The ratio of the loan to the value of the collateral as a percent
         BufferLayout.u8("loanToValueRatio"),
         /// The percent discount the liquidator gets when buying collateral for an unhealthy obligation
         BufferLayout.u8("liquidationBonus"),
         /// The percent at which an obligation is considered unhealthy
         BufferLayout.u8("liquidationThreshold"),
+        /// Min borrow APY
+        BufferLayout.u8("minBorrowRate"),
+        /// Optimal (utilization) borrow APY
+        BufferLayout.u8("optimalBorrowRate"),
+        /// Max borrow APY
+        BufferLayout.u8("maxBorrowRate"),
       ],
       "config"
     ),
 
-    Layout.uint128("cumulativeBorrowRate"),
-    Layout.uint128("totalBorrows"),
+    Layout.uint128("cumulativeBorrowRateWad"),
+    Layout.uint128("totalBorrowsWad"),
 
     Layout.uint64("totalLiquidity"),
     Layout.uint64("collateralMintSupply"),
@@ -66,15 +73,18 @@ export interface LendingReserve {
   dexMarketPrice: BN; // what is precision on the price?
 
   config: {
-    maxUtilizationRate: number;
+    optimalUtilizationRate: number;
     loanToValueRatio: number;
     liquidationBonus: number;
     liquidationThreshold: number;
+    minBorrowRate: number;
+    optimalBorrowRate: number;
+    maxBorrowRate: number;
   };
   // collateralFactor: number;
 
-  cumulativeBorrowRate: BN;
-  totalBorrows: BN;
+  cumulativeBorrowRateWad: BN;
+  totalBorrowsWad: BN;
 
   totalLiquidity: BN;
   collateralMintSupply: BN;
@@ -250,3 +260,23 @@ export const withdrawInstruction = (
     data,
   });
 };
+
+export const calculateBorrowAPY = (reserve: LendingReserve) => {
+  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber()
+  const currentUtilization = totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows)
+  const optimalUtilization = reserve.config.optimalUtilizationRate
+  let borrowAPY;
+  if (currentUtilization < optimalUtilization) {
+    const normalized_factor = currentUtilization / optimalUtilization;
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const minBorrowRate = reserve.config.minBorrowRate / 100;
+    borrowAPY = normalized_factor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+  } else {
+    const normalized_factor = (currentUtilization - optimalUtilization) / (100 - optimalUtilization);
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const maxBorrowRate = reserve.config.maxBorrowRate / 100;
+    borrowAPY = normalized_factor * (maxBorrowRate - optimalBorrowRate) + optimalBorrowRate;
+  }
+
+  return borrowAPY;
+}

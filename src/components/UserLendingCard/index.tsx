@@ -3,12 +3,15 @@ import {
   useCollateralBalance,
   useTokenName,
   useUserBalance,
+  useBorrowedAmount,
 } from "./../../hooks";
 import { LendingReserve } from "../../models/lending";
-import { formatNumber } from "../../utils/utils";
+import { formatNumber, wadToLamports } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
+import { cache, ParsedAccount } from "../../contexts/accounts";
+import { MintInfo } from "@solana/spl-token";
 
 const { Text } = Typography;
 
@@ -25,8 +28,9 @@ export const UserLendingCard = (props: {
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
   const { balance: collateralBalance } = useCollateralBalance(props.reserve);
 
+  const { borrowed: totalBorrowed } = useBorrowedAmount(address);
+
   // TODO: calculate
-  const borrowed = 0;
   const healthFactor = "--";
   const ltv = 0;
   const available = 0;
@@ -54,7 +58,7 @@ export const UserLendingCard = (props: {
           Borrowed
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(borrowed)} {name}
+          {formatNumber.format(totalBorrowed)} {name}
         </div>
       </div>
 

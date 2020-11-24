@@ -1,12 +1,13 @@
 import React from "react";
 import { useTokenName } from "../../hooks";
-import { LendingReserve } from "../../models/lending";
+import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { decimalToLamports, formatNumber, fromLamports } from "../../utils/utils";
+import { wadToLamports, formatNumber, fromLamports } from "../../utils/utils";
 import { Card } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
 import { useMint } from "../../contexts/accounts";
+import { WAD } from "../../constants";
 
 export const LendingReserveItem = (props: {
   reserve: LendingReserve;
@@ -21,7 +22,8 @@ export const LendingReserveItem = (props: {
     liquidityMint
   );
 
-  const totalBorrows = decimalToLamports(props.reserve.totalBorrows).toNumber();
+  console.log(props.reserve.totalBorrowsWad.toString());
+  const totalBorrows = fromLamports(wadToLamports(props.reserve.totalBorrowsWad), liquidityMint);
 
   console.log(liquidityMint);
 
@@ -40,9 +42,12 @@ export const LendingReserveItem = (props: {
             {formatNumber.format(totalBorrows)} {name}
           </div>
           <div>--</div>
-          <div>--</div>
+          <div>{calculateBorrowAPY(props.reserve)}</div>
         </div>
       </Card>
     </Link>
   );
 };
+
+
+

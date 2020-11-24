@@ -12,9 +12,9 @@ export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayo
     /// Reserve which collateral tokens were deposited into
     Layout.publicKey("collateralSupply"),
     /// Borrow rate used for calculating interest.
-    Layout.uint128("cumulativeBorrowRate"),
+    Layout.uint128("cumulativeBorrowRateWad"),
     /// Amount of tokens borrowed for this obligation plus interest
-    Layout.uint128("borrowAmount"),
+    Layout.uint128("borrowAmountWad"),
     /// Reserve which tokens were borrowed from
     Layout.publicKey("borrowReserve"),
     /// Mint address of the tokens for this obligation
@@ -30,8 +30,8 @@ export interface LendingObligation {
   lastUpdateSlot: BN;
   collateralAmount: BN;
   collateralSupply: PublicKey;
-  cumulativeBorrowRate: BN; // decimals
-  borrowAmount: BN; // decimals
+  cumulativeBorrowRateWad: BN; // decimals
+  borrowAmountWad: BN; // decimals
   borrowReserve: PublicKey;
   tokenMint: PublicKey;
 }

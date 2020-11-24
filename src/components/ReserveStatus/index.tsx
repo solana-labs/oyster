@@ -3,6 +3,7 @@ import { LendingReserve } from "../../models/lending";
 import { Card } from "antd";
 import { PublicKey } from "@solana/web3.js";
 import "./style.less";
+import { LABELS } from "../../constants";
 
 export const ReserveStatus = (props: {
   className?: string;
@@ -18,7 +19,7 @@ export const ReserveStatus = (props: {
   return (
     <Card
       className={props.className}
-      title={<>Reserve Status &amp; Configuration</>}
+      title={<>{LABELS.RESERVE_STATUS_TITLE}</>}
       bodyStyle={bodyStyle}
     >
       <div

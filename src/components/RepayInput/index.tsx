@@ -14,7 +14,8 @@ import { useWallet } from "../../contexts/wallet";
 import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
-import { decimalToLamports, formatNumber, fromLamports, toLamports } from "../../utils/utils";
+import { wadToLamports, formatNumber, fromLamports, toLamports } from "../../utils/utils";
+import { LABELS } from "../../constants";
 
 export const RepayInput = (props: {
   className?: string;
@@ -51,9 +52,9 @@ export const RepayInput = (props: {
 
   const lamports = useMemo(() => toLamports(parseFloat(value), repayLiquidityMint), [value, repayLiquidityMint]);
 
-  const mark = decimalToLamports(obligation?.info.borrowAmount).toNumber() / lamports * 100;
+  const mark = wadToLamports(obligation?.info.borrowAmountWad).toNumber() / lamports * 100;
 
-  const onReoay = useCallback(() => {
+  const onRepay = useCallback(() => {
     if (
       !collateralReserve ||
       !obligation ||
@@ -102,7 +103,7 @@ export const RepayInput = (props: {
         }}
       >
         <div className="repay-input-title">
-          How much would you like to repay? (Currently:{" "}
+          {LABELS.REPAY_QUESTION} (Currently:{" "})
           {formatNumber.format(balance)} {name})
         </div>
         <div className="token-input">
@@ -126,8 +127,8 @@ export const RepayInput = (props: {
         <Slider marks={marks} 
           value={mark} 
           onChange={(val: number) => 
-          setValue((fromLamports(decimalToLamports(obligation?.info.borrowAmount).toNumber(), repayLiquidityMint) * val / 100).toFixed(2))} />
-        <div className="repay-input-title">Select collateral account?</div>
+          setValue((fromLamports(wadToLamports(obligation?.info.borrowAmountWad).toNumber(), repayLiquidityMint) * val / 100).toFixed(2))} />
+        <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={repayReserve.info}
           mint={collateralReserveMint}
@@ -136,10 +137,10 @@ export const RepayInput = (props: {
 
         <Button
           type="primary"
-          onClick={onReoay}
+          onClick={onRepay}
           disabled={fromAccounts.length === 0}
         >
-          Repay
+          {LABELS.REPAY_ACTION}
         </Button>
       </div>
     </Card>
