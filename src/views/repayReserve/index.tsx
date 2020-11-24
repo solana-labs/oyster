@@ -1,5 +1,5 @@
 import React from "react";
-import { useLendingReserve } from "../../hooks";
+import { useLendingObligation, useLendingReserve } from "../../hooks";
 import { useParams } from "react-router-dom";
 
 import { RepayInput } from "../../components/RepayInput";
@@ -9,12 +9,17 @@ import {
 } from "../../components/SideReserveOverview";
 
 import "./style.less";
-import { LendingObligation } from "../../models";
 
 export const RepayReserveView = () => {
-  const { id, obligation } = useParams<{ id: string; obligation?: string }>();
-  const lendingReserve = useLendingReserve(id);
+  const { reserve: reserveId, obligation: obligationId } = useParams<{
+    reserve: string;
+    obligation?: string;
+  }>();
+  const lendingReserve = useLendingReserve(reserveId);
+  const lendingObligation = useLendingObligation(obligationId);
   const reserve = lendingReserve?.info;
+
+  console.log([reserveId, obligationId]);
 
   if (!reserve || !lendingReserve) {
     return null;
@@ -25,9 +30,8 @@ export const RepayReserveView = () => {
       <div className="repay-reserve-container">
         <RepayInput
           className="repay-reserve-item repay-reserve-item-left"
-          reserve={reserve}
-          obligation={obligation}
-          address={lendingReserve.pubkey}
+          reserve={lendingReserve}
+          obligation={lendingObligation}
         />
         <SideReserveOverview
           className="repay-reserve-item repay-reserve-item-right"

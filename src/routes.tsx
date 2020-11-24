@@ -54,7 +54,11 @@ export function Routes() {
                         children={<BorrowReserveView />}
                       />
                       <Route
-                        path="/repay/:id"
+                        path="/repay/:reserve/:obligation"
+                        children={<RepayReserveView />}
+                      />
+                      <Route
+                        path="/repay/:reserve"
                         children={<RepayReserveView />}
                       />
                       <Route exact path="/faucet" children={<FaucetView />} />

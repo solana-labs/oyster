@@ -12,19 +12,21 @@ import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
 import { LendingObligation, TokenAccount } from "../models";
+import { ParsedAccount } from "../contexts/accounts";
+import { decimalToLamports } from "../utils/utils";
 
 export const repay = async (
   from: TokenAccount, // CollateralAccount
   amountLamports: number, // in collateral token (lamports)
 
   // which loan to repay
-  obligation: LendingObligation,
+  obligation: ParsedAccount<LendingObligation>,
 
-  repayReserve: LendingReserve,
-  repayReserveAddress: PublicKey,
+  obligationToken: TokenAccount,
 
-  withdrawReserve: LendingReserve,
-  withdrawReserveAddress: PublicKey,
+  repayReserve: ParsedAccount<LendingReserve>,
+
+  withdrawReserve: ParsedAccount<LendingReserve>,
 
   connection: Connection,
   wallet: any
@@ -45,7 +47,7 @@ export const repay = async (
   );
 
   const [authority] = await PublicKey.findProgramAddress(
-    [repayReserve.lendingMarket.toBuffer()],
+    [repayReserve.info.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID
   );
 
@@ -70,23 +72,43 @@ export const repay = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    withdrawReserve.liquidityMint,
+    withdrawReserve.info.collateralMint,
     signers
+  );
+
+  const loanRatio = amountLamports / decimalToLamports(obligation.info.borrowAmount)
+    .toNumber();
+  console.log(loanRatio);
+
+  // create approval for transfer transactions
+  instructions.push(
+    Token.createApproveInstruction(
+      TOKEN_PROGRAM_ID,
+      obligationToken.pubkey,
+      authority,
+      wallet.publicKey,
+      [],
+      obligationToken.info.amount.toNumber()
+    )
   );
 
   // TODO: add obligation
 
-  // instructions.push(
-  //   repayInstruction(
-  //     amountLamports,
-  //     fromAccount,
-  //     toAccount,
-  //     reserveAddress,
-  //     reserve.collateralMint,
-  //     reserve.liquiditySupply,
-  //     authority
-  //   )
-  // );
+  instructions.push(
+    repayInstruction(
+      amountLamports,
+      fromAccount,
+      toAccount,
+      repayReserve.pubkey,
+      repayReserve.info.liquiditySupply,
+      withdrawReserve.pubkey,
+      withdrawReserve.info.collateralSupply,
+      obligation.pubkey,
+      obligation.info.tokenMint,
+      obligationToken.pubkey,
+      authority
+    )
+  );
 
   try {
     let tx = await sendTransaction(

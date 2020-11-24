@@ -3,6 +3,7 @@ import { MintInfo } from "@solana/spl-token";
 
 import { TokenAccount } from "./../models";
 import { PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
 
 export interface KnownToken {
   tokenSymbol: string;
@@ -105,8 +106,13 @@ export function toLamports(
   return amount * precision;
 }
 
+export function decimalToLamports(amount?: BN): BN {
+  // TODO: check math
+  return amount?.div(new BN(10).pow(new BN(18))) || new BN(0);
+}
+
 export function fromLamports(
-  account?: TokenAccount | number,
+  account?: TokenAccount | number | BN,
   mint?: MintInfo,
   rate: number = 1.0
 ): number {
@@ -115,7 +121,11 @@ export function fromLamports(
   }
 
   const amount =
-    typeof account === "number" ? account : account.info.amount?.toNumber();
+    typeof account === "number"
+      ? account
+      : BN.isBN(account)
+      ? account.toNumber()
+      : account.info.amount.toNumber();
 
   const precision = Math.pow(10, mint?.decimals || 0);
   return (amount / precision) * rate;

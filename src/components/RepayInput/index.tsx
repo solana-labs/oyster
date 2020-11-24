@@ -1,33 +1,31 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useTokenName, useUserBalance } from "../../hooks";
+import { useAccountByMint, useTokenName, useUserBalance } from "../../hooks";
 import {
   LendingObligation,
   LendingReserve,
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card } from "antd";
-import { cache, ParsedAccount } from "../../contexts/accounts";
+import { Button, Card, Slider } from "antd";
+import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { repay } from "../../actions";
-import { PublicKey } from "@solana/web3.js";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
+import { decimalToLamports, formatNumber, fromLamports, toLamports } from "../../utils/utils";
 
 export const RepayInput = (props: {
   className?: string;
-  reserve: LendingReserve;
-  obligation?: string;
-  address: PublicKey;
+  reserve: ParsedAccount<LendingReserve>;
+  obligation?: ParsedAccount<LendingObligation>;
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
 
   const repayReserve = props.reserve;
-  const repayReserveAddress = props.address;
   const obligation = props.obligation;
 
   const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
@@ -41,41 +39,49 @@ export const RepayInput = (props: {
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveMint]);
 
-  const name = useTokenName(repayReserve?.liquidityMint);
-  const { accounts: fromAccounts } = useUserBalance(
-    collateralReserve?.info.collateralMint
+  const name = useTokenName(repayReserve?.info.liquidityMint);
+  const { accounts: fromAccounts, balance } = useUserBalance(
+    repayReserve.info.liquidityMint
   );
+
+  const repayLiquidityMint = useMint(repayReserve.info.liquidityMint);
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
-  // TODO:
-  if (!obligation) {
-  }
+  const obligationAccount = useAccountByMint(obligation?.info.tokenMint);
+
+  const lamports = useMemo(() => toLamports(parseFloat(value), repayLiquidityMint), [value, repayLiquidityMint]);
+
+  const mark = decimalToLamports(obligation?.info.borrowAmount).toNumber() / lamports * 100;
 
   const onReoay = useCallback(() => {
-    if (!collateralReserve) {
+    if (
+      !collateralReserve ||
+      !obligation ||
+      !repayReserve ||
+      !obligationAccount
+    ) {
       return;
     }
 
     repay(
       fromAccounts[0],
-      parseFloat(value),
-      obligation as any,
+      lamports,
+      obligation,
+      obligationAccount,
       repayReserve,
-      repayReserveAddress,
-      collateralReserve.info,
-      collateralReserve.pubkey,
+      collateralReserve,
       connection,
       wallet
     );
   }, [
+    lamports,
     connection,
     wallet,
-    value,
     obligation,
     collateralReserve,
     repayReserve,
     fromAccounts,
-    repayReserveAddress,
+    obligationAccount,
   ]);
 
   const bodyStyle: React.CSSProperties = {
@@ -96,10 +102,11 @@ export const RepayInput = (props: {
         }}
       >
         <div className="repay-input-title">
-          How much would you like to repay?
+          How much would you like to repay? (Currently:{" "}
+          {formatNumber.format(balance)} {name})
         </div>
         <div className="token-input">
-          <TokenIcon mintAddress={repayReserve?.liquidityMint} />
+          <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
           <NumericInput
             value={value}
             onChange={(val: any) => {
@@ -116,9 +123,13 @@ export const RepayInput = (props: {
           />
           <div>{name}</div>
         </div>
+        <Slider marks={marks} 
+          value={mark} 
+          onChange={(val: number) => 
+          setValue((fromLamports(decimalToLamports(obligation?.info.borrowAmount).toNumber(), repayLiquidityMint) * val / 100).toFixed(2))} />
         <div className="repay-input-title">Select collateral account?</div>
         <CollateralSelector
-          reserve={repayReserve}
+          reserve={repayReserve.info}
           mint={collateralReserveMint}
           onMintChange={setCollateralReserveMint}
         />
@@ -133,4 +144,12 @@ export const RepayInput = (props: {
       </div>
     </Card>
   );
+};
+
+const marks = {
+  0: '0%',
+  25: '25%',
+  50: '50%',
+  75: '75%',
+  100: '100%'
 };

@@ -34,14 +34,14 @@ export function useLendingObligations() {
   };
 }
 
-export function useLendingObligation(address: string | PublicKey) {
+export function useLendingObligation(address?: string | PublicKey) {
   const id = typeof address === "string" ? address : address?.toBase58();
   const [obligationAccount, setObligationAccount] = useState<
     ParsedAccount<LendingObligation>
   >();
 
   useEffect(() => {
-    setObligationAccount(cache.get(id));
+    setObligationAccount(cache.get(id || ""));
 
     const dispose = cache.emitter.onCache((args) => {
       if (args.id === id) {

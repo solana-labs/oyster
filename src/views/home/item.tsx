@@ -2,7 +2,7 @@ import React from "react";
 import { useTokenName } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber, fromLamports } from "../../utils/utils";
+import { decimalToLamports, formatNumber, fromLamports } from "../../utils/utils";
 import { Card } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
@@ -21,7 +21,7 @@ export const LendingReserveItem = (props: {
     liquidityMint
   );
 
-  const totalBorrows = props.reserve.totalBorrows.toString();
+  const totalBorrows = decimalToLamports(props.reserve.totalBorrows).toNumber();
 
   console.log(liquidityMint);
 
@@ -37,7 +37,7 @@ export const LendingReserveItem = (props: {
             {formatNumber.format(totalLiquidity)} {name}
           </div>
           <div>
-            {totalBorrows} {name}
+            {formatNumber.format(totalBorrows)} {name}
           </div>
           <div>--</div>
           <div>--</div>

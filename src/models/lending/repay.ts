@@ -46,7 +46,7 @@ export const repayInstruction = (
   dataLayout.encode(
     {
       instruction: LendingInstruction.RepayOblogationLiquidity,
-      collateralAmount: new BN(liquidityAmount),
+      liquidityAmount: new BN(liquidityAmount),
     },
     data
   );
