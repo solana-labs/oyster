@@ -76,8 +76,8 @@ export const repay = async (
     signers
   );
 
-  const loanRatio = amountLamports / wadToLamports(obligation.info.borrowAmountWad)
-    .toNumber();
+  const loanRatio =
+    amountLamports / wadToLamports(obligation.info.borrowAmountWad).toNumber();
   console.log(loanRatio);
 
   // create approval for transfer transactions

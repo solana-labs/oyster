@@ -14,7 +14,12 @@ import { useWallet } from "../../contexts/wallet";
 import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
-import { wadToLamports, formatNumber, fromLamports, toLamports } from "../../utils/utils";
+import {
+  wadToLamports,
+  formatNumber,
+  fromLamports,
+  toLamports,
+} from "../../utils/utils";
 import { LABELS } from "../../constants";
 
 export const RepayInput = (props: {
@@ -50,9 +55,14 @@ export const RepayInput = (props: {
 
   const obligationAccount = useAccountByMint(obligation?.info.tokenMint);
 
-  const lamports = useMemo(() => toLamports(parseFloat(value), repayLiquidityMint), [value, repayLiquidityMint]);
+  const lamports = useMemo(
+    () => toLamports(parseFloat(value), repayLiquidityMint),
+    [value, repayLiquidityMint]
+  );
 
-  const mark = wadToLamports(obligation?.info.borrowAmountWad).toNumber() / lamports * 100;
+  const mark =
+    (wadToLamports(obligation?.info.borrowAmountWad).toNumber() / lamports) *
+    100;
 
   const onRepay = useCallback(() => {
     if (
@@ -103,8 +113,8 @@ export const RepayInput = (props: {
         }}
       >
         <div className="repay-input-title">
-          {LABELS.REPAY_QUESTION} (Currently:{" "})
-          {formatNumber.format(balance)} {name})
+          {LABELS.REPAY_QUESTION} (Currently: ){formatNumber.format(balance)}{" "}
+          {name})
         </div>
         <div className="token-input">
           <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
@@ -124,10 +134,22 @@ export const RepayInput = (props: {
           />
           <div>{name}</div>
         </div>
-        <Slider marks={marks} 
-          value={mark} 
-          onChange={(val: number) => 
-          setValue((fromLamports(wadToLamports(obligation?.info.borrowAmountWad).toNumber(), repayLiquidityMint) * val / 100).toFixed(2))} />
+        <Slider
+          marks={marks}
+          value={mark}
+          onChange={(val: number) =>
+            setValue(
+              (
+                (fromLamports(
+                  wadToLamports(obligation?.info.borrowAmountWad).toNumber(),
+                  repayLiquidityMint
+                ) *
+                  val) /
+                100
+              ).toFixed(2)
+            )
+          }
+        />
         <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={repayReserve.info}
@@ -148,9 +170,9 @@ export const RepayInput = (props: {
 };
 
 const marks = {
-  0: '0%',
-  25: '25%',
-  50: '50%',
-  75: '75%',
-  100: '100%'
+  0: "0%",
+  25: "25%",
+  50: "50%",
+  75: "75%",
+  100: "100%",
 };

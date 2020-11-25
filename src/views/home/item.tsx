@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { wadToLamports, formatNumber, fromLamports } from "../../utils/utils";
+import {
+  wadToLamports,
+  formatNumber,
+  fromLamports,
+  formatPct,
+} from "../../utils/utils";
 import { Card } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
 import { useMint } from "../../contexts/accounts";
-import { WAD } from "../../constants";
 
 export const LendingReserveItem = (props: {
   reserve: LendingReserve;
@@ -22,10 +26,15 @@ export const LendingReserveItem = (props: {
     liquidityMint
   );
 
-  console.log(props.reserve.totalBorrowsWad.toString());
-  const totalBorrows = fromLamports(wadToLamports(props.reserve.totalBorrowsWad), liquidityMint);
+  const totalBorrows = useMemo(
+    () =>
+      fromLamports(wadToLamports(props.reserve.totalBorrowsWad), liquidityMint),
+    [props.reserve, liquidityMint]
+  );
 
-  console.log(liquidityMint);
+  const borrowAPY = useMemo(() => calculateBorrowAPY(props.reserve), [
+    props.reserve,
+  ]);
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
@@ -36,18 +45,15 @@ export const LendingReserveItem = (props: {
             {name}
           </span>
           <div>
-            {formatNumber.format(totalLiquidity)} {name}
+            {formatNumber.format(totalLiquidity+totalBorrows)} {name}
           </div>
           <div>
             {formatNumber.format(totalBorrows)} {name}
           </div>
           <div>--</div>
-          <div>{calculateBorrowAPY(props.reserve)}</div>
+          <div>{formatPct.format(borrowAPY)}</div>
         </div>
       </Card>
     </Link>
   );
 };
-
-
-

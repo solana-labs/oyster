@@ -84,9 +84,7 @@ export const BorrowInput = (props: {
           justifyContent: "space-around",
         }}
       >
-        <div className="borrow-input-title">
-          {LABELS.BORROW_QUESTION}
-        </div>
+        <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
         <div className="token-input">
           <TokenIcon mintAddress={borrowReserve?.liquidityMint} />
           <NumericInput

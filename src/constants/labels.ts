@@ -1,11 +1,12 @@
 export const LABELS = {
   CONNECT_LABEL: "Connect Wallet",
   GIVE_SOL: "Give me SOL",
-  FAUCET_INFO: "This faucet will help you fund your accounts outside of Solana main network.",
+  FAUCET_INFO:
+    "This faucet will help you fund your accounts outside of Solana main network.",
   ACCOUNT_FUNDED: "Account funded.",
   REPAY_QUESTION: "How much would you like to repay?",
   REPAY_ACTION: "Repay",
-  RESERVE_STATUS_TITLE: "Reserve Status &amp; Configuration",
+  RESERVE_STATUS_TITLE: "Reserve Status & Configuration",
   AUDIT_WARNING: "Oyster Lending is unaudited software. Use at your own risk.",
   MENU_HOME: "Home",
   MENU_DASHBOARD: "Dashboard",
@@ -27,4 +28,4 @@ export const LABELS = {
   DASHBOARD_TITLE_DEPOSITS: "Deposts",
   WITHDRAW_ACTION: "Withdraw",
   WITHDRAW_QUESTION: "How much would you like to withdraw?",
-}
+};

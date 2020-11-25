@@ -41,7 +41,7 @@ export function useLendingReserve(address?: string | PublicKey) {
   >();
 
   useEffect(() => {
-    setReserveAccount(cache.get(id || ''));
+    setReserveAccount(cache.get(id || ""));
 
     const dispose = cache.emitter.onCache((args) => {
       if (args.id === id) {

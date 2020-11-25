@@ -20,4 +20,5 @@ Any content produced by Solana, or developer resources that Solana provides, are
 - [] Add market size on front page
 - [] Add github link
 - [] Repay from reserve (add selection for obligation/loan)
-- [] 
+- [] Add support for token names in URL in addition to reserve address
+

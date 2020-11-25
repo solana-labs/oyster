@@ -15,9 +15,11 @@ export const RepayReserveView = () => {
     reserve?: string;
     obligation?: string;
   }>();
-  
+
   const lendingObligation = useLendingObligation(obligationId);
-  const lendingReserve = useLendingReserve(obligationId ? lendingObligation?.info.borrowReserve : reserveId);
+  const lendingReserve = useLendingReserve(
+    obligationId ? lendingObligation?.info.borrowReserve : reserveId
+  );
   const reserve = lendingReserve?.info;
 
   console.log([reserveId, obligationId]);

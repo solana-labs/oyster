@@ -6,12 +6,10 @@ import {
   useBorrowedAmount,
 } from "./../../hooks";
 import { LendingReserve } from "../../models/lending";
-import { formatNumber, wadToLamports } from "../../utils/utils";
+import { formatNumber } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
-import { cache, ParsedAccount } from "../../contexts/accounts";
-import { MintInfo } from "@solana/spl-token";
 
 const { Text } = Typography;
 

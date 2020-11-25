@@ -36,9 +36,7 @@ export const AppLayout = (props: any) => {
   return (
     <div className="App">
       <div className="Banner">
-        <div className="Banner-description">
-          {LABELS.AUDIT_WARNING}
-        </div>
+        <div className="Banner-description">{LABELS.AUDIT_WARNING}</div>
       </div>
       <BasicLayout
         title={LABELS.APP_TITLE}

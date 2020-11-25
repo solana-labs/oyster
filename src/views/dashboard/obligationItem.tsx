@@ -2,11 +2,7 @@ import React from "react";
 import { useTokenName } from "../../hooks";
 import { LendingObligation, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import {
-  wadToLamports,
-  formatNumber,
-  fromLamports,
-} from "../../utils/utils";
+import { wadToLamports, formatNumber, fromLamports } from "../../utils/utils";
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
@@ -30,9 +26,7 @@ export const ObligationItem = (props: {
   );
 
   return (
-    <Link
-      to={`/repay/loan/${obligation.pubkey.toBase58()}`}
-    >
+    <Link to={`/repay/loan/${obligation.pubkey.toBase58()}`}>
       <Card>
         <div className="dashboard-item">
           <span style={{ display: "flex" }}>

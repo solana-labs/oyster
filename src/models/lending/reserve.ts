@@ -262,21 +262,26 @@ export const withdrawInstruction = (
 };
 
 export const calculateBorrowAPY = (reserve: LendingReserve) => {
-  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber()
-  const currentUtilization = totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows)
-  const optimalUtilization = reserve.config.optimalUtilizationRate
+  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber();
+  const currentUtilization =
+    totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows);
+  const optimalUtilization = reserve.config.optimalUtilizationRate;
   let borrowAPY;
   if (currentUtilization < optimalUtilization) {
     const normalized_factor = currentUtilization / optimalUtilization;
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const minBorrowRate = reserve.config.minBorrowRate / 100;
-    borrowAPY = normalized_factor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+    borrowAPY =
+      normalized_factor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
   } else {
-    const normalized_factor = (currentUtilization - optimalUtilization) / (100 - optimalUtilization);
+    const normalized_factor =
+      (currentUtilization - optimalUtilization) / (100 - optimalUtilization);
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const maxBorrowRate = reserve.config.maxBorrowRate / 100;
-    borrowAPY = normalized_factor * (maxBorrowRate - optimalBorrowRate) + optimalBorrowRate;
+    borrowAPY =
+      normalized_factor * (maxBorrowRate - optimalBorrowRate) +
+      optimalBorrowRate;
   }
 
   return borrowAPY;
-}
+};
