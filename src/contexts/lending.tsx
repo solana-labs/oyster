@@ -18,6 +18,7 @@ import {
 } from "./accounts";
 import { PublicKey } from "@solana/web3.js";
 import { DexMarketParser } from "../models/dex";
+import { usePrecacheMarket } from "./market";
 
 export interface LendingContextState {}
 
@@ -39,14 +40,19 @@ export function LendingProvider({ children = null as any }) {
 export const useLending = () => {
   const connection = useConnection();
   const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
+  const precacheMarkets = usePrecacheMarket()
+
+  // TODO: query for all the dex from reserves
 
   const processAccount = useCallback((item) => {
     if (isLendingReserve(item.account)) {
-      return cache.add(
+      const reserve = cache.add(
         item.pubkey.toBase58(),
         item.account,
         LendingReserveParser
       );
+
+      return reserve;
     } else if (isLendingMarket(item.account)) {
       return cache.add(
         item.pubkey.toBase58(),
@@ -71,12 +77,14 @@ export const useLending = () => {
         .map(processAccount)
         .filter((item) => item !== undefined);
 
+      const lendingReserves = accounts
+      .filter(
+        (acc) => (acc?.info as LendingReserve).lendingMarket !== undefined
+      )
+      .map((acc) => acc as ParsedAccount<LendingReserve>);
+
       const toQuery = [
-        ...accounts
-          .filter(
-            (acc) => (acc?.info as LendingReserve).lendingMarket !== undefined
-          )
-          .map((acc) => acc as ParsedAccount<LendingReserve>)
+        ...lendingReserves
           .map((acc) => {
             const result = [
               cache.registerParser(

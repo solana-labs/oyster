@@ -10,7 +10,7 @@ import {
   depositInstruction,
   initReserveInstruction,
   LendingReserve,
-} from "./../models/lending/reserve";
+} from "./../models/lending";
 import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import {

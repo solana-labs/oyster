@@ -17,6 +17,8 @@ export interface MarketsContextState {
   marketByMint: Map<string, SerumMarket>;
 
   subscribeToMarket: (mint: string) => () => void;
+
+  precacheMarkets: (mints: string[]) => void;
 }
 
 const REFRESH_INTERVAL = 30_000;
@@ -28,17 +30,15 @@ const marketEmitter = new EventEmitter();
 export function MarketProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
   const accountsToObserve = useMemo(() => new Map<string, number>(), []);
+  const [marketMints, setMarketMints] = useState<string[]>();
 
   const connection = useMemo(() => new Connection(endpoint, "recent"), [
     endpoint,
   ]);
 
-  // TODO: identify which markets to query ...
-  const mints = useMemo(() => [] as PublicKey[], []);
-
   const marketByMint = useMemo(() => {
-    return [...new Set(mints).values()].reduce((acc, key) => {
-      const mintAddress = key.toBase58();
+    return [...new Set(marketMints).values()].reduce((acc, key) => {
+      const mintAddress = key;
 
       const SERUM_TOKEN = TOKEN_MINTS.find(
         (a) => a.address.toBase58() === mintAddress
@@ -58,7 +58,7 @@ export function MarketProvider({ children = null as any }) {
 
       return acc;
     }, new Map<string, SerumMarket>()) as Map<string, SerumMarket>;
-  }, [mints]);
+  }, [marketMints]);
 
   useEffect(() => {
     let timer = 0;
@@ -185,6 +185,10 @@ export function MarketProvider({ children = null as any }) {
     [marketByMint, accountsToObserve]
   );
 
+  const precacheMarkets = useCallback((mints: string[]) => {
+    setMarketMints([...new Set([...marketMints, ...mints]).values()])
+  }, [setMarketMints, marketMints]);
+
   return (
     <MarketsContext.Provider
       value={{
@@ -193,6 +197,7 @@ export function MarketProvider({ children = null as any }) {
         accountsToObserve,
         marketByMint,
         subscribeToMarket,
+        precacheMarkets,
       }}
     >
       {children}
@@ -230,6 +235,11 @@ export const useMidPriceInUSD = (mint: string) => {
 
   return { price, isBase: price === 1.0 };
 };
+
+export const usePrecacheMarket = () => {
+  const context = useMarkets();
+  return context.precacheMarkets;
+}
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

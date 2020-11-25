@@ -7,8 +7,10 @@ import {
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
+import { WAD } from "../../constants/math";
 import * as Layout from "./../../utils/layout";
 import { LendingInstruction } from "./lending";
+import { LendingReserve } from "./reserve";
 
 /// Borrow tokens from a reserve by depositing collateral tokens. The number of borrowed tokens
 /// is calculated by market price. The debt obligation is tokenized.
@@ -97,4 +99,31 @@ export const borrowInstruction = (
     programId: LENDING_PROGRAM_ID,
     data,
   });
+};
+
+// deposit APY utilization currentUtilizationRate * borrowAPY
+
+export const calculateBorrowAPY = (reserve: LendingReserve) => {
+  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber();
+  const currentUtilization =
+    totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows);
+  const optimalUtilization = reserve.config.optimalUtilizationRate;
+  let borrowAPY;
+  if (currentUtilization < optimalUtilization) {
+    const normalized_factor = currentUtilization / optimalUtilization;
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const minBorrowRate = reserve.config.minBorrowRate / 100;
+    borrowAPY =
+      normalized_factor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+  } else {
+    const normalized_factor =
+      (currentUtilization - optimalUtilization) / (100 - optimalUtilization);
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const maxBorrowRate = reserve.config.maxBorrowRate / 100;
+    borrowAPY =
+      normalized_factor * (maxBorrowRate - optimalBorrowRate) +
+      optimalBorrowRate;
+  }
+
+  return borrowAPY;
 };

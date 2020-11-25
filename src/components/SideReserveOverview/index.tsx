@@ -6,6 +6,7 @@ import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
 import { useMint } from "../../contexts/accounts";
 import { PublicKey } from "@solana/web3.js";
+import { Link } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -101,11 +102,13 @@ export const SideReserveOverview = (props: {
             justifyContent: "center",
           }}
         >
-          <TokenIcon
-            mintAddress={reserve?.liquidityMint}
-            style={{ width: 30, height: 30 }}
-          />{" "}
-          {name} Reserve Overview
+          <Link to={`/reserve/${props.address}`}>
+            <TokenIcon
+              mintAddress={reserve?.liquidityMint}
+              style={{ width: 30, height: 30 }}
+            />{" "}
+            {name} Reserve Overview
+          </Link>
         </div>
       }
     >

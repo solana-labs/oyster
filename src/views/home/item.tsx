@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
-import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
+import { calculateBorrowAPY, calculateDepositAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
   wadToLamports,
@@ -36,6 +36,12 @@ export const LendingReserveItem = (props: {
     props.reserve,
   ]);
 
+  const depositAPY = useMemo(() => calculateDepositAPY(props.reserve), [
+    props.reserve,
+  ]);
+
+  const marketSize = totalLiquidity+totalBorrows;
+
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
       <Card>
@@ -44,14 +50,18 @@ export const LendingReserveItem = (props: {
             <TokenIcon mintAddress={props.reserve.liquidityMint} />
             {name}
           </span>
-          <div>
-            {formatNumber.format(totalLiquidity+totalBorrows)} {name}
+          <div title={marketSize.toString()}>
+            {formatNumber.format(marketSize)} {name}
           </div>
-          <div>
+          <div title={totalBorrows.toString()}>
             {formatNumber.format(totalBorrows)} {name}
           </div>
-          <div>--</div>
-          <div>{formatPct.format(borrowAPY)}</div>
+          <div title={depositAPY.toString()}>
+            {formatPct.format(depositAPY)}
+          </div>
+          <div title={borrowAPY.toString()}>
+            {formatPct.format(borrowAPY)}
+          </div>
         </div>
       </Card>
     </Link>

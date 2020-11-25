@@ -9,7 +9,7 @@ import { notify } from "../utils/notifications";
 import {
   LendingReserve,
   withdrawInstruction,
-} from "./../models/lending/reserve";
+} from "./../models/lending";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";

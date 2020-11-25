@@ -1,4 +1,5 @@
 import React from "react";
+import { LABELS } from "../../constants";
 import { useLendingReserves } from "../../hooks";
 import { BorrowItem } from "./item";
 import "./itemStyle.less";
@@ -8,10 +9,10 @@ export const BorrowView = () => {
   return (
     <div className="flexColumn">
       <div className="borrow-item deposit-header">
-        <div>Asset</div>
-        <div>Available fro you</div>
-        <div>APY</div>
-        <div>Action</div>
+        <div>{LABELS.TABLE_TITLE_ASSET}</div>
+        <div>{LABELS.TABLE_TITLE_MAX_BORROW}</div>
+        <div>{LABELS.TABLE_TITLE_APR}</div>
+        <div>{LABELS.TABLE_TITLE_ACTION}</div>
       </div>
       {reserveAccounts.map((account) => (
         <BorrowItem reserve={account.info} address={account.pubkey} />
