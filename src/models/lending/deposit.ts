@@ -8,7 +8,7 @@ import * as BufferLayout from "buffer-layout";
 import { WAD } from "../../constants";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
 import * as Layout from "./../../utils/layout";
-import { calculateBorrowAPY } from "./borrow";
+import { calculateBorrowAPR } from "./borrow";
 import { LendingInstruction } from "./lending";
 import { LendingReserve } from "./reserve";
 
@@ -68,6 +68,6 @@ export const calculateDepositAPY = (reserve: LendingReserve) => {
   const currentUtilization =
     totalBorrows / (reserve.availableLiqudity.toNumber() + totalBorrows);
 
-  const borrowAPY = calculateBorrowAPY(reserve);
+  const borrowAPY = calculateBorrowAPR(reserve);
   return currentUtilization * borrowAPY;
 };

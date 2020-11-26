@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
 import {
-  calculateBorrowAPY,
+  calculateBorrowAPR,
   calculateDepositAPY,
   LendingReserve,
 } from "../../models/lending";
@@ -39,7 +39,7 @@ export const LendingReserveItem = (props: {
     [props.reserve, liquidityMint]
   );
 
-  const borrowAPY = useMemo(() => calculateBorrowAPY(props.reserve), [
+  const borrowAPY = useMemo(() => calculateBorrowAPR(props.reserve), [
     props.reserve,
   ]);
 

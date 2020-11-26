@@ -1,11 +1,12 @@
 import React from "react";
 import { useCollateralBalance, useTokenName } from "../../hooks";
-import { LendingReserve } from "../../models/lending";
+import { calculateBorrowAPR, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber } from "../../utils/utils";
+import { formatNumber, formatPct } from "../../utils/utils";
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
+import { LABELS } from "../../constants";
 
 export const BorrowItem = (props: {
   reserve: LendingReserve;
@@ -15,6 +16,8 @@ export const BorrowItem = (props: {
 
   // TODO: calculate avilable amount... based on total owned collateral across all the reserves
   const { balance: collateralBalance } = useCollateralBalance(props.reserve);
+
+  const apr = calculateBorrowAPR(props.reserve);
 
   return (
     <Link to={`/borrow/${props.address.toBase58()}`}>
@@ -27,10 +30,10 @@ export const BorrowItem = (props: {
           <div>
             {formatNumber.format(collateralBalance)} {name}
           </div>
-          <div>--</div>
+          <div>{formatPct.format(apr)}</div>
           <div>
             <Button>
-              <span>Borrow</span>
+              <span>{LABELS.BORROW_ACTION}</span>
             </Button>
           </div>
         </div>

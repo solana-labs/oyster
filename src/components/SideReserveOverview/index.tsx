@@ -1,11 +1,12 @@
 import React from "react";
 import { useTokenName } from "./../../hooks";
-import { LendingReserve } from "../../models/lending";
+import { calculateBorrowAPR, calculateDepositAPY, calculateUtilizationRatio, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
+import { formatNumber, formatPct, fromLamports, wadToLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
 import { ParsedAccount, useMint } from "../../contexts/accounts";
 import { Link } from "react-router-dom";
+import { LABELS } from "../../constants";
 
 const { Text } = Typography;
 
@@ -29,11 +30,10 @@ export const SideReserveOverview = (props: {
     liquidityMint
   );
 
-  // TODO: calculate
-  const depositApy = 0.048;
-  const borrowApy = 0.048;
+  const depositApy = calculateDepositAPY(reserve);
+  const borrowApr = calculateBorrowAPR(reserve);
 
-  const utilizationRate = reserve.config.loanToValueRatio / 100;
+  const utilizationRate = calculateUtilizationRatio(reserve);
   const liquidiationThreshold = reserve.config.optimalUtilizationRate / 100;
   const liquidiationPenalty = reserve.config.liquidationBonus / 100;
   const maxLTV = liquidiationThreshold - liquidiationPenalty;
@@ -44,7 +44,7 @@ export const SideReserveOverview = (props: {
       <>
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            Deposit APY:
+            {LABELS.TABLE_TITLE_DEPOSIT_APR}:
           </Text>
           <div className="card-cell ">{formatPct.format(depositApy)}</div>
         </div>
@@ -80,9 +80,9 @@ export const SideReserveOverview = (props: {
       <>
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            Borrow APY:
+            {LABELS.TABLE_TITLE_BORROW_APR}:
           </Text>
-          <div className="card-cell ">{formatPct.format(borrowApy)}</div>
+          <div className="card-cell ">{formatPct.format(borrowApr)}</div>
         </div>
       </>
     );

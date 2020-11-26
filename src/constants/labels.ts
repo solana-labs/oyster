@@ -38,4 +38,5 @@ export const LABELS = {
   WITHDRAW_QUESTION: "How much would you like to withdraw?",
   DASHBOARD_ACTION: "Go to dashboard",
   GO_BACK_ACTION: "Go back",
+  DEPOSIT_ACTION: "Deposit",
 };
