@@ -99,6 +99,7 @@ export const LendingReserveParser = (
 ) => {
   const buffer = Buffer.from(info.data);
   const data = LendingReserveLayout.decode(buffer);
+  if (data.lastUpdateSlot.toNumber() === 0) return;
 
   const details = {
     pubkey: pubKey,
