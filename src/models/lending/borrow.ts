@@ -14,7 +14,7 @@ import { LendingReserve } from "./reserve";
 
 export enum BorrowAmountType {
   LiquidityBorrowAmount = 0,
-  CollateralDepositAmount = 1
+  CollateralDepositAmount = 1,
 }
 
 /// Borrow tokens from a reserve by depositing collateral tokens. The number of borrowed tokens

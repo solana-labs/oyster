@@ -9,7 +9,11 @@ export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
     return userAccounts
-      .filter((acc) => mint?.equals(acc.info.mint) && (!account || account.equals(acc.pubkey)))
+      .filter(
+        (acc) =>
+          mint?.equals(acc.info.mint) &&
+          (!account || account.equals(acc.pubkey))
+      )
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
   }, [userAccounts, mint, account]);
 

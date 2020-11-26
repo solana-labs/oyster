@@ -185,9 +185,12 @@ export function MarketProvider({ children = null as any }) {
     [marketByMint, accountsToObserve]
   );
 
-  const precacheMarkets = useCallback((mints: string[]) => {
-    setMarketMints([...new Set([...marketMints, ...mints]).values()])
-  }, [setMarketMints, marketMints]);
+  const precacheMarkets = useCallback(
+    (mints: string[]) => {
+      setMarketMints([...new Set([...marketMints, ...mints]).values()]);
+    },
+    [setMarketMints, marketMints]
+  );
 
   return (
     <MarketsContext.Provider
@@ -239,7 +242,7 @@ export const useMidPriceInUSD = (mint: string) => {
 export const usePrecacheMarket = () => {
   const context = useMarkets();
   return context.precacheMarkets;
-}
+};
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

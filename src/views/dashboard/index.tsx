@@ -21,9 +21,9 @@ export const DashboardView = () => {
             <div>{LABELS.TABLE_TITLE_ACTION}</div>
           </div>
         )}
-        {userDeposits.map(deposit => <DepositItem reserve={deposit.reserve} account={deposit.account} />)
-
-        }
+        {userDeposits.map((deposit) => (
+          <DepositItem reserve={deposit.reserve} account={deposit.account} />
+        ))}
       </div>
       <div className="dashboard-right">
         <span>{LABELS.DASHBOARD_TITLE_LOANS}</span>

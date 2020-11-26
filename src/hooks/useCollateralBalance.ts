@@ -4,9 +4,15 @@ import { LendingReserve } from "../models/lending";
 import { fromLamports } from "../utils/utils";
 import { useUserBalance } from "./useUserBalance";
 
-export function useCollateralBalance(reserve?: LendingReserve, account?: PublicKey) {
+export function useCollateralBalance(
+  reserve?: LendingReserve,
+  account?: PublicKey
+) {
   const mint = useMint(reserve?.collateralMint);
-  const { balanceLamports, accounts } = useUserBalance(reserve?.collateralMint, account);
+  const { balanceLamports, accounts } = useUserBalance(
+    reserve?.collateralMint,
+    account
+  );
 
   const collateralRatioLamports =
     (reserve?.availableLiqudity.toNumber() || 0) *

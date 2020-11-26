@@ -36,7 +36,7 @@ export const ObligationItem = (props: {
           {formatNumber.format(borrowAmount)} {name}
         </div>
         <div>--</div>
-        <div style={{ display: "flex", justifyContent: 'flex-end' }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/borrow/${borrowReserve.pubkey.toBase58()}`}>
             <Button>
               <span>Borrow</span>

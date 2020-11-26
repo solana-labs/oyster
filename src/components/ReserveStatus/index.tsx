@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React from "react";
 import { LendingReserve } from "../../models/lending";
 import { Card } from "antd";
 import { PublicKey } from "@solana/web3.js";

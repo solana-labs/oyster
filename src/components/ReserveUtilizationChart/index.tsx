@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { LendingReserve } from "../../models/lending";
 import echarts from "echarts";
-import { formatNumber, formatUSD, fromLamports, wadToLamports } from "../../utils/utils";
+import {
+  formatNumber,
+  formatUSD,
+  fromLamports,
+  wadToLamports,
+} from "../../utils/utils";
 import { useMint } from "../../contexts/accounts";
 
-export const ReserveUtilizationChart = (props: {
-  reserve: LendingReserve;
-}) => {
+export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
   const chartDiv = useRef<HTMLDivElement>(null);
 
   // dispose chart
@@ -26,7 +29,10 @@ export const ReserveUtilizationChart = (props: {
 
   const totalBorrows = useMemo(
     () =>
-      fromLamports(wadToLamports(props.reserve.borrowedLiquidityWad), liquidityMint),
+      fromLamports(
+        wadToLamports(props.reserve.borrowedLiquidityWad),
+        liquidityMint
+      ),
     [props.reserve, liquidityMint]
   );
 
@@ -42,12 +48,12 @@ export const ReserveUtilizationChart = (props: {
 
     const data = [
       {
-        name: 'Available Liquidity',
+        name: "Available Liquidity",
         value: avilableLiquidity,
         tokens: avilableLiquidity,
       },
       {
-        name: 'Total Borrowed',
+        name: "Total Borrowed",
         value: totalBorrows,
         tokens: totalBorrows,
       },
@@ -66,7 +72,7 @@ export const ReserveUtilizationChart = (props: {
         {
           name: "Liquidity",
           type: "pie",
-          radius: ['50%', '70%'],
+          radius: ["50%", "70%"],
           top: 0,
           bottom: 0,
           left: 0,
@@ -104,5 +110,5 @@ export const ReserveUtilizationChart = (props: {
     });
   }, [totalBorrows, avilableLiquidity]);
 
-  return <div ref={chartDiv} style={{ height: 300, width: 400 }} />
-}
+  return <div ref={chartDiv} style={{ height: 300, width: 400 }} />;
+};

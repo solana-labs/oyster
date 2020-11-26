@@ -24,5 +24,5 @@ Any content produced by Solana, or developer resources that Solana provides, are
 
 # TOP for tomorrow
 
-* subscribe to all dex markets that are used by lending reserves
-* finish reserve overivew
+- subscribe to all dex markets that are used by lending reserves
+- finish reserve overivew

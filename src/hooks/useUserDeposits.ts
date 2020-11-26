@@ -12,20 +12,21 @@ export function useUserDeposits() {
     return reserveAccounts.reduce((result, item) => {
       result.set(item.info.collateralMint.toBase58(), item);
       return result;
-    }
-    , new Map<string, ParsedAccount<LendingReserve>>())
+    }, new Map<string, ParsedAccount<LendingReserve>>());
   }, [reserveAccounts]);
 
   const userDeposits = useMemo(() => {
     return userAccounts
       .filter((acc) => reservesByCollateralMint.has(acc.info.mint.toBase58()))
-      .map(item => ({
-        account: item, 
-        reserve: reservesByCollateralMint.get(item.info.mint.toBase58()) as ParsedAccount<LendingReserve>,
+      .map((item) => ({
+        account: item,
+        reserve: reservesByCollateralMint.get(
+          item.info.mint.toBase58()
+        ) as ParsedAccount<LendingReserve>,
       }));
   }, [userAccounts, reservesByCollateralMint]);
 
   return {
-    userDeposits
+    userDeposits,
   };
 }

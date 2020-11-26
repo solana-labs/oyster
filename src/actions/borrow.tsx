@@ -42,8 +42,7 @@ export const borrow = async (
 
   exsistingObligation?: ParsedAccount<LendingObligation>,
 
-  obligationAccount?: PublicKey,
-
+  obligationAccount?: PublicKey
 ) => {
   notify({
     message: "Borrowing funds...",
@@ -59,34 +58,34 @@ export const borrow = async (
     AccountLayout.span
   );
 
-  const obligation = exsistingObligation ?
-    exsistingObligation.pubkey :
-    createUninitializedObligation(
-      instructions,
-      wallet.publicKey,
-      await connection.getMinimumBalanceForRentExemption(
-        LendingObligationLayout.span
-      ),
-      signers
-    );
+  const obligation = exsistingObligation
+    ? exsistingObligation.pubkey
+    : createUninitializedObligation(
+        instructions,
+        wallet.publicKey,
+        await connection.getMinimumBalanceForRentExemption(
+          LendingObligationLayout.span
+        ),
+        signers
+      );
 
-  const obligationMint = exsistingObligation ?
-    exsistingObligation.info.tokenMint :
-    createUninitializedMint(
-      instructions,
-      wallet.publicKey,
-      await connection.getMinimumBalanceForRentExemption(MintLayout.span),
-      signers
-    );
+  const obligationMint = exsistingObligation
+    ? exsistingObligation.info.tokenMint
+    : createUninitializedMint(
+        instructions,
+        wallet.publicKey,
+        await connection.getMinimumBalanceForRentExemption(MintLayout.span),
+        signers
+      );
 
-  const obligationTokenOutput = obligationAccount ?
-    obligationAccount :
-    createUninitializedAccount(
-      instructions,
-      wallet.publicKey,
-      accountRentExempt,
-      signers
-    );
+  const obligationTokenOutput = obligationAccount
+    ? obligationAccount
+    : createUninitializedAccount(
+        instructions,
+        wallet.publicKey,
+        accountRentExempt,
+        signers
+      );
 
   let toAccount = await findOrCreateAccountByMint(
     wallet.publicKey,
@@ -110,13 +109,12 @@ export const borrow = async (
       type: "success",
     });
   }
-  
+
   notify({
     message: "Adding Liquidity...",
     description: "Please review transactions to approve.",
     type: "warn",
   });
-
 
   signers = [];
   instructions = [];
@@ -130,7 +128,7 @@ export const borrow = async (
   let amountLamports: number = 0;
   let fromLamports: number = 0;
   if (amountType === BorrowAmountType.LiquidityBorrowAmount) {
-    // approve max transfer 
+    // approve max transfer
     // TODO: improve contrain by using dex market data
     const approvedAmount = from.info.amount.toNumber();
 

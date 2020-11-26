@@ -1,6 +1,14 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useTokenName, useUserBalance, useUserObligationByReserve } from "../../hooks";
-import { BorrowAmountType, LendingReserve, LendingReserveParser } from "../../models";
+import {
+  useTokenName,
+  useUserBalance,
+  useUserObligationByReserve,
+} from "../../hooks";
+import {
+  BorrowAmountType,
+  LendingReserve,
+  LendingReserveParser,
+} from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
@@ -38,7 +46,9 @@ export const BorrowInput = (props: {
     collateralReserve?.info.collateralMint
   );
 
-  const { userObligationsByReserve } = useUserObligationByReserve(borrowReserve.pubkey)
+  const { userObligationsByReserve } = useUserObligationByReserve(
+    borrowReserve.pubkey
+  );
 
   const onBorrow = useCallback(() => {
     if (!collateralReserve) {
@@ -56,13 +66,13 @@ export const BorrowInput = (props: {
       borrowReserve,
       collateralReserve,
 
-      userObligationsByReserve.length > 0 ?
-        userObligationsByReserve[0].obligation :
-        undefined,
+      userObligationsByReserve.length > 0
+        ? userObligationsByReserve[0].obligation
+        : undefined,
 
-      userObligationsByReserve.length > 0 ?
-        userObligationsByReserve[0].userAccounts[0].pubkey :
-        undefined
+      userObligationsByReserve.length > 0
+        ? userObligationsByReserve[0].userAccounts[0].pubkey
+        : undefined
     );
   }, [
     connection,

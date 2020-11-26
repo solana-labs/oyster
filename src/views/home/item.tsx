@@ -1,6 +1,10 @@
 import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
-import { calculateBorrowAPY, calculateDepositAPY, LendingReserve } from "../../models/lending";
+import {
+  calculateBorrowAPY,
+  calculateDepositAPY,
+  LendingReserve,
+} from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
   wadToLamports,
@@ -28,7 +32,10 @@ export const LendingReserveItem = (props: {
 
   const totalBorrows = useMemo(
     () =>
-      fromLamports(wadToLamports(props.reserve.borrowedLiquidityWad), liquidityMint),
+      fromLamports(
+        wadToLamports(props.reserve.borrowedLiquidityWad),
+        liquidityMint
+      ),
     [props.reserve, liquidityMint]
   );
 
@@ -40,7 +47,7 @@ export const LendingReserveItem = (props: {
     props.reserve,
   ]);
 
-  const marketSize = availableLiqudity+totalBorrows;
+  const marketSize = availableLiqudity + totalBorrows;
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
@@ -59,9 +66,7 @@ export const LendingReserveItem = (props: {
           <div title={depositAPY.toString()}>
             {formatPct.format(depositAPY)}
           </div>
-          <div title={borrowAPY.toString()}>
-            {formatPct.format(borrowAPY)}
-          </div>
+          <div title={borrowAPY.toString()}>{formatPct.format(borrowAPY)}</div>
         </div>
       </Card>
     </Link>

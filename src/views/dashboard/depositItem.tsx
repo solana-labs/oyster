@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  useCollateralBalance,
-  useTokenName,
-} from "../../hooks";
+import { useCollateralBalance, useTokenName } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber } from "../../utils/utils";
@@ -15,10 +12,12 @@ export const DepositItem = (props: {
   reserve: ParsedAccount<LendingReserve>;
   account: TokenAccount;
 }) => {
-
   const mintAddress = props.reserve.info.liquidityMint;
   const name = useTokenName(mintAddress);
-  const { balance: collateralBalance } = useCollateralBalance(props.reserve.info, props.account.pubkey);
+  const { balance: collateralBalance } = useCollateralBalance(
+    props.reserve.info,
+    props.account.pubkey
+  );
 
   return (
     <Card>
@@ -31,7 +30,7 @@ export const DepositItem = (props: {
           {formatNumber.format(collateralBalance)} {name}
         </div>
         <div>--</div>
-        <div style={{ display: "flex", justifyContent: 'flex-end' }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/deposit/${props.reserve.pubkey.toBase58()}`}>
             <Button>
               <span>Deposit</span>

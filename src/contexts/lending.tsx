@@ -40,7 +40,7 @@ export function LendingProvider({ children = null as any }) {
 export const useLending = () => {
   const connection = useConnection();
   const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
-  const precacheMarkets = usePrecacheMarket()
+  const precacheMarkets = usePrecacheMarket();
 
   // TODO: query for all the dex from reserves
 
@@ -78,31 +78,30 @@ export const useLending = () => {
         .filter((item) => item !== undefined);
 
       const lendingReserves = accounts
-      .filter(
-        (acc) => (acc?.info as LendingReserve).lendingMarket !== undefined
-      )
-      .map((acc) => acc as ParsedAccount<LendingReserve>);
+        .filter(
+          (acc) => (acc?.info as LendingReserve).lendingMarket !== undefined
+        )
+        .map((acc) => acc as ParsedAccount<LendingReserve>);
 
       const toQuery = [
-        ...lendingReserves
-          .map((acc) => {
-            const result = [
-              cache.registerParser(
-                acc?.info.collateralMint.toBase58(),
-                MintParser
-              ),
-              cache.registerParser(
-                acc?.info.liquidityMint.toBase58(),
-                MintParser
-              ),
-              // ignore dex if its not set
-              cache.registerParser(
-                acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : "",
-                DexMarketParser
-              ),
-            ].filter((_) => _);
-            return result;
-          }),
+        ...lendingReserves.map((acc) => {
+          const result = [
+            cache.registerParser(
+              acc?.info.collateralMint.toBase58(),
+              MintParser
+            ),
+            cache.registerParser(
+              acc?.info.liquidityMint.toBase58(),
+              MintParser
+            ),
+            // ignore dex if its not set
+            cache.registerParser(
+              acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : "",
+              DexMarketParser
+            ),
+          ].filter((_) => _);
+          return result;
+        }),
       ].flat() as string[];
 
       // This will pre-cache all accounts used by pools
