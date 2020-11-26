@@ -34,9 +34,9 @@ export const SideReserveOverview = (props: {
   const borrowApr = calculateBorrowAPY(reserve);
 
   const utilizationRate = calculateUtilizationRatio(reserve);
-  const liquidationThreshold = reserve.config.optimalUtilizationRate / 100;
+  const liquidationThreshold = reserve.config.liquidationThreshold / 100;
   const liquidationPenalty = reserve.config.liquidationBonus / 100;
-  const maxLTV = liquidationThreshold - liquidationPenalty;
+  const maxLTV = reserve.config.loanToValueRatio / 100;
 
   let extraInfo: JSX.Element | null = null;
   if (mode === SideReserveOverviewMode.Deposit) {

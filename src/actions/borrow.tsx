@@ -40,7 +40,7 @@ export const borrow = async (
 
   depositReserve: ParsedAccount<LendingReserve>,
 
-  exsistingObligation?: ParsedAccount<LendingObligation>,
+  existingObligation?: ParsedAccount<LendingObligation>,
 
   obligationAccount?: PublicKey
 ) => {
@@ -58,8 +58,8 @@ export const borrow = async (
     AccountLayout.span
   );
 
-  const obligation = exsistingObligation
-    ? exsistingObligation.pubkey
+  const obligation = existingObligation
+    ? existingObligation.pubkey
     : createUninitializedObligation(
         instructions,
         wallet.publicKey,
@@ -69,8 +69,8 @@ export const borrow = async (
         signers
       );
 
-  const obligationMint = exsistingObligation
-    ? exsistingObligation.info.tokenMint
+  const obligationMint = existingObligation
+    ? existingObligation.info.tokenMint
     : createUninitializedMint(
         instructions,
         wallet.publicKey,
@@ -182,7 +182,7 @@ export const borrow = async (
   const dexMarket = cache.get(dexMarketAddress);
 
   if (!dexMarket) {
-    throw new Error(`Dex market doesn't exsists.`);
+    throw new Error(`Dex market doesn't exist.`);
   }
 
   const dexOrderBookSide = market.info.quoteMint.equals(

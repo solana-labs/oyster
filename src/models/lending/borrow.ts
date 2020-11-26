@@ -118,7 +118,7 @@ export const calculateBorrowAPY = (reserve: LendingReserve) => {
   const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
 
   let borrowAPY;
-  if (optimalUtilization == 1.0 || currentUtilization < optimalUtilization) {
+  if (optimalUtilization === 1.0 || currentUtilization < optimalUtilization) {
     const normalizedFactor = currentUtilization / optimalUtilization;
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const minBorrowRate = reserve.config.minBorrowRate / 100;
