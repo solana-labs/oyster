@@ -34,8 +34,7 @@ export const DepositReserveView = () => {
         />
         <SideReserveOverview
           className="deposit-reserve-item deposit-reserve-item-right"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
+          reserve={lendingReserve}
           mode={SideReserveOverviewMode.Deposit}
         />
       </div>

@@ -45,9 +45,9 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     ),
 
     Layout.uint128("cumulativeBorrowRateWad"),
-    Layout.uint128("totalBorrowsWad"),
+    Layout.uint128("borrowedLiquidityWad"),
 
-    Layout.uint64("totalLiquidity"),
+    Layout.uint64("availableLiqudity"),
     Layout.uint64("collateralMintSupply"),
   ]
 );
@@ -83,9 +83,9 @@ export interface LendingReserve {
   // collateralFactor: number;
 
   cumulativeBorrowRateWad: BN;
-  totalBorrowsWad: BN;
+  borrowedLiquidityWad: BN;
 
-  totalLiquidity: BN;
+  availableLiqudity: BN;
   collateralMintSupply: BN;
 
   // Layout.uint128("cumulative_borrow_rate"),

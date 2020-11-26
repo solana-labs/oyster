@@ -23,18 +23,21 @@ import {
   LendingObligationLayout,
   borrowInstruction,
   LendingMarket,
+  BorrowAmountType,
+  LendingObligation,
 } from "../models";
 import { toLamports } from "../utils/utils";
 
 export const borrow = async (
   from: TokenAccount,
   amount: number,
+  amountType: BorrowAmountType,
 
-  borrowReserve: LendingReserve,
-  borrowReserveAddress: PublicKey,
+  borrowReserve: ParsedAccount<LendingReserve>,
 
-  depositReserve: LendingReserve,
-  depositReserveAddress: PublicKey,
+  depositReserve: ParsedAccount<LendingReserve>,
+
+  exsistingObligation: ParsedAccount<LendingObligation> | undefined,
 
   connection: Connection,
   wallet: any
@@ -82,7 +85,7 @@ export const borrow = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    borrowReserve.liquidityMint,
+    borrowReserve.info.liquidityMint,
     signers
   );
 
@@ -108,23 +111,44 @@ export const borrow = async (
   cleanupInstructions = [];
 
   const [authority] = await PublicKey.findProgramAddress(
-    [depositReserve.lendingMarket.toBuffer()],
+    [depositReserve.info.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID
   );
 
-  const mint = (await cache.query(
-    connection,
-    depositReserve.collateralMint,
-    MintParser
-  )) as ParsedAccount<MintInfo>;
-  const amountLamports = toLamports(amount, mint?.info);
+  
+
+  let amountLamports: number = 0;
+  let fromLamports: number = 0;
+  if(amountType === BorrowAmountType.LiquidityBorrowAmount) {
+    // approve max transfer 
+    // TODO: improve contrain by using dex market data
+    const approvedAmount = from.info.amount.toNumber();
+
+    fromLamports = approvedAmount - accountRentExempt;
+
+    const mint = (await cache.query(
+      connection,
+      borrowReserve.info.liquidityMint,
+      MintParser
+    )) as ParsedAccount<MintInfo>;
+
+    amountLamports = toLamports(amount, mint?.info);
+  } else if(amountType === BorrowAmountType.CollateralDepositAmount) {
+    const mint = (await cache.query(
+      connection,
+      depositReserve.info.collateralMint,
+      MintParser
+    )) as ParsedAccount<MintInfo>;
+    amountLamports = toLamports(amount, mint?.info);
+    fromLamports = amountLamports;
+  }
 
   const fromAccount = ensureSplAccount(
     instructions,
     cleanupInstructions,
     from,
     wallet.publicKey,
-    amountLamports + accountRentExempt,
+    fromLamports + accountRentExempt,
     signers
   );
 
@@ -136,17 +160,17 @@ export const borrow = async (
       authority,
       wallet.publicKey,
       [],
-      amountLamports
+      fromLamports
     )
   );
 
-  const market = cache.get(depositReserve.lendingMarket) as ParsedAccount<
+  const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<
     LendingMarket
   >;
 
-  const dexMarketAddress = borrowReserve.dexMarketOption
-    ? borrowReserve.dexMarket
-    : depositReserve.dexMarket;
+  const dexMarketAddress = borrowReserve.info.dexMarketOption
+    ? borrowReserve.info.dexMarket
+    : depositReserve.info.dexMarket;
   const dexMarket = cache.get(dexMarketAddress);
 
   if (!dexMarket) {
@@ -154,7 +178,7 @@ export const borrow = async (
   }
 
   const dexOrderBookSide = market.info.quoteMint.equals(
-    depositReserve.liquidityMint
+    depositReserve.info.liquidityMint
   )
     ? dexMarket?.info.bids
     : dexMarket?.info.asks;
@@ -169,12 +193,13 @@ export const borrow = async (
   instructions.push(
     borrowInstruction(
       amountLamports,
+      amountType,
       fromAccount,
       toAccount,
-      depositReserveAddress,
-      depositReserve.collateralSupply,
-      borrowReserveAddress,
-      borrowReserve.liquiditySupply,
+      depositReserve.pubkey,
+      depositReserve.info.collateralSupply,
+      borrowReserve.pubkey,
+      borrowReserve.info.liquiditySupply,
 
       obligation,
       obligationMint,

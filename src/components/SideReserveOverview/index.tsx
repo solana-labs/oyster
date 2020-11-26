@@ -4,7 +4,7 @@ import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
-import { useMint } from "../../contexts/accounts";
+import { ParsedAccount, useMint } from "../../contexts/accounts";
 import { PublicKey } from "@solana/web3.js";
 import { Link } from "react-router-dom";
 
@@ -17,17 +17,16 @@ export enum SideReserveOverviewMode {
 
 export const SideReserveOverview = (props: {
   className?: string;
-  reserve: LendingReserve;
-  address: PublicKey;
+  reserve: ParsedAccount<LendingReserve>;
   mode: SideReserveOverviewMode;
 }) => {
-  const reserve = props.reserve;
+  const reserve = props.reserve.info;
   const mode = props.mode;
   const name = useTokenName(reserve?.liquidityMint);
-  const liquidityMint = useMint(props.reserve.liquidityMint);
+  const liquidityMint = useMint(reserve.liquidityMint);
 
-  const totalLiquidity = fromLamports(
-    props.reserve.totalLiquidity.toNumber(),
+  const availableLiqudity = fromLamports(
+    reserve.availableLiqudity.toNumber(),
     liquidityMint
   );
 
@@ -102,7 +101,7 @@ export const SideReserveOverview = (props: {
             justifyContent: "center",
           }}
         >
-          <Link to={`/reserve/${props.address}`}>
+          <Link to={`/reserve/${props.reserve.pubkey}`}>
             <TokenIcon
               mintAddress={reserve?.liquidityMint}
               style={{ width: 30, height: 30 }}
@@ -124,7 +123,7 @@ export const SideReserveOverview = (props: {
           Available liquidity:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(totalLiquidity)} {name}
+          {formatNumber.format(availableLiqudity)} {name}
         </div>
       </div>
 

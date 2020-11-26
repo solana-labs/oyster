@@ -12,9 +12,8 @@ import {
 export const BorrowReserveView = () => {
   const { id } = useParams<{ id: string }>();
   const lendingReserve = useLendingReserve(id);
-  const reserve = lendingReserve?.info;
 
-  if (!reserve || !lendingReserve) {
+  if (!lendingReserve) {
     return null;
   }
 
@@ -23,13 +22,11 @@ export const BorrowReserveView = () => {
       <div className="borrow-reserve-container">
         <BorrowInput
           className="borrow-reserve-item borrow-reserve-item-left"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
+          reserve={lendingReserve}
         />
         <SideReserveOverview
           className="borrow-reserve-item borrow-reserve-item-right"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
+          reserve={lendingReserve}
           mode={SideReserveOverviewMode.Borrow}
         />
       </div>

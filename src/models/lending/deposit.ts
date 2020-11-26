@@ -64,9 +64,9 @@ export const depositInstruction = (
 };
 
 export const calculateDepositAPY = (reserve: LendingReserve) => {
-  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber();
+  const totalBorrows = reserve.borrowedLiquidityWad.div(WAD).toNumber();
   const currentUtilization =
-    totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows);
+    totalBorrows / (reserve.availableLiqudity.toNumber() + totalBorrows);
 
   const borrowAPY = calculateBorrowAPY(reserve);
   return currentUtilization * borrowAPY;

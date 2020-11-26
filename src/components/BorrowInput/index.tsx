@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTokenName, useUserBalance } from "../../hooks";
-import { LendingReserve, LendingReserveParser } from "../../models";
+import { BorrowAmountType, LendingReserve, LendingReserveParser } from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
@@ -15,15 +15,13 @@ import { LABELS } from "../../constants";
 
 export const BorrowInput = (props: {
   className?: string;
-  reserve: LendingReserve;
-  address: PublicKey;
+  reserve: ParsedAccount<LendingReserve>;
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
 
   const borrowReserve = props.reserve;
-  const borrowReserveAddress = props.address;
 
   const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
 
@@ -36,7 +34,7 @@ export const BorrowInput = (props: {
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveMint]);
 
-  const name = useTokenName(borrowReserve?.liquidityMint);
+  const name = useTokenName(borrowReserve?.info.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
     collateralReserve?.info.collateralMint
   );
@@ -50,10 +48,11 @@ export const BorrowInput = (props: {
     borrow(
       fromAccounts[0],
       parseFloat(value),
+      // TODO: switch to collateral when user is using slider
+      BorrowAmountType.LiquidityBorrowAmount, 
       borrowReserve,
-      borrowReserveAddress,
-      collateralReserve.info,
-      collateralReserve.pubkey,
+      collateralReserve,
+      undefined,
       connection,
       wallet
     );
@@ -64,7 +63,6 @@ export const BorrowInput = (props: {
     collateralReserve,
     borrowReserve,
     fromAccounts,
-    borrowReserveAddress,
   ]);
 
   const bodyStyle: React.CSSProperties = {
@@ -86,7 +84,7 @@ export const BorrowInput = (props: {
       >
         <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
         <div className="token-input">
-          <TokenIcon mintAddress={borrowReserve?.liquidityMint} />
+          <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
           <NumericInput
             value={value}
             onChange={(val: any) => {
@@ -105,7 +103,7 @@ export const BorrowInput = (props: {
         </div>
         <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
-          reserve={borrowReserve}
+          reserve={borrowReserve.info}
           mint={collateralReserveMint}
           onMintChange={setCollateralReserveMint}
         />

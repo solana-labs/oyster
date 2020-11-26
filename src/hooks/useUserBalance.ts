@@ -4,12 +4,12 @@ import { useMint } from "../contexts/accounts";
 import { fromLamports } from "../utils/utils";
 import { useUserAccounts } from "./useUserAccounts";
 
-export function useUserBalance(mint?: PublicKey) {
+export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
   const { userAccounts } = useUserAccounts();
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
     return userAccounts
-      .filter((acc) => mint?.equals(acc.info.mint))
+      .filter((acc) => mint?.equals(acc.info.mint) && (!account || account.equals(acc.pubkey)))
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
   }, [userAccounts, mint]);
 

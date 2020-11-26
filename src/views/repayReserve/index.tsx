@@ -38,8 +38,7 @@ export const RepayReserveView = () => {
         />
         <SideReserveOverview
           className="repay-reserve-item repay-reserve-item-right"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
+          reserve={lendingReserve}
           mode={SideReserveOverviewMode.Borrow}
         />
       </div>

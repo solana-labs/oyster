@@ -12,6 +12,11 @@ import * as Layout from "./../../utils/layout";
 import { LendingInstruction } from "./lending";
 import { LendingReserve } from "./reserve";
 
+export enum BorrowAmountType {
+  LiquidityBorrowAmount = 0,
+  CollateralDepositAmount = 1
+}
+
 /// Borrow tokens from a reserve by depositing collateral tokens. The number of borrowed tokens
 /// is calculated by market price. The debt obligation is tokenized.
 ///
@@ -33,7 +38,8 @@ import { LendingReserve } from "./reserve";
 ///   15 `[]` Rent sysvar
 ///   16 '[]` Token program id
 export const borrowInstruction = (
-  collateralAmount: number | BN,
+  amount: number | BN,
+  amountType: BorrowAmountType,
   from: PublicKey, // Collateral input SPL Token account. $authority can transfer $collateralAmount
   to: PublicKey, // Liquidity output SPL Token account,
   depositReserve: PublicKey,
@@ -55,17 +61,20 @@ export const borrowInstruction = (
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8("instruction"),
-    Layout.uint64("collateralAmount"),
+    Layout.uint64("amount"),
+    BufferLayout.u8("amountType"),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: LendingInstruction.BorrowLiquidity,
-      collateralAmount: new BN(collateralAmount),
+      amount: new BN(amount),
+      amountType,
     },
     data
   );
+  debugger;
 
   const keys = [
     { pubkey: from, isSigner: false, isWritable: true },
@@ -104,9 +113,9 @@ export const borrowInstruction = (
 // deposit APY utilization currentUtilizationRate * borrowAPY
 
 export const calculateBorrowAPY = (reserve: LendingReserve) => {
-  const totalBorrows = reserve.totalBorrowsWad.div(WAD).toNumber();
+  const totalBorrows = reserve.borrowedLiquidityWad.div(WAD).toNumber();
   const currentUtilization =
-    totalBorrows / (reserve.totalLiquidity.toNumber() + totalBorrows);
+    totalBorrows / (reserve.availableLiqudity.toNumber() + totalBorrows);
   const optimalUtilization = reserve.config.optimalUtilizationRate;
   let borrowAPY;
   if (currentUtilization < optimalUtilization) {

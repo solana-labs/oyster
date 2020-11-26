@@ -21,14 +21,14 @@ export const LendingReserveItem = (props: {
 
   const liquidityMint = useMint(props.reserve.liquidityMint);
 
-  const totalLiquidity = fromLamports(
-    props.reserve.totalLiquidity.toNumber(),
+  const availableLiqudity = fromLamports(
+    props.reserve.availableLiqudity.toNumber(),
     liquidityMint
   );
 
   const totalBorrows = useMemo(
     () =>
-      fromLamports(wadToLamports(props.reserve.totalBorrowsWad), liquidityMint),
+      fromLamports(wadToLamports(props.reserve.borrowedLiquidityWad), liquidityMint),
     [props.reserve, liquidityMint]
   );
 
@@ -40,7 +40,7 @@ export const LendingReserveItem = (props: {
     props.reserve,
   ]);
 
-  const marketSize = totalLiquidity+totalBorrows;
+  const marketSize = availableLiqudity+totalBorrows;
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
