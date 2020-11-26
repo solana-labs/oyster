@@ -26,24 +26,29 @@ export const ObligationItem = (props: {
   );
 
   return (
-    <Link to={`/repay/loan/${obligation.pubkey.toBase58()}`}>
-      <Card>
-        <div className="dashboard-item">
-          <span style={{ display: "flex" }}>
-            <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
-            {name}
-          </span>
-          <div>
-            {formatNumber.format(borrowAmount)} {name}
-          </div>
-          <div>--</div>
-          <div>
+    <Card>
+      <div className="dashboard-item">
+        <span style={{ display: "flex" }}>
+          <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
+          {name}
+        </span>
+        <div>
+          {formatNumber.format(borrowAmount)} {name}
+        </div>
+        <div>--</div>
+        <div style={{ display: "flex", justifyContent: 'flex-end' }}>
+          <Link to={`/borrow/${borrowReserve.pubkey.toBase58()}`}>
+            <Button>
+              <span>Borrow</span>
+            </Button>
+          </Link>
+          <Link to={`/repay/loan/${obligation.pubkey.toBase58()}`}>
             <Button>
               <span>Repay</span>
             </Button>
-          </div>
+          </Link>
         </div>
-      </Card>
-    </Link>
+      </div>
+    </Card>
   );
 };

@@ -8,7 +8,7 @@ import "./style.less";
 export const DashboardView = () => {
   const { userObligations } = useUserObligations();
   const { userDeposits } = useUserDeposits();
-  
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-left">

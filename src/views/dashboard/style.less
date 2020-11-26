@@ -12,6 +12,10 @@
   & > :first-child {
     flex: 80px
   }
+
+  & > :last-child {
+    flex: 200px
+  }
 }
 
 .dashboard-header {
@@ -25,6 +29,10 @@
   & > :first-child {
     text-align: left;
     flex: 80px
+  }
+
+  & > :last-child {
+    flex: 200px
   }
 }
 
@@ -43,7 +51,7 @@
   flex: 50%;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .dashboard-right, .dashboard-left {
     flex: 100%;
   }

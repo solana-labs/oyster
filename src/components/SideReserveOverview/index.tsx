@@ -5,7 +5,6 @@ import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
 import { ParsedAccount, useMint } from "../../contexts/accounts";
-import { PublicKey } from "@solana/web3.js";
 import { Link } from "react-router-dom";
 
 const { Text } = Typography;

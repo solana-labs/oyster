@@ -22,7 +22,7 @@ export const LABELS = {
   BORROW_ACTION: "Borrow",
   TABLE_TITLE_ASSET: "Asset",
   TABLE_TITLE_LOAN_BALANCE: "Your loan balance",
-  TABLE_TITLE_DEPOSIT_BALANCE: "Your deposit balane",
+  TABLE_TITLE_DEPOSIT_BALANCE: "Your deposit balance",
   TABLE_TITLE_APY: "APY",
   TABLE_TITLE_APR: "APR",
   TABLE_TITLE_BORROW_APR: "Borrow APR",
@@ -32,7 +32,7 @@ export const LABELS = {
   TABLE_TITLE_ACTION: "Action",
   TABLE_TITLE_MAX_BORROW: "Available fro you",
   DASHBOARD_TITLE_LOANS: "Loans",
-  DASHBOARD_TITLE_DEPOSITS: "Deposts",
+  DASHBOARD_TITLE_DEPOSITS: "Deposits",
   WITHDRAW_ACTION: "Withdraw",
   WITHDRAW_QUESTION: "How much would you like to withdraw?",
 };

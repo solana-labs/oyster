@@ -4,14 +4,14 @@ Any content produced by Solana, or developer resources that Solana provides, are
 
 ## TODO
 
-- [] Calculate deposit APY and borrow APY for home page
+- [x] Calculate deposit APY and borrow APY for home page
 - [] Finish Reserve overview page (chart, and borrows information)
-- [] Create Dashboard page
+- [x] Create Dashboard page
 - [] Deposit view calculate APY and health factor
 - [x] Format total Borrows
 - [x] Add repay view
 - [] Add liquidate view
-- [] Borrow view calculate available to you and borrow APY
+- [x] Borrow view calculate available to you and borrow APY
 - [] Facuet add USDC that is using sol airdrop and USDC reserve to give user USDC
 - [] Borrow - Convert target ccy to collateral on oposite side
 - [] Borrow - liquidity token wrapped SOL should be unwrapped ...
@@ -22,3 +22,7 @@ Any content produced by Solana, or developer resources that Solana provides, are
 - [] Repay from reserve (add selection for obligation/loan)
 - [] Add support for token names in URL in addition to reserve address
 
+# TOP for tomorrow
+
+* subscribe to all dex markets that are used by lending reserves
+* finish reserve overivew

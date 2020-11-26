@@ -74,7 +74,6 @@ export const borrowInstruction = (
     },
     data
   );
-  debugger;
 
   const keys = [
     { pubkey: from, isSigner: false, isWritable: true },
