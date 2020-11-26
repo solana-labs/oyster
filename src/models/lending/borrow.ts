@@ -111,27 +111,28 @@ export const borrowInstruction = (
 
 // deposit APY utilization currentUtilizationRate * borrowAPY
 
-export const calculateBorrowAPR = (reserve: LendingReserve) => {
+export const calculateBorrowAPY = (reserve: LendingReserve) => {
   const totalBorrows = reserve.borrowedLiquidityWad.div(WAD).toNumber();
   const currentUtilization =
-    totalBorrows / (reserve.availableLiqudity.toNumber() + totalBorrows);
-  const optimalUtilization = reserve.config.optimalUtilizationRate;
-  let borrowAPR;
-  if (currentUtilization < optimalUtilization) {
-    const normalized_factor = currentUtilization / optimalUtilization;
+    totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
+  const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
+
+  let borrowAPY;
+  if (optimalUtilization == 1.0 || currentUtilization < optimalUtilization) {
+    const normalizedFactor = currentUtilization / optimalUtilization;
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const minBorrowRate = reserve.config.minBorrowRate / 100;
-    borrowAPR =
-      normalized_factor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+    borrowAPY =
+      normalizedFactor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
   } else {
-    const normalized_factor =
-      (currentUtilization - optimalUtilization) / (100 - optimalUtilization);
+    const normalizedFactor =
+      (currentUtilization - optimalUtilization) / (1 - optimalUtilization);
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const maxBorrowRate = reserve.config.maxBorrowRate / 100;
-    borrowAPR =
-      normalized_factor * (maxBorrowRate - optimalBorrowRate) +
+    borrowAPY =
+      normalizedFactor * (maxBorrowRate - optimalBorrowRate) +
       optimalBorrowRate;
   }
 
-  return borrowAPR;
+  return borrowAPY;
 };

@@ -23,7 +23,7 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
 
   const liquidityMint = useMint(props.reserve.liquidityMint);
   const avilableLiquidity = fromLamports(
-    props.reserve.availableLiqudity.toNumber(),
+    props.reserve.availableLiquidity.toNumber(),
     liquidityMint
   );
 

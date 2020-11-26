@@ -48,7 +48,7 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.uint128("cumulativeBorrowRateWad"),
     Layout.uint128("borrowedLiquidityWad"),
 
-    Layout.uint64("availableLiqudity"),
+    Layout.uint64("availableLiquidity"),
     Layout.uint64("collateralMintSupply"),
   ]
 );
@@ -86,7 +86,7 @@ export interface LendingReserve {
   cumulativeBorrowRateWad: BN;
   borrowedLiquidityWad: BN;
 
-  availableLiqudity: BN;
+  availableLiquidity: BN;
   collateralMintSupply: BN;
 
   // Layout.uint128("cumulative_borrow_rate"),
@@ -171,6 +171,6 @@ export const initReserveInstruction = (
 };
 
 export const calculateUtilizationRatio = (reserve: LendingReserve) => {
-  return reserve.availableLiqudity.toNumber() /
-    (reserve.availableLiqudity.toNumber() + wadToLamports(reserve.borrowedLiquidityWad).toNumber());
+  return reserve.availableLiquidity.toNumber() /
+    (reserve.availableLiquidity.toNumber() + wadToLamports(reserve.borrowedLiquidityWad).toNumber());
 }

@@ -31,7 +31,7 @@ export const DashboardView = () => {
           <div className="dashboard-item dashboard-header">
             <div>{LABELS.TABLE_TITLE_ASSET}</div>
             <div>{LABELS.TABLE_TITLE_LOAN_BALANCE}</div>
-            <div>{LABELS.TABLE_TITLE_APR}</div>
+            <div>{LABELS.TABLE_TITLE_APY}</div>
             <div>{LABELS.TABLE_TITLE_ACTION}</div>
           </div>
         )}

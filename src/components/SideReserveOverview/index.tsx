@@ -1,6 +1,6 @@
 import React from "react";
 import { useTokenName } from "./../../hooks";
-import { calculateBorrowAPR, calculateDepositAPY, calculateUtilizationRatio, LendingReserve } from "../../models/lending";
+import { calculateBorrowAPY, calculateDepositAPY, calculateUtilizationRatio, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports, wadToLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
@@ -25,13 +25,13 @@ export const SideReserveOverview = (props: {
   const name = useTokenName(reserve?.liquidityMint);
   const liquidityMint = useMint(reserve.liquidityMint);
 
-  const availableLiqudity = fromLamports(
-    reserve.availableLiqudity.toNumber(),
+  const availableLiquidity = fromLamports(
+    reserve.availableLiquidity.toNumber(),
     liquidityMint
   );
 
   const depositApy = calculateDepositAPY(reserve);
-  const borrowApr = calculateBorrowAPR(reserve);
+  const borrowApr = calculateBorrowAPY(reserve);
 
   const utilizationRate = calculateUtilizationRatio(reserve);
   const liquidiationThreshold = reserve.config.optimalUtilizationRate / 100;
@@ -44,7 +44,7 @@ export const SideReserveOverview = (props: {
       <>
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            {LABELS.TABLE_TITLE_DEPOSIT_APR}:
+            {LABELS.TABLE_TITLE_DEPOSIT_APY}:
           </Text>
           <div className="card-cell ">{formatPct.format(depositApy)}</div>
         </div>
@@ -80,7 +80,7 @@ export const SideReserveOverview = (props: {
       <>
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            {LABELS.TABLE_TITLE_BORROW_APR}:
+            {LABELS.TABLE_TITLE_BORROW_APY}:
           </Text>
           <div className="card-cell ">{formatPct.format(borrowApr)}</div>
         </div>
@@ -122,7 +122,7 @@ export const SideReserveOverview = (props: {
           Available liquidity:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(availableLiqudity)} {name}
+          {formatNumber.format(availableLiquidity)} {name}
         </div>
       </div>
 

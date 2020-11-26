@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
 import {
-  calculateBorrowAPR,
+  calculateBorrowAPY,
   calculateDepositAPY,
   LendingReserve,
 } from "../../models/lending";
@@ -25,8 +25,8 @@ export const LendingReserveItem = (props: {
 
   const liquidityMint = useMint(props.reserve.liquidityMint);
 
-  const availableLiqudity = fromLamports(
-    props.reserve.availableLiqudity.toNumber(),
+  const availableLiquidity = fromLamports(
+    props.reserve.availableLiquidity.toNumber(),
     liquidityMint
   );
 
@@ -39,7 +39,7 @@ export const LendingReserveItem = (props: {
     [props.reserve, liquidityMint]
   );
 
-  const borrowAPY = useMemo(() => calculateBorrowAPR(props.reserve), [
+  const borrowAPY = useMemo(() => calculateBorrowAPY(props.reserve), [
     props.reserve,
   ]);
 
@@ -47,7 +47,7 @@ export const LendingReserveItem = (props: {
     props.reserve,
   ]);
 
-  const marketSize = availableLiqudity + totalBorrows;
+  const marketSize = availableLiquidity + totalBorrows;
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>

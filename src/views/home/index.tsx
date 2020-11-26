@@ -15,8 +15,8 @@ export const HomeView = () => {
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_MARKET_SIZE}</div>
         <div>{LABELS.TABLE_TITLE_TOTAL_BORROWED}</div>
-        <div>{LABELS.TABLE_TITLE_DEPOSIT_APR}</div>
-        <div>{LABELS.TABLE_TITLE_BORROW_APR}</div>
+        <div>{LABELS.TABLE_TITLE_DEPOSIT_APY}</div>
+        <div>{LABELS.TABLE_TITLE_BORROW_APY}</div>
       </div>
       {reserveAccounts.map((account) => (
         <LendingReserveItem reserve={account.info} address={account.pubkey} />

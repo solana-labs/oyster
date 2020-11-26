@@ -11,7 +11,7 @@ export const BorrowView = () => {
       <div className="borrow-item deposit-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_MAX_BORROW}</div>
-        <div>{LABELS.TABLE_TITLE_APR}</div>
+        <div>{LABELS.TABLE_TITLE_APY}</div>
         <div>{LABELS.TABLE_TITLE_ACTION}</div>
       </div>
       {reserveAccounts.map((account) => (

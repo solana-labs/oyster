@@ -15,7 +15,7 @@ export function useCollateralBalance(
   );
 
   const collateralRatioLamports =
-    (reserve?.availableLiqudity.toNumber() || 0) *
+    (reserve?.availableLiquidity.toNumber() || 0) *
     (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
 
   return {
