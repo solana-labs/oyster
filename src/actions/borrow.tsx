@@ -238,5 +238,6 @@ export const borrow = async (
     });
   } catch {
     // TODO:
+    throw new Error();
   }
 };

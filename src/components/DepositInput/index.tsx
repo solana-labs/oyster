@@ -2,13 +2,17 @@ import React, { useCallback, useState } from "react";
 import { useTokenName, useUserBalance } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card } from "antd";
+import { Button, Card, Spin } from "antd";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { deposit } from "../../actions/deposit";
 import { PublicKey } from "@solana/web3.js";
 import "./style.less";
+import { LoadingOutlined } from "@ant-design/icons";
+import { ActionConfirmation} from './../ActionConfirmation';
+
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const DepositInput = (props: {
   className?: string;
@@ -18,6 +22,8 @@ export const DepositInput = (props: {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
+  const [pendingTx, setPendingTx] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const reserve = props.reserve;
   const address = props.address;
@@ -27,14 +33,27 @@ export const DepositInput = (props: {
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
   const onDeposit = useCallback(() => {
-    deposit(
-      fromAccounts[0],
-      parseFloat(value),
-      reserve,
-      address,
-      connection,
-      wallet
-    );
+    setPendingTx(true);
+
+    (async () => {
+      try {
+        await deposit(
+          fromAccounts[0],
+          parseFloat(value),
+          reserve,
+          address,
+          connection,
+          wallet
+        );
+
+        setShowConfirmation(true);
+      } catch {
+        // TODO:
+      } finally {
+        setPendingTx(false);
+      }
+    })();
+
   }, [connection, wallet, value, reserve, fromAccounts, address]);
 
   const bodyStyle: React.CSSProperties = {
@@ -47,6 +66,7 @@ export const DepositInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
+      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> : 
       <div
         style={{
           display: "flex",
@@ -79,11 +99,12 @@ export const DepositInput = (props: {
         <Button
           type="primary"
           onClick={onDeposit}
-          disabled={fromAccounts.length === 0}
+          disabled={fromAccounts.length === 0 || pendingTx}
         >
           Deposit
+          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
         </Button>
-      </div>
+      </div>}
     </Card>
   );
 };

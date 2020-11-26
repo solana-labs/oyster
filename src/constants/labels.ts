@@ -7,7 +7,8 @@ export const LABELS = {
   REPAY_QUESTION: "How much would you like to repay?",
   REPAY_ACTION: "Repay",
   RESERVE_STATUS_TITLE: "Reserve Status & Configuration",
-  AUDIT_WARNING: "Oyster Lending is unaudited software. Use at your own risk.",
+  AUDIT_WARNING: "Oyster is an unaudited software project used for internal purposes at the Solana Foundation. This app is not for public use.",
+  FOOTER: "This page was produced by the Solana Foundation (\"SF\") for internal educational and inspiration purposes only. SF does not encourage, induce or sanction the deployment, integration or use of Oyster or any similar application (including its code) in violation of applicable laws or regulations and hereby prohibits any such deployment, integration or use. Anyone using this code or a derivation thereof must comply with applicable laws and regulations when releasing related software.",
   MENU_HOME: "Home",
   MENU_DASHBOARD: "Dashboard",
   MENU_DEPOSIT: "Deposit",
@@ -35,4 +36,6 @@ export const LABELS = {
   DASHBOARD_TITLE_DEPOSITS: "Deposits",
   WITHDRAW_ACTION: "Withdraw",
   WITHDRAW_QUESTION: "How much would you like to withdraw?",
+  DASHBOARD_ACTION: "Go to dashboard",
+  GO_BACK_ACTION: "Go back",
 };

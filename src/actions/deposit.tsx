@@ -153,5 +153,6 @@ export const deposit = async (
     });
   } catch {
     // TODO:
+    throw new Error();
   }
 };

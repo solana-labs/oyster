@@ -40,6 +40,7 @@ export const AppLayout = (props: any) => {
       </div>
       <BasicLayout
         title={LABELS.APP_TITLE}
+        footerRender={() => <div className="footer">{LABELS.FOOTER}</div>}
         navTheme="realDark"
         headerTheme="dark"
         theme="dark"
