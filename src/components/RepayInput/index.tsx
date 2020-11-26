@@ -128,7 +128,7 @@ export const RepayInput = (props: {
               fontSize: 20,
               boxShadow: "none",
               borderColor: "transparent",
-              outline: "transpaernt",
+              outline: "transparent",
             }}
             placeholder="0.00"
           />

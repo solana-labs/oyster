@@ -34,9 +34,9 @@ export const SideReserveOverview = (props: {
   const borrowApr = calculateBorrowAPY(reserve);
 
   const utilizationRate = calculateUtilizationRatio(reserve);
-  const liquidiationThreshold = reserve.config.optimalUtilizationRate / 100;
-  const liquidiationPenalty = reserve.config.liquidationBonus / 100;
-  const maxLTV = liquidiationThreshold - liquidiationPenalty;
+  const liquidationThreshold = reserve.config.optimalUtilizationRate / 100;
+  const liquidationPenalty = reserve.config.liquidationBonus / 100;
+  const maxLTV = liquidationThreshold - liquidationPenalty;
 
   let extraInfo: JSX.Element | null = null;
   if (mode === SideReserveOverviewMode.Deposit) {
@@ -51,17 +51,17 @@ export const SideReserveOverview = (props: {
 
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            Maxiumum LTV:
+            Maximum LTV:
           </Text>
           <div className="card-cell ">{formatPct.format(maxLTV)}</div>
         </div>
 
         <div className="card-row">
           <Text type="secondary" className="card-cell ">
-            Liquidation threashold:
+            Liquidation threshold:
           </Text>
           <div className="card-cell ">
-            {formatPct.format(liquidiationThreshold)}
+            {formatPct.format(liquidationThreshold)}
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export const SideReserveOverview = (props: {
             Liquidation penalty:
           </Text>
           <div className="card-cell ">
-            {formatPct.format(liquidiationPenalty)}
+            {formatPct.format(liquidationPenalty)}
           </div>
         </div>
       </>

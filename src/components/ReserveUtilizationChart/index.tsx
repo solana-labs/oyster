@@ -22,7 +22,7 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
   }, []);
 
   const liquidityMint = useMint(props.reserve.liquidityMint);
-  const avilableLiquidity = fromLamports(
+  const availableLiquidity = fromLamports(
     props.reserve.availableLiquidity.toNumber(),
     liquidityMint
   );
@@ -49,8 +49,8 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
     const data = [
       {
         name: "Available Liquidity",
-        value: avilableLiquidity,
-        tokens: avilableLiquidity,
+        value: availableLiquidity,
+        tokens: availableLiquidity,
       },
       {
         name: "Total Borrowed",
@@ -108,7 +108,7 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
         },
       ],
     });
-  }, [totalBorrows, avilableLiquidity]);
+  }, [totalBorrows, availableLiquidity]);
 
   return <div ref={chartDiv} style={{ height: 300, width: 400 }} />;
 };
