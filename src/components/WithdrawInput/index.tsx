@@ -15,7 +15,7 @@ import { PublicKey } from "@solana/web3.js";
 import "./style.less";
 import { LABELS } from "../../constants";
 import { LoadingOutlined } from "@ant-design/icons";
-import { ActionConfirmation} from './../ActionConfirmation';
+import { ActionConfirmation } from "./../ActionConfirmation";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -51,7 +51,7 @@ export const WithdrawInput = (props: {
           fromAccounts[0],
           Math.ceil(
             collateralBalanceLamports *
-            (parseFloat(value) / collateralBalanceInLiquidity)
+              (parseFloat(value) / collateralBalanceInLiquidity)
           ),
           reserve,
           address,
@@ -88,43 +88,48 @@ export const WithdrawInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
-      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> : 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        <div className="withdraw-input-title">{LABELS.WITHDRAW_QUESTION}</div>
-        <div className="token-input">
-          <TokenIcon mintAddress={reserve?.liquidityMint} />
-          <NumericInput
-            value={value}
-            onChange={(val: any) => {
-              setValue(val);
-            }}
-            autoFocus={true}
-            style={{
-              fontSize: 20,
-              boxShadow: "none",
-              borderColor: "transparent",
-              outline: "transparent",
-            }}
-            placeholder="0.00"
-          />
-          <div>{name}</div>
-        </div>
-
-        <Button
-          type="primary"
-          onClick={onWithdraw}
-          disabled={fromAccounts.length === 0 || pendingTx}
+      {showConfirmation ? (
+        <ActionConfirmation onClose={() => setShowConfirmation(false)} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+          }}
         >
-          {LABELS.WITHDRAW_ACTION}
-          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
-        </Button>
-      </div>}
+          <div className="withdraw-input-title">{LABELS.WITHDRAW_QUESTION}</div>
+          <div className="token-input">
+            <TokenIcon mintAddress={reserve?.liquidityMint} />
+            <NumericInput
+              value={value}
+              onChange={(val: any) => {
+                setValue(val);
+              }}
+              autoFocus={true}
+              style={{
+                fontSize: 20,
+                boxShadow: "none",
+                borderColor: "transparent",
+                outline: "transparent",
+              }}
+              placeholder="0.00"
+            />
+            <div>{name}</div>
+          </div>
+
+          <Button
+            type="primary"
+            onClick={onWithdraw}
+            disabled={fromAccounts.length === 0 || pendingTx}
+          >
+            {LABELS.WITHDRAW_ACTION}
+            {pendingTx && (
+              <Spin indicator={antIcon} className="action-spinner" />
+            )}
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };

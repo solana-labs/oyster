@@ -20,7 +20,7 @@ import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
 import { LABELS } from "../../constants";
 import { LoadingOutlined } from "@ant-design/icons";
-import { ActionConfirmation} from './../ActionConfirmation';
+import { ActionConfirmation } from "./../ActionConfirmation";
 import { BackButton } from "./../BackButton";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -66,7 +66,6 @@ export const BorrowInput = (props: {
 
     (async () => {
       try {
-
         await borrow(
           connection,
           wallet,
@@ -90,8 +89,8 @@ export const BorrowInput = (props: {
         setValue("");
         setShowConfirmation(true);
       } catch {
-        // TODO: 
-      }finally {
+        // TODO:
+      } finally {
         setPendingTx(false);
       }
     })();
@@ -117,50 +116,55 @@ export const BorrowInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
-      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> : 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
-        <div className="token-input">
-          <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
-          <NumericInput
-            value={value}
-            onChange={(val: any) => {
-              setValue(val);
-            }}
-            autoFocus={true}
-            style={{
-              fontSize: 20,
-              boxShadow: "none",
-              borderColor: "transparent",
-              outline: "transparent",
-            }}
-            placeholder="0.00"
-          />
-          <div>{name}</div>
-        </div>
-        <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
-        <CollateralSelector
-          reserve={borrowReserve.info}
-          mint={collateralReserveMint}
-          onMintChange={setCollateralReserveMint}
-        />
-
-        <Button
-          type="primary"
-          onClick={onBorrow}
-          disabled={fromAccounts.length === 0 || pendingTx}
+      {showConfirmation ? (
+        <ActionConfirmation onClose={() => setShowConfirmation(false)} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+          }}
         >
-          {LABELS.BORROW_ACTION}
-          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
-        </Button>
-        <BackButton />
-      </div>}
+          <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
+          <div className="token-input">
+            <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
+            <NumericInput
+              value={value}
+              onChange={(val: any) => {
+                setValue(val);
+              }}
+              autoFocus={true}
+              style={{
+                fontSize: 20,
+                boxShadow: "none",
+                borderColor: "transparent",
+                outline: "transparent",
+              }}
+              placeholder="0.00"
+            />
+            <div>{name}</div>
+          </div>
+          <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
+          <CollateralSelector
+            reserve={borrowReserve.info}
+            mint={collateralReserveMint}
+            onMintChange={setCollateralReserveMint}
+          />
+
+          <Button
+            type="primary"
+            onClick={onBorrow}
+            disabled={fromAccounts.length === 0 || pendingTx}
+          >
+            {LABELS.BORROW_ACTION}
+            {pendingTx && (
+              <Spin indicator={antIcon} className="action-spinner" />
+            )}
+          </Button>
+          <BackButton />
+        </div>
+      )}
     </Card>
   );
 };

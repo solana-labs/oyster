@@ -1,4 +1,4 @@
-import React, { } from "react";
+import React from "react";
 import { Button } from "antd";
 import { LABELS } from "../../constants";
 import { useHistory } from "react-router-dom";

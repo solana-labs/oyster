@@ -14,13 +14,10 @@ import { useWallet } from "../../contexts/wallet";
 import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
-import {
-  formatNumber,
-  toLamports,
-} from "../../utils/utils";
+import { formatNumber, toLamports } from "../../utils/utils";
 import { LABELS } from "../../constants";
 import { LoadingOutlined } from "@ant-design/icons";
-import { ActionConfirmation} from './../ActionConfirmation';
+import { ActionConfirmation } from "./../ActionConfirmation";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -64,7 +61,6 @@ export const RepayInput = (props: {
     [value, repayLiquidityMint]
   );
 
-
   const onRepay = useCallback(() => {
     if (
       !collateralReserve ||
@@ -79,26 +75,25 @@ export const RepayInput = (props: {
 
     (async () => {
       try {
-
         await repay(
-      fromAccounts[0],
-      lamports,
-      obligation,
-      obligationAccount,
-      repayReserve,
-      collateralReserve,
-      connection,
-      wallet
-    );
+          fromAccounts[0],
+          lamports,
+          obligation,
+          obligationAccount,
+          repayReserve,
+          collateralReserve,
+          connection,
+          wallet
+        );
 
-    setValue("");
-    setShowConfirmation(true);
-  } catch {
-    // TODO: 
-  }finally {
-    setPendingTx(false);
-  }
-})();
+        setValue("");
+        setShowConfirmation(true);
+      } catch {
+        // TODO:
+      } finally {
+        setPendingTx(false);
+      }
+    })();
   }, [
     lamports,
     connection,
@@ -120,38 +115,40 @@ export const RepayInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
-      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> :  
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        <div className="repay-input-title">
-          {LABELS.REPAY_QUESTION} (Currently: ){formatNumber.format(balance)}{" "}
-          {name})
-        </div>
-        <div className="token-input">
-          <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
-          <NumericInput
-            value={value}
-            onChange={(val: any) => {
-              setValue(val);
-            }}
-            autoFocus={true}
-            style={{
-              fontSize: 20,
-              boxShadow: "none",
-              borderColor: "transparent",
-              outline: "transparent",
-            }}
-            placeholder="0.00"
-          />
-          <div>{name}</div>
-        </div>
-        {/* TODO: finish slider implementation */}
-        {/* <Slider
+      {showConfirmation ? (
+        <ActionConfirmation onClose={() => setShowConfirmation(false)} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+          }}
+        >
+          <div className="repay-input-title">
+            {LABELS.REPAY_QUESTION} (Currently: ){formatNumber.format(balance)}{" "}
+            {name})
+          </div>
+          <div className="token-input">
+            <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
+            <NumericInput
+              value={value}
+              onChange={(val: any) => {
+                setValue(val);
+              }}
+              autoFocus={true}
+              style={{
+                fontSize: 20,
+                boxShadow: "none",
+                borderColor: "transparent",
+                outline: "transparent",
+              }}
+              placeholder="0.00"
+            />
+            <div>{name}</div>
+          </div>
+          {/* TODO: finish slider implementation */}
+          {/* <Slider
           marks={marks}
           value={mark}
           onChange={(val: number) =>
@@ -167,24 +164,25 @@ export const RepayInput = (props: {
             )
           }
         /> */}
-        <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
-        <CollateralSelector
-          reserve={repayReserve.info}
-          mint={collateralReserveMint}
-          onMintChange={setCollateralReserveMint}
-        />
+          <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
+          <CollateralSelector
+            reserve={repayReserve.info}
+            mint={collateralReserveMint}
+            onMintChange={setCollateralReserveMint}
+          />
 
-        <Button
-          type="primary"
-          onClick={onRepay}
-          disabled={fromAccounts.length === 0}
-        >
-          {LABELS.REPAY_ACTION}
-          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
-        </Button>
-      </div>}
+          <Button
+            type="primary"
+            onClick={onRepay}
+            disabled={fromAccounts.length === 0}
+          >
+            {LABELS.REPAY_ACTION}
+            {pendingTx && (
+              <Spin indicator={antIcon} className="action-spinner" />
+            )}
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
-
-

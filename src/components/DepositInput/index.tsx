@@ -10,7 +10,7 @@ import { deposit } from "../../actions/deposit";
 import { PublicKey } from "@solana/web3.js";
 import "./style.less";
 import { LoadingOutlined } from "@ant-design/icons";
-import { ActionConfirmation} from './../ActionConfirmation';
+import { ActionConfirmation } from "./../ActionConfirmation";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -54,7 +54,6 @@ export const DepositInput = (props: {
         setPendingTx(false);
       }
     })();
-
   }, [connection, wallet, value, reserve, fromAccounts, address]);
 
   const bodyStyle: React.CSSProperties = {
@@ -67,45 +66,50 @@ export const DepositInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
-      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> : 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        <div className="deposit-input-title">
-          How much would you like to deposit?
-        </div>
-        <div className="token-input">
-          <TokenIcon mintAddress={reserve?.liquidityMint} />
-          <NumericInput
-            value={value}
-            onChange={(val: any) => {
-              setValue(val);
-            }}
-            autoFocus={true}
-            style={{
-              fontSize: 20,
-              boxShadow: "none",
-              borderColor: "transparent",
-              outline: "transparent",
-            }}
-            placeholder="0.00"
-          />
-          <div>{name}</div>
-        </div>
-
-        <Button
-          type="primary"
-          onClick={onDeposit}
-          disabled={fromAccounts.length === 0 || pendingTx}
+      {showConfirmation ? (
+        <ActionConfirmation onClose={() => setShowConfirmation(false)} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+          }}
         >
-          Deposit
-          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
-        </Button>
-      </div>}
+          <div className="deposit-input-title">
+            How much would you like to deposit?
+          </div>
+          <div className="token-input">
+            <TokenIcon mintAddress={reserve?.liquidityMint} />
+            <NumericInput
+              value={value}
+              onChange={(val: any) => {
+                setValue(val);
+              }}
+              autoFocus={true}
+              style={{
+                fontSize: 20,
+                boxShadow: "none",
+                borderColor: "transparent",
+                outline: "transparent",
+              }}
+              placeholder="0.00"
+            />
+            <div>{name}</div>
+          </div>
+
+          <Button
+            type="primary"
+            onClick={onDeposit}
+            disabled={fromAccounts.length === 0 || pendingTx}
+          >
+            Deposit
+            {pendingTx && (
+              <Spin indicator={antIcon} className="action-spinner" />
+            )}
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };

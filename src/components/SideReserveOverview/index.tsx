@@ -1,6 +1,11 @@
 import React from "react";
 import { useTokenName } from "./../../hooks";
-import { calculateBorrowAPY, calculateDepositAPY, calculateUtilizationRatio, LendingReserve } from "../../models/lending";
+import {
+  calculateBorrowAPY,
+  calculateDepositAPY,
+  calculateUtilizationRatio,
+  LendingReserve,
+} from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";

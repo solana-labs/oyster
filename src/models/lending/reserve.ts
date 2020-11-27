@@ -167,6 +167,11 @@ export const initReserveInstruction = (
 };
 
 export const calculateUtilizationRatio = (reserve: LendingReserve) => {
-  let borrowedLiquidity = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
-  return borrowedLiquidity / (reserve.availableLiquidity.toNumber() + borrowedLiquidity);
-}
+  let borrowedLiquidity = wadToLamports(
+    reserve.borrowedLiquidityWad
+  ).toNumber();
+  return (
+    borrowedLiquidity /
+    (reserve.availableLiquidity.toNumber() + borrowedLiquidity)
+  );
+};
