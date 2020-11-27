@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   useCollateralBalance,
-  useLendingReserves,
   useTokenName,
 } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
