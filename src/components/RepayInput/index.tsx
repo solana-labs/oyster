@@ -6,7 +6,7 @@ import {
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Slider } from "antd";
+import { Button, Card, Slider, Spin } from "antd";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -21,6 +21,11 @@ import {
   toLamports,
 } from "../../utils/utils";
 import { LABELS } from "../../constants";
+import { LoadingOutlined } from "@ant-design/icons";
+import { ActionConfirmation} from './../ActionConfirmation';
+import { BackButton } from "./../BackButton";
+
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const RepayInput = (props: {
   className?: string;
@@ -30,6 +35,8 @@ export const RepayInput = (props: {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
+  const [pendingTx, setPendingTx] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const repayReserve = props.reserve;
   const obligation = props.obligation;
@@ -74,7 +81,12 @@ export const RepayInput = (props: {
       return;
     }
 
-    repay(
+    setPendingTx(true);
+
+    (async () => {
+      try {
+
+        await repay(
       fromAccounts[0],
       lamports,
       obligation,
@@ -84,6 +96,15 @@ export const RepayInput = (props: {
       connection,
       wallet
     );
+
+    setValue("");
+    setShowConfirmation(true);
+  } catch {
+    // TODO: 
+  }finally {
+    setPendingTx(false);
+  }
+})();
   }, [
     lamports,
     connection,
@@ -105,6 +126,7 @@ export const RepayInput = (props: {
 
   return (
     <Card className={props.className} bodyStyle={bodyStyle}>
+      {showConfirmation ? <ActionConfirmation onClose={() => setShowConfirmation(false)} /> :  
       <div
         style={{
           display: "flex",
@@ -134,7 +156,8 @@ export const RepayInput = (props: {
           />
           <div>{name}</div>
         </div>
-        <Slider
+        {/* TODO: finish slider implementation */}
+        {/* <Slider
           marks={marks}
           value={mark}
           onChange={(val: number) =>
@@ -149,7 +172,7 @@ export const RepayInput = (props: {
               ).toFixed(2)
             )
           }
-        />
+        /> */}
         <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={repayReserve.info}
@@ -163,8 +186,9 @@ export const RepayInput = (props: {
           disabled={fromAccounts.length === 0}
         >
           {LABELS.REPAY_ACTION}
+          {pendingTx && <Spin indicator={antIcon} className="action-spinner" />}
         </Button>
-      </div>
+      </div>}
     </Card>
   );
 };

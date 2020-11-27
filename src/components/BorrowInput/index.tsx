@@ -87,6 +87,7 @@ export const BorrowInput = (props: {
             : undefined
         );
 
+        setValue("");
         setShowConfirmation(true);
       } catch {
         // TODO: 

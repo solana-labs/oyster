@@ -46,6 +46,7 @@ export const DepositInput = (props: {
           wallet
         );
 
+        setValue("");
         setShowConfirmation(true);
       } catch {
         // TODO:
