@@ -13,6 +13,11 @@ export let LENDING_PROGRAM_ID = new PublicKey(
 
 export const setProgramIds = (envName: string) => {
   // Add dynamic program ids
+  if(envName === 'mainnet-beta') {
+    LENDING_PROGRAM_ID = new PublicKey('2KfJP7pZ6QSpXa26RmsN6kKVQteDEdQmizLSvuyryeiW');
+  }
+
+
 };
 
 export const programIds = () => {

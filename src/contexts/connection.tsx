@@ -21,12 +21,12 @@ export type ENV =
 
 export const ENDPOINTS = [
   {
-    name: "lending" as ENV,
-    endpoint: "https://tln.solana.com",
-  },
-  {
     name: "mainnet-beta" as ENV,
     endpoint: "https://solana-api.projectserum.com/",
+  },
+  {
+    name: "lending" as ENV,
+    endpoint: "https://tln.solana.com",
   },
   { name: "testnet" as ENV, endpoint: clusterApiUrl("testnet") },
   { name: "devnet" as ENV, endpoint: clusterApiUrl("devnet") },
