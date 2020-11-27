@@ -6,7 +6,7 @@ import {
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Slider, Spin } from "antd";
+import { Button, Card, Spin } from "antd";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -15,15 +15,12 @@ import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
 import {
-  wadToLamports,
   formatNumber,
-  fromLamports,
   toLamports,
 } from "../../utils/utils";
 import { LABELS } from "../../constants";
 import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation} from './../ActionConfirmation';
-import { BackButton } from "./../BackButton";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -67,9 +64,6 @@ export const RepayInput = (props: {
     [value, repayLiquidityMint]
   );
 
-  const mark =
-    (wadToLamports(obligation?.info.borrowAmountWad).toNumber() / lamports) *
-    100;
 
   const onRepay = useCallback(() => {
     if (
@@ -193,10 +187,4 @@ export const RepayInput = (props: {
   );
 };
 
-const marks = {
-  0: "0%",
-  25: "25%",
-  50: "50%",
-  75: "75%",
-  100: "100%",
-};
+

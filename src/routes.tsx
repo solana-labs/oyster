@@ -34,11 +34,6 @@ export function Routes() {
                       <Route exact path="/" component={() => <HomeView />} />
                       <Route
                         exact
-                        path="/dashboard/deposits"
-                        children={<DashboardView />}
-                      />
-                      <Route
-                        exact
                         path="/dashboard"
                         children={<DashboardView />}
                       />

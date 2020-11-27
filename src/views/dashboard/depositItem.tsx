@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useCollateralBalance, useTokenName } from "../../hooks";
-import { LendingReserve } from "../../models/lending";
+import { calculateDepositAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber } from "../../utils/utils";
+import { formatNumber, formatPct } from "../../utils/utils";
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { TokenAccount } from "../../models";
@@ -19,6 +19,10 @@ export const DepositItem = (props: {
     props.account.pubkey
   );
 
+  const depositAPY = useMemo(() => calculateDepositAPY(props.reserve.info), [
+    props.reserve,
+  ]);
+
   return (
     <Card>
       <div className="dashboard-item">
@@ -29,7 +33,7 @@ export const DepositItem = (props: {
         <div>
           {formatNumber.format(collateralBalance)} {name}
         </div>
-        <div>--</div>
+        <div>{formatPct.format(depositAPY)}</div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/deposit/${props.reserve.pubkey.toBase58()}`}>
             <Button>

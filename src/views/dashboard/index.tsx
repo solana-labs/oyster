@@ -1,16 +1,20 @@
 import React from "react";
 import { LABELS } from "../../constants";
+import { useWallet } from "../../contexts/wallet";
 import { useUserDeposits, useUserObligations } from "./../../hooks";
 import { DepositItem } from "./depositItem";
 import { ObligationItem } from "./obligationItem";
 import "./style.less";
 
 export const DashboardView = () => {
+  const { connected } = useWallet();
   const { userObligations } = useUserObligations();
   const { userDeposits } = useUserDeposits();
 
   return (
     <div className="dashboard-container">
+      {!connected && <div className="dashboard-info">Connect to a wallet to view your deposits/loans.</div>}
+      {connected && userDeposits.length === 0 &&userObligations.length === 0 && <div className="dashboard-info">No loans or deposits.</div>}
       {userDeposits.length > 0 && (<div className="dashboard-left">
         <span>{LABELS.DASHBOARD_TITLE_DEPOSITS}</span>
           <div className="dashboard-item dashboard-header">

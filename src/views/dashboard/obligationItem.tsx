@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTokenName } from "../../hooks";
-import { LendingObligation, LendingReserve } from "../../models/lending";
+import { calculateBorrowAPY, LendingObligation, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { wadToLamports, formatNumber, fromLamports } from "../../utils/utils";
+import { wadToLamports, formatNumber, fromLamports, formatPct } from "../../utils/utils";
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
@@ -25,6 +25,10 @@ export const ObligationItem = (props: {
     liquidityMint
   );
 
+  const borrowAPY = useMemo(() => calculateBorrowAPY(borrowReserve.info), [
+    borrowReserve,
+  ]);
+
   return (
     <Card>
       <div className="dashboard-item">
@@ -35,7 +39,7 @@ export const ObligationItem = (props: {
         <div>
           {formatNumber.format(borrowAmount)} {name}
         </div>
-        <div>--</div>
+        <div>{formatPct.format(borrowAPY)}</div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/borrow/${borrowReserve.pubkey.toBase58()}`}>
             <Button>

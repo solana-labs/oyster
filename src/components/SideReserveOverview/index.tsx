@@ -2,7 +2,7 @@ import React from "react";
 import { useTokenName } from "./../../hooks";
 import { calculateBorrowAPY, calculateDepositAPY, calculateUtilizationRatio, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber, formatPct, fromLamports, wadToLamports } from "../../utils/utils";
+import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
 import { Card, Typography } from "antd";
 import { ParsedAccount, useMint } from "../../contexts/accounts";
 import { Link } from "react-router-dom";
