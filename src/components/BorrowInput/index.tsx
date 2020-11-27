@@ -126,6 +126,13 @@ export const BorrowInput = (props: {
             justifyContent: "space-around",
           }}
         >
+          <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
+          <CollateralSelector
+            reserve={borrowReserve.info}
+            mint={collateralReserveMint}
+            onMintChange={setCollateralReserveMint}
+          />
+
           <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
           <div className="token-input">
             <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
@@ -134,7 +141,6 @@ export const BorrowInput = (props: {
               onChange={(val: any) => {
                 setValue(val);
               }}
-              autoFocus={true}
               style={{
                 fontSize: 20,
                 boxShadow: "none",
@@ -145,13 +151,6 @@ export const BorrowInput = (props: {
             />
             <div>{name}</div>
           </div>
-          <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
-          <CollateralSelector
-            reserve={borrowReserve.info}
-            mint={collateralReserveMint}
-            onMintChange={setCollateralReserveMint}
-          />
-
           <Button
             type="primary"
             onClick={onBorrow}

@@ -20,7 +20,7 @@ export const LABELS = {
   CONNECT_BUTTON: "Connect",
   WALLET_TOOLTIP: "Wallet public key",
   SETTINGS_TOOLTIP: "Settings",
-  SELECT_COLLATERAL: "Select collateral account?",
+  SELECT_COLLATERAL: "Select collateral",
   BORROW_QUESTION: "How much would you like to borrow?",
   BORROW_ACTION: "Borrow",
   TABLE_TITLE_ASSET: "Asset",

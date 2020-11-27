@@ -19,6 +19,7 @@ import {
 import { PublicKey } from "@solana/web3.js";
 import { DexMarketParser } from "../models/dex";
 import { usePrecacheMarket } from "./market";
+import { useLendingReserves } from "../hooks";
 
 export interface LendingContextState {}
 
@@ -40,6 +41,7 @@ export function LendingProvider({ children = null as any }) {
 export const useLending = () => {
   const connection = useConnection();
   const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
+  const { reserveAccounts } = useLendingReserves();
   const precacheMarkets = usePrecacheMarket();
 
   // TODO: query for all the dex from reserves
@@ -67,6 +69,14 @@ export const useLending = () => {
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (reserveAccounts.length > 0) {
+      precacheMarkets(
+        reserveAccounts.map((reserve) => reserve.info.liquidityMint.toBase58())
+      );
+    }
+  }, [reserveAccounts]);
 
   // initial query
   useEffect(() => {

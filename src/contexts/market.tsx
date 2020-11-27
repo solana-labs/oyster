@@ -30,7 +30,7 @@ const marketEmitter = new EventEmitter();
 export function MarketProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
   const accountsToObserve = useMemo(() => new Map<string, number>(), []);
-  const [marketMints, setMarketMints] = useState<string[]>();
+  const [marketMints, setMarketMints] = useState<string[]>([]);
 
   const connection = useMemo(() => new Connection(endpoint, "recent"), [
     endpoint,
