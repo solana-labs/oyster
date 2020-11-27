@@ -18,8 +18,8 @@ export const DashboardView = () => {
       {userDeposits.length > 0 && (<div className="dashboard-left">
         <span>{LABELS.DASHBOARD_TITLE_DEPOSITS}</span>
           <div className="dashboard-item dashboard-header">
+            <div>{LABELS.TABLE_TITLE_ASSET}</div>
             <div>{LABELS.TABLE_TITLE_DEPOSIT_BALANCE}</div>
-            <div>{LABELS.TABLE_TITLE_LOAN_BALANCE}</div>
             <div>{LABELS.TABLE_TITLE_APY}</div>
             <div>{LABELS.TABLE_TITLE_ACTION}</div>
           </div>

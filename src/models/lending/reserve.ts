@@ -70,7 +70,6 @@ export interface LendingReserve {
 
   dexMarketOption: number;
   dexMarket: PublicKey;
-  dexMarketPrice: BN; // what is precision on the price?
 
   config: {
     optimalUtilizationRate: number;
@@ -81,16 +80,12 @@ export interface LendingReserve {
     optimalBorrowRate: number;
     maxBorrowRate: number;
   };
-  // collateralFactor: number;
 
   cumulativeBorrowRateWad: BN;
   borrowedLiquidityWad: BN;
 
   availableLiquidity: BN;
   collateralMintSupply: BN;
-
-  // Layout.uint128("cumulative_borrow_rate"),
-  // Layout.uint128("total_borrows"),
 }
 
 export const LendingReserveParser = (
