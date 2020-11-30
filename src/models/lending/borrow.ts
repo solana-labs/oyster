@@ -7,7 +7,7 @@ import {
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
-import { WAD } from "../../constants/math";
+import { wadToLamports } from "../../utils/utils";
 import * as Layout from "./../../utils/layout";
 import { LendingInstruction } from "./lending";
 import { LendingReserve } from "./reserve";
@@ -112,7 +112,7 @@ export const borrowInstruction = (
 // deposit APY utilization currentUtilizationRate * borrowAPY
 
 export const calculateBorrowAPY = (reserve: LendingReserve) => {
-  const totalBorrows = reserve.borrowedLiquidityWad.div(WAD).toNumber();
+  const totalBorrows = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
   const currentUtilization =
     totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
   const optimalUtilization = reserve.config.optimalUtilizationRate / 100;

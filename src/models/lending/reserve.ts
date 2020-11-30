@@ -175,3 +175,11 @@ export const calculateUtilizationRatio = (reserve: LendingReserve) => {
     (reserve.availableLiquidity.toNumber() + borrowedLiquidity)
   );
 };
+
+export const reserveMarketCap = (reserve?: LendingReserve ) => {
+  const available = (reserve?.availableLiquidity.toNumber() || 0) ;
+  const borrowed = wadToLamports(reserve?.borrowedLiquidityWad).toNumber() ;
+  const total = available + borrowed;
+
+  return total;
+}

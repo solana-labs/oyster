@@ -4,7 +4,8 @@ import { LABELS } from "../../constants";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useMarkets } from "../../contexts/market";
 import { useLendingReserves } from "../../hooks";
-import { formatUSD, fromLamports, wadToLamports } from "../../utils/utils";
+import { reserveMarketCap } from "../../models";
+import { formatUSD, fromLamports } from "../../utils/utils";
 import { LendingReserveItem } from "./item";
 import "./itemStyle.less";
 
@@ -13,12 +14,10 @@ export const HomeView = () => {
   const [totalMarketSize, setTotalMarketSize] = useState(0);
   const { marketEmitter, midPriceInUSD } = useMarkets();
 
-
   useEffect(() => {
     const refreshTotalMarketSize = () => {
       const total = reserveAccounts.reduce((result, item) => {
-        const marketCapLamports = item.info.availableLiquidity.toNumber() +
-          wadToLamports(item.info.borrowedLiquidityWad).toNumber();
+        const marketCapLamports = reserveMarketCap(item.info);
 
         const localCache = cache;
         const mint = localCache.get(item.info.liquidityMint.toBase58()) as ParsedAccount<MintInfo>;

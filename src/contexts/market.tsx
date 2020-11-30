@@ -89,7 +89,7 @@ export function MarketProvider({ children = null as any }) {
         allMarkets.filter((a) => cache.get(a) === undefined),
         "single"
       ).then(({ keys, array }) => {
-        allMarkets.forEach(() => {});
+        allMarkets.forEach(() => { });
 
         return array.map((item, index) => {
           const marketAddress = keys[index];
@@ -158,7 +158,7 @@ export function MarketProvider({ children = null as any }) {
       const info = marketByMint.get(mintAddress);
       const market = cache.get(info?.marketInfo.address.toBase58() || "");
       if (!market) {
-        return () => {};
+        return () => { };
       }
 
       // TODO: get recent volume
@@ -187,7 +187,11 @@ export function MarketProvider({ children = null as any }) {
 
   const precacheMarkets = useCallback(
     (mints: string[]) => {
-      setMarketMints([...new Set([...marketMints, ...mints]).values()]);
+      const newMints = [...new Set([...marketMints, ...mints]).values()];
+
+      if (marketMints.length !== newMints.length) {
+        setMarketMints(newMints);
+      }
     },
     [setMarketMints, marketMints]
   );

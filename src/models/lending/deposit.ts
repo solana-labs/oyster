@@ -5,8 +5,8 @@ import {
 } from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
-import { WAD } from "../../constants";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
+import { wadToLamports } from "../../utils/utils";
 import * as Layout from "./../../utils/layout";
 import { calculateBorrowAPY } from "./borrow";
 import { LendingInstruction } from "./lending";
@@ -64,7 +64,7 @@ export const depositInstruction = (
 };
 
 export const calculateDepositAPY = (reserve: LendingReserve) => {
-  const totalBorrows = reserve.borrowedLiquidityWad.div(WAD).toNumber();
+  const totalBorrows = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
   const currentUtilization =
     totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
 

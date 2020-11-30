@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { useMint } from "../contexts/accounts";
-import { LendingReserve } from "../models/lending";
+import { LendingReserve, reserveMarketCap } from "../models/lending";
 import { fromLamports } from "../utils/utils";
 import { useUserBalance } from "./useUserBalance";
 
@@ -15,7 +15,7 @@ export function useCollateralBalance(
   );
 
   const collateralRatioLamports =
-    (reserve?.availableLiquidity.toNumber() || 0) *
+    reserveMarketCap(reserve) *
     (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
 
   return {

@@ -76,7 +76,7 @@ export const useLending = () => {
         reserveAccounts.map((reserve) => reserve.info.liquidityMint.toBase58())
       );
     }
-  }, [reserveAccounts]);
+  }, [reserveAccounts, precacheMarkets]);
 
   // initial query
   useEffect(() => {
