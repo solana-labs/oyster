@@ -15,13 +15,13 @@ export const DashboardView = () => {
     <div className="dashboard-container">
       {!connected && (
         <div className="dashboard-info">
-          Connect to a wallet to view your deposits/loans.
+          {LABELS.DASHBOARD_INFO}
         </div>
       )}
       {connected &&
         userDeposits.length === 0 &&
         userObligations.length === 0 && (
-          <div className="dashboard-info">No loans or deposits.</div>
+        <div className="dashboard-info">{LABELS.NO_LOANS_NO_DEPOSITS}</div>
         )}
       {userDeposits.length > 0 && (
         <div className="dashboard-left">

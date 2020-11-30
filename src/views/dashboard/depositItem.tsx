@@ -7,6 +7,7 @@ import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { TokenAccount } from "../../models";
 import { ParsedAccount } from "../../contexts/accounts";
+import { LABELS } from "../../constants";
 
 export const DepositItem = (props: {
   reserve: ParsedAccount<LendingReserve>;
@@ -37,12 +38,12 @@ export const DepositItem = (props: {
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/deposit/${props.reserve.pubkey.toBase58()}`}>
             <Button>
-              <span>Deposit</span>
+              <span>{LABELS.DEPOSIT_ACTION}</span>
             </Button>
           </Link>
           <Link to={`/withdraw/${props.reserve.pubkey.toBase58()}`}>
             <Button>
-              <span>Withdraw</span>
+              <span>{LABELS.WITHDRAW_ACTION}</span>
             </Button>
           </Link>
         </div>
