@@ -21,6 +21,7 @@ export function useCollateralBalance(
   return {
     balance: fromLamports(collateralRatioLamports, mint),
     balanceLamports: collateralRatioLamports,
+    mint: reserve?.collateralMint,
     accounts,
   };
 }

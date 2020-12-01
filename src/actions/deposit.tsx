@@ -11,20 +11,18 @@ import {
   initReserveInstruction,
   LendingReserve,
 } from "./../models/lending";
-import { AccountLayout, MintInfo, Token } from "@solana/spl-token";
+import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import {
   createUninitializedAccount,
   ensureSplAccount,
   findOrCreateAccountByMint,
 } from "./account";
-import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
 import { TokenAccount } from "../models";
-import { toLamports } from "../utils/utils";
 
 export const deposit = async (
   from: TokenAccount,
-  amount: number,
+  amountLamports: number,
   reserve: LendingReserve,
   reserveAddress: PublicKey,
   connection: Connection,
@@ -54,13 +52,6 @@ export const deposit = async (
     [reserve.lendingMarket.toBuffer()], // which account should be authority
     LENDING_PROGRAM_ID
   );
-
-  const mint = (await cache.query(
-    connection,
-    reserve.liquidityMint,
-    MintParser
-  )) as ParsedAccount<MintInfo>;
-  const amountLamports = toLamports(amount, mint?.info);
 
   const fromAccount = ensureSplAccount(
     instructions,

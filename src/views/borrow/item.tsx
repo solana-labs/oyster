@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  useCollateralBalance,
-  useTokenName,
-} from "../../hooks";
+import { useCollateralBalance, useTokenName } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct } from "../../utils/utils";

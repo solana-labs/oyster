@@ -83,7 +83,9 @@ export const useLending = () => {
     setLendingAccounts([]);
 
     const queryLendingAccounts = async () => {
-      const programAccounts = (await connection.getProgramAccounts(LENDING_PROGRAM_ID));
+      const programAccounts = await connection.getProgramAccounts(
+        LENDING_PROGRAM_ID
+      );
 
       const accounts = programAccounts
         .map(processAccount)
@@ -116,7 +118,6 @@ export const useLending = () => {
         }),
       ].flat() as string[];
 
-
       // This will pre-cache all accounts used by pools
       // All those accounts are updated whenever there is a change
       await getMultipleAccounts(connection, toQuery, "single").then(
@@ -130,10 +131,8 @@ export const useLending = () => {
       );
 
       // HACK: fix, force account refresh
-      programAccounts
-        .map(processAccount)
-        .filter((item) => item !== undefined);
-        
+      programAccounts.map(processAccount).filter((item) => item !== undefined);
+
       return accounts;
     };
 

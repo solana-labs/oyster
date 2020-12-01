@@ -1,8 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { useTokenName, useUserBalance } from "../../hooks";
+import {
+  InputType,
+  useSliderInput,
+  useTokenName,
+  useUserBalance,
+} from "../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Spin } from "antd";
+import { Button, Card, Slider, Spin } from "antd";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
@@ -11,6 +16,7 @@ import { PublicKey } from "@solana/web3.js";
 import "./style.less";
 import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation } from "./../ActionConfirmation";
+import { marks } from "../../constants";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -21,7 +27,6 @@ export const DepositInput = (props: {
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const [value, setValue] = useState("");
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -29,8 +34,23 @@ export const DepositInput = (props: {
   const address = props.address;
 
   const name = useTokenName(reserve?.liquidityMint);
-  const { accounts: fromAccounts } = useUserBalance(reserve?.liquidityMint);
+  const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
+    reserve?.liquidityMint
+  );
   // const collateralBalance = useUserBalance(reserve?.collateralMint);
+
+  const convert = useCallback(
+    (val: string | number) => {
+      if (typeof val === "string") {
+        return (parseFloat(val) / balance) * 100;
+      } else {
+        return ((val * balance) / 100).toFixed(2);
+      }
+    },
+    [balance]
+  );
+
+  const { value, setValue, mark, setMark, type } = useSliderInput(convert);
 
   const onDeposit = useCallback(() => {
     setPendingTx(true);
@@ -39,7 +59,9 @@ export const DepositInput = (props: {
       try {
         await deposit(
           fromAccounts[0],
-          parseFloat(value),
+          type === InputType.Slider
+            ? (mark * balanceLamports) / 100
+            : Math.ceil(balanceLamports * (parseFloat(value) / balance)),
           reserve,
           address,
           connection,
@@ -54,7 +76,19 @@ export const DepositInput = (props: {
         setPendingTx(false);
       }
     })();
-  }, [connection, wallet, value, reserve, fromAccounts, address]);
+  }, [
+    connection,
+    setValue,
+    balanceLamports,
+    balance,
+    wallet,
+    value,
+    mark,
+    type,
+    reserve,
+    fromAccounts,
+    address,
+  ]);
 
   const bodyStyle: React.CSSProperties = {
     display: "flex",
@@ -97,6 +131,8 @@ export const DepositInput = (props: {
             />
             <div>{name}</div>
           </div>
+
+          <Slider marks={marks} value={mark} onChange={setMark} />
 
           <Button
             type="primary"

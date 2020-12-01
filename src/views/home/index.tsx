@@ -20,13 +20,17 @@ export const HomeView = () => {
         const marketCapLamports = reserveMarketCap(item.info);
 
         const localCache = cache;
-        const mint = localCache.get(item.info.liquidityMint.toBase58()) as ParsedAccount<MintInfo>;
+        const mint = localCache.get(
+          item.info.liquidityMint.toBase58()
+        ) as ParsedAccount<MintInfo>;
 
         if (!mint) {
           return result;
         }
 
-        const marketCap = fromLamports(marketCapLamports, mint?.info) * midPriceInUSD(mint?.pubkey.toBase58());
+        const marketCap =
+          fromLamports(marketCapLamports, mint?.info) *
+          midPriceInUSD(mint?.pubkey.toBase58());
 
         return result + marketCap;
       }, 0);
@@ -43,8 +47,6 @@ export const HomeView = () => {
     return () => {
       dispose();
     };
-
-
   }, [marketEmitter, midPriceInUSD, setTotalMarketSize, reserveAccounts]);
 
   return (
