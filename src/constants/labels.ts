@@ -37,6 +37,7 @@ export const LABELS = {
   TABLE_TITLE_MAX_BORROW: "Available for you",
   DASHBOARD_TITLE_LOANS: "Loans",
   DASHBOARD_TITLE_DEPOSITS: "Deposits",
+  DEPOSIT_QUESTION: "How much would you like to deposit?",
   WITHDRAW_ACTION: "Withdraw",
   WITHDRAW_QUESTION: "How much would you like to withdraw?",
   DASHBOARD_ACTION: "Go to dashboard",

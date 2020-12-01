@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useAccountByMint, useTokenName, useUserBalance } from "../../hooks";
+import { InputType, useAccountByMint, useSliderInput, useTokenName, useUserBalance } from "../../hooks";
 import {
   LendingObligation,
   LendingReserve,
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Spin } from "antd";
+import { Button, Card, Slider, Spin } from "antd";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -14,8 +14,7 @@ import { useWallet } from "../../contexts/wallet";
 import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
-import { formatNumber, toLamports } from "../../utils/utils";
-import { LABELS } from "../../constants";
+import { LABELS, marks } from "../../constants";
 import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation } from "./../ActionConfirmation";
 
@@ -28,7 +27,6 @@ export const RepayInput = (props: {
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const [value, setValue] = useState("");
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -47,7 +45,7 @@ export const RepayInput = (props: {
   }, [collateralReserveMint]);
 
   const name = useTokenName(repayReserve?.info.liquidityMint);
-  const { accounts: fromAccounts, balance } = useUserBalance(
+  const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
     repayReserve.info.liquidityMint
   );
 
@@ -56,10 +54,18 @@ export const RepayInput = (props: {
 
   const obligationAccount = useAccountByMint(obligation?.info.tokenMint);
 
-  const lamports = useMemo(
-    () => toLamports(parseFloat(value), repayLiquidityMint),
-    [value, repayLiquidityMint]
+  const convert = useCallback(
+    (val: string | number) => {
+      if (typeof val === "string") {
+        return (parseFloat(val) / balance) * 100;
+      } else {
+        return ((val * balance) / 100).toFixed(2);
+      }
+    },
+    [balance]
   );
+
+  const { value, setValue, mark, setMark, type } = useSliderInput(convert);
 
   const onRepay = useCallback(() => {
     if (
@@ -77,7 +83,9 @@ export const RepayInput = (props: {
       try {
         await repay(
           fromAccounts[0],
-          lamports,
+          type === InputType.Slider
+          ? (mark * balanceLamports) / 100
+          : Math.ceil(balanceLamports * (parseFloat(value) / balance)),
           obligation,
           obligationAccount,
           repayReserve,
@@ -95,7 +103,11 @@ export const RepayInput = (props: {
       }
     })();
   }, [
-    lamports,
+    mark,
+    value,
+    balance,
+    balanceLamports,
+    type,
     connection,
     wallet,
     obligation,
@@ -126,16 +138,13 @@ export const RepayInput = (props: {
           }}
         >
           <div className="repay-input-title">
-            {LABELS.REPAY_QUESTION} (Currently: ){formatNumber.format(balance)}{" "}
-            {name})
+            {LABELS.REPAY_QUESTION}
           </div>
           <div className="token-input">
             <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
             <NumericInput
               value={value}
-              onChange={(val: any) => {
-                setValue(val);
-              }}
+              onChange={setValue}
               autoFocus={true}
               style={{
                 fontSize: 20,
@@ -147,23 +156,11 @@ export const RepayInput = (props: {
             />
             <div>{name}</div>
           </div>
-          {/* TODO: finish slider implementation */}
-          {/* <Slider
-          marks={marks}
-          value={mark}
-          onChange={(val: number) =>
-            setValue(
-              (
-                (fromLamports(
-                  wadToLamports(obligation?.info.borrowAmountWad).toNumber(),
-                  repayLiquidityMint
-                ) *
-                  val) /
-                100
-              ).toFixed(2)
-            )
-          }
-        /> */}
+          <Slider
+              marks={marks}
+              value={mark}
+              onChange={setMark}
+            />
           <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
           <CollateralSelector
             reserve={repayReserve.info}

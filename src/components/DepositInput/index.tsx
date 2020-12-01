@@ -16,7 +16,7 @@ import { PublicKey } from "@solana/web3.js";
 import "./style.less";
 import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation } from "./../ActionConfirmation";
-import { marks } from "../../constants";
+import { LABELS, marks } from "../../constants";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -37,7 +37,6 @@ export const DepositInput = (props: {
   const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
     reserve?.liquidityMint
   );
-  // const collateralBalance = useUserBalance(reserve?.collateralMint);
 
   const convert = useCallback(
     (val: string | number) => {
@@ -111,15 +110,13 @@ export const DepositInput = (props: {
           }}
         >
           <div className="deposit-input-title">
-            How much would you like to deposit?
+            {LABELS.DEPOSIT_QUESTION}
           </div>
           <div className="token-input">
             <TokenIcon mintAddress={reserve?.liquidityMint} />
             <NumericInput
               value={value}
-              onChange={(val: any) => {
-                setValue(val);
-              }}
+              onChange={setValue}
               autoFocus={true}
               style={{
                 fontSize: 20,
@@ -139,7 +136,7 @@ export const DepositInput = (props: {
             onClick={onDeposit}
             disabled={fromAccounts.length === 0 || pendingTx}
           >
-            Deposit
+            {LABELS.DEPOSIT_ACTION}
             {pendingTx && (
               <Spin indicator={antIcon} className="action-spinner" />
             )}
