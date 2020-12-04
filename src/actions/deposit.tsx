@@ -28,9 +28,6 @@ export const deposit = async (
   connection: Connection,
   wallet: any
 ) => {
-  // TODO: customize ?
-  const MAX_UTILIZATION_RATE = 80;
-
   notify({
     message: "Depositing funds...",
     description: "Please review transactions to approve.",
@@ -110,6 +107,7 @@ export const deposit = async (
     );
   } else {
     // TODO: finish reserve init
+    const MAX_UTILIZATION_RATE = 80;
     instructions.push(
       initReserveInstruction(
         amountLamports,

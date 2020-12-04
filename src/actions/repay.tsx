@@ -109,22 +109,18 @@ export const repay = async (
       authority
     )
   );
+  
+  let tx = await sendTransaction(
+    connection,
+    wallet,
+    instructions.concat(cleanupInstructions),
+    signers,
+    true
+  );
 
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions.concat(cleanupInstructions),
-      signers,
-      true
-    );
-
-    notify({
-      message: "Funds repaid.",
-      type: "success",
-      description: `Transaction - ${tx}`,
-    });
-  } catch {
-    // TODO:
-  }
+  notify({
+    message: "Funds repaid.",
+    type: "success",
+    description: `Transaction - ${tx}`,
+  });
 };

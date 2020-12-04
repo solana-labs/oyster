@@ -10,7 +10,7 @@ import {
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Spin } from "antd";
+import { Button, Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -19,11 +19,8 @@ import { borrow } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
 import { LABELS } from "../../constants";
-import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation } from "./../ActionConfirmation";
 import { BackButton } from "./../BackButton";
-
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const BorrowInput = (props: {
   className?: string;
@@ -154,12 +151,10 @@ export const BorrowInput = (props: {
           <Button
             type="primary"
             onClick={onBorrow}
-            disabled={fromAccounts.length === 0 || pendingTx}
+            loading={pendingTx}
+            disabled={fromAccounts.length === 0}
           >
             {LABELS.BORROW_ACTION}
-            {pendingTx && (
-              <Spin indicator={antIcon} className="action-spinner" />
-            )}
           </Button>
           <BackButton />
         </div>

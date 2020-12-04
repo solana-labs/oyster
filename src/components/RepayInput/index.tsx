@@ -6,7 +6,7 @@ import {
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Slider, Spin } from "antd";
+import { Button, Card, Slider } from "antd";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -15,15 +15,14 @@ import { repay } from "../../actions";
 import { CollateralSelector } from "./../CollateralSelector";
 import "./style.less";
 import { LABELS, marks } from "../../constants";
-import { LoadingOutlined } from "@ant-design/icons";
 import { ActionConfirmation } from "./../ActionConfirmation";
-
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+import { fromLamports, wadToLamports } from "../../utils/utils";
+import { notify } from "../../utils/notifications";
 
 export const RepayInput = (props: {
   className?: string;
   reserve: ParsedAccount<LendingReserve>;
-  obligation?: ParsedAccount<LendingObligation>;
+  obligation: ParsedAccount<LendingObligation>;
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
@@ -32,6 +31,14 @@ export const RepayInput = (props: {
 
   const repayReserve = props.reserve;
   const obligation = props.obligation;
+
+  const liquidityMint = useMint(repayReserve.info.liquidityMint);
+
+  const borrowAmountLamports = wadToLamports(obligation.info.borrowAmountWad).toNumber();
+  const borrowAmount = fromLamports(
+    borrowAmountLamports,
+    liquidityMint
+  );
 
   const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
 
@@ -49,20 +56,17 @@ export const RepayInput = (props: {
     repayReserve.info.liquidityMint
   );
 
-  const repayLiquidityMint = useMint(repayReserve.info.liquidityMint);
-  // const collateralBalance = useUserBalance(reserve?.collateralMint);
-
   const obligationAccount = useAccountByMint(obligation?.info.tokenMint);
 
   const convert = useCallback(
     (val: string | number) => {
       if (typeof val === "string") {
-        return (parseFloat(val) / balance) * 100;
+        return (parseFloat(val) / borrowAmount) * 100;
       } else {
-        return ((val * balance) / 100).toFixed(2);
+        return ((val * borrowAmount) / 100).toFixed(2);
       }
     },
-    [balance]
+    [borrowAmount]
   );
 
   const { value, setValue, mark, setMark, type } = useSliderInput(convert);
@@ -81,11 +85,13 @@ export const RepayInput = (props: {
 
     (async () => {
       try {
+        const toRepayLamports = type === InputType.Slider
+          ? (mark * borrowAmountLamports) / 100
+          : Math.ceil(borrowAmountLamports * (parseFloat(value) / borrowAmount));
+
         await repay(
           fromAccounts[0],
-          type === InputType.Slider
-          ? (mark * balanceLamports) / 100
-          : Math.ceil(balanceLamports * (parseFloat(value) / balance)),
+          toRepayLamports,
           obligation,
           obligationAccount,
           repayReserve,
@@ -96,8 +102,13 @@ export const RepayInput = (props: {
 
         setValue("");
         setShowConfirmation(true);
-      } catch {
-        // TODO:
+      } catch (error) {
+        notify({
+          message: "Unable to repay loan.",
+          type: "error",
+          description: error.message,
+        });
+        
       } finally {
         setPendingTx(false);
       }
@@ -105,7 +116,8 @@ export const RepayInput = (props: {
   }, [
     mark,
     value,
-    balance,
+    borrowAmount,
+    borrowAmountLamports,
     balanceLamports,
     type,
     connection,
@@ -171,12 +183,10 @@ export const RepayInput = (props: {
           <Button
             type="primary"
             onClick={onRepay}
+            loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
             {LABELS.REPAY_ACTION}
-            {pendingTx && (
-              <Spin indicator={antIcon} className="action-spinner" />
-            )}
           </Button>
         </div>
       )}

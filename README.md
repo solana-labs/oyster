@@ -15,14 +15,9 @@ Any content produced by Solana, or developer resources that Solana provides, are
 - [] Facuet add USDC that is using sol airdrop and USDC reserve to give user USDC
 - [] Borrow - Convert target ccy to collateral on oposite side
 - [] Borrow - liquidity token wrapped SOL should be unwrapped ...
-- [] Fix slider on repay page
-- [] Add slider to borrow page (100% max collateral)
-- [] Add market size on front page
+- [x] Fix slider on repay page
+- [x] Add slider to borrow page (100% max collateral)
+- [x] Add market size on front page
 - [] Add github link
 - [] Repay from reserve (add selection for obligation/loan)
 - [] Add support for token names in URL in addition to reserve address
-
-# TOP for tomorrow
-
-- subscribe to all dex markets that are used by lending reserves
-- finish reserve overivew

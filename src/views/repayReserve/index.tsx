@@ -22,9 +22,7 @@ export const RepayReserveView = () => {
   );
   const reserve = lendingReserve?.info;
 
-  console.log([reserveId, obligationId]);
-
-  if (!reserve || !lendingReserve) {
+  if (!reserve || !lendingReserve || !lendingObligation) {
     return null;
   }
 
