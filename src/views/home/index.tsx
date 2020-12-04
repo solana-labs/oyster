@@ -1,48 +1,59 @@
 import { MintInfo } from "@solana/spl-token";
+import { Card, Col, Row, Statistic } from "antd";
 import React, { useEffect, useState } from "react";
 import { LABELS } from "../../constants";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useMarkets } from "../../contexts/market";
 import { useLendingReserves } from "../../hooks";
 import { reserveMarketCap } from "../../models";
-import { formatUSD, fromLamports } from "../../utils/utils";
+import { fromLamports, wadToLamports } from "../../utils/utils";
 import { LendingReserveItem } from "./item";
 import "./itemStyle.less";
 
 export const HomeView = () => {
   const { reserveAccounts } = useLendingReserves();
   const [totalMarketSize, setTotalMarketSize] = useState(0);
+  const [totalBorrowed, setTotalBorrowed] = useState(0);
   const { marketEmitter, midPriceInUSD } = useMarkets();
 
   useEffect(() => {
-    const refreshTotalMarketSize = () => {
-      const total = reserveAccounts.reduce((result, item) => {
+    const refreshTotal = () => {
+      let totalSize = 0;
+      let borrowed = 0;
+
+      reserveAccounts.forEach((item) => {
         const marketCapLamports = reserveMarketCap(item.info);
 
+        
         const localCache = cache;
-        const mint = localCache.get(
+        const liquidityMint = localCache.get(
           item.info.liquidityMint.toBase58()
         ) as ParsedAccount<MintInfo>;
 
-        if (!mint) {
-          return result;
+        if (!liquidityMint) {
+          return;
         }
 
         const marketCap =
-          fromLamports(marketCapLamports, mint?.info) *
-          midPriceInUSD(mint?.pubkey.toBase58());
+          fromLamports(marketCapLamports, liquidityMint?.info) *
+          midPriceInUSD(liquidityMint?.pubkey.toBase58());
 
-        return result + marketCap;
-      }, 0);
+        totalSize = totalSize + marketCap;
 
-      setTotalMarketSize(total);
+        borrowed = borrowed + fromLamports(
+          wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
+          liquidityMint.info);
+      });
+
+      setTotalMarketSize(totalSize);
+      setTotalBorrowed(borrowed);
     };
 
     const dispose = marketEmitter.onMarket(() => {
-      refreshTotalMarketSize();
+      refreshTotal();
     });
 
-    refreshTotalMarketSize();
+    refreshTotal();
 
     return () => {
       dispose();
@@ -51,9 +62,30 @@ export const HomeView = () => {
 
   return (
     <div className="flexColumn">
-      <h2 className="home-market-size">
-        Current market size: {formatUSD.format(totalMarketSize)}
-      </h2>
+      <Row gutter={16} className="home-info-row">
+        <Col span={12}>
+          <Card >
+            <Statistic
+              title="Current market size"
+              value={totalMarketSize}
+              precision={2}
+              valueStyle={{ color: '#3f8600' }}
+              prefix="$"
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card >
+            <Statistic
+              title="Total borrowed"
+              value={totalBorrowed}
+              precision={2}
+              prefix="$"
+            />
+          </Card>
+        </Col>
+      </Row>
+
 
       <div className="home-item home-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>

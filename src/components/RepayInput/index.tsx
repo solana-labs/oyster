@@ -52,7 +52,7 @@ export const RepayInput = (props: {
   }, [collateralReserveMint]);
 
   const name = useTokenName(repayReserve?.info.liquidityMint);
-  const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
+  const { accounts: fromAccounts } = useUserBalance(
     repayReserve.info.liquidityMint
   );
 
@@ -118,7 +118,6 @@ export const RepayInput = (props: {
     value,
     borrowAmount,
     borrowAmountLamports,
-    balanceLamports,
     type,
     connection,
     wallet,
@@ -127,6 +126,7 @@ export const RepayInput = (props: {
     repayReserve,
     fromAccounts,
     obligationAccount,
+    setValue,
   ]);
 
   const bodyStyle: React.CSSProperties = {
