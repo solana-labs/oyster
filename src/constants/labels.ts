@@ -17,6 +17,7 @@ export const LABELS = {
   NO_LOANS_NO_DEPOSITS: "No loans or deposits.",
   MENU_DEPOSIT: "Deposit",
   MENU_BORROW: "Borrow",
+  MENU_LIQUIDATE: "Liquidate",
   MENU_FAUCET: "Faucet",
   APP_TITLE: "Oyster Lending",
   CONNECT_BUTTON: "Connect",
