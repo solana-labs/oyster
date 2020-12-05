@@ -102,7 +102,7 @@ export const AppLayout = (props: any) => {
                 >
                   {LABELS.MENU_LIQUIDATE}
                 </Link>
-              </Menu.Item>              
+              </Menu.Item>
               {env !== "mainnet-beta" && (
                 <Menu.Item key="6" icon={<RocketOutlined />}>
                   <Link
