@@ -34,7 +34,7 @@ export const LiquidateItem = (props: {
   ]);
 
   return (
-    <Link to={`/liquidate/${borrowReserve.pubkey.toBase58()}`}>
+    <Link to={`/liquidate/${obligation.pubkey.toBase58()}`}>
       <Card>
         <div className="liquidate-item">
           <span style={{ display: "flex" }}>

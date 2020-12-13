@@ -19,6 +19,7 @@ import {
   ReserveView,
   WithdrawView,
   LiquidateView,
+  LiquidateReserveView
 } from "./views";
 
 export function Routes() {
@@ -66,6 +67,10 @@ export function Routes() {
                         exact
                         path="/liquidate"
                         children={<LiquidateView />}
+                      />
+                      <Route
+                        path="/liquidate/:id"
+                        children={<LiquidateReserveView />}
                       />
                       <Route exact path="/faucet" children={<FaucetView />} />
                     </Switch>
