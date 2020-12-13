@@ -10,3 +10,4 @@ export * from "./useUserObligationByReserve";
 export * from "./useBorrowedAmount";
 export * from "./useUserDeposits";
 export * from "./useSliderInput";
+export * from "./useLiquidableObligations";

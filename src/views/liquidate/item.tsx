@@ -1,4 +1,4 @@
-import React, { useMemo }  from "react";
+import React, { useMemo } from "react";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { LendingObligation, LendingReserve, calculateBorrowAPY } from "../../models/lending";
 import { useTokenName } from "../../hooks";
@@ -15,15 +15,14 @@ import { LABELS } from "../../constants";
 
 export const LiquidateItem = (props: {
   obligation: ParsedAccount<LendingObligation>;
+  ltv: number
 }) => {
 
-  const { obligation } = props;
+  const { obligation, ltv } = props;
 
   const borrowReserve = cache.get(obligation.info.borrowReserve) as ParsedAccount<LendingReserve>;
   const tokenName = useTokenName(borrowReserve?.info.liquidityMint);
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
-
-  console.log("wad",obligation.info.borrowAmountWad)
 
   const borrowAmount = fromLamports(
     wadToLamports(obligation.info.borrowAmountWad),
@@ -35,7 +34,7 @@ export const LiquidateItem = (props: {
   ]);
 
   return (
-    <Link to={`/liquidate/${obligation.pubkey.toBase58()}`}>
+    <Link to={`/liquidate/${borrowReserve.pubkey.toBase58()}`}>
       <Card>
         <div className="liquidate-item">
           <span style={{ display: "flex" }}>
@@ -47,6 +46,9 @@ export const LiquidateItem = (props: {
           </div>
           <div>
             {formatPct.format(borrowAPY)}
+          </div>
+          <div>
+            {formatPct.format(ltv / 100)}
           </div>
           <div>
             <Button>
