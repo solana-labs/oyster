@@ -1,23 +1,19 @@
 import { useMemo } from "react";
-import { useUserAccounts } from "./useUserAccounts";
 import { useLendingObligations } from "./useLendingObligations";
 import { LendingReserve } from "../models/lending";
 import { useLendingReserves } from "./useLendingReserves";
 import { ParsedAccount } from "../contexts/accounts";
 
 export const useLiquidableObligations = () => {
-  const { userAccounts } = useUserAccounts();
   const { obligations } = useLendingObligations();
   const { reserveAccounts } = useLendingReserves();
 
   const availableReserves = useMemo(() => {
     return reserveAccounts.reduce((map, reserve) => {
-      if (userAccounts.some(acc => acc.info.mint.toBase58() === reserve.info.liquidityMint.toBase58())) {
         map.set(reserve.pubkey.toBase58(), reserve);
-      }
       return map;
     }, new Map<string, ParsedAccount<LendingReserve>>())
-  }, [reserveAccounts, userAccounts])
+  }, [reserveAccounts])
 
   const liquidableObligations = useMemo(() => {
     if (availableReserves.size === 0) {
