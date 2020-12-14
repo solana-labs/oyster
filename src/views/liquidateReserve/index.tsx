@@ -5,6 +5,9 @@ import {
   SideReserveOverview,
   SideReserveOverviewMode,
 } from "../../components/SideReserveOverview";
+
+import { LiquidateInput } from "../../components/LiquidateInput";
+
 import "./style.less";
 
 export const LiquidateReserveView = () => {
@@ -20,9 +23,10 @@ export const LiquidateReserveView = () => {
   return (
     <div className="liquidate-reserve">
       <div className="liquidate-reserve-container">
-        <div
+        <LiquidateInput
           className="liquidate-reserve-item liquidate-reserve-item-left"
-
+          obligation={obligation}
+          reserve={reserve}
         />
         <SideReserveOverview
           className="liquidate-reserve-item liquidate-reserve-item-right"
@@ -32,5 +36,4 @@ export const LiquidateReserveView = () => {
       </div>
     </div>
   )
-
 }
