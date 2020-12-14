@@ -1,36 +1,36 @@
 import { useCallback, useState } from "react";
 
 export enum InputType {
-  Input = 0,
-  Slider = 1,
+  AbsoluteValue = 0,
+  Percent = 1,
 }
 
 export const useSliderInput = (
   convert: (val: string | number) => string | number
 ) => {
   const [value, setValue] = useState("");
-  const [mark, setMark] = useState(0);
-  const [type, setType] = useState(InputType.Slider);
+  const [pct, setPct] = useState(0);
+  const [type, setType] = useState(InputType.Percent);
 
   return {
     value,
     setValue: useCallback(
       (val: string) => {
         console.log(val);
-        setType(InputType.Input);
+        setType(InputType.AbsoluteValue);
         setValue(val);
-        setMark(convert(val) as number);
+        setPct(convert(val) as number);
       },
-      [setType, setValue, setMark, convert]
+      [setType, setValue, setPct, convert]
     ),
-    mark,
-    setMark: useCallback(
+    pct,
+    setPct: useCallback(
       (val: number) => {
-        setType(InputType.Input);
-        setMark(val);
+        setType(InputType.AbsoluteValue);
+        setPct(val);
         setValue(convert(val) as string);
       },
-      [setType, setValue, setMark, convert]
+      [setType, setValue, setPct, convert]
     ),
     type,
   };

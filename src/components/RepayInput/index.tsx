@@ -69,7 +69,7 @@ export const RepayInput = (props: {
     [borrowAmount]
   );
 
-  const { value, setValue, mark, setMark, type } = useSliderInput(convert);
+  const { value, setValue, pct, setPct, type } = useSliderInput(convert);
 
   const onRepay = useCallback(() => {
     if (
@@ -85,8 +85,8 @@ export const RepayInput = (props: {
 
     (async () => {
       try {
-        const toRepayLamports = type === InputType.Slider
-          ? (mark * borrowAmountLamports) / 100
+        const toRepayLamports = type === InputType.Percent
+          ? (pct * borrowAmountLamports) / 100
           : Math.ceil(borrowAmountLamports * (parseFloat(value) / borrowAmount));
 
         await repay(
@@ -114,7 +114,7 @@ export const RepayInput = (props: {
       }
     })();
   }, [
-    mark,
+    pct,
     value,
     borrowAmount,
     borrowAmountLamports,
@@ -170,8 +170,8 @@ export const RepayInput = (props: {
           </div>
           <Slider
               marks={marks}
-              value={mark}
-              onChange={setMark}
+              value={pct}
+              onChange={setPct}
             />
           <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
           <CollateralSelector

@@ -4,7 +4,7 @@ import { LendingReserve, reserveMarketCap } from "../models/lending";
 import { fromLamports } from "../utils/utils";
 import { useUserBalance } from "./useUserBalance";
 
-export function useCollateralBalance(
+export function useUserCollateralBalance(
   reserve?: LendingReserve,
   account?: PublicKey
 ) {

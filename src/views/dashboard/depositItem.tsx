@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useCollateralBalance, useTokenName } from "../../hooks";
+import { useUserCollateralBalance, useTokenName } from "../../hooks";
 import { calculateDepositAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct } from "../../utils/utils";
@@ -15,7 +15,7 @@ export const DepositItem = (props: {
 }) => {
   const mintAddress = props.reserve.info.liquidityMint;
   const name = useTokenName(mintAddress);
-  const { balance: collateralBalance } = useCollateralBalance(
+  const { balance: collateralBalance } = useUserCollateralBalance(
     props.reserve.info,
     props.account.pubkey
   );

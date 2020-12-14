@@ -2,7 +2,7 @@ import React from "react";
 import {
   useTokenName,
   useUserBalance,
-  useCollateralBalance,
+  useUserCollateralBalance,
 } from "./../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { formatNumber } from "../../utils/utils";
@@ -17,7 +17,7 @@ export const DepositInfoLine = (props: {
 }) => {
   const name = useTokenName(props.reserve.liquidityMint);
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useCollateralBalance(props.reserve);
+  const { balance: collateralBalance } = useUserCollateralBalance(props.reserve);
 
   return (
     <Card

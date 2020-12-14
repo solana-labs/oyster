@@ -183,3 +183,7 @@ export const reserveMarketCap = (reserve?: LendingReserve) => {
 
   return total;
 };
+
+export const collateralExchangeRate = (reserve?: LendingReserve) => {
+  return (reserve?.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve);
+}

@@ -46,7 +46,7 @@ export const DepositInput = (props: {
     [balance]
   );
 
-  const { value, setValue, mark, setMark, type } = useSliderInput(convert);
+  const { value, setValue, pct, setPct, type } = useSliderInput(convert);
 
   const onDeposit = useCallback(() => {
     setPendingTx(true);
@@ -55,8 +55,8 @@ export const DepositInput = (props: {
       try {
         await deposit(
           fromAccounts[0],
-          type === InputType.Slider
-            ? (mark * balanceLamports) / 100
+          type === InputType.Percent
+            ? (pct * balanceLamports) / 100
             : Math.ceil(balanceLamports * (parseFloat(value) / balance)),
           reserve,
           address,
@@ -79,7 +79,7 @@ export const DepositInput = (props: {
     balance,
     wallet,
     value,
-    mark,
+    pct,
     type,
     reserve,
     fromAccounts,
@@ -126,7 +126,7 @@ export const DepositInput = (props: {
             <div>{name}</div>
           </div>
 
-          <Slider marks={marks} value={mark} onChange={setMark} />
+          <Slider marks={marks} value={pct} onChange={setPct} />
 
           <Button
             type="primary"
