@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import {
   InputType,
-  useCollateralBalance,
+  useUserCollateralBalance,
   useSliderInput,
   useTokenName,
   useUserBalance,
@@ -36,7 +36,7 @@ export const WithdrawInput = (props: {
     balanceLamports: collateralBalanceLamports,
     accounts: fromAccounts,
   } = useUserBalance(reserve?.collateralMint);
-  const { balance: collateralBalanceInLiquidity } = useCollateralBalance(
+  const { balance: collateralBalanceInLiquidity } = useUserCollateralBalance(
     reserve
   );
 
@@ -51,7 +51,7 @@ export const WithdrawInput = (props: {
     [collateralBalanceInLiquidity]
   );
 
-  const { value, setValue, mark, setMark, type } = useSliderInput(convert);
+  const { value, setValue, pct, setPct, type } = useSliderInput(convert);
 
   const onWithdraw = useCallback(() => {
     setPendingTx(true);
@@ -60,8 +60,8 @@ export const WithdrawInput = (props: {
       try {
         await withdraw(
           fromAccounts[0],
-          type === InputType.Slider
-            ? (mark * collateralBalanceLamports) / 100
+          type === InputType.Percent
+            ? (pct * collateralBalanceLamports) / 100
             : Math.ceil(
                 collateralBalanceLamports *
                   (parseFloat(value) / collateralBalanceInLiquidity)
@@ -86,7 +86,7 @@ export const WithdrawInput = (props: {
     collateralBalanceLamports,
     connection,
     fromAccounts,
-    mark,
+    pct,
     reserve,
     setValue,
     type,
@@ -132,7 +132,7 @@ export const WithdrawInput = (props: {
             <div>{name}</div>
           </div>
 
-          <Slider marks={marks} value={mark} onChange={setMark} />
+          <Slider marks={marks} value={pct} onChange={setPct} />
 
           <Button
             type="primary"

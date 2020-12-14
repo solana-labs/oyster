@@ -1,5 +1,5 @@
 import React from "react";
-import { useCollateralBalance, useTokenName } from "../../hooks";
+import { useUserCollateralBalance, useTokenName } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct } from "../../utils/utils";
@@ -17,7 +17,7 @@ export const BorrowItem = (props: {
   const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
 
   // TODO: calculate avilable amount... based on total owned collateral across all the reserves
-  const { balance: collateralBalance } = useCollateralBalance(props.reserve);
+  const { balance: collateralBalance } = useUserCollateralBalance(props.reserve);
 
   const apr = calculateBorrowAPY(props.reserve);
 

@@ -1,9 +1,11 @@
 import React, { useMemo } from "react";
-import { useTokenName } from "../../hooks";
+import { useUserCollateralBalance, useTokenName } from "../../hooks";
 import {
   calculateBorrowAPY,
+  collateralExchangeRate,
   LendingObligation,
   LendingReserve,
+  reserveMarketCap,
 } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
@@ -28,6 +30,7 @@ export const ObligationItem = (props: {
   const name = useTokenName(borrowReserve?.info.liquidityMint);
 
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
+  const collateralMint = useMint(borrowReserve.info.collateralMint);
 
   const borrowAmount = fromLamports(
     wadToLamports(obligation.info.borrowAmountWad),
@@ -37,6 +40,11 @@ export const ObligationItem = (props: {
   const borrowAPY = useMemo(() => calculateBorrowAPY(borrowReserve.info), [
     borrowReserve,
   ]);
+
+
+  const rate = collateralExchangeRate(borrowReserve.info) ;
+
+  console.log(`collateral ${fromLamports(obligation.info.collateralAmount.toNumber() / rate, collateralMint)}`);
 
   return (
     <Card>
