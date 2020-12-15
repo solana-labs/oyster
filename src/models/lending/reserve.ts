@@ -187,3 +187,12 @@ export const reserveMarketCap = (reserve?: LendingReserve) => {
 export const collateralExchangeRate = (reserve?: LendingReserve) => {
   return (reserve?.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve);
 }
+
+export const collateralToLiquidity = (collateralAmount: BN, reserve?: LendingReserve) => {
+  return Math.floor(collateralAmount.toNumber() / collateralExchangeRate(reserve));
+}
+
+
+export const liquidityToCollateral = (liquidityAmount: BN, reserve?: LendingReserve) => {
+  return Math.floor(liquidityAmount.toNumber() * collateralExchangeRate(reserve));
+}

@@ -11,8 +11,9 @@ const { Option } = Select;
 
 export const CollateralSelector = (props: {
   reserve: LendingReserve;
-  mint?: string;
-  onMintChange: (id: string) => void;
+  collateralReserve?: string;
+  disabled?: boolean;
+  onCollateralReserve?: (id: string) => void;
 }) => {
   const { reserveAccounts } = useLendingReserves();
   const { tokenMap } = useConnectionConfig();
@@ -20,20 +21,22 @@ export const CollateralSelector = (props: {
   const market = cache.get(props.reserve.lendingMarket) as ParsedAccount<
     LendingMarket
   >;
-  const onlyQuoteAllowed = !props.reserve.liquidityMint.equals(
-    market.info.quoteMint
+  const onlyQuoteAllowed = !props.reserve?.liquidityMint?.equals(
+    market?.info?.quoteMint
   );
 
   return (
     <Select
       size="large"
       showSearch
-      style={{ minWidth: 120 }}
+      style={{ minWidth: 120, marginBottom: 10 }}
       placeholder="Collateral"
-      value={props.mint}
+      value={props.collateralReserve}
+      disabled={props.disabled}
+      defaultValue={props.collateralReserve}
       onChange={(item) => {
-        if (props.onMintChange) {
-          props.onMintChange(item);
+        if (props.onCollateralReserve) {
+          props.onCollateralReserve(item);
         }
       }}
       filterOption={(input, option) =>
