@@ -6,6 +6,7 @@ import {
   GithubOutlined,
   BankOutlined,
   LogoutOutlined,
+  LoginOutlined,
   HomeOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
@@ -25,7 +26,8 @@ export const AppLayout = (props: any) => {
     "/dashboard": "2",
     "/deposit": "3",
     "/borrow": "4",
-    "/faucet": "4",
+    "/liquidate": "5",
+    "/faucet": "6",
   };
 
   const current =
@@ -92,8 +94,17 @@ export const AppLayout = (props: any) => {
                   {LABELS.MENU_BORROW}
                 </Link>
               </Menu.Item>
+              <Menu.Item key="5" icon={<LoginOutlined />}>
+                <Link
+                  to={{
+                    pathname: "/liquidate",
+                  }}
+                >
+                  {LABELS.MENU_LIQUIDATE}
+                </Link>
+              </Menu.Item>
               {env !== "mainnet-beta" && (
-                <Menu.Item key="5" icon={<RocketOutlined />}>
+                <Menu.Item key="6" icon={<RocketOutlined />}>
                   <Link
                     to={{
                       pathname: "/faucet",

@@ -1,0 +1,43 @@
+.liquidate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & > div, span {
+    flex: 20%;
+    height: 22px;
+    text-align: right;
+  }
+
+  & > :first-child {
+    flex: 80px
+  }
+}
+
+.liquidate-header {
+  margin: 0px 30px;
+
+  & > div {
+    flex: 20%;
+    text-align: right;
+  }
+
+  & > :first-child {
+    text-align: left;
+    flex: 80px
+  }
+}
+
+.liquidate-info {
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.liquidate-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex: 1;
+}
