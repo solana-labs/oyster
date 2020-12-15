@@ -2,15 +2,19 @@ import { useMemo } from "react";
 import { useUserObligations } from "./useUserObligations";
 import { PublicKey } from "@solana/web3.js";
 
-export function useUserObligationByReserve(reserve?: string | PublicKey) {
+export function useUserObligationByReserve(
+  borrowReserve?: string | PublicKey, 
+  collateralReserve?: string | PublicKey) {
   const { userObligations } = useUserObligations();
 
   const userObligationsByReserve = useMemo(() => {
-    const id = typeof reserve === "string" ? reserve : reserve?.toBase58();
+    const borrowId = typeof borrowReserve === "string" ? borrowReserve : borrowReserve?.toBase58();
+    const collateralId = typeof collateralReserve === "string" ? collateralReserve : collateralReserve?.toBase58();
     return userObligations.filter(
-      (item) => item.obligation.info.borrowReserve.toBase58() === id
+      (item) => item.obligation.info.borrowReserve.toBase58() === borrowId && 
+        item.obligation.info.collateralReserve.toBase58() === collateralId
     );
-  }, [reserve, userObligations]);
+  }, [borrowReserve, collateralReserve, userObligations]);
 
   return {
     userObligationsByReserve,

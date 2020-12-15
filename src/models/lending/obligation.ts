@@ -8,9 +8,9 @@ export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayo
     /// Slot when obligation was updated. Used for calculating interest.
     Layout.uint64("lastUpdateSlot"),
     /// Amount of collateral tokens deposited for this obligation
-    Layout.uint64("collateralAmount"),
+    Layout.uint64("depositedCollateral"),
     /// Reserve which collateral tokens were deposited into
-    Layout.publicKey("collateralSupply"),
+    Layout.publicKey("collateralReserve"),
     /// Borrow rate used for calculating interest.
     Layout.uint128("cumulativeBorrowRateWad"),
     /// Amount of tokens borrowed for this obligation plus interest
@@ -28,8 +28,8 @@ export const isLendingObligation = (info: AccountInfo<Buffer>) => {
 
 export interface LendingObligation {
   lastUpdateSlot: BN;
-  collateralAmount: BN;
-  collateralSupply: PublicKey;
+  depositedCollateral: BN;
+  collateralReserve: PublicKey;
   cumulativeBorrowRateWad: BN; // decimals
   borrowAmountWad: BN; // decimals
   borrowReserve: PublicKey;

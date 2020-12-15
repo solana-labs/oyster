@@ -34,16 +34,16 @@ export const BorrowInput = (props: {
 
   const borrowReserve = props.reserve;
 
-  const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
+  const [collateralReserveKey, setCollateralReserveKey] = useState<string>();
 
   const collateralReserve = useMemo(() => {
     const id: string =
       cache
         .byParser(LendingReserveParser)
-        .find((acc) => acc === collateralReserveMint) || "";
+        .find((acc) => acc === collateralReserveKey) || "";
 
     return cache.get(id) as ParsedAccount<LendingReserve>;
-  }, [collateralReserveMint]);
+  }, [collateralReserveKey]);
 
   const name = useTokenName(borrowReserve?.info.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
@@ -51,7 +51,8 @@ export const BorrowInput = (props: {
   );
 
   const { userObligationsByReserve } = useUserObligationByReserve(
-    borrowReserve.pubkey
+    borrowReserve?.pubkey,
+    collateralReserve?.pubkey,
   );
 
   const onBorrow = useCallback(() => {
@@ -74,6 +75,7 @@ export const BorrowInput = (props: {
           borrowReserve,
           collateralReserve,
 
+          // TODO: select exsisting obligations by collateral reserve
           userObligationsByReserve.length > 0
             ? userObligationsByReserve[0].obligation
             : undefined,
@@ -126,8 +128,8 @@ export const BorrowInput = (props: {
           <div className="borrow-input-title">{LABELS.SELECT_COLLATERAL}</div>
           <CollateralSelector
             reserve={borrowReserve.info}
-            mint={collateralReserveMint}
-            onMintChange={setCollateralReserveMint}
+            collateralReserve={collateralReserveKey}
+            onCollateralReserve={setCollateralReserveKey}
           />
 
           <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>

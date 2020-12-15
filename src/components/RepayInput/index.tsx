@@ -21,7 +21,8 @@ import { notify } from "../../utils/notifications";
 
 export const RepayInput = (props: {
   className?: string;
-  reserve: ParsedAccount<LendingReserve>;
+  borrowReserve: ParsedAccount<LendingReserve>;
+  collateralReserve?: ParsedAccount<LendingReserve>;
   obligation: ParsedAccount<LendingObligation>;
 }) => {
   const connection = useConnection();
@@ -29,7 +30,7 @@ export const RepayInput = (props: {
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const repayReserve = props.reserve;
+  const repayReserve = props.borrowReserve;
   const obligation = props.obligation;
 
   const liquidityMint = useMint(repayReserve.info.liquidityMint);
@@ -39,17 +40,7 @@ export const RepayInput = (props: {
     borrowAmountLamports,
     liquidityMint
   );
-
-  const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
-
-  const collateralReserve = useMemo(() => {
-    const id: string =
-      cache
-        .byParser(LendingReserveParser)
-        .find((acc) => acc === collateralReserveMint) || "";
-
-    return cache.get(id) as ParsedAccount<LendingReserve>;
-  }, [collateralReserveMint]);
+  const collateralReserve = props.collateralReserve;
 
   const name = useTokenName(repayReserve?.info.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
@@ -173,11 +164,11 @@ export const RepayInput = (props: {
               value={pct}
               onChange={setPct}
             />
-          <div className="repay-input-title">{LABELS.SELECT_COLLATERAL}</div>
+          <div className="repay-input-title">{LABELS.COLLATERAL}</div>
           <CollateralSelector
             reserve={repayReserve.info}
-            mint={collateralReserveMint}
-            onMintChange={setCollateralReserveMint}
+            collateralReserve={collateralReserve?.pubkey.toBase58()}
+            disabled={true}
           />
 
           <Button

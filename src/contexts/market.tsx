@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { EventEmitter } from "./../utils/eventEmitter";
 
 import { DexMarketParser } from "./../models/dex";
+import { LendingReserve } from "../models";
 
 export interface MarketsContextState {
   midPriceInUSD: (mint: string) => number;
@@ -247,6 +248,55 @@ export const usePrecacheMarket = () => {
   const context = useMarkets();
   return context.precacheMarkets;
 };
+
+export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve) => {
+  const marketInfo = cache.get(reserve?.dexMarket);
+  if (!marketInfo) {
+    return 0.0;
+  }
+  const decodedMarket = marketInfo.info;
+
+  const baseMintDecimals =
+    cache.get(decodedMarket.baseMint)?.info.decimals || 0;
+  const quoteMintDecimals =
+    cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
+
+  const market = new Market(
+    decodedMarket,
+    baseMintDecimals,
+    quoteMintDecimals,
+    undefined,
+    decodedMarket.programId
+  );
+
+  const bids = cache.get(decodedMarket.bids)?.info;
+  const asks = cache.get(decodedMarket.asks)?.info;
+
+  if (bids && asks) {
+    const bidsBook = new Orderbook(market, bids.accountFlags, bids.slab);
+    const asksBook = new Orderbook(market, asks.accountFlags, asks.slab);
+
+    // TODO: pick side
+    let book = bidsBook;
+
+    let cost = 0;
+    let remaining = amount;
+
+    for (const level of book) {
+      let size = remaining > level.size ? level.size : level.size - remaining;
+      cost = cost + level.price * size;
+      remaining = remaining - size;
+
+      if(remaining <= 0) {
+        break;
+      }
+    }
+
+    return cost;
+  }
+
+  return 0;
+}
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

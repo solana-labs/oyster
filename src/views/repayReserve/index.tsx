@@ -20,6 +20,12 @@ export const RepayReserveView = () => {
   const lendingReserve = useLendingReserve(
     obligationId ? lendingObligation?.info.borrowReserve : reserveId
   );
+
+
+  const repayReserve = useLendingReserve(
+    obligationId ? lendingObligation?.info.collateralReserve : reserveId
+  );
+
   const reserve = lendingReserve?.info;
 
   if (!reserve || !lendingReserve || !lendingObligation) {
@@ -31,7 +37,8 @@ export const RepayReserveView = () => {
       <div className="repay-reserve-container">
         <RepayInput
           className="repay-reserve-item repay-reserve-item-left"
-          reserve={lendingReserve}
+          borrowReserve={lendingReserve}
+          collateralReserve={repayReserve}
           obligation={lendingObligation}
         />
         <SideReserveOverview
