@@ -15,6 +15,7 @@ export const LiquidateReserveView = () => {
 
   const obligation = useLendingObligation(id);
   const reserve = useLendingReserve(obligation?.info.borrowReserve);
+  const collateralReserve = useLendingReserve(obligation?.info.collateralReserve);
 
   if (!obligation || !reserve) {
     return null;
@@ -26,6 +27,7 @@ export const LiquidateReserveView = () => {
         <LiquidateInput
           className="liquidate-reserve-item liquidate-reserve-item-left"
           obligation={obligation}
+          collateralReserve={collateralReserve}
           reserve={reserve}
         />
         <SideReserveOverview

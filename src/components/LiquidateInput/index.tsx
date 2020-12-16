@@ -12,12 +12,11 @@ import "./style.less";
 export const LiquidateInput = (props: {
   className?: string;
   reserve: ParsedAccount<LendingReserve>;
+  collateralReserve?: ParsedAccount<LendingReserve>;
   obligation: ParsedAccount<LendingObligation>;
 }) => {
 
-  const { reserve } = props;
-
-  const [collateralReserveMint, setCollateralReserveMint] = useState<string>();
+  const { reserve, collateralReserve } = props;
   const [pendingTx, setPendingTx] = useState(false);
 
   const onLiquidate = useCallback(() => {
@@ -43,8 +42,8 @@ export const LiquidateInput = (props: {
         <div className="liquidate-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={reserve.info}
-          mint={collateralReserveMint}
-          onMintChange={setCollateralReserveMint}
+          collateralReserve={collateralReserve?.pubkey.toBase58()}
+          disabled={true}
         />
         <Button
           type="primary"

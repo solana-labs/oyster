@@ -51,22 +51,6 @@ export const ObligationItem = (props: {
   const borrowName = useTokenName(borrowReserve?.info.liquidityMint);
   const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
 
-
-  const cost = simulateMarketOrderFill(collateralLamports, borrowReserve.info);
-  console.log(cost);
-
-  // TODO: health factor
-//   let borrow_amount_as_collateral = withdraw_reserve_rates.liquidity_to_collateral(
-//     simulate_market_order_fill(
-//         obligation.borrowed_liquidity_wads,
-//         memory,
-//         dex_market_order_book_side_info,
-//         dex_market_info,
-//         &repay_reserve,
-//     )?
-//     .round_u64(),
-// );
-
   return (
     <Card>
       <div className="dashboard-item">

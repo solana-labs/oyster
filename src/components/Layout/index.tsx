@@ -6,7 +6,7 @@ import {
   GithubOutlined,
   BankOutlined,
   LogoutOutlined,
-  LoginOutlined,
+  ShoppingOutlined,
   HomeOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
@@ -94,7 +94,7 @@ export const AppLayout = (props: any) => {
                   {LABELS.MENU_BORROW}
                 </Link>
               </Menu.Item>
-              <Menu.Item key="5" icon={<LoginOutlined />}>
+              <Menu.Item key="5" icon={<ShoppingOutlined />}>
                 <Link
                   to={{
                     pathname: "/liquidate",

@@ -2,14 +2,14 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { MINT_TO_MARKET } from "./../models/marketOverrides";
 import { STABLE_COINS } from "./../utils/utils";
 import { useConnectionConfig } from "./connection";
-import { cache, getMultipleAccounts } from "./accounts";
+import { cache, getMultipleAccounts, ParsedAccount } from "./accounts";
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from "@project-serum/serum";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 import { EventEmitter } from "./../utils/eventEmitter";
 
 import { DexMarketParser } from "./../models/dex";
-import { LendingReserve } from "../models";
+import { LendingMarket, LendingReserve } from "../models";
 
 export interface MarketsContextState {
   midPriceInUSD: (mint: string) => number;
@@ -90,7 +90,7 @@ export function MarketProvider({ children = null as any }) {
         allMarkets.filter((a) => cache.get(a) === undefined),
         "single"
       ).then(({ keys, array }) => {
-        allMarkets.forEach(() => {});
+        allMarkets.forEach(() => { });
 
         return array.map((item, index) => {
           const marketAddress = keys[index];
@@ -159,7 +159,7 @@ export function MarketProvider({ children = null as any }) {
       const info = marketByMint.get(mintAddress);
       const market = cache.get(info?.marketInfo.address.toBase58() || "");
       if (!market) {
-        return () => {};
+        return () => { };
       }
 
       // TODO: get recent volume
@@ -261,7 +261,11 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve)
   const quoteMintDecimals =
     cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
 
-  const market = new Market(
+  const lendingMarket = cache.get(reserve.lendingMarket) as ParsedAccount<
+    LendingMarket
+  >;
+
+  const dexMarket = new Market(
     decodedMarket,
     baseMintDecimals,
     quoteMintDecimals,
@@ -269,33 +273,35 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve)
     decodedMarket.programId
   );
 
-  const bids = cache.get(decodedMarket.bids)?.info;
-  const asks = cache.get(decodedMarket.asks)?.info;
+  const bookAccount = lendingMarket.info.quoteMint.equals(
+    reserve.liquidityMint
+  )
+    ? decodedMarket?.bids
+    : decodedMarket?.asks;
 
-  if (bids && asks) {
-    const bidsBook = new Orderbook(market, bids.accountFlags, bids.slab);
-    const asksBook = new Orderbook(market, asks.accountFlags, asks.slab);
+  const bookInfo = cache.get(bookAccount)?.info;
+  if (!bookInfo) {
+    return 0;
+  }
 
-    // TODO: pick side
-    let book = bidsBook;
+  const book = new Orderbook(dexMarket, bookInfo.accountFlags, bookInfo.slab);
 
-    let cost = 0;
-    let remaining = amount;
+  let cost = 0;
+  let remaining = amount;
 
+  if (book) {
     for (const level of book) {
       let size = remaining > level.size ? level.size : level.size - remaining;
       cost = cost + level.price * size;
       remaining = remaining - size;
 
-      if(remaining <= 0) {
+      if (remaining <= 0) {
         break;
       }
     }
-
-    return cost;
   }
 
-  return 0;
+  return cost;
 }
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {

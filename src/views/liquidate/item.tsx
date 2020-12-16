@@ -20,7 +20,14 @@ export const LiquidateItem = (props: {
 
   const { obligation, ltv } = props;
 
-  const borrowReserve = cache.get(obligation.info.borrowReserve) as ParsedAccount<LendingReserve>;
+  const borrowReserve = cache.get(
+    obligation.info.borrowReserve
+  ) as ParsedAccount<LendingReserve>;
+
+  const collateralReserve = cache.get(
+    obligation.info.collateralReserve
+  ) as ParsedAccount<LendingReserve>;
+  
   const tokenName = useTokenName(borrowReserve?.info.liquidityMint);
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
 
@@ -33,13 +40,24 @@ export const LiquidateItem = (props: {
     borrowReserve,
   ]);
 
+  const borrowName = useTokenName(borrowReserve?.info.liquidityMint);
+  const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
+
   return (
     <Link to={`/liquidate/${obligation.pubkey.toBase58()}`}>
       <Card>
         <div className="liquidate-item">
           <span style={{ display: "flex" }}>
-            <TokenIcon mintAddress={borrowReserve.info.liquidityMint} />
-            {tokenName}
+            <div style={{ display: "flex" }}>
+              <TokenIcon
+                mintAddress={collateralReserve?.info.liquidityMint}
+                style={{ marginRight: "-0.5rem" }}
+              />
+              <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
+            </div>
+            {collateralName}
+          /
+          {borrowName}
           </span>
           <div>
             {formatNumber.format(borrowAmount)} {tokenName}
