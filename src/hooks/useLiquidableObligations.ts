@@ -39,6 +39,8 @@ export const useLiquidableObligations = () => {
         const collateralLamports = collateralToLiquidity(obligation.info.depositedCollateral, reserve);
         const cost = simulateMarketOrderFill(collateralLamports, reserve);
 
+        console.log(cost);
+
         // TODO: calculate LTV 
         const ltv = 81;
         const liquidationThreshold = item.reserve.info.config.liquidationThreshold;

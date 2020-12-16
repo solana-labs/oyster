@@ -1,12 +1,10 @@
 import React, { useMemo } from "react";
-import { useUserCollateralBalance, useTokenName } from "../../hooks";
+import { useTokenName } from "../../hooks";
 import {
   calculateBorrowAPY,
-  collateralExchangeRate,
   collateralToLiquidity,
   LendingObligation,
   LendingReserve,
-  reserveMarketCap,
 } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
@@ -18,7 +16,6 @@ import {
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
-import { simulateMarketOrderFill } from "../../contexts/market";
 
 export const ObligationItem = (props: {
   obligation: ParsedAccount<LendingObligation>;

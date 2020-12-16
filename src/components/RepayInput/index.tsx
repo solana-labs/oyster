@@ -1,13 +1,12 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { InputType, useAccountByMint, useSliderInput, useTokenName, useUserBalance } from "../../hooks";
 import {
   LendingObligation,
   LendingReserve,
-  LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card, Slider } from "antd";
-import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
+import { ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
