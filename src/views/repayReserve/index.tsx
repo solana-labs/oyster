@@ -1,5 +1,5 @@
 import React from "react";
-import { useLendingObligation, useLendingReserve } from "../../hooks";
+import { useEnrichedLendingObligation, useLendingReserve } from "../../hooks";
 import { useParams } from "react-router-dom";
 
 import { RepayInput } from "../../components/RepayInput";
@@ -16,7 +16,7 @@ export const RepayReserveView = () => {
     obligation?: string;
   }>();
 
-  const lendingObligation = useLendingObligation(obligationId);
+  const lendingObligation = useEnrichedLendingObligation(obligationId);
   const lendingReserve = useLendingReserve(
     obligationId ? lendingObligation?.info.borrowReserve : reserveId
   );

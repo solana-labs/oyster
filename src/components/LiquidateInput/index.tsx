@@ -4,7 +4,8 @@ import React, { useCallback } from "react";
 import { useState } from "react";
 import { LABELS } from "../../constants";
 import { ParsedAccount } from "../../contexts/accounts";
-import { LendingObligation, LendingReserve } from "../../models";
+import { EnrichedLendingObligation } from "../../hooks";
+import { LendingReserve } from "../../models";
 import { BackButton } from "../BackButton";
 import { CollateralSelector } from "../CollateralSelector";
 import "./style.less";
@@ -13,7 +14,7 @@ export const LiquidateInput = (props: {
   className?: string;
   reserve: ParsedAccount<LendingReserve>;
   collateralReserve?: ParsedAccount<LendingReserve>;
-  obligation: ParsedAccount<LendingObligation>;
+  obligation: EnrichedLendingObligation;
 }) => {
 
   const { reserve, collateralReserve } = props;

@@ -77,7 +77,7 @@ export const BorrowInput = (props: {
 
           // TODO: select exsisting obligations by collateral reserve
           userObligationsByReserve.length > 0
-            ? userObligationsByReserve[0].obligation
+            ? userObligationsByReserve[0].obligation.account
             : undefined,
 
           userObligationsByReserve.length > 0

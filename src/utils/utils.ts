@@ -104,7 +104,7 @@ export function toLamports(
     typeof account === "number" ? account : account.info.amount?.toNumber();
 
   const precision = Math.pow(10, mint?.decimals || 0);
-  return amount * precision;
+  return Math.floor(amount * precision);
 }
 
 export function wadToLamports(amount?: BN): BN {
@@ -120,12 +120,12 @@ export function fromLamports(
     return 0;
   }
 
-  const amount =
+  const amount = Math.floor(
     typeof account === "number"
       ? account
       : BN.isBN(account)
       ? account.toNumber()
-      : account.info.amount.toNumber();
+      : account.info.amount.toNumber());
 
   const precision = Math.pow(10, mint?.decimals || 0);
   return (amount / precision) * rate;

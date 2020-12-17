@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
-import { useTokenName } from "../../hooks";
+import { EnrichedLendingObligation, useTokenName } from "../../hooks";
 import {
   calculateBorrowAPY,
   collateralToLiquidity,
-  LendingObligation,
   LendingReserve,
 } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
@@ -18,7 +17,7 @@ import { Link } from "react-router-dom";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 
 export const ObligationItem = (props: {
-  obligation: ParsedAccount<LendingObligation>;
+  obligation: EnrichedLendingObligation;
 }) => {
   const { obligation } = props;
 
@@ -51,17 +50,14 @@ export const ObligationItem = (props: {
   return (
     <Card>
       <div className="dashboard-item">
-        <span style={{ display: "flex" }}>
-          <div style={{ display: "flex" }}>
+        <span style={{ display: "flex", marginLeft: 5 }}>
+          <div style={{ display: "flex" }} title={`${collateralName}→${borrowName}`}>
             <TokenIcon
               mintAddress={collateralReserve?.info.liquidityMint}
               style={{ marginRight: "-0.5rem" }}
             />
             <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
           </div>
-          {collateralName}
-          /
-          {borrowName}
         </span>
         <div>
           {formatNumber.format(borrowAmount)} {borrowName}
@@ -70,13 +66,14 @@ export const ObligationItem = (props: {
           {formatNumber.format(collateral)} {collateralName}
         </div>
         <div>{formatPct.format(borrowAPY)}</div>
+        <div>{formatPct.format(obligation.info.ltv / 100)}</div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/borrow/${borrowReserve.pubkey.toBase58()}`}>
             <Button>
               <span>Borrow</span>
             </Button>
           </Link>
-          <Link to={`/repay/loan/${obligation.pubkey.toBase58()}`}>
+          <Link to={`/repay/loan/${obligation.account.pubkey.toBase58()}`}>
             <Button>
               <span>Repay</span>
             </Button>

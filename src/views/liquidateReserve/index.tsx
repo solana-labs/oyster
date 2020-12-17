@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useLendingObligation, useLendingReserve } from "../../hooks";
+import { useEnrichedLendingObligation, useLendingReserve } from "../../hooks";
 import {
   SideReserveOverview,
   SideReserveOverviewMode,
@@ -13,7 +13,7 @@ import "./style.less";
 export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
 
-  const obligation = useLendingObligation(id);
+  const obligation = useEnrichedLendingObligation(id);
   const reserve = useLendingReserve(obligation?.info.borrowReserve);
   const collateralReserve = useLendingReserve(obligation?.info.collateralReserve);
 

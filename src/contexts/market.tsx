@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { MINT_TO_MARKET } from "./../models/marketOverrides";
-import { STABLE_COINS } from "./../utils/utils";
+import { fromLamports, STABLE_COINS } from "./../utils/utils";
 import { useConnectionConfig } from "./connection";
 import { cache, getMultipleAccounts, ParsedAccount } from "./accounts";
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from "@project-serum/serum";
@@ -249,8 +249,14 @@ export const usePrecacheMarket = () => {
   return context.precacheMarkets;
 };
 
-export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve) => {
-  const marketInfo = cache.get(reserve?.dexMarket);
+export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve, dex: PublicKey) => {
+  const liquidityMint = cache.get(reserve.liquidityMint);
+  const collateralMint = cache.get(reserve.collateralMint);
+  if (!liquidityMint || !collateralMint) {
+    return 0.0;
+  }
+
+  const marketInfo = cache.get(dex);
   if (!marketInfo) {
     return 0.0;
   }
@@ -287,13 +293,20 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve)
   const book = new Orderbook(dexMarket, bookInfo.accountFlags, bookInfo.slab);
 
   let cost = 0;
-  let remaining = amount;
+  let remaining = fromLamports(amount, liquidityMint.info);
 
   if (book) {
-    for (const level of book) {
-      let size = remaining > level.size ? level.size : level.size - remaining;
-      cost = cost + level.price * size;
-      remaining = remaining - size;
+    const depth = book.getL2(1000);
+    let price, sizeAtLevel: number;
+
+    const op = book.isBids ? 
+    (price: number, size: number) => size / price : 
+    (price: number, size: number) => size * price;
+
+    for ([price, sizeAtLevel] of depth) {
+      let filled = remaining > sizeAtLevel ? sizeAtLevel : remaining;
+      cost = cost + op(price, filled);
+      remaining = remaining - filled;
 
       if (remaining <= 0) {
         break;

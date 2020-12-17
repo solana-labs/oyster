@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { InputType, useAccountByMint, useSliderInput, useTokenName, useUserBalance } from "../../hooks";
+import { EnrichedLendingObligation, InputType, useAccountByMint, useSliderInput, useTokenName, useUserBalance } from "../../hooks";
 import {
-  LendingObligation,
   LendingReserve,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
@@ -22,7 +21,7 @@ export const RepayInput = (props: {
   className?: string;
   borrowReserve: ParsedAccount<LendingReserve>;
   collateralReserve?: ParsedAccount<LendingReserve>;
-  obligation: ParsedAccount<LendingObligation>;
+  obligation: EnrichedLendingObligation;
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
@@ -82,7 +81,7 @@ export const RepayInput = (props: {
         await repay(
           fromAccounts[0],
           toRepayLamports,
-          obligation,
+          obligation.account,
           obligationAccount,
           repayReserve,
           collateralReserve,

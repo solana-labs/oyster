@@ -1,15 +1,15 @@
 import React from "react";
 import { LABELS } from "../../constants";
 import { LiquidateItem } from "./item";
-import { useLiquidableObligations } from "./../../hooks";
+import { useEnrichedLendingObligations } from "./../../hooks";
 import "./style.less";
 
 export const LiquidateView = () => {
-  const { liquidableObligations } = useLiquidableObligations();
+  const { obligations } = useEnrichedLendingObligations();
 
   return (
     <div className="liquidate-container">
-      {liquidableObligations.length === 0 ? (
+      {obligations.length === 0 ? (
         <div className="liquidate-info">{LABELS.LIQUIDATE_NO_LOANS}</div>
       ) : (
           <div className="flexColumn">
@@ -20,8 +20,8 @@ export const LiquidateView = () => {
               <div>{LABELS.TABLE_TITLE_LTV}</div>
               <div>{LABELS.TABLE_TITLE_ACTION}</div>
             </div>
-            {liquidableObligations.map((item) => (
-              <LiquidateItem key={item.obligation.pubkey.toBase58()} obligation={item.obligation} ltv={item.ltv}></LiquidateItem>
+            {obligations.map((item) => (
+              <LiquidateItem key={item.account.pubkey.toBase58()} item={item}></LiquidateItem>
             ))}
           </div>
         )}

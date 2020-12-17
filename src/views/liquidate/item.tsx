@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
-import { LendingObligation, LendingReserve, calculateBorrowAPY } from "../../models/lending";
-import { useTokenName } from "../../hooks";
+import { LendingReserve, calculateBorrowAPY } from "../../models/lending";
+import { EnrichedLendingObligation, useTokenName } from "../../hooks";
 import { Link } from "react-router-dom";
 import { Button, Card } from "antd";
 import { TokenIcon } from "../../components/TokenIcon";
@@ -14,25 +14,23 @@ import {
 import { LABELS } from "../../constants";
 
 export const LiquidateItem = (props: {
-  obligation: ParsedAccount<LendingObligation>;
-  ltv: number
+  item: EnrichedLendingObligation
 }) => {
-
-  const { obligation, ltv } = props;
+  let obligation = props.item.info
 
   const borrowReserve = cache.get(
-    obligation.info.borrowReserve
+    obligation.borrowReserve
   ) as ParsedAccount<LendingReserve>;
 
   const collateralReserve = cache.get(
-    obligation.info.collateralReserve
+    obligation.collateralReserve
   ) as ParsedAccount<LendingReserve>;
   
   const tokenName = useTokenName(borrowReserve?.info.liquidityMint);
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
 
   const borrowAmount = fromLamports(
-    wadToLamports(obligation.info.borrowAmountWad),
+    wadToLamports(obligation.borrowAmountWad),
     liquidityMint
   );
 
@@ -44,7 +42,7 @@ export const LiquidateItem = (props: {
   const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
 
   return (
-    <Link to={`/liquidate/${obligation.pubkey.toBase58()}`}>
+    <Link to={`/liquidate/${props.item.account.pubkey.toBase58()}`}>
       <Card>
         <div className="liquidate-item">
           <span style={{ display: "flex" }}>
@@ -56,7 +54,7 @@ export const LiquidateItem = (props: {
               <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
             </div>
             {collateralName}
-          /
+            →
           {borrowName}
           </span>
           <div>
@@ -66,7 +64,7 @@ export const LiquidateItem = (props: {
             {formatPct.format(borrowAPY)}
           </div>
           <div>
-            {formatPct.format(ltv / 100)}
+            {formatPct.format(obligation.ltv / 100)}
           </div>
           <div>
             <Button>

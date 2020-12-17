@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { useUserAccounts } from "./useUserAccounts";
-import { useLendingObligations } from "./useLendingObligations";
+import { useEnrichedLendingObligations } from "./useEnrichedLendingObligations";
 import { TokenAccount } from "../models";
 
 export function useUserObligations() {
   const { userAccounts } = useUserAccounts();
-  const { obligations } = useLendingObligations();
+  const { obligations } = useEnrichedLendingObligations();
 
   const accountsByMint = useMemo(() => {
     return userAccounts.reduce((res, acc) => {
