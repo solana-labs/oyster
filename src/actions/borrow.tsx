@@ -111,7 +111,7 @@ export const borrow = async (
   }
 
   notify({
-    message: "Adding Liquidity...",
+    message: "Borrowing funds...",
     description: "Please review transactions to approve.",
     type: "warn",
   });

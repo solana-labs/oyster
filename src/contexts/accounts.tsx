@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useConnection } from "./connection";
 import { useWallet } from "./wallet";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
@@ -7,10 +7,9 @@ import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
 import { chunks } from "./../utils/utils";
 import { EventEmitter } from "./../utils/eventEmitter";
+import { TokenClass } from "typescript";
 
 const AccountsContext = React.createContext<any>(null);
-
-const accountEmitter = new EventEmitter();
 
 const pendingCalls = new Map<string, Promise<ParsedAccountBase>>();
 const genericCache = new Map<string, ParsedAccountBase>();
@@ -141,8 +140,10 @@ export const cache = {
       return;
     }
 
+    const isNew = !genericCache.has(address);
+
     genericCache.set(address, account);
-    cache.emitter.raiseCacheUpdated(address, deserialize);
+    cache.emitter.raiseCacheUpdated(address, isNew, deserialize);
     return account;
   },
   get: (pubKey: string | PublicKey) => {
@@ -217,8 +218,10 @@ const UseNativeAccount = () => {
     (account) => {
       const wrapped = wrapNativeAccount(wallet.publicKey, account);
       if (wrapped !== undefined && wallet) {
-        cache.registerParser(wallet.publicKey?.toBase58(), TokenAccountParser);
-        genericCache.set(wallet.publicKey?.toBase58(), wrapped as TokenAccount);
+        const id = wallet.publicKey?.toBase58();
+        cache.registerParser(id, TokenAccountParser);
+        genericCache.set(id, wrapped as TokenAccount);
+        cache.emitter.raiseCacheUpdated(id, false, TokenAccountParser);
       }
     },
     [wallet]
@@ -291,6 +294,23 @@ export function AccountsProvider({ children = null as any }) {
     setUserAccounts(accounts);
   }, [nativeAccount, wallet, tokenAccounts, selectUserAccounts]);
 
+  useEffect(() => {
+    const subs: number[] = [];
+    cache.emitter.onCache((args) => {
+      if(args.isNew) {
+        let id = args.id;
+        let deserialize = args.parser;
+        connection.onAccountChange(new PublicKey(id), (info) => {
+          cache.add(id, info, deserialize);
+        });
+      }
+    });
+
+    return () => {
+      subs.forEach(id => connection.removeAccountChangeListener(id));
+    }
+  }, [connection]);
+
   const publicKey = wallet?.publicKey;
   useEffect(() => {
     if (!connection || !publicKey) {
@@ -301,7 +321,8 @@ export function AccountsProvider({ children = null as any }) {
       });
 
       // This can return different types of accounts: token-account, mint, multisig
-      // TODO: web3.js expose ability to filter. discuss filter syntax
+      // TODO: web3.js expose ability to filter. 
+      // this should use only filter syntax to only get accounts that are owned by user
       const tokenSubID = connection.onProgramAccountChange(
         programIds().token,
         (info) => {
@@ -311,22 +332,10 @@ export function AccountsProvider({ children = null as any }) {
           if (info.accountInfo.data.length === AccountLayout.span) {
             const data = deserializeAccount(info.accountInfo.data);
 
-            if (PRECACHED_OWNERS.has(data.owner.toBase58()) || cache.get(id)) {
+            if (PRECACHED_OWNERS.has(data.owner.toBase58())) {
               cache.add(id, info.accountInfo, TokenAccountParser);
               setTokenAccounts(selectUserAccounts());
-              accountEmitter.raiseAccountUpdated(id);
             }
-          } else if (info.accountInfo.data.length === MintLayout.span) {
-            if (cache.get(id)) {
-              cache.add(id, info.accountInfo, MintParser);
-              accountEmitter.raiseAccountUpdated(id);
-            }
-
-            accountEmitter.raiseAccountUpdated(id);
-          }
-
-          if (genericCache.has(id)) {
-            cache.add(new PublicKey(id), info.accountInfo);
           }
         },
         "singleGossip"
