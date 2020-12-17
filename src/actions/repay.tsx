@@ -13,7 +13,6 @@ import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
 import { LendingObligation, TokenAccount } from "../models";
 import { ParsedAccount } from "../contexts/accounts";
-import { wadToLamports } from "../utils/utils";
 
 export const repay = async (
   from: TokenAccount, // CollateralAccount
@@ -75,10 +74,6 @@ export const repay = async (
     withdrawReserve.info.collateralMint,
     signers
   );
-
-  const loanRatio =
-    amountLamports / wadToLamports(obligation.info.borrowAmountWad).toNumber();
-  console.log(loanRatio);
 
   // create approval for transfer transactions
   instructions.push(

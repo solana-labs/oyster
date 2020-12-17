@@ -13,11 +13,9 @@ const getLendingReserves = () => {
 export function useLendingReserves() {
   const [reserveAccounts, setReserveAccounts] = useState<
     ParsedAccount<LendingReserve>[]
-  >([]);
+  >(getLendingReserves());
 
   useEffect(() => {
-    setReserveAccounts(getLendingReserves());
-
     const dispose = cache.emitter.onCache((args) => {
       if (args.parser === LendingReserveParser) {
         setReserveAccounts(getLendingReserves());
@@ -38,14 +36,12 @@ export function useLendingReserve(address?: string | PublicKey) {
   const id = typeof address === "string" ? address : address?.toBase58();
   const [reserveAccount, setReserveAccount] = useState<
     ParsedAccount<LendingReserve>
-  >();
+  >(cache.get(id || "") as ParsedAccount<LendingReserve>);
 
   useEffect(() => {
-    setReserveAccount(cache.get(id || ""));
-
     const dispose = cache.emitter.onCache((args) => {
       if (args.id === id) {
-        setReserveAccount(cache.get(id));
+        setReserveAccount(cache.get(id) as ParsedAccount<LendingReserve>);
       }
     });
 

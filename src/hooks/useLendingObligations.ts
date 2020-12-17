@@ -7,17 +7,13 @@ const getLendingObligations = () => {
   return cache
     .byParser(LendingObligationParser)
     .map((id) => cache.get(id))
-    .filter((acc) => acc !== undefined) as any[];
+    .filter((acc) => acc !== undefined) as ParsedAccount<LendingObligation>[];
 };
 
 export function useLendingObligations() {
-  const [obligations, setObligations] = useState<
-    ParsedAccount<LendingObligation>[]
-  >([]);
+  const [obligations, setObligations] = useState(getLendingObligations());
 
   useEffect(() => {
-    setObligations(getLendingObligations());
-
     const dispose = cache.emitter.onCache((args) => {
       if (args.parser === LendingObligationParser) {
         setObligations(getLendingObligations());
@@ -36,16 +32,12 @@ export function useLendingObligations() {
 
 export function useLendingObligation(address?: string | PublicKey) {
   const id = typeof address === "string" ? address : address?.toBase58();
-  const [obligationAccount, setObligationAccount] = useState<
-    ParsedAccount<LendingObligation>
-  >();
+  const [obligationAccount, setObligationAccount] = useState(cache.get(id || "") as ParsedAccount<LendingObligation>);
 
   useEffect(() => {
-    setObligationAccount(cache.get(id || ""));
-
     const dispose = cache.emitter.onCache((args) => {
       if (args.id === id) {
-        setObligationAccount(cache.get(id));
+        setObligationAccount(cache.get(id) as ParsedAccount<LendingObligation>);
       }
     });
 

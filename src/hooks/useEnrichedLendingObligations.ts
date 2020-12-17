@@ -22,7 +22,6 @@ export function useEnrichedLendingObligations() {
   const { obligations } = useLendingObligations();
   const { reserveAccounts } = useLendingReserves();
   const { marketEmitter } = useMarkets();
-  const [enriched, setEnriched] = useState<EnrichedLendingObligation[]>([]);
 
   const availableReserves = useMemo(() => {
     return reserveAccounts.reduce((map, reserve) => {
@@ -86,11 +85,12 @@ export function useEnrichedLendingObligations() {
       .sort((a, b) => a.info.health - b.info.health);
   }, [obligations, availableReserves]);
 
+  const [enriched, setEnriched] = useState<EnrichedLendingObligation[]>(enrichedFactory());
 
   useEffect(() => {
     const dispose = marketEmitter.onMarket(() => {
       setEnriched(enrichedFactory());
-    })
+    });
 
     return () => {
       dispose();

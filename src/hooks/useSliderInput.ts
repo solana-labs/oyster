@@ -16,7 +16,6 @@ export const useSliderInput = (
     value,
     setValue: useCallback(
       (val: string) => {
-        console.log(val);
         setType(InputType.AbsoluteValue);
         setValue(val);
         setPct(convert(val) as number);

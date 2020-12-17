@@ -21,7 +21,6 @@ export function WalletProvider({ children = null as any }) {
     "https://www.sollet.io"
   );
   const wallet = useMemo(() => {
-    console.log("use new provider:", providerUrl, " endpoint:", endpoint);
     if (providerUrl === "http://solongwallet.com") {
       return new SolongAdapter(providerUrl, endpoint);
     } else {
@@ -31,9 +30,7 @@ export function WalletProvider({ children = null as any }) {
 
   const [connected, setConnected] = useState(false);
   useEffect(() => {
-    console.log("trying to connect");
     wallet.on("connect", () => {
-      console.log("connected");
       setConnected(true);
       let walletPublicKey = wallet.publicKey.toBase58();
       let keyToDisplay =

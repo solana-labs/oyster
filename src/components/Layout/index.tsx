@@ -21,7 +21,6 @@ export const AppLayout = (props: any) => {
   const { env } = useConnectionConfig();
   const location = useLocation();
 
-  console.log(location.pathname);
   const paths: { [key: string]: string } = {
     "/dashboard": "2",
     "/deposit": "3",
