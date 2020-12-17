@@ -312,7 +312,6 @@ export function AccountsProvider({ children = null as any }) {
             const data = deserializeAccount(info.accountInfo.data);
 
             if (PRECACHED_OWNERS.has(data.owner.toBase58()) || cache.get(id)) {
-              console.log(id);
               cache.add(id, info.accountInfo, TokenAccountParser);
               setTokenAccounts(selectUserAccounts());
               accountEmitter.raiseAccountUpdated(id);
