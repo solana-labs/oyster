@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./index.less";
 
 export const WaterWave = (props: any) => {
@@ -17,9 +17,9 @@ export const WaterWave = (props: any) => {
   useEffect(() => {
     resize();
 
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
     };
   }, [resize]);
 
@@ -31,11 +31,12 @@ export const WaterWave = (props: any) => {
       (val) => {
         timer = val;
       },
-      color);
+      color
+    );
 
     return () => {
       cancelAnimationFrame(timer);
-    }
+    };
   }, [percent, color]);
 
   return (
@@ -44,7 +45,7 @@ export const WaterWave = (props: any) => {
       ref={root as any}
       style={{ transform: `scale(${radio})` }}
     >
-      <div style={{ width: height, height, overflow: 'hidden' }}>
+      <div style={{ width: height, height, overflow: "hidden" }}>
         <canvas
           className="waterWaveCanvasWrapper"
           ref={node as any}
@@ -58,16 +59,20 @@ export const WaterWave = (props: any) => {
       </div>
     </div>
   );
-}
+};
 
-
-const renderChart = (canvas: HTMLCanvasElement | undefined, percent: number, setTimer: (timer: number) => void, color = '#1890FF',) => {
+const renderChart = (
+  canvas: HTMLCanvasElement | undefined,
+  percent: number,
+  setTimer: (timer: number) => void,
+  color = "#1890FF"
+) => {
   const data = percent / 100;
   if (!canvas || !data) {
     return;
   }
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   if (!ctx) {
     return;
@@ -95,7 +100,10 @@ const renderChart = (canvas: HTMLCanvasElement | undefined, percent: number, set
   const circleOffset = -(Math.PI / 2);
   let circleLock = true;
 
-  const cStartPoint = [radius + bR * Math.cos(circleOffset), radius + bR * Math.sin(circleOffset)];
+  const cStartPoint = [
+    radius + bR * Math.cos(circleOffset),
+    radius + bR * Math.sin(circleOffset),
+  ];
   ctx.strokeStyle = color;
   ctx.moveTo(cStartPoint[0], cStartPoint[1]);
 
@@ -125,19 +133,19 @@ const renderChart = (canvas: HTMLCanvasElement | undefined, percent: number, set
     ctx.lineTo(startPoint[0], startPoint[1]);
 
     const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-    gradient.addColorStop(0, '#ffffff');
-    gradient.addColorStop(1, '#1890FF');
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(1, "#1890FF");
     ctx.fillStyle = gradient;
     ctx.fill();
     ctx.restore();
-  }
+  };
 
   const render = () => {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     if (circleLock) {
       circleLock = false;
 
-      ctx.globalCompositeOperation = 'destination-over';
+      ctx.globalCompositeOperation = "destination-over";
 
       ctx.beginPath();
       ctx.save();
@@ -145,7 +153,7 @@ const renderChart = (canvas: HTMLCanvasElement | undefined, percent: number, set
       ctx.stroke();
       ctx.restore();
       ctx.clip();
-      ctx.fillStyle = '#1890FF';
+      ctx.fillStyle = "#1890FF";
     } else {
       if (data >= 0.85) {
         if (currRange > range / 4) {
@@ -178,7 +186,7 @@ const renderChart = (canvas: HTMLCanvasElement | undefined, percent: number, set
       drawSin();
     }
     setTimer(requestAnimationFrame(render));
-  }
+  };
 
   render();
-}
+};

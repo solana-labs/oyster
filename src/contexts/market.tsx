@@ -90,7 +90,7 @@ export function MarketProvider({ children = null as any }) {
         allMarkets.filter((a) => cache.get(a) === undefined),
         "single"
       ).then(({ keys, array }) => {
-        allMarkets.forEach(() => { });
+        allMarkets.forEach(() => {});
 
         return array.map((item, index) => {
           const marketAddress = keys[index];
@@ -159,7 +159,7 @@ export function MarketProvider({ children = null as any }) {
       const info = marketByMint.get(mintAddress);
       const market = cache.get(info?.marketInfo.address.toBase58() || "");
       if (!market) {
-        return () => { };
+        return () => {};
       }
 
       // TODO: get recent volume
@@ -249,7 +249,11 @@ export const usePrecacheMarket = () => {
   return context.precacheMarkets;
 };
 
-export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve, dex: PublicKey) => {
+export const simulateMarketOrderFill = (
+  amount: number,
+  reserve: LendingReserve,
+  dex: PublicKey
+) => {
   const liquidityMint = cache.get(reserve.liquidityMint);
   const collateralMint = cache.get(reserve.collateralMint);
   if (!liquidityMint || !collateralMint) {
@@ -279,9 +283,7 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve,
     decodedMarket.programId
   );
 
-  const bookAccount = lendingMarket.info.quoteMint.equals(
-    reserve.liquidityMint
-  )
+  const bookAccount = lendingMarket.info.quoteMint.equals(reserve.liquidityMint)
     ? decodedMarket?.bids
     : decodedMarket?.asks;
 
@@ -299,9 +301,9 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve,
     const depth = book.getL2(1000);
     let price, sizeAtLevel: number;
 
-    const op = book.isBids ? 
-    (price: number, size: number) => size / price : 
-    (price: number, size: number) => size * price;
+    const op = book.isBids
+      ? (price: number, size: number) => size / price
+      : (price: number, size: number) => size * price;
 
     for ([price, sizeAtLevel] of depth) {
       let filled = remaining > sizeAtLevel ? sizeAtLevel : remaining;
@@ -315,7 +317,7 @@ export const simulateMarketOrderFill = (amount: number, reserve: LendingReserve,
   }
 
   return cost;
-}
+};
 
 const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
   const SERUM_TOKEN = TOKEN_MINTS.find(

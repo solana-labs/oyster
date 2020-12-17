@@ -106,9 +106,7 @@ export const DepositInput = (props: {
             justifyContent: "space-around",
           }}
         >
-          <div className="deposit-input-title">
-            {LABELS.DEPOSIT_QUESTION}
-          </div>
+          <div className="deposit-input-title">{LABELS.DEPOSIT_QUESTION}</div>
           <div className="token-input">
             <TokenIcon mintAddress={reserve?.liquidityMint} />
             <NumericInput

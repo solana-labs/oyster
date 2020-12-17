@@ -13,19 +13,17 @@ import {
 } from "../../utils/utils";
 import { LABELS } from "../../constants";
 
-export const LiquidateItem = (props: {
-  item: EnrichedLendingObligation
-}) => {
-  let obligation = props.item.info
+export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
+  let obligation = props.item.info;
 
-  const borrowReserve = cache.get(
-    obligation.borrowReserve
-  ) as ParsedAccount<LendingReserve>;
+  const borrowReserve = cache.get(obligation.borrowReserve) as ParsedAccount<
+    LendingReserve
+  >;
 
   const collateralReserve = cache.get(
     obligation.collateralReserve
   ) as ParsedAccount<LendingReserve>;
-  
+
   const tokenName = useTokenName(borrowReserve?.info.liquidityMint);
   const liquidityMint = useMint(borrowReserve.info.liquidityMint);
 
@@ -53,19 +51,13 @@ export const LiquidateItem = (props: {
               />
               <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
             </div>
-            {collateralName}
-            →
-          {borrowName}
+            {collateralName}→{borrowName}
           </span>
           <div>
             {formatNumber.format(borrowAmount)} {tokenName}
           </div>
-          <div>
-            {formatPct.format(borrowAPY)}
-          </div>
-          <div>
-            {formatPct.format(obligation.ltv / 100)}
-          </div>
+          <div>{formatPct.format(borrowAPY)}</div>
+          <div>{formatPct.format(obligation.ltv / 100)}</div>
           <div>
             <Button>
               <span>{LABELS.LIQUIDATE_ACTION}</span>

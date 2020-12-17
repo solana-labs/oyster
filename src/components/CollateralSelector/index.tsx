@@ -29,7 +29,7 @@ export const CollateralSelector = (props: {
     <Select
       size="large"
       showSearch
-      style={{ minWidth: 300 , margin: "5px 0px" }}
+      style={{ minWidth: 300, margin: "5px 0px" }}
       placeholder="Collateral"
       value={props.collateralReserve}
       disabled={props.disabled}

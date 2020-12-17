@@ -17,7 +17,9 @@ export const DepositInfoLine = (props: {
 }) => {
   const name = useTokenName(props.reserve.liquidityMint);
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useUserCollateralBalance(props.reserve);
+  const { balance: collateralBalance } = useUserCollateralBalance(
+    props.reserve
+  );
 
   return (
     <Card

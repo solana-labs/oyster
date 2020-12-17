@@ -24,7 +24,6 @@ export const HomeView = () => {
       reserveAccounts.forEach((item) => {
         const marketCapLamports = reserveMarketCap(item.info);
 
-        
         const localCache = cache;
         const liquidityMint = localCache.get(
           item.info.liquidityMint.toBase58()
@@ -40,9 +39,12 @@ export const HomeView = () => {
 
         totalSize = totalSize + marketCap;
 
-        borrowed = borrowed + fromLamports(
-          wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
-          liquidityMint.info);
+        borrowed =
+          borrowed +
+          fromLamports(
+            wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
+            liquidityMint.info
+          );
       });
 
       setTotalMarketSize(totalSize);
@@ -64,18 +66,18 @@ export const HomeView = () => {
     <div className="flexColumn">
       <Row gutter={16} className="home-info-row">
         <Col span={12}>
-          <Card >
+          <Card>
             <Statistic
               title="Current market size"
               value={totalMarketSize}
               precision={2}
-              valueStyle={{ color: '#3f8600' }}
+              valueStyle={{ color: "#3f8600" }}
               prefix="$"
             />
           </Card>
         </Col>
         <Col span={12}>
-          <Card >
+          <Card>
             <Statistic
               title="Total borrowed"
               value={totalBorrowed}
@@ -85,7 +87,6 @@ export const HomeView = () => {
           </Card>
         </Col>
       </Row>
-
 
       <div className="home-item home-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>

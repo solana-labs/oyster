@@ -19,7 +19,7 @@ import {
   ReserveView,
   WithdrawView,
   LiquidateView,
-  LiquidateReserveView
+  LiquidateReserveView,
 } from "./views";
 
 export function Routes() {

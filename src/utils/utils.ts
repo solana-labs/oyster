@@ -125,7 +125,8 @@ export function fromLamports(
       ? account
       : BN.isBN(account)
       ? account.toNumber()
-      : account.info.amount.toNumber());
+      : account.info.amount.toNumber()
+  );
 
   const precision = Math.pow(10, mint?.decimals || 0);
   return (amount / precision) * rate;

@@ -40,8 +40,11 @@ export const ObligationItem = (props: {
   const borrowAPY = useMemo(() => calculateBorrowAPY(borrowReserve.info), [
     borrowReserve,
   ]);
-  
-  const collateralLamports = collateralToLiquidity(obligation.info.depositedCollateral, borrowReserve.info);
+
+  const collateralLamports = collateralToLiquidity(
+    obligation.info.depositedCollateral,
+    borrowReserve.info
+  );
   const collateral = fromLamports(collateralLamports, collateralMint);
 
   const borrowName = useTokenName(borrowReserve?.info.liquidityMint);
@@ -51,7 +54,10 @@ export const ObligationItem = (props: {
     <Card>
       <div className="dashboard-item">
         <span style={{ display: "flex", marginLeft: 5 }}>
-          <div style={{ display: "flex" }} title={`${collateralName}→${borrowName}`}>
+          <div
+            style={{ display: "flex" }}
+            title={`${collateralName}→${borrowName}`}
+          >
             <TokenIcon
               mintAddress={collateralReserve?.info.liquidityMint}
               style={{ marginRight: "-0.5rem" }}

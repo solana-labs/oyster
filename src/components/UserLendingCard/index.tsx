@@ -24,7 +24,9 @@ export const UserLendingCard = (props: {
   const name = useTokenName(reserve?.liquidityMint);
 
   const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useUserCollateralBalance(props.reserve);
+  const { balance: collateralBalance } = useUserCollateralBalance(
+    props.reserve
+  );
 
   const { borrowed: totalBorrowed } = useBorrowedAmount(address);
 

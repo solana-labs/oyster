@@ -21,7 +21,6 @@ export const RepayReserveView = () => {
     obligationId ? lendingObligation?.info.borrowReserve : reserveId
   );
 
-
   const repayReserve = useLendingReserve(
     obligationId ? lendingObligation?.info.collateralReserve : reserveId
   );

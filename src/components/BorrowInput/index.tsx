@@ -52,7 +52,7 @@ export const BorrowInput = (props: {
 
   const { userObligationsByReserve } = useUserObligationByReserve(
     borrowReserve?.pubkey,
-    collateralReserve?.pubkey,
+    collateralReserve?.pubkey
   );
 
   const onBorrow = useCallback(() => {

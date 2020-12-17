@@ -1,8 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { EnrichedLendingObligation, InputType, useAccountByMint, useSliderInput, useTokenName, useUserBalance } from "../../hooks";
 import {
-  LendingReserve,
-} from "../../models";
+  EnrichedLendingObligation,
+  InputType,
+  useAccountByMint,
+  useSliderInput,
+  useTokenName,
+  useUserBalance,
+} from "../../hooks";
+import { LendingReserve } from "../../models";
 import { TokenIcon } from "../TokenIcon";
 import { Button, Card, Slider } from "antd";
 import { ParsedAccount, useMint } from "../../contexts/accounts";
@@ -33,11 +38,10 @@ export const RepayInput = (props: {
 
   const liquidityMint = useMint(repayReserve.info.liquidityMint);
 
-  const borrowAmountLamports = wadToLamports(obligation.info.borrowAmountWad).toNumber();
-  const borrowAmount = fromLamports(
-    borrowAmountLamports,
-    liquidityMint
-  );
+  const borrowAmountLamports = wadToLamports(
+    obligation.info.borrowAmountWad
+  ).toNumber();
+  const borrowAmount = fromLamports(borrowAmountLamports, liquidityMint);
   const collateralReserve = props.collateralReserve;
 
   const name = useTokenName(repayReserve?.info.liquidityMint);
@@ -74,9 +78,12 @@ export const RepayInput = (props: {
 
     (async () => {
       try {
-        const toRepayLamports = type === InputType.Percent
-          ? (pct * borrowAmountLamports) / 100
-          : Math.ceil(borrowAmountLamports * (parseFloat(value) / borrowAmount));
+        const toRepayLamports =
+          type === InputType.Percent
+            ? (pct * borrowAmountLamports) / 100
+            : Math.ceil(
+                borrowAmountLamports * (parseFloat(value) / borrowAmount)
+              );
 
         await repay(
           fromAccounts[0],
@@ -97,7 +104,6 @@ export const RepayInput = (props: {
           type: "error",
           description: error.message,
         });
-        
       } finally {
         setPendingTx(false);
       }
@@ -138,9 +144,7 @@ export const RepayInput = (props: {
             justifyContent: "space-around",
           }}
         >
-          <div className="repay-input-title">
-            {LABELS.REPAY_QUESTION}
-          </div>
+          <div className="repay-input-title">{LABELS.REPAY_QUESTION}</div>
           <div className="token-input">
             <TokenIcon mintAddress={repayReserve?.info.liquidityMint} />
             <NumericInput
@@ -157,11 +161,7 @@ export const RepayInput = (props: {
             />
             <div>{name}</div>
           </div>
-          <Slider
-              marks={marks}
-              value={pct}
-              onChange={setPct}
-            />
+          <Slider marks={marks} value={pct} onChange={setPct} />
           <div className="repay-input-title">{LABELS.COLLATERAL}</div>
           <CollateralSelector
             reserve={repayReserve.info}

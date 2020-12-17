@@ -17,7 +17,9 @@ export const BorrowItem = (props: {
   const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
 
   // TODO: calculate avilable amount... based on total owned collateral across all the reserves
-  const { balance: collateralBalance } = useUserCollateralBalance(props.reserve);
+  const { balance: collateralBalance } = useUserCollateralBalance(
+    props.reserve
+  );
 
   const apr = calculateBorrowAPY(props.reserve);
 

@@ -15,7 +15,9 @@ export const LiquidateReserveView = () => {
 
   const obligation = useEnrichedLendingObligation(id);
   const reserve = useLendingReserve(obligation?.info.borrowReserve);
-  const collateralReserve = useLendingReserve(obligation?.info.collateralReserve);
+  const collateralReserve = useLendingReserve(
+    obligation?.info.collateralReserve
+  );
 
   if (!obligation || !reserve) {
     return null;
@@ -37,5 +39,5 @@ export const LiquidateReserveView = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};

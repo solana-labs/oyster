@@ -41,7 +41,7 @@ export const LendingObligationParser = (
   info: AccountInfo<Buffer>
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = LendingObligationLayout.decode(buffer); 
+  const data = LendingObligationLayout.decode(buffer);
 
   const details = {
     pubkey: pubKey,

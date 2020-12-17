@@ -183,16 +183,29 @@ export const reserveMarketCap = (reserve?: LendingReserve) => {
 };
 
 export const collateralExchangeRate = (reserve?: LendingReserve) => {
-  return (reserve?.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve);
-}
+  return (
+    (reserve?.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve)
+  );
+};
 
-export const collateralToLiquidity = (collateralAmount: BN | number, reserve?: LendingReserve) => {
-  const amount = typeof collateralAmount === 'number' ? collateralAmount : collateralAmount.toNumber();
+export const collateralToLiquidity = (
+  collateralAmount: BN | number,
+  reserve?: LendingReserve
+) => {
+  const amount =
+    typeof collateralAmount === "number"
+      ? collateralAmount
+      : collateralAmount.toNumber();
   return Math.floor(amount / collateralExchangeRate(reserve));
-}
+};
 
-
-export const liquidityToCollateral = (liquidityAmount: BN | number, reserve?: LendingReserve) => {
-  const amount = typeof liquidityAmount === 'number' ? liquidityAmount : liquidityAmount.toNumber();
+export const liquidityToCollateral = (
+  liquidityAmount: BN | number,
+  reserve?: LendingReserve
+) => {
+  const amount =
+    typeof liquidityAmount === "number"
+      ? liquidityAmount
+      : liquidityAmount.toNumber();
   return Math.floor(amount * collateralExchangeRate(reserve));
-}
+};

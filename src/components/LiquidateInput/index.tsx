@@ -16,7 +16,6 @@ export const LiquidateInput = (props: {
   collateralReserve?: ParsedAccount<LendingReserve>;
   obligation: EnrichedLendingObligation;
 }) => {
-
   const { reserve, collateralReserve } = props;
   const [pendingTx, setPendingTx] = useState(false);
 
@@ -34,27 +33,25 @@ export const LiquidateInput = (props: {
   };
 
   return (
-    <Card className={props.className} bodyStyle={bodyStyle} >
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-      }}>
+    <Card className={props.className} bodyStyle={bodyStyle}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-around",
+        }}
+      >
         <div className="liquidate-input-title">{LABELS.SELECT_COLLATERAL}</div>
         <CollateralSelector
           reserve={reserve.info}
           collateralReserve={collateralReserve?.pubkey.toBase58()}
           disabled={true}
         />
-        <Button
-          type="primary"
-          onClick={onLiquidate}
-          loading={pendingTx}
-        >
+        <Button type="primary" onClick={onLiquidate} loading={pendingTx}>
           {LABELS.LIQUIDATE_ACTION}
         </Button>
         <BackButton />
       </div>
     </Card>
-  )
-}
+  );
+};
