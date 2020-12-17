@@ -1,12 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { cache, ParsedAccount } from "./../contexts/accounts";
 import { useLendingObligations } from "./useLendingObligations";
 import { collateralToLiquidity, LendingObligation, LendingReserve } from "../models/lending";
 import { useLendingReserves } from "./useLendingReserves";
 import { fromLamports, wadToLamports } from "../utils/utils";
 import { MintInfo } from "@solana/spl-token";
-import { simulateMarketOrderFill } from "../contexts/market";
+import { simulateMarketOrderFill, useMarkets } from "../contexts/market";
 
 interface EnrichedLendingObligationInfo extends LendingObligation {
   ltv: number;
@@ -21,6 +21,8 @@ export interface EnrichedLendingObligation {
 export function useEnrichedLendingObligations() {
   const { obligations } = useLendingObligations();
   const { reserveAccounts } = useLendingReserves();
+  const { marketEmitter } = useMarkets();
+  const [enriched, setEnriched] = useState<EnrichedLendingObligation[]>([]);
 
   const availableReserves = useMemo(() => {
     return reserveAccounts.reduce((map, reserve) => {
@@ -29,9 +31,8 @@ export function useEnrichedLendingObligations() {
     }, new Map<string, ParsedAccount<LendingReserve>>())
   }, [reserveAccounts]);
 
-  // TODO: subscribe to market updates
 
-  const enrichedObligations = useMemo(() => {
+  const enrichedFactory = useCallback(() => {
     if (availableReserves.size === 0) {
       return [];
     }
@@ -78,6 +79,7 @@ export function useEnrichedLendingObligations() {
             ...obligation.info,
             ltv,
             health,
+            // TODO: add borrow and collateral expressed in lending market quote ccy
           }
         } as EnrichedLendingObligation;
       })
@@ -85,8 +87,18 @@ export function useEnrichedLendingObligations() {
   }, [obligations, availableReserves]);
 
 
+  useEffect(() => {
+    const dispose = marketEmitter.onMarket(() => {
+      setEnriched(enrichedFactory());
+    })
+
+    return () => {
+      dispose();
+    };
+  }, [enrichedFactory, setEnriched, marketEmitter]);
+
   return {
-    obligations: enrichedObligations,
+    obligations: enriched,
   };
 }
 
