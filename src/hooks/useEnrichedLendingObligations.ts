@@ -86,7 +86,7 @@ export function useEnrichedLendingObligations() {
                 : item.collateralReserve.info.dexMarket
             );
 
-            ltv = (100 * collateral) / borrowedAmount;
+            ltv = (100 * borrowedAmount) / collateral;
           }
 
           const liquidationThreshold =
