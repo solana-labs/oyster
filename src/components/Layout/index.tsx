@@ -33,6 +33,7 @@ export const AppLayout = (props: any) => {
     [...Object.keys(paths)].find((key) => location.pathname.startsWith(key)) ||
     "";
   const defaultKey = paths[current] || "1";
+  const theme = 'light';
 
   return (
     <div className="App">
@@ -42,10 +43,11 @@ export const AppLayout = (props: any) => {
       <BasicLayout
         title={LABELS.APP_TITLE}
         footerRender={() => <div className="footer">{LABELS.FOOTER}</div>}
-        navTheme="realDark"
-        headerTheme="dark"
-        theme="dark"
-        layout="side"
+        navTheme={theme}
+        headerTheme={theme}
+        theme={theme}
+        layout="mix"
+        fixSiderbar={true}
         primaryColor="#d83aeb"
         logo={<div className="App-logo" />}
         rightContentRender={() => <AppBar />}
@@ -56,7 +58,7 @@ export const AppLayout = (props: any) => {
         ]}
         menuContentRender={() => {
           return (
-            <Menu theme="dark" defaultSelectedKeys={[defaultKey]} mode="inline">
+            <Menu theme={theme} defaultSelectedKeys={[defaultKey]} mode="inline">
               <Menu.Item key="1" icon={<HomeOutlined />}>
                 <Link
                   to={{

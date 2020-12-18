@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ant-design/pro-layout": "^6.5.14",
+    "@ant-design/pro-layout": "^6.7.0",
     "@craco/craco": "^5.7.0",
     "@project-serum/serum": "^0.13.11",
     "@project-serum/sol-wallet-adapter": "^0.1.1",

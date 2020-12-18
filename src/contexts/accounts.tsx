@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useConnection } from "./connection";
 import { useWallet } from "./wallet";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
@@ -7,7 +7,6 @@ import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 import { TokenAccount } from "./../models";
 import { chunks } from "./../utils/utils";
 import { EventEmitter } from "./../utils/eventEmitter";
-import { TokenClass } from "typescript";
 
 const AccountsContext = React.createContext<any>(null);
 
