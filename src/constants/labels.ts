@@ -36,6 +36,7 @@ export const LABELS = {
   TABLE_TITLE_DEPOSIT_BALANCE: "Your deposit balance",
   TABLE_TITLE_APY: "APY",
   TABLE_TITLE_LTV: "LTV",
+  TABLE_TITLE_HEALTH: "Health Factor",
   TABLE_TITLE_BORROW_APY: "Borrow APY",
   TABLE_TITLE_DEPOSIT_APY: "Deposit APY",
   TABLE_TITLE_TOTAL_BORROWED: "Total Borrowed",

@@ -64,6 +64,7 @@ export function useEnrichedLendingObligations() {
             reserve.liquidityMint
           ) as ParsedAccount<MintInfo>;
           let ltv = 0;
+          let health = 0;
 
           if (liquidityMint) {
             const collateral = fromLamports(
@@ -87,11 +88,12 @@ export function useEnrichedLendingObligations() {
             );
 
             ltv = (100 * borrowedAmount) / collateral;
+
+            const liquidationThreshold =
+              item.reserve.info.config.liquidationThreshold;
+            health = collateral * liquidationThreshold / 100 / borrowedAmount;
           }
 
-          const liquidationThreshold =
-            item.reserve.info.config.liquidationThreshold;
-          const health = ltv / liquidationThreshold;
           return {
             account: obligation,
             info: {

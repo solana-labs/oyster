@@ -67,6 +67,7 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
           </div>
           <div>{formatPct.format(borrowAPY)}</div>
           <div>{formatPct.format(obligation.ltv / 100)}</div>
+          <div>{obligation.health.toFixed(2)}</div>
           <div>
             <Button>
               <span>{LABELS.LIQUIDATE_ACTION}</span>
