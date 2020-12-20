@@ -1,20 +1,20 @@
 import React, { useMemo } from "react";
-import { EnrichedLendingObligation, useTokenName } from "../../hooks";
+import { EnrichedLendingObligation, useTokenName } from "../../../hooks";
 import {
   calculateBorrowAPY,
   collateralToLiquidity,
   LendingReserve,
-} from "../../models/lending";
-import { TokenIcon } from "../../components/TokenIcon";
+} from "../../../models/lending";
+import { TokenIcon } from "../../../components/TokenIcon";
 import {
   wadToLamports,
   formatNumber,
   fromLamports,
   formatPct,
-} from "../../utils/utils";
+} from "../../../utils/utils";
 import { Button, Card } from "antd";
 import { Link } from "react-router-dom";
-import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
+import { cache, ParsedAccount, useMint } from "../../../contexts/accounts";
 
 export const ObligationItem = (props: {
   obligation: EnrichedLendingObligation;

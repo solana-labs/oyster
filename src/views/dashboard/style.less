@@ -41,25 +41,23 @@
   flex-direction: row;
   flex-wrap: wrap;
   flex: 1;
-}
 
-.dashboard-right {
-  flex: 50%;
-}
-
-.dashboard-left {
-  flex: 50%;
+  & > :first-child {
+    flex: 1;
+  }
 }
 
 .dashboard-info {
   display: flex;
+  flex-direction: column;
   align-self: center;
   justify-content: center;
   flex: 1;
-}
 
-@media (max-width: 700px) {
-  .dashboard-right, .dashboard-left {
-    flex: 100%;
+  .dashboard-splash {
+    max-width: 400px;
+    width: 100%;
+    align-self: center;
   }
 }
+

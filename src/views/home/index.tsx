@@ -3,23 +3,45 @@ import { Card, Col, Row, Statistic } from "antd";
 import React, { useEffect, useState } from "react";
 import { LABELS } from "../../constants";
 import { cache, ParsedAccount } from "../../contexts/accounts";
+import { useConnectionConfig } from "../../contexts/connection";
 import { useMarkets } from "../../contexts/market";
 import { useLendingReserves } from "../../hooks";
 import { reserveMarketCap } from "../../models";
-import { fromLamports, wadToLamports } from "../../utils/utils";
+import { fromLamports, getTokenName, wadToLamports } from "../../utils/utils";
 import { LendingReserveItem } from "./item";
+import { BarChartStatistic } from "./../../components/BarChartStatistic";
 import "./itemStyle.less";
+
+interface Totals {
+  marketSize: number;
+  borrowed: number;
+  lentOutPct: number;
+  items: {
+    marketSize: number;
+    borrowed: number;
+    name: string;
+  }[];
+}
 
 export const HomeView = () => {
   const { reserveAccounts } = useLendingReserves();
-  const [totalMarketSize, setTotalMarketSize] = useState(0);
-  const [totalBorrowed, setTotalBorrowed] = useState(0);
   const { marketEmitter, midPriceInUSD } = useMarkets();
+  const { tokenMap } = useConnectionConfig();
+  const [totals, setTotals] = useState<Totals>({
+    marketSize: 0,
+    borrowed: 0,
+    lentOutPct: 0, 
+    items: [],
+  })
 
   useEffect(() => {
     const refreshTotal = () => {
-      let totalSize = 0;
-      let borrowed = 0;
+      let newTotals: Totals = {
+        marketSize: 0,
+        borrowed: 0,
+        lentOutPct: 0, 
+        items: [],
+      };
 
       reserveAccounts.forEach((item) => {
         const marketCapLamports = reserveMarketCap(item.info);
@@ -33,22 +55,28 @@ export const HomeView = () => {
           return;
         }
 
-        const marketCap =
-          fromLamports(marketCapLamports, liquidityMint?.info) *
-          midPriceInUSD(liquidityMint?.pubkey.toBase58());
-
-        totalSize = totalSize + marketCap;
-
-        borrowed =
-          borrowed +
-          fromLamports(
+        let leaf = {
+          marketSize: fromLamports(marketCapLamports, liquidityMint?.info) *
+            midPriceInUSD(liquidityMint?.pubkey.toBase58()),
+          borrowed: fromLamports(
             wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
             liquidityMint.info
-          );
+          ),
+          name: getTokenName(tokenMap, item.info.liquidityMint.toBase58())
+        }
+
+        newTotals.items.push(leaf);
+
+        newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
+        newTotals.borrowed = newTotals.borrowed + leaf.borrowed;
+        
       });
 
-      setTotalMarketSize(totalSize);
-      setTotalBorrowed(borrowed);
+      newTotals.lentOutPct = newTotals.borrowed / newTotals.marketSize;
+      newTotals.lentOutPct = Number.isFinite(newTotals.lentOutPct) ? newTotals.lentOutPct : 0;
+      newTotals.items = newTotals.items.sort((a, b) => b.marketSize - a.marketSize)
+
+      setTotals(newTotals);
     };
 
     const dispose = marketEmitter.onMarket(() => {
@@ -60,30 +88,51 @@ export const HomeView = () => {
     return () => {
       dispose();
     };
-  }, [marketEmitter, midPriceInUSD, setTotalMarketSize, reserveAccounts]);
+  }, [marketEmitter, midPriceInUSD, setTotals, reserveAccounts, tokenMap]);
 
   return (
     <div className="flexColumn">
-      <Row gutter={16} className="home-info-row">
-        <Col span={12}>
+      <Row 
+        gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} 
+        className="home-info-row" >
+        <Col xs={24} xl={5}>
           <Card>
             <Statistic
               title="Current market size"
-              value={totalMarketSize}
+              value={totals.marketSize}
               precision={2}
               valueStyle={{ color: "#3f8600" }}
               prefix="$"
             />
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xs={24} xl={5}>
           <Card>
             <Statistic
               title="Total borrowed"
-              value={totalBorrowed}
+              value={totals.borrowed}
               precision={2}
               prefix="$"
             />
+          </Card>
+        </Col>
+        <Col xs={24} xl={5}>
+          <Card>
+            <Statistic
+              title="% Lent out"
+              value={totals.lentOutPct * 100}
+              precision={2}
+              suffix="%"
+            />
+          </Card>
+        </Col>
+        <Col xs={24} xl={9}>
+          <Card>
+            <BarChartStatistic
+              title="Market composition"
+              name={(item) => item.name}
+              getPct={(item) => item.marketSize / totals.marketSize}
+              items={totals.items} />
           </Card>
         </Col>
       </Row>

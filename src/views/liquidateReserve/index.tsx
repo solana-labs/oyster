@@ -14,12 +14,12 @@ export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
 
   const obligation = useEnrichedLendingObligation(id);
-  const reserve = useLendingReserve(obligation?.info.borrowReserve);
-  const collateralReserve = useLendingReserve(
+  const repayReserve = useLendingReserve(obligation?.info.borrowReserve);
+  const withdrawReserve = useLendingReserve(
     obligation?.info.collateralReserve
   );
 
-  if (!obligation || !reserve) {
+  if (!obligation || !repayReserve) {
     return null;
   }
 
@@ -29,12 +29,12 @@ export const LiquidateReserveView = () => {
         <LiquidateInput
           className="liquidate-reserve-item liquidate-reserve-item-left"
           obligation={obligation}
-          collateralReserve={collateralReserve}
-          reserve={reserve}
+          withdrawReserve={withdrawReserve}
+          repayReserve={repayReserve}
         />
         <SideReserveOverview
           className="liquidate-reserve-item liquidate-reserve-item-right"
-          reserve={reserve}
+          reserve={repayReserve}
           mode={SideReserveOverviewMode.Deposit}
         />
       </div>

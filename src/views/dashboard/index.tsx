@@ -1,9 +1,10 @@
+import { Col, Row } from "antd";
 import React from "react";
 import { LABELS } from "../../constants";
 import { useWallet } from "../../contexts/wallet";
 import { useUserDeposits, useUserObligations } from "./../../hooks";
-import { DepositItem } from "./depositItem";
-import { ObligationItem } from "./obligationItem";
+import { DashboardObligations } from "./obligation";
+import { DashboardDeposits } from "./deposit";
 import "./style.less";
 
 export const DashboardView = () => {
@@ -13,44 +14,32 @@ export const DashboardView = () => {
 
   return (
     <div className="dashboard-container">
-      {!connected && (
-        <div className="dashboard-info">{LABELS.DASHBOARD_INFO}</div>
+       {!connected && (
+        <div className="dashboard-info">
+          <img src="splash.svg" alt="connect your wallet" className="dashboard-splash"/>
+          {LABELS.DASHBOARD_INFO}
+          </div>
       )}
       {connected &&
         userDeposits.length === 0 &&
         userObligations.length === 0 && (
-          <div className="dashboard-info">{LABELS.NO_LOANS_NO_DEPOSITS}</div>
+          <div className="dashboard-info">
+            <img src="splash.svg" alt="connect your wallet" className="dashboard-splash"/>
+            {LABELS.NO_LOANS_NO_DEPOSITS}
+            </div>
         )}
-      {userDeposits.length > 0 && (
-        <div className="dashboard-left">
-          <span>{LABELS.DASHBOARD_TITLE_DEPOSITS}</span>
-          <div className="dashboard-item dashboard-header">
-            <div>{LABELS.TABLE_TITLE_ASSET}</div>
-            <div>{LABELS.TABLE_TITLE_DEPOSIT_BALANCE}</div>
-            <div>{LABELS.TABLE_TITLE_APY}</div>
-            <div>{LABELS.TABLE_TITLE_ACTION}</div>
-          </div>
-          {userDeposits.map((deposit) => (
-            <DepositItem reserve={deposit.reserve} account={deposit.account} />
-          ))}
-        </div>
-      )}
-      {userObligations.length > 0 && (
-        <div className="dashboard-right">
-          <span>{LABELS.DASHBOARD_TITLE_LOANS}</span>
-          <div className="dashboard-item dashboard-header">
-            <div>{LABELS.TABLE_TITLE_ASSET}</div>
-            <div>{LABELS.TABLE_TITLE_YOUR_LOAN_BALANCE}</div>
-            <div>{LABELS.TABLE_TITLE_COLLATERAL_BALANCE}</div>
-            <div>{LABELS.TABLE_TITLE_APY}</div>
-            <div>{LABELS.TABLE_TITLE_LTV}</div>
-            <div>{LABELS.TABLE_TITLE_ACTION}</div>
-          </div>
-          {userObligations.map((item) => {
-            return <ObligationItem obligation={item.obligation} />;
-          })}
-        </div>
-      )}
+      <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} >
+       {userDeposits.length >0 && (
+       <Col md={24} xl={12}  span={24}>
+          <DashboardDeposits />
+        </Col>
+        )}
+        {userObligations.length >0 && (
+        <Col md={24} xl={12}  span={24}>
+          <DashboardObligations />
+        </Col>
+        )}
+      </Row>      
     </div>
   );
 };

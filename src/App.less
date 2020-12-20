@@ -17,7 +17,10 @@ body {
 .footer {
   background-color: black;
   color: lightgray;
-  padding: 20px;
+  padding: 10px 10px;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .action-spinner {
@@ -156,7 +159,6 @@ body {
 }
 
 .wallet-wrapper {
-  background: @background-color-base;
   padding-left: 0.7rem;
   border-radius: 0.5rem;
   display: flex;
@@ -165,7 +167,6 @@ body {
 }
 
 .wallet-key {
-  background: @background-color-base;
   padding: 0.1rem 0.5rem 0.1rem 0.7rem;
   margin-left: 0.3rem;
   border-radius: 0.5rem;
@@ -266,6 +267,27 @@ body {
 
 .ant-pro-sider.ant-layout-sider-collapsed .ant-pro-sider-logo {
   padding: 8px 8px;
+}
+
+.ant-pro-global-header {
+  .ant-pro-global-header-logo a h1 {
+    color: white !important;
+  }
+
+  background-color: black !important;
+  color: white !important;
+
+  .ant-btn {
+    color: white !important;
+  }
+}
+
+.ant-statistic {
+  user-select: none;
+}
+
+.ant-statistic-content {
+  font-weight: bold;
 }
 
 .token-input {

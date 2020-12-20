@@ -61,31 +61,31 @@ export const borrow = async (
   const obligation = existingObligation
     ? existingObligation.pubkey
     : createUninitializedObligation(
-        instructions,
-        wallet.publicKey,
-        await connection.getMinimumBalanceForRentExemption(
-          LendingObligationLayout.span
-        ),
-        signers
-      );
+      instructions,
+      wallet.publicKey,
+      await connection.getMinimumBalanceForRentExemption(
+        LendingObligationLayout.span
+      ),
+      signers
+    );
 
   const obligationMint = existingObligation
     ? existingObligation.info.tokenMint
     : createUninitializedMint(
-        instructions,
-        wallet.publicKey,
-        await connection.getMinimumBalanceForRentExemption(MintLayout.span),
-        signers
-      );
+      instructions,
+      wallet.publicKey,
+      await connection.getMinimumBalanceForRentExemption(MintLayout.span),
+      signers
+    );
 
   const obligationTokenOutput = obligationAccount
     ? obligationAccount
     : createUninitializedAccount(
-        instructions,
-        wallet.publicKey,
-        accountRentExempt,
-        signers
-      );
+      instructions,
+      wallet.publicKey,
+      accountRentExempt,
+      signers
+    );
 
   let toAccount = await findOrCreateAccountByMint(
     wallet.publicKey,
@@ -172,10 +172,6 @@ export const borrow = async (
     )
   );
 
-  const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<
-    LendingMarket
-  >;
-
   const dexMarketAddress = borrowReserve.info.dexMarketOption
     ? borrowReserve.info.dexMarket
     : depositReserve.info.dexMarket;
@@ -185,6 +181,9 @@ export const borrow = async (
     throw new Error(`Dex market doesn't exist.`);
   }
 
+  const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<
+    LendingMarket
+  >;
   const dexOrderBookSide = market.info.quoteMint.equals(
     depositReserve.info.liquidityMint
   )

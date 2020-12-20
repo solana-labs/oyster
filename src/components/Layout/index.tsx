@@ -42,7 +42,7 @@ export const AppLayout = (props: any) => {
       </div>
       <BasicLayout
         title={LABELS.APP_TITLE}
-        footerRender={() => <div className="footer">{LABELS.FOOTER}</div>}
+        footerRender={() => <div className="footer" title={LABELS.FOOTER}>{LABELS.FOOTER}</div>}
         navTheme={theme}
         headerTheme={theme}
         theme={theme}
