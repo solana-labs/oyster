@@ -2,11 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 50px;
 
   & > div, span {
     flex: 15%;
-    height: 22px;
     text-align: right;
+    white-space: nowrap;
   }
 
   & > :first-child {
@@ -16,11 +17,35 @@
   & > :last-child {
     flex: 200px
   }
+
+  em {
+    font-weight: bold;
+    font-style: normal;
+    text-decoration: none;
+  }
+
+
+  border-bottom: 1px solid #eee;
+}
+
+.dashboard-title {
+  display: flex;
+  
+  & > :first-child {
+    margin-left: 0px;
+    margin-right: auto;
+  }
+
+  & > :last-child {
+    span {
+      font-size: 10px;
+      color: gray
+    }
+  }
 }
 
 .dashboard-header {
-  margin: 0px 30px;
-
+  
   & > div {
     flex: 15%;
     text-align: right;
@@ -45,6 +70,11 @@
   & > :first-child {
     flex: 1;
   }
+}
+
+.dashboard-amount-quote {
+  font-size: 9px;
+  font-style: normal;
 }
 
 .dashboard-info {

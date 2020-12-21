@@ -51,9 +51,11 @@ export function shortenAddress(address: string, chars = 4): string {
 
 export function getTokenName(
   map: KnownTokenMap,
-  mintAddress?: string,
+  mint?: string | PublicKey,
   shorten = true
 ): string {
+  const mintAddress = typeof mint === 'string' ? mint : mint?.toBase58();
+
   if (!mintAddress) {
     return "N/A";
   }
@@ -124,8 +126,8 @@ export function fromLamports(
     typeof account === "number"
       ? account
       : BN.isBN(account)
-      ? account.toNumber()
-      : account.info.amount.toNumber()
+        ? account.toNumber()
+        : account.info.amount.toNumber()
   );
 
   const precision = Math.pow(10, mint?.decimals || 0);

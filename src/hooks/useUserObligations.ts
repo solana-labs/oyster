@@ -28,13 +28,12 @@ export function useUserObligations() {
         return {
           obligation: ob,
           userAccounts: [...accountsByMint.get(ob.info.tokenMint.toBase58())],
-
-          // TODO: add total borrowed amount?
         };
       });
   }, [accountsByMint, obligations]);
 
   return {
     userObligations,
+    totalInQuote: userObligations.reduce((result, item) => result + item.obligation.info.borrowedInQuote, 0),
   };
 }

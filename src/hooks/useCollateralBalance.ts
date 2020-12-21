@@ -14,14 +14,20 @@ export function useUserCollateralBalance(
     account
   );
 
-  const collateralRatioLamports =
-    reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
+  const collateralBalance = reserve &&
+    calculateCollateralBalance(reserve, balanceLamports);
 
   return {
-    balance: fromLamports(collateralRatioLamports, mint),
-    balanceLamports: collateralRatioLamports,
+    balance: fromLamports(collateralBalance, mint),
+    balanceLamports: collateralBalance,
     mint: reserve?.collateralMint,
     accounts,
   };
 }
+export function calculateCollateralBalance(
+  reserve: LendingReserve,
+  balanceLamports: number) {
+  return reserveMarketCap(reserve) *
+    (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
+}
+

@@ -28,7 +28,7 @@ export const DashboardView = () => {
             {LABELS.NO_LOANS_NO_DEPOSITS}
             </div>
         )}
-      <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} >
+      {connected && <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} >
        {userDeposits.length >0 && (
        <Col md={24} xl={12}  span={24}>
           <DashboardDeposits />
@@ -39,7 +39,7 @@ export const DashboardView = () => {
           <DashboardObligations />
         </Col>
         )}
-      </Row>      
+      </Row>}  
     </div>
   );
 };

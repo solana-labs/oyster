@@ -8,13 +8,16 @@ import {
   LendingReserve,
 } from "../models/lending";
 import { useLendingReserves } from "./useLendingReserves";
-import { fromLamports, wadToLamports } from "../utils/utils";
+import { fromLamports, getTokenName, wadToLamports } from "../utils/utils";
 import { MintInfo } from "@solana/spl-token";
 import { simulateMarketOrderFill, useMarkets } from "../contexts/market";
+import { useConnectionConfig } from "../contexts/connection";
 
 interface EnrichedLendingObligationInfo extends LendingObligation {
   ltv: number;
   health: number;
+  borrowedInQuote: number;
+  name: string;
 }
 
 export interface EnrichedLendingObligation {
@@ -25,7 +28,8 @@ export interface EnrichedLendingObligation {
 export function useEnrichedLendingObligations() {
   const { obligations } = useLendingObligations();
   const { reserveAccounts } = useLendingReserves();
-  const { marketEmitter } = useMarkets();
+  const { tokenMap } = useConnectionConfig();
+  const { marketEmitter, midPriceInUSD } = useMarkets();
 
   const availableReserves = useMemo(() => {
     return reserveAccounts.reduce((map, reserve) => {
@@ -65,6 +69,7 @@ export function useEnrichedLendingObligations() {
           ) as ParsedAccount<MintInfo>;
           let ltv = 0;
           let health = 0;
+          let borrowedInQuote = 0;
 
           if (liquidityMint) {
             const collateral = fromLamports(
@@ -86,6 +91,14 @@ export function useEnrichedLendingObligations() {
                 ? item.reserve.info.dexMarket
                 : item.collateralReserve.info.dexMarket
             );
+            
+            const liquidityMintAddress = item.reserve.info.liquidityMint.toBase58();
+            const price = midPriceInUSD(liquidityMintAddress);
+
+            const liquidityMint = cache.get(liquidityMintAddress) as ParsedAccount<MintInfo>;
+
+            borrowedInQuote = fromLamports(borrowed, liquidityMint.info) * price;
+
 
             ltv = (100 * borrowedAmount) / collateral;
 
@@ -100,13 +113,14 @@ export function useEnrichedLendingObligations() {
               ...obligation.info,
               ltv,
               health,
-              // TODO: add borrow and collateral expressed in lending market quote ccy
+              borrowedInQuote, 
+              name: getTokenName(tokenMap, reserve.liquidityMint)
             },
           } as EnrichedLendingObligation;
         })
         .sort((a, b) => a.info.health - b.info.health)
     );
-  }, [obligations, availableReserves]);
+  }, [obligations, availableReserves, midPriceInUSD, tokenMap]);
 
   const [enriched, setEnriched] = useState<EnrichedLendingObligation[]>(
     enrichedFactory()
@@ -120,7 +134,7 @@ export function useEnrichedLendingObligations() {
     return () => {
       dispose();
     };
-  }, [enrichedFactory, setEnriched, marketEmitter]);
+  }, [enrichedFactory, setEnriched, marketEmitter, midPriceInUSD]);
 
   return {
     obligations: enriched,

@@ -53,3 +53,7 @@ export const LendingObligationParser = (
 
   return details;
 };
+
+export const healthFactorToRiskColor = (health: number) => {
+  return '';
+} 

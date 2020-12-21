@@ -3,6 +3,7 @@ import { EnrichedLendingObligation, useTokenName } from "../../../hooks";
 import {
   calculateBorrowAPY,
   collateralToLiquidity,
+  healthFactorToRiskColor,
   LendingReserve,
 } from "../../../models/lending";
 import { TokenIcon } from "../../../components/TokenIcon";
@@ -12,7 +13,7 @@ import {
   fromLamports,
   formatPct,
 } from "../../../utils/utils";
-import { Button, Card } from "antd";
+import { Button } from "antd";
 import { Link } from "react-router-dom";
 import { cache, ParsedAccount, useMint } from "../../../contexts/accounts";
 
@@ -51,7 +52,6 @@ export const ObligationItem = (props: {
   const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
 
   return (
-    <Card>
       <div className="dashboard-item">
         <span style={{ display: "flex", marginLeft: 5 }}>
           <div
@@ -66,26 +66,28 @@ export const ObligationItem = (props: {
           </div>
         </span>
         <div>
-          {formatNumber.format(borrowAmount)} {borrowName}
+          <div>
+            <div><em>{formatNumber.format(borrowAmount)}</em> {borrowName}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(obligation.info.borrowedInQuote)}</div>
+          </div>
         </div>
         <div>
           {formatNumber.format(collateral)} {collateralName}
         </div>
         <div>{formatPct.format(borrowAPY)}</div>
-        <div>{formatPct.format(obligation.info.ltv / 100)}</div>
+        <div style={{ color: healthFactorToRiskColor(obligation.info.health)}}>{formatPct.format(obligation.info.ltv / 100)}</div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Link to={`/borrow/${borrowReserve.pubkey.toBase58()}`}>
-            <Button>
+            <Button type="primary">
               <span>Borrow</span>
             </Button>
           </Link>
           <Link to={`/repay/loan/${obligation.account.pubkey.toBase58()}`}>
-            <Button>
+            <Button type="text">
               <span>Repay</span>
             </Button>
           </Link>
         </div>
       </div>
-    </Card>
   );
 };

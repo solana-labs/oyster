@@ -3,8 +3,9 @@ import React, {  } from "react";
 
 export const BarChartStatistic = <T, >(props: {
   items: T[];
-  title: string;
+  title?: string;
   name: (item: T) => string;
+  color?: (item: T) => string;
   getPct: (item: T) => number;
 }) => {
   const colors = [
@@ -28,9 +29,10 @@ export const BarChartStatistic = <T, >(props: {
             {props.items.map((item, i) => 
               <div key={props.name(item)} 
               title={props.name(item)} 
-              style={{ 
+              style={{
+                overflow: "hidden",
                 width: `${100 * props.getPct(item)}%` , 
-                backgroundColor: colors[i % props.items.length] }} >
+                backgroundColor: (props.color && props.color(item)) || colors[i % props.items.length] }} >
                   {props.name(item)} 
                 </div>)}
           </div>}

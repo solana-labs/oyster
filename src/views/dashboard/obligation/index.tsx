@@ -1,25 +1,35 @@
+import { Card } from "antd";
 import React from "react";
+import { BarChartStatistic } from "../../../components/BarChartStatistic";
 import { LABELS } from "../../../constants";
+import { formatNumber } from "../../../utils/utils";
 import { useUserObligations } from "./../../../hooks";
 import { ObligationItem } from "./item";
 
 export const DashboardObligations = () => {
-  const { userObligations } = useUserObligations();
+  const { userObligations, totalInQuote } = useUserObligations();
 
   return (
-    <>
-      <span>{LABELS.DASHBOARD_TITLE_LOANS}</span>
+    <Card title={
+      <div className="dashboard-title">
+        <div>{LABELS.DASHBOARD_TITLE_LOANS}</div>
+        <div><span>Total: </span>${formatNumber.format(totalInQuote)}</div>
+      </div>}>
+      <BarChartStatistic
+        items={userObligations}
+        getPct={(item) => item.obligation.info.borrowedInQuote / totalInQuote}
+        name={(item) => item.obligation.info.name} />
       <div className="dashboard-item dashboard-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_YOUR_LOAN_BALANCE}</div>
         <div>{LABELS.TABLE_TITLE_COLLATERAL_BALANCE}</div>
         <div>{LABELS.TABLE_TITLE_APY}</div>
         <div>{LABELS.TABLE_TITLE_LTV}</div>
-        <div>{LABELS.TABLE_TITLE_ACTION}</div>
+        <div></div>
       </div>
       {userObligations.map((item) => {
         return <ObligationItem obligation={item.obligation} />;
       })}
-    </>
+    </Card>
   );
 };
