@@ -13,7 +13,7 @@ export const DashboardObligations = () => {
     <Card title={
       <div className="dashboard-title">
         <div>{LABELS.DASHBOARD_TITLE_LOANS}</div>
-        <div><span>Total: </span>${formatNumber.format(totalInQuote)}</div>
+        <div><span>{LABELS.TOTAL_TITLE}: </span>${formatNumber.format(totalInQuote)}</div>
       </div>}>
       <BarChartStatistic
         items={userObligations}

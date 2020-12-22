@@ -87,7 +87,7 @@ export const LiquidateInput = (props: {
               disabled={true}
             />
             <Button type="primary" 
-              onClick={onLiquidate} 
+              onClick={onLiquidate}
               disabled={fromAccounts.length === 0}
               loading={pendingTx}>
               {LABELS.LIQUIDATE_ACTION}

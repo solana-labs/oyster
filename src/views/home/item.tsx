@@ -15,10 +15,12 @@ import {
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
 import { useMint } from "../../contexts/accounts";
+import { TotalItem } from "../../models";
 
 export const LendingReserveItem = (props: {
   reserve: LendingReserve;
   address: PublicKey;
+  item?: TotalItem;
 }) => {
   const name = useTokenName(props.reserve.liquidityMint);
 
@@ -56,10 +58,16 @@ export const LendingReserveItem = (props: {
           {name}
         </span>
         <div title={marketSize.toString()}>
-          {formatNumber.format(marketSize)} {name}
+          <div>
+            <div><em>{formatNumber.format(marketSize)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(props.item?.marketSize)}</div>
+          </div>
         </div>
         <div title={totalBorrows.toString()}>
-          {formatNumber.format(totalBorrows)} {name}
+          <div>
+            <div><em>{formatNumber.format(totalBorrows)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(props.item?.borrowed)}</div>
+          </div>
         </div>
         <div title={depositAPY.toString()}>
           {formatPct.format(depositAPY)}

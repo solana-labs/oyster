@@ -6,22 +6,11 @@ import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useConnectionConfig } from "../../contexts/connection";
 import { useMarkets } from "../../contexts/market";
 import { useLendingReserves } from "../../hooks";
-import { reserveMarketCap } from "../../models";
+import { reserveMarketCap, Totals } from "../../models";
 import { fromLamports, getTokenName, wadToLamports } from "../../utils/utils";
 import { LendingReserveItem } from "./item";
 import { BarChartStatistic } from "./../../components/BarChartStatistic";
 import "./itemStyle.less";
-
-interface Totals {
-  marketSize: number;
-  borrowed: number;
-  lentOutPct: number;
-  items: {
-    marketSize: number;
-    borrowed: number;
-    name: string;
-  }[];
-}
 
 export const HomeView = () => {
   const { reserveAccounts } = useLendingReserves();
@@ -56,6 +45,7 @@ export const HomeView = () => {
         }
 
         let leaf = {
+          key: item.pubkey.toBase58(),
           marketSize: fromLamports(marketCapLamports, liquidityMint?.info) *
             midPriceInUSD(liquidityMint?.pubkey.toBase58()),
           borrowed: fromLamports(
@@ -146,7 +136,7 @@ export const HomeView = () => {
         <div>{LABELS.TABLE_TITLE_BORROW_APY}</div>
       </div>
       {reserveAccounts.map((account) => (
-        <LendingReserveItem reserve={account.info} address={account.pubkey} />
+        <LendingReserveItem reserve={account.info} address={account.pubkey} item={totals.items.find(item => item.key === account.pubkey.toBase58())} />
       ))}
       </Card>
     </div>

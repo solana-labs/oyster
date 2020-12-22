@@ -17,7 +17,7 @@ export const BorrowItem = (props: {
   const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
 
   // TODO: calculate avilable amount... based on total owned collateral across all the reserves
-  const { balance: collateralBalance } = useUserCollateralBalance(
+  const { balance: collateralBalance, balanceInUSD: collateralBalanceInUSD } = useUserCollateralBalance(
     props.reserve
   );
 
@@ -32,7 +32,10 @@ export const BorrowItem = (props: {
         </span>
         <div>${formatNumber.format(price)}</div>
         <div>
-          {formatNumber.format(collateralBalance)} {name}
+          <div>
+            <div><em>{formatNumber.format(collateralBalance)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(collateralBalanceInUSD)}</div>
+          </div>
         </div>
         <div>{formatPct.format(apr)}</div>
         <div>

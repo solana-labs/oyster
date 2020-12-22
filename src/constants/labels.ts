@@ -51,4 +51,5 @@ export const LABELS = {
   DASHBOARD_ACTION: "Go to dashboard",
   GO_BACK_ACTION: "Go back",
   DEPOSIT_ACTION: "Deposit",
+  TOTAL_TITLE: "Total",
 };
