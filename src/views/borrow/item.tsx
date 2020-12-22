@@ -3,7 +3,7 @@ import { useUserCollateralBalance, useTokenName } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct } from "../../utils/utils";
-import { Button, Card } from "antd";
+import { Button } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
 import { LABELS } from "../../constants";

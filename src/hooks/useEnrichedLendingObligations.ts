@@ -17,6 +17,7 @@ interface EnrichedLendingObligationInfo extends LendingObligation {
   ltv: number;
   health: number;
   borrowedInQuote: number;
+  collateralInQuote: number;
   name: string;
 }
 
@@ -70,14 +71,17 @@ export function useEnrichedLendingObligations() {
           let ltv = 0;
           let health = 0;
           let borrowedInQuote = 0;
+          let collateralInQuote = 0;
 
           if (liquidityMint) {
+            const collateralMint = cache.get(item.collateralReserve.info.liquidityMint);
+
             const collateral = fromLamports(
               collateralToLiquidity(
                 obligation.info.depositedCollateral,
                 item.reserve.info
               ),
-              cache.get(item.collateralReserve.info.liquidityMint)?.info
+              collateralMint?.info,
             );
 
             const borrowed = wadToLamports(
@@ -91,14 +95,11 @@ export function useEnrichedLendingObligations() {
                 ? item.reserve.info.dexMarket
                 : item.collateralReserve.info.dexMarket
             );
-            
+
             const liquidityMintAddress = item.reserve.info.liquidityMint.toBase58();
-            const price = midPriceInUSD(liquidityMintAddress);
-
             const liquidityMint = cache.get(liquidityMintAddress) as ParsedAccount<MintInfo>;
-
-            borrowedInQuote = fromLamports(borrowed, liquidityMint.info) * price;
-
+            borrowedInQuote = fromLamports(borrowed, liquidityMint.info) * midPriceInUSD(liquidityMintAddress);;
+            collateralInQuote = collateral * midPriceInUSD(collateralMint?.pubkey.toBase58() || '');
 
             ltv = (100 * borrowedAmount) / collateral;
 
@@ -114,6 +115,7 @@ export function useEnrichedLendingObligations() {
               ltv,
               health,
               borrowedInQuote, 
+              collateralInQuote,
               name: getTokenName(tokenMap, reserve.liquidityMint)
             },
           } as EnrichedLendingObligation;

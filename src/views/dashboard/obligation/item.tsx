@@ -72,7 +72,10 @@ export const ObligationItem = (props: {
           </div>
         </div>
         <div>
-          {formatNumber.format(collateral)} {collateralName}
+          <div>
+            <div><em>{formatNumber.format(collateral)}</em> {collateralName}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(obligation.info.collateralInQuote)}</div>
+          </div>
         </div>
         <div>{formatPct.format(borrowAPY)}</div>
         <div style={{ color: healthFactorToRiskColor(obligation.info.health)}}>{formatPct.format(obligation.info.ltv / 100)}</div>

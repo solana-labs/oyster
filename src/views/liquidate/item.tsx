@@ -3,7 +3,7 @@ import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
 import { LendingReserve, calculateBorrowAPY, collateralToLiquidity } from "../../models/lending";
 import { EnrichedLendingObligation, useTokenName } from "../../hooks";
 import { Link } from "react-router-dom";
-import { Button, Card } from "antd";
+import { Button } from "antd";
 import { TokenIcon } from "../../components/TokenIcon";
 import {
   wadToLamports,
@@ -59,10 +59,16 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
           {collateralName}→{borrowName}
         </span>
         <div>
-          {formatNumber.format(borrowAmount)} {borrowName}
+          <div>
+            <div><em>{formatNumber.format(borrowAmount)}</em> {borrowName}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(obligation.borrowedInQuote)}</div>
+          </div>
         </div>
         <div>
-          {formatNumber.format(collateral)} {collateralName}
+          <div>
+            <div><em>{formatNumber.format(collateral)}</em> {collateralName}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(obligation.collateralInQuote)}</div>
+          </div>
         </div>
         <div>{formatPct.format(borrowAPY)}</div>
         <div>{formatPct.format(obligation.ltv / 100)}</div>
