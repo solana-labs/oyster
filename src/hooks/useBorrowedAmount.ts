@@ -16,12 +16,24 @@ import { useLendingReserve } from "./useLendingReserves";
 export function useBorrowedAmount(address?: string | PublicKey) {
   const connection = useConnection();
   const { userObligationsByReserve } = useUserObligationByReserve(address);
-  const [borrowedLamports, setBorrowedLamports] = useState(0);
+  const [borrowedInfo, setBorrowedInfo] = useState({
+    borrowedLamports: 0,
+    borrowedInUSD: 0,
+    colateralInUSD: 0,
+    ltv: 0, 
+      health: 0,
+  });
   const reserve = useLendingReserve(address);
   const liquidityMint = useMint(reserve?.info.liquidityMint);
 
   useEffect(() => {
-    setBorrowedLamports(0);
+    setBorrowedInfo({
+      borrowedLamports: 0,
+      borrowedInUSD: 0,
+      colateralInUSD: 0, 
+      ltv: 0, 
+      health: 0,
+    });
 
     (async () => {
       // precache obligation mints
@@ -38,29 +50,50 @@ export function useBorrowedAmount(address?: string | PublicKey) {
         cache.add(new PublicKey(address), item, MintParser);
       });
 
-      setBorrowedLamports(
-        userObligationsByReserve.reduce((result, item) => {
-          const borrowed = wadToLamports(
-            item.obligation.info.borrowAmountWad
-          ).toNumber();
+      const result = {
+        borrowedLamports: 0,
+        borrowedInUSD: 0,
+        colateralInUSD: 0, 
+        ltv: 0, 
+      health: 0,
+      };
 
-          const owned = item.userAccounts.reduce(
-            (amount, acc) => (amount += acc.info.amount.toNumber()),
-            0
-          );
-          const obligationMint = cache.get(
-            item.obligation.info.tokenMint
-          ) as ParsedAccount<MintInfo>;
+      let liquidationThreshold = 0;
 
-          result += (borrowed * owned) / obligationMint?.info.supply.toNumber();
-          return result;
-        }, 0)
-      );
+      userObligationsByReserve.forEach((item) => {
+        const borrowed = wadToLamports(
+          item.obligation.info.borrowAmountWad
+        ).toNumber();
+
+        const owned = item.userAccounts.reduce(
+          (amount, acc) => (amount += acc.info.amount.toNumber()),
+          0
+        );
+        const obligationMint = cache.get(
+          item.obligation.info.tokenMint
+        ) as ParsedAccount<MintInfo>;
+
+        result.borrowedLamports += borrowed * (owned / obligationMint?.info.supply.toNumber());
+        result.borrowedInUSD += item.obligation.info.borrowedInQuote;
+        result.colateralInUSD += item.obligation.info.collateralInQuote;
+        liquidationThreshold = item.obligation.info.liquidationThreshold;
+      }, 0);
+
+      if (userObligationsByReserve.length === 1) {
+        result.ltv = userObligationsByReserve[0].obligation.info.ltv;
+        result.health = userObligationsByReserve[0].obligation.info.health;
+      } else {
+        result.ltv = 100 * result.borrowedInUSD / result.colateralInUSD;
+        result.health = result.colateralInUSD * liquidationThreshold / 100 / result.borrowedInUSD;
+      }
+
+
+      setBorrowedInfo(result);
     })();
-  }, [connection, userObligationsByReserve]);
+  }, [connection, userObligationsByReserve, setBorrowedInfo]);
 
   return {
-    borrowed: fromLamports(borrowedLamports, liquidityMint),
-    borrowedLamports,
+    borrowed: fromLamports(borrowedInfo.borrowedLamports, liquidityMint),
+    ...borrowedInfo,
   };
 }

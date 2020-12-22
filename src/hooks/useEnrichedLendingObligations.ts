@@ -18,6 +18,7 @@ interface EnrichedLendingObligationInfo extends LendingObligation {
   health: number;
   borrowedInQuote: number;
   collateralInQuote: number;
+  liquidationThreshold: number;
   name: string;
 }
 
@@ -116,6 +117,7 @@ export function useEnrichedLendingObligations() {
               health,
               borrowedInQuote, 
               collateralInQuote,
+              liquidationThreshold: item.reserve.info.config.liquidationThreshold,
               name: getTokenName(tokenMap, reserve.liquidityMint)
             },
           } as EnrichedLendingObligation;

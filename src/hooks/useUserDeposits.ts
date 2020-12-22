@@ -22,7 +22,7 @@ export interface UserDeposit {
   reserve: ParsedAccount<LendingReserve>;
 }
 
-export function useUserDeposits() {
+export function useUserDeposits(reserveAddress?: string) {
   const { userAccounts } = useUserAccounts();
   const { reserveAccounts } = useLendingReserves();
   const [userDeposits, setUserDeposits] = useState<UserDeposit[]>([]);
@@ -31,26 +31,29 @@ export function useUserDeposits() {
 
   const reservesByCollateralMint = useMemo(() => {
     return reserveAccounts.reduce((result, item) => {
-      result.set(item.info.collateralMint.toBase58(), item);
+      if(!reserveAddress || item.pubkey.toBase58() === reserveAddress) {
+        result.set(item.info.collateralMint.toBase58(), item);
+      }
+
       return result;
     }, new Map<string, ParsedAccount<LendingReserve>>());
-  }, [reserveAccounts]);
+  }, [reserveAccounts, reserveAddress]);
 
   useEffect(() => {
     const activeMarkets = new Set(reserveAccounts.map(r => r.info.dexMarket.toBase58()));
 
     const userDepositsFactory = () => {
       return userAccounts
-        .filter((acc) => reservesByCollateralMint.has(acc.info.mint.toBase58()))
+        .filter((acc) => reservesByCollateralMint.has(acc?.info.mint.toBase58()))
         .map((item) => {
           const reserve = reservesByCollateralMint.get(
-            item.info.mint.toBase58()
+            item?.info.mint.toBase58()
           ) as ParsedAccount<LendingReserve>;
 
           let collateralMint = cache.get(reserve.info.collateralMint) as ParsedAccount<MintInfo>;
 
-          const amountLamports = calculateCollateralBalance(reserve.info, item.info.amount.toNumber());
-          const amount = fromLamports(amountLamports, collateralMint.info);
+          const amountLamports = calculateCollateralBalance(reserve.info, item?.info.amount.toNumber());
+          const amount = fromLamports(amountLamports, collateralMint?.info);
           const price = midPriceInUSD(reserve.info.liquidityMint.toBase58());
           const amountInQuote = price * amount;
 

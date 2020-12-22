@@ -23,17 +23,15 @@ export const UserLendingCard = (props: {
 
   const name = useTokenName(reserve?.liquidityMint);
 
-  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance } = useUserCollateralBalance(
+  const { balance: tokenBalance, balanceInUSD: tokenBalanceInUSD } = useUserBalance(props.reserve.liquidityMint);
+  const { balance: collateralBalance, balanceInUSD: collateralBalanceInUSD } = useUserCollateralBalance(
     props.reserve
   );
 
-  const { borrowed: totalBorrowed } = useBorrowedAmount(address);
+  const { borrowed: totalBorrowed, borrowedInUSD, ltv, health } = useBorrowedAmount(address);
 
   // TODO: calculate
-  const healthFactor = "--";
-  const ltv = 0;
-  const available = 0;
+  const available = 0; // use all available deposits and convert using market rate
 
   return (
     <Card
@@ -58,7 +56,10 @@ export const UserLendingCard = (props: {
           Borrowed
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(totalBorrowed)} {name}
+          <div>
+            <div><em>{formatNumber.format(totalBorrowed)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(borrowedInUSD)}</div>
+          </div>
         </div>
       </div>
 
@@ -66,7 +67,7 @@ export const UserLendingCard = (props: {
         <Text type="secondary" className="card-cell ">
           Health factor:
         </Text>
-        <div className="card-cell ">{healthFactor}</div>
+        <div className="card-cell ">{health.toFixed(2)}</div>
       </div>
 
       <div className="card-row">
@@ -92,7 +93,10 @@ export const UserLendingCard = (props: {
           Wallet balance:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(tokenBalance)} {name}
+          <div>
+            <div><em>{formatNumber.format(tokenBalance)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(tokenBalanceInUSD)}</div>
+          </div>
         </div>
       </div>
 
@@ -101,7 +105,10 @@ export const UserLendingCard = (props: {
           You already deposited:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(collateralBalance)} {name}
+          <div>
+            <div><em>{formatNumber.format(collateralBalance)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(collateralBalanceInUSD)}</div>
+          </div>
         </div>
       </div>
 

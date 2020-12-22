@@ -23,9 +23,9 @@ export const BarChartStatistic = <T, >(props: {
       <Statistic
         title={props.title}
         valueRender={() =>
-          <div style={{ width: '100%', height: 40, display: 'flex', backgroundColor: 'lightgrey',
+          <div style={{ width: '100%', height: 37, display: 'flex', backgroundColor: 'lightgrey',
           fontSize: 12,
-          lineHeight: '40px', }}>
+          lineHeight: '37px', }}>
             {props.items.map((item, i) => 
               <div key={props.name(item)} 
               title={props.name(item)} 
