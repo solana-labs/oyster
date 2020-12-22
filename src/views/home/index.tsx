@@ -137,6 +137,7 @@ export const HomeView = () => {
         </Col>
       </Row>
 
+      <Card>
       <div className="home-item home-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_MARKET_SIZE}</div>
@@ -147,6 +148,7 @@ export const HomeView = () => {
       {reserveAccounts.map((account) => (
         <LendingReserveItem reserve={account.info} address={account.pubkey} />
       ))}
+      </Card>
     </div>
   );
 };

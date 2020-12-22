@@ -25,24 +25,22 @@ export const BorrowItem = (props: {
 
   return (
     <Link to={`/borrow/${props.address.toBase58()}`}>
-      <Card>
-        <div className="borrow-item">
-          <span style={{ display: "flex" }}>
-            <TokenIcon mintAddress={props.reserve.liquidityMint} />
-            {name}
-          </span>
-          <div>{formatNumber.format(price)} USDC</div>
-          <div>
-            {formatNumber.format(collateralBalance)} {name}
-          </div>
-          <div>{formatPct.format(apr)}</div>
-          <div>
-            <Button>
-              <span>{LABELS.BORROW_ACTION}</span>
-            </Button>
-          </div>
+      <div className="borrow-item">
+        <span style={{ display: "flex" }}>
+          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          {name}
+        </span>
+        <div>${formatNumber.format(price)}</div>
+        <div>
+          {formatNumber.format(collateralBalance)} {name}
         </div>
-      </Card>
+        <div>{formatPct.format(apr)}</div>
+        <div>
+          <Button type="primary">
+            <span>{LABELS.BORROW_ACTION}</span>
+          </Button>
+        </div>
+      </div>
     </Link>
   );
 };

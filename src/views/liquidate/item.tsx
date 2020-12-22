@@ -47,34 +47,32 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
 
   return (
     <Link to={`/liquidate/${props.item.account.pubkey.toBase58()}`}>
-      <Card>
-        <div className="liquidate-item">
-          <span style={{ display: "flex" }}>
-            <div style={{ display: "flex" }}>
-              <TokenIcon
-                mintAddress={collateralReserve?.info.liquidityMint}
-                style={{ marginRight: "-0.5rem" }}
-              />
-              <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
-            </div>
-            {collateralName}→{borrowName}
-          </span>
-          <div>
-            {formatNumber.format(borrowAmount)} {borrowName}
+      <div className="liquidate-item">
+        <span style={{ display: "flex" }}>
+          <div style={{ display: "flex" }}>
+            <TokenIcon
+              mintAddress={collateralReserve?.info.liquidityMint}
+              style={{ marginRight: "-0.5rem" }}
+            />
+            <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
           </div>
-          <div>
-            {formatNumber.format(collateral)} {collateralName}
-          </div>
-          <div>{formatPct.format(borrowAPY)}</div>
-          <div>{formatPct.format(obligation.ltv / 100)}</div>
-          <div>{obligation.health.toFixed(2)}</div>
-          <div>
-            <Button>
-              <span>{LABELS.LIQUIDATE_ACTION}</span>
-            </Button>
-          </div>
+          {collateralName}→{borrowName}
+        </span>
+        <div>
+          {formatNumber.format(borrowAmount)} {borrowName}
         </div>
-      </Card>
+        <div>
+          {formatNumber.format(collateral)} {collateralName}
+        </div>
+        <div>{formatPct.format(borrowAPY)}</div>
+        <div>{formatPct.format(obligation.ltv / 100)}</div>
+        <div>{obligation.health.toFixed(2)}</div>
+        <div>
+          <Button type="primary">
+            <span>{LABELS.LIQUIDATE_ACTION}</span>
+          </Button>
+        </div>
+      </div>
     </Link>
   );
 };

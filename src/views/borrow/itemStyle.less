@@ -1,22 +1,25 @@
+@import '~antd/es/style/themes/default.less';
+
 .borrow-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: @text-color;
 
-  & > div, span {
+  & > :nth-child(n) {
     flex: 20%;
-    height: 22px;
     text-align: right;
+    margin: 15px 0px;
   }
 
   & > :first-child {
     flex: 80px
   }
+  
+  border-bottom: 1px solid #eee;
 }
 
 .borrow-header {
-  margin: 0px 30px;
-
   & > div {
     flex: 20%;
     text-align: right;

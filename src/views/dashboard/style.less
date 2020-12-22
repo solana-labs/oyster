@@ -1,13 +1,16 @@
+@import '~antd/es/style/themes/default.less';
+
 .dashboard-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 50px;
+  color: @text-color;
 
-  & > div, span {
+  & > :nth-child(n) {
     flex: 15%;
     text-align: right;
     white-space: nowrap;
+    margin: 15px 0px;
   }
 
   & > :first-child {
@@ -23,7 +26,6 @@
     font-style: normal;
     text-decoration: none;
   }
-
 
   border-bottom: 1px solid #eee;
 }
@@ -46,7 +48,7 @@
 
 .dashboard-header {
   
-  & > div {
+  & > :nth-child(n) {
     flex: 15%;
     text-align: right;
   }

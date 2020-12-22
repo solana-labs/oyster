@@ -12,7 +12,6 @@ import {
   fromLamports,
   formatPct,
 } from "../../utils/utils";
-import { Card } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
 import { useMint } from "../../contexts/accounts";
@@ -51,24 +50,22 @@ export const LendingReserveItem = (props: {
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
-      <Card>
-        <div className="home-item">
-          <span style={{ display: "flex" }}>
-            <TokenIcon mintAddress={props.reserve.liquidityMint} />
-            {name}
-          </span>
-          <div title={marketSize.toString()}>
-            {formatNumber.format(marketSize)} {name}
-          </div>
-          <div title={totalBorrows.toString()}>
-            {formatNumber.format(totalBorrows)} {name}
-          </div>
-          <div title={depositAPY.toString()}>
-            {formatPct.format(depositAPY)}
-          </div>
-          <div title={borrowAPY.toString()}>{formatPct.format(borrowAPY)}</div>
+      <div className="home-item">
+        <span style={{ display: "flex" }}>
+          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          {name}
+        </span>
+        <div title={marketSize.toString()}>
+          {formatNumber.format(marketSize)} {name}
         </div>
-      </Card>
+        <div title={totalBorrows.toString()}>
+          {formatNumber.format(totalBorrows)} {name}
+        </div>
+        <div title={depositAPY.toString()}>
+          {formatPct.format(depositAPY)}
+        </div>
+        <div title={borrowAPY.toString()}>{formatPct.format(borrowAPY)}</div>
+      </div>
     </Link>
   );
 };
