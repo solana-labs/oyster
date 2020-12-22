@@ -85,6 +85,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
       } else {
         result.ltv = 100 * result.borrowedInUSD / result.colateralInUSD;
         result.health = result.colateralInUSD * liquidationThreshold / 100 / result.borrowedInUSD;
+        result.health = Number.isFinite(result.health) ? result.health : 0;
       }
 
 
