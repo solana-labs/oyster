@@ -19,6 +19,7 @@ export const LABELS = {
   MENU_BORROW: "Borrow",
   MENU_LIQUIDATE: "Liquidate",
   MENU_FAUCET: "Faucet",
+  MARGIN_TRADING: "Margin Trading",
   APP_TITLE: "Oyster Lending",
   CONNECT_BUTTON: "Connect",
   WALLET_TOOLTIP: "Wallet public key",
