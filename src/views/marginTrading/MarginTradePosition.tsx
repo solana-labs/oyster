@@ -1,28 +1,29 @@
 import { Button, Select, Slider } from 'antd';
 import React from 'react';
+import { IPosition } from '.';
 import { NumericInput } from '../../components/Input/numeric';
 import { TokenIcon } from '../../components/TokenIcon';
 import tokens from '../../config/tokens.json';
 import { LABELS } from '../../constants/labels';
 const { Option } = Select;
 
-interface EditableAssetProps {
+interface IEditableAssetProps {
   label: string;
-  itemAssetKey: string;
-  itemAssetValueKey: string;
+  assetKey: string;
   setItem: (item: any) => void;
   item: any;
 }
-function EditableAsset({ label, itemAssetKey, itemAssetValueKey, setItem, item }: EditableAssetProps) {
-  console.log('Now looking at', item);
-  if (!item[itemAssetKey]) {
+function EditableAsset({ label, assetKey, setItem, item }: IEditableAssetProps) {
+  if (!item[assetKey]?.type) {
     return (
       <Select
         size='large'
         showSearch
         style={{ margin: '5px 0px' }}
         placeholder={label}
-        onChange={(v) => setItem({ ...item, [itemAssetKey]: tokens.find((t) => t.mintAddress === v) })}
+        onChange={(v) =>
+          setItem({ ...item, [assetKey]: { ...(item[assetKey] || {}), type: tokens.find((t) => t.mintAddress === v) } })
+        }
       >
         {tokens.map((token) => (
           <Option key={token.mintAddress} value={token.mintAddress} name={token.tokenName} title={token.tokenName}>
@@ -38,33 +39,45 @@ function EditableAsset({ label, itemAssetKey, itemAssetValueKey, setItem, item }
     return (
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
         <NumericInput
-          value={item[itemAssetValueKey]}
+          value={item[assetKey].value}
           style={{
             fontSize: 20,
             boxShadow: 'none',
             borderColor: 'transparent',
             outline: 'transparent',
           }}
+          onChange={(v: number) => {
+            setItem({ ...item, [assetKey]: { ...(item[assetKey] || {}), value: v } });
+          }}
           placeholder='0.00'
         />
-        <TokenIcon mintAddress={item[itemAssetKey]?.mintAddress} />
+        <TokenIcon mintAddress={item[assetKey]?.type?.mintAddress} />
       </div>
     );
   }
 }
 
-export default function MarginTradePosition({ item, setItem }: { item: any; setItem?: (item: any) => void }) {
+export default function MarginTradePosition({ item, setItem }: { item: IPosition; setItem?: (item: any) => void }) {
   return (
     <div className='trading-item'>
       <div>
         {setItem && (
-          <EditableAsset
-            item={item}
-            setItem={setItem}
-            label={LABELS.TRADING_TABLE_TITLE_MY_COLLATERAL}
-            itemAssetKey={'collateralType'}
-            itemAssetValueKey={'collateralValue'}
-          />
+          <Select
+            size='large'
+            showSearch
+            style={{ margin: '5px 0px' }}
+            placeholder={LABELS.TRADING_TABLE_TITLE_MY_COLLATERAL}
+            onChange={(v) => setItem({ ...item, collateral: tokens.find((t) => t.mintAddress === v) })}
+          >
+            {tokens.map((token) => (
+              <Option key={token.mintAddress} value={token.mintAddress} name={token.tokenName} title={token.tokenName}>
+                <div key={token.mintAddress} style={{ display: 'flex', alignItems: 'center' }}>
+                  <TokenIcon mintAddress={token.mintAddress} />
+                  {token.tokenName}
+                </div>
+              </Option>
+            ))}
+          </Select>
         )}
       </div>
       <div>
@@ -72,14 +85,26 @@ export default function MarginTradePosition({ item, setItem }: { item: any; setI
           <EditableAsset
             item={item}
             setItem={setItem}
-            label={LABELS.TRADING_TABLE_TITLE_MY_COLLATERAL}
-            itemAssetKey={'assetType'}
-            itemAssetValueKey={'assetValue'}
+            label={LABELS.TRADING_TABLE_TITLE_DESIRED_ASSET}
+            assetKey={'asset'}
           />
         )}
       </div>
       <div>
-        <Slider tooltipVisible={true} defaultValue={1} dots={true} max={5} min={1} step={1} tooltipPlacement={'top'} />
+        {setItem && (
+          <Slider
+            tooltipVisible={true}
+            defaultValue={1}
+            dots={true}
+            max={5}
+            min={1}
+            step={1}
+            tooltipPlacement={'top'}
+            onChange={(v: number) => {
+              setItem({ ...item, leverage: v });
+            }}
+          />
+        )}
       </div>
       <div>123</div>
       <div>123</div>
