@@ -18,7 +18,7 @@ export const DashboardObligations = () => {
       <BarChartStatistic
         items={userObligations}
         getPct={(item) => item.obligation.info.borrowedInQuote / totalInQuote}
-        name={(item) => item.obligation.info.name} />
+        name={(item) => item.obligation.info.repayName} />
       <div className="dashboard-item dashboard-header">
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_YOUR_LOAN_BALANCE}</div>

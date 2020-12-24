@@ -11,3 +11,5 @@ export * from "./useBorrowedAmount";
 export * from "./useUserDeposits";
 export * from "./useSliderInput";
 export * from "./useEnrichedLendingObligations";
+export * from "./useBorrowingPower";
+export * from "./useLendingMarket";

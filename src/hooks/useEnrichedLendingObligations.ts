@@ -19,7 +19,8 @@ interface EnrichedLendingObligationInfo extends LendingObligation {
   borrowedInQuote: number;
   collateralInQuote: number;
   liquidationThreshold: number;
-  name: string;
+  repayName: string;
+  collateralName: string;
 }
 
 export interface EnrichedLendingObligation {
@@ -66,6 +67,7 @@ export function useEnrichedLendingObligations() {
         .map((item) => {
           const obligation = item.obligation;
           const reserve = item.reserve.info;
+          const collateralReserve = item.reserve.info;
           const liquidityMint = cache.get(
             reserve.liquidityMint
           ) as ParsedAccount<MintInfo>;
@@ -118,7 +120,8 @@ export function useEnrichedLendingObligations() {
               borrowedInQuote, 
               collateralInQuote,
               liquidationThreshold: item.reserve.info.config.liquidationThreshold,
-              name: getTokenName(tokenMap, reserve.liquidityMint)
+              repayName: getTokenName(tokenMap, reserve.liquidityMint),
+              collateralName: getTokenName(tokenMap, collateralReserve.liquidityMint)
             },
           } as EnrichedLendingObligation;
         })

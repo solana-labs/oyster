@@ -11,13 +11,13 @@ export const LiquidateView = () => {
 
   const atRisk = useMemo(() => obligations.filter(item => item.info.health < 1.0), [obligations]);
 
-  const valueAtRisk = useMemo(() => atRisk.reduce((acc, item) => acc + item.info.borrowedInQuote, 0), [atRisk]);
+  const valueAtRisk = useMemo(() => atRisk.reduce((acc, item) => acc + item.info.collateralInQuote, 0), [atRisk]);
   const loansAtRiskCount = useMemo(() => atRisk.length, [atRisk]);
   const pctAtRisk = useMemo(() => atRisk.length / obligations.length, [atRisk, obligations]);
 
   const groupedLoans = useMemo(() => {
     return atRisk.reduce((acc, item) => {
-      acc.set(item.info.name, (acc.get(item.info.name) || 0) + item.info.borrowedInQuote);
+      acc.set(item.info.repayName, (acc.get(item.info.collateralName) || 0) + item.info.collateralInQuote);
       return acc;
     }, new Map<string, number>())
   }, [atRisk]);

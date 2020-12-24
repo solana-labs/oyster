@@ -1,5 +1,5 @@
 import React from "react";
-import { useUserCollateralBalance, useTokenName } from "../../hooks";
+import { useTokenName, useBorrowingPower } from "../../hooks";
 import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../../components/TokenIcon";
 import { formatNumber, formatPct } from "../../utils/utils";
@@ -16,10 +16,7 @@ export const BorrowItem = (props: {
   const name = useTokenName(props.reserve.liquidityMint);
   const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
 
-  // TODO: calculate avilable amount... based on total owned collateral across all the reserves
-  const { balance: collateralBalance, balanceInUSD: collateralBalanceInUSD } = useUserCollateralBalance(
-    props.reserve
-  );
+  const { borrowingPower, totalInQuote } =  useBorrowingPower(props.address)
 
   const apr = calculateBorrowAPY(props.reserve);
 
@@ -33,8 +30,8 @@ export const BorrowItem = (props: {
         <div>${formatNumber.format(price)}</div>
         <div>
           <div>
-            <div><em>{formatNumber.format(collateralBalance)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(collateralBalanceInUSD)}</div>
+            <div><em>{formatNumber.format(borrowingPower)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(totalInQuote)}</div>
           </div>
         </div>
         <div>{formatPct.format(apr)}</div>

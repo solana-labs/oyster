@@ -22,7 +22,7 @@ export interface UserDeposit {
   reserve: ParsedAccount<LendingReserve>;
 }
 
-export function useUserDeposits(reserveAddress?: string) {
+export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   const { userAccounts } = useUserAccounts();
   const { reserveAccounts } = useLendingReserves();
   const [userDeposits, setUserDeposits] = useState<UserDeposit[]>([]);
@@ -31,13 +31,18 @@ export function useUserDeposits(reserveAddress?: string) {
 
   const reservesByCollateralMint = useMemo(() => {
     return reserveAccounts.reduce((result, item) => {
-      if(!reserveAddress || item.pubkey.toBase58() === reserveAddress) {
+      const id = item.pubkey.toBase58();
+      if (exclude && exclude.has(id)) {
+        return result;
+      }
+
+      if (!include || include.has(id)) {
         result.set(item.info.collateralMint.toBase58(), item);
       }
 
       return result;
     }, new Map<string, ParsedAccount<LendingReserve>>());
-  }, [reserveAccounts, reserveAddress]);
+  }, [reserveAccounts, exclude, include]);
 
   useEffect(() => {
     const activeMarkets = new Set(reserveAccounts.map(r => r.info.dexMarket.toBase58()));
@@ -62,7 +67,7 @@ export function useUserDeposits(reserveAddress?: string) {
             info: {
               amount,
               amountInQuote: amountInQuote,
-              apy: calculateDepositAPY(reserve.info), 
+              apy: calculateDepositAPY(reserve.info),
               name: getTokenName(tokenMap, reserve.info.liquidityMint),
             },
             reserve,
@@ -73,7 +78,7 @@ export function useUserDeposits(reserveAddress?: string) {
 
     const dispose = marketEmitter.onMarket((args) => {
       // ignore if none of the markets is used by the reserve
-      if([...args.ids.values()].every(id => !activeMarkets.has(id))) {
+      if ([...args.ids.values()].every(id => !activeMarkets.has(id))) {
         return;
       }
 

@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LendingReserve, LendingReserveParser } from "../models/lending";
 import { cache, ParsedAccount } from "./../contexts/accounts";
 
@@ -33,7 +33,7 @@ export function useLendingReserves() {
 }
 
 export function useLendingReserve(address?: string | PublicKey) {
-  const id = typeof address === "string" ? address : address?.toBase58();
+  const id = useMemo(() => typeof address === "string" ? address : address?.toBase58(), [address]);
   const [reserveAccount, setReserveAccount] = useState<
     ParsedAccount<LendingReserve>
   >(cache.get(id || "") as ParsedAccount<LendingReserve>);
