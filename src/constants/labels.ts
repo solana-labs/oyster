@@ -60,4 +60,7 @@ export const LABELS = {
   TRADING_TABLE_TITLE_APY: 'APY',
   TRADING_TABLE_TITLE_ACTIONS: 'Action',
   TRADING_ADD_POSITION: 'Add Position',
+  MARGIN_TRADE_ACTION: 'Margin Trade',
+  MARGIN_TRADE_QUESTION: 'How much of this asset would you like?',
+  TABLE_TITLE_BUYING_POWER: 'Total Buying Power',
 };

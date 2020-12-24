@@ -1,0 +1,32 @@
+.new-position {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.new-position-item {
+  margin: 4px;
+}
+
+.new-position-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.new-position-item-left {
+  flex: 60%;
+}
+
+.new-position-item-right {
+  flex: 30%;
+}
+
+/* Responsive layout - makes a one column layout instead of a two-column layout */
+@media (max-width: 600px) {
+  .new-position-item-right,
+  .new-position-item-left {
+    flex: 100%;
+  }
+}
