@@ -1,15 +1,17 @@
 import { Button, Card, Radio } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ActionConfirmation } from '../../../components/ActionConfirmation';
 import { NumericInput } from '../../../components/Input/numeric';
 import { TokenIcon } from '../../../components/TokenIcon';
 import { LABELS } from '../../../constants';
 import { cache, ParsedAccount } from '../../../contexts/accounts';
-import { LendingReserve, LendingReserveParser } from '../../../models/lending/reserve';
+import { collateralToLiquidity, LendingReserve, LendingReserveParser } from '../../../models/lending/reserve';
 import { Position } from './interfaces';
 import tokens from '../../../config/tokens.json';
 import { CollateralSelector } from '../../../components/CollateralSelector';
 import { Breakdown } from './Breakdown';
+import { usePoolForBasket } from '../../../utils/pools';
+import { useEnrichedPools } from '../../../contexts/market';
 
 interface NewPositionFormProps {
   lendingReserve: ParsedAccount<LendingReserve>;
@@ -26,6 +28,66 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
     height: '100%',
   };
   const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const collType = newPosition.collateral;
+  const desiredType = newPosition.asset.type;
+
+  const pool = usePoolForBasket([
+    collType?.info?.liquidityMint?.toBase58(),
+    desiredType?.info?.liquidityMint?.toBase58(),
+  ]);
+
+  const enriched = useEnrichedPools(pool ? [pool] : []);
+
+  // Leverage validation - if you choose this leverage, is it allowable, with your buying power and with
+  // the pool we have to cover you?
+  useEffect(() => {
+    if (!collType || !desiredType || !newPosition.asset.value || !enriched || enriched.length == 0) {
+      return;
+    }
+
+    const amountDesiredToPurchase = newPosition.asset.value;
+    const leverageDesired = newPosition.leverage;
+    console.log('collateral reserve', collType);
+    const amountAvailableInOysterForMargin = collateralToLiquidity(collType.info.availableLiquidity, desiredType.info);
+    const amountToDepositOnMargin = amountDesiredToPurchase / leverageDesired;
+    console.log(
+      'Amount desired',
+      amountDesiredToPurchase,
+      'leverage',
+      leverageDesired,
+      'amountAvailable',
+      amountAvailableInOysterForMargin,
+      ' amount to deposit on margin',
+      amountToDepositOnMargin
+    );
+    if (amountToDepositOnMargin > amountAvailableInOysterForMargin) {
+      setNewPosition({ ...newPosition, error: LABELS.NOT_ENOUGH_MARGIN_MESSAGE });
+      return;
+    }
+
+    const liqA = enriched[0].liquidityA;
+    const liqB = enriched[0].liquidityB;
+    const supplyRatio = liqA / liqB;
+
+    console.log('Liq A', liqA, 'liq b', liqB, 'supply ratio', supplyRatio);
+
+    // change in liquidity is amount desired (in units of B) converted to collateral units(A)
+    const chgLiqA = collateralToLiquidity(amountDesiredToPurchase, collType.info);
+    const newLiqA = liqA - chgLiqA;
+    const newLiqB = liqB + amountDesiredToPurchase;
+    const newSupplyRatio = newLiqA / newLiqB; // 75 / 100
+    console.log('chg in liq a', chgLiqA, 'new liq a', newLiqA, 'new supply ratio', newSupplyRatio);
+    const priceImpact = Math.abs(100 - 100 * (newSupplyRatio / supplyRatio)); // abs(100 - 100*(0.75 / 1)) = 25%
+    const marginToLeverage = 100 / leverageDesired;
+    console.log('priceImpact', priceImpact, 'marginToLeverage', marginToLeverage);
+    if (marginToLeverage > priceImpact) {
+      // if their marginToLeverage ratio < priceImpact, we say hey ho no go
+      setNewPosition({ ...newPosition, error: LABELS.LEVERAGE_LIMIT_MESSAGE });
+      return;
+    }
+  }, [collType, desiredType, newPosition.asset.value, newPosition.leverage, enriched]);
+
   return (
     <Card className='new-position-item new-position-item-left' bodyStyle={bodyStyle}>
       {showConfirmation ? (
@@ -44,14 +106,13 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
             onCollateralReserve={(key) => {
               const id: string = cache.byParser(LendingReserveParser).find((acc) => acc === key) || '';
               const parser = cache.get(id) as ParsedAccount<LendingReserve>;
-              const tokenMint = parser.info.collateralMint.toBase58();
-              setNewPosition({ ...newPosition, collateral: tokens.find((t) => t.mintAddress === tokenMint) });
+              setNewPosition({ ...newPosition, collateral: parser });
             }}
           />
 
           <div className='borrow-input-title'>{LABELS.MARGIN_TRADE_QUESTION}</div>
           <div className='token-input'>
-            <TokenIcon mintAddress={newPosition.asset.type?.mintAddress} />
+            <TokenIcon mintAddress={newPosition.asset.type?.info?.liquidityMint?.toBase58()} />
             <NumericInput
               value={newPosition.asset.value}
               style={{
@@ -65,7 +126,12 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
               }}
               placeholder='0.00'
             />
-            <div>{newPosition.asset.type?.tokenSymbol}</div>
+            <div>
+              {
+                tokens.find((t) => t.mintAddress === newPosition.asset.type?.info?.liquidityMint?.toBase58())
+                  ?.tokenSymbol
+              }
+            </div>
           </div>
 
           <div>
@@ -94,6 +160,7 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
                 setNewPosition({ ...newPosition, leverage });
               }}
             />
+            <p>{newPosition.error}</p>
           </div>
           <div>
             <Button type='primary'>

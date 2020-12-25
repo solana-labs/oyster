@@ -63,4 +63,7 @@ export const LABELS = {
   MARGIN_TRADE_ACTION: 'Margin Trade',
   MARGIN_TRADE_QUESTION: 'How much of this asset would you like?',
   TABLE_TITLE_BUYING_POWER: 'Total Buying Power',
+  NOT_ENOUGH_MARGIN_MESSAGE: 'Not enough buying power in oyster to make this trade at this leverage.',
+  LEVERAGE_LIMIT_MESSAGE:
+    'With liquidity pools in their current state, you are not allowed to use leverage at this multiple. You will need more margin to make this trade.',
 };

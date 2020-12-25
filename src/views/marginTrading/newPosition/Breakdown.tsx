@@ -2,6 +2,7 @@ import { Progress, Slider, Card, Statistic } from 'antd';
 import React, { useState } from 'react';
 import { Position } from './interfaces';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import tokens from '../../../config/tokens.json';
 
 export function Breakdown({ item }: { item: Position }) {
   let myPart = (item.asset?.value || 0) / item.leverage;
@@ -10,6 +11,7 @@ export function Breakdown({ item }: { item: Position }) {
   const myColor = 'blue';
   const gains = 'green';
   const losses = 'red';
+  const token = tokens.find((t) => t.mintAddress === item.asset.type?.info?.liquidityMint?.toBase58());
 
   const [myGain, setMyGain] = useState<number>(0);
   const profitPart = (myPart + brokeragePart) * (myGain / 100);
@@ -64,7 +66,7 @@ export function Breakdown({ item }: { item: Position }) {
             value={brokeragePart}
             precision={2}
             valueStyle={{ color: brokerageColor }}
-            suffix={item.asset?.type?.tokenName}
+            suffix={token?.tokenSymbol}
           />
         </Card>
         <Card>
@@ -73,7 +75,7 @@ export function Breakdown({ item }: { item: Position }) {
             value={myPart}
             precision={2}
             valueStyle={{ color: myColor }}
-            suffix={item.asset?.type?.tokenName}
+            suffix={token?.tokenSymbol}
           />
         </Card>
         <Card>
@@ -82,7 +84,7 @@ export function Breakdown({ item }: { item: Position }) {
             value={profitPart}
             precision={2}
             valueStyle={{ color: profitPart > 0 ? gains : losses }}
-            suffix={item.asset?.type?.tokenSymbol}
+            suffix={token?.tokenSymbol}
             prefix={profitPart > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
           />
         </Card>

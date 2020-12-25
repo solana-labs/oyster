@@ -1,13 +1,9 @@
-import {
-  PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import BN from "bn.js";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
-import { LendingInstruction } from "./lending";
-import * as BufferLayout from "buffer-layout";
-import * as Layout from "./../../utils/layout";
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js';
+import BN from 'bn.js';
+import { LendingInstruction } from './lending';
+import * as BufferLayout from 'buffer-layout';
+import * as Layout from './../../utils/layout';
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
 
 /// Repay loaned tokens to a reserve and receive collateral tokens. The obligation balance
 /// will be recalculated for interest.
@@ -37,10 +33,7 @@ export const repayInstruction = (
   obligationInput: PublicKey,
   authority: PublicKey
 ): TransactionInstruction => {
-  const dataLayout = BufferLayout.struct([
-    BufferLayout.u8("instruction"),
-    Layout.uint64("liquidityAmount"),
-  ]);
+  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('liquidityAmount')]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(

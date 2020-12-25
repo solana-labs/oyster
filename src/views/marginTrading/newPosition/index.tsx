@@ -18,17 +18,12 @@ export const NewPosition = () => {
     asset: { value: 0 },
   });
 
-  const assetTokenType = tokens.find((t) => t.mintAddress === lendingReserve?.info?.liquidityMint?.toBase58());
   if (!lendingReserve) {
     return null;
   }
 
-  if (!assetTokenType) {
-    return null;
-  } else {
-    if (newPosition.asset.type != assetTokenType) {
-      setNewPosition({ ...newPosition, asset: { value: newPosition.asset.value, type: assetTokenType } });
-    }
+  if (!newPosition.asset.type) {
+    setNewPosition({ ...newPosition, asset: { value: newPosition.asset.value, type: lendingReserve } });
   }
 
   return (

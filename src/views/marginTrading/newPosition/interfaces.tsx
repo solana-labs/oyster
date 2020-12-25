@@ -1,3 +1,6 @@
+import { ParsedAccount } from '../../../contexts/accounts';
+import { LendingReserve } from '../../../models/lending/reserve';
+
 export interface Token {
   mintAddress: string;
   tokenName: string;
@@ -7,9 +10,10 @@ export interface Token {
 export interface Position {
   id?: number | null;
   leverage: number;
-  collateral?: Token;
+  collateral?: ParsedAccount<LendingReserve>;
   asset: {
-    type?: Token;
+    type?: ParsedAccount<LendingReserve>;
     value: number;
   };
+  error?: string;
 }
