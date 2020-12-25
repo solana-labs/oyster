@@ -15,7 +15,7 @@ export const NewPosition = () => {
   const [newPosition, setNewPosition] = useState<Position>({
     id: null,
     leverage: 1,
-    asset: { value: 0 },
+    asset: { value: '0' },
   });
 
   if (!lendingReserve) {

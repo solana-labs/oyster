@@ -13,7 +13,7 @@ export interface Position {
   collateral?: ParsedAccount<LendingReserve>;
   asset: {
     type?: ParsedAccount<LendingReserve>;
-    value: number;
+    value: string; // because NumericInput returns strings and I dont want to deal with fixing it right now
   };
   error?: string;
 }

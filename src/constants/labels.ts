@@ -66,4 +66,5 @@ export const LABELS = {
   NOT_ENOUGH_MARGIN_MESSAGE: 'Not enough buying power in oyster to make this trade at this leverage.',
   LEVERAGE_LIMIT_MESSAGE:
     'With liquidity pools in their current state, you are not allowed to use leverage at this multiple. You will need more margin to make this trade.',
+  NO_DEPOSIT_MESSAGE: 'You need to deposit coin of this type into oyster before trading with it on margin.',
 };

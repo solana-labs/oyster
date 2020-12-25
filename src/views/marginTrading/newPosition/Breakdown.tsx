@@ -5,8 +5,8 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import tokens from '../../../config/tokens.json';
 
 export function Breakdown({ item }: { item: Position }) {
-  let myPart = (item.asset?.value || 0) / item.leverage;
-  const brokeragePart = (item.asset?.value || 0) - myPart;
+  let myPart = parseFloat(item.asset?.value || '0') / item.leverage;
+  const brokeragePart = parseFloat(item.asset?.value || '0') - myPart;
   const brokerageColor = 'brown';
   const myColor = 'blue';
   const gains = 'green';
