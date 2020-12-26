@@ -11,14 +11,14 @@ import {
   initReserveInstruction,
   LendingReserve,
 } from "./../models/lending";
-import { AccountLayout, Token } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
+import { AccountLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../constants/ids";
 import {
   createUninitializedAccount,
   ensureSplAccount,
   findOrCreateAccountByMint,
 } from "./account";
-import { TokenAccount } from "../models";
+import { approve, TokenAccount } from "../models";
 
 export const deposit = async (
   from: TokenAccount,
@@ -60,15 +60,13 @@ export const deposit = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      fromAccount,
-      authority,
-      wallet.publicKey,
-      [],
-      amountLamports
-    )
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    amountLamports
   );
 
   let toAccount: PublicKey;

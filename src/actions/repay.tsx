@@ -11,7 +11,7 @@ import { repayInstruction } from "./../models/lending/repay";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
-import { LendingObligation, TokenAccount } from "../models";
+import { approve, LendingObligation, TokenAccount } from "../models";
 import { ParsedAccount } from "../contexts/accounts";
 
 export const repay = async (
@@ -53,15 +53,13 @@ export const repay = async (
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      fromAccount,
-      authority,
-      wallet.publicKey,
-      [],
-      amountLamports
-    )
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    amountLamports
   );
 
   // get destination account
@@ -76,15 +74,13 @@ export const repay = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      obligationToken.pubkey,
-      authority,
-      wallet.publicKey,
-      [],
-      obligationToken.info.amount.toNumber()
-    )
+  approve(
+    instructions,
+    cleanupInstructions,
+    obligationToken.pubkey,
+    authority,
+    wallet.publicKey,
+    obligationToken.info.amount.toNumber()
   );
 
   // TODO: add obligation

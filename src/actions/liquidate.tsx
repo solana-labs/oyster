@@ -11,7 +11,7 @@ import { liquidateInstruction } from "./../models/lending/liquidate";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { createTempMemoryAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
-import { LendingMarket, LendingObligation, TokenAccount } from "../models";
+import { approve, LendingMarket, LendingObligation, TokenAccount } from "../models";
 import { cache, ParsedAccount } from "../contexts/accounts";
 
 export const liquidate = async (
@@ -58,15 +58,13 @@ export const liquidate = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      fromAccount,
-      authority,
-      wallet.publicKey,
-      [],
-      amountLamports
-    )
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    amountLamports
   );
 
   // get destination account

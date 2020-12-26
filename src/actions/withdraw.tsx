@@ -10,7 +10,7 @@ import { LendingReserve, withdrawInstruction } from "./../models/lending";
 import { AccountLayout, Token } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
 import { findOrCreateAccountByMint } from "./account";
-import { TokenAccount } from "../models";
+import { approve, TokenAccount } from "../models";
 
 export const withdraw = async (
   from: TokenAccount, // CollateralAccount
@@ -43,15 +43,13 @@ export const withdraw = async (
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
+  approve(
+      instructions,
+      cleanupInstructions,
       fromAccount,
       authority,
       wallet.publicKey,
-      [],
       amountLamports
-    )
   );
 
   // get destination account

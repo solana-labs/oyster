@@ -25,6 +25,7 @@ import {
   LendingMarket,
   BorrowAmountType,
   LendingObligation,
+  approve,
 } from "../models";
 import { toLamports } from "../utils/utils";
 
@@ -161,15 +162,13 @@ export const borrow = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      fromAccount,
-      authority,
-      wallet.publicKey,
-      [],
-      fromLamports
-    )
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    fromLamports
   );
 
   const dexMarketAddress = borrowReserve.info.dexMarketOption
