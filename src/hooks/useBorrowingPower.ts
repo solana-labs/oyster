@@ -5,7 +5,9 @@ import { useLendingMarket } from "./useLendingMarket";
 import { useLendingReserve } from "./useLendingReserves";
 import { useUserDeposits } from "./useUserDeposits";
 
-export function useBorrowingPower(reserveAddress: string | PublicKey) {
+// TODO: add option to decrease buying power by overcollateralization factor
+
+export function useBorrowingPower(reserveAddress: string | PublicKey, overcollateralize = true) {
   const key = useMemo(() => typeof reserveAddress === 'string' ? reserveAddress : reserveAddress.toBase58(), [reserveAddress]);
   const exclude = useMemo(() => new Set([key]), [key]);
   const { totalInQuote  } = useUserDeposits(exclude)
