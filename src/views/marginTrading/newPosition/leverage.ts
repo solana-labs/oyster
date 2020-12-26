@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { LABELS } from '../../../constants';
 import { useEnrichedPools } from '../../../contexts/market';
 import { useUserDeposits } from '../../../hooks';
-import { collateralToLiquidity, liquidityToCollateral } from '../../../models';
 import { usePoolForBasket } from '../../../utils/pools';
 import { Position } from './interfaces';
 
@@ -39,10 +38,11 @@ export function useLeverage({
       return;
     }
 
+    // If there is more of A than B
+    const exchangeRate = enriched[0].liquidityB / enriched[0].liquidityA;
     const amountDesiredToPurchase = parseFloat(newPosition.asset.value);
     const leverageDesired = newPosition.leverage;
-
-    const amountAvailableInOysterForMargin = collateralToLiquidity(collateralDeposit.info.amount, desiredType.info);
+    const amountAvailableInOysterForMargin = collateralDeposit.info.amount * exchangeRate;
     const amountToDepositOnMargin = amountDesiredToPurchase / leverageDesired;
 
     if (amountToDepositOnMargin > amountAvailableInOysterForMargin) {
@@ -55,7 +55,7 @@ export function useLeverage({
     const supplyRatio = liqA / liqB;
 
     // change in liquidity is amount desired (in units of B) converted to collateral units(A)
-    const chgLiqA = liquidityToCollateral(amountDesiredToPurchase, desiredType.info);
+    const chgLiqA = amountDesiredToPurchase / exchangeRate;
     const newLiqA = liqA - chgLiqA;
     const newLiqB = liqB + amountDesiredToPurchase;
     const newSupplyRatio = newLiqA / newLiqB;

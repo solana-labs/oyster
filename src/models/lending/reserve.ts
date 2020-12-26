@@ -184,5 +184,6 @@ export const collateralToLiquidity = (collateralAmount: BN | number, reserve?: L
 
 export const liquidityToCollateral = (liquidityAmount: BN | number, reserve?: LendingReserve) => {
   const amount = typeof liquidityAmount === 'number' ? liquidityAmount : liquidityAmount.toNumber();
+  console.log('Exchange rate:', collateralExchangeRate(reserve));
   return Math.floor(amount * collateralExchangeRate(reserve));
 };
