@@ -7,8 +7,8 @@ import {
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
-import { AccountLayout, MintInfo, MintLayout, Token } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants/ids";
+import { AccountLayout, MintInfo, MintLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../constants/ids";
 import {
   createTempMemoryAccount,
   createUninitializedAccount,
