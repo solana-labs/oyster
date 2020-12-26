@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Position } from './interfaces';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import tokens from '../../../config/tokens.json';
+import GainsChart from './GainsChart';
 
 export function Breakdown({ item }: { item: Position }) {
   let myPart = parseFloat(item.asset?.value || '0') / item.leverage;
@@ -89,6 +90,7 @@ export function Breakdown({ item }: { item: Position }) {
           />
         </Card>
       </div>
+      <GainsChart item={item} priceChange={myGain} />
       {progressBar}
     </div>
   );
