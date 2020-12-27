@@ -126,6 +126,7 @@ function updateChartData({
 }
 
 function drawLabels(t: any, ctx: any, leverage: number, priceChange: number) {
+  console.log('drawing');
   ctx.save();
   ctx.font = 'normal normal bold 15px /1.5 Muli';
   ctx.textBaseline = 'bottom';
@@ -161,23 +162,33 @@ function drawLabels(t: any, ctx: any, leverage: number, priceChange: number) {
 
 export default function GainsChart({ item, priceChange }: { item: Position; priceChange: number }) {
   const chartRef = useRef<any>();
+  const [booted, setBooted] = useState<boolean>(false);
+  const [canvas, setCanvas] = useState<any>();
   useEffect(() => {
     if (chartRef.current.chartInstance) updateChartData({ item, priceChange, chartRef });
   }, [priceChange, item.leverage]);
 
-  return useMemo(
+  useEffect(() => {
+    if (chartRef.current && !booted && canvas) {
+      //@ts-ignore
+      const originalController = window.Chart.controllers.line;
+      //@ts-ignore
+      window.Chart.controllers.line = Chart.controllers.line.extend({
+        draw: function () {
+          originalController.prototype.draw.call(this, arguments);
+          drawLabels(this, canvas.getContext('2d'), item.leverage, priceChange);
+        },
+      });
+      setBooted(true);
+    }
+  }, [chartRef, canvas]);
+
+  const chart = useMemo(
     () => (
       <Line
         ref={chartRef}
         data={(canvas: any) => {
-          const originalController = chartRef.current?.chartInstance?.controllers?.line;
-          if (originalController)
-            chartRef.current.chartInstance.controllers.line = chartRef.current.chartInstance.controllers.line.extend({
-              draw: function () {
-                originalController.prototype.draw.call(this, arguments);
-                drawLabels(this, canvas.getContext('2d'), item.leverage, priceChange);
-              },
-            });
+          setCanvas(canvas);
           return getChartData({ item, priceChange });
         }}
         options={{
@@ -226,5 +237,23 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
       />
     ),
     []
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
+      {chart}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span>past</span>
+        <span>today</span>
+        <span>future</span>
+      </div>
+    </div>
   );
 }
