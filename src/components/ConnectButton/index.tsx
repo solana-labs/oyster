@@ -8,9 +8,9 @@ export const ConnectButton = (
   props: ButtonProps & React.RefAttributes<HTMLElement>
 ) => {
   const { wallet, connected } = useWallet();
-  const { onClick, children, ...rest } = props;
+  const { onClick, children, disabled, ...rest } = props;
   return (
-    <Button {...rest} onClick={connected ? onClick : wallet.connect}>
+    <Button {...rest} onClick={connected ? onClick : wallet.connect} disabled={connected && disabled}>
       {connected ? props.children : LABELS.CONNECT_LABEL}
     </Button>
   );
