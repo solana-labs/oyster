@@ -25,7 +25,7 @@ export const useSliderInput = (
     pct,
     setPct: useCallback(
       (val: number) => {
-        setType(InputType.AbsoluteValue);
+        setType(InputType.Percent);
         setPct(val);
         setValue(convert(val) as string);
       },
