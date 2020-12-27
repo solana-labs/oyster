@@ -42,72 +42,73 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
             justifyContent: 'space-around',
           }}
         >
-          <div className='borrow-input-title'>{LABELS.SELECT_COLLATERAL}</div>
-          <CollateralSelector
-            reserve={lendingReserve.info}
-            onCollateralReserve={(key) => {
-              const id: string = cache.byParser(LendingReserveParser).find((acc) => acc === key) || '';
-              const parser = cache.get(id) as ParsedAccount<LendingReserve>;
-              setNewPosition({ ...newPosition, collateral: parser });
-            }}
-          />
+          <p>{newPosition.error}</p>
 
-          <div className='borrow-input-title'>{LABELS.MARGIN_TRADE_QUESTION}</div>
-          <div className='token-input'>
-            <TokenIcon mintAddress={newPosition.asset.type?.info?.liquidityMint?.toBase58()} />
-            <NumericInput
-              value={newPosition.asset.value}
-              style={{
-                fontSize: 20,
-                boxShadow: 'none',
-                borderColor: 'transparent',
-                outline: 'transparent',
+          <p>{LABELS.MARGIN_TRADE_CHOOSE_COLLATERAL_AND_LEVERAGE}</p>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+            <CollateralSelector
+              reserve={lendingReserve.info}
+              onCollateralReserve={(key) => {
+                const id: string = cache.byParser(LendingReserveParser).find((acc) => acc === key) || '';
+                const parser = cache.get(id) as ParsedAccount<LendingReserve>;
+                setNewPosition({ ...newPosition, collateral: parser });
               }}
-              onChange={(v: string) => {
-                setNewPosition({
-                  ...newPosition,
-                  asset: { ...newPosition.asset, value: v },
-                });
-              }}
-              placeholder='0.00'
             />
-            <div>
-              {
-                tokens.find((t) => t.mintAddress === newPosition.asset.type?.info?.liquidityMint?.toBase58())
-                  ?.tokenSymbol
-              }
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <Radio.Group
+                defaultValue={newPosition.leverage}
+                size='large'
+                onChange={(e) => {
+                  setNewPosition({ ...newPosition, leverage: e.target.value });
+                }}
+              >
+                <Radio.Button value={1}>1x</Radio.Button>
+                <Radio.Button value={2}>2x</Radio.Button>
+                <Radio.Button value={3}>3x</Radio.Button>
+                <Radio.Button value={4}>4x</Radio.Button>
+                <Radio.Button value={5}>5x</Radio.Button>
+              </Radio.Group>
+              <NumericInput
+                value={newPosition.leverage}
+                style={{
+                  maxWidth: '75px',
+                }}
+                onChange={(leverage: number) => {
+                  setNewPosition({ ...newPosition, leverage });
+                }}
+              />
             </div>
           </div>
+          <br />
+          <p>{LABELS.MARGIN_TRADE_QUESTION}</p>
 
-          <div>
-            <Radio.Group
-              defaultValue={newPosition.leverage}
-              size='large'
-              onChange={(e) => {
-                setNewPosition({ ...newPosition, leverage: e.target.value });
-              }}
-            >
-              <Radio.Button value={1}>1x</Radio.Button>
-              <Radio.Button value={2}>2x</Radio.Button>
-              <Radio.Button value={3}>3x</Radio.Button>
-              <Radio.Button value={4}>4x</Radio.Button>
-              <Radio.Button value={5}>5x</Radio.Button>
-            </Radio.Group>
-            <NumericInput
-              value={newPosition.leverage}
-              style={{
-                fontSize: 20,
-                boxShadow: 'none',
-                borderColor: 'transparent',
-                outline: 'transparent',
-              }}
-              onChange={(leverage: number) => {
-                setNewPosition({ ...newPosition, leverage });
-              }}
-            />
-            <p>{newPosition.error}</p>
-          </div>
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch' }}>
+            <div className='token-input'>
+              <TokenIcon mintAddress={newPosition.asset.type?.info?.liquidityMint?.toBase58()} />
+              <NumericInput
+                value={newPosition.asset.value}
+                style={{
+                  fontSize: 20,
+                  boxShadow: 'none',
+                  borderColor: 'transparent',
+                  outline: 'transparent',
+                }}
+                onChange={(v: string) => {
+                  setNewPosition({
+                    ...newPosition,
+                    asset: { ...newPosition.asset, value: v },
+                  });
+                }}
+                placeholder='0.00'
+              />
+              <div>
+                {
+                  tokens.find((t) => t.mintAddress === newPosition.asset.type?.info?.liquidityMint?.toBase58())
+                    ?.tokenSymbol
+                }
+              </div>
+            </div>
+
             <Button type='primary'>
               <span>{LABELS.TRADING_ADD_POSITION}</span>
             </Button>

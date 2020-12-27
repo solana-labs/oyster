@@ -21,7 +21,7 @@ export class NumericInput extends React.Component<any, any> {
     if (value.startsWith && (value.startsWith('.') || value.startsWith('-.'))) {
       valueTemp = valueTemp.replace('.', '0.');
     }
-    onChange?.(valueTemp.replace(/0*(\d+)/, '$1'));
+    if (valueTemp.replace) onChange?.(valueTemp.replace(/0*(\d+)/, '$1'));
     if (onBlur) {
       onBlur();
     }

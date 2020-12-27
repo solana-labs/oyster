@@ -61,7 +61,8 @@ export const LABELS = {
   TRADING_TABLE_TITLE_ACTIONS: 'Action',
   TRADING_ADD_POSITION: 'Add Position',
   MARGIN_TRADE_ACTION: 'Margin Trade',
-  MARGIN_TRADE_QUESTION: 'How much of this asset would you like?',
+  MARGIN_TRADE_CHOOSE_COLLATERAL_AND_LEVERAGE: 'Please choose your collateral and leverage.',
+  MARGIN_TRADE_QUESTION: 'Please choose how much of this asset you wish to purchase.',
   TABLE_TITLE_BUYING_POWER: 'Total Buying Power',
   NOT_ENOUGH_MARGIN_MESSAGE: 'Not enough buying power in oyster to make this trade at this leverage.',
   LEVERAGE_LIMIT_MESSAGE:
