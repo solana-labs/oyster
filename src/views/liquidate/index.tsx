@@ -3,7 +3,7 @@ import { LABELS } from "../../constants";
 import { LiquidateItem } from "./item";
 import { useEnrichedLendingObligations } from "./../../hooks";
 import "./style.less";
-import { Card, Col, Row, Statistic } from "antd";
+import { Card, Col, Row, Statistic, Typography } from "antd";
 import { BarChartStatistic } from "../../components/BarChartStatistic";
 
 export const LiquidateView = () => {
@@ -30,6 +30,14 @@ export const LiquidateView = () => {
         <div className="liquidate-info">{LABELS.LIQUIDATE_NO_LOANS}</div>
       ) : (
           <div className="flexColumn">
+            <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]}
+              className="home-info-row" >
+              <Card>
+                <Typography>
+                {LABELS.LIQUIDATION_INFO}
+                 </Typography>
+              </Card>
+            </Row>
             <Row
               gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]}
               className="home-info-row" >
