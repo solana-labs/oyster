@@ -22,7 +22,7 @@ export const CollateralItem = (props: {
   } = props;
 
   return (
-   <>
+    <>
       <div
         style={{ display: "flex", alignItems: "center" }}
       >
@@ -32,10 +32,10 @@ export const CollateralItem = (props: {
           className="token-balance"
         >
           &nbsp;{" "}
-          {userDeposit ? formatAmount(userDeposit.info.amount): '--'}
+          {userDeposit ? formatAmount(userDeposit.info.amount) : '--'}
         </span>
       </div>
-      </>
+    </>
   );
 }
 
@@ -52,8 +52,11 @@ export const CollateralSelector = (props: {
   const market = cache.get(props.reserve?.lendingMarket) as ParsedAccount<
     LendingMarket
   >;
-  const onlyQuoteAllowed = props.reserve?.liquidityMint?.toBase58() !== 
-    market?.info?.quoteMint?.toBase58();
+
+  const quoteMintAddress = market?.info?.quoteMint?.toBase58();
+
+  const onlyQuoteAllowed = props.reserve?.liquidityMint?.toBase58() !==
+    quoteMintAddress;
 
   return (
     <Select
