@@ -65,7 +65,8 @@ export const LABELS = {
   MARGIN_TRADE_QUESTION: 'Please choose how much of this asset you wish to purchase.',
   TABLE_TITLE_BUYING_POWER: 'Total Buying Power',
   NOT_ENOUGH_MARGIN_MESSAGE: 'Not enough buying power in oyster to make this trade at this leverage.',
-  LEVERAGE_LIMIT_MESSAGE:
-    'With liquidity pools in their current state, you are not allowed to use leverage at this multiple. You will need more margin to make this trade.',
+  SET_MORE_MARGIN_MESSAGE: 'You need more margin to match this leverage amount to make this trade.',
+  LEVERAGE_LIMIT_MESSAGE: 'You will need more margin to make this trade.',
   NO_DEPOSIT_MESSAGE: 'You need to deposit coin of this type into oyster before trading with it on margin.',
+  NO_COLL_TYPE_MESSAGE: 'Choose Collateral CCY',
 };

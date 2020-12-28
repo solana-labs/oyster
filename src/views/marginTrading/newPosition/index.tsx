@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { useLendingReserve, useTokenName } from '../../../hooks';
+import { useLendingReserve } from '../../../hooks';
 import { useParams } from 'react-router-dom';
 import './style.less';
-import tokens from '../../../config/tokens.json';
 
-import { SideReserveOverview, SideReserveOverviewMode } from '../../../components/SideReserveOverview';
 import NewPositionForm from './NewPositionForm';
 import { Position } from './interfaces';
-import { useEffect } from 'react';
+import Breakdown from './Breakdown';
+import PoolHealth from './PoolHealth';
 
 export const NewPosition = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +14,8 @@ export const NewPosition = () => {
   const [newPosition, setNewPosition] = useState<Position>({
     id: null,
     leverage: 1,
-    asset: { value: '0' },
+    collateral: {},
+    asset: {},
   });
 
   if (!lendingReserve) {
@@ -29,12 +29,11 @@ export const NewPosition = () => {
   return (
     <div className='new-position'>
       <div className='new-position-container'>
-        <NewPositionForm lendingReserve={lendingReserve} newPosition={newPosition} setNewPosition={setNewPosition} />
-        <SideReserveOverview
-          className='new-position-item new-position-item-right'
-          reserve={lendingReserve}
-          mode={SideReserveOverviewMode.Borrow}
-        />
+        <div className='new-position-item-left'>
+          <NewPositionForm lendingReserve={lendingReserve} newPosition={newPosition} setNewPosition={setNewPosition} />
+          <PoolHealth newPosition={newPosition} />
+        </div>
+        <Breakdown item={newPosition} />
       </div>
     </div>
   );

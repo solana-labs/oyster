@@ -272,6 +272,7 @@ export const useEnrichedPools = (pools: PoolInfo[]) => {
       dispose && dispose();
       subscriptions.forEach((dispose) => dispose && dispose());
     };
+    // Do not add pools here, causes a really bad infinite rendering loop. Use poolKeys instead.
   }, [tokenMap, dailyVolume, poolKeys, subscribeToMarket, marketEmitter, marketsByMint]);
 
   return enriched;

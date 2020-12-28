@@ -1,21 +1,64 @@
-import { Button, Card, Radio } from 'antd';
+import { Button, Card } from 'antd';
 import React, { useState } from 'react';
 import { ActionConfirmation } from '../../../components/ActionConfirmation';
-import { NumericInput } from '../../../components/Input/numeric';
-import { TokenIcon } from '../../../components/TokenIcon';
 import { LABELS } from '../../../constants';
 import { cache, ParsedAccount } from '../../../contexts/accounts';
 import { LendingReserve, LendingReserveParser } from '../../../models/lending/reserve';
 import { Position } from './interfaces';
-import tokens from '../../../config/tokens.json';
-import { CollateralSelector } from '../../../components/CollateralSelector';
-import { Breakdown } from './Breakdown';
 import { useLeverage } from './leverage';
+import CollateralInput from '../../../components/CollateralInput';
+import { usePoolAndTradeInfoFrom } from './utils';
+import { UserDeposit } from '../../../hooks';
+import { ArrowDownOutlined } from '@ant-design/icons';
+import { useWallet } from '../../../contexts/wallet';
 
 interface NewPositionFormProps {
   lendingReserve: ParsedAccount<LendingReserve>;
   newPosition: Position;
   setNewPosition: (pos: Position) => void;
+}
+
+export const generateActionLabel = (connected: boolean, newPosition: Position) => {
+  return !connected ? LABELS.CONNECT_LABEL : newPosition.error ? newPosition.error : LABELS.TRADING_ADD_POSITION;
+};
+
+function onUserChangesLeverageOrCollateralValue({
+  newPosition,
+  setNewPosition,
+  collateralDeposit,
+  enrichedPools,
+}: {
+  newPosition: Position;
+  setNewPosition: (pos: Position) => void;
+  enrichedPools: any[];
+  collateralDeposit: UserDeposit | undefined;
+}) {
+  setNewPosition(newPosition); // It has always changed, need to guarantee save
+  // if user changes leverage, we need to adjust the amount they desire up.
+  if (collateralDeposit && enrichedPools.length) {
+    const exchangeRate = enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
+    const convertedAmount = (newPosition.collateral.value || 0) * newPosition.leverage * exchangeRate;
+    setNewPosition({ ...newPosition, asset: { ...newPosition.asset, value: convertedAmount } });
+  }
+}
+
+function onUserChangesAssetValue({
+  newPosition,
+  setNewPosition,
+  collateralDeposit,
+  enrichedPools,
+}: {
+  newPosition: Position;
+  setNewPosition: (pos: Position) => void;
+  enrichedPools: any[];
+  collateralDeposit: UserDeposit | undefined;
+}) {
+  setNewPosition(newPosition); // It has always changed, need to guarantee save
+  if (collateralDeposit && enrichedPools.length) {
+    const exchangeRate = enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
+    const convertedAmount = (newPosition.asset.value || 0) / (exchangeRate * newPosition.leverage);
+    setNewPosition({ ...newPosition, collateral: { ...newPosition.collateral, value: convertedAmount } });
+  }
 }
 
 export default function NewPositionForm({ lendingReserve, newPosition, setNewPosition }: NewPositionFormProps) {
@@ -27,11 +70,12 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
     height: '100%',
   };
   const [showConfirmation, setShowConfirmation] = useState(false);
-
+  const { enrichedPools, collateralDeposit } = usePoolAndTradeInfoFrom(newPosition);
   useLeverage({ newPosition, setNewPosition });
+  const { wallet, connected } = useWallet();
 
   return (
-    <Card className='new-position-item new-position-item-left' bodyStyle={bodyStyle}>
+    <Card className='new-position-item new-position-item-top-left' bodyStyle={bodyStyle}>
       {showConfirmation ? (
         <ActionConfirmation onClose={() => setShowConfirmation(false)} />
       ) : (
@@ -42,78 +86,76 @@ export default function NewPositionForm({ lendingReserve, newPosition, setNewPos
             justifyContent: 'space-around',
           }}
         >
-          <p>{newPosition.error}</p>
-
-          <p>{LABELS.MARGIN_TRADE_CHOOSE_COLLATERAL_AND_LEVERAGE}</p>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
-            <CollateralSelector
+            <CollateralInput
+              title='Collateral'
               reserve={lendingReserve.info}
+              amount={newPosition.collateral.value}
+              onInputChange={(val: number | null) => {
+                const newPos = { ...newPosition, collateral: { ...newPosition.collateral, value: val } };
+                onUserChangesLeverageOrCollateralValue({
+                  newPosition: newPos,
+                  setNewPosition,
+                  enrichedPools,
+                  collateralDeposit,
+                });
+              }}
               onCollateralReserve={(key) => {
                 const id: string = cache.byParser(LendingReserveParser).find((acc) => acc === key) || '';
                 const parser = cache.get(id) as ParsedAccount<LendingReserve>;
-                setNewPosition({ ...newPosition, collateral: parser });
+                const newPos = { ...newPosition, collateral: { value: newPosition.collateral.value, type: parser } };
+                onUserChangesLeverageOrCollateralValue({
+                  newPosition: newPos,
+                  setNewPosition,
+                  enrichedPools,
+                  collateralDeposit,
+                });
               }}
+              showLeverageSelector={true}
+              onLeverage={(leverage: number) => {
+                const newPos = { ...newPosition, leverage };
+                onUserChangesLeverageOrCollateralValue({
+                  newPosition: newPos,
+                  setNewPosition,
+                  enrichedPools,
+                  collateralDeposit,
+                });
+              }}
+              leverage={newPosition.leverage}
             />
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <Radio.Group
-                defaultValue={newPosition.leverage}
-                size='large'
-                onChange={(e) => {
-                  setNewPosition({ ...newPosition, leverage: e.target.value });
-                }}
-              >
-                <Radio.Button value={1}>1x</Radio.Button>
-                <Radio.Button value={2}>2x</Radio.Button>
-                <Radio.Button value={3}>3x</Radio.Button>
-                <Radio.Button value={4}>4x</Radio.Button>
-                <Radio.Button value={5}>5x</Radio.Button>
-              </Radio.Group>
-              <NumericInput
-                value={newPosition.leverage}
-                style={{
-                  maxWidth: '75px',
-                }}
-                onChange={(leverage: number) => {
-                  setNewPosition({ ...newPosition, leverage });
-                }}
-              />
-            </div>
           </div>
-          <br />
-          <p>{LABELS.MARGIN_TRADE_QUESTION}</p>
+          <ArrowDownOutlined />
 
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch' }}>
-            <div className='token-input'>
-              <TokenIcon mintAddress={newPosition.asset.type?.info?.liquidityMint?.toBase58()} />
-              <NumericInput
-                value={newPosition.asset.value}
-                style={{
-                  fontSize: 20,
-                  boxShadow: 'none',
-                  borderColor: 'transparent',
-                  outline: 'transparent',
-                }}
-                onChange={(v: string) => {
-                  setNewPosition({
-                    ...newPosition,
-                    asset: { ...newPosition.asset, value: v },
+            {newPosition.asset.type && (
+              <CollateralInput
+                title='Choose trade'
+                reserve={newPosition.asset.type.info}
+                amount={newPosition.asset.value}
+                onInputChange={(val: number | null) => {
+                  const newPos = { ...newPosition, asset: { ...newPosition.asset, value: val } };
+                  onUserChangesAssetValue({
+                    newPosition: newPos,
+                    setNewPosition,
+                    enrichedPools,
+                    collateralDeposit,
                   });
                 }}
-                placeholder='0.00'
+                disabled
+                hideBalance={true}
               />
-              <div>
-                {
-                  tokens.find((t) => t.mintAddress === newPosition.asset.type?.info?.liquidityMint?.toBase58())
-                    ?.tokenSymbol
-                }
-              </div>
-            </div>
-
-            <Button type='primary'>
-              <span>{LABELS.TRADING_ADD_POSITION}</span>
+            )}
+            <Button
+              className='trade-button'
+              type='primary'
+              size='large'
+              onClick={connected ? null : wallet.connect}
+              style={{ width: '100%' }}
+              disabled={connected && !!newPosition.error}
+            >
+              <span>{generateActionLabel(connected, newPosition)}</span>
             </Button>
           </div>
-          <Breakdown item={newPosition} />
         </div>
       )}
     </Card>

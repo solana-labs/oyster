@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { LABELS } from '../../../constants';
-import { useEnrichedPools } from '../../../contexts/market';
-import { useUserDeposits } from '../../../hooks';
-import { usePoolForBasket } from '../../../utils/pools';
 import { Position } from './interfaces';
+import { usePoolAndTradeInfoFrom } from './utils';
 
 export function useLeverage({
   newPosition,
@@ -12,52 +10,57 @@ export function useLeverage({
   newPosition: Position;
   setNewPosition: (pos: Position) => void;
 }) {
-  const collType = newPosition.collateral;
-  const desiredType = newPosition.asset.type;
-
-  const pool = usePoolForBasket([
-    collType?.info?.liquidityMint?.toBase58(),
-    desiredType?.info?.liquidityMint?.toBase58(),
-  ]);
-
-  const userDeposits = useUserDeposits();
-  const collateralDeposit = userDeposits.userDeposits.find(
-    (u) => u.reserve.info.liquidityMint.toBase58() == collType?.info?.liquidityMint?.toBase58()
-  );
-  const enriched = useEnrichedPools(pool ? [pool] : []);
+  const {
+    enrichedPools,
+    collateralDeposit,
+    collType,
+    desiredType,
+    collValue,
+    desiredValue,
+    leverage,
+  } = usePoolAndTradeInfoFrom(newPosition);
 
   // Leverage validation - if you choose this leverage, is it allowable, with your buying power and with
   // the pool we have to cover you?
   useEffect(() => {
+    if (!collType) {
+      setNewPosition({ ...newPosition, error: LABELS.NO_COLL_TYPE_MESSAGE });
+      return;
+    }
+
     if (!collateralDeposit) {
       setNewPosition({ ...newPosition, error: LABELS.NO_DEPOSIT_MESSAGE });
       return;
     }
 
-    if (!collType || !desiredType || !newPosition.asset.value || !enriched || enriched.length == 0) {
+    if (!desiredType || !newPosition.asset.value || !enrichedPools || enrichedPools.length == 0) {
       return;
     }
 
     // If there is more of A than B
-    const exchangeRate = enriched[0].liquidityB / enriched[0].liquidityA;
-    const amountDesiredToPurchase = parseFloat(newPosition.asset.value);
+    const exchangeRate = enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
     const leverageDesired = newPosition.leverage;
     const amountAvailableInOysterForMargin = collateralDeposit.info.amount * exchangeRate;
-    const amountToDepositOnMargin = amountDesiredToPurchase / leverageDesired;
+    const amountToDepositOnMargin = desiredValue / leverageDesired;
 
     if (amountToDepositOnMargin > amountAvailableInOysterForMargin) {
       setNewPosition({ ...newPosition, error: LABELS.NOT_ENOUGH_MARGIN_MESSAGE });
       return;
     }
 
-    const liqA = enriched[0].liquidityA;
-    const liqB = enriched[0].liquidityB;
+    if (amountToDepositOnMargin > collValue) {
+      setNewPosition({ ...newPosition, error: LABELS.SET_MORE_MARGIN_MESSAGE });
+      return;
+    }
+
+    const liqA = enrichedPools[0].liquidityA;
+    const liqB = enrichedPools[0].liquidityB;
     const supplyRatio = liqA / liqB;
 
     // change in liquidity is amount desired (in units of B) converted to collateral units(A)
-    const chgLiqA = amountDesiredToPurchase / exchangeRate;
+    const chgLiqA = desiredValue / exchangeRate;
     const newLiqA = liqA - chgLiqA;
-    const newLiqB = liqB + amountDesiredToPurchase;
+    const newLiqB = liqB + desiredValue;
     const newSupplyRatio = newLiqA / newLiqB;
 
     const priceImpact = Math.abs(100 - 100 * (newSupplyRatio / supplyRatio));
@@ -69,5 +72,5 @@ export function useLeverage({
       return;
     }
     setNewPosition({ ...newPosition, error: '' });
-  }, [collType, desiredType, newPosition.asset.value, newPosition.leverage, enriched]);
+  }, [collType, desiredType, desiredValue, leverage, enrichedPools, collValue, collateralDeposit?.info.amount]);
 }

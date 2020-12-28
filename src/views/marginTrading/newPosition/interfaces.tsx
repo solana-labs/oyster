@@ -10,10 +10,13 @@ export interface Token {
 export interface Position {
   id?: number | null;
   leverage: number;
-  collateral?: ParsedAccount<LendingReserve>;
+  collateral: {
+    type?: ParsedAccount<LendingReserve>;
+    value?: number | null;
+  };
   asset: {
     type?: ParsedAccount<LendingReserve>;
-    value: string; // because NumericInput returns strings and I dont want to deal with fixing it right now
+    value?: number | null;
   };
   error?: string;
 }

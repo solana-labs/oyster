@@ -25,6 +25,7 @@
     "eventemitter3": "^4.0.7",
     "identicon.js": "^2.3.3",
     "jazzicon": "^1.5.0",
+    "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.11.1",
     "react-dom": "^16.13.1",

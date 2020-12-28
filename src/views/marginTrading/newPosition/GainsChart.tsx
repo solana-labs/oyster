@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Position } from './interfaces';
+import { debounce } from 'lodash';
 
 // Special thanks to
 // https://github.com/bZxNetwork/fulcrum_ui/blob/development/packages/fulcrum-website/assets/js/trading.js
@@ -126,7 +127,6 @@ function updateChartData({
 }
 
 function drawLabels(t: any, ctx: any, leverage: number, priceChange: number) {
-  console.log('drawing');
   ctx.save();
   ctx.font = 'normal normal bold 15px /1.5 Muli';
   ctx.textBaseline = 'bottom';
@@ -159,13 +159,14 @@ function drawLabels(t: any, ctx: any, leverage: number, priceChange: number) {
   });
   ctx.restore();
 }
+const debouncedUpdateChartData = debounce(updateChartData, 200);
 
 export default function GainsChart({ item, priceChange }: { item: Position; priceChange: number }) {
   const chartRef = useRef<any>();
   const [booted, setBooted] = useState<boolean>(false);
   const [canvas, setCanvas] = useState<any>();
   useEffect(() => {
-    if (chartRef.current.chartInstance) updateChartData({ item, priceChange, chartRef });
+    if (chartRef.current.chartInstance) debouncedUpdateChartData({ item, priceChange, chartRef });
   }, [priceChange, item.leverage]);
 
   useEffect(() => {
