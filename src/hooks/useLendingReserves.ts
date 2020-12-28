@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { LendingReserve, LendingReserveParser } from "../models/lending";
 import { cache, ParsedAccount } from "./../contexts/accounts";
 
-const getLendingReserves = () => {
+export const getLendingReserves = () => {
   return cache
     .byParser(LendingReserveParser)
     .map((id) => cache.get(id))
-    .filter((acc) => acc !== undefined) as any[];
+    .filter((acc) => acc !== undefined) as ParsedAccount<LendingReserve>[];
 };
 
 export function useLendingReserves() {

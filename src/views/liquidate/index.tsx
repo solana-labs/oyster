@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { LABELS } from "../../constants";
+import { GUTTER, LABELS } from "../../constants";
 import { LiquidateItem } from "./item";
 import { useEnrichedLendingObligations } from "./../../hooks";
 import "./style.less";
@@ -30,17 +30,17 @@ export const LiquidateView = () => {
         <div className="liquidate-info">{LABELS.LIQUIDATE_NO_LOANS}</div>
       ) : (
           <div className="flexColumn">
-            <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]}
-              className="home-info-row" >
-              <Card>
-                <Typography>
-                {LABELS.LIQUIDATION_INFO}
-                 </Typography>
-              </Card>
+            <Row gutter={GUTTER}>
+              <Col span={24}>
+                <Card>
+                  <Typography>
+                    {LABELS.LIQUIDATION_INFO}
+                  </Typography>
+                </Card>
+              </Col>
             </Row>
             <Row
-              gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]}
-              className="home-info-row" >
+              gutter={GUTTER}>
               <Col xs={24} xl={5}>
                 <Card>
                   <Statistic
@@ -81,23 +81,27 @@ export const LiquidateView = () => {
                 </Card>
               </Col>
             </Row>
-            <Card >
-              <div className="liquidate-item liquidate-header">
-                <div>{LABELS.TABLE_TITLE_ASSET}</div>
-                <div>{LABELS.TABLE_TITLE_LOAN_BALANCE}</div>
-                <div>{LABELS.TABLE_TITLE_COLLATERAL_BALANCE}</div>
-                <div>{LABELS.TABLE_TITLE_APY}</div>
-                <div>{LABELS.TABLE_TITLE_LTV}</div>
-                <div>{LABELS.TABLE_TITLE_HEALTH}</div>
-                <div>{LABELS.TABLE_TITLE_ACTION}</div>
-              </div>
-              {atRisk.map((item) => (
-                <LiquidateItem
-                  key={item.account.pubkey.toBase58()}
-                  item={item}
-                ></LiquidateItem>
-              ))}
-            </Card>
+            <Row gutter={GUTTER}>
+              <Col span={24}>
+                <Card className="card-fill">
+                  <div className="liquidate-item liquidate-header">
+                    <div>{LABELS.TABLE_TITLE_ASSET}</div>
+                    <div>{LABELS.TABLE_TITLE_LOAN_BALANCE}</div>
+                    <div>{LABELS.TABLE_TITLE_COLLATERAL_BALANCE}</div>
+                    <div>{LABELS.TABLE_TITLE_APY}</div>
+                    <div>{LABELS.TABLE_TITLE_LTV}</div>
+                    <div>{LABELS.TABLE_TITLE_HEALTH}</div>
+                    <div>{LABELS.TABLE_TITLE_ACTION}</div>
+                  </div>
+                  {atRisk.map((item) => (
+                    <LiquidateItem
+                      key={item.account.pubkey.toBase58()}
+                      item={item}
+                    ></LiquidateItem>
+                  ))}
+                </Card>
+              </Col>
+            </Row>
           </div>
         )}
     </div>

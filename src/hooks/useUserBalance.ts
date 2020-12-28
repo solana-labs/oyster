@@ -5,7 +5,8 @@ import { useMarkets } from "../contexts/market";
 import { fromLamports } from "../utils/utils";
 import { useUserAccounts } from "./useUserAccounts";
 
-export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
+export function useUserBalance(mintAddress?: PublicKey | string, account?: PublicKey) {
+  const mint = useMemo(() => typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58(), [mintAddress]);
   const { userAccounts } = useUserAccounts();
   const [balanceInUSD, setBalanceInUSD] = useState(0);
   const { marketEmitter, midPriceInUSD } = useMarkets();
@@ -15,7 +16,7 @@ export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
     return userAccounts
       .filter(
         (acc) =>
-          mint?.equals(acc.info.mint) &&
+          mint === acc.info.mint.toBase58() &&
           (!account || account.equals(acc.pubkey))
       )
       .sort((a, b) => b.info.amount.sub(a.info.amount).toNumber());
@@ -32,7 +33,7 @@ export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
 
   useEffect(() => {
     const updateBalance = () => {
-      setBalanceInUSD(balance * midPriceInUSD(mint?.toBase58() || ''));
+      setBalanceInUSD(balance * midPriceInUSD(mint || ''));
     }
 
     const dispose = marketEmitter.onMarket((args) => {
@@ -51,5 +52,6 @@ export function useUserBalance(mint?: PublicKey, account?: PublicKey) {
     balanceLamports,
     balanceInUSD,
     accounts,
+    hasBalance: accounts.length > 0 && balance > 0,
   };
 }

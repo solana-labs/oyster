@@ -1,7 +1,7 @@
 import { MintInfo } from "@solana/spl-token";
 import { Card, Col, Row, Statistic } from "antd";
 import React, { useEffect, useState } from "react";
-import { LABELS } from "../../constants";
+import { GUTTER, LABELS } from "../../constants";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useConnectionConfig } from "../../contexts/connection";
 import { useMarkets } from "../../contexts/market";
@@ -83,7 +83,7 @@ export const HomeView = () => {
   return (
     <div className="flexColumn">
       <Row 
-        gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} 
+        gutter={GUTTER} 
         className="home-info-row" >
         <Col xs={24} xl={5}>
           <Card>

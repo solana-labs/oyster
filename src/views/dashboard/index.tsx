@@ -1,6 +1,6 @@
 import { Col, Row } from "antd";
 import React from "react";
-import { LABELS } from "../../constants";
+import { GUTTER, LABELS } from "../../constants";
 import { useWallet } from "../../contexts/wallet";
 import { useUserDeposits, useUserObligations } from "./../../hooks";
 import { DashboardObligations } from "./obligation";
@@ -28,7 +28,7 @@ export const DashboardView = () => {
             {LABELS.NO_LOANS_NO_DEPOSITS}
             </div>
         )}
-      {connected && <Row gutter={[16, { xs: 8, sm: 16, md: 16, lg: 16 }]} >
+      {connected && <Row gutter={GUTTER} >
        {userDeposits.length >0 && (
        <Col md={24} xl={12}  span={24}>
           <DashboardDeposits />

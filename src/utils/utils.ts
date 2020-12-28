@@ -148,7 +148,7 @@ const abbreviateNumber = (number: number, precision: number) => {
   return scaled.toFixed(precision) + suffix;
 };
 
-const format = (val: number, precision: number, abbr: boolean) =>
+export const formatAmount = (val: number, precision: number = 6, abbr: boolean = true) =>
   abbr ? abbreviateNumber(val, precision) : val.toFixed(precision);
 
 export function formatTokenAmount(
@@ -164,7 +164,7 @@ export function formatTokenAmount(
     return "";
   }
 
-  return `${[prefix]}${format(
+  return `${[prefix]}${formatAmount(
     fromLamports(account, mint, rate),
     precision,
     abbr

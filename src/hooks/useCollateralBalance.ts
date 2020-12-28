@@ -50,6 +50,7 @@ export function useUserCollateralBalance(
     balanceInUSD,
     mint: reserve?.collateralMint,
     accounts,
+    hasBalance: accounts.length > 0 && balance > 0,
   };
 }
 export function calculateCollateralBalance(

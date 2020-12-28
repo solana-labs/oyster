@@ -231,6 +231,10 @@ em {
   flex: 1;
 }
 
+.card-fill {
+  height: 100%;
+}
+
 .card-row {
   box-sizing: border-box;
   margin: 5px 0px;
@@ -295,12 +299,28 @@ em {
   font-weight: bold;
 }
 
+.ant-select-selection-item {
+  .token-balance {
+    display: none;
+  };
+};
+
 .token-input {
   display: flex;
   align-items: center;
   border: 1px solid grey;
   padding: 0px 10px;
   margin: 5px 0px;
+}
+
+.token-balance {
+  margin-left: auto;
+  margin-right: 5px;
+  color: @text-color-secondary;
+}
+
+[class="ant-layout-header"] {
+  height: 16px !important;
 }
 
 .dashboard-amount-quote {
