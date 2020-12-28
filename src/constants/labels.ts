@@ -1,6 +1,7 @@
 export const LABELS = {
   CONNECT_LABEL: "Connect Wallet",
   GIVE_SOL: "Give me SOL",
+  LIQUIDATION_INFO: "This view displays all loans that can be liquidated. A liquidation is a process where borrower collateral does not cover value of the loan. It is represented by health factor falling below 1.o. When a loan is liquidated, an liquidator can purchase collateral at a discount by repaing the portio of the loan. ",
   FAUCET_INFO:
     "This faucet will help you fund your accounts outside of Solana main network.",
   ACCOUNT_FUNDED: "Account funded.",
