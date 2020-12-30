@@ -13,4 +13,4 @@ Any content produced by Solana, or developer resources that Solana provides, are
 * integrate fees
 * ephemeral keys
 * merge margin PR and apply swap like style to borrow/repay
-
+* add values to bar chart labels
