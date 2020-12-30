@@ -8,7 +8,7 @@ import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import { LendingReserve, withdrawInstruction } from "./../models/lending";
 import { AccountLayout } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID } from "../constants/ids";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
 import { findOrCreateAccountByMint } from "./account";
 import { approve, TokenAccount } from "../models";
 
@@ -21,9 +21,9 @@ export const withdraw = async (
   wallet: any
 ) => {
   notify({
-    message: "Withdrawing funds...",
-    description: "Please review transactions to approve.",
-    type: "warn",
+    message: 'Withdrawing funds...',
+    description: 'Please review transactions to approve.',
+    type: 'warn',
   });
 
   // user from account
@@ -31,14 +31,9 @@ export const withdraw = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-    AccountLayout.span
-  );
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
-  const [authority] = await PublicKey.findProgramAddress(
-    [reserve.lendingMarket.toBuffer()],
-    LENDING_PROGRAM_ID
-  );
+  const [authority] = await PublicKey.findProgramAddress([reserve.lendingMarket.toBuffer()], LENDING_PROGRAM_ID);
 
   const fromAccount = from.pubkey;
 
@@ -76,17 +71,11 @@ export const withdraw = async (
   );
 
   try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions.concat(cleanupInstructions),
-      signers,
-      true
-    );
+    let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
 
     notify({
-      message: "Funds deposited.",
-      type: "success",
+      message: 'Funds deposited.',
+      type: 'success',
       description: `Transaction - ${tx}`,
     });
   } catch {

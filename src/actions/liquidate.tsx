@@ -9,13 +9,12 @@ import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
 import { liquidateInstruction } from "./../models/lending/liquidate";
 import { AccountLayout } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID } from "../constants/ids";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
 import { createTempMemoryAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
 import { approve, LendingMarket, LendingObligation, TokenAccount } from "../models";
 import { cache, ParsedAccount } from "../contexts/accounts";
 
 export const liquidate = async (
-
   connection: Connection,
   wallet: any,
   from: TokenAccount, // liquidity account
@@ -26,12 +25,12 @@ export const liquidate = async (
 
   repayReserve: ParsedAccount<LendingReserve>,
 
-  withdrawReserve: ParsedAccount<LendingReserve>,
+  withdrawReserve: ParsedAccount<LendingReserve>
 ) => {
   notify({
-    message: "Repaing funds...",
-    description: "Please review transactions to approve.",
-    type: "warn",
+    message: 'Repaing funds...',
+    description: 'Please review transactions to approve.',
+    type: 'warn',
   });
 
   // user from account
@@ -39,9 +38,7 @@ export const liquidate = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-    AccountLayout.span
-  );
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   const [authority] = await PublicKey.findProgramAddress(
     [repayReserve.info.lendingMarket.toBuffer()],
@@ -87,24 +84,15 @@ export const liquidate = async (
     throw new Error(`Dex market doesn't exist.`);
   }
 
-  const market = cache.get(withdrawReserve.info.lendingMarket) as ParsedAccount<
-    LendingMarket
-  >;
+  const market = cache.get(withdrawReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
 
-  const dexOrderBookSide = market.info.quoteMint.equals(
-    repayReserve.info.liquidityMint
-  )
+  const dexOrderBookSide = market.info.quoteMint.equals(repayReserve.info.liquidityMint)
     ? dexMarket?.info.bids
     : dexMarket?.info.asks;
 
+  console.log(dexMarketAddress.toBase58());
 
-  console.log(dexMarketAddress.toBase58())
-
-  const memory = createTempMemoryAccount(
-    instructions,
-    wallet.publicKey,
-    signers
-  );
+  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
 
   instructions.push(
     liquidateInstruction(
@@ -123,17 +111,11 @@ export const liquidate = async (
     )
   );
 
-  let tx = await sendTransaction(
-    connection,
-    wallet,
-    instructions.concat(cleanupInstructions),
-    signers,
-    true
-  );
+  let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
 
   notify({
-    message: "Funds liquidated.",
-    type: "success",
+    message: 'Funds liquidated.',
+    type: 'success',
     description: `Transaction - ${tx}`,
   });
 };

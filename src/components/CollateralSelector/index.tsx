@@ -52,6 +52,7 @@ export const CollateralSelector = (props: {
   const market = cache.get(props.reserve?.lendingMarket) as ParsedAccount<
     LendingMarket
   >;
+  if (!market) return null;
 
   const quoteMintAddress = market?.info?.quoteMint?.toBase58();
 
@@ -60,10 +61,10 @@ export const CollateralSelector = (props: {
 
   return (
     <Select
-      size="large"
+      size='large'
       showSearch
-      style={{ minWidth: 300, margin: "5px 0px" }}
-      placeholder="Collateral"
+      style={{ minWidth: 300, margin: '5px 0px' }}
+      placeholder='Collateral'
       value={props.collateralReserve}
       disabled={props.disabled}
       defaultValue={props.collateralReserve}
@@ -72,22 +73,15 @@ export const CollateralSelector = (props: {
           props.onCollateralReserve(item);
         }
       }}
-      filterOption={(input, option) =>
-        option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      }
+      filterOption={(input, option) => option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
     >
       {reserveAccounts
         .filter((reserve) => reserve.info !== props.reserve)
-        .filter(
-          (reserve) =>
-            !onlyQuoteAllowed ||
-            reserve.info.liquidityMint.equals(market.info.quoteMint)
-        )
+        .filter((reserve) => !onlyQuoteAllowed || reserve.info.liquidityMint.equals(market.info.quoteMint))
         .map((reserve) => {
           const mint = reserve.info.liquidityMint.toBase58();
           const address = reserve.pubkey.toBase58();
           const name = getTokenName(tokenMap, mint);
-
 
           return <Option key={address} value={address} name={name} title={address}>
             <CollateralItem

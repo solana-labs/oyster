@@ -1,16 +1,11 @@
-import {
-  PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import BN from "bn.js";
-import * as BufferLayout from "buffer-layout";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../constants/ids";
-import { wadToLamports } from "../../utils/utils";
-import * as Layout from "./../../utils/layout";
-import { LendingInstruction } from "./lending";
-import { LendingReserve } from "./reserve";
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
+import BN from 'bn.js';
+import * as BufferLayout from 'buffer-layout';
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
+import { wadToLamports } from '../../utils/utils';
+import * as Layout from './../../utils/layout';
+import { LendingInstruction } from './lending';
+import { LendingReserve } from './reserve';
 
 export enum BorrowAmountType {
   LiquidityBorrowAmount = 0,
@@ -60,9 +55,9 @@ export const borrowInstruction = (
   memory: PublicKey
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
-    BufferLayout.u8("instruction"),
-    Layout.uint64("amount"),
-    BufferLayout.u8("amountType"),
+    BufferLayout.u8('instruction'),
+    Layout.uint64('amount'),
+    BufferLayout.u8('amountType'),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
@@ -113,8 +108,7 @@ export const borrowInstruction = (
 
 export const calculateBorrowAPY = (reserve: LendingReserve) => {
   const totalBorrows = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
-  const currentUtilization =
-    totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
+  const currentUtilization = totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
   const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
 
   let borrowAPY;
@@ -122,16 +116,12 @@ export const calculateBorrowAPY = (reserve: LendingReserve) => {
     const normalizedFactor = currentUtilization / optimalUtilization;
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const minBorrowRate = reserve.config.minBorrowRate / 100;
-    borrowAPY =
-      normalizedFactor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+    borrowAPY = normalizedFactor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
   } else {
-    const normalizedFactor =
-      (currentUtilization - optimalUtilization) / (1 - optimalUtilization);
+    const normalizedFactor = (currentUtilization - optimalUtilization) / (1 - optimalUtilization);
     const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
     const maxBorrowRate = reserve.config.maxBorrowRate / 100;
-    borrowAPY =
-      normalizedFactor * (maxBorrowRate - optimalBorrowRate) +
-      optimalBorrowRate;
+    borrowAPY = normalizedFactor * (maxBorrowRate - optimalBorrowRate) + optimalBorrowRate;
   }
 
   return borrowAPY;

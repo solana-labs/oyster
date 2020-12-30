@@ -9,7 +9,7 @@ import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
 import { repayInstruction } from "./../models/lending/repay";
 import { AccountLayout } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID } from "../constants/ids";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
 import { findOrCreateAccountByMint } from "./account";
 import { approve, LendingObligation, TokenAccount } from "../models";
 import { ParsedAccount } from "../contexts/accounts";
@@ -31,9 +31,9 @@ export const repay = async (
   wallet: any
 ) => {
   notify({
-    message: "Repaing funds...",
-    description: "Please review transactions to approve.",
-    type: "warn",
+    message: 'Repaing funds...',
+    description: 'Please review transactions to approve.',
+    type: 'warn',
   });
 
   // user from account
@@ -41,9 +41,7 @@ export const repay = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-    AccountLayout.span
-  );
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   const [authority] = await PublicKey.findProgramAddress(
     [repayReserve.info.lendingMarket.toBuffer()],
@@ -101,17 +99,11 @@ export const repay = async (
     )
   );
 
-  let tx = await sendTransaction(
-    connection,
-    wallet,
-    instructions.concat(cleanupInstructions),
-    signers,
-    true
-  );
+  let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
 
   notify({
-    message: "Funds repaid.",
-    type: "success",
+    message: 'Funds repaid.',
+    type: 'success',
     description: `Transaction - ${tx}`,
   });
 };
