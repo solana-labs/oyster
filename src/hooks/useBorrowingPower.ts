@@ -7,8 +7,8 @@ import { useUserDeposits } from "./useUserDeposits";
 import { useUserObligations } from "./useUserObligations";
 
 // TODO: add option to decrease buying power by overcollateralization factor
-
-export function useBorrowingPower(reserveAddress: string | PublicKey, overcollateralize = true) {
+// TODO: add support for balance in the wallet
+export function useBorrowingPower(reserveAddress: string | PublicKey, includeWallet = false, overcollateralize = true) {
   const key = useMemo(() => typeof reserveAddress === 'string' ? reserveAddress : reserveAddress.toBase58(), [reserveAddress]);
 
   const reserve = useLendingReserve(key);
