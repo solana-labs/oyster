@@ -19,7 +19,7 @@ export const HomeView = () => {
   const [totals, setTotals] = useState<Totals>({
     marketSize: 0,
     borrowed: 0,
-    lentOutPct: 0, 
+    lentOutPct: 0,
     items: [],
   })
 
@@ -28,7 +28,7 @@ export const HomeView = () => {
       let newTotals: Totals = {
         marketSize: 0,
         borrowed: 0,
-        lentOutPct: 0, 
+        lentOutPct: 0,
         items: [],
       };
 
@@ -44,14 +44,17 @@ export const HomeView = () => {
           return;
         }
 
+        const price = midPriceInUSD(liquidityMint?.pubkey.toBase58());
+
         let leaf = {
           key: item.pubkey.toBase58(),
           marketSize: fromLamports(marketCapLamports, liquidityMint?.info) *
-            midPriceInUSD(liquidityMint?.pubkey.toBase58()),
+          price,
           borrowed: fromLamports(
             wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
             liquidityMint.info
-          ),
+          ) *
+          price,
           name: getTokenName(tokenMap, item.info.liquidityMint.toBase58())
         }
 
@@ -59,7 +62,7 @@ export const HomeView = () => {
 
         newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
         newTotals.borrowed = newTotals.borrowed + leaf.borrowed;
-        
+
       });
 
       newTotals.lentOutPct = newTotals.borrowed / newTotals.marketSize;
@@ -82,8 +85,8 @@ export const HomeView = () => {
 
   return (
     <div className="flexColumn">
-      <Row 
-        gutter={GUTTER} 
+      <Row
+        gutter={GUTTER}
         className="home-info-row" >
         <Col xs={24} xl={5}>
           <Card>
@@ -128,16 +131,16 @@ export const HomeView = () => {
       </Row>
 
       <Card>
-      <div className="home-item home-header">
-        <div>{LABELS.TABLE_TITLE_ASSET}</div>
-        <div>{LABELS.TABLE_TITLE_MARKET_SIZE}</div>
-        <div>{LABELS.TABLE_TITLE_TOTAL_BORROWED}</div>
-        <div>{LABELS.TABLE_TITLE_DEPOSIT_APY}</div>
-        <div>{LABELS.TABLE_TITLE_BORROW_APY}</div>
-      </div>
-      {reserveAccounts.map((account) => (
-        <LendingReserveItem reserve={account.info} address={account.pubkey} item={totals.items.find(item => item.key === account.pubkey.toBase58())} />
-      ))}
+        <div className="home-item home-header">
+          <div>{LABELS.TABLE_TITLE_ASSET}</div>
+          <div>{LABELS.TABLE_TITLE_MARKET_SIZE}</div>
+          <div>{LABELS.TABLE_TITLE_TOTAL_BORROWED}</div>
+          <div>{LABELS.TABLE_TITLE_DEPOSIT_APY}</div>
+          <div>{LABELS.TABLE_TITLE_BORROW_APY}</div>
+        </div>
+        {reserveAccounts.map((account) => (
+          <LendingReserveItem reserve={account.info} address={account.pubkey} item={totals.items.find(item => item.key === account.pubkey.toBase58())} />
+        ))}
       </Card>
     </div>
   );
