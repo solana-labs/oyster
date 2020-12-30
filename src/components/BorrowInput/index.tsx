@@ -10,7 +10,7 @@ import {
   LendingReserveParser,
 } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card } from "antd";
+import { Card } from "antd";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -21,6 +21,7 @@ import "./style.less";
 import { LABELS } from "../../constants";
 import { ActionConfirmation } from "./../ActionConfirmation";
 import { BackButton } from "./../BackButton";
+import { ConnectButton } from "../ConnectButton";
 
 export const BorrowInput = (props: {
   className?: string;
@@ -150,14 +151,14 @@ export const BorrowInput = (props: {
             />
             <div>{name}</div>
           </div>
-          <Button
+          <ConnectButton
             type="primary"
             onClick={onBorrow}
             loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
-            {LABELS.BORROW_ACTION}
-          </Button>
+            {fromAccounts.length === 0 ? LABELS.NO_DEPOSITS : LABELS.BORROW_ACTION}
+          </ConnectButton>
           <BackButton />
         </div>
       )}

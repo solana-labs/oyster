@@ -7,7 +7,7 @@ import {
 } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Slider } from "antd";
+import { Card, Slider } from "antd";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
@@ -16,6 +16,7 @@ import { PublicKey } from "@solana/web3.js";
 import "./style.less";
 import { ActionConfirmation } from "./../ActionConfirmation";
 import { LABELS, marks } from "../../constants";
+import { ConnectButton } from "../ConnectButton";
 
 export const DepositInput = (props: {
   className?: string;
@@ -126,14 +127,14 @@ export const DepositInput = (props: {
 
           <Slider marks={marks} value={pct} onChange={setPct} />
 
-          <Button
+          <ConnectButton
             type="primary"
             onClick={onDeposit}
             loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
             {LABELS.DEPOSIT_ACTION}
-          </Button>
+          </ConnectButton>
         </div>
       )}
     </Card>

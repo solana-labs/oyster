@@ -1,9 +1,14 @@
-import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from '../contexts/connection';
-import { notify } from '../utils/notifications';
-import { LendingReserve } from './../models/lending/reserve';
-import { AccountLayout, MintInfo, MintLayout, Token } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../utils/ids';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import { sendTransaction } from "../contexts/connection";
+import { notify } from "../utils/notifications";
+import { LendingReserve } from "./../models/lending/reserve";
+import { AccountLayout, MintInfo, MintLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
 import {
   createTempMemoryAccount,
   createUninitializedAccount,
@@ -20,8 +25,9 @@ import {
   LendingMarket,
   BorrowAmountType,
   LendingObligation,
-} from '../models';
-import { toLamports } from '../utils/utils';
+  approve,
+} from "../models";
+import { toLamports } from "../utils/utils";
 
 export const borrow = async (
   connection: Connection,
@@ -141,8 +147,13 @@ export const borrow = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(TOKEN_PROGRAM_ID, fromAccount, authority, wallet.publicKey, [], fromLamports)
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    fromLamports
   );
 
   const dexMarketAddress = borrowReserve.info.dexMarketOption

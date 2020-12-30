@@ -4,13 +4,15 @@
   display: inline-block;
   position: relative;
   transform-origin: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   .text {
     position: absolute;
-    left: 5px;
-    top: calc(50% - 15px);
     text-align: center;
     width: 100%;
-    span {
+    .title {
       color: @text-color-secondary;
       font-size: 14px;
       line-height: 22px;

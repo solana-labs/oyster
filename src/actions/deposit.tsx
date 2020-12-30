@@ -1,11 +1,24 @@
-import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from '../contexts/connection';
-import { notify } from '../utils/notifications';
-import { depositInstruction, initReserveInstruction, LendingReserve } from './../models/lending';
-import { AccountLayout, Token } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../utils/ids';
-import { createUninitializedAccount, ensureSplAccount, findOrCreateAccountByMint } from './account';
-import { TokenAccount } from '../models';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import { sendTransaction } from "../contexts/connection";
+import { notify } from "../utils/notifications";
+import {
+  depositInstruction,
+  initReserveInstruction,
+  LendingReserve,
+} from "./../models/lending";
+import { AccountLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
+import {
+  createUninitializedAccount,
+  ensureSplAccount,
+  findOrCreateAccountByMint,
+} from "./account";
+import { approve, TokenAccount } from "../models";
 
 export const deposit = async (
   from: TokenAccount,
@@ -45,8 +58,13 @@ export const deposit = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(TOKEN_PROGRAM_ID, fromAccount, authority, wallet.publicKey, [], amountLamports)
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    amountLamports
   );
 
   let toAccount: PublicKey;

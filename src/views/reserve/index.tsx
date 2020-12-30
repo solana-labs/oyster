@@ -5,6 +5,8 @@ import "./style.less";
 
 import { UserLendingCard } from "./../../components/UserLendingCard";
 import { ReserveStatus } from "./../../components/ReserveStatus";
+import { Col, Row } from "antd";
+import { GUTTER } from "../../constants";
 
 export const ReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,19 +18,21 @@ export const ReserveView = () => {
   }
 
   return (
-    <div className="reserve-overview">
-      <div className="reserve-overview-container">
-        <ReserveStatus
-          className="reserve-overview-item reserve-overview-item-left"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
-        />
-        <UserLendingCard
-          className="reserve-overview-item reserve-overview-item-right"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
-        />
-      </div>
+    <div className="flexColumn">
+      <Row gutter={GUTTER}>
+        <Col sm={24} md={12} lg={14} xl={15} xxl={18}>
+          <ReserveStatus
+            reserve={reserve}
+            address={lendingReserve.pubkey} />
+        </Col>
+        <Col sm={24} md={12} lg={10} xl={9} xxl={6}>
+          <UserLendingCard
+            className="user-lending-card"
+            reserve={reserve}
+            address={lendingReserve.pubkey}
+          />
+        </Col>
+      </Row>
     </div>
   );
 };

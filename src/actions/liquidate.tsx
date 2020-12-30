@@ -1,13 +1,18 @@
-import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from '../contexts/connection';
-import { notify } from '../utils/notifications';
-import { LendingReserve } from './../models/lending/reserve';
-import { liquidateInstruction } from './../models/lending/liquidate';
-import { AccountLayout, Token } from '@solana/spl-token';
-import { createTempMemoryAccount, ensureSplAccount, findOrCreateAccountByMint } from './account';
-import { LendingMarket, LendingObligation, TokenAccount } from '../models';
-import { cache, ParsedAccount } from '../contexts/accounts';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../utils/ids';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import { sendTransaction } from "../contexts/connection";
+import { notify } from "../utils/notifications";
+import { LendingReserve } from "./../models/lending/reserve";
+import { liquidateInstruction } from "./../models/lending/liquidate";
+import { AccountLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
+import { createTempMemoryAccount, ensureSplAccount, findOrCreateAccountByMint } from "./account";
+import { approve, LendingMarket, LendingObligation, TokenAccount } from "../models";
+import { cache, ParsedAccount } from "../contexts/accounts";
 
 export const liquidate = async (
   connection: Connection,
@@ -50,8 +55,13 @@ export const liquidate = async (
   );
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(TOKEN_PROGRAM_ID, fromAccount, authority, wallet.publicKey, [], amountLamports)
+  approve(
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    authority,
+    wallet.publicKey,
+    amountLamports
   );
 
   // get destination account

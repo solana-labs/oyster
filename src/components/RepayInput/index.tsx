@@ -9,7 +9,7 @@ import {
 } from "../../hooks";
 import { LendingReserve } from "../../models";
 import { TokenIcon } from "../TokenIcon";
-import { Button, Card, Slider } from "antd";
+import { Card, Slider } from "antd";
 import { ParsedAccount, useMint } from "../../contexts/accounts";
 import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
@@ -21,6 +21,7 @@ import { LABELS, marks } from "../../constants";
 import { ActionConfirmation } from "./../ActionConfirmation";
 import { fromLamports, wadToLamports } from "../../utils/utils";
 import { notify } from "../../utils/notifications";
+import { ConnectButton } from "../ConnectButton";
 
 export const RepayInput = (props: {
   className?: string;
@@ -169,14 +170,14 @@ export const RepayInput = (props: {
             disabled={true}
           />
 
-          <Button
+          <ConnectButton
             type="primary"
             onClick={onRepay}
             loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
             {LABELS.REPAY_ACTION}
-          </Button>
+          </ConnectButton>
         </div>
       )}
     </Card>

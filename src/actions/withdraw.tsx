@@ -1,11 +1,16 @@
-import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from '../contexts/connection';
-import { notify } from '../utils/notifications';
-import { LendingReserve, withdrawInstruction } from './../models/lending';
-import { AccountLayout, Token } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../utils/ids';
-import { findOrCreateAccountByMint } from './account';
-import { TokenAccount } from '../models';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import { sendTransaction } from "../contexts/connection";
+import { notify } from "../utils/notifications";
+import { LendingReserve, withdrawInstruction } from "./../models/lending";
+import { AccountLayout } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID } from "../utils/ids";
+import { findOrCreateAccountByMint } from "./account";
+import { approve, TokenAccount } from "../models";
 
 export const withdraw = async (
   from: TokenAccount, // CollateralAccount
@@ -33,8 +38,13 @@ export const withdraw = async (
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
-  instructions.push(
-    Token.createApproveInstruction(TOKEN_PROGRAM_ID, fromAccount, authority, wallet.publicKey, [], amountLamports)
+  approve(
+      instructions,
+      cleanupInstructions,
+      fromAccount,
+      authority,
+      wallet.publicKey,
+      amountLamports
   );
 
   // get destination account

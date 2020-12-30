@@ -231,6 +231,10 @@ em {
   flex: 1;
 }
 
+.card-fill {
+  height: 100%;
+}
+
 .card-row {
   box-sizing: border-box;
   margin: 5px 0px;
@@ -295,6 +299,12 @@ em {
   font-weight: bold;
 }
 
+.ant-select-selection-item {
+  .token-balance {
+    display: none;
+  };
+};
+
 .token-input {
   display: flex;
   align-items: center;
@@ -303,10 +313,46 @@ em {
   margin: 5px 0px;
 }
 
+.token-balance {
+  margin-left: auto;
+  margin-right: 5px;
+  color: @text-color-secondary;
+}
+
+[class="ant-layout-header"] {
+  height: 16px !important;
+}
+
 .dashboard-amount-quote {
   font-size: 10px;
   font-style: normal;
   text-align: right;
+}
+
+.small-statisitc {
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    max-height: 20px;
+    line-height: 2px;;
+  }
+
+  .ant-statistic-content-value-int {
+    font-size: 12px;
+  }
+
+  .ant-statistic-content-value-decimal {
+    font-size: 10px;
+  }
+}
+
+.dashboard-amount-quote-stat {
+  font-size: 10px;
+  font-style: normal;
+  text-align: center;
+  font-weight: normal;
 }
 
 @media only screen and (max-width: 600px) {

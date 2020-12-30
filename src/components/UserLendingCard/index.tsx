@@ -4,6 +4,7 @@ import {
   useTokenName,
   useUserBalance,
   useBorrowedAmount,
+  useBorrowingPower,
 } from "./../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { formatNumber } from "../../utils/utils";
@@ -29,9 +30,7 @@ export const UserLendingCard = (props: {
   );
 
   const { borrowed: totalBorrowed, borrowedInUSD, ltv, health } = useBorrowedAmount(address);
-
-  // TODO: calculate
-  const available = 0; // use all available deposits and convert using market rate
+  const { totalInQuote: borrowingPowerInUSD, borrowingPower } = useBorrowingPower(address); 
 
   return (
     <Card
@@ -82,7 +81,10 @@ export const UserLendingCard = (props: {
           Available to you:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(available)} {name}
+          <div>
+            <div><em>{formatNumber.format(borrowingPower)}</em> {name}</div>
+            <div className="dashboard-amount-quote">${formatNumber.format(borrowingPowerInUSD)}</div>
+          </div>
         </div>
       </div>
 

@@ -7,10 +7,13 @@ import { PublicKey } from "@solana/web3.js";
 export const TokenIcon = (props: {
   mintAddress?: string | PublicKey;
   style?: React.CSSProperties;
+  size?: number;
   className?: string;
 }) => {
   const { tokenMap } = useConnectionConfig();
   const icon = getTokenIcon(tokenMap, props.mintAddress);
+
+  const size = props.size || 20;
 
   if (icon) {
     return (
@@ -18,8 +21,8 @@ export const TokenIcon = (props: {
         alt="Token icon"
         className={props.className}
         key={icon}
-        width={props.style?.width || "20"}
-        height={props.style?.height || "20"}
+        width={props.style?.width || size.toString()}
+        height={props.style?.height || size.toString()}
         src={icon}
         style={{
           marginRight: "0.5rem",
@@ -38,8 +41,8 @@ export const TokenIcon = (props: {
       address={props.mintAddress}
       style={{
         marginRight: "0.5rem",
-        width: 20,
-        height: 20,
+        width: size,
+        height: size,
         marginTop: 2,
         ...props.style,
       }}

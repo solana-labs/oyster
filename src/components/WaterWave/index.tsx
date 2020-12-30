@@ -5,7 +5,7 @@ export const WaterWave = (props: any) => {
   const node = useRef<HTMLCanvasElement>();
   const root = useRef<HTMLDivElement>();
   const [radio, setRadio] = useState(1);
-  const { percent, title, style, color } = props;
+  const { percent, title, style, color, showPercent } = props;
   const { height } = style;
 
   const resize = useCallback(() => {
@@ -54,8 +54,8 @@ export const WaterWave = (props: any) => {
         />
       </div>
       <div className="text" style={{ width: height }}>
-        {title && <span>{title}</span>}
-        <h4>{percent.toFixed(2)}%</h4>
+        {title}
+        <h4>{showPercent && `${percent.toFixed(2)}%`}</h4>
       </div>
     </div>
   );
