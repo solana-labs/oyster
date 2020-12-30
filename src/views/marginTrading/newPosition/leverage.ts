@@ -33,7 +33,7 @@ export function useLeverage({
       return;
     }
 
-    if (!desiredType || !newPosition.asset.value || !enrichedPools || enrichedPools.length == 0) {
+    if (!desiredType || !newPosition.asset.value || !enrichedPools || enrichedPools.length === 0) {
       return;
     }
 
@@ -65,7 +65,7 @@ export function useLeverage({
 
     const priceImpact = Math.abs(100 - 100 * (newSupplyRatio / supplyRatio));
     const marginToLeverage = 100 / leverageDesired; // Would be 20% for 5x
-    if (marginToLeverage < priceImpact && leverageDesired != 1) {
+    if (marginToLeverage < priceImpact && leverageDesired !== 1) {
       // Obviously we allow 1x as edge case
       // if their marginToLeverage ratio < priceImpact, we say hey ho no go
       setNewPosition({ ...newPosition, error: LABELS.LEVERAGE_LIMIT_MESSAGE });

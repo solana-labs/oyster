@@ -80,9 +80,9 @@ export default function CollateralInput(props: {
       </div>
       <div className='ccy-input-header' style={{ padding: '0px 10px 5px 7px' }}>
         <NumericInput
-          value={parseFloat(lastAmount || '0.00') == props.amount ? lastAmount : props.amount?.toFixed(6)?.toString()}
+          value={parseFloat(lastAmount || '0.00') === props.amount ? lastAmount : props.amount?.toFixed(6)?.toString()}
           onChange={(val: string) => {
-            if (props.onInputChange && parseFloat(val) != props.amount) {
+            if (props.onInputChange && parseFloat(val) !== props.amount) {
               if (!val || !parseFloat(val)) props.onInputChange(null);
               else props.onInputChange(parseFloat(val));
             }

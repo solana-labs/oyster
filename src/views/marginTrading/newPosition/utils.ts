@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { ParsedAccount } from '../../../contexts/accounts';
 import { useEnrichedPools } from '../../../contexts/market';
 import { UserDeposit, useUserDeposits } from '../../../hooks';
@@ -30,7 +29,7 @@ export function usePoolAndTradeInfoFrom(
 
   const userDeposits = useUserDeposits();
   const collateralDeposit = userDeposits.userDeposits.find(
-    (u) => u.reserve.info.liquidityMint.toBase58() == collType?.info?.liquidityMint?.toBase58()
+    (u) => u.reserve.info.liquidityMint.toBase58() === collType?.info?.liquidityMint?.toBase58()
   );
 
   const enrichedPools = useEnrichedPools(pool ? [pool] : []);

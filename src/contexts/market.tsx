@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { MINT_TO_MARKET } from './../models/marketOverrides';
 import { POOLS_WITH_AIRDROP } from './../models/airdrops';
 import { convert, fromLamports, getPoolName, getTokenName, KnownTokenMap, STABLE_COINS } from './../utils/utils';
-import { useConnection, useConnectionConfig } from './connection';
+import { useConnectionConfig } from './connection';
 import { cache, getMultipleAccounts, ParsedAccount } from './accounts';
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
@@ -69,30 +69,12 @@ export function MarketProvider({ children = null as any }) {
 
   useEffect(() => {
     let timer = 0;
-    let bonfidaTimer = 0;
 
     const updateData = async () => {
       await refreshAccounts(connection, [...accountsToObserve.keys()]);
       marketEmitter.raiseMarketUpdated(new Set([...marketByMint.keys()]));
 
       timer = window.setTimeout(() => updateData(), REFRESH_INTERVAL);
-    };
-
-    const bonfidaQuery = async () => {
-      try {
-        const resp = await window.fetch('https://serum-api.bonfida.com/pools-recent');
-        const data = await resp.json();
-        const map = (data?.data as RecentPoolData[]).reduce((acc, item) => {
-          acc.set(item.pool_identifier, item);
-          return acc;
-        }, new Map<string, RecentPoolData>());
-
-        setDailyVolume(map);
-      } catch {
-        // ignore
-      }
-
-      bonfidaTimer = window.setTimeout(() => bonfidaQuery(), BONFIDA_POOL_INTERVAL);
     };
 
     const initalQuery = async () => {
@@ -165,7 +147,6 @@ export function MarketProvider({ children = null as any }) {
 
     return () => {
       window.clearTimeout(timer);
-      window.clearTimeout(bonfidaTimer);
     };
   }, [marketByMint, accountsToObserve, connection]);
 

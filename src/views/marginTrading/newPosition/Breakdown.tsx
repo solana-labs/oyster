@@ -9,7 +9,7 @@ import { usePoolAndTradeInfoFrom } from './utils';
 export default function Breakdown({ item }: { item: Position }) {
   const { enrichedPools, leverage } = usePoolAndTradeInfoFrom(item);
 
-  const exchangeRate = enrichedPools.length == 0 ? 1 : enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
+  const exchangeRate = enrichedPools.length === 0 ? 1 : enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
 
   let myPart = item.collateral.value || 0;
   const brokeragePart = (item.collateral.value || 0) * leverage - myPart;
