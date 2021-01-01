@@ -233,7 +233,7 @@ export const useEnrichedPools = (pools: PoolInfo[]) => {
   const poolKeys = pools.map((p) => p.pubkeys.account.toBase58()).join(',');
 
   useEffect(() => {
-    if (!marketEmitter || !subscribeToMarket || pools.length == 0) {
+    if (!marketEmitter || !subscribeToMarket || pools.length === 0) {
       return;
     }
     //@ts-ignore

@@ -47,9 +47,9 @@ export function Routes() {
                       <Route path='/repay/:reserve' children={<RepayReserveView />} />
                       <Route exact path='/liquidate' children={<LiquidateView />} />
                       <Route path='/liquidate/:id' children={<LiquidateReserveView />} />
-                      <Route exact path='/marginTrading' children={<MarginTrading />} />
+                      <Route exact path='/margin' children={<MarginTrading />} />
 
-                      <Route path='/marginTrading/:id' children={<NewPosition />} />
+                      <Route path='/margin/:id' children={<NewPosition />} />
                       <Route exact path='/faucet' children={<FaucetView />} />
                     </Switch>
                   </AppLayout>

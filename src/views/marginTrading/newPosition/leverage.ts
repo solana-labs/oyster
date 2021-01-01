@@ -72,5 +72,5 @@ export function useLeverage({
       return;
     }
     setNewPosition({ ...newPosition, error: '' });
-  }, [collType, desiredType, desiredValue, leverage, enrichedPools, collValue, collateralDeposit?.info.amount]);
+  }, [collType, desiredType, desiredValue, leverage, enrichedPools, collValue, collateralDeposit]);
 }

@@ -57,7 +57,7 @@ export default function Breakdown({ item }: { item: Position }) {
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
           <Card>
             <Statistic
-              title='Leverage'
+              title='Borrowed'
               value={brokeragePart * exchangeRate}
               precision={2}
               valueStyle={{ color: brokerageColor }}
@@ -66,7 +66,7 @@ export default function Breakdown({ item }: { item: Position }) {
           </Card>
           <Card>
             <Statistic
-              title='My Collateral Value'
+              title='My Collateral'
               value={myPart}
               precision={2}
               valueStyle={{ color: myColor }}
@@ -101,14 +101,6 @@ export default function Breakdown({ item }: { item: Position }) {
           }}
           style={{ marginBottom: '20px' }}
         />
-        <span style={{ float: 'right', fontSize: '9px' }}>
-          <a
-            href='https://github.com/bZxNetwork/fulcrum_ui/blob/development/packages/fulcrum-website/assets/js/trading.js'
-            target='blank'
-          >
-            credit
-          </a>
-        </span>
       </Card>
     </div>
   );

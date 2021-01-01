@@ -108,7 +108,7 @@ export const AppLayout = (props: any) => {
               <Menu.Item key="6" icon={< LineChartOutlined/>}>
                 <Link
                   to={{
-                    pathname: "/marginTrading",
+                    pathname: "/margin",
                   }}
                 >
                   {LABELS.MARGIN_TRADING}

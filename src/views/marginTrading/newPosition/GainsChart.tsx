@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Line } from 'react-chartjs-2';
+import React, { useEffect, useRef } from 'react';
+import Chart, { ChartPluginsOptions } from "chart.js";
 import { Position } from './interfaces';
-import { debounce } from 'lodash';
 
 // Special thanks to
 // https://github.com/bZxNetwork/fulcrum_ui/blob/development/packages/fulcrum-website/assets/js/trading.js
@@ -61,23 +60,10 @@ const baseData = [
   { x: 50, y: 65 },
 ];
 
-function getChartData({ item, priceChange }: { item: Position; priceChange: number }) {
+function getChartData() {
   //the only way to create an immutable copy of array with objects inside.
-  const baseDashed = JSON.parse(JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2)));
+  const baseDashed = getBaseDashed();
   const baseSolid = JSON.parse(JSON.stringify(baseData.slice(0, Math.floor(baseData.length) / 2 + 1)));
-
-  const leverage = item.leverage;
-
-  baseDashed.forEach((item: { y: number; x: number }, index: number) => {
-    if (index !== 0) item.y += (item.y * priceChange) / 100;
-  });
-  var leverageData = baseDashed.map((item: { x: number; y: number }, index: number) => {
-    if (index === 0) {
-      return { x: item.x, y: item.y };
-    }
-    const gain = (priceChange * leverage) / 100;
-    return { x: item.x, y: item.y * (1 + gain) };
-  });
 
   return {
     datasets: [
@@ -90,10 +76,10 @@ function getChartData({ item, priceChange }: { item: Position; priceChange: numb
       },
       {
         backgroundColor: 'transparent',
-        borderColor: priceChange >= 0 ? 'rgb(51, 223, 204)' : 'rgb(255,79,79)',
+
         borderWidth: 4,
         radius: 0,
-        data: leverageData,
+        data: baseDashed,
         borderDash: [15, 3],
         label: 'LEVERAGE',
       },
@@ -110,139 +96,167 @@ function getChartData({ item, priceChange }: { item: Position; priceChange: numb
   };
 }
 
+const labelPlugin: ChartPluginsOptions = {};
+
+const getBaseDashed = () => {
+  return JSON.parse(JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2))) as { x: number, y: number }[];
+}
+
 function updateChartData({
   item,
   priceChange,
-  chartRef,
+  chart,
 }: {
   item: Position;
   priceChange: number;
-  chartRef: React.RefObject<any>;
+  chart: Chart;
 }) {
-  const data = getChartData({ item, priceChange });
-  chartRef.current.chartInstance.data = data;
-  chartRef.current.chartInstance.canvas.parentNode.style.width = '100%';
-  chartRef.current.chartInstance.canvas.parentNode.style.height = 'auto';
-  chartRef.current.chartInstance.update();
+  if (!chart?.data.datasets || chart?.data.datasets.length < 2) {
+    return;
+  }
+
+  labelPlugin.afterDraw = (instance: Chart) => {
+    drawLabels(instance, item.leverage, priceChange)
+  };
+
+  const baseDashed = getBaseDashed();
+  const leverage = item.leverage;
+  var leverageData = baseDashed.map((item: { x: number; y: number }, index: number) => {
+    if (index === 0) {
+      return { x: item.x, y: item.y };
+    }
+    const gain = (priceChange * leverage) / 100;
+    return { x: item.x, y: item.y * (1 + gain) };
+  });
+
+  chart.data.datasets[1].data = leverageData;
+  chart.data.datasets[1].borderColor = priceChange >= 0 ? 'rgb(51, 223, 204)' : 'rgb(255,79,79)';
+
+  baseDashed.forEach((item: { y: number; x: number }, index: number) => {
+    if (index !== 0) item.y += (item.y * priceChange) / 100;
+  });
+
+  chart.data.datasets[2].data = baseDashed;
+
+  // chart.chartInstance.canvas.parentNode.style.width = '100%';
+  // chart.chartInstance.canvas.parentNode.style.height = 'auto';
+  chart?.update()
 }
 
-function drawLabels(t: any, ctx: any, leverage: number, priceChange: number) {
+function drawLabels(chart: Chart, leverage: number, priceChange: number) {
+  if (!chart.config || !chart.config.data || !chart.config.data.datasets || !chart.canvas) {
+    return;
+  }
+
+  const ctx = chart.ctx;
+  if (!ctx) {
+    return;
+  }
+
   ctx.save();
   ctx.font = 'normal normal bold 15px /1.5 Muli';
   ctx.textBaseline = 'bottom';
 
-  const chartInstance = t.chart;
-  const datasets = chartInstance.config.data.datasets;
-  datasets.forEach(function (ds: { label: any; borderColor: any }, index: number) {
+  const datasets = chart.config.data.datasets;
+  const element = (chart?.canvas?.parentNode as HTMLElement);
+  datasets.forEach((ds, index) => {
     const label = ds.label;
-    ctx.fillStyle = ds.borderColor;
+    ctx.fillStyle = ds.borderColor as string;
 
-    const meta = chartInstance.controller.getDatasetMeta(index);
+    const meta = chart.getDatasetMeta(index);
     const len = meta.data.length - 1;
     const pointPostition = Math.floor(len / 2) - Math.floor(0.2 * len);
     const x = meta.data[pointPostition]._model.x;
     const xOffset = x;
     const y = meta.data[pointPostition]._model.y;
     let yOffset;
+
     if (label === 'HOLD') {
       yOffset = leverage * priceChange > 0 ? y * 1.2 : y * 0.8;
     } else {
       yOffset = leverage * priceChange > 0 ? y * 0.8 : y * 1.2;
     }
 
-    if (yOffset > chartInstance.canvas.parentNode.offsetHeight) {
+    if (yOffset > element.offsetHeight) {
       // yOffset = 295;
-      chartInstance.canvas.parentNode.style.height = `${yOffset * 1.3}px`;
+      element.style.height = `${yOffset * 1.3}px`;
     }
     if (yOffset < 0) yOffset = 5;
     if (label) ctx.fillText(label, xOffset, yOffset);
   });
   ctx.restore();
 }
-const debouncedUpdateChartData = debounce(updateChartData, 200);
 
 export default function GainsChart({ item, priceChange }: { item: Position; priceChange: number }) {
-  const chartRef = useRef<any>();
-  const [booted, setBooted] = useState<boolean>(false);
-  const [canvas, setCanvas] = useState<any>();
-  useEffect(() => {
-    if (chartRef.current.chartInstance) debouncedUpdateChartData({ item, priceChange, chartRef });
-  }, [priceChange, item.leverage]);
+  const chartRef = useRef<Chart>();
+  const canvasRef = useRef<HTMLCanvasElement>();
 
   useEffect(() => {
-    if (chartRef.current && !booted && canvas) {
-      //@ts-ignore
-      const originalController = window.Chart.controllers.line;
-      //@ts-ignore
-      window.Chart.controllers.line = Chart.controllers.line.extend({
-        draw: function () {
-          originalController.prototype.draw.call(this, arguments);
-          drawLabels(this, canvas.getContext('2d'), item.leverage, priceChange);
-        },
-      });
-      setBooted(true);
+    if (!canvasRef.current || chartRef.current) {
+      return;
     }
-  }, [chartRef, canvas]);
 
-  const chart = useMemo(
-    () => (
-      <Line
-        ref={chartRef}
-        data={(canvas: any) => {
-          setCanvas(canvas);
-          return getChartData({ item, priceChange });
-        }}
-        options={{
-          responsive: true,
-          maintainAspectRatio: true,
-          scaleShowLabels: false,
-          layout: {
-            padding: {
-              top: 30,
-              bottom: 80,
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'line',
+      data: getChartData(),
+      plugins: [
+        labelPlugin
+      ],
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scaleShowLabels: false,
+        layout: {
+          padding: {
+            top: 30,
+            bottom: 80,
+          },
+        },
+        labels: {
+          render: 'title',
+          fontColor: ['green', 'white', 'red'],
+          precision: 2,
+        },
+        animation: {
+          easing: 'easeOutExpo',
+          duration: 500,
+        },
+        scales: {
+          xAxes: [
+            {
+              display: false,
+              gridLines: {
+                display: false,
+              },
+              type: 'linear',
+              position: 'bottom',
             },
-          },
-          labels: {
-            render: 'title',
-            fontColor: ['green', 'white', 'red'],
-            precision: 2,
-          },
-          animation: {
-            easing: 'easeOutExpo',
-            duration: 500,
-          },
-          scales: {
-            xAxes: [
-              {
+          ],
+          yAxes: [
+            {
+              display: false,
+              gridLines: {
                 display: false,
-                gridLines: {
-                  display: false,
-                },
-                type: 'linear',
-                position: 'bottom',
               },
-            ],
-            yAxes: [
-              {
-                display: false,
-                gridLines: {
-                  display: false,
-                },
-              },
-            ],
-          },
-          legend: {
-            display: false,
-          },
-        }}
-      />
-    ),
-    []
-  );
+            },
+          ],
+        },
+        legend: {
+          display: false,
+        },
+      } as any
+    });
+  }, []);
+
+  useEffect(() => {
+    if (chartRef.current) {
+      updateChartData({ item, priceChange, chart: chartRef.current });
+    }
+  }, [priceChange, item]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
-      {chart}
+      <canvas ref={canvasRef as any} />
       <div
         style={{
           display: 'flex',

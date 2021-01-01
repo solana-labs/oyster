@@ -16,7 +16,7 @@ export const MarginTradeItem = (props: { reserve: LendingReserve; address: Publi
   const apr = calculateBorrowAPY(props.reserve);
 
   return (
-    <Link to={`/marginTrading/${props.address.toBase58()}`}>
+    <Link to={`/margin/${props.address.toBase58()}`}>
       <div className='choose-margin-item'>
         <span style={{ display: 'flex' }}>
           <TokenIcon mintAddress={props.reserve.liquidityMint} />
