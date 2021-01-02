@@ -12,5 +12,10 @@ Any content produced by Solana, or developer resources that Solana provides, are
 * add slider to borrow that shows risk/collateral usage
 * integrate fees
 * ephemeral keys
-* merge margin PR and apply swap like style to borrow/repay
 * add values to bar chart labels
+* apply swap like style to borrow/repay
+* combine deposit/borrow into one action if user doesnt have enough collateral
+
+--- margin trading
+
+* dont show collateral below zero on the chart

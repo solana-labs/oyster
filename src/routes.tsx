@@ -22,7 +22,7 @@ import {
   LiquidateReserveView,
   MarginTrading,
 } from './views';
-import { NewPosition } from './views/marginTrading/newPosition';
+import { NewPosition } from './views/margin/newPosition';
 
 export function Routes() {
   return (

@@ -101,7 +101,7 @@ export default function CollateralInput(props: {
             <Select
               size='large'
               showSearch
-              style={{ minWidth: 150 }}
+              style={{ width: 80 }}
               placeholder='CCY'
               value={props.leverage}
               onChange={(item: number) => {

@@ -9,7 +9,7 @@ import {
   ShoppingOutlined,
   HomeOutlined,
   RocketOutlined,
-  LineChartOutlined
+  // LineChartOutlined
 } from "@ant-design/icons";
 
 import BasicLayout from "@ant-design/pro-layout";
@@ -27,7 +27,8 @@ export const AppLayout = (props: any) => {
     "/deposit": "3",
     "/borrow": "4",
     "/liquidate": "5",
-    "/faucet": "6",
+    "/margin": "6",
+    "/faucet": "7",
   };
 
   const current =
@@ -105,7 +106,8 @@ export const AppLayout = (props: any) => {
                   {LABELS.MENU_LIQUIDATE}
                 </Link>
               </Menu.Item>
-              <Menu.Item key="6" icon={< LineChartOutlined/>}>
+              {/* Hide margin option for now  */}
+              {/* <Menu.Item key="6" icon={< LineChartOutlined/>}>
                 <Link
                   to={{
                     pathname: "/margin",
@@ -113,7 +115,7 @@ export const AppLayout = (props: any) => {
                 >
                   {LABELS.MARGIN_TRADING}
                 </Link>
-              </Menu.Item>
+              </Menu.Item> */}
               {env !== "mainnet-beta" && (
                 <Menu.Item key="7" icon={<RocketOutlined />}>
                   <Link

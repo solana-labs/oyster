@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTokenName } from '../../hooks';
+import { useBorrowingPower, useTokenName } from '../../hooks';
 import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
 import { TokenIcon } from '../../components/TokenIcon';
 import { formatNumber, formatPct } from '../../utils/utils';
@@ -15,6 +15,9 @@ export const MarginTradeItem = (props: { reserve: LendingReserve; address: Publi
 
   const apr = calculateBorrowAPY(props.reserve);
 
+  // TODO: specifc max leverage
+  const { totalInQuote, borrowingPower } = useBorrowingPower(props.address, false, false);
+
   return (
     <Link to={`/margin/${props.address.toBase58()}`}>
       <div className='choose-margin-item'>
@@ -26,9 +29,9 @@ export const MarginTradeItem = (props: { reserve: LendingReserve; address: Publi
         <div>
           <div>
             <div>
-              <em>{formatNumber.format(200)}</em> {name}
+              <em>{formatNumber.format(borrowingPower)}</em> {name}
             </div>
-            <div className='dashboard-amount-quote'>${formatNumber.format(300)}</div>
+            <div className='dashboard-amount-quote'>${formatNumber.format(totalInQuote)}</div>
           </div>
         </div>
         <div>{formatPct.format(apr)}</div>
