@@ -67,14 +67,14 @@ export const BorrowReserveView = () => {
           </Card>
         </Col>
       </Row>
-      <Row gutter={GUTTER} className="flexColumn">
+      <Row gutter={GUTTER} style={{ flex: 1 }}>
         <Col xs={24} xl={15}>
           <BorrowInput
             className="card-fill"
             reserve={lendingReserve}
           />
         </Col>
-        <Col xs={24} xl={8}>
+        <Col xs={24} xl={9}>
           <SideReserveOverview
             className="card-fill"
             reserve={lendingReserve}
