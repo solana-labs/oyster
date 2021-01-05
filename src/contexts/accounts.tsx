@@ -7,7 +7,6 @@ import { PoolInfo, TokenAccount } from './../models';
 import { chunks } from './../utils/utils';
 import { EventEmitter } from './../utils/eventEmitter';
 import { useUserAccounts } from '../hooks/useUserAccounts';
-import { usePools } from '../utils/pools';
 import { WRAPPED_SOL_MINT, programIds } from '../utils/ids';
 
 const AccountsContext = React.createContext<any>(null);
@@ -347,7 +346,6 @@ export function AccountsProvider({ children = null as any }) {
   const [tokenAccounts, setTokenAccounts] = useState<TokenAccount[]>([]);
   const [userAccounts, setUserAccounts] = useState<TokenAccount[]>([]);
   const { nativeAccount } = UseNativeAccount();
-  const { pools } = usePools();
 
   const selectUserAccounts = useCallback(() => {
     return cache
@@ -419,7 +417,6 @@ export function AccountsProvider({ children = null as any }) {
     <AccountsContext.Provider
       value={{
         userAccounts,
-        pools,
         nativeAccount,
       }}
     >

@@ -74,7 +74,7 @@ export const BorrowReserveView = () => {
             reserve={lendingReserve}
           />
         </Col>
-        <Col xs={24} xl={9}>
+        <Col xs={24} xl={8}>
           <SideReserveOverview
             className="card-fill"
             reserve={lendingReserve}
