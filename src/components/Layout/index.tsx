@@ -9,6 +9,7 @@ import {
   ShoppingOutlined,
   HomeOutlined,
   RocketOutlined,
+  ForkOutlined
   // LineChartOutlined
 } from "@ant-design/icons";
 
@@ -17,8 +18,9 @@ import { AppBar } from "./../AppBar";
 import { Link, useLocation } from "react-router-dom";
 import { useConnectionConfig } from "../../contexts/connection";
 import { LABELS } from "../../constants";
+import config from './../../../package.json';
 
-export const AppLayout = (props: any) => {
+export const AppLayout = React.memo((props: any) => {
   const { env } = useConnectionConfig();
   const location = useLocation();
 
@@ -37,6 +39,7 @@ export const AppLayout = (props: any) => {
   const defaultKey = paths[current] || "1";
   const theme = 'light';
 
+
   return (
     <div className="App">
       <div className="Banner">
@@ -54,12 +57,10 @@ export const AppLayout = (props: any) => {
         logo={<div className="App-logo" />}
         rightContentRender={() => <AppBar />}
         links={[
-          <div title="Fork">
-            <GithubOutlined />
-          </div>,
+
         ]}
         menuContentRender={() => {
-          return (
+          return (<div className="links">
             <Menu theme={theme} defaultSelectedKeys={[defaultKey]} mode="inline">
               <Menu.Item key="1" icon={<HomeOutlined />}>
                 <Link
@@ -107,7 +108,7 @@ export const AppLayout = (props: any) => {
                 </Link>
               </Menu.Item>
               {/* Hide margin option for now  */}
-              {/* <Menu.Item key="6" icon={< LineChartOutlined/>}>
+              {/* <Menu.Item key="6"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
                 <Link
                   to={{
                     pathname: "/margin",
@@ -128,6 +129,19 @@ export const AppLayout = (props: any) => {
                 </Menu.Item>
               )}
             </Menu>
+            <Menu theme={theme} defaultSelectedKeys={[defaultKey]} selectable={false} mode="inline" className="bottom-links">
+              <Menu.Item key="16" icon={<ForkOutlined />}>
+                <a title="Fork" href={`${config.repository.url}/fork`} target="_blank">
+                  Fork
+                </a>
+                  </Menu.Item>,
+                <Menu.Item key="15" icon={<GithubOutlined />}>
+                  <a title="Gtihub" href={config.repository.url} target="_blank">
+                    Github
+                  </a>
+                </Menu.Item>
+              </Menu>
+          </div>
           );
         }}
       >
@@ -135,4 +149,4 @@ export const AppLayout = (props: any) => {
       </BasicLayout>
     </div>
   );
-};
+});
