@@ -57,6 +57,6 @@ export function calculateCollateralBalance(
   reserve: LendingReserve,
   balanceLamports: number) {
   return reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.collateralMintSupply.toNumber() || 1));
+    (balanceLamports / (reserve?.state.collateralMintSupply.toNumber() || 1));
 }
 

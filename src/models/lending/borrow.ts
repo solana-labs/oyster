@@ -2,10 +2,9 @@ import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruct
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
-import { wadToLamports } from '../../utils/utils';
 import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './lending';
-import { LendingReserve } from './reserve';
+import { calculateUtilizationRatio, LendingReserve } from './reserve';
 
 export enum BorrowAmountType {
   LiquidityBorrowAmount = 0,
@@ -116,8 +115,7 @@ export const borrowInstruction = (
 // deposit APY utilization currentUtilizationRate * borrowAPY
 
 export const calculateBorrowAPY = (reserve: LendingReserve) => {
-  const totalBorrows = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
-  const currentUtilization = totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
+  const currentUtilization = calculateUtilizationRatio(reserve);
   const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
 
   let borrowAPY;

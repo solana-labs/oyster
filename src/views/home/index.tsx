@@ -51,7 +51,7 @@ export const HomeView = () => {
           marketSize: fromLamports(marketCapLamports, liquidityMint?.info) *
           price,
           borrowed: fromLamports(
-            wadToLamports(item.info?.borrowedLiquidityWad).toNumber(),
+            wadToLamports(item.info?.state.borrowedLiquidityWad).toNumber(),
             liquidityMint.info
           ) *
           price,

@@ -31,7 +31,7 @@ export const SideReserveOverview = (props: {
   const liquidityMint = useMint(reserve.liquidityMint);
 
   const availableLiquidity = fromLamports(
-    reserve.availableLiquidity.toNumber(),
+    reserve.state.availableLiquidity,
     liquidityMint
   );
 

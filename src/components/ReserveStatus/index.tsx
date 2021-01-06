@@ -26,7 +26,7 @@ export const ReserveStatus = (props: {
   const liquidityMint = useMint(mintAddress);
   const { price } = useMidPriceInUSD(mintAddress);
   const availableLiquidity = fromLamports(
-    props.reserve.availableLiquidity.toNumber(),
+    props.reserve.state.availableLiquidity,
     liquidityMint
   );
 
@@ -35,7 +35,7 @@ export const ReserveStatus = (props: {
   const totalBorrows = useMemo(
     () =>
       fromLamports(
-        wadToLamports(props.reserve.borrowedLiquidityWad),
+        wadToLamports(props.reserve.state.borrowedLiquidityWad),
         liquidityMint
       ),
     [props.reserve, liquidityMint]
