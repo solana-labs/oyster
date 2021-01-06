@@ -10,16 +10,13 @@ let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
 let SWAP_PROGRAM_LAYOUT: any;
 
-export const SWAP_PROGRAM_OWNER_FEE_ADDRESS = new PublicKey('HfoTxFR1Tm6kGmWgYWD6J7YHVy1UwqSULUGVLXkJqaKN');
+export const LEND_HOST_FEE_ADDRESS = process.env.REACT_APP_LEND_HOST_FEE_ADDRESS
+  ? new PublicKey(`${process.env.REACT_APP_LEND_HOST_FEE_ADDRESS}`)
+  : undefined;
 
-export const SWAP_HOST_FEE_ADDRESS = process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS
-  ? new PublicKey(`${process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS}`)
-  : SWAP_PROGRAM_OWNER_FEE_ADDRESS;
+  console.debug(`Lend host fee address: ${LEND_HOST_FEE_ADDRESS?.toBase58()}`);
 
 export const ENABLE_FEES_INPUT = false;
-
-console.debug(`Host address: ${SWAP_HOST_FEE_ADDRESS?.toBase58()}`);
-console.debug(`Owner address: ${SWAP_PROGRAM_OWNER_FEE_ADDRESS?.toBase58()}`);
 
 // legacy pools are used to show users contributions in those pools to allow for withdrawals of funds
 export const PROGRAM_IDS = [

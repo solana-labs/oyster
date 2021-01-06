@@ -7,7 +7,6 @@ import {
 } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
-import { HALF_WAD } from '../../constants';
 import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
 import { wadToLamports } from '../../utils/utils';
 import * as Layout from './../../utils/layout';

@@ -41,6 +41,8 @@ export const borrowInstruction = (
   to: PublicKey, // Liquidity output SPL Token account,
   depositReserve: PublicKey,
   depositReserveCollateralSupply: PublicKey,
+  ownerFeeReceiver: PublicKey,
+
   borrowReserve: PublicKey,
   borrowReserveLiquiditySupply: PublicKey,
 
@@ -56,7 +58,9 @@ export const borrowInstruction = (
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
 
-  memory: PublicKey
+  memory: PublicKey,
+
+  hostFeeReceiver?: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
@@ -83,6 +87,8 @@ export const borrowInstruction = (
       isSigner: false,
       isWritable: true,
     },
+    { pubkey: ownerFeeReceiver, isSigner: false, isWritable: false },
+
     { pubkey: borrowReserve, isSigner: false, isWritable: true },
     {
       pubkey: borrowReserveLiquiditySupply,
@@ -105,6 +111,11 @@ export const borrowInstruction = (
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
+
+  if(hostFeeReceiver) {
+    keys.push({ pubkey: hostFeeReceiver, isSigner: false, isWritable: false })
+  }
+
   return new TransactionInstruction({
     keys,
     programId: LENDING_PROGRAM_ID,

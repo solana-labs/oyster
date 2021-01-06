@@ -7,7 +7,7 @@ import { PoolInfo, TokenAccount } from './../models';
 import { chunks } from './../utils/utils';
 import { EventEmitter } from './../utils/eventEmitter';
 import { useUserAccounts } from '../hooks/useUserAccounts';
-import { WRAPPED_SOL_MINT, programIds } from '../utils/ids';
+import { WRAPPED_SOL_MINT, programIds, LEND_HOST_FEE_ADDRESS } from '../utils/ids';
 
 const AccountsContext = React.createContext<any>(null);
 
@@ -382,6 +382,8 @@ export function AccountsProvider({ children = null as any }) {
     if (!connection || !publicKey) {
       setTokenAccounts([]);
     } else {
+      precacheUserTokenAccounts(connection, LEND_HOST_FEE_ADDRESS);
+
       precacheUserTokenAccounts(connection, publicKey).then(() => {
         setTokenAccounts(selectUserAccounts());
       });
