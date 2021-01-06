@@ -12,7 +12,9 @@ export const withdrawInstruction = (
   reserveAccount: PublicKey,
   collateralMint: PublicKey,
   reserveSupply: PublicKey,
-  authority: PublicKey
+  lendingMarket: PublicKey,
+  authority: PublicKey,
+  transferAuthority: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('collateralAmount')]);
 
@@ -31,7 +33,9 @@ export const withdrawInstruction = (
     { pubkey: reserveAccount, isSigner: false, isWritable: true },
     { pubkey: collateralMint, isSigner: false, isWritable: true },
     { pubkey: reserveSupply, isSigner: false, isWritable: true },
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];

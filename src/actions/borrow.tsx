@@ -147,14 +147,14 @@ export const borrow = async (
   );
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     fromLamports
   );
+  signers.push(transferAuthority);
 
   const dexMarketAddress = borrowReserve.info.dexMarketOption
     ? borrowReserve.info.dexMarket
@@ -189,7 +189,9 @@ export const borrow = async (
       obligationTokenOutput,
       wallet.publicKey,
 
+      depositReserve.info.lendingMarket,
       authority,
+      transferAuthority.publicKey,
 
       dexMarketAddress,
       dexOrderBookSide,

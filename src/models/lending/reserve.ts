@@ -114,6 +114,7 @@ export const initReserveInstruction = (
   collateralSupply: PublicKey,
   lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
+  transferAuthority: PublicKey,
 
   dexMarket: PublicKey // TODO: optional
 ): TransactionInstruction => {
@@ -145,6 +146,7 @@ export const initReserveInstruction = (
     // NOTE: Why lending market needs to be a signer?
     { pubkey: lendingMarket, isSigner: true, isWritable: true },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },

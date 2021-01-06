@@ -15,23 +15,26 @@ export enum BorrowAmountType {
 /// Borrow tokens from a reserve by depositing collateral tokens. The number of borrowed tokens
 /// is calculated by market price. The debt obligation is tokenized.
 ///
-///   0. `[writable]` Collateral input SPL Token account, $authority can transfer $collateral_amount
-///   1. `[writable]` Liquidity output SPL Token account
+///   0. `[writable]` Source collateral token account, minted by deposit reserve collateral mint,
+///                     $authority can transfer $collateral_amount
+///   1. `[writable]` Destination liquidity token account, minted by borrow reserve liquidity mint
 ///   2. `[writable]` Deposit reserve account.
 ///   3. `[writable]` Deposit reserve collateral supply SPL Token account
 ///   4. `[writable]` Borrow reserve account.
 ///   5. `[writable]` Borrow reserve liquidity supply SPL Token account
-///   6. `[writable]` Obligation - uninitialized
-///   7. `[writable]` Obligation token mint - uninitialized
-///   8. `[writable]` Obligation token output - uninitialized
+///   6. `[writable]` Obligation
+///   7. `[writable]` Obligation token mint
+///   8. `[writable]` Obligation token output
 ///   9. `[]` Obligation token owner
-///   10 `[]` Derived lending market authority ($authority).
-///   11 `[]` Dex market
-///   12 `[]` Dex order book side // could be bid/ask
-///   13 `[]` Temporary memory
-///   14 `[]` Clock sysvar
-///   15 `[]` Rent sysvar
-///   16 '[]` Token program id
+///   10 `[]` Lending market account.
+///   11 `[]` Derived lending market authority.
+///   12 `[]` User transfer authority ($authority).
+///   13 `[]` Dex market
+///   14 `[]` Dex market order book side
+///   15 `[]` Temporary memory
+///   16 `[]` Clock sysvar
+///   17 `[]` Rent sysvar
+///   18 '[]` Token program id
 export const borrowInstruction = (
   amount: number | BN,
   amountType: BorrowAmountType,
@@ -47,7 +50,9 @@ export const borrowInstruction = (
   obligationTokenOutput: PublicKey,
   obligationTokenOwner: PublicKey,
 
+  lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
+  transferAuthority: PublicKey,
 
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
@@ -89,7 +94,11 @@ export const borrowInstruction = (
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOwner, isSigner: false, isWritable: false },
+
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: false, isWritable: false },
+
     { pubkey: dexMarket, isSigner: false, isWritable: false },
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },
     { pubkey: memory, isSigner: false, isWritable: false },

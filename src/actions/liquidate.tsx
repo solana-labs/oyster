@@ -55,14 +55,14 @@ export const liquidate = async (
   );
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     amountLamports
   );
+  signers.push(transferAuthority);
 
   // get destination account
   const toAccount = await findOrCreateAccountByMint(
@@ -104,7 +104,9 @@ export const liquidate = async (
       withdrawReserve.pubkey,
       withdrawReserve.info.collateralSupply,
       obligation.pubkey,
+      repayReserve.info.lendingMarket,
       authority,
+      transferAuthority.publicKey,
       dexMarketAddress,
       dexOrderBookSide,
       memory

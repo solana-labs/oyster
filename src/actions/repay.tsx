@@ -51,14 +51,14 @@ export const repay = async (
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     amountLamports
   );
+  signers.push(transferAuthority);
 
   // get destination account
   const toAccount = await findOrCreateAccountByMint(
@@ -76,9 +76,11 @@ export const repay = async (
     instructions,
     cleanupInstructions,
     obligationToken.pubkey,
-    authority,
     wallet.publicKey,
-    obligationToken.info.amount.toNumber()
+    obligationToken.info.amount.toNumber(),
+
+    // reuse transfer authority
+    transferAuthority.publicKey,
   );
 
   // TODO: add obligation
@@ -95,7 +97,9 @@ export const repay = async (
       obligation.pubkey,
       obligation.info.tokenMint,
       obligationToken.pubkey,
-      authority
+      repayReserve.info.lendingMarket,
+      authority,
+      transferAuthority.publicKey,
     )
   );
 
