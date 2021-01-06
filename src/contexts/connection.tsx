@@ -14,8 +14,8 @@ export const ENDPOINTS = [
     endpoint: 'https://solana-api.projectserum.com/',
   },
   {
-    name: 'lending' as ENV,
-    endpoint: 'https://tln.solana.com',
+    name: 'Oyster Dev' as ENV,
+    endpoint: 'http://oyster-dev.solana.com/',
   },
   { name: 'testnet' as ENV, endpoint: clusterApiUrl('testnet') },
   { name: 'devnet' as ENV, endpoint: clusterApiUrl('devnet') },

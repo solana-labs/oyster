@@ -68,7 +68,7 @@ export const liquidateInstruction = (
 
     { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
 
     { pubkey: dexMarket, isSigner: false, isWritable: false },
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },

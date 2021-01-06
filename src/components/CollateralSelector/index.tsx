@@ -52,6 +52,7 @@ export const CollateralSelector = (props: {
   const market = cache.get(props.reserve?.lendingMarket) as ParsedAccount<
     LendingMarket
   >;
+  debugger;
   if (!market) return null;
 
   const quoteMintAddress = market?.info?.quoteMint?.toBase58();

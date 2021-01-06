@@ -35,7 +35,7 @@ export const withdrawInstruction = (
     { pubkey: reserveSupply, isSigner: false, isWritable: true },
     { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];

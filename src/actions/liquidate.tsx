@@ -90,8 +90,6 @@ export const liquidate = async (
     ? dexMarket?.info.bids
     : dexMarket?.info.asks;
 
-  console.log(dexMarketAddress.toBase58());
-
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
 
   instructions.push(

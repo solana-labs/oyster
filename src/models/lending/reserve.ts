@@ -13,6 +13,7 @@ import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './lending';
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct([
+  Layout.uint64('lastUpdateSlot'),
 
   Layout.publicKey('lendingMarket'),
   Layout.publicKey('liquidityMint'),
@@ -26,17 +27,6 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
   // TODO: replace u32 option with generic quivalent
   BufferLayout.u32('dexMarketOption'),
   Layout.publicKey('dexMarket'),
-
-  BufferLayout.struct(
-    [
-      Layout.uint64('lastUpdateSlot'),
-      Layout.uint128('cumulativeBorrowRateWad'),
-      Layout.uint128('borrowedLiquidityWad'),
-      Layout.uint64('availableLiquidity'),
-      Layout.uint64('collateralMintSupply'),
-    ],
-    'state'
-  ),
 
   BufferLayout.struct(
     [
@@ -74,14 +64,23 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     'config'
   ),
 
+  BufferLayout.struct(
+    [    
+      Layout.uint128('cumulativeBorrowRateWad'),
+      Layout.uint128('borrowedLiquidityWad'),
+      Layout.uint64('availableLiquidity'),
+      Layout.uint64('collateralMintSupply'),
+    ],
+    'state'
+  ),
 ]);
 
 export const isLendingReserve = (info: AccountInfo<Buffer>) => {
-  console.log('Lending Reserve: ', LendingReserveLayout.span)
   return info.data.length === LendingReserveLayout.span;
 };
 
 export interface LendingReserve {
+  lastUpdateSlot: BN;
 
   lendingMarket: PublicKey;
   liquiditySupply: PublicKey;
@@ -109,7 +108,6 @@ export interface LendingReserve {
   };
 
   state: {
-    lastUpdateSlot: BN;
     cumulativeBorrowRateWad: BN;
     borrowedLiquidityWad: BN;
 
@@ -122,7 +120,9 @@ export const LendingReserveParser = (pubKey: PublicKey, info: AccountInfo<Buffer
   const buffer = Buffer.from(info.data);
   const data = LendingReserveLayout.decode(buffer) as LendingReserve;
 
-  if (data.state.lastUpdateSlot.toNumber() === 0) return;
+  if (data.lastUpdateSlot.toNumber() === 0) {
+    return;
+  }
 
   const details = {
     pubkey: pubKey,
@@ -183,7 +183,7 @@ export const initReserveInstruction = (
     // NOTE: Why lending market needs to be a signer?
     { pubkey: lendingMarket, isSigner: true, isWritable: true },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },

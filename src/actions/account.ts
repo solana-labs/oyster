@@ -25,7 +25,7 @@ export function ensureSplAccount(
   return account;
 }
 
-export const DEFAULT_TEMP_MEM_SPACE = 65528;
+export const DEFAULT_TEMP_MEM_SPACE = 65548;
 
 export function createTempMemoryAccount(
   instructions: TransactionInstruction[],

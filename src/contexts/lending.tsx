@@ -42,9 +42,6 @@ export const useLending = () => {
   // TODO: query for all the dex from reserves
 
   const processAccount = useCallback((item : { pubkey: PublicKey, account: AccountInfo<Buffer> }) => {
-
-    console.log('Account length: ', item.account.data.length);
-
     if (isLendingReserve(item.account)) {
       const reserve = cache.add(item.pubkey.toBase58(), item.account, LendingReserveParser);
 
