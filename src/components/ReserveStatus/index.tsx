@@ -98,7 +98,7 @@ export const ReserveStatus = (props: {
         <Row gutter={GUTTER}>
           <Col span={6}>
             <Statistic
-              title="Maximum LTV"
+              title={LABELS.MAX_LTV}
               className="small-statisitc"
               value={maxLTV}
               precision={2}
@@ -106,7 +106,7 @@ export const ReserveStatus = (props: {
           </Col>
           <Col span={6}>
             <Statistic
-              title="Liquidation threashold"
+              title={LABELS.LIQUIDATION_THREASHOLD}
               className="small-statisitc"
               value={liquidationThreshold}
               precision={2}
@@ -114,7 +114,7 @@ export const ReserveStatus = (props: {
           </Col>
           <Col span={6}>
             <Statistic
-              title="Liquidation penalty"
+              title={LABELS.LIQUIDATION_PENALTY}
               className="small-statisitc"
               value={liquidationPenalty}
               precision={2}
@@ -122,7 +122,7 @@ export const ReserveStatus = (props: {
           </Col>
           <Col span={6}>
             <Statistic
-              title="APY"
+              title={LABELS.TABLE_TITLE_DEPOSIT_APY}
               className="small-statisitc"
               value={depositAPY * 100}
               precision={2}

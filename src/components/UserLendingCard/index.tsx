@@ -11,6 +11,7 @@ import { formatNumber } from "../../utils/utils";
 import { Button, Card, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { PublicKey } from "@solana/web3.js";
+import { LABELS } from "../../constants";
 
 const { Text } = Typography;
 
@@ -48,7 +49,7 @@ export const UserLendingCard = (props: {
         </div>
       }
     >
-      <h3>Borrows</h3>
+      <h3>{LABELS.BORROWS}</h3>
 
       <div className="card-row">
         <Text type="secondary" className="card-cell ">
@@ -64,14 +65,14 @@ export const UserLendingCard = (props: {
 
       <div className="card-row">
         <Text type="secondary" className="card-cell ">
-          Health factor:
+          {LABELS.TABLE_TITLE_HEALTH}:
         </Text>
         <div className="card-cell ">{health.toFixed(2)}</div>
       </div>
 
       <div className="card-row">
         <Text type="secondary" className="card-cell ">
-          Loan to value:
+          {LABELS.LOAN_TO_VALUE}:
         </Text>
         <div className="card-cell ">{formatNumber.format(ltv)}</div>
       </div>
@@ -88,11 +89,11 @@ export const UserLendingCard = (props: {
         </div>
       </div>
 
-      <h3>Deposits</h3>
+      <h3>{LABELS.DEPOSITS}</h3>
 
       <div className="card-row">
         <Text type="secondary" className="card-cell ">
-          Wallet balance:
+          {LABELS.WALLET_BALANCE}:
         </Text>
         <div className="card-cell ">
           <div>
@@ -119,16 +120,16 @@ export const UserLendingCard = (props: {
         style={{ marginTop: 20, justifyContent: "space-evenly" }}
       >
         <Link to={`/deposit/${address}`}>
-          <Button>Deposit</Button>
+          <Button>{LABELS.DEPOSIT_ACTION}</Button>
         </Link>
         <Link to={`/borrow/${address}`}>
-          <Button>Borrow</Button>
+          <Button>{LABELS.BORROW_ACTION}</Button>
         </Link>
         <Link to={`/withdraw/${address}`}>
-          <Button>Withdraw</Button>
+          <Button>{LABELS.WITHDRAW_ACTION}</Button>
         </Link>
         <Link to={`/repay/${address}`}>
-          <Button>Repay</Button>
+          <Button>{LABELS.REPAY_ACTION}</Button>
         </Link>
       </div>
     </Card>
