@@ -40,6 +40,17 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
       BufferLayout.u8('optimalBorrowRate'),
       /// Max borrow APY
       BufferLayout.u8('maxBorrowRate'),
+
+      /// Fee assessed on `BorrowReserveLiquidity`, expressed as a Wad.
+      /// Must be between 0 and 10^18, such that 10^18 = 1.  A few examples for
+      /// clarity:
+      /// 1% = 10_000_000_000_000_000
+      /// 0.01% (1 basis point) = 100_000_000_000_000
+      /// 0.00001% (Aave borrow fee) = 100_000_000_000
+      BufferLayout.uint64('borrowFeeWad'),
+
+      /// Amount of fee going to host account, if provided in liquidate and repay
+      BufferLayout.u8('hostFeePercentage'),
     ],
     'config'
   ),
@@ -75,6 +86,9 @@ export interface LendingReserve {
     minBorrowRate: number;
     optimalBorrowRate: number;
     maxBorrowRate: number;
+
+    borrowFeeWad: BN;  
+    hostFeePercentage: number;
   };
 
   cumulativeBorrowRateWad: BN;
