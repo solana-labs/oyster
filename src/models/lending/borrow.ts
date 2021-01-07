@@ -87,7 +87,7 @@ export const borrowInstruction = (
       isSigner: false,
       isWritable: true,
     },
-    { pubkey: ownerFeeReceiver, isSigner: false, isWritable: false },
+    { pubkey: ownerFeeReceiver, isSigner: false, isWritable: true },
 
     { pubkey: borrowReserve, isSigner: false, isWritable: true },
     {
@@ -113,7 +113,7 @@ export const borrowInstruction = (
   ];
 
   if(hostFeeReceiver) {
-    keys.push({ pubkey: hostFeeReceiver, isSigner: false, isWritable: false })
+    keys.push({ pubkey: hostFeeReceiver, isSigner: false, isWritable: true })
   }
 
   return new TransactionInstruction({
