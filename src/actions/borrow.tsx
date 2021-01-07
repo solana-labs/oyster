@@ -167,8 +167,8 @@ export const borrow = async (
 
   const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
   const dexOrderBookSide = market.info.quoteMint.equals(depositReserve.info.liquidityMint)
-    ? dexMarket?.info.bids
-    : dexMarket?.info.asks;
+    ? dexMarket?.info.asks
+    : dexMarket?.info.bids;
 
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
 

@@ -87,8 +87,8 @@ export const liquidate = async (
   const market = cache.get(withdrawReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
 
   const dexOrderBookSide = market.info.quoteMint.equals(repayReserve.info.liquidityMint)
-    ? dexMarket?.info.bids
-    : dexMarket?.info.asks;
+    ? dexMarket?.info.asks
+    : dexMarket?.info.bids;
 
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
 
