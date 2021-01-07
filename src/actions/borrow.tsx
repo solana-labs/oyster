@@ -170,7 +170,7 @@ export const borrow = async (
     ? dexMarket?.info.asks
     : dexMarket?.info.bids;
 
-  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
+  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
 
   // Creates host fee account if it doesn't exsist
   let hostFeeReceiver = LEND_HOST_FEE_ADDRESS
