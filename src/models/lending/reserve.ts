@@ -13,6 +13,7 @@ import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './lending';
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct([
+  BufferLayout.u8('version'),
   Layout.uint64('lastUpdateSlot'),
 
   Layout.publicKey('lendingMarket'),
@@ -76,7 +77,7 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
 ]);
 
 export const isLendingReserve = (info: AccountInfo<Buffer>) => {
-  return info.data.length === LendingReserveLayout.span;
+  return info.data.length === LendingReserveLayout.span + 300;
 };
 
 export interface LendingReserve {
