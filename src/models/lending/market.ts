@@ -17,7 +17,7 @@ export interface LendingMarket {
 }
 
 export const isLendingMarket = (info: AccountInfo<Buffer>) => {
-  return info.data.length === LendingMarketLayout.span + 62;
+  return info.data.length === LendingMarketLayout.span + 63;
 };
 
 export const LendingMarketParser = (
