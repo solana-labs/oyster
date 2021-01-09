@@ -5,7 +5,7 @@ import * as Layout from "./../../utils/layout";
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8("version"),
+    BufferLayout.u8('version'),
     /// Slot when obligation was updated. Used for calculating interest.
     Layout.uint64("lastUpdateSlot"),
     /// Amount of collateral tokens deposited for this obligation
@@ -20,14 +20,19 @@ export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayo
     Layout.publicKey("borrowReserve"),
     /// Mint address of the tokens for this obligation
     Layout.publicKey("tokenMint"),
+
+    // extra space for future contract changes
+    BufferLayout.blob(128, "padding"),
   ]
 );
 
 export const isLendingObligation = (info: AccountInfo<Buffer>) => {
-  return info.data.length === LendingObligationLayout.span + 300;
+  return info.data.length === LendingObligationLayout.span;
 };
 
 export interface LendingObligation {
+  version: number;
+
   lastUpdateSlot: BN;
   depositedCollateral: BN;
   collateralReserve: PublicKey;

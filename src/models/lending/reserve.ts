@@ -66,7 +66,7 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
   ),
 
   BufferLayout.struct(
-    [    
+    [
       Layout.uint128('cumulativeBorrowRateWad'),
       Layout.uint128('borrowedLiquidityWad'),
       Layout.uint64('availableLiquidity'),
@@ -74,13 +74,18 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
     ],
     'state'
   ),
+
+  // extra space for future contract changes
+  BufferLayout.blob(300, "padding"),
 ]);
 
 export const isLendingReserve = (info: AccountInfo<Buffer>) => {
-  return info.data.length === LendingReserveLayout.span + 300;
+  return info.data.length === LendingReserveLayout.span;
 };
 
 export interface LendingReserve {
+  version: number;
+
   lastUpdateSlot: BN;
 
   lendingMarket: PublicKey;
