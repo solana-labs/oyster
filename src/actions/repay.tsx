@@ -8,15 +8,15 @@ import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
 import { repayInstruction } from "./../models/lending/repay";
-import { AccountLayout } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID } from "../utils/ids";
-import { findOrCreateAccountByMint } from "./account";
+import { AccountLayout, Token, NATIVE_MINT } from "@solana/spl-token";
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../utils/ids";
+import { createTokenAccount, findOrCreateAccountByMint } from "./account";
 import { approve, LendingObligation, TokenAccount } from "../models";
 import { ParsedAccount } from "../contexts/accounts";
 
 export const repay = async (
-  from: TokenAccount, // CollateralAccount
-  amountLamports: number, // in collateral token (lamports)
+  from: TokenAccount,
+  repayAmount: number,
 
   // which loan to repay
   obligation: ParsedAccount<LendingObligation>,
@@ -31,7 +31,7 @@ export const repay = async (
   wallet: any
 ) => {
   notify({
-    message: 'Repaing funds...',
+    message: 'Repaying funds...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });
@@ -48,7 +48,11 @@ export const repay = async (
     LENDING_PROGRAM_ID
   );
 
-  const fromAccount = from.pubkey;
+  let fromAccount = from.pubkey;
+  if (wallet.publicKey.equals(fromAccount) && repayReserve.info.liquidityMint.equals(NATIVE_MINT)) {
+    fromAccount = createTokenAccount(instructions, wallet.publicKey, accountRentExempt + repayAmount, NATIVE_MINT, wallet.publicKey, signers);
+    cleanupInstructions.push(Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, fromAccount, wallet.publicKey, wallet.publicKey, []));
+  }
 
   // create approval for transfer transactions
   approve(
@@ -57,7 +61,7 @@ export const repay = async (
     fromAccount,
     authority,
     wallet.publicKey,
-    amountLamports
+    repayAmount
   );
 
   // get destination account
@@ -85,7 +89,7 @@ export const repay = async (
 
   instructions.push(
     repayInstruction(
-      amountLamports,
+      repayAmount,
       fromAccount,
       toAccount,
       repayReserve.pubkey,

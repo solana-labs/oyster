@@ -28,7 +28,7 @@ export const liquidate = async (
   withdrawReserve: ParsedAccount<LendingReserve>
 ) => {
   notify({
-    message: 'Repaing funds...',
+    message: 'Repaying funds...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });

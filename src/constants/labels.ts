@@ -53,7 +53,7 @@ export const LABELS = {
   TABLE_TITLE_MARKET_SIZE: "Market Size",
   TABLE_TITLE_ACTION: "Action",
   MAX_LTV: "Maximum LTV",
-  LIQUIDATION_THREASHOLD: "Liquidation threashold",
+  LIQUIDATION_THRESHOLD: "Liquidation threshold",
   LIQUIDATION_PENALTY: "Liquidation penalty",
   TABLE_TITLE_MAX_BORROW: "Available for you",
   DASHBOARD_TITLE_LOANS: "Loans",
