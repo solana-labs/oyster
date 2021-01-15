@@ -5,11 +5,12 @@ import * as Layout from "./../../utils/layout";
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),
+    BufferLayout.u8('bumpSeed'),
     Layout.publicKey("quoteMint"),
     Layout.publicKey("tokenProgramId"),
 
     // extra space for future contract changes
-    BufferLayout.blob(63, "padding"),
+    BufferLayout.blob(62, "padding"),
   ],
 );
 
