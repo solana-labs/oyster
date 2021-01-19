@@ -74,16 +74,12 @@ export function getTokenName(
   return shorten ? `${mintAddress.substring(0, 5)}...` : mintAddress;
 }
 
-export function getTokenByName(tokens: KnownToken[], name: string) {
-  let token = null;
-  const nameToToken = tokens.reduce((map, item) => {
-    map.set(item.tokenSymbol, item);
-    return map;
-  }, new Map<string, any>());
-
-  if (name) {
-    if (nameToToken.has(name)) {
-      token = nameToToken.get(name);
+export function getTokenByName(tokenMap: KnownTokenMap, name: string) {
+  let token: KnownToken | null = null;
+  for (const val of tokenMap.values()) {
+    if (val.tokenSymbol === name) {
+      token = val;
+      break;
     }
   }
   return token;
