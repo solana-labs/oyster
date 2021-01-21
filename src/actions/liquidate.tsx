@@ -55,14 +55,14 @@ export const liquidate = async (
   );
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     amountLamports
   );
+  signers.push(transferAuthority);
 
   // get destination account
   const toAccount = await findOrCreateAccountByMint(
@@ -87,12 +87,10 @@ export const liquidate = async (
   const market = cache.get(withdrawReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
 
   const dexOrderBookSide = market.info.quoteMint.equals(repayReserve.info.liquidityMint)
-    ? dexMarket?.info.bids
-    : dexMarket?.info.asks;
+    ? dexMarket?.info.asks
+    : dexMarket?.info.bids;
 
-  console.log(dexMarketAddress.toBase58());
-
-  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
+  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
 
   instructions.push(
     liquidateInstruction(
@@ -104,7 +102,9 @@ export const liquidate = async (
       withdrawReserve.pubkey,
       withdrawReserve.info.collateralSupply,
       obligation.pubkey,
+      repayReserve.info.lendingMarket,
       authority,
+      transferAuthority.publicKey,
       dexMarketAddress,
       dexOrderBookSide,
       memory

@@ -13,13 +13,18 @@ import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './lending';
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct([
+  BufferLayout.u8('version'),
   Layout.uint64('lastUpdateSlot'),
+
   Layout.publicKey('lendingMarket'),
   Layout.publicKey('liquidityMint'),
   BufferLayout.u8('liquidityMintDecimals'),
   Layout.publicKey('liquiditySupply'),
   Layout.publicKey('collateralMint'),
   Layout.publicKey('collateralSupply'),
+
+  Layout.publicKey('collateralFeesReceiver'),
+
   // TODO: replace u32 option with generic quivalent
   BufferLayout.u32('dexMarketOption'),
   Layout.publicKey('dexMarket'),
@@ -40,15 +45,38 @@ export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.
       BufferLayout.u8('optimalBorrowRate'),
       /// Max borrow APY
       BufferLayout.u8('maxBorrowRate'),
+
+      BufferLayout.struct(
+        [
+          /// Fee assessed on `BorrowReserveLiquidity`, expressed as a Wad.
+          /// Must be between 0 and 10^18, such that 10^18 = 1.  A few examples for
+          /// clarity:
+          /// 1% = 10_000_000_000_000_000
+          /// 0.01% (1 basis point) = 100_000_000_000_000
+          /// 0.00001% (Aave borrow fee) = 100_000_000_000
+          Layout.uint64('borrowFeeWad'),
+
+          /// Amount of fee going to host account, if provided in liquidate and repay
+          BufferLayout.u8('hostFeePercentage'),
+        ],
+        'fees'
+      ),
     ],
     'config'
   ),
 
-  Layout.uint128('cumulativeBorrowRateWad'),
-  Layout.uint128('borrowedLiquidityWad'),
+  BufferLayout.struct(
+    [
+      Layout.uint128('cumulativeBorrowRateWad'),
+      Layout.uint128('borrowedLiquidityWad'),
+      Layout.uint64('availableLiquidity'),
+      Layout.uint64('collateralMintSupply'),
+    ],
+    'state'
+  ),
 
-  Layout.uint64('availableLiquidity'),
-  Layout.uint64('collateralMintSupply'),
+  // extra space for future contract changes
+  BufferLayout.blob(300, "padding"),
 ]);
 
 export const isLendingReserve = (info: AccountInfo<Buffer>) => {
@@ -56,13 +84,16 @@ export const isLendingReserve = (info: AccountInfo<Buffer>) => {
 };
 
 export interface LendingReserve {
+  version: number;
+
   lastUpdateSlot: BN;
 
   lendingMarket: PublicKey;
   liquiditySupply: PublicKey;
   liquidityMint: PublicKey;
-  collateralSupply: PublicKey;
   collateralMint: PublicKey;
+  collateralSupply: PublicKey;
+  collateralFeesReceiver: PublicKey;
 
   dexMarketOption: number;
   dexMarket: PublicKey;
@@ -75,19 +106,29 @@ export interface LendingReserve {
     minBorrowRate: number;
     optimalBorrowRate: number;
     maxBorrowRate: number;
+
+    fees: {
+      borrowFeeWad: BN;  
+      hostFeePercentage: number;
+    };
   };
 
-  cumulativeBorrowRateWad: BN;
-  borrowedLiquidityWad: BN;
+  state: {
+    cumulativeBorrowRateWad: BN;
+    borrowedLiquidityWad: BN;
 
-  availableLiquidity: BN;
-  collateralMintSupply: BN;
+    availableLiquidity: BN;
+    collateralMintSupply: BN;
+  };
 }
 
 export const LendingReserveParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
   const buffer = Buffer.from(info.data);
-  const data = LendingReserveLayout.decode(buffer);
-  if (data.lastUpdateSlot.toNumber() === 0) return;
+  const data = LendingReserveLayout.decode(buffer) as LendingReserve;
+
+  if (data.lastUpdateSlot.toNumber() === 0) {
+    return;
+  }
 
   const details = {
     pubkey: pubKey,
@@ -96,6 +137,8 @@ export const LendingReserveParser = (pubKey: PublicKey, info: AccountInfo<Buffer
     },
     info: data,
   };
+
+  
 
   return details;
 };
@@ -114,6 +157,7 @@ export const initReserveInstruction = (
   collateralSupply: PublicKey,
   lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
+  transferAuthority: PublicKey,
 
   dexMarket: PublicKey // TODO: optional
 ): TransactionInstruction => {
@@ -145,6 +189,7 @@ export const initReserveInstruction = (
     // NOTE: Why lending market needs to be a signer?
     { pubkey: lendingMarket, isSigner: true, isWritable: true },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -160,20 +205,22 @@ export const initReserveInstruction = (
 };
 
 export const calculateUtilizationRatio = (reserve: LendingReserve) => {
-  let borrowedLiquidity = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
-  return borrowedLiquidity / (reserve.availableLiquidity.toNumber() + borrowedLiquidity);
+  const totalBorrows = wadToLamports(reserve.state.borrowedLiquidityWad).toNumber();
+  const currentUtilization = totalBorrows / (reserve.state.availableLiquidity.toNumber() + totalBorrows);
+
+  return currentUtilization;
 };
 
 export const reserveMarketCap = (reserve?: LendingReserve) => {
-  const available = reserve?.availableLiquidity.toNumber() || 0;
-  const borrowed = wadToLamports(reserve?.borrowedLiquidityWad).toNumber();
+  const available = reserve?.state.availableLiquidity.toNumber() || 0;
+  const borrowed = wadToLamports(reserve?.state.borrowedLiquidityWad).toNumber();
   const total = available + borrowed;
 
   return total;
 };
 
 export const collateralExchangeRate = (reserve?: LendingReserve) => {
-  return (reserve?.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve);
+  return (reserve?.state.collateralMintSupply.toNumber() || 1) / reserveMarketCap(reserve);
 };
 
 export const collateralToLiquidity = (collateralAmount: BN | number, reserve?: LendingReserve) => {

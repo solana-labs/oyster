@@ -58,14 +58,15 @@ export const deposit = async (
   );
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     amountLamports
   );
+
+  signers.push(transferAuthority);
 
   let toAccount: PublicKey;
   if (isInitalized) {
@@ -90,7 +91,9 @@ export const deposit = async (
         amountLamports,
         fromAccount,
         toAccount,
+        reserve.lendingMarket,
         authority,
+        transferAuthority.publicKey,
         reserveAddress,
         reserve.liquiditySupply,
         reserve.collateralMint
@@ -112,6 +115,7 @@ export const deposit = async (
         reserve.collateralSupply,
         reserve.lendingMarket,
         authority,
+        transferAuthority.publicKey,
         reserve.dexMarket
       )
     );

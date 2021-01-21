@@ -7,19 +7,22 @@ import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
 
 /// Purchase collateral tokens at a discount rate if the chosen obligation is unhealthy.
 ///
-///   0. `[writable]` Liquidity input SPL Token account, $authority can transfer $liquidity_amount
-///   1. `[writable]` Collateral output SPL Token account
+///   0. `[writable]` Source liquidity token account, minted by repay reserve liquidity mint
+///                     $authority can transfer $collateral_amount
+///   1. `[writable]` Destination collateral token account, minted by withdraw reserve collateral mint
 ///   2. `[writable]` Repay reserve account.
 ///   3. `[writable]` Repay reserve liquidity supply SPL Token account
 ///   4. `[writable]` Withdraw reserve account.
 ///   5. `[writable]` Withdraw reserve collateral supply SPL Token account
 ///   6. `[writable]` Obligation - initialized
-///   7. `[]` Derived lending market authority ($authority).
-///   8. `[]` Dex market
-///   9. `[]` Dex market orders
-///   10 `[]` Temporary memory
-///   11 `[]` Clock sysvar
-///   12 `[]` Token program id
+///   7. `[]` Lending market account.
+///   8. `[]` Derived lending market authority.
+///   9. `[]` User transfer authority ($authority).
+///   10 `[]` Dex market
+///   11 `[]` Dex market order book side
+///   12 `[]` Temporary memory
+///   13 `[]` Clock sysvar
+///   14 `[]` Token program id
 export const liquidateInstruction = (
   liquidityAmount: number | BN,
   from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
@@ -29,7 +32,9 @@ export const liquidateInstruction = (
   withdrawReserve: PublicKey,
   withdrawReserveCollateralSupply: PublicKey,
   obligation: PublicKey,
+  lendingMarket: PublicKey,
   authority: PublicKey,
+  transferAuthority: PublicKey,
   dexMarket: PublicKey,
   dexOrderBookSide: PublicKey,
   memory: PublicKey
@@ -61,7 +66,9 @@ export const liquidateInstruction = (
 
     { pubkey: obligation, isSigner: false, isWritable: true },
 
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
 
     { pubkey: dexMarket, isSigner: false, isWritable: false },
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },

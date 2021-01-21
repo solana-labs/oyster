@@ -2,33 +2,39 @@ import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
-import { wadToLamports } from '../../utils/utils';
 import * as Layout from './../../utils/layout';
 import { calculateBorrowAPY } from './borrow';
 import { LendingInstruction } from './lending';
-import { LendingReserve } from './reserve';
+import { calculateUtilizationRatio, LendingReserve } from './reserve';
 
 /// Deposit liquidity into a reserve. The output is a collateral token representing ownership
 /// of the reserve liquidity pool.
 ///
-///   0. `[writable]` Liquidity input SPL Token account. $authority can transfer $liquidity_amount
-///   1. `[writable]` Collateral output SPL Token account,
+///   0. `[writable]` Source liquidity token account. $authority can transfer $liquidity_amount
+///   1. `[writable]` Destination collateral token account.
 ///   2. `[writable]` Reserve account.
 ///   3. `[writable]` Reserve liquidity supply SPL Token account.
 ///   4. `[writable]` Reserve collateral SPL Token mint.
-///   5. `[]` Derived lending market authority ($authority).
-///   6. `[]` Clock sysvar
-///   7. '[]` Token program id
+///   5. `[]` Lending market account.
+///   6. `[]` Derived lending market authority.
+///   7. `[]` User transfer authority ($authority).
+///   8. `[]` Clock sysvar
+///   9. '[]` Token program id
 export const depositInstruction = (
   liquidityAmount: number | BN,
   from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
   to: PublicKey, // Collateral output SPL Token account,
+  lendingMarket: PublicKey,
   reserveAuthority: PublicKey,
+  transferAuthority: PublicKey,
   reserveAccount: PublicKey,
   reserveSupply: PublicKey,
   collateralMint: PublicKey
 ): TransactionInstruction => {
-  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('liquidityAmount')]);
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8('instruction'), 
+    Layout.uint64('liquidityAmount')
+  ]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
@@ -45,7 +51,9 @@ export const depositInstruction = (
     { pubkey: reserveAccount, isSigner: false, isWritable: true },
     { pubkey: reserveSupply, isSigner: false, isWritable: true },
     { pubkey: collateralMint, isSigner: false, isWritable: true },
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: reserveAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
@@ -57,8 +65,7 @@ export const depositInstruction = (
 };
 
 export const calculateDepositAPY = (reserve: LendingReserve) => {
-  const totalBorrows = wadToLamports(reserve.borrowedLiquidityWad).toNumber();
-  const currentUtilization = totalBorrows / (reserve.availableLiquidity.toNumber() + totalBorrows);
+  const currentUtilization = calculateUtilizationRatio(reserve);
 
   const borrowAPY = calculateBorrowAPY(reserve);
   return currentUtilization * borrowAPY;

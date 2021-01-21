@@ -8,18 +8,21 @@ import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
 /// Repay loaned tokens to a reserve and receive collateral tokens. The obligation balance
 /// will be recalculated for interest.
 ///
-///   0. `[writable]` Liquidity input SPL Token account, $authority can transfer $liquidity_amount
-///   1. `[writable]` Collateral output SPL Token account
+///   0. `[writable]` Source liquidity token account, minted by repay reserve liquidity mint
+///                     $authority can transfer $collateral_amount
+///   1. `[writable]` Destination collateral token account, minted by withdraw reserve collateral mint
 ///   2. `[writable]` Repay reserve account.
 ///   3. `[writable]` Repay reserve liquidity supply SPL Token account
 ///   4. `[]` Withdraw reserve account.
 ///   5. `[writable]` Withdraw reserve collateral supply SPL Token account
 ///   6. `[writable]` Obligation - initialized
-///   7. `[writable]` Obligation token mint, $authority can transfer calculated amount
-///   8. `[writable]` Obligation token input
-///   9. `[]` Derived lending market authority ($authority).
-///   10 `[]` Clock sysvar
-///   11 `[]` Token program id
+///   7. `[writable]` Obligation token mint
+///   8. `[writable]` Obligation token input, $authority can transfer calculated amount
+///   9. `[]` Lending market account.
+///   10 `[]` Derived lending market authority.
+///   11 `[]` User transfer authority ($authority).
+///   12 `[]` Clock sysvar
+///   13 `[]` Token program id
 export const repayInstruction = (
   liquidityAmount: number | BN,
   from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
@@ -31,7 +34,9 @@ export const repayInstruction = (
   obligation: PublicKey,
   obligationMint: PublicKey,
   obligationInput: PublicKey,
-  authority: PublicKey
+  lendingMarket: PublicKey,
+  authority: PublicKey,
+  transferAuthority: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('liquidityAmount')]);
 
@@ -62,7 +67,10 @@ export const repayInstruction = (
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationInput, isSigner: false, isWritable: true },
 
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
+
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];

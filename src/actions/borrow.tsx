@@ -8,7 +8,7 @@ import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import { LendingReserve } from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, MintLayout } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID } from "../utils/ids";
+import { LENDING_PROGRAM_ID, LEND_HOST_FEE_ADDRESS } from "../utils/ids";
 import {
   createTempMemoryAccount,
   createUninitializedAccount,
@@ -60,20 +60,20 @@ export const borrow = async (
   const obligation = existingObligation
     ? existingObligation.pubkey
     : createUninitializedObligation(
-        instructions,
-        wallet.publicKey,
-        await connection.getMinimumBalanceForRentExemption(LendingObligationLayout.span),
-        signers
-      );
+      instructions,
+      wallet.publicKey,
+      await connection.getMinimumBalanceForRentExemption(LendingObligationLayout.span),
+      signers
+    );
 
   const obligationMint = existingObligation
     ? existingObligation.info.tokenMint
     : createUninitializedMint(
-        instructions,
-        wallet.publicKey,
-        await connection.getMinimumBalanceForRentExemption(MintLayout.span),
-        signers
-      );
+      instructions,
+      wallet.publicKey,
+      await connection.getMinimumBalanceForRentExemption(MintLayout.span),
+      signers
+    );
 
   const obligationTokenOutput = obligationAccount
     ? obligationAccount
@@ -147,14 +147,14 @@ export const borrow = async (
   );
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
     instructions,
     cleanupInstructions,
     fromAccount,
-    authority,
     wallet.publicKey,
     fromLamports
   );
+  signers.push(transferAuthority);
 
   const dexMarketAddress = borrowReserve.info.dexMarketOption
     ? borrowReserve.info.dexMarket
@@ -167,10 +167,23 @@ export const borrow = async (
 
   const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
   const dexOrderBookSide = market.info.quoteMint.equals(depositReserve.info.liquidityMint)
-    ? dexMarket?.info.bids
-    : dexMarket?.info.asks;
+    ? dexMarket?.info.asks
+    : dexMarket?.info.bids;
 
-  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers);
+  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
+
+  // Creates host fee account if it doesn't exsist
+  let hostFeeReceiver = LEND_HOST_FEE_ADDRESS
+    ? findOrCreateAccountByMint(
+      wallet.publicKey,
+      LEND_HOST_FEE_ADDRESS,
+      instructions,
+      cleanupInstructions,
+      accountRentExempt,
+      depositReserve.info.collateralMint,
+      signers
+    )
+    : undefined;
 
   // deposit
   instructions.push(
@@ -181,6 +194,8 @@ export const borrow = async (
       toAccount,
       depositReserve.pubkey,
       depositReserve.info.collateralSupply,
+      depositReserve.info.collateralFeesReceiver,
+
       borrowReserve.pubkey,
       borrowReserve.info.liquiditySupply,
 
@@ -189,12 +204,16 @@ export const borrow = async (
       obligationTokenOutput,
       wallet.publicKey,
 
+      depositReserve.info.lendingMarket,
       authority,
+      transferAuthority.publicKey,
 
       dexMarketAddress,
       dexOrderBookSide,
 
-      memory
+      memory,
+
+      hostFeeReceiver,
     )
   );
   try {

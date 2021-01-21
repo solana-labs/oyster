@@ -38,14 +38,15 @@ export const withdraw = async (
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
-  approve(
+  const transferAuthority = approve(
       instructions,
       cleanupInstructions,
       fromAccount,
-      authority,
       wallet.publicKey,
       amountLamports
   );
+
+  signers.push(transferAuthority);
 
   // get destination account
   const toAccount = await findOrCreateAccountByMint(
@@ -66,7 +67,9 @@ export const withdraw = async (
       reserveAddress,
       reserve.collateralMint,
       reserve.liquiditySupply,
-      authority
+      reserve.lendingMarket,
+      authority,
+      transferAuthority.publicKey,
     )
   );
 

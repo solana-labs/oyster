@@ -11,7 +11,7 @@ import {
   LendingObligationParser,
 } from './../models/lending';
 import { cache, getMultipleAccounts, MintParser, ParsedAccount } from './accounts';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, AccountInfo } from '@solana/web3.js';
 import { DexMarketParser } from '../models/dex';
 import { usePrecacheMarket } from './market';
 import { useLendingReserves } from '../hooks';
@@ -41,7 +41,7 @@ export const useLending = () => {
 
   // TODO: query for all the dex from reserves
 
-  const processAccount = useCallback((item) => {
+  const processAccount = useCallback((item : { pubkey: PublicKey, account: AccountInfo<Buffer> }) => {
     if (isLendingReserve(item.account)) {
       const reserve = cache.add(item.pubkey.toBase58(), item.account, LendingReserveParser);
 
