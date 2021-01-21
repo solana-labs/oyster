@@ -59,14 +59,15 @@ export const WithdrawInput = (props: {
 
     (async () => {
       try {
-        await withdraw(
-          fromAccounts[0],
-          type === InputType.Percent
+        const withdrawAmount = Math.min(type === InputType.Percent
             ? (pct * collateralBalanceLamports) / 100
             : Math.ceil(
                 collateralBalanceLamports *
                   (parseFloat(value) / collateralBalanceInLiquidity)
-              ),
+              ), collateralBalanceLamports);
+        await withdraw(
+          fromAccounts[0],
+          withdrawAmount,
           reserve,
           address,
           connection,

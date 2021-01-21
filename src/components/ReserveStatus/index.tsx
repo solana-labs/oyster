@@ -106,7 +106,7 @@ export const ReserveStatus = (props: {
           </Col>
           <Col span={6}>
             <Statistic
-              title={LABELS.LIQUIDATION_THREASHOLD}
+              title={LABELS.LIQUIDATION_THRESHOLD}
               className="small-statisitc"
               value={liquidationThreshold}
               precision={2}
