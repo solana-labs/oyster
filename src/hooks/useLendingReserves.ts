@@ -2,6 +2,8 @@ import { PublicKey } from "@solana/web3.js";
 import { useEffect, useMemo, useState } from "react";
 import { LendingReserve, LendingReserveParser } from "../models/lending";
 import { cache, ParsedAccount } from "./../contexts/accounts";
+import { useConnectionConfig } from "./../contexts/connection";
+import { getTokenByName, KnownToken } from "../utils/utils";
 
 export const getLendingReserves = () => {
   return cache
@@ -33,7 +35,27 @@ export function useLendingReserves() {
 }
 
 export function useLendingReserve(address?: string | PublicKey) {
-  const id = useMemo(() => typeof address === "string" ? address : address?.toBase58(), [address]);
+  const { tokenMap } = useConnectionConfig();
+  const { reserveAccounts } = useLendingReserves();
+  let addressName = address;
+  if (typeof address === "string") {
+    const token: KnownToken | null = getTokenByName(tokenMap, address);
+    if (token) {
+      const account = reserveAccounts.filter(
+        (acc) => acc.info.liquidityMint.toBase58() === token.mintAddress
+      )[0]
+      if (account) {
+        addressName = account.pubkey;
+      }
+    }
+
+  }
+  const id = useMemo(
+    () =>
+      typeof addressName === "string" ? addressName : addressName?.toBase58(),
+    [addressName]
+  );
+
   const [reserveAccount, setReserveAccount] = useState<
     ParsedAccount<LendingReserve>
   >(cache.get(id || "") as ParsedAccount<LendingReserve>);
