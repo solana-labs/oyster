@@ -6,7 +6,7 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { LendingReserve } from "./../models/lending/reserve";
+import { accrueInterestInstruction, LendingReserve } from "./../models/lending/reserve";
 import { liquidateInstruction } from "./../models/lending/liquidate";
 import { AccountLayout } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID } from "../utils/ids";
@@ -91,6 +91,13 @@ export const liquidate = async (
     : dexMarket?.info.bids;
 
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
+
+  instructions.push(
+    accrueInterestInstruction(
+      repayReserve.pubkey,
+      withdrawReserve.pubkey,
+    )
+  );
 
   instructions.push(
     liquidateInstruction(

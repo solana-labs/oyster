@@ -6,7 +6,7 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { LendingReserve, withdrawInstruction } from "./../models/lending";
+import { accrueInterestInstruction, LendingReserve, withdrawInstruction } from "./../models/lending";
 import { AccountLayout } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID } from "../utils/ids";
 import { findOrCreateAccountByMint } from "./account";
@@ -57,6 +57,12 @@ export const withdraw = async (
     accountRentExempt,
     reserve.liquidityMint,
     signers
+  );
+
+  instructions.push(
+    accrueInterestInstruction(
+      reserveAddress
+    )
   );
 
   instructions.push(

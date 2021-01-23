@@ -6,7 +6,7 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { LendingReserve } from "./../models/lending/reserve";
+import { accrueInterestInstruction, LendingReserve } from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, MintLayout } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, LEND_HOST_FEE_ADDRESS } from "../utils/ids";
 import {
@@ -123,7 +123,6 @@ export const borrow = async (
   )
   : undefined;
 
-
   if (instructions.length > 0) {
     // create all accounts in one transaction
     let tx = await sendTransaction(connection, wallet, instructions, [...signers]);
@@ -201,6 +200,13 @@ export const borrow = async (
     : dexMarket?.info.bids;
 
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
+
+  instructions.push(
+    accrueInterestInstruction(
+      depositReserve.pubkey,
+      borrowReserve.pubkey,
+    )
+  );
 
   // borrow
   instructions.push(

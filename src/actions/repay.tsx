@@ -6,7 +6,7 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { LendingReserve } from "./../models/lending/reserve";
+import { accrueInterestInstruction, LendingReserve } from "./../models/lending/reserve";
 import { repayInstruction } from "./../models/lending/repay";
 import { AccountLayout, Token, NATIVE_MINT } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../utils/ids";
@@ -87,8 +87,13 @@ export const repay = async (
     transferAuthority.publicKey,
   );
 
-  // TODO: add obligation
-
+  instructions.push(
+    accrueInterestInstruction(
+      repayReserve.pubkey,
+      withdrawReserve.pubkey,
+    )
+  );
+  
   instructions.push(
     repayInstruction(
       repayAmount,

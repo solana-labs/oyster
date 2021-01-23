@@ -7,6 +7,7 @@ import {
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
 import {
+  accrueInterestInstruction,
   depositInstruction,
   initReserveInstruction,
   LendingReserve,
@@ -85,6 +86,12 @@ export const deposit = async (
   }
 
   if (isInitalized) {
+    instructions.push(
+      accrueInterestInstruction(
+        reserveAddress,
+      )
+    );
+
     // deposit
     instructions.push(
       depositInstruction(

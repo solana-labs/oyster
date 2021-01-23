@@ -205,7 +205,7 @@ export const initReserveInstruction = (
 };
 
 export const accrueInterestInstruction = (
-  reserveAccount: PublicKey[],
+  ...reserveAccount: PublicKey[]
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
