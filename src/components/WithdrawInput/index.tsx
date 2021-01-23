@@ -59,12 +59,15 @@ export const WithdrawInput = (props: {
 
     (async () => {
       try {
-        const withdrawAmount = Math.min(type === InputType.Percent
+        const withdrawAmount = Math.min(
+          type === InputType.Percent
             ? (pct * collateralBalanceLamports) / 100
             : Math.ceil(
                 collateralBalanceLamports *
                   (parseFloat(value) / collateralBalanceInLiquidity)
-              ), collateralBalanceLamports);
+              ),
+          collateralBalanceLamports
+        );
         await withdraw(
           fromAccounts[0],
           withdrawAmount,
@@ -142,7 +145,9 @@ export const WithdrawInput = (props: {
             loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
-            {fromAccounts.length === 0 ? LABELS.NO_DEPOSITS : LABELS.WITHDRAW_ACTION}
+            {fromAccounts.length === 0
+              ? LABELS.NO_DEPOSITS
+              : LABELS.WITHDRAW_ACTION}
           </ConnectButton>
         </div>
       )}

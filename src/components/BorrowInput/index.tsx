@@ -157,7 +157,9 @@ export const BorrowInput = (props: {
             loading={pendingTx}
             disabled={fromAccounts.length === 0}
           >
-            {fromAccounts.length === 0 ? LABELS.NO_DEPOSITS : LABELS.BORROW_ACTION}
+            {fromAccounts.length === 0
+              ? LABELS.NO_DEPOSITS
+              : LABELS.BORROW_ACTION}
           </ConnectButton>
           <BackButton />
         </div>

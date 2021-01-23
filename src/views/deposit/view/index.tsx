@@ -8,7 +8,7 @@ export const DepositView = () => {
   const { reserveAccounts } = useLendingReserves();
   return (
     <div className="flexColumn">
-      <Card >
+      <Card>
         <div className="deposit-item deposit-header">
           <div>Asset</div>
           <div>Your wallet balance</div>

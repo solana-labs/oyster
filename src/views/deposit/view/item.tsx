@@ -17,10 +17,14 @@ export const ReserveItem = (props: {
   address: PublicKey;
 }) => {
   const name = useTokenName(props.reserve.liquidityMint);
-  const { balance: tokenBalance, balanceInUSD: tokenBalanceInUSD } = useUserBalance(props.reserve.liquidityMint);
-  const { balance: collateralBalance, balanceInUSD: collateralBalanceInUSD } = useUserCollateralBalance(
-    props.reserve
-  );
+  const {
+    balance: tokenBalance,
+    balanceInUSD: tokenBalanceInUSD,
+  } = useUserBalance(props.reserve.liquidityMint);
+  const {
+    balance: collateralBalance,
+    balanceInUSD: collateralBalanceInUSD,
+  } = useUserCollateralBalance(props.reserve);
 
   const apy = calculateDepositAPY(props.reserve);
 
@@ -33,14 +37,22 @@ export const ReserveItem = (props: {
         </span>
         <div>
           <div>
-            <div><em>{formatNumber.format(tokenBalance)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(tokenBalanceInUSD)}</div>
+            <div>
+              <em>{formatNumber.format(tokenBalance)}</em> {name}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(tokenBalanceInUSD)}
+            </div>
           </div>
         </div>
         <div>
           <div>
-            <div><em>{formatNumber.format(collateralBalance)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(collateralBalanceInUSD)}</div>
+            <div>
+              <em>{formatNumber.format(collateralBalance)}</em> {name}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(collateralBalanceInUSD)}
+            </div>
           </div>
         </div>
         <div>{formatPct.format(apy)}</div>

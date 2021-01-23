@@ -30,11 +30,17 @@ export function useUserObligations() {
           userAccounts: [...accountsByMint.get(ob.info.tokenMint.toBase58())],
         };
       })
-      .sort((a, b) => b.obligation.info.borrowedInQuote - a.obligation.info.borrowedInQuote);
+      .sort(
+        (a, b) =>
+          b.obligation.info.borrowedInQuote - a.obligation.info.borrowedInQuote
+      );
   }, [accountsByMint, obligations]);
 
   return {
     userObligations,
-    totalInQuote: userObligations.reduce((result, item) => result + item.obligation.info.borrowedInQuote, 0),
+    totalInQuote: userObligations.reduce(
+      (result, item) => result + item.obligation.info.borrowedInQuote,
+      0
+    ),
   };
 }

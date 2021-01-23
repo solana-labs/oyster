@@ -6,7 +6,10 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { accrueInterestInstruction, LendingReserve } from "./../models/lending/reserve";
+import {
+  accrueInterestInstruction,
+  LendingReserve,
+} from "./../models/lending/reserve";
 import { AccountLayout, MintInfo, MintLayout } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID, LEND_HOST_FEE_ADDRESS } from "../utils/ids";
 import {
@@ -16,8 +19,8 @@ import {
   createUninitializedObligation,
   ensureSplAccount,
   findOrCreateAccountByMint,
-} from './account';
-import { cache, MintParser, ParsedAccount } from '../contexts/accounts';
+} from "./account";
+import { cache, MintParser, ParsedAccount } from "../contexts/accounts";
 import {
   TokenAccount,
   LendingObligationLayout,
@@ -47,9 +50,9 @@ export const borrow = async (
   obligationAccount?: PublicKey
 ) => {
   notify({
-    message: 'Borrowing funds...',
-    description: 'Please review transactions to approve.',
-    type: 'warn',
+    message: "Borrowing funds...",
+    description: "Please review transactions to approve.",
+    type: "warn",
   });
 
   let signers: Account[] = [];
@@ -61,29 +64,38 @@ export const borrow = async (
     LENDING_PROGRAM_ID
   );
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span
+  );
 
   const obligation = existingObligation
     ? existingObligation.pubkey
     : createUninitializedObligation(
-      instructions,
-      wallet.publicKey,
-      await connection.getMinimumBalanceForRentExemption(LendingObligationLayout.span),
-      signers
-    );
+        instructions,
+        wallet.publicKey,
+        await connection.getMinimumBalanceForRentExemption(
+          LendingObligationLayout.span
+        ),
+        signers
+      );
 
   const obligationMint = existingObligation
     ? existingObligation.info.tokenMint
     : createUninitializedMint(
-      instructions,
-      wallet.publicKey,
-      await connection.getMinimumBalanceForRentExemption(MintLayout.span),
-      signers
-    );
+        instructions,
+        wallet.publicKey,
+        await connection.getMinimumBalanceForRentExemption(MintLayout.span),
+        signers
+      );
 
   const obligationTokenOutput = obligationAccount
     ? obligationAccount
-    : createUninitializedAccount(instructions, wallet.publicKey, accountRentExempt, signers);
+    : createUninitializedAccount(
+        instructions,
+        wallet.publicKey,
+        accountRentExempt,
+        signers
+      );
 
   let toAccount = await findOrCreateAccountByMint(
     wallet.publicKey,
@@ -105,39 +117,41 @@ export const borrow = async (
         obligationTokenOutput,
         wallet.publicKey,
         depositReserve.info.lendingMarket,
-        authority,
+        authority
       )
     );
   }
 
   // Creates host fee account if it doesn't exsist
   let hostFeeReceiver = LEND_HOST_FEE_ADDRESS
-  ? findOrCreateAccountByMint(
-    wallet.publicKey,
-    LEND_HOST_FEE_ADDRESS,
-    instructions,
-    cleanupInstructions,
-    accountRentExempt,
-    depositReserve.info.collateralMint,
-    signers
-  )
-  : undefined;
+    ? findOrCreateAccountByMint(
+        wallet.publicKey,
+        LEND_HOST_FEE_ADDRESS,
+        instructions,
+        cleanupInstructions,
+        accountRentExempt,
+        depositReserve.info.collateralMint,
+        signers
+      )
+    : undefined;
 
   if (instructions.length > 0) {
     // create all accounts in one transaction
-    let tx = await sendTransaction(connection, wallet, instructions, [...signers]);
+    let tx = await sendTransaction(connection, wallet, instructions, [
+      ...signers,
+    ]);
 
     notify({
-      message: 'Obligation accounts created',
+      message: "Obligation accounts created",
       description: `Transaction ${tx}`,
-      type: 'success',
+      type: "success",
     });
   }
 
   notify({
-    message: 'Borrowing funds...',
-    description: 'Please review transactions to approve.',
-    type: 'warn',
+    message: "Borrowing funds...",
+    description: "Please review transactions to approve.",
+    type: "warn",
   });
 
   signers = [];
@@ -153,15 +167,19 @@ export const borrow = async (
 
     fromLamports = approvedAmount - accountRentExempt;
 
-    const mint = (await cache.query(connection, borrowReserve.info.liquidityMint, MintParser)) as ParsedAccount<
-      MintInfo
-    >;
+    const mint = (await cache.query(
+      connection,
+      borrowReserve.info.liquidityMint,
+      MintParser
+    )) as ParsedAccount<MintInfo>;
 
     amountLamports = toLamports(amount, mint?.info);
   } else if (amountType === BorrowAmountType.CollateralDepositAmount) {
-    const mint = (await cache.query(connection, depositReserve.info.collateralMint, MintParser)) as ParsedAccount<
-      MintInfo
-    >;
+    const mint = (await cache.query(
+      connection,
+      depositReserve.info.collateralMint,
+      MintParser
+    )) as ParsedAccount<MintInfo>;
     amountLamports = toLamports(amount, mint?.info);
     fromLamports = amountLamports;
   }
@@ -194,18 +212,24 @@ export const borrow = async (
     throw new Error(`Dex market doesn't exist.`);
   }
 
-  const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<LendingMarket>;
-  const dexOrderBookSide = market.info.quoteMint.equals(depositReserve.info.liquidityMint)
+  const market = cache.get(depositReserve.info.lendingMarket) as ParsedAccount<
+    LendingMarket
+  >;
+  const dexOrderBookSide = market.info.quoteMint.equals(
+    depositReserve.info.liquidityMint
+  )
     ? dexMarket?.info.asks
     : dexMarket?.info.bids;
 
-  const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
+  const memory = createTempMemoryAccount(
+    instructions,
+    wallet.publicKey,
+    signers,
+    LENDING_PROGRAM_ID
+  );
 
   instructions.push(
-    accrueInterestInstruction(
-      depositReserve.pubkey,
-      borrowReserve.pubkey,
-    )
+    accrueInterestInstruction(depositReserve.pubkey, borrowReserve.pubkey)
   );
 
   // borrow
@@ -235,19 +259,25 @@ export const borrow = async (
 
       memory,
 
-      hostFeeReceiver,
+      hostFeeReceiver
     )
   );
   try {
-    let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
+    let tx = await sendTransaction(
+      connection,
+      wallet,
+      instructions.concat(cleanupInstructions),
+      signers,
+      true
+    );
 
     notify({
-      message: 'Funds borrowed.',
-      type: 'success',
+      message: "Funds borrowed.",
+      type: "success",
       description: `Transaction - ${tx}`,
     });
   } catch (ex) {
-    console.error(ex)
+    console.error(ex);
     throw new Error();
   }
 };

@@ -1,15 +1,18 @@
-import React from 'react';
-import { useTokenName, useBorrowingPower } from '../../hooks';
-import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
-import { TokenIcon } from '../../components/TokenIcon';
-import { formatNumber, formatPct } from '../../utils/utils';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
-import { PublicKey } from '@solana/web3.js';
-import { LABELS } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import React from "react";
+import { useTokenName, useBorrowingPower } from "../../hooks";
+import { calculateBorrowAPY, LendingReserve } from "../../models/lending";
+import { TokenIcon } from "../../components/TokenIcon";
+import { formatNumber, formatPct } from "../../utils/utils";
+import { Button } from "antd";
+import { Link } from "react-router-dom";
+import { PublicKey } from "@solana/web3.js";
+import { LABELS } from "../../constants";
+import { useMidPriceInUSD } from "../../contexts/market";
 
-export const BorrowItem = (props: { reserve: LendingReserve; address: PublicKey }) => {
+export const BorrowItem = (props: {
+  reserve: LendingReserve;
+  address: PublicKey;
+}) => {
   const name = useTokenName(props.reserve.liquidityMint);
   const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
 
@@ -19,8 +22,8 @@ export const BorrowItem = (props: { reserve: LendingReserve; address: PublicKey 
 
   return (
     <Link to={`/borrow/${props.address.toBase58()}`}>
-      <div className='borrow-item'>
-        <span style={{ display: 'flex' }}>
+      <div className="borrow-item">
+        <span style={{ display: "flex" }}>
           <TokenIcon mintAddress={props.reserve.liquidityMint} />
           {name}
         </span>
@@ -30,12 +33,14 @@ export const BorrowItem = (props: { reserve: LendingReserve; address: PublicKey 
             <div>
               <em>{formatNumber.format(borrowingPower)}</em> {name}
             </div>
-            <div className='dashboard-amount-quote'>${formatNumber.format(totalInQuote)}</div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(totalInQuote)}
+            </div>
           </div>
         </div>
         <div>{formatPct.format(apr)}</div>
         <div>
-          <Button type='primary'>
+          <Button type="primary">
             <span>{LABELS.BORROW_ACTION}</span>
           </Button>
         </div>

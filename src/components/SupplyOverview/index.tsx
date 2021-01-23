@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { PoolInfo } from '../../models';
-import echarts from 'echarts';
-import { formatNumber, formatUSD } from '../../utils/utils';
-import { useEnrichedPools } from '../../contexts/market';
+import React, { useEffect, useMemo, useRef } from "react";
+import { PoolInfo } from "../../models";
+import echarts from "echarts";
+import { formatNumber, formatUSD } from "../../utils/utils";
+import { useEnrichedPools } from "../../contexts/market";
 
 export const SupplyOverview = (props: { pool?: PoolInfo }) => {
   const { pool } = props;
@@ -44,7 +44,7 @@ export const SupplyOverview = (props: { pool?: PoolInfo }) => {
 
     instance.setOption({
       tooltip: {
-        trigger: 'item',
+        trigger: "item",
         formatter: function (params: any) {
           var val = formatUSD.format(params.value);
           var tokenAmount = formatNumber.format(params.data.tokens);
@@ -53,8 +53,8 @@ export const SupplyOverview = (props: { pool?: PoolInfo }) => {
       },
       series: [
         {
-          name: 'Liquidity',
-          type: 'pie',
+          name: "Liquidity",
+          type: "pie",
           top: 0,
           bottom: 0,
           left: 0,
@@ -70,20 +70,20 @@ export const SupplyOverview = (props: { pool?: PoolInfo }) => {
             },
             rich: {
               c: {
-                color: 'black',
+                color: "black",
                 lineHeight: 22,
-                align: 'center',
+                align: "center",
               },
               r: {
-                color: 'black',
-                align: 'right',
+                color: "black",
+                align: "right",
               },
             },
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: "rgba(255, 255, 255, 0.5)",
           },
           itemStyle: {
             normal: {
-              borderColor: '#000',
+              borderColor: "#000",
             },
           },
           data,
@@ -96,5 +96,5 @@ export const SupplyOverview = (props: { pool?: PoolInfo }) => {
     return null;
   }
 
-  return <div ref={chartDiv} style={{ height: 150, width: '100%' }} />;
+  return <div ref={chartDiv} style={{ height: 150, width: "100%" }} />;
 };

@@ -45,19 +45,28 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   }, [reserveAccounts, exclude, include]);
 
   useEffect(() => {
-    const activeMarkets = new Set(reserveAccounts.map(r => r.info.dexMarket.toBase58()));
+    const activeMarkets = new Set(
+      reserveAccounts.map((r) => r.info.dexMarket.toBase58())
+    );
 
     const userDepositsFactory = () => {
       return userAccounts
-        .filter((acc) => reservesByCollateralMint.has(acc?.info.mint.toBase58()))
+        .filter((acc) =>
+          reservesByCollateralMint.has(acc?.info.mint.toBase58())
+        )
         .map((item) => {
           const reserve = reservesByCollateralMint.get(
             item?.info.mint.toBase58()
           ) as ParsedAccount<LendingReserve>;
 
-          let collateralMint = cache.get(reserve.info.collateralMint) as ParsedAccount<MintInfo>;
+          let collateralMint = cache.get(
+            reserve.info.collateralMint
+          ) as ParsedAccount<MintInfo>;
 
-          const amountLamports = calculateCollateralBalance(reserve.info, item?.info.amount.toNumber());
+          const amountLamports = calculateCollateralBalance(
+            reserve.info,
+            item?.info.amount.toNumber()
+          );
           const amount = fromLamports(amountLamports, collateralMint?.info);
           const price = midPriceInUSD(reserve.info.liquidityMint.toBase58());
           const amountInQuote = price * amount;
@@ -78,7 +87,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
 
     const dispose = marketEmitter.onMarket((args) => {
       // ignore if none of the markets is used by the reserve
-      if ([...args.ids.values()].every(id => !activeMarkets.has(id))) {
+      if ([...args.ids.values()].every((id) => !activeMarkets.has(id))) {
         return;
       }
 
@@ -90,10 +99,20 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
     return () => {
       dispose();
     };
-  }, [userAccounts, reserveAccounts, reservesByCollateralMint, tokenMap, midPriceInUSD, marketEmitter]);
+  }, [
+    userAccounts,
+    reserveAccounts,
+    reservesByCollateralMint,
+    tokenMap,
+    midPriceInUSD,
+    marketEmitter,
+  ]);
 
   return {
     userDeposits,
-    totalInQuote: userDeposits.reduce((res, item) => res + item.info.amountInQuote, 0),
+    totalInQuote: userDeposits.reduce(
+      (res, item) => res + item.info.amountInQuote,
+      0
+    ),
   };
 }

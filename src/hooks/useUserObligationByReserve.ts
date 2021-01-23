@@ -17,13 +17,14 @@ export function useUserObligationByReserve(
       typeof collateralReserve === "string"
         ? collateralReserve
         : collateralReserve?.toBase58();
-    return userObligations.filter(
-      (item) =>
-        borrowId && collateralId ?
-          item.obligation.info.borrowReserve.toBase58() === borrowId &&
-          item.obligation.info.collateralReserve.toBase58() === collateralId :
-          (borrowId && item.obligation.info.borrowReserve.toBase58() === borrowId) ||
-          (collateralId && item.obligation.info.collateralReserve.toBase58() === collateralId)
+    return userObligations.filter((item) =>
+      borrowId && collateralId
+        ? item.obligation.info.borrowReserve.toBase58() === borrowId &&
+          item.obligation.info.collateralReserve.toBase58() === collateralId
+        : (borrowId &&
+            item.obligation.info.borrowReserve.toBase58() === borrowId) ||
+          (collateralId &&
+            item.obligation.info.collateralReserve.toBase58() === collateralId)
     );
   }, [borrowReserve, collateralReserve, userObligations]);
 

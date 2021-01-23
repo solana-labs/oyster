@@ -1,5 +1,5 @@
-import { ParsedAccount } from '../../../contexts/accounts';
-import { LendingReserve } from '../../../models/lending/reserve';
+import { ParsedAccount } from "../../../contexts/accounts";
+import { LendingReserve } from "../../../models/lending/reserve";
 
 export interface Token {
   mintAddress: string;

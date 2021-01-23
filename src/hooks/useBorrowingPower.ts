@@ -8,8 +8,18 @@ import { useUserObligations } from "./useUserObligations";
 
 // TODO: add option to decrease buying power by overcollateralization factor
 // TODO: add support for balance in the wallet
-export function useBorrowingPower(reserveAddress: string | PublicKey | undefined, includeWallet = false, overcollateralize = true) {
-  const key = useMemo(() => typeof reserveAddress === 'string' ? reserveAddress : reserveAddress?.toBase58() || '', [reserveAddress]);
+export function useBorrowingPower(
+  reserveAddress: string | PublicKey | undefined,
+  includeWallet = false,
+  overcollateralize = true
+) {
+  const key = useMemo(
+    () =>
+      typeof reserveAddress === "string"
+        ? reserveAddress
+        : reserveAddress?.toBase58() || "",
+    [reserveAddress]
+  );
 
   const reserve = useLendingReserve(key);
 
@@ -20,21 +30,19 @@ export function useBorrowingPower(reserveAddress: string | PublicKey | undefined
   const quoteMintAddess = market?.info?.quoteMint?.toBase58();
 
   // TODO: remove once cross-collateral is supported
-  const onlyQuoteAllowed = liquidityMintAddress !==
-    quoteMintAddess;
+  const onlyQuoteAllowed = liquidityMintAddress !== quoteMintAddess;
 
-  const exclude = useMemo(() => new Set(
-    [key]),
-    [key]);
+  const exclude = useMemo(() => new Set([key]), [key]);
   const inlcude = useMemo(() => {
-    const quoteReserve = getLendingReserves()
-      .find(r => r.info.liquidityMint.toBase58() === quoteMintAddess);
-    return onlyQuoteAllowed && quoteReserve ?
-      new Set([quoteReserve.pubkey.toBase58()]) :
-      undefined;
+    const quoteReserve = getLendingReserves().find(
+      (r) => r.info.liquidityMint.toBase58() === quoteMintAddess
+    );
+    return onlyQuoteAllowed && quoteReserve
+      ? new Set([quoteReserve.pubkey.toBase58()])
+      : undefined;
   }, [onlyQuoteAllowed, quoteMintAddess]);
 
-  const { totalInQuote } = useUserDeposits(exclude, inlcude)
+  const { totalInQuote } = useUserDeposits(exclude, inlcude);
 
   const price = useMidPriceInUSD(liquidityMintAddress).price;
 
@@ -56,6 +64,6 @@ export function useBorrowingPower(reserveAddress: string | PublicKey | undefined
   return {
     borrowingPower: totalInQuote / price,
     totalInQuote,
-    utilization
+    utilization,
   };
 }

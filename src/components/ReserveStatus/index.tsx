@@ -44,7 +44,7 @@ export const ReserveStatus = (props: {
   const totalBorrowsInUSD = price * totalBorrows;
 
   const depositAPY = useMemo(() => calculateDepositAPY(props.reserve), [
-    props.reserve
+    props.reserve,
   ]);
 
   const liquidationThreshold = props.reserve.config.liquidationThreshold;
@@ -54,10 +54,21 @@ export const ReserveStatus = (props: {
   return (
     <Card
       className={props.className}
-      title={<>
-        <TokenIcon style={{ marginRight: 0, marginTop: 0, position: 'absolute', left: 15 }}
-          mintAddress={mintAddress} size={30} />
-        {LABELS.RESERVE_STATUS_TITLE}</>}
+      title={
+        <>
+          <TokenIcon
+            style={{
+              marginRight: 0,
+              marginTop: 0,
+              position: "absolute",
+              left: 15,
+            }}
+            mintAddress={mintAddress}
+            size={30}
+          />
+          {LABELS.RESERVE_STATUS_TITLE}
+        </>
+      }
       bodyStyle={bodyStyle}
     >
       <div className="flexColumn">
@@ -66,21 +77,31 @@ export const ReserveStatus = (props: {
             <Statistic
               title="Available Liquidity"
               value={availableLiquidity}
-              valueRender={(node) => <div>
-                {node}
-                <div className="dashboard-amount-quote-stat">${formatNumber.format(availableLiquidityInUSD)}</div>
-              </div>}
-              precision={2} />
+              valueRender={(node) => (
+                <div>
+                  {node}
+                  <div className="dashboard-amount-quote-stat">
+                    ${formatNumber.format(availableLiquidityInUSD)}
+                  </div>
+                </div>
+              )}
+              precision={2}
+            />
           </Col>
           <Col span={12}>
             <Statistic
               title="Total Borrowed"
               value={totalBorrows}
-              valueRender={(node) => <div>
-                {node}
-                <div className="dashboard-amount-quote-stat">${formatNumber.format(totalBorrowsInUSD)}</div>
-              </div>}
-              precision={2} />
+              valueRender={(node) => (
+                <div>
+                  {node}
+                  <div className="dashboard-amount-quote-stat">
+                    ${formatNumber.format(totalBorrowsInUSD)}
+                  </div>
+                </div>
+              )}
+              precision={2}
+            />
           </Col>
         </Row>
         <Row gutter={GUTTER}>
@@ -102,7 +123,8 @@ export const ReserveStatus = (props: {
               className="small-statisitc"
               value={maxLTV}
               precision={2}
-              suffix="%" />
+              suffix="%"
+            />
           </Col>
           <Col span={6}>
             <Statistic
@@ -110,7 +132,8 @@ export const ReserveStatus = (props: {
               className="small-statisitc"
               value={liquidationThreshold}
               precision={2}
-              suffix="%" />
+              suffix="%"
+            />
           </Col>
           <Col span={6}>
             <Statistic
@@ -118,7 +141,8 @@ export const ReserveStatus = (props: {
               className="small-statisitc"
               value={liquidationPenalty}
               precision={2}
-              suffix="%" />
+              suffix="%"
+            />
           </Col>
           <Col span={6}>
             <Statistic
@@ -126,7 +150,8 @@ export const ReserveStatus = (props: {
               className="small-statisitc"
               value={depositAPY * 100}
               precision={2}
-              suffix="%" />
+              suffix="%"
+            />
           </Col>
         </Row>
       </div>

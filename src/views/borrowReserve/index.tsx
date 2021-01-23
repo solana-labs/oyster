@@ -1,5 +1,9 @@
 import React from "react";
-import { useBorrowingPower, useLendingReserve, useUserObligations } from "../../hooks";
+import {
+  useBorrowingPower,
+  useLendingReserve,
+  useUserObligations,
+} from "../../hooks";
 import { useParams } from "react-router-dom";
 import "./style.less";
 
@@ -17,7 +21,7 @@ export const BorrowReserveView = () => {
   const lendingReserve = useLendingReserve(id);
   const { userObligations, totalInQuote: loansValue } = useUserObligations();
 
-  const { totalInQuote: borrowingPower, utilization } = useBorrowingPower(id)
+  const { totalInQuote: borrowingPower, utilization } = useBorrowingPower(id);
 
   if (!lendingReserve) {
     return null;
@@ -62,17 +66,17 @@ export const BorrowReserveView = () => {
             <BarChartStatistic
               title="Your Loans"
               items={userObligations}
-              getPct={(item) => item.obligation.info.borrowedInQuote / loansValue}
-              name={(item) => item.obligation.info.repayName} />
+              getPct={(item) =>
+                item.obligation.info.borrowedInQuote / loansValue
+              }
+              name={(item) => item.obligation.info.repayName}
+            />
           </Card>
         </Col>
       </Row>
       <Row gutter={GUTTER} style={{ flex: 1 }}>
         <Col xs={24} xl={15}>
-          <BorrowInput
-            className="card-fill"
-            reserve={lendingReserve}
-          />
+          <BorrowInput className="card-fill" reserve={lendingReserve} />
         </Col>
         <Col xs={24} xl={9}>
           <SideReserveOverview

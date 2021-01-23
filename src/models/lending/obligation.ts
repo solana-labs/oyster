@@ -1,4 +1,10 @@
-import { AccountInfo, PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import {
+  AccountInfo,
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  SYSVAR_RENT_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
 import { LendingInstruction } from ".";
@@ -7,7 +13,7 @@ import * as Layout from "./../../utils/layout";
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('version'),
+    BufferLayout.u8("version"),
     /// Amount of collateral tokens deposited for this obligation
     Layout.uint64("depositedCollateral"),
     /// Reserve which collateral tokens were deposited into
@@ -60,8 +66,8 @@ export const LendingObligationParser = (
 };
 
 export const healthFactorToRiskColor = (health: number) => {
-  return '';
-} 
+  return "";
+};
 
 /// Initializes a new loan obligation.
 ///	    ///
@@ -84,19 +90,14 @@ export const initObligationInstruction = (
   obligationTokenOutput: PublicKey,
   obligationTokenOwner: PublicKey,
   lendingMarket: PublicKey,
-  lendingMarketAuthority: PublicKey,
-  
-
-  
+  lendingMarketAuthority: PublicKey
 ): TransactionInstruction => {
-  const dataLayout = BufferLayout.struct([
-    BufferLayout.u8('instruction'),
-  ]);
+  const dataLayout = BufferLayout.struct([BufferLayout.u8("instruction")]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
-      instruction: LendingInstruction.InitObligation, 
+      instruction: LendingInstruction.InitObligation,
     },
     data
   );

@@ -1,9 +1,13 @@
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js';
-import BN from 'bn.js';
-import { LendingInstruction } from './lending';
-import * as BufferLayout from 'buffer-layout';
-import * as Layout from './../../utils/layout';
-import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { LendingInstruction } from "./lending";
+import * as BufferLayout from "buffer-layout";
+import * as Layout from "./../../utils/layout";
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from "../../utils/ids";
 
 /// Purchase collateral tokens at a discount rate if the chosen obligation is unhealthy.
 ///
@@ -39,7 +43,10 @@ export const liquidateInstruction = (
   dexOrderBookSide: PublicKey,
   memory: PublicKey
 ): TransactionInstruction => {
-  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('liquidityAmount')]);
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8("instruction"),
+    Layout.uint64("liquidityAmount"),
+  ]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(

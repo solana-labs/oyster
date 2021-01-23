@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 import Chart, { ChartPluginsOptions } from "chart.js";
-import { Position } from './interfaces';
+import { Position } from "./interfaces";
 
 // Special thanks to
 // https://github.com/bZxNetwork/fulcrum_ui/blob/development/packages/fulcrum-website/assets/js/trading.js
@@ -63,34 +63,36 @@ const baseData = [
 function getChartData() {
   //the only way to create an immutable copy of array with objects inside.
   const baseDashed = getBaseDashed();
-  const baseSolid = JSON.parse(JSON.stringify(baseData.slice(0, Math.floor(baseData.length) / 2 + 1)));
+  const baseSolid = JSON.parse(
+    JSON.stringify(baseData.slice(0, Math.floor(baseData.length) / 2 + 1))
+  );
 
   return {
     datasets: [
       {
-        backgroundColor: 'transparent',
-        borderColor: 'rgb(39, 107, 251)',
+        backgroundColor: "transparent",
+        borderColor: "rgb(39, 107, 251)",
         borderWidth: 4,
         radius: 0,
         data: baseSolid,
       },
       {
-        backgroundColor: 'transparent',
+        backgroundColor: "transparent",
 
         borderWidth: 4,
         radius: 0,
         data: baseDashed,
         borderDash: [15, 3],
-        label: 'LEVERAGE',
+        label: "LEVERAGE",
       },
       {
-        backgroundColor: 'transparent',
-        borderColor: 'rgb(86, 169, 255)',
+        backgroundColor: "transparent",
+        borderColor: "rgb(86, 169, 255)",
         borderWidth: 2,
         radius: 0,
         data: baseDashed,
         borderDash: [8, 4],
-        label: 'HOLD',
+        label: "HOLD",
       },
     ],
   };
@@ -99,8 +101,10 @@ function getChartData() {
 const labelPlugin: ChartPluginsOptions = {};
 
 const getBaseDashed = () => {
-  return JSON.parse(JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2))) as { x: number, y: number }[];
-}
+  return JSON.parse(
+    JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2))
+  ) as { x: number; y: number }[];
+};
 
 function updateChartData({
   item,
@@ -116,21 +120,24 @@ function updateChartData({
   }
 
   labelPlugin.afterDraw = (instance: Chart) => {
-    drawLabels(instance, item.leverage, priceChange)
+    drawLabels(instance, item.leverage, priceChange);
   };
 
   const baseDashed = getBaseDashed();
   const leverage = item.leverage;
-  var leverageData = baseDashed.map((item: { x: number; y: number }, index: number) => {
-    if (index === 0) {
-      return { x: item.x, y: item.y };
+  var leverageData = baseDashed.map(
+    (item: { x: number; y: number }, index: number) => {
+      if (index === 0) {
+        return { x: item.x, y: item.y };
+      }
+      const gain = (priceChange * leverage) / 100;
+      return { x: item.x, y: item.y * (1 + gain) };
     }
-    const gain = (priceChange * leverage) / 100;
-    return { x: item.x, y: item.y * (1 + gain) };
-  });
+  );
 
   chart.data.datasets[1].data = leverageData;
-  chart.data.datasets[1].borderColor = priceChange >= 0 ? 'rgb(51, 223, 204)' : 'rgb(255,79,79)';
+  chart.data.datasets[1].borderColor =
+    priceChange >= 0 ? "rgb(51, 223, 204)" : "rgb(255,79,79)";
 
   baseDashed.forEach((item: { y: number; x: number }, index: number) => {
     if (index !== 0) item.y += (item.y * priceChange) / 100;
@@ -140,11 +147,16 @@ function updateChartData({
 
   // chart.chartInstance.canvas.parentNode.style.width = '100%';
   // chart.chartInstance.canvas.parentNode.style.height = 'auto';
-  chart?.update()
+  chart?.update();
 }
 
 function drawLabels(chart: Chart, leverage: number, priceChange: number) {
-  if (!chart.config || !chart.config.data || !chart.config.data.datasets || !chart.canvas) {
+  if (
+    !chart.config ||
+    !chart.config.data ||
+    !chart.config.data.datasets ||
+    !chart.canvas
+  ) {
     return;
   }
 
@@ -154,11 +166,11 @@ function drawLabels(chart: Chart, leverage: number, priceChange: number) {
   }
 
   ctx.save();
-  ctx.font = 'normal normal bold 15px /1.5 Muli';
-  ctx.textBaseline = 'bottom';
+  ctx.font = "normal normal bold 15px /1.5 Muli";
+  ctx.textBaseline = "bottom";
 
   const datasets = chart.config.data.datasets;
-  const element = (chart?.canvas?.parentNode as HTMLElement);
+  const element = chart?.canvas?.parentNode as HTMLElement;
   datasets.forEach((ds, index) => {
     const label = ds.label;
     ctx.fillStyle = ds.borderColor as string;
@@ -171,7 +183,7 @@ function drawLabels(chart: Chart, leverage: number, priceChange: number) {
     const y = meta.data[pointPostition]._model.y;
     let yOffset;
 
-    if (label === 'HOLD') {
+    if (label === "HOLD") {
       yOffset = leverage * priceChange > 0 ? y * 1.2 : y * 0.8;
     } else {
       yOffset = leverage * priceChange > 0 ? y * 0.8 : y * 1.2;
@@ -187,7 +199,13 @@ function drawLabels(chart: Chart, leverage: number, priceChange: number) {
   ctx.restore();
 }
 
-export default function GainsChart({ item, priceChange }: { item: Position; priceChange: number }) {
+export default function GainsChart({
+  item,
+  priceChange,
+}: {
+  item: Position;
+  priceChange: number;
+}) {
   const chartRef = useRef<Chart>();
   const canvasRef = useRef<HTMLCanvasElement>();
 
@@ -197,11 +215,9 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
     }
 
     chartRef.current = new Chart(canvasRef.current, {
-      type: 'line',
+      type: "line",
       data: getChartData(),
-      plugins: [
-        labelPlugin
-      ],
+      plugins: [labelPlugin],
       options: {
         responsive: true,
         maintainAspectRatio: true,
@@ -213,12 +229,12 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
           },
         },
         labels: {
-          render: 'title',
-          fontColor: ['green', 'white', 'red'],
+          render: "title",
+          fontColor: ["green", "white", "red"],
           precision: 2,
         },
         animation: {
-          easing: 'easeOutExpo',
+          easing: "easeOutExpo",
           duration: 500,
         },
         scales: {
@@ -228,8 +244,8 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
               gridLines: {
                 display: false,
               },
-              type: 'linear',
-              position: 'bottom',
+              type: "linear",
+              position: "bottom",
             },
           ],
           yAxes: [
@@ -244,7 +260,7 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
         legend: {
           display: false,
         },
-      } as any
+      } as any,
     });
   }, []);
 
@@ -255,14 +271,21 @@ export default function GainsChart({ item, priceChange }: { item: Position; pric
   }, [priceChange, item]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        justifyContent: "center",
+      }}
+    >
       <canvas ref={canvasRef as any} />
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <span>past</span>

@@ -7,10 +7,8 @@ import { Button } from "antd";
 import { Link } from "react-router-dom";
 import { LABELS } from "../../../constants";
 
-export const DepositItem = (props: {
-  userDeposit: UserDeposit;
-}) => {
-  const {reserve, info} = props.userDeposit;
+export const DepositItem = (props: { userDeposit: UserDeposit }) => {
+  const { reserve, info } = props.userDeposit;
   const mintAddress = reserve.info.liquidityMint;
   const name = useTokenName(mintAddress);
 
@@ -19,30 +17,34 @@ export const DepositItem = (props: {
   ]);
 
   return (
-      <div className="dashboard-item">
-        <span style={{ display: "flex" }}>
-          <TokenIcon mintAddress={mintAddress} />
-          {name}
-        </span>
+    <div className="dashboard-item">
+      <span style={{ display: "flex" }}>
+        <TokenIcon mintAddress={mintAddress} />
+        {name}
+      </span>
+      <div>
         <div>
           <div>
-            <div><em>{formatNumber.format(info.amount)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(info.amountInQuote)}</div>
+            <em>{formatNumber.format(info.amount)}</em> {name}
+          </div>
+          <div className="dashboard-amount-quote">
+            ${formatNumber.format(info.amountInQuote)}
           </div>
         </div>
-        <div>{formatPct.format(depositAPY)}</div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Link to={`/deposit/${reserve.pubkey.toBase58()}`}>
-            <Button type="primary">
-              <span>{LABELS.DEPOSIT_ACTION}</span>
-            </Button>
-          </Link>
-          <Link to={`/withdraw/${reserve.pubkey.toBase58()}`}>
-            <Button  type="text">
-              <span>{LABELS.WITHDRAW_ACTION}</span>
-            </Button>
-          </Link>
-        </div>
       </div>
+      <div>{formatPct.format(depositAPY)}</div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Link to={`/deposit/${reserve.pubkey.toBase58()}`}>
+          <Button type="primary">
+            <span>{LABELS.DEPOSIT_ACTION}</span>
+          </Button>
+        </Link>
+        <Link to={`/withdraw/${reserve.pubkey.toBase58()}`}>
+          <Button type="text">
+            <span>{LABELS.WITHDRAW_ACTION}</span>
+          </Button>
+        </Link>
+      </div>
+    </div>
   );
 };

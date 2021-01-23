@@ -10,7 +10,11 @@ export const ConnectButton = (
   const { wallet, connected } = useWallet();
   const { onClick, children, disabled, ...rest } = props;
   return (
-    <Button {...rest} onClick={connected ? onClick : wallet.connect} disabled={connected && disabled}>
+    <Button
+      {...rest}
+      onClick={connected ? onClick : wallet.connect}
+      disabled={connected && disabled}
+    >
       {connected ? props.children : LABELS.CONNECT_LABEL}
     </Button>
   );

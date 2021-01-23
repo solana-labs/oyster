@@ -9,7 +9,7 @@ export const BorrowView = () => {
   const { reserveAccounts } = useLendingReserves();
   return (
     <div className="flexColumn">
-      <Card >
+      <Card>
         <div className="borrow-item deposit-header">
           <div>{LABELS.TABLE_TITLE_ASSET}</div>
           <div>Serum Dex Price</div>

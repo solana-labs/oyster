@@ -43,12 +43,11 @@ export function useLendingReserve(address?: string | PublicKey) {
     if (token) {
       const account = reserveAccounts.filter(
         (acc) => acc.info.liquidityMint.toBase58() === token.mintAddress
-      )[0]
+      )[0];
       if (account) {
         addressName = account.pubkey;
       }
     }
-
   }
   const id = useMemo(
     () =>

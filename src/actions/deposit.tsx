@@ -30,9 +30,9 @@ export const deposit = async (
   wallet: any
 ) => {
   notify({
-    message: 'Depositing funds...',
-    description: 'Please review transactions to approve.',
-    type: 'warn',
+    message: "Depositing funds...",
+    description: "Please review transactions to approve.",
+    type: "warn",
   });
 
   const isInitalized = true; // TODO: finish reserve init
@@ -42,7 +42,9 @@ export const deposit = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span
+  );
 
   const [authority] = await PublicKey.findProgramAddress(
     [reserve.lendingMarket.toBuffer()], // which account should be authority
@@ -82,15 +84,16 @@ export const deposit = async (
       signers
     );
   } else {
-    toAccount = createUninitializedAccount(instructions, wallet.publicKey, accountRentExempt, signers);
+    toAccount = createUninitializedAccount(
+      instructions,
+      wallet.publicKey,
+      accountRentExempt,
+      signers
+    );
   }
 
   if (isInitalized) {
-    instructions.push(
-      accrueInterestInstruction(
-        reserveAddress,
-      )
-    );
+    instructions.push(accrueInterestInstruction(reserveAddress));
 
     // deposit
     instructions.push(
@@ -129,11 +132,17 @@ export const deposit = async (
   }
 
   try {
-    let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
+    let tx = await sendTransaction(
+      connection,
+      wallet,
+      instructions.concat(cleanupInstructions),
+      signers,
+      true
+    );
 
     notify({
-      message: 'Funds deposited.',
-      type: 'success',
+      message: "Funds deposited.",
+      type: "success",
       description: `Transaction - ${tx}`,
     });
   } catch {

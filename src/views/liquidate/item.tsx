@@ -1,6 +1,10 @@
 import React, { useMemo } from "react";
 import { cache, ParsedAccount, useMint } from "../../contexts/accounts";
-import { LendingReserve, calculateBorrowAPY, collateralToLiquidity } from "../../models/lending";
+import {
+  LendingReserve,
+  calculateBorrowAPY,
+  collateralToLiquidity,
+} from "../../models/lending";
 import { EnrichedLendingObligation, useTokenName } from "../../hooks";
 import { Link } from "react-router-dom";
 import { Button } from "antd";
@@ -60,14 +64,22 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
         </span>
         <div>
           <div>
-            <div><em>{formatNumber.format(borrowAmount)}</em> {borrowName}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(obligation.borrowedInQuote)}</div>
+            <div>
+              <em>{formatNumber.format(borrowAmount)}</em> {borrowName}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(obligation.borrowedInQuote)}
+            </div>
           </div>
         </div>
         <div>
           <div>
-            <div><em>{formatNumber.format(collateral)}</em> {collateralName}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(obligation.collateralInQuote)}</div>
+            <div>
+              <em>{formatNumber.format(collateral)}</em> {collateralName}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(obligation.collateralInQuote)}
+            </div>
           </div>
         </div>
         <div>{formatPct.format(borrowAPY)}</div>

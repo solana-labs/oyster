@@ -6,7 +6,11 @@ import {
 } from "@solana/web3.js";
 import { sendTransaction } from "../contexts/connection";
 import { notify } from "../utils/notifications";
-import { accrueInterestInstruction, LendingReserve, withdrawInstruction } from "./../models/lending";
+import {
+  accrueInterestInstruction,
+  LendingReserve,
+  withdrawInstruction,
+} from "./../models/lending";
 import { AccountLayout } from "@solana/spl-token";
 import { LENDING_PROGRAM_ID } from "../utils/ids";
 import { findOrCreateAccountByMint } from "./account";
@@ -21,9 +25,9 @@ export const withdraw = async (
   wallet: any
 ) => {
   notify({
-    message: 'Withdrawing funds...',
-    description: 'Please review transactions to approve.',
-    type: 'warn',
+    message: "Withdrawing funds...",
+    description: "Please review transactions to approve.",
+    type: "warn",
   });
 
   // user from account
@@ -31,19 +35,24 @@ export const withdraw = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span
+  );
 
-  const [authority] = await PublicKey.findProgramAddress([reserve.lendingMarket.toBuffer()], LENDING_PROGRAM_ID);
+  const [authority] = await PublicKey.findProgramAddress(
+    [reserve.lendingMarket.toBuffer()],
+    LENDING_PROGRAM_ID
+  );
 
   const fromAccount = from.pubkey;
 
   // create approval for transfer transactions
   const transferAuthority = approve(
-      instructions,
-      cleanupInstructions,
-      fromAccount,
-      wallet.publicKey,
-      amountLamports
+    instructions,
+    cleanupInstructions,
+    fromAccount,
+    wallet.publicKey,
+    amountLamports
   );
 
   signers.push(transferAuthority);
@@ -59,11 +68,7 @@ export const withdraw = async (
     signers
   );
 
-  instructions.push(
-    accrueInterestInstruction(
-      reserveAddress
-    )
-  );
+  instructions.push(accrueInterestInstruction(reserveAddress));
 
   instructions.push(
     withdrawInstruction(
@@ -75,16 +80,22 @@ export const withdraw = async (
       reserve.liquiditySupply,
       reserve.lendingMarket,
       authority,
-      transferAuthority.publicKey,
+      transferAuthority.publicKey
     )
   );
 
   try {
-    let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
+    let tx = await sendTransaction(
+      connection,
+      wallet,
+      instructions.concat(cleanupInstructions),
+      signers,
+      true
+    );
 
     notify({
-      message: 'Funds deposited.',
-      type: 'success',
+      message: "Funds deposited.",
+      type: "success",
       description: `Transaction - ${tx}`,
     });
   } catch {

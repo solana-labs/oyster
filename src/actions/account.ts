@@ -1,8 +1,17 @@
-import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT } from '../utils/ids';
-import { LendingObligationLayout, TokenAccount } from '../models';
-import { cache, TokenAccountParser } from './../contexts/accounts';
+import { AccountLayout, MintLayout, Token } from "@solana/spl-token";
+import {
+  Account,
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import {
+  LENDING_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  WRAPPED_SOL_MINT,
+} from "../utils/ids";
+import { LendingObligationLayout, TokenAccount } from "../models";
+import { cache, TokenAccountParser } from "./../contexts/accounts";
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -16,11 +25,31 @@ export function ensureSplAccount(
     return toCheck.pubkey;
   }
 
-  const account = createUninitializedAccount(instructions, payer, amount, signers);
+  const account = createUninitializedAccount(
+    instructions,
+    payer,
+    amount,
+    signers
+  );
 
-  instructions.push(Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT, account, payer));
+  instructions.push(
+    Token.createInitAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      WRAPPED_SOL_MINT,
+      account,
+      payer
+    )
+  );
 
-  cleanupInstructions.push(Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, account, payer, payer, []));
+  cleanupInstructions.push(
+    Token.createCloseAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      account,
+      payer,
+      payer,
+      []
+    )
+  );
 
   return account;
 }
@@ -125,9 +154,16 @@ export function createTokenAccount(
   owner: PublicKey,
   signers: Account[]
 ) {
-  const account = createUninitializedAccount(instructions, payer, accountRentExempt, signers);
+  const account = createUninitializedAccount(
+    instructions,
+    payer,
+    accountRentExempt,
+    signers
+  );
 
-  instructions.push(Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, mint, account, owner));
+  instructions.push(
+    Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, mint, account, owner)
+  );
 
   return account;
 }
@@ -161,10 +197,25 @@ export function findOrCreateAccountByMint(
     toAccount = account.pubkey;
   } else {
     // creating depositor pool account
-    toAccount = createTokenAccount(instructions, payer, accountRentExempt, mint, owner, signers);
+    toAccount = createTokenAccount(
+      instructions,
+      payer,
+      accountRentExempt,
+      mint,
+      owner,
+      signers
+    );
 
     if (isWrappedSol) {
-      cleanupInstructions.push(Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, toAccount, payer, payer, []));
+      cleanupInstructions.push(
+        Token.createCloseAccountInstruction(
+          TOKEN_PROGRAM_ID,
+          toAccount,
+          payer,
+          payer,
+          []
+        )
+      );
     }
   }
 

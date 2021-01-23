@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { LABELS } from '../../../constants';
-import { Position } from './interfaces';
-import { usePoolAndTradeInfoFrom } from './utils';
+import { useEffect } from "react";
+import { LABELS } from "../../../constants";
+import { Position } from "./interfaces";
+import { usePoolAndTradeInfoFrom } from "./utils";
 
 export function useLeverage({
   newPosition,
@@ -33,18 +33,28 @@ export function useLeverage({
       return;
     }
 
-    if (!desiredType || !newPosition.asset.value || !enrichedPools || enrichedPools.length === 0) {
+    if (
+      !desiredType ||
+      !newPosition.asset.value ||
+      !enrichedPools ||
+      enrichedPools.length === 0
+    ) {
       return;
     }
 
     // If there is more of A than B
-    const exchangeRate = enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
+    const exchangeRate =
+      enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
     const leverageDesired = newPosition.leverage;
-    const amountAvailableInOysterForMargin = collateralDeposit.info.amount * exchangeRate;
+    const amountAvailableInOysterForMargin =
+      collateralDeposit.info.amount * exchangeRate;
     const amountToDepositOnMargin = desiredValue / leverageDesired;
 
     if (amountToDepositOnMargin > amountAvailableInOysterForMargin) {
-      setNewPosition({ ...newPosition, error: LABELS.NOT_ENOUGH_MARGIN_MESSAGE });
+      setNewPosition({
+        ...newPosition,
+        error: LABELS.NOT_ENOUGH_MARGIN_MESSAGE,
+      });
       return;
     }
 
@@ -71,6 +81,14 @@ export function useLeverage({
       setNewPosition({ ...newPosition, error: LABELS.LEVERAGE_LIMIT_MESSAGE });
       return;
     }
-    setNewPosition({ ...newPosition, error: '' });
-  }, [collType, desiredType, desiredValue, leverage, enrichedPools, collValue, collateralDeposit]);
+    setNewPosition({ ...newPosition, error: "" });
+  }, [
+    collType,
+    desiredType,
+    desiredValue,
+    leverage,
+    enrichedPools,
+    collValue,
+    collateralDeposit,
+  ]);
 }
