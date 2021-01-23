@@ -1,4 +1,4 @@
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
@@ -24,16 +24,14 @@ export enum BorrowAmountType {
 ///   6. `[writable]` Obligation
 ///   7. `[writable]` Obligation token mint
 ///   8. `[writable]` Obligation token output
-///   9. `[]` Obligation token owner
-///   10 `[]` Lending market account.
-///   11 `[]` Derived lending market authority.
-///   12 `[]` User transfer authority ($authority).
-///   13 `[]` Dex market
-///   14 `[]` Dex market order book side
-///   15 `[]` Temporary memory
-///   16 `[]` Clock sysvar
-///   17 `[]` Rent sysvar
-///   18 '[]` Token program id
+///   8 `[]` Lending market account.
+///   10 `[]` Derived lending market authority.
+///   11 `[]` User transfer authority ($authority).
+///   12 `[]` Dex market
+///   13 `[]` Dex market order book side
+///   14 `[]` Temporary memory
+///   15 `[]` Clock sysvar
+///   16 '[]` Token program id
 export const borrowInstruction = (
   amount: number | BN,
   amountType: BorrowAmountType,
@@ -49,7 +47,6 @@ export const borrowInstruction = (
   obligation: PublicKey,
   obligationMint: PublicKey,
   obligationTokenOutput: PublicKey,
-  obligationTokenOwner: PublicKey,
 
   lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
@@ -98,7 +95,6 @@ export const borrowInstruction = (
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },
-    { pubkey: obligationTokenOwner, isSigner: false, isWritable: false },
 
     { pubkey: lendingMarket, isSigner: false, isWritable: false },
     { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
@@ -108,7 +104,6 @@ export const borrowInstruction = (
     { pubkey: dexOrderBookSide, isSigner: false, isWritable: false },
     { pubkey: memory, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 

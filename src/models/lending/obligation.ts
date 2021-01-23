@@ -1,6 +1,8 @@
-import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { AccountInfo, PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
 import * as BufferLayout from "buffer-layout";
+import { LendingInstruction } from ".";
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../../utils/ids";
 import * as Layout from "./../../utils/layout";
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -60,3 +62,50 @@ export const LendingObligationParser = (
 export const healthFactorToRiskColor = (health: number) => {
   return '';
 } 
+
+export const initObligationInstruction = (
+  depositReserve: PublicKey,
+  borrowReserve: PublicKey,
+  obligation: PublicKey,
+  obligationMint: PublicKey,
+  obligationTokenOutput: PublicKey,
+  obligationTokenOwner: PublicKey,
+  lendingMarket: PublicKey,
+  lendingMarketAuthority: PublicKey,
+  
+
+  
+): TransactionInstruction => {
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8('instruction'),
+  ]);
+
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: LendingInstruction.InitObligation, 
+    },
+    data
+  );
+
+  const keys = [
+    { pubkey: depositReserve, isSigner: false, isWritable: true },
+    { pubkey: borrowReserve, isSigner: false, isWritable: true },
+    { pubkey: obligation, isSigner: false, isWritable: true },
+    { pubkey: obligationMint, isSigner: false, isWritable: true },
+    { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },
+    { pubkey: obligationTokenOwner, isSigner: false, isWritable: false },
+
+    { pubkey: lendingMarket, isSigner: false, isWritable: false },
+    { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
+
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+  ];
+  return new TransactionInstruction({
+    keys,
+    programId: LENDING_PROGRAM_ID,
+    data,
+  });
+};

@@ -26,6 +26,7 @@ import {
   BorrowAmountType,
   LendingObligation,
   approve,
+  initObligationInstruction,
 } from "../models";
 import { toLamports } from "../utils/utils";
 
@@ -185,7 +186,22 @@ export const borrow = async (
     )
     : undefined;
 
-  // deposit
+  if (!obligationAccount) {
+    instructions.push(
+      initObligationInstruction(
+        depositReserve.pubkey,
+        borrowReserve.pubkey,
+        obligation,
+        obligationMint,
+        obligationTokenOutput,
+        wallet.publicKey,
+        depositReserve.info.lendingMarket,
+        authority,
+      )
+    );
+  }
+
+  // borrow
   instructions.push(
     borrowInstruction(
       amountLamports,
@@ -202,7 +218,6 @@ export const borrow = async (
       obligation,
       obligationMint,
       obligationTokenOutput,
-      wallet.publicKey,
 
       depositReserve.info.lendingMarket,
       authority,
