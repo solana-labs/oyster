@@ -7,4 +7,5 @@ export enum LendingInstruction {
   BorrowLiquidity = 5,
   RepayOblogationLiquidity = 6,
   LiquidateObligation = 7,
+  AccrueReserveInterest = 8,
 }

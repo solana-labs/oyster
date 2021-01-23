@@ -56,6 +56,11 @@ export const borrow = async (
   let instructions: TransactionInstruction[] = [];
   let cleanupInstructions: TransactionInstruction[] = [];
 
+  const [authority] = await PublicKey.findProgramAddress(
+    [depositReserve.info.lendingMarket.toBuffer()],
+    LENDING_PROGRAM_ID
+  );
+
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   const obligation = existingObligation
@@ -90,6 +95,35 @@ export const borrow = async (
     signers
   );
 
+  if (!obligationAccount) {
+    instructions.push(
+      initObligationInstruction(
+        depositReserve.pubkey,
+        borrowReserve.pubkey,
+        obligation,
+        obligationMint,
+        obligationTokenOutput,
+        wallet.publicKey,
+        depositReserve.info.lendingMarket,
+        authority,
+      )
+    );
+  }
+
+  // Creates host fee account if it doesn't exsist
+  let hostFeeReceiver = LEND_HOST_FEE_ADDRESS
+  ? findOrCreateAccountByMint(
+    wallet.publicKey,
+    LEND_HOST_FEE_ADDRESS,
+    instructions,
+    cleanupInstructions,
+    accountRentExempt,
+    depositReserve.info.collateralMint,
+    signers
+  )
+  : undefined;
+
+
   if (instructions.length > 0) {
     // create all accounts in one transaction
     let tx = await sendTransaction(connection, wallet, instructions, [...signers]);
@@ -110,11 +144,6 @@ export const borrow = async (
   signers = [];
   instructions = [];
   cleanupInstructions = [];
-
-  const [authority] = await PublicKey.findProgramAddress(
-    [depositReserve.info.lendingMarket.toBuffer()],
-    LENDING_PROGRAM_ID
-  );
 
   let amountLamports: number = 0;
   let fromLamports: number = 0;
@@ -173,34 +202,6 @@ export const borrow = async (
 
   const memory = createTempMemoryAccount(instructions, wallet.publicKey, signers, LENDING_PROGRAM_ID);
 
-  // Creates host fee account if it doesn't exsist
-  let hostFeeReceiver = LEND_HOST_FEE_ADDRESS
-    ? findOrCreateAccountByMint(
-      wallet.publicKey,
-      LEND_HOST_FEE_ADDRESS,
-      instructions,
-      cleanupInstructions,
-      accountRentExempt,
-      depositReserve.info.collateralMint,
-      signers
-    )
-    : undefined;
-
-  if (!obligationAccount) {
-    instructions.push(
-      initObligationInstruction(
-        depositReserve.pubkey,
-        borrowReserve.pubkey,
-        obligation,
-        obligationMint,
-        obligationTokenOutput,
-        wallet.publicKey,
-        depositReserve.info.lendingMarket,
-        authority,
-      )
-    );
-  }
-
   // borrow
   instructions.push(
     borrowInstruction(
@@ -239,8 +240,8 @@ export const borrow = async (
       type: 'success',
       description: `Transaction - ${tx}`,
     });
-  } catch {
-    // TODO:
+  } catch (ex) {
+    console.error(ex)
     throw new Error();
   }
 };

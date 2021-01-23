@@ -204,6 +204,32 @@ export const initReserveInstruction = (
   });
 };
 
+export const accrueInterestInstruction = (
+  reserveAccount: PublicKey[],
+): TransactionInstruction => {
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8('instruction'),
+  ]);
+
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: LendingInstruction.AccrueReserveInterest,
+    },
+    data
+  );
+
+  const keys = [
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    ...reserveAccount.map(reserve => ({ pubkey: reserve, isSigner: false, isWritable: true }))
+  ];
+  return new TransactionInstruction({
+    keys,
+    programId: LENDING_PROGRAM_ID,
+    data,
+  });
+};
+
 export const calculateUtilizationRatio = (reserve: LendingReserve) => {
   const totalBorrows = wadToLamports(reserve.state.borrowedLiquidityWad).toNumber();
   const currentUtilization = totalBorrows / (reserve.state.availableLiquidity.toNumber() + totalBorrows);

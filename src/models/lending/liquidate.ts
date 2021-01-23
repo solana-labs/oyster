@@ -10,7 +10,7 @@ import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
 ///   0. `[writable]` Source liquidity token account, minted by repay reserve liquidity mint
 ///                     $authority can transfer $collateral_amount
 ///   1. `[writable]` Destination collateral token account, minted by withdraw reserve collateral mint
-///   2. `[writable]` Repay reserve account.
+///   2. `[]` Repay reserve account.
 ///   3. `[writable]` Repay reserve liquidity supply SPL Token account
 ///   4. `[writable]` Withdraw reserve account.
 ///   5. `[writable]` Withdraw reserve collateral supply SPL Token account
@@ -57,7 +57,7 @@ export const liquidateInstruction = (
     { pubkey: repayReserveAccount, isSigner: false, isWritable: true },
     { pubkey: repayReserveLiquiditySupply, isSigner: false, isWritable: true },
 
-    { pubkey: withdrawReserve, isSigner: false, isWritable: true },
+    { pubkey: withdrawReserve, isSigner: false, isWritable: false },
     {
       pubkey: withdrawReserveCollateralSupply,
       isSigner: false,

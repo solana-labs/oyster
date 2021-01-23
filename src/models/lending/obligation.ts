@@ -63,6 +63,19 @@ export const healthFactorToRiskColor = (health: number) => {
   return '';
 } 
 
+/// Initializes a new loan obligation.
+///	    ///
+///   0. `[]` Deposit reserve account.	    ///   0. `[]` Deposit reserve account.
+///   1. `[writable]` Borrow reserve account.	    ///   1. `[]` Borrow reserve account.
+///   2. `[writable]` Obligation	    ///   2. `[writable]` Obligation
+///   3. `[writable]` Obligation token mint	    ///   3. `[writable]` Obligation token mint
+///   4. `[writable]` Obligation token output	    ///   4. `[writable]` Obligation token output
+///   5. `[]` Obligation token owner	    ///   5. `[]` Obligation token owner
+///   6. `[]` Lending market account.	    ///   6. `[]` Lending market account.
+///   7. `[]` Derived lending market authority.	    ///   7. `[]` Derived lending market authority.
+///   8. `[]` Clock sysvar	    ///   8. `[]` Clock sysvar
+///   9. `[]` Rent sysvar	    ///   9. `[]` Rent sysvar
+///   10 '[]` Token program id	    ///   10 '[]` Token program id
 export const initObligationInstruction = (
   depositReserve: PublicKey,
   borrowReserve: PublicKey,
@@ -89,8 +102,8 @@ export const initObligationInstruction = (
   );
 
   const keys = [
-    { pubkey: depositReserve, isSigner: false, isWritable: true },
-    { pubkey: borrowReserve, isSigner: false, isWritable: true },
+    { pubkey: depositReserve, isSigner: false, isWritable: false },
+    { pubkey: borrowReserve, isSigner: false, isWritable: false },
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: obligationMint, isSigner: false, isWritable: true },
     { pubkey: obligationTokenOutput, isSigner: false, isWritable: true },

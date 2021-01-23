@@ -17,7 +17,7 @@ export enum BorrowAmountType {
 ///   0. `[writable]` Source collateral token account, minted by deposit reserve collateral mint,
 ///                     $authority can transfer $collateral_amount
 ///   1. `[writable]` Destination liquidity token account, minted by borrow reserve liquidity mint
-///   2. `[writable]` Deposit reserve account.
+///   2. `[]` Deposit reserve account.
 ///   3. `[writable]` Deposit reserve collateral supply SPL Token account
 ///   4. `[writable]` Borrow reserve account.
 ///   5. `[writable]` Borrow reserve liquidity supply SPL Token account
@@ -78,7 +78,7 @@ export const borrowInstruction = (
   const keys = [
     { pubkey: from, isSigner: false, isWritable: true },
     { pubkey: to, isSigner: false, isWritable: true },
-    { pubkey: depositReserve, isSigner: false, isWritable: true },
+    { pubkey: depositReserve, isSigner: false, isWritable: false },
     {
       pubkey: depositReserveCollateralSupply,
       isSigner: false,
