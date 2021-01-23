@@ -19,20 +19,25 @@ export function useUserCollateralBalance(
   const [balanceInUSD, setBalanceInUSD] = useState(0);
   const { marketEmitter, midPriceInUSD } = useMarkets();
 
-  const balanceLamports = useMemo(() => reserve &&
-    calculateCollateralBalance(reserve, userBalance),
-    [userBalance, reserve]);
+  const balanceLamports = useMemo(
+    () => reserve && calculateCollateralBalance(reserve, userBalance),
+    [userBalance, reserve]
+  );
 
-  const balance = useMemo(() => fromLamports(balanceLamports, mint),
-    [balanceLamports, mint]);
+  const balance = useMemo(() => fromLamports(balanceLamports, mint), [
+    balanceLamports,
+    mint,
+  ]);
 
   useEffect(() => {
     const updateBalance = () => {
-      setBalanceInUSD(balance * midPriceInUSD(reserve?.liquidityMint?.toBase58() || ''));
-    }
+      setBalanceInUSD(
+        balance * midPriceInUSD(reserve?.liquidityMint?.toBase58() || "")
+      );
+    };
 
     const dispose = marketEmitter.onMarket((args) => {
-      if(args.ids.has(reserve?.dexMarket.toBase58() || '')) {
+      if (args.ids.has(reserve?.dexMarket.toBase58() || "")) {
         updateBalance();
       }
     });
@@ -55,8 +60,10 @@ export function useUserCollateralBalance(
 }
 export function calculateCollateralBalance(
   reserve: LendingReserve,
-  balanceLamports: number) {
-  return reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.state.collateralMintSupply.toNumber() || 1));
+  balanceLamports: number
+) {
+  return (
+    reserveMarketCap(reserve) *
+    (balanceLamports / (reserve?.state.collateralMintSupply.toNumber() || 1))
+  );
 }
-

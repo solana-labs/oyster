@@ -4,14 +4,15 @@ import * as Layout from "./../../utils/layout";
 
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('version'),
-    BufferLayout.u8('bumpSeed'),
+    BufferLayout.u8("version"),
+    BufferLayout.u8("bumpSeed"),
+    Layout.publicKey("owner"),
     Layout.publicKey("quoteMint"),
     Layout.publicKey("tokenProgramId"),
 
     // extra space for future contract changes
     BufferLayout.blob(62, "padding"),
-  ],
+  ]
 );
 
 export interface LendingMarket {
@@ -19,7 +20,7 @@ export interface LendingMarket {
 
   isInitialized: boolean;
   quoteMint: PublicKey;
-  tokenProgramId: PublicKey,
+  tokenProgramId: PublicKey;
 }
 
 export const isLendingMarket = (info: AccountInfo<Buffer>) => {

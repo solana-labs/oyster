@@ -59,19 +59,25 @@ export const LendingReserveItem = (props: {
         </span>
         <div title={marketSize.toString()}>
           <div>
-            <div><em>{formatNumber.format(marketSize)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(props.item?.marketSize)}</div>
+            <div>
+              <em>{formatNumber.format(marketSize)}</em> {name}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(props.item?.marketSize)}
+            </div>
           </div>
         </div>
         <div title={totalBorrows.toString()}>
           <div>
-            <div><em>{formatNumber.format(totalBorrows)}</em> {name}</div>
-            <div className="dashboard-amount-quote">${formatNumber.format(props.item?.borrowed)}</div>
+            <div>
+              <em>{formatNumber.format(totalBorrows)}</em> {name}
+            </div>
+            <div className="dashboard-amount-quote">
+              ${formatNumber.format(props.item?.borrowed)}
+            </div>
           </div>
         </div>
-        <div title={depositAPY.toString()}>
-          {formatPct.format(depositAPY)}
-        </div>
+        <div title={depositAPY.toString()}>{formatPct.format(depositAPY)}</div>
         <div title={borrowAPY.toString()}>{formatPct.format(borrowAPY)}</div>
       </div>
     </Link>

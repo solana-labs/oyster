@@ -1,6 +1,6 @@
-import React from 'react';
-import { useMint, useAccountByMint } from '../../contexts/accounts';
-import { TokenIcon } from '../TokenIcon';
+import React from "react";
+import { useMint, useAccountByMint } from "../../contexts/accounts";
+import { TokenIcon } from "../TokenIcon";
 
 export const TokenDisplay = (props: {
   name: string;
@@ -16,7 +16,8 @@ export const TokenDisplay = (props: {
   let hasBalance: boolean = false;
   if (showBalance) {
     if (tokenAccount && tokenMint) {
-      balance = tokenAccount.info.amount.toNumber() / Math.pow(10, tokenMint.decimals);
+      balance =
+        tokenAccount.info.amount.toNumber() / Math.pow(10, tokenMint.decimals);
       hasBalance = balance > 0;
     }
   }
@@ -27,18 +28,27 @@ export const TokenDisplay = (props: {
         title={mintAddress}
         key={mintAddress}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           {icon || <TokenIcon mintAddress={mintAddress} />}
           {name}
         </div>
         {showBalance ? (
-          <span title={balance.toString()} key={mintAddress} className='token-balance'>
-            &nbsp; {hasBalance ? (balance < 0.001 ? '<0.001' : balance.toFixed(3)) : '-'}
+          <span
+            title={balance.toString()}
+            key={mintAddress}
+            className="token-balance"
+          >
+            &nbsp;{" "}
+            {hasBalance
+              ? balance < 0.001
+                ? "<0.001"
+                : balance.toFixed(3)
+              : "-"}
           </span>
         ) : null}
       </div>

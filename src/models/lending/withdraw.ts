@@ -1,9 +1,13 @@
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js';
-import BN from 'bn.js';
-import * as BufferLayout from 'buffer-layout';
-import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '../../utils/ids';
-import * as Layout from './../../utils/layout';
-import { LendingInstruction } from './lending';
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import * as BufferLayout from "buffer-layout";
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from "../../utils/ids";
+import * as Layout from "./../../utils/layout";
+import { LendingInstruction } from "./lending";
 
 export const withdrawInstruction = (
   collateralAmount: number | BN,
@@ -14,9 +18,12 @@ export const withdrawInstruction = (
   reserveSupply: PublicKey,
   lendingMarket: PublicKey,
   authority: PublicKey,
-  transferAuthority: PublicKey,
+  transferAuthority: PublicKey
 ): TransactionInstruction => {
-  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction'), Layout.uint64('collateralAmount')]);
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8("instruction"),
+    Layout.uint64("collateralAmount"),
+  ]);
 
   const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(

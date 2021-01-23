@@ -23,7 +23,7 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
   );
 
   const totalSupply = availableLiquidity + totalBorrows;
-  const percent = 100 * totalBorrows / totalSupply;
+  const percent = (100 * totalBorrows) / totalSupply;
 
   return (
     <WaterWave
@@ -31,10 +31,11 @@ export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
       showPercent={false}
       title={
         <Statistic
-        title="Utilization"
-        value={percent}
-        suffix="%"
-        precision={2} />
+          title="Utilization"
+          value={percent}
+          suffix="%"
+          precision={2}
+        />
       }
       percent={percent}
     />

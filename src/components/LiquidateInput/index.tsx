@@ -48,7 +48,7 @@ export const LiquidateInput = (props: {
           wadToLamports(obligation.info.borrowAmountWad).toNumber(),
           obligation.account,
           repayReserve,
-          withdrawReserve,
+          withdrawReserve
         );
 
         setShowConfirmation(true);
@@ -58,7 +58,14 @@ export const LiquidateInput = (props: {
         setPendingTx(false);
       }
     })();
-  }, [withdrawReserve, fromAccounts, obligation, repayReserve, wallet, connection]);
+  }, [
+    withdrawReserve,
+    fromAccounts,
+    obligation,
+    repayReserve,
+    wallet,
+    connection,
+  ]);
 
   const bodyStyle: React.CSSProperties = {
     display: "flex",
@@ -73,27 +80,32 @@ export const LiquidateInput = (props: {
       {showConfirmation ? (
         <ActionConfirmation onClose={() => setShowConfirmation(false)} />
       ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
-            }}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+          }}
+        >
+          <div className="liquidate-input-title">
+            {LABELS.SELECT_COLLATERAL}
+          </div>
+          <CollateralSelector
+            reserve={repayReserve.info}
+            collateralReserve={withdrawReserve?.pubkey.toBase58()}
+            disabled={true}
+          />
+          <Button
+            type="primary"
+            onClick={onLiquidate}
+            disabled={fromAccounts.length === 0}
+            loading={pendingTx}
           >
-            <div className="liquidate-input-title">{LABELS.SELECT_COLLATERAL}</div>
-            <CollateralSelector
-              reserve={repayReserve.info}
-              collateralReserve={withdrawReserve?.pubkey.toBase58()}
-              disabled={true}
-            />
-            <Button type="primary" 
-              onClick={onLiquidate}
-              disabled={fromAccounts.length === 0}
-              loading={pendingTx}>
-              {LABELS.LIQUIDATE_ACTION}
-            </Button>
-            <BackButton />
-          </div>)}
+            {LABELS.LIQUIDATE_ACTION}
+          </Button>
+          <BackButton />
+        </div>
+      )}
     </Card>
   );
 };

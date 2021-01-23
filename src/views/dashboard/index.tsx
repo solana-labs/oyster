@@ -14,32 +14,40 @@ export const DashboardView = () => {
 
   return (
     <div className="dashboard-container">
-       {!connected && (
+      {!connected && (
         <div className="dashboard-info">
-          <img src="splash.svg" alt="connect your wallet" className="dashboard-splash"/>
+          <img
+            src="splash.svg"
+            alt="connect your wallet"
+            className="dashboard-splash"
+          />
           {LABELS.DASHBOARD_INFO}
-          </div>
+        </div>
       )}
-      {connected &&
-        userDeposits.length === 0 &&
-        userObligations.length === 0 && (
-          <div className="dashboard-info">
-            <img src="splash.svg" alt="connect your wallet" className="dashboard-splash"/>
-            {LABELS.NO_LOANS_NO_DEPOSITS}
-            </div>
-        )}
-      {connected && <Row gutter={GUTTER} >
-       {userDeposits.length >0 && (
-       <Col md={24} xl={12}  span={24}>
-          <DashboardDeposits />
-        </Col>
-        )}
-        {userObligations.length >0 && (
-        <Col md={24} xl={12}  span={24}>
-          <DashboardObligations />
-        </Col>
-        )}
-      </Row>}  
+      {connected && userDeposits.length === 0 && userObligations.length === 0 && (
+        <div className="dashboard-info">
+          <img
+            src="splash.svg"
+            alt="connect your wallet"
+            className="dashboard-splash"
+          />
+          {LABELS.NO_LOANS_NO_DEPOSITS}
+        </div>
+      )}
+      {connected && (
+        <Row gutter={GUTTER}>
+          {userDeposits.length > 0 && (
+            <Col md={24} xl={12} span={24}>
+              <DashboardDeposits />
+            </Col>
+          )}
+          {userObligations.length > 0 && (
+            <Col md={24} xl={12} span={24}>
+              <DashboardObligations />
+            </Col>
+          )}
+        </Row>
+      )}
     </div>
   );
 };

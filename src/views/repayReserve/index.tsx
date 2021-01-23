@@ -1,5 +1,10 @@
 import React from "react";
-import { useBorrowingPower, useEnrichedLendingObligation, useLendingReserve, useUserObligations } from "../../hooks";
+import {
+  useBorrowingPower,
+  useEnrichedLendingObligation,
+  useLendingReserve,
+  useUserObligations,
+} from "../../hooks";
 import { useParams } from "react-router-dom";
 
 import { RepayInput } from "../../components/RepayInput";
@@ -35,7 +40,6 @@ export const RepayReserveView = () => {
   if (!reserve || !lendingReserve || !lendingObligation) {
     return null;
   }
-
 
   return (
     <div className="repay-reserve">
@@ -76,8 +80,11 @@ export const RepayReserveView = () => {
             <BarChartStatistic
               title="Your Loans"
               items={userObligations}
-              getPct={(item) => item.obligation.info.borrowedInQuote / loansValue}
-              name={(item) => item.obligation.info.repayName} />
+              getPct={(item) =>
+                item.obligation.info.borrowedInQuote / loansValue
+              }
+              name={(item) => item.obligation.info.repayName}
+            />
           </Card>
         </Col>
       </Row>
@@ -98,5 +105,6 @@ export const RepayReserveView = () => {
           />
         </Col>
       </Row>
-    </div>);
-}
+    </div>
+  );
+};

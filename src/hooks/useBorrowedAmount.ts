@@ -20,8 +20,8 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     borrowedLamports: 0,
     borrowedInUSD: 0,
     colateralInUSD: 0,
-    ltv: 0, 
-      health: 0,
+    ltv: 0,
+    health: 0,
   });
   const reserve = useLendingReserve(address);
   const liquidityMint = useMint(reserve?.info.liquidityMint);
@@ -30,8 +30,8 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     setBorrowedInfo({
       borrowedLamports: 0,
       borrowedInUSD: 0,
-      colateralInUSD: 0, 
-      ltv: 0, 
+      colateralInUSD: 0,
+      ltv: 0,
       health: 0,
     });
 
@@ -53,8 +53,8 @@ export function useBorrowedAmount(address?: string | PublicKey) {
       const result = {
         borrowedLamports: 0,
         borrowedInUSD: 0,
-        colateralInUSD: 0, 
-        ltv: 0, 
+        colateralInUSD: 0,
+        ltv: 0,
         health: 0,
       };
 
@@ -73,7 +73,8 @@ export function useBorrowedAmount(address?: string | PublicKey) {
           item.obligation.info.tokenMint
         ) as ParsedAccount<MintInfo>;
 
-        result.borrowedLamports += borrowed * (owned / obligationMint?.info.supply.toNumber());
+        result.borrowedLamports +=
+          borrowed * (owned / obligationMint?.info.supply.toNumber());
         result.borrowedInUSD += item.obligation.info.borrowedInQuote;
         result.colateralInUSD += item.obligation.info.collateralInQuote;
         liquidationThreshold = item.obligation.info.liquidationThreshold;
@@ -83,8 +84,11 @@ export function useBorrowedAmount(address?: string | PublicKey) {
         result.ltv = userObligationsByReserve[0].obligation.info.ltv;
         result.health = userObligationsByReserve[0].obligation.info.health;
       } else {
-        result.ltv = 100 * result.borrowedInUSD / result.colateralInUSD;
-        result.health = result.colateralInUSD * liquidationThreshold / 100 / result.borrowedInUSD;
+        result.ltv = (100 * result.borrowedInUSD) / result.colateralInUSD;
+        result.health =
+          (result.colateralInUSD * liquidationThreshold) /
+          100 /
+          result.borrowedInUSD;
         result.health = Number.isFinite(result.health) ? result.health : 0;
       }
 

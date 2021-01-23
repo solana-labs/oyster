@@ -21,7 +21,7 @@ export const HomeView = () => {
     borrowed: 0,
     lentOutPct: 0,
     items: [],
-  })
+  });
 
   useEffect(() => {
     const refreshTotal = () => {
@@ -48,26 +48,29 @@ export const HomeView = () => {
 
         let leaf = {
           key: item.pubkey.toBase58(),
-          marketSize: fromLamports(marketCapLamports, liquidityMint?.info) *
-          price,
-          borrowed: fromLamports(
-            wadToLamports(item.info?.state.borrowedLiquidityWad).toNumber(),
-            liquidityMint.info
-          ) *
-          price,
-          name: getTokenName(tokenMap, item.info.liquidityMint.toBase58())
-        }
+          marketSize:
+            fromLamports(marketCapLamports, liquidityMint?.info) * price,
+          borrowed:
+            fromLamports(
+              wadToLamports(item.info?.state.borrowedLiquidityWad).toNumber(),
+              liquidityMint.info
+            ) * price,
+          name: getTokenName(tokenMap, item.info.liquidityMint.toBase58()),
+        };
 
         newTotals.items.push(leaf);
 
         newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
         newTotals.borrowed = newTotals.borrowed + leaf.borrowed;
-
       });
 
       newTotals.lentOutPct = newTotals.borrowed / newTotals.marketSize;
-      newTotals.lentOutPct = Number.isFinite(newTotals.lentOutPct) ? newTotals.lentOutPct : 0;
-      newTotals.items = newTotals.items.sort((a, b) => b.marketSize - a.marketSize)
+      newTotals.lentOutPct = Number.isFinite(newTotals.lentOutPct)
+        ? newTotals.lentOutPct
+        : 0;
+      newTotals.items = newTotals.items.sort(
+        (a, b) => b.marketSize - a.marketSize
+      );
 
       setTotals(newTotals);
     };
@@ -85,9 +88,7 @@ export const HomeView = () => {
 
   return (
     <div className="flexColumn">
-      <Row
-        gutter={GUTTER}
-        className="home-info-row" >
+      <Row gutter={GUTTER} className="home-info-row">
         <Col xs={24} xl={5}>
           <Card>
             <Statistic
@@ -125,7 +126,8 @@ export const HomeView = () => {
               title="Market composition"
               name={(item) => item.name}
               getPct={(item) => item.marketSize / totals.marketSize}
-              items={totals.items} />
+              items={totals.items}
+            />
           </Card>
         </Col>
       </Row>
@@ -139,7 +141,13 @@ export const HomeView = () => {
           <div>{LABELS.TABLE_TITLE_BORROW_APY}</div>
         </div>
         {reserveAccounts.map((account) => (
-          <LendingReserveItem reserve={account.info} address={account.pubkey} item={totals.items.find(item => item.key === account.pubkey.toBase58())} />
+          <LendingReserveItem
+            reserve={account.info}
+            address={account.pubkey}
+            item={totals.items.find(
+              (item) => item.key === account.pubkey.toBase58()
+            )}
+          />
         ))}
       </Card>
     </div>

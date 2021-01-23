@@ -4,7 +4,8 @@ export const LABELS = {
   BORROWING_POWER_VALUE: "Borrowing Power",
   BORROWED_VALUE: "You borrowed",
   GIVE_SOL: "Give me SOL",
-  LIQUIDATION_INFO: "This view displays all loans that can be liquidated. A liquidation is a process where borrower collateral does not cover value of the loan. It is represented by health factor falling below 1.0. When a loan is liquidated, an liquidator can purchase collateral at a discount by repaing the portio of the loan. ",
+  LIQUIDATION_INFO:
+    "This view displays all loans that can be liquidated. A liquidation is a process where borrower collateral does not cover value of the loan. It is represented by health factor falling below 1.0. When a loan is liquidated, an liquidator can purchase collateral at a discount by repaing the portio of the loan. ",
   FAUCET_INFO:
     "This faucet will help you fund your accounts outside of Solana main network.",
   ACCOUNT_FUNDED: "Account funded.",
@@ -12,7 +13,7 @@ export const LABELS = {
   REPAY_ACTION: "Repay",
   RESERVE_STATUS_TITLE: "Reserve Status & Configuration",
   AUDIT_WARNING:
-    'Oyster is an unaudited software project used for internal purposes at the Solana Foundation. This app is not for public use.',
+    "Oyster is an unaudited software project used for internal purposes at the Solana Foundation. This app is not for public use.",
   FOOTER:
     'This page was produced by the Solana Foundation ("SF") for internal educational and inspiration purposes only. SF does not encourage, induce or sanction the deployment, integration or use of Oyster or any similar application (including its code) in violation of applicable laws or regulations and hereby prohibits any such deployment, integration or use. Anyone using this code or a derivation thereof must comply with applicable laws and regulations when releasing related software.',
   MENU_HOME: "Home",
@@ -26,7 +27,7 @@ export const LABELS = {
   MENU_BORROW: "Borrow",
   MENU_LIQUIDATE: "Liquidate",
   MENU_FAUCET: "Faucet",
-  MARGIN_TRADING: 'Margin Trading',
+  MARGIN_TRADING: "Margin Trading",
   APP_TITLE: "Oyster Lending",
   CONNECT_BUTTON: "Connect",
   WALLET_TOOLTIP: "Wallet public key",
@@ -65,21 +66,26 @@ export const LABELS = {
   GO_BACK_ACTION: "Go back",
   DEPOSIT_ACTION: "Deposit",
   TOTAL_TITLE: "Total",
-  TRADING_TABLE_TITLE_MY_COLLATERAL: 'Chosen Collateral',
-  TRADING_TABLE_TITLE_DESIRED_ASSET: 'Desired Asset',
-  TRADING_TABLE_TITLE_MULTIPLIER: 'Leverage',
-  TRADING_TABLE_TITLE_ASSET_PRICE: 'Asset Price',
-  TRADING_TABLE_TITLE_LIQUIDATION_PRICE: 'Liquidation Price',
-  TRADING_TABLE_TITLE_APY: 'APY',
-  TRADING_TABLE_TITLE_ACTIONS: 'Action',
-  TRADING_ADD_POSITION: 'Add Position',
-  MARGIN_TRADE_ACTION: 'Margin Trade',
-  MARGIN_TRADE_CHOOSE_COLLATERAL_AND_LEVERAGE: 'Please choose your collateral and leverage.',
-  MARGIN_TRADE_QUESTION: 'Please choose how much of this asset you wish to purchase.',
-  TABLE_TITLE_BUYING_POWER: 'Total Buying Power',
-  NOT_ENOUGH_MARGIN_MESSAGE: 'Not enough buying power in oyster to make this trade at this leverage.',
-  SET_MORE_MARGIN_MESSAGE: 'You need more margin to match this leverage amount to make this trade.',
-  LEVERAGE_LIMIT_MESSAGE: 'You will need more margin to make this trade.',
-  NO_DEPOSIT_MESSAGE: 'You need to deposit coin of this type into oyster before trading with it on margin.',
-  NO_COLL_TYPE_MESSAGE: 'Choose Collateral CCY',
+  TRADING_TABLE_TITLE_MY_COLLATERAL: "Chosen Collateral",
+  TRADING_TABLE_TITLE_DESIRED_ASSET: "Desired Asset",
+  TRADING_TABLE_TITLE_MULTIPLIER: "Leverage",
+  TRADING_TABLE_TITLE_ASSET_PRICE: "Asset Price",
+  TRADING_TABLE_TITLE_LIQUIDATION_PRICE: "Liquidation Price",
+  TRADING_TABLE_TITLE_APY: "APY",
+  TRADING_TABLE_TITLE_ACTIONS: "Action",
+  TRADING_ADD_POSITION: "Add Position",
+  MARGIN_TRADE_ACTION: "Margin Trade",
+  MARGIN_TRADE_CHOOSE_COLLATERAL_AND_LEVERAGE:
+    "Please choose your collateral and leverage.",
+  MARGIN_TRADE_QUESTION:
+    "Please choose how much of this asset you wish to purchase.",
+  TABLE_TITLE_BUYING_POWER: "Total Buying Power",
+  NOT_ENOUGH_MARGIN_MESSAGE:
+    "Not enough buying power in oyster to make this trade at this leverage.",
+  SET_MORE_MARGIN_MESSAGE:
+    "You need more margin to match this leverage amount to make this trade.",
+  LEVERAGE_LIMIT_MESSAGE: "You will need more margin to make this trade.",
+  NO_DEPOSIT_MESSAGE:
+    "You need to deposit coin of this type into oyster before trading with it on margin.",
+  NO_COLL_TYPE_MESSAGE: "Choose Collateral CCY",
 };

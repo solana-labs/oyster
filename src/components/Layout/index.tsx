@@ -9,7 +9,7 @@ import {
   ShoppingOutlined,
   HomeOutlined,
   RocketOutlined,
-  ForkOutlined
+  ForkOutlined,
   // LineChartOutlined
 } from "@ant-design/icons";
 
@@ -18,7 +18,7 @@ import { AppBar } from "./../AppBar";
 import { Link, useLocation } from "react-router-dom";
 import { useConnectionConfig } from "../../contexts/connection";
 import { LABELS } from "../../constants";
-import config from './../../../package.json';
+import config from "./../../../package.json";
 
 export const AppLayout = React.memo((props: any) => {
   const { env } = useConnectionConfig();
@@ -37,8 +37,7 @@ export const AppLayout = React.memo((props: any) => {
     [...Object.keys(paths)].find((key) => location.pathname.startsWith(key)) ||
     "";
   const defaultKey = paths[current] || "1";
-  const theme = 'light';
-
+  const theme = "light";
 
   return (
     <div className="App">
@@ -47,7 +46,11 @@ export const AppLayout = React.memo((props: any) => {
       </div>
       <BasicLayout
         title={LABELS.APP_TITLE}
-        footerRender={() => <div className="footer" title={LABELS.FOOTER}>{LABELS.FOOTER}</div>}
+        footerRender={() => (
+          <div className="footer" title={LABELS.FOOTER}>
+            {LABELS.FOOTER}
+          </div>
+        )}
         navTheme={theme}
         headerTheme={theme}
         theme={theme}
@@ -56,59 +59,62 @@ export const AppLayout = React.memo((props: any) => {
         primaryColor="#d83aeb"
         logo={<div className="App-logo" />}
         rightContentRender={() => <AppBar />}
-        links={[
-
-        ]}
+        links={[]}
         menuContentRender={() => {
-          return (<div className="links">
-            <Menu theme={theme} defaultSelectedKeys={[defaultKey]} mode="inline">
-              <Menu.Item key="1" icon={<HomeOutlined />}>
-                <Link
-                  to={{
-                    pathname: "/",
-                  }}
-                >
-                  {LABELS.MENU_HOME}
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="2" icon={<PieChartOutlined />}>
-                <Link
-                  to={{
-                    pathname: "/dashboard",
-                  }}
-                >
-                  {LABELS.MENU_DASHBOARD}
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="3" icon={<BankOutlined />}>
-                <Link
-                  to={{
-                    pathname: "/deposit",
-                  }}
-                >
-                  {LABELS.MENU_DEPOSIT}
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="4" icon={<LogoutOutlined />}>
-                <Link
-                  to={{
-                    pathname: "/borrow",
-                  }}
-                >
-                  {LABELS.MENU_BORROW}
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="5" icon={<ShoppingOutlined />}>
-                <Link
-                  to={{
-                    pathname: "/liquidate",
-                  }}
-                >
-                  {LABELS.MENU_LIQUIDATE}
-                </Link>
-              </Menu.Item>
-              {/* Hide margin option for now  */}
-              {/* <Menu.Item key="6"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
+          return (
+            <div className="links">
+              <Menu
+                theme={theme}
+                defaultSelectedKeys={[defaultKey]}
+                mode="inline"
+              >
+                <Menu.Item key="1" icon={<HomeOutlined />}>
+                  <Link
+                    to={{
+                      pathname: "/",
+                    }}
+                  >
+                    {LABELS.MENU_HOME}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="2" icon={<PieChartOutlined />}>
+                  <Link
+                    to={{
+                      pathname: "/dashboard",
+                    }}
+                  >
+                    {LABELS.MENU_DASHBOARD}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="3" icon={<BankOutlined />}>
+                  <Link
+                    to={{
+                      pathname: "/deposit",
+                    }}
+                  >
+                    {LABELS.MENU_DEPOSIT}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="4" icon={<LogoutOutlined />}>
+                  <Link
+                    to={{
+                      pathname: "/borrow",
+                    }}
+                  >
+                    {LABELS.MENU_BORROW}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="5" icon={<ShoppingOutlined />}>
+                  <Link
+                    to={{
+                      pathname: "/liquidate",
+                    }}
+                  >
+                    {LABELS.MENU_LIQUIDATE}
+                  </Link>
+                </Menu.Item>
+                {/* Hide margin option for now  */}
+                {/* <Menu.Item key="6"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
                 <Link
                   to={{
                     pathname: "/margin",
@@ -117,31 +123,48 @@ export const AppLayout = React.memo((props: any) => {
                   {LABELS.MARGIN_TRADING}
                 </Link>
               </Menu.Item> */}
-              {env !== "mainnet-beta" && (
-                <Menu.Item key="7" icon={<RocketOutlined />}>
-                  <Link
-                    to={{
-                      pathname: "/faucet",
-                    }}
+                {env !== "mainnet-beta" && (
+                  <Menu.Item key="7" icon={<RocketOutlined />}>
+                    <Link
+                      to={{
+                        pathname: "/faucet",
+                      }}
+                    >
+                      {LABELS.MENU_FAUCET}
+                    </Link>
+                  </Menu.Item>
+                )}
+              </Menu>
+              <Menu
+                theme={theme}
+                defaultSelectedKeys={[defaultKey]}
+                selectable={false}
+                mode="inline"
+                className="bottom-links"
+              >
+                <Menu.Item key="16" icon={<ForkOutlined />}>
+                  <a
+                    title="Fork"
+                    href={`${config.repository.url}/fork`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    {LABELS.MENU_FAUCET}
-                  </Link>
+                    Fork
+                  </a>
                 </Menu.Item>
-              )}
-            </Menu>
-            <Menu theme={theme} defaultSelectedKeys={[defaultKey]} selectable={false} mode="inline" className="bottom-links">
-              <Menu.Item key="16" icon={<ForkOutlined />}>
-                <a title="Fork" href={`${config.repository.url}/fork`} target="_blank" rel="noopener noreferrer" >
-                  Fork
-                </a>
-                  </Menu.Item>,
+                ,
                 <Menu.Item key="15" icon={<GithubOutlined />}>
-                  <a title="Gtihub" href={config.repository.url} target="_blank" rel="noopener noreferrer" >
+                  <a
+                    title="Gtihub"
+                    href={config.repository.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Github
                   </a>
                 </Menu.Item>
               </Menu>
-          </div>
+            </div>
           );
         }}
       >

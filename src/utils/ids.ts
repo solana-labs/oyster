@@ -1,10 +1,16 @@
-import { PublicKey } from '@solana/web3.js';
-import { TokenSwapLayout, TokenSwapLayoutV1 } from '../models';
+import { PublicKey } from "@solana/web3.js";
+import { TokenSwapLayout, TokenSwapLayoutV1 } from "../models";
 
-export const WRAPPED_SOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
-export let TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+export const WRAPPED_SOL_MINT = new PublicKey(
+  "So11111111111111111111111111111111111111112"
+);
+export let TOKEN_PROGRAM_ID = new PublicKey(
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+);
 
-export let LENDING_PROGRAM_ID = new PublicKey('TokenLending1111111111111111111111111111111');
+export let LENDING_PROGRAM_ID = new PublicKey(
+  "TokenLending1111111111111111111111111111111"
+);
 
 let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
@@ -14,17 +20,17 @@ export const LEND_HOST_FEE_ADDRESS = process.env.REACT_APP_LEND_HOST_FEE_ADDRESS
   ? new PublicKey(`${process.env.REACT_APP_LEND_HOST_FEE_ADDRESS}`)
   : undefined;
 
-  console.debug(`Lend host fee address: ${LEND_HOST_FEE_ADDRESS?.toBase58()}`);
+console.debug(`Lend host fee address: ${LEND_HOST_FEE_ADDRESS?.toBase58()}`);
 
 export const ENABLE_FEES_INPUT = false;
 
 // legacy pools are used to show users contributions in those pools to allow for withdrawals of funds
 export const PROGRAM_IDS = [
   {
-    name: 'mainnet-beta',
+    name: "mainnet-beta",
     swap: () => ({
       current: {
-        pubkey: new PublicKey('9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL'),
+        pubkey: new PublicKey("9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL"),
         layout: TokenSwapLayoutV1,
       },
       legacy: [
@@ -34,30 +40,30 @@ export const PROGRAM_IDS = [
     }),
   },
   {
-    name: 'testnet',
+    name: "testnet",
     swap: () => ({
       current: {
-        pubkey: new PublicKey('2n2dsFSgmPcZ8jkmBZLGUM2nzuFqcBGQ3JEEj6RJJcEg'),
+        pubkey: new PublicKey("2n2dsFSgmPcZ8jkmBZLGUM2nzuFqcBGQ3JEEj6RJJcEg"),
         layout: TokenSwapLayoutV1,
       },
       legacy: [],
     }),
   },
   {
-    name: 'devnet',
+    name: "devnet",
     swap: () => ({
       current: {
-        pubkey: new PublicKey('6Cust2JhvweKLh4CVo1dt21s2PJ86uNGkziudpkNPaCj'),
+        pubkey: new PublicKey("6Cust2JhvweKLh4CVo1dt21s2PJ86uNGkziudpkNPaCj"),
         layout: TokenSwapLayout,
       },
-      legacy: [new PublicKey('BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ')],
+      legacy: [new PublicKey("BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ")],
     }),
   },
   {
-    name: 'localnet',
+    name: "localnet",
     swap: () => ({
       current: {
-        pubkey: new PublicKey('369YmCWHGxznT7GGBhcLZDRcRoGWmGKFWdmtiPy78yj7'),
+        pubkey: new PublicKey("369YmCWHGxznT7GGBhcLZDRcRoGWmGKFWdmtiPy78yj7"),
         layout: TokenSwapLayoutV1,
       },
       legacy: [],
@@ -77,8 +83,10 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LAYOUT = swap.current.layout;
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
-  if (envName === 'mainnet-beta') {
-    LENDING_PROGRAM_ID = new PublicKey('2KfJP7pZ6QSpXa26RmsN6kKVQteDEdQmizLSvuyryeiW');
+  if (envName === "mainnet-beta") {
+    LENDING_PROGRAM_ID = new PublicKey(
+      "2KfJP7pZ6QSpXa26RmsN6kKVQteDEdQmizLSvuyryeiW"
+    );
   }
 };
 

@@ -77,14 +77,16 @@ export function useEnrichedLendingObligations() {
           let collateralInQuote = 0;
 
           if (liquidityMint) {
-            const collateralMint = cache.get(item.collateralReserve.info.liquidityMint);
+            const collateralMint = cache.get(
+              item.collateralReserve.info.liquidityMint
+            );
 
             const collateral = fromLamports(
               collateralToLiquidity(
                 obligation.info.depositedCollateral,
                 item.reserve.info
               ),
-              collateralMint?.info,
+              collateralMint?.info
             );
 
             const borrowed = wadToLamports(
@@ -96,19 +98,26 @@ export function useEnrichedLendingObligations() {
               item.reserve.info,
               item.reserve.info.dexMarketOption
                 ? item.reserve.info.dexMarket
-                : item.collateralReserve.info.dexMarket
+                : item.collateralReserve.info.dexMarket,
+              true
             );
 
             const liquidityMintAddress = item.reserve.info.liquidityMint.toBase58();
-            const liquidityMint = cache.get(liquidityMintAddress) as ParsedAccount<MintInfo>;
-            borrowedInQuote = fromLamports(borrowed, liquidityMint.info) * midPriceInUSD(liquidityMintAddress);;
-            collateralInQuote = collateral * midPriceInUSD(collateralMint?.pubkey.toBase58() || '');
+            const liquidityMint = cache.get(
+              liquidityMintAddress
+            ) as ParsedAccount<MintInfo>;
+            borrowedInQuote =
+              fromLamports(borrowed, liquidityMint.info) *
+              midPriceInUSD(liquidityMintAddress);
+            collateralInQuote =
+              collateral *
+              midPriceInUSD(collateralMint?.pubkey.toBase58() || "");
 
             ltv = (100 * borrowedAmount) / collateral;
 
             const liquidationThreshold =
               item.reserve.info.config.liquidationThreshold;
-            health = collateral * liquidationThreshold / 100 / borrowedAmount;
+            health = (collateral * liquidationThreshold) / 100 / borrowedAmount;
           }
 
           return {
@@ -117,11 +126,15 @@ export function useEnrichedLendingObligations() {
               ...obligation.info,
               ltv,
               health,
-              borrowedInQuote, 
+              borrowedInQuote,
               collateralInQuote,
-              liquidationThreshold: item.reserve.info.config.liquidationThreshold,
+              liquidationThreshold:
+                item.reserve.info.config.liquidationThreshold,
               repayName: getTokenName(tokenMap, reserve.liquidityMint),
-              collateralName: getTokenName(tokenMap, collateralReserve.liquidityMint)
+              collateralName: getTokenName(
+                tokenMap,
+                collateralReserve.liquidityMint
+              ),
             },
           } as EnrichedLendingObligation;
         })
