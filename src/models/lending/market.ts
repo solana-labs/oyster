@@ -6,6 +6,7 @@ export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.s
   [
     BufferLayout.u8('version'),
     BufferLayout.u8('bumpSeed'),
+    Layout.publicKey("owner"),
     Layout.publicKey("quoteMint"),
     Layout.publicKey("tokenProgramId"),
 
