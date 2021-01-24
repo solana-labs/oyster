@@ -1,8 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {
-  useUserBalance,
-  useUserObligationByReserve,
-} from "../../hooks";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useUserBalance, useUserObligationByReserve } from "../../hooks";
 import {
   BorrowAmountType,
   LendingReserve,
@@ -19,8 +16,8 @@ import { ActionConfirmation } from "./../ActionConfirmation";
 import { BackButton } from "./../BackButton";
 import { ConnectButton } from "../ConnectButton";
 import CollateralInput from "../CollateralInput";
-import {ArrowDownOutlined} from "@ant-design/icons";
-import {useMidPriceInUSD} from "../../contexts/market";
+import { ArrowDownOutlined } from "@ant-design/icons";
+import { useMidPriceInUSD } from "../../contexts/market";
 
 export const BorrowInput = (props: {
   className?: string;
@@ -47,8 +44,12 @@ export const BorrowInput = (props: {
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveKey]);
 
-  const borrowPrice = useMidPriceInUSD(borrowReserve.info.liquidityMint.toBase58()).price;
-  const collateralPrice = useMidPriceInUSD(collateralReserve?.info.liquidityMint.toBase58())?.price;
+  const borrowPrice = useMidPriceInUSD(
+    borrowReserve.info.liquidityMint.toBase58()
+  ).price;
+  const collateralPrice = useMidPriceInUSD(
+    collateralReserve?.info.liquidityMint.toBase58()
+  )?.price;
 
   useEffect(() => {
     if (collateralReserve && lastTyped === "collateral") {
@@ -58,12 +59,19 @@ export const BorrowInput = (props: {
         const nCollateralValue = parseFloat(collateralValue);
         const borrowInUSD = nCollateralValue * collateralPrice * ltv;
         const borrowAmount = borrowInUSD / borrowPrice;
-        setValue(borrowAmount.toString())
+        setValue(borrowAmount.toString());
       } else {
-        setValue("")
+        setValue("");
       }
     }
-  }, [lastTyped, collateralReserve, collateralPrice, borrowPrice, borrowReserve, collateralValue])
+  }, [
+    lastTyped,
+    collateralReserve,
+    collateralPrice,
+    borrowPrice,
+    borrowReserve,
+    collateralValue,
+  ]);
 
   useEffect(() => {
     if (collateralReserve && lastTyped === "borrow") {
@@ -72,13 +80,20 @@ export const BorrowInput = (props: {
       if (value) {
         const nValue = parseFloat(value);
         const borrowInUSD = nValue * borrowPrice;
-        const collateralAmount = (borrowInUSD / ltv) / collateralPrice
-        setCollateralValue(collateralAmount.toString())
+        const collateralAmount = borrowInUSD / ltv / collateralPrice;
+        setCollateralValue(collateralAmount.toString());
       } else {
-        setCollateralValue("")
+        setCollateralValue("");
       }
     }
-  }, [lastTyped, collateralReserve, collateralPrice, borrowPrice, borrowReserve, value])
+  }, [
+    lastTyped,
+    collateralReserve,
+    collateralPrice,
+    borrowPrice,
+    borrowReserve,
+    value,
+  ]);
 
   const { accounts: fromAccounts } = useUserBalance(
     collateralReserve?.info.collateralMint
@@ -160,14 +175,21 @@ export const BorrowInput = (props: {
             justifyContent: "space-around",
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
             <CollateralInput
-              title='Collateral (estimated)'
+              title="Collateral (estimated)"
               reserve={borrowReserve.info}
               amount={parseFloat(collateralValue) || 0}
               onInputChange={(val: number | null) => {
-                setCollateralValue(val?.toString() || "")
-                setLastTyped("collateral")
+                setCollateralValue(val?.toString() || "");
+                setLastTyped("collateral");
               }}
               onCollateralReserve={(key) => {
                 setCollateralReserveKey(key);
@@ -175,21 +197,28 @@ export const BorrowInput = (props: {
             />
           </div>
           <ArrowDownOutlined />
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
             <CollateralInput
-              title='Borrow Amount'
+              title="Borrow Amount"
               reserve={borrowReserve.info}
               amount={parseFloat(value) || 0}
               onInputChange={(val: number | null) => {
-                setValue(val?.toString() || "")
-                setLastTyped("borrow")
+                setValue(val?.toString() || "");
+                setLastTyped("borrow");
               }}
               disabled={true}
               hideBalance={true}
             />
           </div>
           <ConnectButton
-            size='large'
+            size="large"
             type="primary"
             onClick={onBorrow}
             loading={pendingTx}

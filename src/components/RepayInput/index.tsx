@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   EnrichedLendingObligation,
   InputType,
@@ -19,7 +19,7 @@ import { fromLamports, wadToLamports } from "../../utils/utils";
 import { notify } from "../../utils/notifications";
 import { ConnectButton } from "../ConnectButton";
 import CollateralInput from "../CollateralInput";
-import {useMidPriceInUSD} from "../../contexts/market";
+import { useMidPriceInUSD } from "../../contexts/market";
 
 export const RepayInput = (props: {
   className?: string;
@@ -53,11 +53,11 @@ export const RepayInput = (props: {
 
   const convert = useCallback(
     (val: string | number) => {
-      setLastTyped("repay")
+      setLastTyped("repay");
       if (typeof val === "string") {
         return (parseFloat(val) / borrowAmount) * 100;
       } else {
-        return ((val * borrowAmount) / 100);
+        return (val * borrowAmount) / 100;
       }
     },
     [borrowAmount]
@@ -97,7 +97,7 @@ export const RepayInput = (props: {
         );
 
         setValue("");
-        setCollateralValue("")
+        setCollateralValue("");
         setShowConfirmation(true);
       } catch (error) {
         notify({
@@ -125,35 +125,52 @@ export const RepayInput = (props: {
     setValue,
   ]);
 
-  const collateralPrice = useMidPriceInUSD(collateralReserve?.info.liquidityMint.toBase58())?.price;
+  const collateralPrice = useMidPriceInUSD(
+    collateralReserve?.info.liquidityMint.toBase58()
+  )?.price;
 
   useEffect(() => {
     if (collateralReserve && lastTyped === "repay") {
       const collateralInQuote = obligation.info.collateralInQuote;
-      const collateral = collateralInQuote * collateralPrice
+      const collateral = collateralInQuote * collateralPrice;
       if (value) {
-        const borrowRatio = (parseFloat(value) / borrowAmount) * 100
-        const collateralAmount = (borrowRatio * collateral) / 100
-        setCollateralValue(collateralAmount.toString())
+        const borrowRatio = (parseFloat(value) / borrowAmount) * 100;
+        const collateralAmount = (borrowRatio * collateral) / 100;
+        setCollateralValue(collateralAmount.toString());
       } else {
-        setCollateralValue("")
+        setCollateralValue("");
       }
     }
-  }, [lastTyped, collateralReserve, obligation.info.collateralInQuote, collateralPrice, borrowAmount, value])
+  }, [
+    lastTyped,
+    collateralReserve,
+    obligation.info.collateralInQuote,
+    collateralPrice,
+    borrowAmount,
+    value,
+  ]);
 
   useEffect(() => {
     if (collateralReserve && lastTyped === "collateral") {
       const collateralInQuote = obligation.info.collateralInQuote;
-      const collateral = collateralInQuote * collateralPrice
+      const collateral = collateralInQuote * collateralPrice;
       if (collateralValue) {
-        const collateralRatio = (parseFloat(collateralValue) / collateral) * 100
-        const borrowValue = (collateralRatio * borrowAmount) / 100
-        setValue(borrowValue.toString())
+        const collateralRatio =
+          (parseFloat(collateralValue) / collateral) * 100;
+        const borrowValue = (collateralRatio * borrowAmount) / 100;
+        setValue(borrowValue.toString());
       } else {
-        setValue("")
+        setValue("");
       }
     }
-  }, [lastTyped, collateralReserve, obligation.info.collateralInQuote, collateralPrice, borrowAmount, collateralValue])
+  }, [
+    lastTyped,
+    collateralReserve,
+    obligation.info.collateralInQuote,
+    collateralPrice,
+    borrowAmount,
+    collateralValue,
+  ]);
 
   const bodyStyle: React.CSSProperties = {
     display: "flex",
@@ -175,28 +192,42 @@ export const RepayInput = (props: {
             justifyContent: "space-around",
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
             <CollateralInput
-              title='Repay Amount'
+              title="Repay Amount"
               reserve={repayReserve.info}
               amount={parseFloat(value) || 0}
               onInputChange={(val: number | null) => {
-                setValue(val?.toString() || "")
-                setLastTyped("repay")
+                setValue(val?.toString() || "");
+                setLastTyped("repay");
               }}
               disabled={true}
               hideBalance={true}
             />
           </div>
           <Slider marks={marks} value={pct} onChange={setPct} />
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
             <CollateralInput
-              title='Collateral Amount (estimated)'
+              title="Collateral Amount (estimated)"
               reserve={collateralReserve?.info}
               amount={parseFloat(collateralValue) || 0}
               onInputChange={(val: number | null) => {
-                setCollateralValue(val?.toString() || "")
-                setLastTyped("collateral")
+                setCollateralValue(val?.toString() || "");
+                setLastTyped("collateral");
               }}
               disabled={true}
               hideBalance={true}
