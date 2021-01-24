@@ -31,6 +31,7 @@ export const BorrowInput = (props: {
   const { wallet } = useWallet();
   const [value, setValue] = useState("");
   const [collateralValue, setCollateralValue] = useState("");
+  const [lastTyped, setLastTyped] = useState("collateral");
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -51,7 +52,7 @@ export const BorrowInput = (props: {
   const collateralPrice = useMidPriceInUSD(collateralReserve?.info.liquidityMint.toBase58())?.price;
 
   useEffect(() => {
-    if (collateralReserve) {
+    if (collateralReserve && lastTyped == "collateral") {
       const ltv = borrowReserve.info.config.loanToValueRatio / 100;
 
       if (collateralValue) {
@@ -64,6 +65,21 @@ export const BorrowInput = (props: {
       }
     }
   }, [collateralReserve, collateralPrice, borrowPrice, borrowReserve, collateralValue])
+
+  useEffect(() => {
+    if (collateralReserve && lastTyped == "borrow") {
+      const ltv = borrowReserve.info.config.loanToValueRatio / 100;
+
+      if (value) {
+        const nValue = parseFloat(value);
+        const borrowInUSD = nValue * borrowPrice;
+        const collateralAmount = (borrowInUSD / ltv) / collateralPrice
+        setCollateralValue(collateralAmount.toString())
+      } else {
+        setCollateralValue("")
+      }
+    }
+  }, [lastTyped, collateralReserve, collateralPrice, borrowPrice, borrowReserve, value])
 
   const name = useTokenName(borrowReserve?.info.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
@@ -153,6 +169,7 @@ export const BorrowInput = (props: {
               amount={parseFloat(collateralValue) || 0}
               onInputChange={(val: number | null) => {
                 setCollateralValue(val?.toString() || "")
+                setLastTyped("collateral")
               }}
               onCollateralReserve={(key) => {
                 setCollateralReserveKey(key);
@@ -167,6 +184,7 @@ export const BorrowInput = (props: {
               amount={parseFloat(value) || 0}
               onInputChange={(val: number | null) => {
                 setValue(val?.toString() || "")
+                setLastTyped("borrow")
               }}
               disabled={true}
               hideBalance={true}
