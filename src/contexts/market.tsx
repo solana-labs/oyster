@@ -275,6 +275,7 @@ export const useEnrichedPools = (pools: PoolInfo[]) => {
     };
     // Do not add pools here, causes a really bad infinite rendering loop. Use poolKeys instead.
   }, [
+    pools,
     tokenMap,
     dailyVolume,
     poolKeys,

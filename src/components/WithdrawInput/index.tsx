@@ -3,13 +3,10 @@ import {
   InputType,
   useUserCollateralBalance,
   useSliderInput,
-  useTokenName,
   useUserBalance,
 } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
-import { TokenIcon } from "../TokenIcon";
 import { Card, Slider } from "antd";
-import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { withdraw } from "../../actions";
@@ -18,6 +15,7 @@ import "./style.less";
 import { LABELS, marks } from "../../constants";
 import { ActionConfirmation } from "./../ActionConfirmation";
 import { ConnectButton } from "../ConnectButton";
+import CollateralInput from "../CollateralInput";
 
 export const WithdrawInput = (props: {
   className?: string;
@@ -32,7 +30,6 @@ export const WithdrawInput = (props: {
   const reserve = props.reserve;
   const address = props.address;
 
-  const name = useTokenName(reserve?.liquidityMint);
   const {
     balanceLamports: collateralBalanceLamports,
     accounts: fromAccounts,
@@ -46,7 +43,7 @@ export const WithdrawInput = (props: {
       if (typeof val === "string") {
         return (parseFloat(val) / collateralBalanceInLiquidity) * 100;
       } else {
-        return ((val * collateralBalanceInLiquidity) / 100).toFixed(2);
+        return (val * collateralBalanceInLiquidity) / 100;
       }
     },
     [collateralBalanceInLiquidity]
@@ -120,26 +117,30 @@ export const WithdrawInput = (props: {
           }}
         >
           <div className="withdraw-input-title">{LABELS.WITHDRAW_QUESTION}</div>
-          <div className="token-input">
-            <TokenIcon mintAddress={reserve?.liquidityMint} />
-            <NumericInput
-              value={value}
-              onChange={setValue}
-              autoFocus={true}
-              style={{
-                fontSize: 20,
-                boxShadow: "none",
-                borderColor: "transparent",
-                outline: "transparent",
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+            }}
+          >
+            <CollateralInput
+              title="Amount"
+              reserve={reserve}
+              amount={parseFloat(value) || 0}
+              onInputChange={(val: number | null) => {
+                setValue(val?.toString() || "");
               }}
-              placeholder="0.00"
+              disabled={true}
+              hideBalance={true}
             />
-            <div>{name}</div>
           </div>
 
           <Slider marks={marks} value={pct} onChange={setPct} />
 
           <ConnectButton
+            size="large"
             type="primary"
             onClick={onWithdraw}
             loading={pendingTx}
