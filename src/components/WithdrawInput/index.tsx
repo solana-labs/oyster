@@ -140,6 +140,7 @@ export const WithdrawInput = (props: {
           <Slider marks={marks} value={pct} onChange={setPct} />
 
           <ConnectButton
+            size="large"
             type="primary"
             onClick={onWithdraw}
             loading={pendingTx}
