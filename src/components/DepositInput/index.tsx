@@ -1,14 +1,7 @@
 import React, { useCallback, useState } from "react";
-import {
-  InputType,
-  useSliderInput,
-  useTokenName,
-  useUserBalance,
-} from "../../hooks";
+import { InputType, useSliderInput, useUserBalance } from "../../hooks";
 import { LendingReserve } from "../../models/lending";
-import { TokenIcon } from "../TokenIcon";
 import { Card, Slider } from "antd";
-import { NumericInput } from "../Input/numeric";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { deposit } from "../../actions/deposit";
@@ -35,7 +28,7 @@ export const DepositInput = (props: {
   const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
     reserve?.liquidityMint
   );
-  console.log(balance)
+
   const convert = useCallback(
     (val: string | number) => {
       if (typeof val === "string") {
