@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {
-  useTokenName,
   useUserBalance,
   useUserObligationByReserve,
 } from "../../hooks";
@@ -52,7 +51,7 @@ export const BorrowInput = (props: {
   const collateralPrice = useMidPriceInUSD(collateralReserve?.info.liquidityMint.toBase58())?.price;
 
   useEffect(() => {
-    if (collateralReserve && lastTyped == "collateral") {
+    if (collateralReserve && lastTyped === "collateral") {
       const ltv = borrowReserve.info.config.loanToValueRatio / 100;
 
       if (collateralValue) {
@@ -64,10 +63,10 @@ export const BorrowInput = (props: {
         setValue("")
       }
     }
-  }, [collateralReserve, collateralPrice, borrowPrice, borrowReserve, collateralValue])
+  }, [lastTyped, collateralReserve, collateralPrice, borrowPrice, borrowReserve, collateralValue])
 
   useEffect(() => {
-    if (collateralReserve && lastTyped == "borrow") {
+    if (collateralReserve && lastTyped === "borrow") {
       const ltv = borrowReserve.info.config.loanToValueRatio / 100;
 
       if (value) {
@@ -81,7 +80,6 @@ export const BorrowInput = (props: {
     }
   }, [lastTyped, collateralReserve, collateralPrice, borrowPrice, borrowReserve, value])
 
-  const name = useTokenName(borrowReserve?.info.liquidityMint);
   const { accounts: fromAccounts } = useUserBalance(
     collateralReserve?.info.collateralMint
   );
@@ -164,7 +162,7 @@ export const BorrowInput = (props: {
         >
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <CollateralInput
-              title='Collateral'
+              title='Collateral (estimated)'
               reserve={borrowReserve.info}
               amount={parseFloat(collateralValue) || 0}
               onInputChange={(val: number | null) => {
