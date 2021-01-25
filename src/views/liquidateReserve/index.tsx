@@ -6,6 +6,8 @@ import {
   SideReserveOverviewMode,
 } from "../../components/SideReserveOverview";
 
+import { LoanInfoLine } from "../../components/LoanInfoLine";
+
 import { LiquidateInput } from "../../components/LiquidateInput";
 
 import "./style.less";
@@ -14,6 +16,7 @@ export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
 
   const obligation = useEnrichedLendingObligation(id);
+
   const repayReserve = useLendingReserve(obligation?.info.borrowReserve);
   const withdrawReserve = useLendingReserve(obligation?.info.collateralReserve);
 
@@ -23,6 +26,10 @@ export const LiquidateReserveView = () => {
 
   return (
     <div className="liquidate-reserve">
+      <LoanInfoLine
+        className="liquidate-reserve-item"
+        obligation={obligation}
+      />
       <div className="liquidate-reserve-container">
         <LiquidateInput
           className="liquidate-reserve-item liquidate-reserve-item-left"
