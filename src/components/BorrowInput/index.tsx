@@ -195,6 +195,7 @@ export const BorrowInput = (props: {
               onCollateralReserve={(key) => {
                 setCollateralReserveKey(key);
               }}
+              useFirstReserve={true}
             />
           </div>
           <ArrowDownOutlined />

@@ -28,6 +28,7 @@ export default function CollateralInput(props: {
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
   useWalletBalance?: boolean;
+  useFirstReserve?: boolean;
   showLeverageSelector?: boolean;
   leverage?: number;
 }) {
@@ -70,13 +71,19 @@ export default function CollateralInput(props: {
     market?.info?.quoteMint
   );
 
-  const renderReserveAccounts = reserveAccounts
+  const filteredReserveAccounts = reserveAccounts
     .filter((reserve) => reserve.info !== props.reserve)
     .filter(
       (reserve) =>
         !onlyQuoteAllowed ||
         reserve.info.liquidityMint.equals(market.info.quoteMint)
     )
+
+  if(!collateralReserve && props.useFirstReserve && filteredReserveAccounts.length) {
+    const address = filteredReserveAccounts[0].pubkey.toBase58();
+    setCollateralReserve(address);
+  }
+  const renderReserveAccounts = filteredReserveAccounts
     .map((reserve) => {
       const mint = reserve.info.liquidityMint.toBase58();
       const address = reserve.pubkey.toBase58();
