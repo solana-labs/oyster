@@ -55,7 +55,7 @@ export const BorrowReserveView = () => {
             <Statistic
               title={LABELS.BORROWING_POWER_VALUE}
               value={borrowingPower}
-              valueStyle={{ color: "#3f8600" }}
+              valueStyle={{ color: "#3fBB00" }}
               precision={2}
               prefix="$"
             />

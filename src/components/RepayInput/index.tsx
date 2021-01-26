@@ -132,7 +132,7 @@ export const RepayInput = (props: {
   useEffect(() => {
     if (collateralReserve && lastTyped === "repay") {
       const collateralInQuote = obligation.info.collateralInQuote;
-      const collateral = collateralInQuote * collateralPrice;
+      const collateral = collateralInQuote / collateralPrice;
       if (value) {
         const borrowRatio = (parseFloat(value) / borrowAmount) * 100;
         const collateralAmount = (borrowRatio * collateral) / 100;
@@ -153,7 +153,7 @@ export const RepayInput = (props: {
   useEffect(() => {
     if (collateralReserve && lastTyped === "collateral") {
       const collateralInQuote = obligation.info.collateralInQuote;
-      const collateral = collateralInQuote * collateralPrice;
+      const collateral = collateralInQuote / collateralPrice;
       if (collateralValue) {
         const collateralRatio =
           (parseFloat(collateralValue) / collateral) * 100;
@@ -193,6 +193,7 @@ export const RepayInput = (props: {
             justifyContent: "space-around",
           }}
         >
+          <div className="repay-input-title">{LABELS.REPAY_QUESTION}</div>
           <div
             style={{
               display: "flex",
@@ -220,6 +221,7 @@ export const RepayInput = (props: {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
+              marginBottom: 20
             }}
           >
             <CollateralInput

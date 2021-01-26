@@ -175,6 +175,7 @@ export const BorrowInput = (props: {
             justifyContent: "space-around",
           }}
         >
+          <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
           <div
             style={{
               display: "flex",
@@ -203,6 +204,7 @@ export const BorrowInput = (props: {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
+              marginBottom: 20
             }}
           >
             <CollateralInput

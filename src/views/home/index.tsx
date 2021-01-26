@@ -95,7 +95,7 @@ export const HomeView = () => {
               title="Current market size"
               value={totals.marketSize}
               precision={2}
-              valueStyle={{ color: "#3f8600" }}
+              valueStyle={{ color: "#3fBB00" }}
               prefix="$"
             />
           </Card>
