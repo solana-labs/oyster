@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useConnectionConfig } from "../../contexts/connection";
-import { useLendingReserves, useUserDeposits } from "../../hooks";
+import {useLendingReserves, useUserBalance, useUserDeposits} from "../../hooks";
 import {
   LendingReserve,
   LendingMarket,
@@ -27,9 +27,11 @@ export default function CollateralInput(props: {
   onLeverage?: (leverage: number) => void;
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
+  useWalletBalance?: boolean;
   showLeverageSelector?: boolean;
   leverage?: number;
 }) {
+  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
   const { reserveAccounts } = useLendingReserves();
   const { tokenMap } = useConnectionConfig();
   const [collateralReserve, setCollateralReserve] = useState<string>();
@@ -38,21 +40,26 @@ export default function CollateralInput(props: {
   const userDeposits = useUserDeposits();
 
   useEffect(() => {
-    const id: string =
-      cache
-        .byParser(LendingReserveParser)
-        .find((acc) => acc === collateralReserve) || "";
-    const parser = cache.get(id) as ParsedAccount<LendingReserve>;
-    if (parser) {
-      const collateralDeposit = userDeposits.userDeposits.find(
-        (u) =>
-          u.reserve.info.liquidityMint.toBase58() ===
-          parser.info.liquidityMint.toBase58()
-      );
-      if (collateralDeposit) setBalance(collateralDeposit.info.amount);
-      else setBalance(0);
+    if (props.useWalletBalance) {
+      setBalance(tokenBalance)
+    } else {
+      const id: string =
+        cache
+          .byParser(LendingReserveParser)
+          .find((acc) => acc === collateralReserve) || "";
+      const parser = cache.get(id) as ParsedAccount<LendingReserve>;
+
+      if (parser) {
+        const collateralDeposit = userDeposits.userDeposits.find(
+          (u) =>
+            u.reserve.info.liquidityMint.toBase58() ===
+            parser.info.liquidityMint.toBase58()
+        );
+        if (collateralDeposit) setBalance(collateralDeposit.info.amount);
+        else setBalance(0);
+      }
     }
-  }, [collateralReserve, userDeposits]);
+  }, [collateralReserve, userDeposits, tokenBalance, props.useWalletBalance]);
 
   const market = cache.get(props.reserve.lendingMarket) as ParsedAccount<
     LendingMarket

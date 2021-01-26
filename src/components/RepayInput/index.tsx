@@ -211,7 +211,7 @@ export const RepayInput = (props: {
                 setLastTyped("repay");
               }}
               disabled={true}
-              hideBalance={true}
+              useWalletBalance={true}
             />
           </div>
           <Slider marks={marks} value={pct} onChange={setPct} />
