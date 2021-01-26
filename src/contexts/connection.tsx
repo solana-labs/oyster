@@ -30,7 +30,7 @@ export const ENDPOINTS = [
   },
   {
     name: "Lending" as ENV,
-    endpoint: "http://tln.solana.com/",
+    endpoint: "https://tln.solana.com/",
   },
   { name: "testnet" as ENV, endpoint: clusterApiUrl("testnet") },
   { name: "devnet" as ENV, endpoint: clusterApiUrl("devnet") },
