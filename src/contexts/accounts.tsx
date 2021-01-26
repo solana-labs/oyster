@@ -148,6 +148,10 @@ export const cache = {
     obj: AccountInfo<Buffer>,
     parser?: AccountParser
   ) => {
+    if(obj.data.length === 0) {
+      return;
+    }
+
     const address = typeof id === "string" ? id : id?.toBase58();
     const deserialize = parser ? parser : keyToAccountParser.get(address);
     if (!deserialize) {

@@ -58,6 +58,7 @@ export const borrow = async (
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
   let cleanupInstructions: TransactionInstruction[] = [];
+  let finalCleanupInstructions: TransactionInstruction[] = [];
 
   const [authority] = await PublicKey.findProgramAddress(
     [depositReserve.info.lendingMarket.toBuffer()],
@@ -97,16 +98,6 @@ export const borrow = async (
         signers
       );
 
-  let toAccount = await findOrCreateAccountByMint(
-    wallet.publicKey,
-    wallet.publicKey,
-    instructions,
-    cleanupInstructions,
-    accountRentExempt,
-    borrowReserve.info.liquidityMint,
-    signers
-  );
-
   if (!obligationAccount) {
     instructions.push(
       initObligationInstruction(
@@ -128,35 +119,14 @@ export const borrow = async (
         wallet.publicKey,
         LEND_HOST_FEE_ADDRESS,
         instructions,
-        cleanupInstructions,
+        [],
         accountRentExempt,
         depositReserve.info.collateralMint,
         signers
       )
     : undefined;
 
-  if (instructions.length > 0) {
-    // create all accounts in one transaction
-    let tx = await sendTransaction(connection, wallet, instructions, [
-      ...signers,
-    ]);
-
-    notify({
-      message: "Obligation accounts created",
-      description: `Transaction ${tx}`,
-      type: "success",
-    });
-  }
-
-  notify({
-    message: "Borrowing funds...",
-    description: "Please review transactions to approve.",
-    type: "warn",
-  });
-
-  signers = [];
-  instructions = [];
-  cleanupInstructions = [];
+ 
 
   let amountLamports: number = 0;
   let fromLamports: number = 0;
@@ -184,14 +154,49 @@ export const borrow = async (
     fromLamports = amountLamports;
   }
 
+
   const fromAccount = ensureSplAccount(
     instructions,
-    cleanupInstructions,
+    finalCleanupInstructions,
     from,
     wallet.publicKey,
     fromLamports + accountRentExempt,
     signers
   );
+
+  let toAccount = await findOrCreateAccountByMint(
+    wallet.publicKey,
+    wallet.publicKey,
+    instructions,
+    finalCleanupInstructions,
+    accountRentExempt,
+    borrowReserve.info.liquidityMint,
+    signers
+  );
+
+  if (instructions.length > 0) {
+    // create all accounts in one transaction
+    let tx = await sendTransaction(connection, wallet, instructions, [
+      ...signers,
+    ]);
+
+    notify({
+      message: "Obligation accounts created",
+      description: `Transaction ${tx}`,
+      type: "success",
+    });
+  }
+
+  notify({
+    message: "Borrowing funds...",
+    description: "Please review transactions to approve.",
+    type: "warn",
+  });
+
+  signers = [];
+  instructions = [];
+  cleanupInstructions = [...finalCleanupInstructions];
+
 
   // create approval for transfer transactions
   const transferAuthority = approve(
@@ -199,7 +204,8 @@ export const borrow = async (
     cleanupInstructions,
     fromAccount,
     wallet.publicKey,
-    fromLamports
+    fromLamports,
+    false,
   );
   signers.push(transferAuthority);
 
@@ -231,7 +237,6 @@ export const borrow = async (
   instructions.push(
     accrueInterestInstruction(depositReserve.pubkey, borrowReserve.pubkey)
   );
-
   // borrow
   instructions.push(
     borrowInstruction(

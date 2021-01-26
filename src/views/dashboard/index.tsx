@@ -1,4 +1,4 @@
-import { Col, Row } from "antd";
+import { Card, Col, Row } from "antd";
 import React from "react";
 import { GUTTER, LABELS } from "../../constants";
 import { useWallet } from "../../contexts/wallet";
@@ -14,7 +14,7 @@ export const DashboardView = () => {
 
   return (
     <div className="dashboard-container">
-      {!connected && (
+      {!connected ? (
         <div className="dashboard-info">
           <img
             src="splash.svg"
@@ -23,8 +23,9 @@ export const DashboardView = () => {
           />
           {LABELS.DASHBOARD_INFO}
         </div>
-      )}
-      {connected && userDeposits.length === 0 && userObligations.length === 0 && (
+      ):
+      userDeposits.length === 0 && userObligations.length === 0 ? 
+      (
         <div className="dashboard-info">
           <img
             src="splash.svg"
@@ -33,19 +34,18 @@ export const DashboardView = () => {
           />
           {LABELS.NO_LOANS_NO_DEPOSITS}
         </div>
-      )}
-      {connected && (
+      ): (
         <Row gutter={GUTTER}>
-          {userDeposits.length > 0 && (
-            <Col md={24} xl={12} span={24}>
-              <DashboardDeposits />
-            </Col>
-          )}
-          {userObligations.length > 0 && (
-            <Col md={24} xl={12} span={24}>
-              <DashboardObligations />
-            </Col>
-          )}
+          <Col md={24} xl={12} span={24}>
+            {userDeposits.length > 0 ? 
+              <DashboardDeposits /> : 
+              <Card>{LABELS.NO_DEPOSITS}</Card> }
+          </Col>
+          <Col md={24} xl={12} span={24}>
+            {userObligations.length > 0 ? 
+              <DashboardObligations /> : 
+              <Card>{LABELS.NO_LOANS}</Card> }
+          </Col>
         </Row>
       )}
     </div>

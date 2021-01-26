@@ -17,7 +17,7 @@ export const DepositView = () => {
           <div></div>
         </div>
         {reserveAccounts.map((account) => (
-          <ReserveItem reserve={account.info} address={account.pubkey} />
+          <ReserveItem key={account.pubkey.toBase58()} reserve={account.info} address={account.pubkey} />
         ))}
       </Card>
     </div>

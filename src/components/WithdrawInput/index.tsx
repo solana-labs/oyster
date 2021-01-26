@@ -147,7 +147,7 @@ export const WithdrawInput = (props: {
             disabled={fromAccounts.length === 0}
           >
             {fromAccounts.length === 0
-              ? LABELS.NO_DEPOSITS
+              ? LABELS.NO_COLLATERAL
               : LABELS.WITHDRAW_ACTION}
           </ConnectButton>
         </div>

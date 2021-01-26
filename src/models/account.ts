@@ -20,6 +20,7 @@ export function approve(
   account: PublicKey,
   owner: PublicKey,
   amount: number,
+  autoRevoke = true,
 
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey
@@ -38,9 +39,11 @@ export function approve(
     )
   );
 
-  cleanupInstructions.push(
-    Token.createRevokeInstruction(tokenProgram, account, owner, [])
-  );
+  if(autoRevoke) {
+    cleanupInstructions.push(
+      Token.createRevokeInstruction(tokenProgram, account, owner, [])
+    );
+  }
 
   return transferAuthority;
 }

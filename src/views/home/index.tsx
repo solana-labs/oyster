@@ -142,6 +142,7 @@ export const HomeView = () => {
         </div>
         {reserveAccounts.map((account) => (
           <LendingReserveItem
+            key={account.pubkey.toBase58()}
             reserve={account.info}
             address={account.pubkey}
             item={totals.items.find(

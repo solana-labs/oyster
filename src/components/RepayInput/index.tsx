@@ -110,19 +110,19 @@ export const RepayInput = (props: {
       }
     })();
   }, [
-    pct,
-    value,
     borrowAmount,
     borrowAmountLamports,
-    type,
-    connection,
-    wallet,
-    obligation,
     collateralReserve,
-    repayReserve,
+    connection,
     fromAccounts,
+    obligation,
     obligationAccount,
+    pct,
+    repayReserve,
     setValue,
+    type,
+    value,
+    wallet,
   ]);
 
   const collateralPrice = useMidPriceInUSD(
@@ -142,11 +142,11 @@ export const RepayInput = (props: {
       }
     }
   }, [
-    lastTyped,
-    collateralReserve,
-    obligation.info.collateralInQuote,
-    collateralPrice,
     borrowAmount,
+    collateralPrice,
+    collateralReserve,
+    lastTyped,
+    obligation.info.collateralInQuote,
     value,
   ]);
 
@@ -164,12 +164,13 @@ export const RepayInput = (props: {
       }
     }
   }, [
-    lastTyped,
-    collateralReserve,
-    obligation.info.collateralInQuote,
-    collateralPrice,
     borrowAmount,
+    collateralPrice,
+    collateralReserve,
     collateralValue,
+    lastTyped,
+    obligation.info.collateralInQuote,
+    setValue,
   ]);
 
   const bodyStyle: React.CSSProperties = {

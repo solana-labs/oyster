@@ -105,7 +105,7 @@ export const repay = async (
     obligationToken.pubkey,
     wallet.publicKey,
     obligationToken.info.amount.toNumber(),
-
+    true,
     // reuse transfer authority
     transferAuthority.publicKey
   );

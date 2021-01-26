@@ -225,7 +225,7 @@ export const BorrowInput = (props: {
             disabled={fromAccounts.length === 0}
           >
             {fromAccounts.length === 0
-              ? LABELS.NO_DEPOSITS
+              ? LABELS.NO_COLLATERAL
               : LABELS.BORROW_ACTION}
           </ConnectButton>
           <BackButton />
