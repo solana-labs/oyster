@@ -1,4 +1,4 @@
-import { Card, Statistic } from "antd";
+import { Card, Col, Row, Statistic } from "antd";
 import {
   formatNumber,
   formatPct,
@@ -13,6 +13,7 @@ import {
 } from "../../hooks";
 import { useMint } from "../../contexts/accounts";
 import { calculateBorrowAPY, collateralToLiquidity } from "../../models";
+import { GUTTER } from "../../constants";
 
 export const LoanInfoLine = (props: {
   className?: string;
@@ -46,43 +47,56 @@ export const LoanInfoLine = (props: {
   const collateral = fromLamports(collateralLamports, collateralMint);
 
   return (
-    <Card
-      className={props.className}
-      bodyStyle={{ display: "flex", justifyContent: "space-between" }}
-    >
-      <Statistic
-        title="Loan Balance"
-        value={obligation.info.borrowedInQuote}
-        formatter={(val) => (
-          <div>
-            <div>
-              <em>{formatNumber.format(borrowAmount)}</em> {repayName}
-            </div>
-            <div className="dashboard-amount-quote">
-              ${formatNumber.format(parseFloat(val.toString()))}
-            </div>
-          </div>
-        )}
-      />
-      <Statistic
-        title="Collateral"
-        value={obligation.info.borrowedInQuote}
-        formatter={(val) => (
-          <div>
-            <div>
-              <em>{formatNumber.format(collateral)}</em> {withdrawName}
-            </div>
-            <div className="dashboard-amount-quote">
-              ${formatNumber.format(parseFloat(val.toString()))}
-            </div>
-          </div>
-        )}
-      />
-      <Statistic title="APY" value={formatPct.format(borrowAPY)} />
-      <Statistic
-        title="Health Factor"
-        value={obligation.info.health.toFixed(2)}
-      />
-    </Card>
+    <Row gutter={GUTTER}>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic
+            title="Loan Balance"
+            value={obligation.info.borrowedInQuote}
+            formatter={(val) => (
+              <div>
+                <div>
+                  <em>{formatNumber.format(borrowAmount)}</em> {repayName}
+                </div>
+                <div className="dashboard-amount-quote">
+                  ${formatNumber.format(parseFloat(val.toString()))}
+                </div>
+              </div>
+            )}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic
+            title="Collateral"
+            value={obligation.info.borrowedInQuote}
+            formatter={(val) => (
+              <div>
+                <div>
+                  <em>{formatNumber.format(collateral)}</em> {withdrawName}
+                </div>
+                <div className="dashboard-amount-quote">
+                  ${formatNumber.format(parseFloat(val.toString()))}
+                </div>
+              </div>
+            )}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic title="APY" value={formatPct.format(borrowAPY)} />
+        </Card>
+      </Col>
+      <Col xs={24} xl={9}>
+        <Card className={props.className}>
+          <Statistic
+            title="Health Factor"
+            value={obligation.info.health.toFixed(2)}
+          />
+        </Card>
+      </Col>
+    </Row>
   );
 };

@@ -11,6 +11,9 @@ import { LoanInfoLine } from "../../components/LoanInfoLine";
 import { LiquidateInput } from "../../components/LiquidateInput";
 
 import "./style.less";
+import { Col, Row } from "antd";
+import { GUTTER } from "../../constants";
+import { BorrowInput } from "../../components/BorrowInput";
 
 export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,24 +28,25 @@ export const LiquidateReserveView = () => {
   }
 
   return (
-    <div className="liquidate-reserve">
-      <LoanInfoLine
-        className="liquidate-reserve-item"
-        obligation={obligation}
-      />
-      <div className="liquidate-reserve-container">
-        <LiquidateInput
-          className="liquidate-reserve-item liquidate-reserve-item-left"
-          obligation={obligation}
-          withdrawReserve={withdrawReserve}
-          repayReserve={repayReserve}
-        />
-        <SideReserveOverview
-          className="liquidate-reserve-item liquidate-reserve-item-right"
-          reserve={repayReserve}
-          mode={SideReserveOverviewMode.Deposit}
-        />
-      </div>
+    <div className="borrow-reserve">
+      <LoanInfoLine className="card-fill" obligation={obligation} />
+      <Row gutter={GUTTER} style={{ flex: 1 }}>
+        <Col xs={24} xl={15}>
+          <LiquidateInput
+            className="card-fill"
+            obligation={obligation}
+            withdrawReserve={withdrawReserve}
+            repayReserve={repayReserve}
+          />
+        </Col>
+        <Col xs={24} xl={9}>
+          <SideReserveOverview
+            className="card-fill"
+            reserve={repayReserve}
+            mode={SideReserveOverviewMode.Deposit}
+          />
+        </Col>
+      </Row>
     </div>
   );
 };
