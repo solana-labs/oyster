@@ -23,9 +23,7 @@ export const DashboardView = () => {
           />
           {LABELS.DASHBOARD_INFO}
         </div>
-      ):
-      userDeposits.length === 0 && userObligations.length === 0 ? 
-      (
+      ) : userDeposits.length === 0 && userObligations.length === 0 ? (
         <div className="dashboard-info">
           <img
             src="splash.svg"
@@ -34,17 +32,21 @@ export const DashboardView = () => {
           />
           {LABELS.NO_LOANS_NO_DEPOSITS}
         </div>
-      ): (
+      ) : (
         <Row gutter={GUTTER}>
           <Col md={24} xl={12} span={24}>
-            {userDeposits.length > 0 ? 
-              <DashboardDeposits /> : 
-              <Card>{LABELS.NO_DEPOSITS}</Card> }
+            {userDeposits.length > 0 ? (
+              <DashboardDeposits />
+            ) : (
+              <Card>{LABELS.NO_DEPOSITS}</Card>
+            )}
           </Col>
           <Col md={24} xl={12} span={24}>
-            {userObligations.length > 0 ? 
-              <DashboardObligations /> : 
-              <Card>{LABELS.NO_LOANS}</Card> }
+            {userObligations.length > 0 ? (
+              <DashboardObligations />
+            ) : (
+              <Card>{LABELS.NO_LOANS}</Card>
+            )}
           </Col>
         </Row>
       )}

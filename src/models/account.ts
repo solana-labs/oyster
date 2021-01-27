@@ -39,7 +39,7 @@ export function approve(
     )
   );
 
-  if(autoRevoke) {
+  if (autoRevoke) {
     cleanupInstructions.push(
       Token.createRevokeInstruction(tokenProgram, account, owner, [])
     );

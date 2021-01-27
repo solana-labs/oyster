@@ -205,7 +205,7 @@ export const BorrowInput = (props: {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             <CollateralInput

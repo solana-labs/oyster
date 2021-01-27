@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useConnectionConfig } from "../../contexts/connection";
-import {useLendingReserves, useUserBalance, useUserDeposits} from "../../hooks";
+import {
+  useLendingReserves,
+  useUserBalance,
+  useUserDeposits,
+} from "../../hooks";
 import {
   LendingReserve,
   LendingMarket,
@@ -42,7 +46,7 @@ export default function CollateralInput(props: {
 
   useEffect(() => {
     if (props.useWalletBalance) {
-      setBalance(tokenBalance)
+      setBalance(tokenBalance);
     } else {
       const id: string =
         cache
@@ -77,26 +81,29 @@ export default function CollateralInput(props: {
       (reserve) =>
         !onlyQuoteAllowed ||
         reserve.info.liquidityMint.equals(market.info.quoteMint)
-    )
+    );
 
-  if(!collateralReserve && props.useFirstReserve && filteredReserveAccounts.length) {
+  if (
+    !collateralReserve &&
+    props.useFirstReserve &&
+    filteredReserveAccounts.length
+  ) {
     const address = filteredReserveAccounts[0].pubkey.toBase58();
     setCollateralReserve(address);
   }
-  const renderReserveAccounts = filteredReserveAccounts
-    .map((reserve) => {
-      const mint = reserve.info.liquidityMint.toBase58();
-      const address = reserve.pubkey.toBase58();
-      const name = getTokenName(tokenMap, mint);
-      return (
-        <Option key={address} value={address} name={name} title={address}>
-          <div key={address} style={{ display: "flex", alignItems: "center" }}>
-            <TokenIcon mintAddress={mint} />
-            {name}
-          </div>
-        </Option>
-      );
-    });
+  const renderReserveAccounts = filteredReserveAccounts.map((reserve) => {
+    const mint = reserve.info.liquidityMint.toBase58();
+    const address = reserve.pubkey.toBase58();
+    const name = getTokenName(tokenMap, mint);
+    return (
+      <Option key={address} value={address} name={name} title={address}>
+        <div key={address} style={{ display: "flex", alignItems: "center" }}>
+          <TokenIcon mintAddress={mint} />
+          {name}
+        </div>
+      </Option>
+    );
+  });
 
   return (
     <Card

@@ -35,9 +35,12 @@ export const DashboardObligations = () => {
         <div></div>
       </div>
       {userObligations.map((item) => {
-        return <ObligationItem 
-          key={item.obligation.account.pubkey.toBase58()} 
-          obligation={item.obligation} />;
+        return (
+          <ObligationItem
+            key={item.obligation.account.pubkey.toBase58()}
+            obligation={item.obligation}
+          />
+        );
       })}
     </Card>
   );
