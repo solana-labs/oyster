@@ -56,7 +56,7 @@ export const RepayInput = (props: {
 
   const convert = useCallback(
     (val: string | number) => {
-      const minAmount = Math.min(tokenBalance, borrowAmount);
+      const minAmount = Math.min(tokenBalance || Infinity, borrowAmount);
       setLastTyped("repay");
       if (typeof val === "string") {
         return (parseFloat(val) / minAmount) * 100;
