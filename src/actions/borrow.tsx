@@ -125,7 +125,7 @@ export const borrow = async (
         signers
       )
     : undefined;
-
+  
   let amountLamports: number = 0;
   let fromLamports: number = 0;
   if (amountType === BorrowAmountType.LiquidityBorrowAmount) {
@@ -151,6 +151,7 @@ export const borrow = async (
     amountLamports = toLamports(amount, mint?.info);
     fromLamports = amountLamports;
   }
+
 
   const fromAccount = ensureSplAccount(
     instructions,
@@ -201,7 +202,7 @@ export const borrow = async (
     fromAccount,
     wallet.publicKey,
     fromLamports,
-    false
+    false,
   );
   signers.push(transferAuthority);
 
