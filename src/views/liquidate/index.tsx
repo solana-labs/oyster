@@ -107,7 +107,7 @@ export const LiquidateView = () => {
                   <LiquidateItem
                     key={item.account.pubkey.toBase58()}
                     item={item}
-                  ></LiquidateItem>
+                  />
                 ))}
               </Card>
             </Col>
