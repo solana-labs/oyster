@@ -1,21 +1,26 @@
-import {Slider} from "antd";
+import { Slider } from "antd";
 import Card from "antd/lib/card";
-import React, {useCallback, useEffect} from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
-import {LABELS, marks} from "../../constants";
-import {ParsedAccount, useMint} from "../../contexts/accounts";
-import {EnrichedLendingObligation, InputType, useSliderInput, useUserBalance} from "../../hooks";
+import { LABELS, marks } from "../../constants";
+import { ParsedAccount, useMint } from "../../contexts/accounts";
+import {
+  EnrichedLendingObligation,
+  InputType,
+  useSliderInput,
+  useUserBalance,
+} from "../../hooks";
 import { LendingReserve } from "../../models";
 import { ActionConfirmation } from "../ActionConfirmation";
 import { liquidate } from "../../actions";
 import "./style.less";
 import { useConnection } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
-import {fromLamports, wadToLamports} from "../../utils/utils";
+import { fromLamports, wadToLamports } from "../../utils/utils";
 import CollateralInput from "../CollateralInput";
-import {notify} from "../../utils/notifications";
-import {ConnectButton} from "../ConnectButton";
-import {useMidPriceInUSD} from "../../contexts/market";
+import { notify } from "../../utils/notifications";
+import { ConnectButton } from "../ConnectButton";
+import { useMidPriceInUSD } from "../../contexts/market";
 
 export const LiquidateInput = (props: {
   className?: string;
@@ -56,7 +61,6 @@ export const LiquidateInput = (props: {
 
   const { value, setValue, pct, setPct, type } = useSliderInput(convert);
 
-
   const onLiquidate = useCallback(() => {
     if (!withdrawReserve) {
       return;
@@ -86,7 +90,7 @@ export const LiquidateInput = (props: {
         setValue("");
         setCollateralValue("");
         setShowConfirmation(true);
-      } catch (error){
+      } catch (error) {
         // TODO:
         notify({
           message: "Unable to liquidate loan.",
@@ -110,7 +114,7 @@ export const LiquidateInput = (props: {
     borrowAmountLamports,
     pct,
     tokenBalance,
-    type
+    type,
   ]);
 
   const collateralPrice = useMidPriceInUSD(
