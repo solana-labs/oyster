@@ -125,9 +125,7 @@ export const borrow = async (
         signers
       )
     : undefined;
-
- 
-
+  
   let amountLamports: number = 0;
   let fromLamports: number = 0;
   if (amountType === BorrowAmountType.LiquidityBorrowAmount) {
@@ -196,7 +194,6 @@ export const borrow = async (
   signers = [];
   instructions = [];
   cleanupInstructions = [...finalCleanupInstructions];
-
 
   // create approval for transfer transactions
   const transferAuthority = approve(

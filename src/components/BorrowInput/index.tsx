@@ -195,6 +195,7 @@ export const BorrowInput = (props: {
               onCollateralReserve={(key) => {
                 setCollateralReserveKey(key);
               }}
+              useFirstReserve={true}
             />
           </div>
           <ArrowDownOutlined />
@@ -204,7 +205,7 @@ export const BorrowInput = (props: {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             <CollateralInput

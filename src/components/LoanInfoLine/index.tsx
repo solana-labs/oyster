@@ -70,7 +70,7 @@ export const LoanInfoLine = (props: {
         <Card className={props.className}>
           <Statistic
             title="Collateral"
-            value={obligation.info.borrowedInQuote}
+            value={obligation.info.collateralInQuote}
             formatter={(val) => (
               <div>
                 <div>

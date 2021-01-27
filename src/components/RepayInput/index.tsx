@@ -38,6 +38,9 @@ export const RepayInput = (props: {
   const obligation = props.obligation;
 
   const liquidityMint = useMint(repayReserve.info.liquidityMint);
+  const { balance: tokenBalance } = useUserBalance(
+    repayReserve.info.liquidityMint
+  );
 
   const borrowAmountLamports = wadToLamports(
     obligation.info.borrowAmountWad
@@ -53,14 +56,15 @@ export const RepayInput = (props: {
 
   const convert = useCallback(
     (val: string | number) => {
+      const minAmount = Math.min(tokenBalance || Infinity, borrowAmount);
       setLastTyped("repay");
       if (typeof val === "string") {
-        return (parseFloat(val) / borrowAmount) * 100;
+        return (parseFloat(val) / minAmount) * 100;
       } else {
-        return (val * borrowAmount) / 100;
+        return (val * minAmount) / 100;
       }
     },
-    [borrowAmount]
+    [borrowAmount, tokenBalance]
   );
 
   const { value, setValue, pct, setPct, type } = useSliderInput(convert);
@@ -211,7 +215,7 @@ export const RepayInput = (props: {
                 setLastTyped("repay");
               }}
               disabled={true}
-              hideBalance={true}
+              useWalletBalance={true}
             />
           </div>
           <Slider marks={marks} value={pct} onChange={setPct} />
@@ -221,7 +225,7 @@ export const RepayInput = (props: {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             <CollateralInput

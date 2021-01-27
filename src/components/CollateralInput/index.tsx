@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { cache, ParsedAccount } from "../../contexts/accounts";
 import { useConnectionConfig } from "../../contexts/connection";
-import { useLendingReserves, useUserDeposits } from "../../hooks";
+import {
+  useLendingReserves,
+  useUserBalance,
+  useUserDeposits,
+} from "../../hooks";
 import {
   LendingReserve,
   LendingMarket,
@@ -27,9 +31,12 @@ export default function CollateralInput(props: {
   onLeverage?: (leverage: number) => void;
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
+  useWalletBalance?: boolean;
+  useFirstReserve?: boolean;
   showLeverageSelector?: boolean;
   leverage?: number;
 }) {
+  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
   const { reserveAccounts } = useLendingReserves();
   const { tokenMap } = useConnectionConfig();
   const [collateralReserve, setCollateralReserve] = useState<string>();
@@ -38,21 +45,26 @@ export default function CollateralInput(props: {
   const userDeposits = useUserDeposits();
 
   useEffect(() => {
-    const id: string =
-      cache
-        .byParser(LendingReserveParser)
-        .find((acc) => acc === collateralReserve) || "";
-    const parser = cache.get(id) as ParsedAccount<LendingReserve>;
-    if (parser) {
-      const collateralDeposit = userDeposits.userDeposits.find(
-        (u) =>
-          u.reserve.info.liquidityMint.toBase58() ===
-          parser.info.liquidityMint.toBase58()
-      );
-      if (collateralDeposit) setBalance(collateralDeposit.info.amount);
-      else setBalance(0);
+    if (props.useWalletBalance) {
+      setBalance(tokenBalance);
+    } else {
+      const id: string =
+        cache
+          .byParser(LendingReserveParser)
+          .find((acc) => acc === collateralReserve) || "";
+      const parser = cache.get(id) as ParsedAccount<LendingReserve>;
+
+      if (parser) {
+        const collateralDeposit = userDeposits.userDeposits.find(
+          (u) =>
+            u.reserve.info.liquidityMint.toBase58() ===
+            parser.info.liquidityMint.toBase58()
+        );
+        if (collateralDeposit) setBalance(collateralDeposit.info.amount);
+        else setBalance(0);
+      }
     }
-  }, [collateralReserve, userDeposits]);
+  }, [collateralReserve, userDeposits, tokenBalance, props.useWalletBalance]);
 
   const market = cache.get(props.reserve.lendingMarket) as ParsedAccount<
     LendingMarket
@@ -63,26 +75,35 @@ export default function CollateralInput(props: {
     market?.info?.quoteMint
   );
 
-  const renderReserveAccounts = reserveAccounts
+  const filteredReserveAccounts = reserveAccounts
     .filter((reserve) => reserve.info !== props.reserve)
     .filter(
       (reserve) =>
         !onlyQuoteAllowed ||
         reserve.info.liquidityMint.equals(market.info.quoteMint)
-    )
-    .map((reserve) => {
-      const mint = reserve.info.liquidityMint.toBase58();
-      const address = reserve.pubkey.toBase58();
-      const name = getTokenName(tokenMap, mint);
-      return (
-        <Option key={address} value={address} name={name} title={address}>
-          <div key={address} style={{ display: "flex", alignItems: "center" }}>
-            <TokenIcon mintAddress={mint} />
-            {name}
-          </div>
-        </Option>
-      );
-    });
+    );
+
+  if (
+    !collateralReserve &&
+    props.useFirstReserve &&
+    filteredReserveAccounts.length
+  ) {
+    const address = filteredReserveAccounts[0].pubkey.toBase58();
+    setCollateralReserve(address);
+  }
+  const renderReserveAccounts = filteredReserveAccounts.map((reserve) => {
+    const mint = reserve.info.liquidityMint.toBase58();
+    const address = reserve.pubkey.toBase58();
+    const name = getTokenName(tokenMap, mint);
+    return (
+      <Option key={address} value={address} name={name} title={address}>
+        <div key={address} style={{ display: "flex", alignItems: "center" }}>
+          <TokenIcon mintAddress={mint} />
+          {name}
+        </div>
+      </Option>
+    );
+  });
 
   return (
     <Card

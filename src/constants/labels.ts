@@ -40,6 +40,7 @@ export const LABELS = {
   NO_COLLATERAL: "No collateral",
   NO_DEPOSITS: "No deposits",
   NO_LOANS: "No loans",
+  LIQUIDATE_QUESTION: "How much would you like to liquidate?",
   LIQUIDATE_ACTION: "Liquidate",
   LIQUIDATE_NO_LOANS: "There are no loans to liquidate.",
   TABLE_TITLE_ASSET: "Asset",

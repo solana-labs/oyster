@@ -33,7 +33,10 @@ export const DashboardDeposits = () => {
         <div></div>
       </div>
       {userDeposits.map((deposit) => (
-        <DepositItem key={deposit.account.pubkey.toBase58()} userDeposit={deposit} />
+        <DepositItem
+          key={deposit.account.pubkey.toBase58()}
+          userDeposit={deposit}
+        />
       ))}
     </Card>
   );

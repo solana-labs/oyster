@@ -148,7 +148,7 @@ export const cache = {
     obj: AccountInfo<Buffer>,
     parser?: AccountParser
   ) => {
-    if(obj.data.length === 0) {
+    if (obj.data.length === 0) {
       return;
     }
 

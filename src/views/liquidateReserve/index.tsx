@@ -13,7 +13,6 @@ import { LiquidateInput } from "../../components/LiquidateInput";
 import "./style.less";
 import { Col, Row } from "antd";
 import { GUTTER } from "../../constants";
-import { BorrowInput } from "../../components/BorrowInput";
 
 export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
