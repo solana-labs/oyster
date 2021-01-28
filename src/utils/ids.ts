@@ -85,7 +85,7 @@ export const setProgramIds = (envName: string) => {
 
   if (envName === "mainnet-beta") {
     LENDING_PROGRAM_ID = new PublicKey(
-      "2KfJP7pZ6QSpXa26RmsN6kKVQteDEdQmizLSvuyryeiW"
+      "LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi"
     );
   }
 };
