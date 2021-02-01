@@ -173,6 +173,7 @@ export const BorrowInput = (props: {
     connection,
     wallet,
     value,
+    setValue,
     collateralReserve,
     borrowReserve,
     fromAccounts,

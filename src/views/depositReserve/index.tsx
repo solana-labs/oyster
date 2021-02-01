@@ -11,7 +11,6 @@ import {
 } from "../../components/SideReserveOverview";
 import { Col, Row } from "antd";
 import { GUTTER } from "../../constants";
-import { LiquidateInput } from "../../components/LiquidateInput";
 
 export const DepositReserveView = () => {
   const { id } = useParams<{ id: string }>();
