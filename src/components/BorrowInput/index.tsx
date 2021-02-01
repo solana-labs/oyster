@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useUserBalance, useUserObligationByReserve } from "../../hooks";
+import {
+  useSliderInput,
+  useUserBalance,
+  useUserDeposits,
+  useUserObligationByReserve,
+} from "../../hooks";
 import {
   BorrowAmountType,
   LendingReserve,
@@ -16,8 +21,8 @@ import { ActionConfirmation } from "./../ActionConfirmation";
 import { BackButton } from "./../BackButton";
 import { ConnectButton } from "../ConnectButton";
 import CollateralInput from "../CollateralInput";
-import { ArrowDownOutlined } from "@ant-design/icons";
 import { useMidPriceInUSD } from "../../contexts/market";
+import { RiskSlider } from "../RiskSlider";
 
 export const BorrowInput = (props: {
   className?: string;
@@ -25,7 +30,6 @@ export const BorrowInput = (props: {
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const [value, setValue] = useState("");
   const [collateralValue, setCollateralValue] = useState("");
   const [lastTyped, setLastTyped] = useState("collateral");
   const [pendingTx, setPendingTx] = useState(false);
@@ -43,13 +47,36 @@ export const BorrowInput = (props: {
 
     return cache.get(id) as ParsedAccount<LendingReserve>;
   }, [collateralReserveKey]);
-
   const borrowPrice = useMidPriceInUSD(
     borrowReserve.info.liquidityMint.toBase58()
   ).price;
   const collateralPrice = useMidPriceInUSD(
     collateralReserve?.info.liquidityMint.toBase58()
   )?.price;
+
+  const include = useMemo(
+    () => new Set([collateralReserve?.pubkey.toBase58()]),
+    [collateralReserve]
+  );
+
+  const exclude = useMemo(() => new Set([]), []);
+
+  const { userDeposits: accountBalance } = useUserDeposits(exclude, include);
+  const tokenBalance = accountBalance[0]?.info.amount || 0;
+
+  const convert = useCallback(
+    (val: string | number) => {
+      const minAmount = Math.min(tokenBalance, Infinity);
+      if (typeof val === "string") {
+        return (parseFloat(val) / minAmount) * 100;
+      } else {
+        return (val * minAmount) / 100;
+      }
+    },
+    [tokenBalance]
+  );
+
+  const { value, setValue, pct } = useSliderInput(convert);
 
   useEffect(() => {
     if (collateralReserve && lastTyped === "collateral") {
@@ -71,6 +98,7 @@ export const BorrowInput = (props: {
     borrowPrice,
     borrowReserve,
     collateralValue,
+    setValue,
   ]);
 
   useEffect(() => {
@@ -95,15 +123,13 @@ export const BorrowInput = (props: {
     value,
   ]);
 
-  const { accounts: fromAccounts } = useUserBalance(
-    collateralReserve?.info.collateralMint
-  );
-
   const { userObligationsByReserve } = useUserObligationByReserve(
     borrowReserve?.pubkey,
     collateralReserve?.pubkey
   );
-
+  const { accounts: fromAccounts } = useUserBalance(
+    collateralReserve?.info.collateralMint
+  );
   const onBorrow = useCallback(() => {
     if (!collateralReserve) {
       return;
@@ -198,7 +224,7 @@ export const BorrowInput = (props: {
               useFirstReserve={true}
             />
           </div>
-          <ArrowDownOutlined />
+          <RiskSlider value={pct} />
           <div
             style={{
               display: "flex",
