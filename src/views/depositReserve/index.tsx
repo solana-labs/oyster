@@ -9,6 +9,9 @@ import {
   SideReserveOverview,
   SideReserveOverviewMode,
 } from "../../components/SideReserveOverview";
+import { Col, Row } from "antd";
+import { GUTTER } from "../../constants";
+import { LiquidateInput } from "../../components/LiquidateInput";
 
 export const DepositReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,24 +23,28 @@ export const DepositReserveView = () => {
   }
 
   return (
-    <div className="deposit-reserve">
+    <div className="borrow-reserve">
       <DepositInfoLine
-        className="deposit-reserve-item"
+        className="card-fill"
         reserve={reserve}
         address={lendingReserve.pubkey}
       />
-      <div className="deposit-reserve-container">
-        <DepositInput
-          className="deposit-reserve-item deposit-reserve-item-left"
-          reserve={reserve}
-          address={lendingReserve.pubkey}
-        />
-        <SideReserveOverview
-          className="deposit-reserve-item deposit-reserve-item-right"
-          reserve={lendingReserve}
-          mode={SideReserveOverviewMode.Deposit}
-        />
-      </div>
+      <Row gutter={GUTTER} style={{ flex: 1 }}>
+        <Col xs={24} xl={15}>
+          <DepositInput
+            className="card-fill"
+            reserve={reserve}
+            address={lendingReserve.pubkey}
+          />
+        </Col>
+        <Col xs={24} xl={9}>
+          <SideReserveOverview
+            className="card-fill"
+            reserve={lendingReserve}
+            mode={SideReserveOverviewMode.Deposit}
+          />
+        </Col>
+      </Row>
     </div>
   );
 };
