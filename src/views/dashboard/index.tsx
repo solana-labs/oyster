@@ -6,6 +6,7 @@ import { useUserDeposits, useUserObligations } from "./../../hooks";
 import { DashboardObligations } from "./obligation";
 import { DashboardDeposits } from "./deposit";
 import "./style.less";
+import { NothingBorrowedPanel } from "../../components/NothingBorrowedPanel";
 
 export const DashboardView = () => {
   const { connected } = useWallet();
@@ -45,7 +46,7 @@ export const DashboardView = () => {
             {userObligations.length > 0 ? (
               <DashboardObligations />
             ) : (
-              <Card>{LABELS.NO_LOANS}</Card>
+              <NothingBorrowedPanel />
             )}
           </Col>
         </Row>
