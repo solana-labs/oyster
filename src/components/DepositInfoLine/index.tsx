@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   useTokenName,
   useUserBalance,
   useUserCollateralBalance,
 } from "./../../hooks";
-import { LendingReserve } from "../../models/lending";
-import { formatNumber } from "../../utils/utils";
-import { Card } from "antd";
+import { calculateDepositAPY, LendingReserve } from "../../models/lending";
+import { formatNumber, formatPct } from "../../utils/utils";
+import { Card, Col, Row, Statistic } from "antd";
 import "./style.less";
 import { PublicKey } from "@solana/web3.js";
+import { GUTTER } from "../../constants";
 
 export const DepositInfoLine = (props: {
   className?: string;
@@ -20,28 +21,40 @@ export const DepositInfoLine = (props: {
   const { balance: collateralBalance } = useUserCollateralBalance(
     props.reserve
   );
+  const depositAPY = useMemo(() => calculateDepositAPY(props.reserve), [
+    props.reserve,
+  ]);
 
   return (
-    <Card
-      className={props.className}
-      bodyStyle={{ display: "flex", justifyContent: "space-around" }}
-    >
-      <div className="deposit-info-line-item ">
-        <div>Your balance in Oyster</div>
-        <div>
-          {formatNumber.format(collateralBalance)} {name}
-        </div>
-      </div>
-      <div className="deposit-info-line-item ">
-        <div>Your wallet balance</div>
-        <div>
-          {formatNumber.format(tokenBalance)} {name}
-        </div>
-      </div>
-      <div className="deposit-info-line-item ">
-        <div>Health factor</div>
-        <div>--</div>
-      </div>
-    </Card>
+    <Row gutter={GUTTER}>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic
+            title="Your balance in Oyster"
+            value={formatNumber.format(collateralBalance)}
+            suffix={name}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic
+            title="Your wallet balance"
+            value={formatNumber.format(tokenBalance)}
+            suffix={name}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} xl={5}>
+        <Card className={props.className}>
+          <Statistic title="Health Factor" value="--" />
+        </Card>
+      </Col>
+      <Col xs={24} xl={9}>
+        <Card className={props.className}>
+          <Statistic title="APY" value={formatPct.format(depositAPY)} />
+        </Card>
+      </Col>
+    </Row>
   );
 };

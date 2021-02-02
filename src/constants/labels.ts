@@ -40,6 +40,10 @@ export const LABELS = {
   NO_COLLATERAL: "No collateral",
   NO_DEPOSITS: "No deposits",
   NO_LOANS: "No loans",
+  NOTHING_BORROWED: "Nothing borrowed yet",
+  NOTHING_BORROWED_MESSAGE:
+    "There will be a list of all the assets you have borrowed. For now, it's empty since you have not borrowed.",
+  BORROW_NOW: "Borrow now",
   LIQUIDATE_QUESTION: "How much would you like to liquidate?",
   LIQUIDATE_ACTION: "Liquidate",
   LIQUIDATE_NO_LOANS: "There are no loans to liquidate.",
@@ -91,4 +95,6 @@ export const LABELS = {
   NO_DEPOSIT_MESSAGE:
     "You need to deposit coin of this type into oyster before trading with it on margin.",
   NO_COLL_TYPE_MESSAGE: "Choose Collateral CCY",
+  SAFER: "Safer",
+  RISKIER: "Riskier",
 };

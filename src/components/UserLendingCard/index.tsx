@@ -5,6 +5,7 @@ import {
   useUserBalance,
   useBorrowedAmount,
   useBorrowingPower,
+  useUserObligationByReserve,
 } from "./../../hooks";
 import { LendingReserve } from "../../models/lending";
 import { formatNumber } from "../../utils/utils";
@@ -44,6 +45,7 @@ export const UserLendingCard = (props: {
     totalInQuote: borrowingPowerInUSD,
     borrowingPower,
   } = useBorrowingPower(address);
+  const { userObligationsByReserve } = useUserObligationByReserve(address);
 
   return (
     <Card
@@ -156,9 +158,13 @@ export const UserLendingCard = (props: {
         <Link to={`/withdraw/${address}`}>
           <Button>{LABELS.WITHDRAW_ACTION}</Button>
         </Link>
-        <Link to={`/repay/${address}`}>
-          <Button>{LABELS.REPAY_ACTION}</Button>
-        </Link>
+        {!!userObligationsByReserve.length && (
+          <Link
+            to={`/repay/loan/${userObligationsByReserve[0].obligation.account.pubkey.toBase58()}`}
+          >
+            <Button>{LABELS.REPAY_ACTION}</Button>
+          </Link>
+        )}
       </div>
     </Card>
   );
