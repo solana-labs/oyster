@@ -2,6 +2,7 @@
   "name": "lending",
   "version": "0.1.0",
   "dependencies": {
+    "@ant-design/icons": "^4.4.0",
     "@ant-design/pro-layout": "^6.7.0",
     "@craco/craco": "^5.7.0",
     "@project-serum/serum": "^0.13.11",
@@ -21,6 +22,7 @@
     "bs58": "^4.0.1",
     "buffer-layout": "^1.2.0",
     "chart.js": "^2.9.4",
+    "common": "workspace:common",
     "craco-less": "^1.17.0",
     "echarts": "^4.9.0",
     "eventemitter3": "^4.0.7",

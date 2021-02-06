@@ -1,5 +1,5 @@
-import { PublicKey } from "@solana/web3.js";
-import { TokenAccount } from "./account";
+import { PublicKey } from '@solana/web3.js';
+import { TokenAccount } from 'common/src/models/account';
 
 export const DEFAULT_DENOMINATOR = 10_000;
 

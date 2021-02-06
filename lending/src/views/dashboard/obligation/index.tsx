@@ -1,10 +1,10 @@
-import { Card } from "antd";
-import React from "react";
-import { BarChartStatistic } from "../../../components/BarChartStatistic";
-import { LABELS } from "../../../constants";
-import { formatNumber } from "../../../utils/utils";
-import { useUserObligations } from "./../../../hooks";
-import { ObligationItem } from "./item";
+import { Card } from 'antd';
+import React from 'react';
+import { BarChartStatistic } from '../../../components/BarChartStatistic';
+import { LABELS } from '../../../constants';
+import { formatNumber } from 'common/src/utils/utils';
+import { useUserObligations } from './../../../hooks';
+import { ObligationItem } from './item';
 
 export const DashboardObligations = () => {
   const { userObligations, totalInQuote } = useUserObligations();
@@ -12,11 +12,10 @@ export const DashboardObligations = () => {
   return (
     <Card
       title={
-        <div className="dashboard-title">
+        <div className='dashboard-title'>
           <div>{LABELS.DASHBOARD_TITLE_LOANS}</div>
           <div>
-            <span>{LABELS.TOTAL_TITLE}: </span>$
-            {formatNumber.format(totalInQuote)}
+            <span>{LABELS.TOTAL_TITLE}: </span>${formatNumber.format(totalInQuote)}
           </div>
         </div>
       }
@@ -26,7 +25,7 @@ export const DashboardObligations = () => {
         getPct={(item) => item.obligation.info.borrowedInQuote / totalInQuote}
         name={(item) => item.obligation.info.repayName}
       />
-      <div className="dashboard-item dashboard-header">
+      <div className='dashboard-item dashboard-header'>
         <div>{LABELS.TABLE_TITLE_ASSET}</div>
         <div>{LABELS.TABLE_TITLE_YOUR_LOAN_BALANCE}</div>
         <div>{LABELS.TABLE_TITLE_COLLATERAL_BALANCE}</div>
@@ -35,12 +34,7 @@ export const DashboardObligations = () => {
         <div></div>
       </div>
       {userObligations.map((item) => {
-        return (
-          <ObligationItem
-            key={item.obligation.account.pubkey.toBase58()}
-            obligation={item.obligation}
-          />
-        );
+        return <ObligationItem key={item.obligation.account.pubkey.toBase58()} obligation={item.obligation} />;
       })}
     </Card>
   );

@@ -5230,6 +5230,54 @@ __metadata:
   languageName: node
   linkType: hard
 
+"common@workspace:common":
+  version: 0.0.0-use.local
+  resolution: "common@workspace:common"
+  dependencies:
+    "@ant-design/pro-layout": ^6.7.0
+    "@craco/craco": ^5.7.0
+    "@project-serum/serum": ^0.13.11
+    "@project-serum/sol-wallet-adapter": ^0.1.4
+    "@solana/spl-token": 0.0.11
+    "@solana/spl-token-swap": 0.0.2
+    "@solana/web3.js": ^0.86.2
+    "@testing-library/jest-dom": ^4.2.4
+    "@testing-library/react": ^9.5.0
+    "@testing-library/user-event": ^7.2.1
+    "@types/bn.js": ^4.11.6
+    "@types/bs58": ^4.0.1
+    "@types/chart.js": ^2.9.29
+    "@types/echarts": ^4.9.0
+    "@types/identicon.js": ^2.3.0
+    "@types/jest": ^24.9.1
+    "@types/node": ^12.12.62
+    "@types/react": ^16.9.50
+    "@types/react-dom": ^16.9.8
+    "@types/react-router-dom": ^5.1.6
+    "@welldone-software/why-did-you-render": ^6.0.5
+    antd: ^4.6.6
+    arweave-deploy: ^1.9.1
+    bn.js: ^5.1.3
+    bs58: ^4.0.1
+    buffer-layout: ^1.2.0
+    chart.js: ^2.9.4
+    craco-less: ^1.17.0
+    echarts: ^4.9.0
+    eventemitter3: ^4.0.7
+    gh-pages: ^3.1.0
+    identicon.js: ^2.3.3
+    jazzicon: ^1.5.0
+    lodash: ^4.17.20
+    prettier: ^2.1.2
+    react: ^16.13.1
+    react-dom: ^16.13.1
+    react-github-btn: ^1.2.0
+    react-intl: ^5.10.2
+    react-router-dom: ^5.2.0
+    react-scripts: 3.4.3
+  languageName: unknown
+  linkType: soft
+
 "commondir@npm:^1.0.1":
   version: 1.0.1
   resolution: "commondir@npm:1.0.1"
@@ -10369,6 +10417,7 @@ fsevents@~2.3.1:
   version: 0.0.0-use.local
   resolution: "lending@workspace:lending"
   dependencies:
+    "@ant-design/icons": ^4.4.0
     "@ant-design/pro-layout": ^6.7.0
     "@craco/craco": ^5.7.0
     "@project-serum/serum": ^0.13.11
@@ -10396,6 +10445,7 @@ fsevents@~2.3.1:
     bs58: ^4.0.1
     buffer-layout: ^1.2.0
     chart.js: ^2.9.4
+    common: "workspace:common"
     craco-less: ^1.17.0
     echarts: ^4.9.0
     eventemitter3: ^4.0.7

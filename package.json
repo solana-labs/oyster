@@ -21,7 +21,8 @@
   },
   "homepage": ".",
   "workspaces": [
-    "lending"
+    "lending",
+    "common"
   ],
   "dependencies": {
     "@yarnpkg/pnpify": "^2.4.0",

@@ -1,22 +1,18 @@
-import React, { useCallback, useState } from "react";
-import { InputType, useSliderInput, useUserBalance } from "../../hooks";
-import { LendingReserve } from "../../models/lending";
-import { Card, Slider } from "antd";
-import { useConnection } from "../../contexts/connection";
-import { useWallet } from "../../contexts/wallet";
-import { deposit } from "../../actions/deposit";
-import { PublicKey } from "@solana/web3.js";
-import "./style.less";
-import { ActionConfirmation } from "./../ActionConfirmation";
-import { LABELS, marks } from "../../constants";
-import { ConnectButton } from "../ConnectButton";
-import CollateralInput from "../CollateralInput";
+import React, { useCallback, useState } from 'react';
+import { InputType, useSliderInput, useUserBalance } from '../../hooks';
+import { LendingReserve } from '../../models/lending';
+import { Card, Slider } from 'antd';
+import { useConnection } from 'common/src/contexts/connection';
+import { useWallet } from 'common/src/contexts/wallet';
+import { deposit } from '../../actions/deposit';
+import { PublicKey } from '@solana/web3.js';
+import './style.less';
+import { ActionConfirmation } from './../ActionConfirmation';
+import { LABELS, marks } from '../../constants';
+import { ConnectButton } from '../ConnectButton';
+import CollateralInput from '../CollateralInput';
 
-export const DepositInput = (props: {
-  className?: string;
-  reserve: LendingReserve;
-  address: PublicKey;
-}) => {
+export const DepositInput = (props: { className?: string; reserve: LendingReserve; address: PublicKey }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const [pendingTx, setPendingTx] = useState(false);
@@ -25,13 +21,11 @@ export const DepositInput = (props: {
   const reserve = props.reserve;
   const address = props.address;
 
-  const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(
-    reserve?.liquidityMint
-  );
+  const { accounts: fromAccounts, balance, balanceLamports } = useUserBalance(reserve?.liquidityMint);
 
   const convert = useCallback(
     (val: string | number) => {
-      if (typeof val === "string") {
+      if (typeof val === 'string') {
         return (parseFloat(val) / balance) * 100;
       } else {
         return (val * balance) / 100;
@@ -58,7 +52,7 @@ export const DepositInput = (props: {
           wallet
         );
 
-        setValue("");
+        setValue('');
         setShowConfirmation(true);
       } catch {
         // TODO:
@@ -66,26 +60,14 @@ export const DepositInput = (props: {
         setPendingTx(false);
       }
     })();
-  }, [
-    connection,
-    setValue,
-    balanceLamports,
-    balance,
-    wallet,
-    value,
-    pct,
-    type,
-    reserve,
-    fromAccounts,
-    address,
-  ]);
+  }, [connection, setValue, balanceLamports, balance, wallet, value, pct, type, reserve, fromAccounts, address]);
 
   const bodyStyle: React.CSSProperties = {
-    display: "flex",
+    display: 'flex',
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
   };
 
   return (
@@ -95,26 +77,26 @@ export const DepositInput = (props: {
       ) : (
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-around",
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-around',
           }}
         >
-          <div className="deposit-input-title">{LABELS.DEPOSIT_QUESTION}</div>
+          <div className='deposit-input-title'>{LABELS.DEPOSIT_QUESTION}</div>
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              alignItems: "center",
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
             }}
           >
             <CollateralInput
-              title="Amount"
+              title='Amount'
               reserve={reserve}
               amount={parseFloat(value) || 0}
               onInputChange={(val: number | null) => {
-                setValue(val?.toString() || "");
+                setValue(val?.toString() || '');
               }}
               disabled={true}
               hideBalance={true}
@@ -124,8 +106,8 @@ export const DepositInput = (props: {
           <Slider marks={marks} value={pct} onChange={setPct} />
 
           <ConnectButton
-            size="large"
-            type="primary"
+            size='large'
+            type='primary'
             onClick={onDeposit}
             loading={pendingTx}
             disabled={fromAccounts.length === 0}

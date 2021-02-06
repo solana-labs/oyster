@@ -1,7 +1,7 @@
-import React from "react";
-import { Select } from "antd";
-import { ENDPOINTS, useConnectionConfig } from "../../contexts/connection";
-import { useWallet, WALLET_PROVIDERS } from "../../contexts/wallet";
+import React from 'react';
+import { Select } from 'antd';
+import { ENDPOINTS, useConnectionConfig } from 'common/src/contexts/connection';
+import { useWallet, WALLET_PROVIDERS } from 'common/src/contexts/wallet';
 
 export const Settings = () => {
   const { providerUrl, setProvider } = useWallet();
@@ -9,13 +9,9 @@ export const Settings = () => {
 
   return (
     <>
-      <div style={{ display: "grid" }}>
-        Network:{" "}
-        <Select
-          onSelect={setEndpoint}
-          value={endpoint}
-          style={{ marginRight: 8 }}
-        >
+      <div style={{ display: 'grid' }}>
+        Network:{' '}
+        <Select onSelect={setEndpoint} value={endpoint} style={{ marginRight: 8 }}>
           {ENDPOINTS.map(({ name, endpoint }) => (
             <Select.Option value={endpoint} key={endpoint}>
               {name}
@@ -23,8 +19,8 @@ export const Settings = () => {
           ))}
         </Select>
       </div>
-      <div style={{ display: "grid" }}>
-        Wallet:{" "}
+      <div style={{ display: 'grid' }}>
+        Wallet:{' '}
         <Select onSelect={setProvider} value={providerUrl}>
           {WALLET_PROVIDERS.map(({ name, url }) => (
             <Select.Option value={url} key={url}>

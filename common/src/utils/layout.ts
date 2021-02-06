@@ -1,11 +1,11 @@
-import { PublicKey } from "@solana/web3.js";
-import BN from "bn.js";
-import * as BufferLayout from "buffer-layout";
+import { PublicKey } from '@solana/web3.js';
+import BN from 'bn.js';
+import * as BufferLayout from 'buffer-layout';
 
 /**
  * Layout for a public key
  */
-export const publicKey = (property = "publicKey"): unknown => {
+export const publicKey = (property = 'publicKey'): unknown => {
   const publicKeyLayout = BufferLayout.blob(32, property);
 
   const _decode = publicKeyLayout.decode.bind(publicKeyLayout);
@@ -26,7 +26,7 @@ export const publicKey = (property = "publicKey"): unknown => {
 /**
  * Layout for a 64bit unsigned value
  */
-export const uint64 = (property = "uint64"): unknown => {
+export const uint64 = (property = 'uint64'): unknown => {
   const layout = BufferLayout.blob(8, property);
 
   const _decode = layout.decode.bind(layout);
@@ -38,7 +38,7 @@ export const uint64 = (property = "uint64"): unknown => {
       [...data]
         .reverse()
         .map((i) => `00${i.toString(16)}`.slice(-2))
-        .join(""),
+        .join(''),
       16
     );
   };
@@ -58,7 +58,7 @@ export const uint64 = (property = "uint64"): unknown => {
 };
 
 // TODO: wrap in BN (what about decimals?)
-export const uint128 = (property = "uint128"): unknown => {
+export const uint128 = (property = 'uint128'): unknown => {
   const layout = BufferLayout.blob(16, property);
 
   const _decode = layout.decode.bind(layout);
@@ -70,7 +70,7 @@ export const uint128 = (property = "uint128"): unknown => {
       [...data]
         .reverse()
         .map((i) => `00${i.toString(16)}`.slice(-2))
-        .join(""),
+        .join(''),
       16
     );
   };
@@ -93,12 +93,12 @@ export const uint128 = (property = "uint128"): unknown => {
 /**
  * Layout for a Rust String type
  */
-export const rustString = (property = "string"): unknown => {
+export const rustString = (property = 'string'): unknown => {
   const rsl = BufferLayout.struct(
     [
-      BufferLayout.u32("length"),
-      BufferLayout.u32("lengthPadding"),
-      BufferLayout.blob(BufferLayout.offset(BufferLayout.u32(), -8), "chars"),
+      BufferLayout.u32('length'),
+      BufferLayout.u32('lengthPadding'),
+      BufferLayout.blob(BufferLayout.offset(BufferLayout.u32(), -8), 'chars'),
     ],
     property
   );
@@ -107,12 +107,12 @@ export const rustString = (property = "string"): unknown => {
 
   rsl.decode = (buffer: Buffer, offset: number) => {
     const data = _decode(buffer, offset);
-    return data.chars.toString("utf8");
+    return data.chars.toString('utf8');
   };
 
   rsl.encode = (str: string, buffer: Buffer, offset: number) => {
     const data = {
-      chars: Buffer.from(str, "utf8"),
+      chars: Buffer.from(str, 'utf8'),
     };
     return _encode(data, buffer, offset);
   };

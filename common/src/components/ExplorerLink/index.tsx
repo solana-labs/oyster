@@ -1,7 +1,7 @@
-import React from "react";
-import { Typography } from "antd";
-import { shortenAddress } from "../../utils/utils";
-import { PublicKey } from "@solana/web3.js";
+import React from 'react';
+import { Typography } from 'antd';
+import { shortenAddress } from '../../utils/utils';
+import { PublicKey } from '@solana/web3.js';
 
 export const ExplorerLink = (props: {
   address: string | PublicKey;
@@ -12,10 +12,7 @@ export const ExplorerLink = (props: {
 }) => {
   const { type, code } = props;
 
-  const address =
-    typeof props.address === "string"
-      ? props.address
-      : props.address?.toBase58();
+  const address = typeof props.address === 'string' ? props.address : props.address?.toBase58();
 
   if (!address) {
     return null;
@@ -27,7 +24,7 @@ export const ExplorerLink = (props: {
     <a
       href={`https://explorer.solana.com/${type}/${address}`}
       // eslint-disable-next-line react/jsx-no-target-blank
-      target="_blank"
+      target='_blank'
       title={address}
       style={props.style}
     >

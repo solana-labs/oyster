@@ -1,7 +1,7 @@
-import { PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
-import { LendingObligation, LendingObligationParser } from "../models/lending";
-import { cache, ParsedAccount } from "./../contexts/accounts";
+import { PublicKey } from '@solana/web3.js';
+import { useEffect, useState } from 'react';
+import { LendingObligation, LendingObligationParser } from '../models/lending';
+import { cache, ParsedAccount } from 'common/src/contexts/accounts';
 
 const getLendingObligations = () => {
   return cache
@@ -31,10 +31,8 @@ export function useLendingObligations() {
 }
 
 export function useLendingObligation(address?: string | PublicKey) {
-  const id = typeof address === "string" ? address : address?.toBase58();
-  const [obligationAccount, setObligationAccount] = useState(
-    cache.get(id || "") as ParsedAccount<LendingObligation>
-  );
+  const id = typeof address === 'string' ? address : address?.toBase58();
+  const [obligationAccount, setObligationAccount] = useState(cache.get(id || '') as ParsedAccount<LendingObligation>);
 
   useEffect(() => {
     const dispose = cache.emitter.onCache((args) => {

@@ -1,14 +1,14 @@
-import { cache, ParsedAccount } from "../contexts/accounts";
-import { calculateDepositAPY, LendingReserve } from "../models/lending";
-import { useUserAccounts } from "./useUserAccounts";
-import { useLendingReserves } from "./useLendingReserves";
-import { useEffect, useMemo, useState } from "react";
-import { TokenAccount } from "../models";
-import { useMarkets } from "../contexts/market";
-import { fromLamports, getTokenName } from "../utils/utils";
-import { useConnectionConfig } from "../contexts/connection";
-import { calculateCollateralBalance } from "./useCollateralBalance";
-import { MintInfo } from "@solana/spl-token";
+import { cache, ParsedAccount } from 'common/src/contexts/accounts';
+import { calculateDepositAPY, LendingReserve } from '../models/lending';
+import { useUserAccounts } from 'common/src/hooks/useUserAccounts';
+import { useLendingReserves } from './useLendingReserves';
+import { useEffect, useMemo, useState } from 'react';
+import { TokenAccount } from 'common/src/models';
+import { useMarkets } from '../contexts/market';
+import { fromLamports, getTokenName } from 'common/src/utils/utils';
+import { useConnectionConfig } from 'common/src/contexts/connection';
+import { calculateCollateralBalance } from './useCollateralBalance';
+import { MintInfo } from '@solana/spl-token';
 
 export interface UserDeposit {
   account: TokenAccount;
@@ -45,28 +45,17 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   }, [reserveAccounts, exclude, include]);
 
   useEffect(() => {
-    const activeMarkets = new Set(
-      reserveAccounts.map((r) => r.info.dexMarket.toBase58())
-    );
+    const activeMarkets = new Set(reserveAccounts.map((r) => r.info.dexMarket.toBase58()));
 
     const userDepositsFactory = () => {
       return userAccounts
-        .filter((acc) =>
-          reservesByCollateralMint.has(acc?.info.mint.toBase58())
-        )
+        .filter((acc) => reservesByCollateralMint.has(acc?.info.mint.toBase58()))
         .map((item) => {
-          const reserve = reservesByCollateralMint.get(
-            item?.info.mint.toBase58()
-          ) as ParsedAccount<LendingReserve>;
+          const reserve = reservesByCollateralMint.get(item?.info.mint.toBase58()) as ParsedAccount<LendingReserve>;
 
-          let collateralMint = cache.get(
-            reserve.info.collateralMint
-          ) as ParsedAccount<MintInfo>;
+          let collateralMint = cache.get(reserve.info.collateralMint) as ParsedAccount<MintInfo>;
 
-          const amountLamports = calculateCollateralBalance(
-            reserve.info,
-            item?.info.amount.toNumber()
-          );
+          const amountLamports = calculateCollateralBalance(reserve.info, item?.info.amount.toNumber());
           const amount = fromLamports(amountLamports, collateralMint?.info);
           const price = midPriceInUSD(reserve.info.liquidityMint.toBase58());
           const amountInQuote = price * amount;
@@ -99,20 +88,10 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
     return () => {
       dispose();
     };
-  }, [
-    userAccounts,
-    reserveAccounts,
-    reservesByCollateralMint,
-    tokenMap,
-    midPriceInUSD,
-    marketEmitter,
-  ]);
+  }, [userAccounts, reserveAccounts, reservesByCollateralMint, tokenMap, midPriceInUSD, marketEmitter]);
 
   return {
     userDeposits,
-    totalInQuote: userDeposits.reduce(
-      (res, item) => res + item.info.amountInQuote,
-      0
-    ),
+    totalInQuote: userDeposits.reduce((res, item) => res + item.info.amountInQuote, 0),
   };
 }

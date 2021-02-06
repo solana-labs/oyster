@@ -1,21 +1,14 @@
-import {
-  Account,
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import { sendTransaction } from "../contexts/connection";
-import { notify } from "../utils/notifications";
-import {
-  accrueInterestInstruction,
-  LendingReserve,
-} from "./../models/lending/reserve";
-import { repayInstruction } from "./../models/lending/repay";
-import { AccountLayout, Token, NATIVE_MINT } from "@solana/spl-token";
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../utils/ids";
-import { createTokenAccount, findOrCreateAccountByMint } from "./account";
-import { approve, LendingObligation, TokenAccount } from "../models";
-import { ParsedAccount } from "../contexts/accounts";
+import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { sendTransaction } from 'common/src/contexts/connection';
+import { notify } from 'common/src/utils/notifications';
+import { accrueInterestInstruction, LendingReserve } from './../models/lending/reserve';
+import { repayInstruction } from './../models/lending/repay';
+import { AccountLayout, Token, NATIVE_MINT } from '@solana/spl-token';
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'common/src/utils/ids';
+import { createTokenAccount, findOrCreateAccountByMint } from 'common/src/actions/account';
+import { LendingObligation } from '../models';
+import { approve, TokenAccount } from 'common/src/models';
+import { ParsedAccount } from 'common/src/contexts/accounts';
 
 export const repay = async (
   from: TokenAccount,
@@ -34,9 +27,9 @@ export const repay = async (
   wallet: any
 ) => {
   notify({
-    message: "Repaying funds...",
-    description: "Please review transactions to approve.",
-    type: "warn",
+    message: 'Repaying funds...',
+    description: 'Please review transactions to approve.',
+    type: 'warn',
   });
 
   // user from account
@@ -44,9 +37,7 @@ export const repay = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-    AccountLayout.span
-  );
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   const [authority] = await PublicKey.findProgramAddress(
     [repayReserve.info.lendingMarket.toBuffer()],
@@ -54,10 +45,7 @@ export const repay = async (
   );
 
   let fromAccount = from.pubkey;
-  if (
-    wallet.publicKey.equals(fromAccount) &&
-    repayReserve.info.liquidityMint.equals(NATIVE_MINT)
-  ) {
+  if (wallet.publicKey.equals(fromAccount) && repayReserve.info.liquidityMint.equals(NATIVE_MINT)) {
     fromAccount = createTokenAccount(
       instructions,
       wallet.publicKey,
@@ -67,24 +55,12 @@ export const repay = async (
       signers
     );
     cleanupInstructions.push(
-      Token.createCloseAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        fromAccount,
-        wallet.publicKey,
-        wallet.publicKey,
-        []
-      )
+      Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, fromAccount, wallet.publicKey, wallet.publicKey, [])
     );
   }
 
   // create approval for transfer transactions
-  const transferAuthority = approve(
-    instructions,
-    cleanupInstructions,
-    fromAccount,
-    wallet.publicKey,
-    repayAmount
-  );
+  const transferAuthority = approve(instructions, cleanupInstructions, fromAccount, wallet.publicKey, repayAmount);
   signers.push(transferAuthority);
 
   // get destination account
@@ -110,9 +86,7 @@ export const repay = async (
     transferAuthority.publicKey
   );
 
-  instructions.push(
-    accrueInterestInstruction(repayReserve.pubkey, withdrawReserve.pubkey)
-  );
+  instructions.push(accrueInterestInstruction(repayReserve.pubkey, withdrawReserve.pubkey));
 
   instructions.push(
     repayInstruction(
@@ -132,17 +106,11 @@ export const repay = async (
     )
   );
 
-  let tx = await sendTransaction(
-    connection,
-    wallet,
-    instructions.concat(cleanupInstructions),
-    signers,
-    true
-  );
+  let tx = await sendTransaction(connection, wallet, instructions.concat(cleanupInstructions), signers, true);
 
   notify({
-    message: "Funds repaid.",
-    type: "success",
+    message: 'Funds repaid.',
+    type: 'success',
     description: `Transaction - ${tx}`,
   });
 };

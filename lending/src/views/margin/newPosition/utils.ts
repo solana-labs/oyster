@@ -1,9 +1,9 @@
-import { ParsedAccount } from "../../../contexts/accounts";
-import { useEnrichedPools } from "../../../contexts/market";
-import { UserDeposit, useUserDeposits } from "../../../hooks";
-import { LendingReserve, PoolInfo } from "../../../models";
-import { usePoolForBasket } from "../../../utils/pools";
-import { Position } from "./interfaces";
+import { ParsedAccount } from 'common/src/contexts/accounts';
+import { useEnrichedPools } from '../../../contexts/market';
+import { UserDeposit, useUserDeposits } from '../../../hooks';
+import { LendingReserve, PoolInfo } from '../../../models';
+import { usePoolForBasket } from '../../../utils/pools';
+import { Position } from './interfaces';
 
 export function usePoolAndTradeInfoFrom(
   newPosition: Position
@@ -29,9 +29,7 @@ export function usePoolAndTradeInfoFrom(
 
   const userDeposits = useUserDeposits();
   const collateralDeposit = userDeposits.userDeposits.find(
-    (u) =>
-      u.reserve.info.liquidityMint.toBase58() ===
-      collType?.info?.liquidityMint?.toBase58()
+    (u) => u.reserve.info.liquidityMint.toBase58() === collType?.info?.liquidityMint?.toBase58()
   );
 
   const enrichedPools = useEnrichedPools(pool ? [pool] : []);

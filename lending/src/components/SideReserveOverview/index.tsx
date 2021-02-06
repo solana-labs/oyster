@@ -1,23 +1,23 @@
-import React from "react";
-import { useTokenName } from "./../../hooks";
+import React from 'react';
+import { useTokenName } from 'common/src/hooks';
 import {
   calculateBorrowAPY,
   calculateDepositAPY,
   calculateUtilizationRatio,
   LendingReserve,
-} from "../../models/lending";
-import { TokenIcon } from "../../components/TokenIcon";
-import { formatNumber, formatPct, fromLamports } from "../../utils/utils";
-import { Card, Typography } from "antd";
-import { ParsedAccount, useMint } from "../../contexts/accounts";
-import { Link } from "react-router-dom";
-import { LABELS } from "../../constants";
+} from '../../models/lending';
+import { TokenIcon } from '../../components/TokenIcon';
+import { formatNumber, formatPct, fromLamports } from 'common/src/utils/utils';
+import { Card, Typography } from 'antd';
+import { ParsedAccount, useMint } from 'common/src/contexts/accounts';
+import { Link } from 'react-router-dom';
+import { LABELS } from '../../constants';
 
 const { Text } = Typography;
 
 export enum SideReserveOverviewMode {
-  Deposit = "deposit",
-  Borrow = "borrow",
+  Deposit = 'deposit',
+  Borrow = 'borrow',
 }
 
 export const SideReserveOverview = (props: {
@@ -30,10 +30,7 @@ export const SideReserveOverview = (props: {
   const name = useTokenName(reserve?.liquidityMint);
   const liquidityMint = useMint(reserve.liquidityMint);
 
-  const availableLiquidity = fromLamports(
-    reserve.state.availableLiquidity,
-    liquidityMint
-  );
+  const availableLiquidity = fromLamports(reserve.state.availableLiquidity, liquidityMint);
 
   const depositApy = calculateDepositAPY(reserve);
   const borrowApr = calculateBorrowAPY(reserve);
@@ -47,47 +44,43 @@ export const SideReserveOverview = (props: {
   if (mode === SideReserveOverviewMode.Deposit) {
     extraInfo = (
       <>
-        <div className="card-row">
-          <Text type="secondary" className="card-cell ">
+        <div className='card-row'>
+          <Text type='secondary' className='card-cell '>
             {LABELS.TABLE_TITLE_DEPOSIT_APY}:
           </Text>
-          <div className="card-cell ">{formatPct.format(depositApy)}</div>
+          <div className='card-cell '>{formatPct.format(depositApy)}</div>
         </div>
 
-        <div className="card-row">
-          <Text type="secondary" className="card-cell ">
+        <div className='card-row'>
+          <Text type='secondary' className='card-cell '>
             Maximum LTV:
           </Text>
-          <div className="card-cell ">{formatPct.format(maxLTV)}</div>
+          <div className='card-cell '>{formatPct.format(maxLTV)}</div>
         </div>
 
-        <div className="card-row">
-          <Text type="secondary" className="card-cell ">
+        <div className='card-row'>
+          <Text type='secondary' className='card-cell '>
             Liquidation threshold:
           </Text>
-          <div className="card-cell ">
-            {formatPct.format(liquidationThreshold)}
-          </div>
+          <div className='card-cell '>{formatPct.format(liquidationThreshold)}</div>
         </div>
 
-        <div className="card-row">
-          <Text type="secondary" className="card-cell ">
+        <div className='card-row'>
+          <Text type='secondary' className='card-cell '>
             Liquidation penalty:
           </Text>
-          <div className="card-cell ">
-            {formatPct.format(liquidationPenalty)}
-          </div>
+          <div className='card-cell '>{formatPct.format(liquidationPenalty)}</div>
         </div>
       </>
     );
   } else if (mode === SideReserveOverviewMode.Borrow) {
     extraInfo = (
       <>
-        <div className="card-row">
-          <Text type="secondary" className="card-cell ">
+        <div className='card-row'>
+          <Text type='secondary' className='card-cell '>
             {LABELS.TABLE_TITLE_BORROW_APY}:
           </Text>
-          <div className="card-cell ">{formatPct.format(borrowApr)}</div>
+          <div className='card-cell '>{formatPct.format(borrowApr)}</div>
         </div>
       </>
     );
@@ -99,34 +92,30 @@ export const SideReserveOverview = (props: {
       title={
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            fontSize: "1.2rem",
-            justifyContent: "center",
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '1.2rem',
+            justifyContent: 'center',
           }}
         >
           <Link to={`/reserve/${props.reserve.pubkey}`}>
-            <TokenIcon
-              mintAddress={reserve?.liquidityMint}
-              style={{ width: 30, height: 30 }}
-            />{" "}
-            {name} Reserve Overview
+            <TokenIcon mintAddress={reserve?.liquidityMint} style={{ width: 30, height: 30 }} /> {name} Reserve Overview
           </Link>
         </div>
       }
     >
-      <div className="card-row">
-        <Text type="secondary" className="card-cell ">
+      <div className='card-row'>
+        <Text type='secondary' className='card-cell '>
           Utilization rate:
         </Text>
-        <div className="card-cell ">{formatPct.format(utilizationRate)}</div>
+        <div className='card-cell '>{formatPct.format(utilizationRate)}</div>
       </div>
 
-      <div className="card-row">
-        <Text type="secondary" className="card-cell ">
+      <div className='card-row'>
+        <Text type='secondary' className='card-cell '>
           Available liquidity:
         </Text>
-        <div className="card-cell ">
+        <div className='card-cell '>
           {formatNumber.format(availableLiquidity)} {name}
         </div>
       </div>

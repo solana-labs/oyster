@@ -1,27 +1,24 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import Wallet from "@project-serum/sol-wallet-adapter";
-import { notify } from "./../utils/notifications";
-import { useConnectionConfig } from "./connection";
-import { useLocalStorageState } from "./../utils/utils";
-import { SolongAdapter } from "./../wallet-adapters/solong_adapter";
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import Wallet from '@project-serum/sol-wallet-adapter';
+import { notify } from '../utils/notifications';
+import { useConnectionConfig } from 'common/src/contexts/connection';
+import { useLocalStorageState } from '../utils/utils';
+import { SolongAdapter } from '../wallet-adapters/solong_adapter';
 
 export const WALLET_PROVIDERS = [
-  { name: "sollet.io", url: "https://www.sollet.io" },
-  { name: "solongwallet.com", url: "http://solongwallet.com" },
-  { name: "solflare.com", url: "https://solflare.com/access-wallet" },
-  { name: "mathwallet.org", url: "https://www.mathwallet.org" },
+  { name: 'sollet.io', url: 'https://www.sollet.io' },
+  { name: 'solongwallet.com', url: 'http://solongwallet.com' },
+  { name: 'solflare.com', url: 'https://solflare.com/access-wallet' },
+  { name: 'mathwallet.org', url: 'https://www.mathwallet.org' },
 ];
 
 const WalletContext = React.createContext<any>(null);
 
 export function WalletProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
-  const [providerUrl, setProviderUrl] = useLocalStorageState(
-    "walletProvider",
-    "https://www.sollet.io"
-  );
+  const [providerUrl, setProviderUrl] = useLocalStorageState('walletProvider', 'https://www.sollet.io');
   const wallet = useMemo(() => {
-    if (providerUrl === "http://solongwallet.com") {
+    if (providerUrl === 'http://solongwallet.com') {
       return new SolongAdapter(providerUrl, endpoint);
     } else {
       return new Wallet(providerUrl, endpoint);
@@ -30,7 +27,7 @@ export function WalletProvider({ children = null as any }) {
 
   const [connected, setConnected] = useState(false);
   useEffect(() => {
-    wallet.on("connect", () => {
+    wallet.on('connect', () => {
       setConnected(true);
       let walletPublicKey = wallet.publicKey.toBase58();
       let keyToDisplay =
@@ -42,15 +39,15 @@ export function WalletProvider({ children = null as any }) {
           : walletPublicKey;
 
       notify({
-        message: "Wallet update",
-        description: "Connected to wallet " + keyToDisplay,
+        message: 'Wallet update',
+        description: 'Connected to wallet ' + keyToDisplay,
       });
     });
-    wallet.on("disconnect", () => {
+    wallet.on('disconnect', () => {
       setConnected(false);
       notify({
-        message: "Wallet update",
-        description: "Disconnected from wallet",
+        message: 'Wallet update',
+        description: 'Disconnected from wallet',
       });
     });
     return () => {
@@ -65,9 +62,7 @@ export function WalletProvider({ children = null as any }) {
         connected,
         providerUrl,
         setProviderUrl,
-        providerName:
-          WALLET_PROVIDERS.find(({ url }) => url === providerUrl)?.name ??
-          providerUrl,
+        providerName: WALLET_PROVIDERS.find(({ url }) => url === providerUrl)?.name ?? providerUrl,
       }}
     >
       {children}

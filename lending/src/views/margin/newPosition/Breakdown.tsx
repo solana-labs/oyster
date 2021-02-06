@@ -1,32 +1,24 @@
-import { Progress, Slider, Card, Statistic } from "antd";
-import React, { useState } from "react";
-import { Position } from "./interfaces";
-import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
-import tokens from "../../../config/tokens.json";
-import GainsChart from "./GainsChart";
-import { usePoolAndTradeInfoFrom } from "./utils";
+import { Progress, Slider, Card, Statistic } from 'antd';
+import React, { useState } from 'react';
+import { Position } from './interfaces';
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import tokens from 'common/src/config/tokens.json';
+import GainsChart from './GainsChart';
+import { usePoolAndTradeInfoFrom } from './utils';
 
 export default function Breakdown({ item }: { item: Position }) {
   const { enrichedPools, leverage } = usePoolAndTradeInfoFrom(item);
 
-  const exchangeRate =
-    enrichedPools.length === 0
-      ? 1
-      : enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
+  const exchangeRate = enrichedPools.length === 0 ? 1 : enrichedPools[0].liquidityB / enrichedPools[0].liquidityA;
 
   let myPart = item.collateral.value || 0;
   const brokeragePart = (item.collateral.value || 0) * leverage - myPart;
-  const brokerageColor = "brown";
-  const myColor = "blue";
-  const gains = "green";
-  const losses = "red";
-  const token = tokens.find(
-    (t) => t.mintAddress === item.asset.type?.info?.liquidityMint?.toBase58()
-  );
-  const collateralToken = tokens.find(
-    (t) =>
-      t.mintAddress === item.collateral.type?.info?.liquidityMint?.toBase58()
-  );
+  const brokerageColor = 'brown';
+  const myColor = 'blue';
+  const gains = 'green';
+  const losses = 'red';
+  const token = tokens.find((t) => t.mintAddress === item.asset.type?.info?.liquidityMint?.toBase58());
+  const collateralToken = tokens.find((t) => t.mintAddress === item.collateral.type?.info?.liquidityMint?.toBase58());
 
   const [myGain, setMyGain] = useState<number>(10);
   const profitPart = (myPart + brokeragePart) * (myGain / 100);
@@ -51,9 +43,7 @@ export default function Breakdown({ item }: { item: Position }) {
     myPart += profitPart; // profit is negative
     const total = myPart + brokeragePart;
     if (myPart < 0) {
-      progressBar = (
-        <p>Your position has been liquidated at this price swing.</p>
-      );
+      progressBar = <p>Your position has been liquidated at this price swing.</p>;
     } else
       progressBar = (
         <Progress
@@ -68,19 +58,19 @@ export default function Breakdown({ item }: { item: Position }) {
   }
 
   return (
-    <div className="new-position-item new-position-item-top-right">
-      <Card className="new-position-item new-position-item-top-right">
+    <div className='new-position-item new-position-item-top-right'>
+      <Card className='new-position-item new-position-item-top-right'>
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            alignItems: 'center',
           }}
         >
           <Card>
             <Statistic
-              title="Borrowed"
+              title='Borrowed'
               value={brokeragePart * exchangeRate}
               precision={2}
               valueStyle={{ color: brokerageColor }}
@@ -89,7 +79,7 @@ export default function Breakdown({ item }: { item: Position }) {
           </Card>
           <Card>
             <Statistic
-              title="My Collateral"
+              title='My Collateral'
               value={myPart}
               precision={2}
               valueStyle={{ color: myColor }}
@@ -98,21 +88,19 @@ export default function Breakdown({ item }: { item: Position }) {
           </Card>
           <Card>
             <Statistic
-              title="Profit/Loss"
+              title='Profit/Loss'
               value={profitPart * exchangeRate}
               precision={2}
               valueStyle={{ color: profitPart > 0 ? gains : losses }}
               suffix={token?.tokenSymbol}
-              prefix={
-                profitPart > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />
-              }
+              prefix={profitPart > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
             />
           </Card>
         </div>
         <br />
         {progressBar}
       </Card>
-      <Card className="new-position-item new-position-item-bottom-right">
+      <Card className='new-position-item new-position-item-bottom-right'>
         <GainsChart item={item} priceChange={myGain} />
         <Slider
           tooltipVisible={true}
@@ -120,11 +108,11 @@ export default function Breakdown({ item }: { item: Position }) {
           tipFormatter={(p) => <span>{p}%</span>}
           max={100}
           min={-100}
-          tooltipPlacement={"top"}
+          tooltipPlacement={'top'}
           onChange={(v: number) => {
             setMyGain(v);
           }}
-          style={{ marginBottom: "20px" }}
+          style={{ marginBottom: '20px' }}
         />
       </Card>
     </div>

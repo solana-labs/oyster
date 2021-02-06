@@ -1,51 +1,38 @@
-import React from "react";
-import { calculateDepositAPY, LendingReserve } from "../../models/lending";
-import { Card, Col, Row, Statistic } from "antd";
-import { PublicKey } from "@solana/web3.js";
-import "./style.less";
-import { GUTTER, LABELS } from "../../constants";
-import { ReserveUtilizationChart } from "./../../components/ReserveUtilizationChart";
-import { useMemo } from "react";
-import { formatNumber, fromLamports, wadToLamports } from "../../utils/utils";
-import { useMint } from "../../contexts/accounts";
-import { useMidPriceInUSD } from "../../contexts/market";
-import { TokenIcon } from "../TokenIcon";
+import React from 'react';
+import { calculateDepositAPY, LendingReserve } from '../../models/lending';
+import { Card, Col, Row, Statistic } from 'antd';
+import { PublicKey } from '@solana/web3.js';
+import './style.less';
+import { GUTTER, LABELS } from '../../constants';
+import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
+import { useMemo } from 'react';
+import { formatNumber, fromLamports, wadToLamports } from 'common/src/utils/utils';
+import { useMint } from 'common/src/contexts/accounts';
+import { useMidPriceInUSD } from '../../contexts/market';
+import { TokenIcon } from '../TokenIcon';
 
-export const ReserveStatus = (props: {
-  className?: string;
-  reserve: LendingReserve;
-  address: PublicKey;
-}) => {
+export const ReserveStatus = (props: { className?: string; reserve: LendingReserve; address: PublicKey }) => {
   const bodyStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   };
 
   const mintAddress = props.reserve.liquidityMint?.toBase58();
   const liquidityMint = useMint(mintAddress);
   const { price } = useMidPriceInUSD(mintAddress);
-  const availableLiquidity = fromLamports(
-    props.reserve.state.availableLiquidity,
-    liquidityMint
-  );
+  const availableLiquidity = fromLamports(props.reserve.state.availableLiquidity, liquidityMint);
 
   const availableLiquidityInUSD = price * availableLiquidity;
 
   const totalBorrows = useMemo(
-    () =>
-      fromLamports(
-        wadToLamports(props.reserve.state.borrowedLiquidityWad),
-        liquidityMint
-      ),
+    () => fromLamports(wadToLamports(props.reserve.state.borrowedLiquidityWad), liquidityMint),
     [props.reserve, liquidityMint]
   );
 
   const totalBorrowsInUSD = price * totalBorrows;
 
-  const depositAPY = useMemo(() => calculateDepositAPY(props.reserve), [
-    props.reserve,
-  ]);
+  const depositAPY = useMemo(() => calculateDepositAPY(props.reserve), [props.reserve]);
 
   const liquidationThreshold = props.reserve.config.liquidationThreshold;
   const liquidationPenalty = props.reserve.config.liquidationBonus;
@@ -60,7 +47,7 @@ export const ReserveStatus = (props: {
             style={{
               marginRight: 0,
               marginTop: 0,
-              position: "absolute",
+              position: 'absolute',
               left: 15,
             }}
             mintAddress={mintAddress}
@@ -71,18 +58,16 @@ export const ReserveStatus = (props: {
       }
       bodyStyle={bodyStyle}
     >
-      <div className="flexColumn">
+      <div className='flexColumn'>
         <Row gutter={GUTTER}>
           <Col span={12}>
             <Statistic
-              title="Available Liquidity"
+              title='Available Liquidity'
               value={availableLiquidity}
               valueRender={(node) => (
                 <div>
                   {node}
-                  <div className="dashboard-amount-quote-stat">
-                    ${formatNumber.format(availableLiquidityInUSD)}
-                  </div>
+                  <div className='dashboard-amount-quote-stat'>${formatNumber.format(availableLiquidityInUSD)}</div>
                 </div>
               )}
               precision={2}
@@ -90,14 +75,12 @@ export const ReserveStatus = (props: {
           </Col>
           <Col span={12}>
             <Statistic
-              title="Total Borrowed"
+              title='Total Borrowed'
               value={totalBorrows}
               valueRender={(node) => (
                 <div>
                   {node}
-                  <div className="dashboard-amount-quote-stat">
-                    ${formatNumber.format(totalBorrowsInUSD)}
-                  </div>
+                  <div className='dashboard-amount-quote-stat'>${formatNumber.format(totalBorrowsInUSD)}</div>
                 </div>
               )}
               precision={2}
@@ -108,9 +91,9 @@ export const ReserveStatus = (props: {
           <Col
             span={24}
             style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
             }}
           >
             <ReserveUtilizationChart reserve={props.reserve} />
@@ -118,39 +101,33 @@ export const ReserveStatus = (props: {
         </Row>
         <Row gutter={GUTTER}>
           <Col span={6}>
-            <Statistic
-              title={LABELS.MAX_LTV}
-              className="small-statisitc"
-              value={maxLTV}
-              precision={2}
-              suffix="%"
-            />
+            <Statistic title={LABELS.MAX_LTV} className='small-statisitc' value={maxLTV} precision={2} suffix='%' />
           </Col>
           <Col span={6}>
             <Statistic
               title={LABELS.LIQUIDATION_THRESHOLD}
-              className="small-statisitc"
+              className='small-statisitc'
               value={liquidationThreshold}
               precision={2}
-              suffix="%"
+              suffix='%'
             />
           </Col>
           <Col span={6}>
             <Statistic
               title={LABELS.LIQUIDATION_PENALTY}
-              className="small-statisitc"
+              className='small-statisitc'
               value={liquidationPenalty}
               precision={2}
-              suffix="%"
+              suffix='%'
             />
           </Col>
           <Col span={6}>
             <Statistic
               title={LABELS.TABLE_TITLE_DEPOSIT_APY}
-              className="small-statisitc"
+              className='small-statisitc'
               value={depositAPY * 100}
               precision={2}
-              suffix="%"
+              suffix='%'
             />
           </Col>
         </Row>
