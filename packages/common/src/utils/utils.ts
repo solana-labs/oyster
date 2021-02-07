@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import { MintInfo } from '@solana/spl-token';
+
 import { TokenAccount } from './../models';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { WAD, ZERO } from '../constants';
-import { u64 } from '../types/u64';
 
 export interface KnownToken {
   tokenSymbol: string;
@@ -107,12 +107,7 @@ export function toLamports(account?: TokenAccount | number, mint?: MintInfo): nu
     return 0;
   }
 
-  const amount =
-    typeof account === 'number'
-      ? account
-      : account.info.amount
-      ? u64.fromBuffer(account.info.amount.toBuffer()).toNumber()
-      : 0;
+  const amount = typeof account === 'number' ? account : account.info.amount?.toNumber();
 
   const precision = Math.pow(10, mint?.decimals || 0);
   return Math.floor(amount * precision);
@@ -128,13 +123,7 @@ export function fromLamports(account?: TokenAccount | number | BN, mint?: MintIn
   }
 
   const amount = Math.floor(
-    typeof account === 'number'
-      ? account
-      : BN.isBN(account)
-      ? account.toNumber()
-      : account.info.amount
-      ? new u64(u64.fromBuffer(account.info.amount.toBuffer())).toNumber()
-      : 0
+    typeof account === 'number' ? account : BN.isBN(account) ? account.toNumber() : account.info.amount.toNumber()
   );
 
   const precision = Math.pow(10, mint?.decimals || 0);
@@ -206,12 +195,7 @@ export function convert(account?: TokenAccount | number, mint?: MintInfo, rate: 
     return 0;
   }
 
-  const amount =
-    typeof account === 'number'
-      ? account
-      : account.info.amount
-      ? u64.fromBuffer(account.info.amount.toBuffer()).toNumber()
-      : 0;
+  const amount = typeof account === 'number' ? account : account.info.amount?.toNumber();
 
   const precision = Math.pow(10, mint?.decimals || 0);
   let result = (amount / precision) * rate;

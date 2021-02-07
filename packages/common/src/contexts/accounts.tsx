@@ -2,8 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useConnection } from '../contexts/connection';
 import { useWallet } from '../contexts/wallet';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
-import { AccountLayout, MintInfo, MintLayout } from '@solana/spl-token';
-import { u64 } from '../types/u64';
+import { AccountLayout, MintInfo, MintLayout, u64 } from '@solana/spl-token';
 import { TokenAccount } from '../models';
 import { chunks } from '../utils/utils';
 import { EventEmitter } from '../utils/eventEmitter';

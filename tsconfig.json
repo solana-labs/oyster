@@ -13,7 +13,6 @@
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "typeRoots": ["./types"],
     "jsx": "react",
     "isolatedModules": true,
     "baseUrl": "./",
