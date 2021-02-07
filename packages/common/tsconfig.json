@@ -5,5 +5,5 @@
     "composite": true,
     "noEmit": false
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/config/tokens.json"]
 }

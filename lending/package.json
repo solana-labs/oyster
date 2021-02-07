@@ -18,6 +18,7 @@
     "@types/chart.js": "^2.9.29",
     "@types/echarts": "^4.9.0",
     "@types/react-router-dom": "^5.1.6",
+    "@types/testing-library__react": "^10.2.0",
     "@welldone-software/why-did-you-render": "^6.0.5",
     "antd": "^4.6.6",
     "bn.js": "^5.1.3",

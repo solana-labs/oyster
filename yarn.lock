@@ -2386,7 +2386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/dom@npm:*":
+"@testing-library/dom@npm:*, @testing-library/dom@npm:^7.28.1":
   version: 7.29.4
   resolution: "@testing-library/dom@npm:7.29.4"
   dependencies:
@@ -2431,6 +2431,19 @@ __metadata:
     pretty-format: ^24.0.0
     redent: ^3.0.0
   checksum: b378081be5032f88e7deac8a07cdeb2f1538bb3d5cbe82e3493020af2def696d7e6d54f0662f1cd717c5b2ae28f96c2771e365a812d0d3659947594dbb132c41
+  languageName: node
+  linkType: hard
+
+"@testing-library/react@npm:*":
+  version: 11.2.5
+  resolution: "@testing-library/react@npm:11.2.5"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+    "@testing-library/dom": ^7.28.1
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+  checksum: 1389b4eb110ad32ac328634846fd92570979c0cb739a3ee99eeb2278860a1910a81126612457379fc306dbd6417b4b5ff1ddd88ede3d8ebb1da3972e70877e83
   languageName: node
   linkType: hard
 
@@ -2855,6 +2868,15 @@ __metadata:
   dependencies:
     pretty-format: ^24.3.0
   checksum: 8c52edd75c929bdbd607d55daad971a6a7a88566b8ac245bd0a2dbf71c54e276375adb0790bc31ced2c56da2f478e07f1259383afcb3958ab81c7acbae9d78a5
+  languageName: node
+  linkType: hard
+
+"@types/testing-library__react@npm:^10.2.0":
+  version: 10.2.0
+  resolution: "@types/testing-library__react@npm:10.2.0"
+  dependencies:
+    "@testing-library/react": "*"
+  checksum: 84af6b07c8225f2942c064baf7d4884f5cd95c6dd8273743f7190ebcd1ad0978032fa433f6f808d9a993b0ef4289ca17036a0d5dfeecaf08251ff890b0c13b9d
   languageName: node
   linkType: hard
 
@@ -10460,6 +10482,7 @@ fsevents@~2.3.1:
     "@types/react": ^16.9.50
     "@types/react-dom": ^16.9.8
     "@types/react-router-dom": ^5.1.6
+    "@types/testing-library__react": ^10.2.0
     "@welldone-software/why-did-you-render": ^6.0.5
     antd: ^4.6.6
     arweave-deploy: ^1.9.1

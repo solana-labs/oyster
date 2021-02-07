@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useConnection } from '@common/contexts/connection';
+import { useConnection } from '@packages/common/contexts/connection';
 import { LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
 import {
   LendingMarketParser,
