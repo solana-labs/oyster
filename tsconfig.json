@@ -15,6 +15,15 @@
     "noEmit": true,
     "typeRoots": ["./types"],
     "jsx": "react",
-    "isolatedModules": true
-  }
+    "isolatedModules": true,
+    "baseUrl": "./",
+    "paths": {
+      "@packages/common/*": ["packages/common/src/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "packages/common"
+    }
+  ]
 }

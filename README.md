@@ -21,6 +21,10 @@ In general, to run a package.json script in a project, just do """yarn workspace
 
 DO NOT DELETE THE .YARN FOLDER. It is not like the old node_modules, which has been deprecated. Use """yarn cache clean""".
 
+## Adding a new package
+
+Note that in addition to adding a new package to the packages folder, one also needs to add a new entry to the top level tsconfig.json to let the TS transpiler know that it is fair game.
+
 ## ⚠️ Warning
 
 Any content produced by Solana, or developer resources that Solana provides, are for educational and inspiration purposes only. Solana does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.

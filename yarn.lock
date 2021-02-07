@@ -2040,7 +2040,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@packages/common@workspace:*, @packages/common@workspace:packages/common":
+"@packages/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@packages/common@workspace:packages/common"
   dependencies:
@@ -10441,7 +10441,7 @@ fsevents@~2.3.1:
     "@ant-design/pro-layout": ^6.7.0
     "@craco/craco": ^5.7.0
     "@dvhb/craco-extend-scope": ^1.0.1
-    "@packages/common": "workspace:*"
+    "@packages/common": "workspace:packages/common"
     "@project-serum/serum": ^0.13.11
     "@project-serum/sol-wallet-adapter": ^0.1.4
     "@solana/spl-token": 0.0.13
