@@ -1,14 +1,14 @@
 import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from 'common/src/contexts/connection';
-import { notify } from 'common/src/utils/notifications';
+import { sendTransaction } from '@packages/common/contexts/connection';
+import { notify } from '@packages/common/utils/notifications';
 import { accrueInterestInstruction, LendingReserve } from './../models/lending/reserve';
 import { repayInstruction } from './../models/lending/repay';
 import { AccountLayout, Token, NATIVE_MINT } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'common/src/utils/ids';
-import { createTokenAccount, findOrCreateAccountByMint } from 'common/src/actions/account';
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@packages/common/utils/ids';
+import { createTokenAccount, findOrCreateAccountByMint } from '@packages/common/actions/account';
 import { LendingObligation } from '../models';
-import { approve, TokenAccount } from 'common/src/models';
-import { ParsedAccount } from 'common/src/contexts/accounts';
+import { approve, TokenAccount } from '@packages/common/models';
+import { ParsedAccount } from '@packages/common/contexts/accounts';
 
 export const repay = async (
   from: TokenAccount,

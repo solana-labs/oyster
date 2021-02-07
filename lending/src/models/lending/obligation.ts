@@ -8,8 +8,8 @@ import {
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { LendingInstruction } from '.';
-import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'common/src/utils/ids';
-import * as Layout from 'common/src/utils/layout';
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@packages/common/utils/ids';
+import * as Layout from '@packages/common/utils/layout';
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct([
   BufferLayout.u8('version'),

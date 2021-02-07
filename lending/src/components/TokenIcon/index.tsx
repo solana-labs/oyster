@@ -1,7 +1,7 @@
 import { Identicon } from '../Identicon';
 import React from 'react';
-import { getTokenIcon } from 'common/src/utils/utils';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { getTokenIcon } from '@packages/common/utils/utils';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
 import { PublicKey } from '@solana/web3.js';
 
 export const TokenIcon = (props: {

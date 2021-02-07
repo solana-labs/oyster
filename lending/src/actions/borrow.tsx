@@ -1,18 +1,18 @@
 import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from 'common/src/contexts/connection';
-import { notify } from 'common/src/utils/notifications';
+import { sendTransaction } from '@packages/common/contexts/connection';
+import { notify } from '@packages/common/utils/notifications';
 import { accrueInterestInstruction, LendingReserve } from './../models/lending/reserve';
 import { AccountLayout, MintInfo, MintLayout } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID, LEND_HOST_FEE_ADDRESS } from 'common/src/utils/ids';
+import { LENDING_PROGRAM_ID, LEND_HOST_FEE_ADDRESS } from '@packages/common/utils/ids';
 import {
   createTempMemoryAccount,
   createUninitializedAccount,
   createUninitializedMint,
   ensureSplAccount,
   findOrCreateAccountByMint,
-} from 'common/src/actions/account';
+} from '@packages/common/actions/account';
 import { createUninitializedObligation } from './obligation';
-import { cache, MintParser, ParsedAccount } from 'common/src/contexts/accounts';
+import { cache, MintParser, ParsedAccount } from '@packages/common/contexts/accounts';
 import {
   LendingObligationLayout,
   borrowInstruction,
@@ -21,8 +21,8 @@ import {
   LendingObligation,
   initObligationInstruction,
 } from '../models';
-import { TokenAccount, approve } from 'common/src/models';
-import { toLamports } from 'common/src/utils/utils';
+import { TokenAccount, approve } from '@packages/common/models';
+import { toLamports } from '@packages/common/utils/utils';
 
 export const borrow = async (
   connection: Connection,

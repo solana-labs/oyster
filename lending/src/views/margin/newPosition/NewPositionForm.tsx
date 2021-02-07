@@ -2,7 +2,7 @@ import { Button, Card } from 'antd';
 import React, { useState } from 'react';
 import { ActionConfirmation } from '../../../components/ActionConfirmation';
 import { LABELS } from '../../../constants';
-import { cache, ParsedAccount } from 'common/src/contexts/accounts';
+import { cache, ParsedAccount } from '@packages/common/contexts/accounts';
 import { LendingReserve, LendingReserveParser } from '../../../models/lending/reserve';
 import { Position } from './interfaces';
 import { useLeverage } from './leverage';
@@ -10,7 +10,7 @@ import CollateralInput from '../../../components/CollateralInput';
 import { usePoolAndTradeInfoFrom } from './utils';
 import { UserDeposit } from '../../../hooks';
 import { ArrowDownOutlined } from '@ant-design/icons';
-import { useWallet } from 'common/src/contexts/wallet';
+import { useWallet } from '@packages/common/contexts/wallet';
 
 interface NewPositionFormProps {
   lendingReserve: ParsedAccount<LendingReserve>;

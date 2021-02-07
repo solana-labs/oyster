@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { Card } from 'antd';
-import { useConnection } from 'common/src/contexts/connection';
-import { useWallet } from 'common/src/contexts/wallet';
+import { useConnection } from '@packages/common/contexts/connection';
+import { useWallet } from '@packages/common/contexts/wallet';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { notify } from 'common/src/utils/notifications';
+import { notify } from '@packages/common/utils/notifications';
 import { ConnectButton } from './../../components/ConnectButton';
 import { LABELS } from '../../constants';
 

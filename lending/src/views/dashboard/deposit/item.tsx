@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { UserDeposit } from '../../../hooks';
 import { calculateDepositAPY } from '../../../models/lending';
 import { TokenIcon } from '../../../components/TokenIcon';
-import { formatNumber, formatPct } from 'common/src/utils/utils';
+import { formatNumber, formatPct } from '@packages/common/utils/utils';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../../constants';

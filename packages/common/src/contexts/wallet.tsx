@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import Wallet from '@project-serum/sol-wallet-adapter';
 import { notify } from '../utils/notifications';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { useConnectionConfig } from './connection';
 import { useLocalStorageState } from '../utils/utils';
 import { SolongAdapter } from '../wallet-adapters/solong_adapter';
 

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useUserBalance, useUserCollateralBalance } from './../../hooks';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { calculateDepositAPY, LendingReserve } from '../../models/lending';
-import { formatNumber, formatPct } from 'common/src/utils/utils';
+import { formatNumber, formatPct } from '@packages/common/utils/utils';
 import { Card, Col, Row, Statistic } from 'antd';
 import './style.less';
 import { PublicKey } from '@solana/web3.js';

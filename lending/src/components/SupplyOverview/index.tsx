@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { PoolInfo } from '../../models';
 import echarts from 'echarts';
-import { formatNumber, formatUSD } from 'common/src/utils/utils';
+import { formatNumber, formatUSD } from '@packages/common/utils/utils';
 import { useEnrichedPools } from '../../contexts/market';
 
 export const SupplyOverview = (props: { pool?: PoolInfo }) => {

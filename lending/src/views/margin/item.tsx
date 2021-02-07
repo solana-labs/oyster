@@ -1,9 +1,9 @@
 import React from 'react';
 import { useBorrowingPower } from '../../hooks';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
 import { TokenIcon } from '../../components/TokenIcon';
-import { formatNumber, formatPct } from 'common/src/utils/utils';
+import { formatNumber, formatPct } from '@packages/common/utils/utils';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';

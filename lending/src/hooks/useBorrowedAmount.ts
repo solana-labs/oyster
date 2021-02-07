@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useUserObligationByReserve } from './useUserObligationByReserve';
-import { fromLamports, wadToLamports } from 'common/src/utils/utils';
-import { cache, getMultipleAccounts, MintParser, ParsedAccount, useMint } from 'common/src/contexts/accounts';
-import { useConnection } from 'common/src/contexts/connection';
+import { fromLamports, wadToLamports } from '@packages/common/utils/utils';
+import { cache, getMultipleAccounts, MintParser, ParsedAccount, useMint } from '@packages/common/contexts/accounts';
+import { useConnection } from '@packages/common/contexts/connection';
 import { MintInfo } from '@solana/spl-token';
 import { useLendingReserve } from './useLendingReserves';
 

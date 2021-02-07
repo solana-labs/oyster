@@ -1,4 +1,4 @@
-import { ParsedAccount } from 'common/src/contexts/accounts';
+import { ParsedAccount } from '@packages/common/contexts/accounts';
 import { LendingReserve } from '../../../models/lending/reserve';
 
 export interface Token {

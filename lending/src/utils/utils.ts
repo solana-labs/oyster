@@ -1,4 +1,4 @@
-import { getTokenName, KnownTokenMap } from 'common/src/utils/utils';
+import { getTokenName, KnownTokenMap } from '@packages/common/utils/utils';
 import { PoolInfo } from '../models';
 
 export function getPoolName(map: KnownTokenMap, pool: PoolInfo, shorten = true) {

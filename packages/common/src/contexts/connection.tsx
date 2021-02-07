@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { notify } from '../utils/notifications';
 import { ExplorerLink } from '../components/ExplorerLink';
 import LocalTokens from '../config/tokens.json';
-import { setProgramIds } from 'common/src/utils/ids';
+import { setProgramIds } from '../utils/ids';
 
 export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet' | 'lending';
 

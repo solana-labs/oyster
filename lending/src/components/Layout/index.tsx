@@ -16,7 +16,7 @@ import {
 import BasicLayout from '@ant-design/pro-layout';
 import { AppBar } from './../AppBar';
 import { Link, useLocation } from 'react-router-dom';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
 

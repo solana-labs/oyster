@@ -1,10 +1,10 @@
 import { Card, Row, Col } from 'antd';
 import React, { useMemo } from 'react';
-import { useMint } from 'common/src/contexts/accounts';
+import { useMint } from '@packages/common/contexts/accounts';
 import { useEnrichedPools } from '../../contexts/market';
-import { useUserAccounts } from 'common/src/hooks';
+import { useUserAccounts } from '@packages/common/hooks';
 import { PoolInfo } from '../../models';
-import { formatPriceNumber } from 'common/src/utils/utils';
+import { formatPriceNumber } from '@packages/common/utils/utils';
 
 export const PoolPrice = (props: { pool: PoolInfo }) => {
   const pool = props.pool;

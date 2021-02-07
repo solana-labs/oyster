@@ -1688,6 +1688,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dvhb/craco-extend-scope@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@dvhb/craco-extend-scope@npm:1.0.1"
+  checksum: 545e28318d94b4a4c9b40dd79ba9278ba621217efb3938ac3364b47d631243ac3c6dc457a3c6dc308572dba59da37b537daf9690f1ac15a7c63d78f2361269b3
+  languageName: node
+  linkType: hard
+
 "@formatjs/ecma402-abstract@npm:1.5.2":
   version: 1.5.2
   resolution: "@formatjs/ecma402-abstract@npm:1.5.2"
@@ -2033,6 +2040,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@packages/common@workspace:*, @packages/common@workspace:packages/common":
+  version: 0.0.0-use.local
+  resolution: "@packages/common@workspace:packages/common"
+  dependencies:
+    "@ant-design/pro-layout": ^6.7.0
+    "@craco/craco": ^5.7.0
+    "@project-serum/serum": ^0.13.11
+    "@project-serum/sol-wallet-adapter": ^0.1.4
+    "@solana/spl-token": 0.0.13
+    "@solana/spl-token-swap": 0.1.0
+    "@solana/web3.js": ^0.86.2
+    "@testing-library/jest-dom": ^4.2.4
+    "@testing-library/react": ^9.5.0
+    "@testing-library/user-event": ^7.2.1
+    "@types/bn.js": ^4.11.6
+    "@types/bs58": ^4.0.1
+    "@types/chart.js": ^2.9.29
+    "@types/echarts": ^4.9.0
+    "@types/identicon.js": ^2.3.0
+    "@types/jest": ^24.9.1
+    "@types/node": ^12.12.62
+    "@types/react": ^16.9.50
+    "@types/react-dom": ^16.9.8
+    "@types/react-router-dom": ^5.1.6
+    "@welldone-software/why-did-you-render": ^6.0.5
+    antd: ^4.6.6
+    arweave-deploy: ^1.9.1
+    bn.js: ^5.1.3
+    bs58: ^4.0.1
+    buffer-layout: ^1.2.0
+    chart.js: ^2.9.4
+    craco-less: ^1.17.0
+    echarts: ^4.9.0
+    eventemitter3: ^4.0.7
+    gh-pages: ^3.1.0
+    identicon.js: ^2.3.3
+    jazzicon: ^1.5.0
+    lodash: ^4.17.20
+    prettier: ^2.1.2
+    react: ^16.13.1
+    react-dom: ^16.13.1
+    react-github-btn: ^1.2.0
+    react-intl: ^5.10.2
+    react-router-dom: ^5.2.0
+    react-scripts: 3.4.3
+    typescript: ^4.1.3
+  languageName: unknown
+  linkType: soft
+
 "@project-serum/serum@npm:^0.13.11":
   version: 0.13.20
   resolution: "@project-serum/serum@npm:0.13.20"
@@ -2077,32 +2133,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solana/spl-token-swap@npm:0.0.2":
-  version: 0.0.2
-  resolution: "@solana/spl-token-swap@npm:0.0.2"
+"@solana/spl-token-swap@npm:0.1.0":
+  version: 0.1.0
+  resolution: "@solana/spl-token-swap@npm:0.1.0"
   dependencies:
     "@babel/runtime": ^7.11.2
-    "@solana/web3.js": ^0.78.0
+    "@solana/web3.js": ^0.90.0
     bn.js: ^5.1.3
     buffer-layout: ^1.2.0
     dotenv: 8.2.0
     json-to-pretty-yaml: ^1.2.2
     mkdirp: 1.0.4
-  checksum: 4260970013ac33cc661fc905df7bd1187eb5b3c3be2b4df983906ea644803868e0361f2f09385c9b01efad0413b24eec69816d3d580162d3aec225d07f721190
+  checksum: 17d77c2cc142bf53680491198e7c8a8671ee5480c38eb2c15b527b713af8ff534e81731bb500e579354857f8f9dd00284ad4132e5c49088d8016f02771503ab3
   languageName: node
   linkType: hard
 
-"@solana/spl-token@npm:0.0.11":
-  version: 0.0.11
-  resolution: "@solana/spl-token@npm:0.0.11"
+"@solana/spl-token@npm:0.0.13":
+  version: 0.0.13
+  resolution: "@solana/spl-token@npm:0.0.13"
   dependencies:
     "@babel/runtime": ^7.10.5
-    "@solana/web3.js": ^0.78.0
+    "@solana/web3.js": ^0.86.1
     bn.js: ^5.0.0
     buffer-layout: ^1.2.0
     dotenv: 8.2.0
     mkdirp: 1.0.4
-  checksum: 026212b281c67a9bb3dcc2b6b6760a28982766d4fc7d0d72b94511dd9aa91103d40b047cb4907c4349de9cd718454b7153f69ae5da12013939297225849e40b5
+  checksum: 757aa4064224353d45600b985a96b32a7185c0eaa00853f4ddce28b18efe62d37e0507a914bab78a07396728ef463ff50c8911683916ef9581175169d95f5cf0
   languageName: node
   linkType: hard
 
@@ -2134,33 +2190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solana/web3.js@npm:^0.78.0":
-  version: 0.78.4
-  resolution: "@solana/web3.js@npm:0.78.4"
-  dependencies:
-    "@babel/runtime": ^7.3.1
-    bn.js: ^5.0.0
-    bs58: ^4.0.1
-    buffer: ^5.4.3
-    buffer-layout: ^1.2.0
-    crypto-hash: ^1.2.2
-    esdoc-inject-style-plugin: ^1.0.0
-    jayson: ^3.0.1
-    mz: ^2.7.0
-    node-fetch: ^2.2.0
-    npm-run-all: ^4.1.5
-    rpc-websockets: ^7.4.2
-    superstruct: ^0.8.3
-    tweetnacl: ^1.0.0
-    ws: ^7.0.0
-  bin:
-    solana-bpf-sdk-install: bin/bpf-sdk-install.sh
-    solana-localnet: bin/localnet.sh
-  checksum: 951faa6aefe158147692f6a4ade782355374a93b424f816b8371b80dce0e01d679c4497cf6c6c95048793ae2484f33fe4a1c8b45a488c0603b8170ec3f16d292
-  languageName: node
-  linkType: hard
-
-"@solana/web3.js@npm:^0.86.2":
+"@solana/web3.js@npm:^0.86.1, @solana/web3.js@npm:^0.86.2":
   version: 0.86.4
   resolution: "@solana/web3.js@npm:0.86.4"
   dependencies:
@@ -2185,6 +2215,34 @@ __metadata:
     solana-bpf-sdk-install: bin/bpf-sdk-install.sh
     solana-localnet: bin/localnet.sh
   checksum: b71ec3bc50dddcba67ad0d98097c15841374a2e32f4c721dd35f75e92fe7aa6a5aa24fe92f0a611ad34b58f4445446ea0ef175aefdf0666d1a6eb1fccce5e064
+  languageName: node
+  linkType: hard
+
+"@solana/web3.js@npm:^0.90.0":
+  version: 0.90.5
+  resolution: "@solana/web3.js@npm:0.90.5"
+  dependencies:
+    "@babel/runtime": ^7.3.1
+    bn.js: ^5.0.0
+    bs58: ^4.0.1
+    buffer: ^6.0.1
+    buffer-layout: ^1.2.0
+    crypto-hash: ^1.2.2
+    esdoc-inject-style-plugin: ^1.0.0
+    jayson: ^3.0.1
+    keccak: ^3.0.1
+    mz: ^2.7.0
+    node-fetch: ^2.2.0
+    npm-run-all: ^4.1.5
+    rpc-websockets: ^7.4.2
+    secp256k1: ^4.0.2
+    superstruct: ^0.8.3
+    tweetnacl: ^1.0.0
+    ws: ^7.0.0
+  bin:
+    solana-bpf-sdk-install: bin/bpf-sdk-install.sh
+    solana-localnet: bin/localnet.sh
+  checksum: f1e9e7361b511b2e928e91facef0441d80fd4dac367387742781c65491b5216b2c3fece5d45c07a9568dea2030fa5a12c1bc336d40db216a87464138288da336
   languageName: node
   linkType: hard
 
@@ -4524,6 +4582,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer@npm:^6.0.1":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.2.1
+  checksum: a8cf6a58571dc7c43b24ab821ad4c72222d9040775f49fd143a30fad45f33ec0a8e0d572ca80d589ad4f8b4715aa012c029dc2b925dc95467f135c2d13d7abfb
+  languageName: node
+  linkType: hard
+
 "bufferutil@npm:^4.0.1":
   version: 4.0.3
   resolution: "bufferutil@npm:4.0.3"
@@ -5229,54 +5297,6 @@ __metadata:
   checksum: f37a868d868929cf345fe49c4122efde693f9b06bf5764df36c3bdf5d3c271a24bb3fb6fbfaeec1f29768e60ad648cc11a4092c91bac05a8bde90ddbf5aae1a8
   languageName: node
   linkType: hard
-
-"common@workspace:common":
-  version: 0.0.0-use.local
-  resolution: "common@workspace:common"
-  dependencies:
-    "@ant-design/pro-layout": ^6.7.0
-    "@craco/craco": ^5.7.0
-    "@project-serum/serum": ^0.13.11
-    "@project-serum/sol-wallet-adapter": ^0.1.4
-    "@solana/spl-token": 0.0.11
-    "@solana/spl-token-swap": 0.0.2
-    "@solana/web3.js": ^0.86.2
-    "@testing-library/jest-dom": ^4.2.4
-    "@testing-library/react": ^9.5.0
-    "@testing-library/user-event": ^7.2.1
-    "@types/bn.js": ^4.11.6
-    "@types/bs58": ^4.0.1
-    "@types/chart.js": ^2.9.29
-    "@types/echarts": ^4.9.0
-    "@types/identicon.js": ^2.3.0
-    "@types/jest": ^24.9.1
-    "@types/node": ^12.12.62
-    "@types/react": ^16.9.50
-    "@types/react-dom": ^16.9.8
-    "@types/react-router-dom": ^5.1.6
-    "@welldone-software/why-did-you-render": ^6.0.5
-    antd: ^4.6.6
-    arweave-deploy: ^1.9.1
-    bn.js: ^5.1.3
-    bs58: ^4.0.1
-    buffer-layout: ^1.2.0
-    chart.js: ^2.9.4
-    craco-less: ^1.17.0
-    echarts: ^4.9.0
-    eventemitter3: ^4.0.7
-    gh-pages: ^3.1.0
-    identicon.js: ^2.3.3
-    jazzicon: ^1.5.0
-    lodash: ^4.17.20
-    prettier: ^2.1.2
-    react: ^16.13.1
-    react-dom: ^16.13.1
-    react-github-btn: ^1.2.0
-    react-intl: ^5.10.2
-    react-router-dom: ^5.2.0
-    react-scripts: 3.4.3
-  languageName: unknown
-  linkType: soft
 
 "commondir@npm:^1.0.1":
   version: 1.0.1
@@ -8653,7 +8673,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4":
+"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4, ieee754@npm:^1.2.1":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 6c1cfab995ecab3b0dbb6cfb7e192686eb02f0f8e788f2d962e1fc02e2d5ab38a85e06d417221f136bd029663a77cdb920d99605d68d3730a05597dd7910426a
@@ -10420,10 +10440,12 @@ fsevents@~2.3.1:
     "@ant-design/icons": ^4.4.0
     "@ant-design/pro-layout": ^6.7.0
     "@craco/craco": ^5.7.0
+    "@dvhb/craco-extend-scope": ^1.0.1
+    "@packages/common": "workspace:*"
     "@project-serum/serum": ^0.13.11
     "@project-serum/sol-wallet-adapter": ^0.1.4
-    "@solana/spl-token": 0.0.11
-    "@solana/spl-token-swap": 0.0.2
+    "@solana/spl-token": 0.0.13
+    "@solana/spl-token-swap": 0.1.0
     "@solana/web3.js": ^0.86.2
     "@testing-library/jest-dom": ^4.2.4
     "@testing-library/react": ^9.5.0
@@ -10445,7 +10467,6 @@ fsevents@~2.3.1:
     bs58: ^4.0.1
     buffer-layout: ^1.2.0
     chart.js: ^2.9.4
-    common: "workspace:common"
     craco-less: ^1.17.0
     echarts: ^4.9.0
     eventemitter3: ^4.0.7
@@ -10455,11 +10476,12 @@ fsevents@~2.3.1:
     lodash: ^4.17.20
     prettier: ^2.1.2
     react: ^16.13.1
-    react-dom: ^16.13.1
+    react-dom: ^17.0.1
     react-github-btn: ^1.2.0
     react-intl: ^5.10.2
     react-router-dom: ^5.2.0
     react-scripts: 3.4.3
+    typescript: ^4.1.3
   languageName: unknown
   linkType: soft
 
@@ -14304,6 +14326,19 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
+"react-dom@npm:*, react-dom@npm:^17.0.1":
+  version: 17.0.1
+  resolution: "react-dom@npm:17.0.1"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+    scheduler: ^0.20.1
+  peerDependencies:
+    react: 17.0.1
+  checksum: 6a70028fbe3c95e0056c5e8ce065b4a9b8d4ff3bffde9b016454072bde5e4b012af7668ca45b7235ace428267d5be5237b68ea87ce8c296e54e81a8d678a4355
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^16.13.1":
   version: 16.14.0
   resolution: "react-dom@npm:16.14.0"
@@ -14493,6 +14528,16 @@ fsevents@~2.3.1:
   bin:
     react-scripts: bin/react-scripts.js
   checksum: 63a9f736e57caaf4d32edbf2b513973b2a620c919393727735b483b0198fa51b3749ec56c814bd0d5c8cc0c1643636f298a60ba6dd18d264bf6d32aa1c631d37
+  languageName: node
+  linkType: hard
+
+"react@npm:*":
+  version: 17.0.1
+  resolution: "react@npm:17.0.1"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+  checksum: a76d86ec973eb4b25a46071ac7f974adfd66ed89ad1db63043be1d976ec25417520a210e6d724b0ad937422b706afcf9962cedda9e92125992a8c0e8a95f2051
   languageName: node
   linkType: hard
 
@@ -15271,6 +15316,16 @@ resolve@1.15.0:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
   checksum: 804f990b9f370cca6d42b65f3cba2cc2bfed4973ee5623bed1ea36a6627842db8c891e2e5ac003f06f9ee892d1d3396921e27fa077346caf0213af05776e8dee
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.20.1":
+  version: 0.20.1
+  resolution: "scheduler@npm:0.20.1"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+  checksum: 377b4ad0d8313c4548bac7374bc38409e9d142799979ce396787efa04d1bcabf2591540f243f2131e3df8e56e7f5b29c5415248523e88ecb60f13a32db2e076f
   languageName: node
   linkType: hard
 

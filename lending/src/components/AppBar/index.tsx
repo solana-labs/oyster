@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Popover } from 'antd';
-import { useWallet } from 'common/src/contexts/wallet';
+import { useWallet } from '@packages/common/contexts/wallet';
 import { CurrentUserBadge } from '../CurrentUserBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { cache, ParsedAccount } from 'common/src/contexts/accounts';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { cache, ParsedAccount } from '@packages/common/contexts/accounts';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
 import { useLendingReserves, useUserBalance, useUserDeposits } from '../../hooks';
 import { LendingReserve, LendingMarket, LendingReserveParser } from '../../models';
-import { getTokenName } from 'common/src/utils/utils';
+import { getTokenName } from '@packages/common/utils/utils';
 import { Card, Select } from 'antd';
 import { TokenIcon } from '../TokenIcon';
 import { NumericInput } from '../Input/numeric';

@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { useMint } from 'common/src/contexts/accounts';
+import { useMint } from '@packages/common/contexts/accounts';
 import { useMarkets } from '../contexts/market';
-import { fromLamports } from 'common/src/utils/utils';
-import { useUserAccounts } from 'common/src/hooks/useUserAccounts';
+import { fromLamports } from '@packages/common/utils/utils';
+import { useUserAccounts } from '@packages/common/hooks/useUserAccounts';
 
 export function useUserBalance(mintAddress?: PublicKey | string, account?: PublicKey) {
   const mint = useMemo(() => (typeof mintAddress === 'string' ? mintAddress : mintAddress?.toBase58()), [mintAddress]);

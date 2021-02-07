@@ -1,4 +1,4 @@
-import { ParsedAccount } from 'common/src/contexts/accounts';
+import { ParsedAccount } from '@packages/common/contexts/accounts';
 import { useEnrichedPools } from '../../../contexts/market';
 import { UserDeposit, useUserDeposits } from '../../../hooks';
 import { LendingReserve, PoolInfo } from '../../../models';

@@ -2,7 +2,7 @@ import { Progress, Slider, Card, Statistic } from 'antd';
 import React, { useState } from 'react';
 import { Position } from './interfaces';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-import tokens from 'common/src/config/tokens.json';
+import tokens from '@packages/common/config/tokens.json';
 import GainsChart from './GainsChart';
 import { usePoolAndTradeInfoFrom } from './utils';
 

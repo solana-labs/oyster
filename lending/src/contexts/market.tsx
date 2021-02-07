@@ -1,14 +1,14 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { MINT_TO_MARKET } from './../models/marketOverrides';
 import { POOLS_WITH_AIRDROP } from './../models/airdrops';
-import { convert, fromLamports, getTokenName, KnownTokenMap, STABLE_COINS } from 'common/src/utils/utils';
+import { convert, fromLamports, getTokenName, KnownTokenMap, STABLE_COINS } from '@packages/common/utils/utils';
 import { getPoolName } from '../utils/utils';
-import { useConnectionConfig } from 'common/src/contexts/connection';
-import { cache, getMultipleAccounts, ParsedAccount } from 'common/src/contexts/accounts';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
+import { cache, getMultipleAccounts, ParsedAccount } from '@packages/common/contexts/accounts';
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { EventEmitter } from 'common/src/utils/eventEmitter';
+import { EventEmitter } from '@packages/common/utils/eventEmitter';
 
 import { DexMarketParser } from './../models/dex';
 import { LendingMarket, LendingReserve, PoolInfo } from '../models';

@@ -6,8 +6,8 @@ import './style.less';
 import { GUTTER, LABELS } from '../../constants';
 import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
 import { useMemo } from 'react';
-import { formatNumber, fromLamports, wadToLamports } from 'common/src/utils/utils';
-import { useMint } from 'common/src/contexts/accounts';
+import { formatNumber, fromLamports, wadToLamports } from '@packages/common/utils/utils';
+import { useMint } from '@packages/common/contexts/accounts';
 import { useMidPriceInUSD } from '../../contexts/market';
 import { TokenIcon } from '../TokenIcon';
 

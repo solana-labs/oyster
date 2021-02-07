@@ -1,13 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { cache, ParsedAccount } from 'common/src/contexts/accounts';
+import { cache, ParsedAccount } from '@packages/common/contexts/accounts';
 import { useLendingObligations } from './useLendingObligations';
 import { collateralToLiquidity, LendingObligation, LendingReserve } from '../models/lending';
 import { useLendingReserves } from './useLendingReserves';
-import { fromLamports, getTokenName, wadToLamports } from 'common/src/utils/utils';
+import { fromLamports, getTokenName, wadToLamports } from '@packages/common/utils/utils';
 import { MintInfo } from '@solana/spl-token';
 import { simulateMarketOrderFill, useMarkets } from '../contexts/market';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
 
 interface EnrichedLendingObligationInfo extends LendingObligation {
   ltv: number;

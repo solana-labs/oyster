@@ -1,6 +1,6 @@
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
-import * as Layout from 'common/src/utils/layout';
+import * as Layout from '@packages/common/utils/layout';
 
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct([
   BufferLayout.u8('version'),

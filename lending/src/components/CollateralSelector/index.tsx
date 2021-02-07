@@ -2,10 +2,10 @@ import React from 'react';
 import { useLendingReserves, UserDeposit, useUserDeposits } from '../../hooks';
 import { LendingMarket, LendingReserve } from '../../models';
 import { TokenIcon } from '../TokenIcon';
-import { formatAmount, getTokenName } from 'common/src/utils/utils';
+import { formatAmount, getTokenName } from '@packages/common/utils/utils';
 import { Select } from 'antd';
-import { useConnectionConfig } from 'common/src/contexts/connection';
-import { cache, ParsedAccount } from 'common/src/contexts/accounts';
+import { useConnectionConfig } from '@packages/common/contexts/connection';
+import { cache, ParsedAccount } from '@packages/common/contexts/accounts';
 
 const { Option } = Select;
 

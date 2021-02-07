@@ -7,9 +7,9 @@ import {
 } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
-import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from 'common/src/utils/ids';
-import { wadToLamports } from 'common/src/utils/utils';
-import * as Layout from 'common/src/utils/layout';
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
+import { wadToLamports } from '@packages/common/utils/utils';
+import * as Layout from '@packages/common/utils/layout';
 import { LendingInstruction } from './lending';
 
 export const LendingReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct([

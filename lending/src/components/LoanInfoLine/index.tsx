@@ -1,9 +1,9 @@
 import { Card, Col, Row, Statistic } from 'antd';
-import { formatNumber, formatPct, fromLamports, wadToLamports } from 'common/src/utils/utils';
+import { formatNumber, formatPct, fromLamports, wadToLamports } from '@packages/common/utils/utils';
 import React, { useMemo } from 'react';
 import { EnrichedLendingObligation, useLendingReserve } from '../../hooks';
-import { useTokenName } from 'common/src/hooks';
-import { useMint } from 'common/src/contexts/accounts';
+import { useTokenName } from '@packages/common/hooks';
+import { useMint } from '@packages/common/contexts/accounts';
 import { calculateBorrowAPY, collateralToLiquidity } from '../../models';
 import { GUTTER } from '../../constants';
 

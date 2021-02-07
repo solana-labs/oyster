@@ -1,11 +1,15 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { MintLayout, AccountLayout } from '@solana/spl-token';
-import { programIds } from 'common/src/utils/ids';
-import { TokenSwapLayout, TokenSwapLayoutLegacyV0 as TokenSwapLayoutV0, TokenSwapLayoutV1 } from 'common/src/models';
+import { programIds } from '@packages/common/utils/ids';
+import {
+  TokenSwapLayout,
+  TokenSwapLayoutLegacyV0 as TokenSwapLayoutV0,
+  TokenSwapLayoutV1,
+} from '@packages/common/models';
 import { PoolInfo } from '../models';
-import { useConnection } from 'common/src/contexts/connection';
-import { cache, getMultipleAccounts, TokenAccountParser } from 'common/src/contexts/accounts';
+import { useConnection } from '@packages/common/contexts/connection';
+import { cache, getMultipleAccounts, TokenAccountParser } from '@packages/common/contexts/accounts';
 
 export const LIQUIDITY_PROVIDER_FEE = 0.003;
 export const SERUM_FEE = 0.0005;

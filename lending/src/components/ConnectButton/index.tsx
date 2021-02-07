@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import { ButtonProps } from 'antd/lib/button';
 import React from 'react';
-import { useWallet } from 'common/src/contexts/wallet';
+import { useWallet } from '@packages/common/contexts/wallet';
 import { LABELS } from './../../constants';
 
 export const ConnectButton = (props: ButtonProps & React.RefAttributes<HTMLElement>) => {

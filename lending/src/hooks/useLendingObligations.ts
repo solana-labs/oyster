@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 import { LendingObligation, LendingObligationParser } from '../models/lending';
-import { cache, ParsedAccount } from 'common/src/contexts/accounts';
+import { cache, ParsedAccount } from '@packages/common/contexts/accounts';
 
 const getLendingObligations = () => {
   return cache

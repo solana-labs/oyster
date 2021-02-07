@@ -1,7 +1,7 @@
 import { Card, Col, Row } from 'antd';
 import React from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { useWallet } from 'common/src/contexts/wallet';
+import { useWallet } from '@packages/common/contexts/wallet';
 import { useUserDeposits, useUserObligations } from './../../hooks';
 import { DashboardObligations } from './obligation';
 import { DashboardDeposits } from './deposit';

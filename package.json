@@ -22,7 +22,7 @@
   "homepage": ".",
   "workspaces": [
     "lending",
-    "common"
+    "packages/*"
   ],
   "dependencies": {
     "@yarnpkg/pnpify": "^2.4.0",

@@ -2,7 +2,7 @@ import { Card } from 'antd';
 import React from 'react';
 import { BarChartStatistic } from '../../../components/BarChartStatistic';
 import { LABELS } from '../../../constants';
-import { formatNumber } from 'common/src/utils/utils';
+import { formatNumber } from '@packages/common/utils/utils';
 import { useUserObligations } from './../../../hooks';
 import { ObligationItem } from './item';
 

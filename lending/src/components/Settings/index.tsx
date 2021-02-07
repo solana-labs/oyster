@@ -1,7 +1,7 @@
 import React from 'react';
 import { Select } from 'antd';
-import { ENDPOINTS, useConnectionConfig } from 'common/src/contexts/connection';
-import { useWallet, WALLET_PROVIDERS } from 'common/src/contexts/wallet';
+import { ENDPOINTS, useConnectionConfig } from '@packages/common/contexts/connection';
+import { useWallet, WALLET_PROVIDERS } from '@packages/common/contexts/wallet';
 
 export const Settings = () => {
   const { providerUrl, setProvider } = useWallet();

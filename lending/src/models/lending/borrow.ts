@@ -1,8 +1,8 @@
 import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
-import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from 'common/src/utils/ids';
-import * as Layout from 'common/src/utils/layout';
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
+import * as Layout from '@packages/common/utils/layout';
 import { LendingInstruction } from './lending';
 import { calculateUtilizationRatio, LendingReserve } from './reserve';
 

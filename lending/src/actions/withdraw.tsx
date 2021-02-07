@@ -1,11 +1,11 @@
 import { Account, Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { sendTransaction } from 'common/src/contexts/connection';
-import { notify } from 'common/src/utils/notifications';
+import { sendTransaction } from '@packages/common/contexts/connection';
+import { notify } from '@packages/common/utils/notifications';
 import { accrueInterestInstruction, LendingReserve, withdrawInstruction } from './../models/lending';
 import { AccountLayout } from '@solana/spl-token';
-import { LENDING_PROGRAM_ID } from 'common/src/utils/ids';
-import { findOrCreateAccountByMint } from 'common/src/actions/account';
-import { approve, TokenAccount } from 'common/src/models';
+import { LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
+import { findOrCreateAccountByMint } from '@packages/common/actions/account';
+import { approve, TokenAccount } from '@packages/common/models';
 
 export const withdraw = async (
   from: TokenAccount, // CollateralAccount

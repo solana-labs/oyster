@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import { cache, ParsedAccount, useMint } from 'common/src/contexts/accounts';
+import { cache, ParsedAccount, useMint } from '@packages/common/contexts/accounts';
 import { LendingReserve, calculateBorrowAPY, collateralToLiquidity } from '../../models/lending';
 import { EnrichedLendingObligation } from '../../hooks';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { TokenIcon } from '../../components/TokenIcon';
-import { wadToLamports, formatNumber, fromLamports, formatPct } from 'common/src/utils/utils';
+import { wadToLamports, formatNumber, fromLamports, formatPct } from '@packages/common/utils/utils';
 import { LABELS } from '../../constants';
 
 export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {

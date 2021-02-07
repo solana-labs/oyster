@@ -6,9 +6,9 @@ import {
   useBorrowingPower,
   useUserObligationByReserve,
 } from './../../hooks';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { LendingReserve } from '../../models/lending';
-import { formatNumber } from 'common/src/utils/utils';
+import { formatNumber } from '@packages/common/utils/utils';
 import { Button, Card, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';

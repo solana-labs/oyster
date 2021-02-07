@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useConnection } from '@common/contexts/connection';
-import { LENDING_PROGRAM_ID } from 'common/src/utils/ids';
+import { LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
 import {
   LendingMarketParser,
   isLendingReserve,
@@ -10,7 +10,7 @@ import {
   isLendingObligation,
   LendingObligationParser,
 } from './../models/lending';
-import { cache, getMultipleAccounts, MintParser, ParsedAccount } from 'common/src/contexts/accounts';
+import { cache, getMultipleAccounts, MintParser, ParsedAccount } from '@packages/common/contexts/accounts';
 import { PublicKey, AccountInfo } from '@solana/web3.js';
 import { DexMarketParser } from '../models/dex';
 import { usePrecacheMarket } from './market';

@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { useMint } from 'common/src/contexts/accounts';
+import { useMint } from '@packages/common/contexts/accounts';
 import { useMarkets } from '../contexts/market';
 import { LendingReserve, reserveMarketCap } from '../models/lending';
-import { fromLamports } from 'common/src/utils/utils';
+import { fromLamports } from '@packages/common/utils/utils';
 import { useUserBalance } from './useUserBalance';
 
 export function useUserCollateralBalance(reserve?: LendingReserve, account?: PublicKey) {

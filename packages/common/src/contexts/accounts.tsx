@@ -2,12 +2,13 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useConnection } from '../contexts/connection';
 import { useWallet } from '../contexts/wallet';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
-import { AccountLayout, u64, MintInfo, MintLayout } from '@solana/spl-token';
+import { AccountLayout, MintInfo, MintLayout } from '@solana/spl-token';
+import { u64 } from '../types/u64';
 import { TokenAccount } from '../models';
 import { chunks } from '../utils/utils';
 import { EventEmitter } from '../utils/eventEmitter';
 import { useUserAccounts } from '../hooks/useUserAccounts';
-import { WRAPPED_SOL_MINT, programIds, LEND_HOST_FEE_ADDRESS } from 'common/src/utils/ids';
+import { WRAPPED_SOL_MINT, programIds, LEND_HOST_FEE_ADDRESS } from '../utils/ids';
 
 const AccountsContext = React.createContext<any>(null);
 

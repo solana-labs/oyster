@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { LendingReserve } from '../../models/lending';
-import { fromLamports, wadToLamports } from 'common/src/utils/utils';
-import { useMint } from 'common/src/contexts/accounts';
+import { fromLamports, wadToLamports } from '@packages/common/utils/utils';
+import { useMint } from '@packages/common/contexts/accounts';
 import { WaterWave } from './../WaterWave';
 import { Statistic } from 'antd';
 

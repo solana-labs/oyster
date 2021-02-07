@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import {
   calculateBorrowAPY,
   calculateDepositAPY,
@@ -7,9 +7,9 @@ import {
   LendingReserve,
 } from '../../models/lending';
 import { TokenIcon } from '../../components/TokenIcon';
-import { formatNumber, formatPct, fromLamports } from 'common/src/utils/utils';
+import { formatNumber, formatPct, fromLamports } from '@packages/common/utils/utils';
 import { Card, Typography } from 'antd';
-import { ParsedAccount, useMint } from 'common/src/contexts/accounts';
+import { ParsedAccount, useMint } from '@packages/common/contexts/accounts';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
 

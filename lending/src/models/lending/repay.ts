@@ -2,8 +2,8 @@ import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/
 import BN from 'bn.js';
 import { LendingInstruction } from './lending';
 import * as BufferLayout from 'buffer-layout';
-import * as Layout from 'common/src/utils/layout';
-import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from 'common/src/utils/ids';
+import * as Layout from '@packages/common/utils/layout';
+import { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } from '@packages/common/utils/ids';
 
 /// Repay loaned tokens to a reserve and receive collateral tokens. The obligation balance
 /// will be recalculated for interest.

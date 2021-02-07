@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { useTokenName } from 'common/src/hooks';
+import { useTokenName } from '@packages/common/hooks';
 import { calculateBorrowAPY, calculateDepositAPY, LendingReserve } from '../../models/lending';
 import { TokenIcon } from '../../components/TokenIcon';
-import { wadToLamports, formatNumber, fromLamports, formatPct } from 'common/src/utils/utils';
+import { wadToLamports, formatNumber, fromLamports, formatPct } from '@packages/common/utils/utils';
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';
-import { useMint } from 'common/src/contexts/accounts';
+import { useMint } from '@packages/common/contexts/accounts';
 import { TotalItem } from '../../models';
 
 export const LendingReserveItem = (props: { reserve: LendingReserve; address: PublicKey; item?: TotalItem }) => {

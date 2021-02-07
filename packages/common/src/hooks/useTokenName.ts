@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-import { useConnectionConfig } from 'common/src/contexts/connection';
+import { useConnectionConfig } from '../contexts/connection';
 import { getTokenName } from '../utils/utils';
 
 export function useTokenName(mintAddress?: string | PublicKey) {

@@ -1,8 +1,8 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
-import { WalletProvider } from 'common/src/contexts/wallet';
-import { ConnectionProvider } from 'common/src/contexts/connection';
-import { AccountsProvider } from 'common/src/contexts/accounts';
+import { WalletProvider } from '@packages/common/contexts/wallet';
+import { ConnectionProvider } from '@packages/common/contexts/connection';
+import { AccountsProvider } from '@packages/common/contexts/accounts';
 import { MarketProvider } from './contexts/market';
 import { LendingProvider } from './contexts/lending';
 import { AppLayout } from './components/Layout';
