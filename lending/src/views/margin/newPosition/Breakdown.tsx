@@ -22,7 +22,7 @@ export default function Breakdown({ item }: { item: Position }) {
 
   const [myGain, setMyGain] = useState<number>(10);
   const profitPart = (myPart + brokeragePart) * (myGain / 100);
-  let progressBar = null;
+  let progressBar;
   if (profitPart > 0) {
     // normalize...
     const total = profitPart + myPart + brokeragePart;

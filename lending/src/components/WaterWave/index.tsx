@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./index.less";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import './index.less';
 
 export const WaterWave = (props: any) => {
   const node = useRef<HTMLCanvasElement>();
@@ -17,9 +17,9 @@ export const WaterWave = (props: any) => {
   useEffect(() => {
     resize();
 
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
     return () => {
-      window.removeEventListener("resize", resize);
+      window.removeEventListener('resize', resize);
     };
   }, [resize]);
 
@@ -40,20 +40,11 @@ export const WaterWave = (props: any) => {
   }, [percent, color]);
 
   return (
-    <div
-      className="waterWave"
-      ref={root as any}
-      style={{ transform: `scale(${radio})` }}
-    >
-      <div style={{ width: height, height, overflow: "hidden" }}>
-        <canvas
-          className="waterWaveCanvasWrapper"
-          ref={node as any}
-          width={height * 2}
-          height={height * 2}
-        />
+    <div className='waterWave' ref={root as any} style={{ transform: `scale(${radio})` }}>
+      <div style={{ width: height, height, overflow: 'hidden' }}>
+        <canvas className='waterWaveCanvasWrapper' ref={node as any} width={height * 2} height={height * 2} />
       </div>
-      <div className="text" style={{ width: height }}>
+      <div className='text' style={{ width: height }}>
         {title}
         <h4>{showPercent && `${percent.toFixed(2)}%`}</h4>
       </div>
@@ -65,14 +56,14 @@ const renderChart = (
   canvas: HTMLCanvasElement | undefined,
   percent: number,
   setTimer: (timer: number) => void,
-  color = "#1890FF"
+  color = '#1890FF'
 ) => {
   const data = percent / 100;
   if (!canvas || !data) {
     return;
   }
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
 
   if (!ctx) {
     return;
@@ -100,10 +91,7 @@ const renderChart = (
   const circleOffset = -(Math.PI / 2);
   let circleLock = true;
 
-  const cStartPoint = [
-    radius + bR * Math.cos(circleOffset),
-    radius + bR * Math.sin(circleOffset),
-  ];
+  const cStartPoint = [radius + bR * Math.cos(circleOffset), radius + bR * Math.sin(circleOffset)];
   ctx.strokeStyle = color;
   ctx.moveTo(cStartPoint[0], cStartPoint[1]);
 
@@ -111,7 +99,7 @@ const renderChart = (
     ctx.beginPath();
     ctx.save();
 
-    const sinStack = [];
+    const sinStack: Array<[number, number]> = [];
     for (let i = xOffset; i <= xOffset + axisLength; i += 20 / axisLength) {
       const x = sp + (xOffset + i) / unit;
       const y = Math.sin(x) * currRange;
@@ -133,8 +121,8 @@ const renderChart = (
     ctx.lineTo(startPoint[0], startPoint[1]);
 
     const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-    gradient.addColorStop(0, "#ffffff");
-    gradient.addColorStop(1, "#1890FF");
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(1, '#1890FF');
     ctx.fillStyle = gradient;
     ctx.fill();
     ctx.restore();
@@ -145,7 +133,7 @@ const renderChart = (
     if (circleLock) {
       circleLock = false;
 
-      ctx.globalCompositeOperation = "destination-over";
+      ctx.globalCompositeOperation = 'destination-over';
 
       ctx.beginPath();
       ctx.save();
@@ -153,7 +141,7 @@ const renderChart = (
       ctx.stroke();
       ctx.restore();
       ctx.clip();
-      ctx.fillStyle = "#1890FF";
+      ctx.fillStyle = '#1890FF';
     } else {
       if (data >= 0.85) {
         if (currRange > range / 4) {
