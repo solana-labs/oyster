@@ -1,9 +1,46 @@
 const CracoLessPlugin = require('craco-less');
-const CracoExtendScope = require('@dvhb/craco-extend-scope');
+const CracoAlias = require('craco-alias');
+const CracoBabelLoader = require('craco-babel-loader');
+const path = require('path');
+const fs = require('fs');
+
+//console.log('qualified', pnp.resolveRequest('@babel/preset-typescript'), path.resolve(__dirname, '/') + 'src/');
+
+// Handle relative paths to sibling packages
+const appDirectory = fs.realpathSync(process.cwd());
+const resolvePackage = (relativePath) => path.resolve(appDirectory, relativePath);
 
 module.exports = {
+  webpack: {
+    configure: (webpackConfig) => {
+      const scopePluginIndex = webpackConfig.resolve.plugins.findIndex(
+        ({ constructor }) => constructor && constructor.name === 'ModuleScopePlugin'
+      );
+      webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
+      return webpackConfig;
+    },
+  },
   plugins: [
-    { plugin: CracoExtendScope, options: { path: '@packages' } },
+    {
+      plugin: CracoBabelLoader,
+      options: {
+        includes: [
+          // No "unexpected token" error importing components from these lerna siblings:
+          resolvePackage('../packages'),
+        ],
+      },
+    },
+    {
+      plugin: CracoAlias,
+      options: {
+        source: 'tsconfig',
+        // baseUrl SHOULD be specified
+        // plugin does not take it from tsconfig
+        baseUrl: '../',
+        // tsConfigPath should point to the file where "baseUrl" and "paths" are specified
+        tsConfigPath: '../tsconfig.base.json',
+      },
+    },
     {
       plugin: CracoLessPlugin,
       options: {

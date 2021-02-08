@@ -1,9 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "composite": true,
-    "noEmit": false
-  },
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {},
   "include": ["src/**/*", "src/config/tokens.json"]
 }
