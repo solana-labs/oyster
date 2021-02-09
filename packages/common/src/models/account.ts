@@ -3,10 +3,10 @@ import {
   AccountInfo,
   PublicKey,
   TransactionInstruction,
-} from "@solana/web3.js";
+} from '@solana/web3.js';
 
-import { AccountInfo as TokenAccountInfo, Token } from "@solana/spl-token";
-import { TOKEN_PROGRAM_ID } from "../utils/ids";
+import { AccountInfo as TokenAccountInfo, Token } from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID } from '../utils/ids';
 
 export interface TokenAccount {
   pubkey: PublicKey;
@@ -23,7 +23,7 @@ export function approve(
   autoRevoke = true,
 
   // if delegate is not passed ephemeral transfer authority is used
-  delegate?: PublicKey
+  delegate?: PublicKey,
 ): Account {
   const tokenProgram = TOKEN_PROGRAM_ID;
   const transferAuthority = new Account();
@@ -35,13 +35,13 @@ export function approve(
       delegate ?? transferAuthority.publicKey,
       owner,
       [],
-      amount
-    )
+      amount,
+    ),
   );
 
   if (autoRevoke) {
     cleanupInstructions.push(
-      Token.createRevokeInstruction(tokenProgram, account, owner, [])
+      Token.createRevokeInstruction(tokenProgram, account, owner, []),
     );
   }
 
