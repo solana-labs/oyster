@@ -1,29 +1,14 @@
 ## Setup
 
-This is a yarn 2 monorepository. It works off of a yarn 2 cjs dump version-controlled in the repo so that everybody
-has the same version. Each folder is it's own workspace, and the workspaces can link together via package.json additions.
-Each workspace can in addition be published and version controlled ultimately, so that one workspace can depend on a static
-version on another instead of the current setup, which is more of a symlinking, similar to the way Lerna used to allow it.
+`lerna bootstrap`
 
-"""
-yarn install
-"""
+Sometimes lerna doesn't install sub package node_modules, do:
 
-## Running an app
+`lerna exec node install`
 
-"""
-yarn workspace lending start
-"""
+Then:
 
-In general, to run a package.json script in a project, just do """yarn workspace project script-name"""
-
-## Clearing the cache in yarn 2
-
-DO NOT DELETE THE .YARN FOLDER. It is not like the old node_modules, which has been deprecated. Use """yarn cache clean""".
-
-## Adding a new package
-
-Note that in addition to adding a new package to the packages folder, one also needs to add a new entry to the top level tsconfig.json to let the TS transpiler know that it is fair game.
+`npm run start --app=lending`
 
 ## ⚠️ Warning
 
