@@ -1,10 +1,16 @@
 import { PublicKey } from '@solana/web3.js';
 import { TokenSwapLayout, TokenSwapLayoutV1 } from '../models/tokenSwap';
 
-export const WRAPPED_SOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
-export let TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+export const WRAPPED_SOL_MINT = new PublicKey(
+  'So11111111111111111111111111111111111111112',
+);
+export let TOKEN_PROGRAM_ID = new PublicKey(
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+);
 
-export let LENDING_PROGRAM_ID = new PublicKey('TokenLending1111111111111111111111111111111');
+export let LENDING_PROGRAM_ID = new PublicKey(
+  'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
+);
 
 let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
@@ -66,7 +72,7 @@ export const PROGRAM_IDS = [
 ];
 
 export const setProgramIds = (envName: string) => {
-  let instance = PROGRAM_IDS.find((env) => env.name === envName);
+  let instance = PROGRAM_IDS.find(env => env.name === envName);
   if (!instance) {
     return;
   }
@@ -78,7 +84,9 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
   if (envName === 'mainnet-beta') {
-    LENDING_PROGRAM_ID = new PublicKey('LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi');
+    LENDING_PROGRAM_ID = new PublicKey(
+      'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
+    );
   }
 };
 
