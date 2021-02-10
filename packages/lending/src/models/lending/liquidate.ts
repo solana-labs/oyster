@@ -6,7 +6,9 @@ import {
 import BN from 'bn.js';
 import { LendingInstruction } from './lending';
 import * as BufferLayout from 'buffer-layout';
-import { Layout, utils } from '@oyster/common';
+import { utils } from '@oyster/common';
+import * as Layout from '../../utils/layout';
+
 const { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } = utils;
 /// Purchase collateral tokens at a discount rate if the chosen obligation is unhealthy.
 ///

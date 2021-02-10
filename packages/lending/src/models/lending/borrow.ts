@@ -7,7 +7,8 @@ import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { LendingInstruction } from './lending';
 import { calculateUtilizationRatio, LendingReserve } from './reserve';
-import { Layout, utils } from '@oyster/common';
+import { utils } from '@oyster/common';
+import * as Layout from '../../utils/layout';
 const { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } = utils;
 export enum BorrowAmountType {
   LiquidityBorrowAmount = 0,

@@ -1,6 +1,7 @@
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
-import { Layout } from '@oyster/common';
+import * as Layout from '../../utils/layout';
+
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),

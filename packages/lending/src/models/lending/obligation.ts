@@ -8,7 +8,9 @@ import {
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import { LendingInstruction } from '.';
-import { utils, Layout } from '@oyster/common';
+import { utils } from '@oyster/common';
+import * as Layout from '../../utils/layout';
+
 const { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } = utils;
 
 export const LendingObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(

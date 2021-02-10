@@ -8,7 +8,9 @@ import * as BufferLayout from 'buffer-layout';
 import { calculateBorrowAPY } from './borrow';
 import { LendingInstruction } from './lending';
 import { calculateUtilizationRatio, LendingReserve } from './reserve';
-import { Layout, utils } from '@oyster/common';
+import { utils } from '@oyster/common';
+import * as Layout from '../../utils/layout';
+
 const { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } = utils;
 /// Deposit liquidity into a reserve. The output is a collateral token representing ownership
 /// of the reserve liquidity pool.
