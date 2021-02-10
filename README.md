@@ -1,10 +1,6 @@
 ## Setup
 
-`lerna bootstrap`
-
-Sometimes lerna doesn't install sub package node_modules, do:
-
-`lerna exec node install`
+`npm run bootstrap`
 
 Then:
 
