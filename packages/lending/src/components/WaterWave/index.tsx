@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './index.less';
 
 export const WaterWave = (props: any) => {
-  return null;
-  /* const node = useRef<HTMLCanvasElement>();
+  const node = useRef<HTMLCanvasElement>();
   const root = useRef<HTMLDivElement>();
   const [radio, setRadio] = useState(1);
   const { percent, title, style, color, showPercent } = props;
@@ -112,7 +111,7 @@ const renderChart = (
     ctx.beginPath();
     ctx.save();
 
-    const sinStack: Array<[number, number]> = [];
+    const sinStack = [];
     for (let i = xOffset; i <= xOffset + axisLength; i += 20 / axisLength) {
       const x = sp + (xOffset + i) / unit;
       const y = Math.sin(x) * currRange;
@@ -189,5 +188,5 @@ const renderChart = (
     setTimer(requestAnimationFrame(render));
   };
 
-  render();*/
+  render();
 };

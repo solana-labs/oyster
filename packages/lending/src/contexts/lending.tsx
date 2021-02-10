@@ -87,7 +87,6 @@ export const useLending = () => {
       const programAccounts = await connection.getProgramAccounts(
         LENDING_PROGRAM_ID,
       );
-      console.log('Accounts', programAccounts);
 
       const accounts = programAccounts
         .map(processAccount)
