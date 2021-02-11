@@ -18,7 +18,7 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
           <Button
             type="text"
             size="large"
-            onClick={connected ? wallet.disconnect : wallet.connect}
+            onClick={connected ? wallet?.disconnect : wallet?.connect}
             style={{ color: '#2abdd2' }}
           >
             {LABELS.CONNECT_BUTTON}

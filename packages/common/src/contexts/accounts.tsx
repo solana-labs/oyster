@@ -280,12 +280,14 @@ const UseNativeAccount = () => {
 
   const updateCache = useCallback(
     (account) => {
-      const wrapped = wrapNativeAccount(wallet.publicKey, account);
-      if (wrapped !== undefined && wallet) {
-        const id = wallet.publicKey?.toBase58();
-        cache.registerParser(id, TokenAccountParser);
-        genericCache.set(id, wrapped as TokenAccount);
-        cache.emitter.raiseCacheUpdated(id, false, TokenAccountParser);
+      if(wallet && wallet.publicKey) {
+        const wrapped = wrapNativeAccount(wallet.publicKey, account);
+        if (wrapped !== undefined && wallet) {
+          const id = wallet.publicKey?.toBase58();
+          cache.registerParser(id, TokenAccountParser);
+          genericCache.set(id, wrapped as TokenAccount);
+          cache.emitter.raiseCacheUpdated(id, false, TokenAccountParser);
+        }
       }
     },
     [wallet]
@@ -308,7 +310,7 @@ const UseNativeAccount = () => {
         setNativeAccount(acc);
       }
     });
-  }, [setNativeAccount, wallet, wallet.publicKey, connection, updateCache]);
+  }, [setNativeAccount, wallet, wallet?.publicKey, connection, updateCache]);
 
   return { nativeAccount };
 };
@@ -342,7 +344,7 @@ export function AccountsProvider({ children = null as any }) {
     return cache
       .byParser(TokenAccountParser)
       .map((id) => cache.get(id))
-      .filter((a) => a && a.info.owner.toBase58() === wallet.publicKey?.toBase58())
+      .filter((a) => a && a.info.owner.toBase58() === wallet?.publicKey?.toBase58())
       .map((a) => a as TokenAccount);
   }, [wallet]);
 
