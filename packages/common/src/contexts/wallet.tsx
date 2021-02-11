@@ -11,28 +11,29 @@ import { useLocalStorageState } from "./../utils/utils";
 import { LedgerWalletAdapter } from "../wallet-adapters/ledger";
 import { SolongWalletAdapter } from "../wallet-adapters/solong";
 
+const ASSETS_URL = 'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
 export const WALLET_PROVIDERS = [
   {
     name: "Sollet",
     url:  "https://www.sollet.io",
-    icon: `sollet.svg`,
+    icon: `${ASSETS_URL}sollet.svg`,
   }, {
     name: "Solong",
     url:  "https://solongwallet.com",
-    icon: `solong.png`,
+    icon: `${ASSETS_URL}solong.png`,
     adapter: SolongWalletAdapter,
   }, {
     name: "Solflare",
     url:  "https://solflare.com/access-wallet",
-    icon: `solflare.svg`,
+    icon: `${ASSETS_URL}solflare.svg`,
   }, {
     name: "MathWallet",
     url:  "https://mathwallet.org",
-    icon: `mathwallet.svg`,
+    icon: `${ASSETS_URL}mathwallet.svg`,
   }, {
     name: "Ledger",
     url:  "https://www.ledger.com",
-    icon: `ledger.svg`,
+    icon: `${ASSETS_URL}ledger.svg`,
     adapter: LedgerWalletAdapter,
   },
 ];
