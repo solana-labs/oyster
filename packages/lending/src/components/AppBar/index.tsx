@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Popover } from 'antd';
-import { contexts } from '@oyster/common';
+import { contexts, ConnectButton } from '@oyster/common';
 import { CurrentUserBadge } from '../CurrentUserBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';
@@ -12,26 +12,15 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
 
   const TopBar = (
     <div className="App-Bar-right">
-      <CurrentUserBadge />
-      <div>
-        {!connected && (
-          <Button
+      {connected ? (
+          <CurrentUserBadge />
+      ) : (
+          <ConnectButton
             type="text"
             size="large"
-            onClick={connected ? wallet?.disconnect : wallet?.connect}
-            style={{ color: '#2abdd2' }}
-          >
-            {LABELS.CONNECT_BUTTON}
-          </Button>
-        )}
-        {connected && (
-          <Popover
-            placement="bottomRight"
-            title={LABELS.WALLET_TOOLTIP}
-            trigger="click"
-          ></Popover>
-        )}
-      </div>
+            allowWalletChange={true}
+            style={{ color: "#2abdd2" }}/>
+      )}
       <Popover
         placement="topRight"
         title={LABELS.SETTINGS_TOOLTIP}

@@ -11,14 +11,13 @@ import {
   LendingReserveParser,
 } from '../../models';
 import { Card } from 'antd';
-import { contexts, ParsedAccount } from '@oyster/common';
+import { contexts, ParsedAccount, ConnectButton } from '@oyster/common';
 
 import { borrow } from '../../actions';
 import './style.less';
 import { LABELS } from '../../constants';
 import { ActionConfirmation } from './../ActionConfirmation';
 import { BackButton } from './../BackButton';
-import { ConnectButton } from '../ConnectButton';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
 import { RiskSlider } from '../RiskSlider';

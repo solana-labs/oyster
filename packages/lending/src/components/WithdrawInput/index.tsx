@@ -12,9 +12,8 @@ import { PublicKey } from '@solana/web3.js';
 import './style.less';
 import { LABELS, marks } from '../../constants';
 import { ActionConfirmation } from './../ActionConfirmation';
-import { ConnectButton } from '../ConnectButton';
 import CollateralInput from '../CollateralInput';
-import { contexts } from '@oyster/common';
+import { contexts, ConnectButton } from '@oyster/common';
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 

@@ -1,9 +1,7 @@
 import { Button, Dropdown, Menu } from "antd";
 import { ButtonProps } from "antd/lib/button";
 import React from "react";
-import { LABELS } from "../../constants";
-import { contexts } from '@oyster/common';
-const { useWallet } = contexts.Wallet;
+import { useWallet } from './../../contexts/wallet';
 
 export interface ConnectButtonProps extends ButtonProps, React.RefAttributes<HTMLElement> {
   allowWalletChange?: boolean;
@@ -29,7 +27,7 @@ export const ConnectButton = (
       onClick={connected ? onClick : connect}
       disabled={connected && disabled}
     >
-      {connected ? props.children : LABELS.CONNECT_LABEL}
+      {connected ? props.children : 'Connect'}
     </Button>;
   }
 
@@ -38,7 +36,7 @@ export const ConnectButton = (
         onClick={connected ? onClick : connect}
         disabled={connected && disabled}
         overlay={menu}>
-      {LABELS.CONNECT_LABEL}
+      Connect
     </Dropdown.Button>
   );
 };

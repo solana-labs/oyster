@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import { Card } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { ConnectButton } from './../../components/ConnectButton';
 import { LABELS } from '../../constants';
-import { contexts, utils } from '@oyster/common';
+import { contexts, utils, ConnectButton } from '@oyster/common';
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 const { notify } = utils;

@@ -41,6 +41,7 @@ export const WALLET_PROVIDERS = [
 export interface WalletAdapter extends EventEmitter {
   publicKey: PublicKey | null,
   signTransaction: (transaction: Transaction) => Promise<Transaction>;
+  // signMultipleTransaction: (transaction: Transaction[]) => Promise<Transaction[]>;
   connect: () => any,
   disconnect: () => any,
 }
