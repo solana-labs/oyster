@@ -13,7 +13,7 @@
   "scripts": {
     "bootstrap": "lerna link && lerna bootstrap && lerna exec npm install",
     "build": "lerna run build",
-    "start": "CI=true lerna run start --scope common --stream --parallel --scope ",
+    "start": "CI=true lerna run start --scope $npm_config_app --scope @oyster/common --stream --parallel",
     "lint": "eslint 'packages/*/{src,test}/**/*.ts' && prettier -c 'packages/*/{src,test}/**/*.ts'",
     "lint:fix": "eslint --fix 'packages/*/{src,test}/**/*.ts' && prettier --write 'packages/*/{src,test}/**/*.ts'",
     "deploy": "run-s deploy:docs build deploy:apps && gh-pages -d docs",
