@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.ant-pro-basicLayout-content {
+  margin: 0 !important;
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.home-info-row {
+  min-height: 75vh;
+}
+
+.wormhole-bg {
+  background-image: url("../src/assets/wormhole.svg");
+  background-size: cover;
+  background-position: center;
+}
