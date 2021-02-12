@@ -39,7 +39,7 @@ export const AppLayout = React.memo((props: any) => {
 
   return (
     <div className="App">
-      <BasicLayout
+      {/* <BasicLayout
         title={LABELS.APP_TITLE}
         footerRender={() => (
           <div className="footer" title={LABELS.FOOTER}>
@@ -47,16 +47,16 @@ export const AppLayout = React.memo((props: any) => {
           </div>
         )}
         navTheme={theme}
-        headerTheme={theme}
+        // headerTheme={theme}
         theme={theme}
         layout="top"
         primaryColor="#d83aeb"
         logo={<div className="App-logo" />}
-        rightContentRender={() => <AppBar />}
+        // rightContentRender={() => <AppBar />}
         links={[]}
-      >
-        {props.children}
-      </BasicLayout>
+      > */}
+      {props.children}
+      {/* </BasicLayout> */}
     </div>
   );
 });
