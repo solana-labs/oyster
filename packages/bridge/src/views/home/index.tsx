@@ -1,5 +1,5 @@
 import { MintInfo } from '@solana/spl-token';
-import { Table, Tag, Space, Card, Col, Row, Statistic } from 'antd';
+import { Table, Tag, Space, Card, Col, Row, Statistic, Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { GUTTER, LABELS } from '../../constants';
 import { contexts, ParsedAccount, utils } from '@oyster/common';
@@ -9,6 +9,7 @@ import { LendingReserveItem } from './item';
 import { AppBar } from './../../components/AppBar';
 import './itemStyle.less';
 import { Totals } from '../../models/totals';
+import { Link } from 'react-router-dom';
 const { fromLamports, getTokenName, wadToLamports } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -115,33 +116,21 @@ export const HomeView = () => {
         gutter={GUTTER}
         justify="center"
         align="middle"
-        className="home-info-row wormhole-bg"
+        className="home-info-row"
       >
-        <Col xs={24} xl={8}>
+        <Col xs={24} xl={12} className="app-title">
           <h1>Wormhole</h1>
-          <h2>Ethereum and Solana Bridge</h2>
-          <AppBar />
+          <h2><span>Ethereum + Solana Bridge</span></h2>
+          <Link to="/move">
+            <Button className="app-action">Get Started</Button>
+          </Link>
         </Col>
-        <Col xs={24} xl={5}>
-          <Card>
-            <Statistic
-              title="Current market size"
-              value={totals.marketSize}
-              precision={2}
-              valueStyle={{ color: '#3fBB00' }}
-              prefix="$"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} xl={5}>
-          <Card>
-            <Statistic
-              title="Assets"
-              value={totals.numberOfAssets}
-              precision={2}
-              prefix="$"
-            />
-          </Card>
+        <Col xs={24} xl={12}>
+          <Statistic
+            className="home-statistic"
+            title="$1,231"
+            value="TOTAL VALUE LOCKED"
+          />
         </Col>
       </Row>
       <Table dataSource={dataSource} columns={columns} />

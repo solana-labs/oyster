@@ -1,0 +1,48 @@
+{
+  "name": "@solana/bridge-ethereum",
+  "version": "0.0.1",
+  "dependencies": {
+    "@oyster/common": "0.0.1",
+    "@solana/spl-token": "0.0.13",
+    "@solana/spl-token-swap": "0.1.0",
+    "@solana/web3.js": "^0.86.2",
+    "bn.js": "^5.1.3",
+    "bs58": "^4.0.1",
+    "buffer-layout": "^1.2.0",
+    "ethers": "^4.0.48",
+    "eventemitter3": "^4.0.7",
+    "lodash": "^4.17.20",
+    "typescript": "^4.1.3",
+    "web3": "^1.3.0"
+  },
+  "scripts": {
+    "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
+    "ethers": "typechain --target ethers-v4 --outDir src/contracts 'contracts/*.json'"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/solana-labs/oyster"
+  },
+  "homepage": ".",
+  "devDependencies": {
+    "@typechain/ethers-v4": "^1.0.0",
+    "@types/bn.js": "^5.1.0",
+    "@types/bs58": "^4.0.1",
+    "@types/node": "^12.12.62",
+    "arweave-deploy": "^1.9.1",
+    "gh-pages": "^3.1.0",
+    "prettier": "^2.1.2"
+  }
+}

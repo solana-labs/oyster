@@ -1,26 +1,13 @@
 import React from 'react';
 import './../../App.less';
-import { Menu } from 'antd';
-import {
-  PieChartOutlined,
-  GithubOutlined,
-  BankOutlined,
-  LogoutOutlined,
-  ShoppingOutlined,
-  HomeOutlined,
-  RocketOutlined,
-  ForkOutlined,
-  // LineChartOutlined
-} from '@ant-design/icons';
-
-import BasicLayout from '@ant-design/pro-layout';
-import { AppBar } from './../AppBar';
+import { Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
-import config from './../../../package.json';
 import { contexts } from '@oyster/common';
 
+
+const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
 
 export const AppLayout = React.memo((props: any) => {
@@ -34,29 +21,18 @@ export const AppLayout = React.memo((props: any) => {
   const current =
     [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
     '';
-  const defaultKey = paths[current] || '1';
-  const theme = 'dark';
-
   return (
-    <div className="App">
-      {/* <BasicLayout
+    <div className="App wormhole-bg">
+      <Layout
         title={LABELS.APP_TITLE}
-        footerRender={() => (
-          <div className="footer" title={LABELS.FOOTER}>
-            {LABELS.FOOTER}
-          </div>
-        )}
-        navTheme={theme}
-        // headerTheme={theme}
-        theme={theme}
-        layout="top"
-        primaryColor="#d83aeb"
-        logo={<div className="App-logo" />}
-        // rightContentRender={() => <AppBar />}
-        links={[]}
-      > */}
-      {props.children}
-      {/* </BasicLayout> */}
+      >
+        {location.pathname !== '/' && <Header className="header">
+          <div className="App-logo" />
+        </Header>}
+        <Content style={{ padding: '0 50px' }}>
+          {props.children}
+        </Content>
+      </Layout>
     </div>
   );
 });

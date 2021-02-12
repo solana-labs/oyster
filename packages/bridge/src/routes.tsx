@@ -7,6 +7,7 @@ import { AppLayout } from './components/Layout';
 import {
   FaucetView,
   HomeView,
+  TransferView,
 } from './views';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -23,6 +24,7 @@ export function Routes() {
                   <AppLayout>
                     <Switch>
                       <Route exact path="/" component={() => <HomeView />} />
+                      <Route path="/move" children={<TransferView />} />
                       <Route exact path="/faucet" children={<FaucetView />} />
                     </Switch>
                   </AppLayout>

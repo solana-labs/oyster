@@ -1,6 +1,8 @@
 @import "~antd/dist/antd.dark.less";
 @import "./ant-custom.less";
 
+@solana-green: #00FFA3;
+
 body {
   --row-highlight: @background-color-base;
 }
@@ -12,6 +14,36 @@ body {
   background-repeat: no-repeat;
   background-size: 32px;
   width: 32px;
+}
+
+.app-title {
+  font-family: "FF Oxide Solid";
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
+
+  h1 {
+    font-size: 48px;
+    margin: 0px;
+  }
+
+  h2 {
+    span {
+      display: inline-block;
+      font-size: 16px;
+      background: linear-gradient(270deg, @solana-green 0%, #DC1FFF 101.97%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+.app-action {
+  border-color: @solana-green;
+  color: @solana-green;
+
+  padding: 20px 30px;
+  line-height: 2px;
 }
 
 .footer {
@@ -216,6 +248,10 @@ em {
   }
 }
 
+.ant-layout {
+  background: transparent !important;
+}
+
 .ant-layout-content {
   display: flex;
   overflow: auto;
@@ -270,21 +306,13 @@ em {
   margin: 20px 15px 40px 15px;
 }
 
-.ant-pro-sider.ant-layout-sider-collapsed .ant-pro-sider-logo {
-  padding: 8px 8px;
-}
-
-.ant-pro-global-header {
-  .ant-pro-global-header-logo a h1 {
-    color: white !important;
-  }
-
-  background-color: black !important;
-  color: white !important;
-
-  .ant-btn {
-    color: white !important;
-  }
+.ant-layout-header {
+  align-items: center;
+  height: 42px;
+  padding: 0 20px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 64px;
+  display: flex;
 }
 
 .ant-statistic {
@@ -315,6 +343,7 @@ em {
   color: @text-color-secondary;
 }
 
+
 [class="ant-layout-header"] {
   height: 16px !important;
 }
@@ -325,22 +354,22 @@ em {
   text-align: right;
 }
 
-.small-statisitc {
+.home-statistic {
+  font-family: "FF Oxide Solid";
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
+
   .ant-statistic-title {
-    font-size: 12px;
+    display: inline-block;
+    font-size: 48px !important;
+    background: linear-gradient(254.55deg, @solana-green 10.02%, #DC1FFF 89.22%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .ant-statistic-content {
-    max-height: 20px;
-    line-height: 2px;;
-  }
-
-  .ant-statistic-content-value-int {
-    font-size: 12px;
-  }
-
-  .ant-statistic-content-value-decimal {
-    font-size: 10px;
+    font-size: 20px !important;
   }
 }
 
