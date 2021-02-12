@@ -13,13 +13,14 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
   const TopBar = (
     <div>
       {connected ? (
-          <CurrentUserBadge />
+        <CurrentUserBadge />
       ) : (
-          <ConnectButton
-            type="text"
-            size="large"
-            allowWalletChange={true}
-            style={{ color: "#2abdd2" }}/>
+        <ConnectButton
+          type="text"
+          size="large"
+          allowWalletChange={true}
+          style={{ color: '#2abdd2' }}
+        />
       )}
       <Popover
         placement="topRight"

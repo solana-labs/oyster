@@ -6,7 +6,7 @@ import { contexts, ParsedAccount, utils } from '@oyster/common';
 import { useMarkets } from '../../contexts/market';
 
 import { LendingReserveItem } from './item';
-import { AppBar } from "./../../components/AppBar";
+import { AppBar } from './../../components/AppBar';
 import './itemStyle.less';
 import { Totals } from '../../models/totals';
 const { fromLamports, getTokenName, wadToLamports } = utils;
@@ -44,7 +44,8 @@ export const HomeView = () => {
 
         const price = midPriceInUSD(liquidityMint?.pubkey.toBase58());
         const marketCapLamports = 0;
-        const marketSize = fromLamports(marketCapLamports, liquidityMint?.info) * price;
+        const marketSize =
+          fromLamports(marketCapLamports, liquidityMint?.info) * price;
         let leaf = {
           key: address,
           marketSize,
@@ -75,43 +76,47 @@ export const HomeView = () => {
     };
   }, [marketEmitter, midPriceInUSD, setTotals, tokenMap]);
 
+  const dataSource = [
+    {
+      key: '1',
+      name: 'Mike',
+      age: 32,
+      address: '10 Downing Street',
+    },
+    {
+      key: '2',
+      name: 'John',
+      age: 42,
+      address: '10 Downing Street',
+    },
+  ];
 
-const dataSource = [
-  {
-    key: '1',
-    name: 'Mike',
-    age: 32,
-    address: '10 Downing Street',
-  },
-  {
-    key: '2',
-    name: 'John',
-    age: 42,
-    address: '10 Downing Street',
-  },
-];
-
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-];
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+    },
+  ];
 
   return (
     <div className="flexColumn">
-      <Row gutter={GUTTER} justify="center" align="middle" className="home-info-row wormhole-bg">
+      <Row
+        gutter={GUTTER}
+        justify="center"
+        align="middle"
+        className="home-info-row wormhole-bg"
+      >
         <Col xs={24} xl={8}>
           <h1>Wormhole</h1>
           <h2>Ethereum and Solana Bridge</h2>
@@ -140,7 +145,6 @@ const columns = [
         </Col>
       </Row>
       <Table dataSource={dataSource} columns={columns} />
-
     </div>
   );
 };

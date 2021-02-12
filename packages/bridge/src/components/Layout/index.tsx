@@ -55,7 +55,7 @@ export const AppLayout = React.memo((props: any) => {
         // rightContentRender={() => <AppBar />}
         links={[]}
       > */}
-        {props.children}
+      {props.children}
       {/* </BasicLayout> */}
     </div>
   );
