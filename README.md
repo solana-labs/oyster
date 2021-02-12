@@ -1,10 +1,18 @@
 ## Setup
 
+
+Be sure to be running Node v12.16.2 and npm version 6.14.4.
+
+
 `npm run bootstrap`
 
-Then:
+Then run:
 
-`npm run start --app=lending`
+`npm start lending`
+
+
+You may have to rebuild your package more than one time to secure a
+running environment.
 
 ## ⚠️ Warning
 
