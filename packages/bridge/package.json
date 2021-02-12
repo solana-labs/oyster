@@ -29,6 +29,7 @@
     "craco-babel-loader": "^0.1.4",
     "craco-less": "^1.17.0",
     "echarts": "^4.9.0",
+    "eth-hooks": "^1.1.2",
     "ethers": "^4.0.48",
     "eventemitter3": "^4.0.7",
     "identicon.js": "^2.3.3",
