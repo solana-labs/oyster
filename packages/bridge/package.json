@@ -29,6 +29,7 @@
     "craco-babel-loader": "^0.1.4",
     "craco-less": "^1.17.0",
     "echarts": "^4.9.0",
+    "ethers": "^4.0.48",
     "eventemitter3": "^4.0.7",
     "identicon.js": "^2.3.3",
     "jazzicon": "^1.5.0",
@@ -39,7 +40,8 @@
     "react-intl": "^5.10.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "web3": "^1.3.0"
   },
   "scripts": {
     "prestart": "npm-link-shared ../common/node_modules/ . react",
@@ -49,7 +51,8 @@
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
     "deploy:ar": "arweave deploy-dir build --key-file ",
-    "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\""
+    "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
+    "ethers": "typechain --target ethers-v4 --outDir src/contracts 'contracts/*.json'"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -68,10 +71,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/solana-labs/oyster-lending"
+    "url": "https://github.com/solana-labs/oyster"
   },
   "homepage": ".",
   "devDependencies": {
+    "@typechain/ethers-v4": "^1.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
     "@types/identicon.js": "^2.3.0",
