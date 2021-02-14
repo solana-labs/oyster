@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
+import { AppBar } from '../AppBar';
 
 
 const { Header, Content } = Layout;
@@ -26,8 +27,9 @@ export const AppLayout = React.memo((props: any) => {
       <Layout
         title={LABELS.APP_TITLE}
       >
-        {location.pathname !== '/' && <Header className="header">
-          <div className="App-logo" />
+        {location.pathname !== '/' && <Header className="App-Bar">
+          <div className="app-title"><h2>WORMHOLE</h2></div>
+          <AppBar />
         </Header>}
         <Content style={{ padding: '0 50px' }}>
           {props.children}

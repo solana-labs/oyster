@@ -7,7 +7,7 @@ body {
   --row-highlight: @background-color-base;
 }
 
-.App-logo {
+.app-logo {
   background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzMwMHB4JyB3aWR0aD0nMzAwcHgnICBmaWxsPSIjZDgzYWViIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTQwLjM2LDUwLjkxYzAuMDA3LTguMTc0LDMuODM2LTExLjUyNSw3LjA0OC0xMi44OThjNi41NTEtMi44MDEsMTYuNzksMC4xNDEsMjMuODA5LDYuODQyICBjMS4yNDYsMS4xODksMi4zNjEsMi4zMDksMy4zNjUsMy4zNjhjLTUuNjg0LTguMzcyLTE1LjAyNS0xNy41NjYtMjkuMDY0LTE4Ljg1OWMtNy43OTQtMC43MTYtMTMuNzk0LDIuNzk5LTE2LjAzMyw5LjQwOCAgYy0yLjY0OSw3LjgyMSwwLjM0MSwxOS4zMDUsMTEuMTgxLDI2LjEyMmM2LjE1MywzLjg2OSwxMi4zLDYuODY5LDE3LjM0MSw5LjA0NWMtMC41NTEtMC4zNTQtMS4xMDUtMC43MTYtMS42Ni0xLjA5MSAgQzQ1LjczMyw2NS42NjIsNDAuMzU0LDU4LjI4MSw0MC4zNiw1MC45MXoiPjwvcGF0aD48cGF0aCBkPSJNNjAuMDI3LDYzLjc2MWMtMC4wNzgtNC43MTUsMS44OTgtOC4yNSw1LjQyMi05LjY5OGM0LjEzOS0xLjcsOS40OS0wLjAwNCwxMy42MzMsNC4zMjMgIGMwLjY5MSwwLjcyMywxLjMwMywxLjQ1MywxLjg3NSwyLjE4NGMtMS42NzQtMy42OTktNC41MS03Ljk1OC0xMS4xMjEtMTQuMjY5Yy02LjM3MS02LjA4MS0xNS44NzktOC45MTItMjEuNjQyLTYuNDUgIGMtMy44MTIsMS42MjktNS44MjksNS40NTQtNS44MzQsMTEuMDYxYy0wLjAxLDExLjgxNSwxNi4zMTIsMjEuNjQ2LDI1LjA3MiwyNi4wNzJDNjMuNzc1LDczLjc0Niw2MC4xMTUsNjkuMTY4LDYwLjAyNyw2My43NjF6Ij48L3BhdGg+PHBhdGggZD0iTTI3LjU5MSwzOC4xM2MyLjU1Ni03LjU0NSw5LjMzMS0xMS41NjgsMTguMTExLTEwLjc1OGMxMS41MjksMS4wNjEsMjAuMDE1LDcuMTQ4LDI2LjAxMywxMy45MiAgQzYxLjUsMjYuMDU0LDQ4Ljk2MywyMC4zMzksNDguODE3LDIwLjI3NGMtMy4yOTYtMS42ODgtNi43OTctMi41MzEtMTAuNDU3LTIuNTMxYy0xMi43NzQsMC0yMy4xNjcsMTAuNTgtMjMuMTY3LDIzLjU4MyAgYzAsNy45NjEsNC4yMDEsMTUuNTIxLDExLjIzOCwyMC4yMjJjMy43ODksMi41MywxMS40ODgsNS44MjQsMjAuMDQ2LDkuMDM4Yy0yLjI1NC0xLjIxNS00LjU2NC0yLjU0Ny02Ljg3NS00ICBDMjcuODg1LDU5LjIxOSwyNC42OSw0Ni42OTQsMjcuNTkxLDM4LjEzeiI+PC9wYXRoPjxwYXRoIGQ9Ik03Ny42MzcsNTkuNzY5Yy0zLjU2OC0zLjcyOS04LjA1Ny01LjI0Mi0xMS40MjgtMy44NTVjLTIuNzIxLDEuMTE4LTQuMjQ2LDMuOTY3LTQuMTgyLDcuODE0ICBjMC4xNDgsOS4wMzUsMTEuMzEzLDE1LjMxOCwxMy41ODgsMTYuNTkyYzMuNDg5LDEuOTU0LDcuNjI1LDIuMDg3LDcuOTA0LDEuOTM4czAuMjc5LTAuMTQ5LDAuNTMxLTAuNjUxICBjMC42Ni0xLjMwOSwxLjA1My00LjI3NSwwLjM2MS04Ljk2NkM4My43NzcsNjkuNDg5LDgyLjA5Niw2NC40MjcsNzcuNjM3LDU5Ljc2OXoiPjwvcGF0aD48L3N2Zz4=");
   height: 32px;
   pointer-events: none;
@@ -28,9 +28,12 @@ body {
   }
 
   h2 {
+    margin: 0px;
+
     span {
       display: inline-block;
       font-size: 16px;
+      margin-bottom: 20px;
       background: linear-gradient(270deg, @solana-green 0%, #DC1FFF 101.97%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -46,40 +49,14 @@ body {
   line-height: 2px;
 }
 
-.footer {
-  background-color: black;
-  color: lightgray;
-  padding: 10px 10px;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .action-spinner {
   position: absolute;
   right: 5px;
 }
 
-.Banner {
-  min-height: 30px;
-  width: 100%;
-  background-color: #fff704;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  // z-index: 10;
-}
-
-.Banner-description {
-  color: black;
-  text-align: center;
-  display: flex;
-  align-self: center;
-  align-items: center;
-  height: 100%;
-}
 
 .App-Bar {
+  background-color: #181818;
   display: grid;
   grid-template-columns: 1fr 120px;
   -webkit-box-pack: justify;
@@ -398,8 +375,31 @@ em {
   font-weight: normal;
 }
 
+.bridge-card {
+  border-radius: 20px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
+  width: 450px;
+  margin: 40px auto 4px auto;
+  padding: 0px;
+
+  .ant-tabs-tab {
+    width: 50%;
+    margin: 0px;
+    justify-content: center;
+    border-radius: 20px 20px 0px 0px;
+  }
+
+  .ant-tabs-tab-active {
+    background-color: @background-color-light;
+  }
+
+  .ant-tabs-nav-list {
+    width: 100% !important;
+  }
+}
+
 @media only screen and (max-width: 600px) {
-  .exchange-card {
+  .bridge-card {
     width: 360px;
   }
 }

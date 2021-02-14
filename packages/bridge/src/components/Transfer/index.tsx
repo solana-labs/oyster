@@ -49,7 +49,7 @@ export const Transfer = () => {
 
   return (
     <>
-    <div className="input-card">
+    <div className="exchange-card">
       INPUT
       <Button type="primary" className="swap-button">
         ⇅
