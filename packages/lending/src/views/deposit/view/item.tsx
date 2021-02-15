@@ -1,8 +1,7 @@
 import React from 'react';
 import { useUserCollateralBalance, useUserBalance } from '../../../hooks';
-import { hooks, utils } from '@oyster/common';
+import { hooks, utils, TokenIcon } from '@oyster/common';
 import { calculateDepositAPY, LendingReserve } from '../../../models/lending';
-import { TokenIcon } from '../../../components/TokenIcon';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';

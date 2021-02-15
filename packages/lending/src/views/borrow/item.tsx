@@ -1,8 +1,7 @@
 import React from 'react';
-import { utils, hooks } from '@oyster/common';
+import { utils, hooks, TokenIcon } from '@oyster/common';
 import { useBorrowingPower } from '../../hooks';
 import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
-import { TokenIcon } from '../../components/TokenIcon';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount, NumericInput } from '@oyster/common';
+import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
 import {
   useLendingReserves,
   useUserBalance,
@@ -11,9 +11,7 @@ import {
   LendingReserveParser,
 } from '../../models';
 import { Card, Select } from 'antd';
-import { TokenIcon } from '../TokenIcon';
 import './style.less';
-import { TokenDisplay } from '../TokenDisplay';
 const { getTokenName } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;

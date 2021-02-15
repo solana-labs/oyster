@@ -1,9 +1,8 @@
 import React from 'react';
 import { useLendingReserves, UserDeposit, useUserDeposits } from '../../hooks';
 import { LendingMarket, LendingReserve } from '../../models';
-import { TokenIcon } from '../TokenIcon';
 import { Select } from 'antd';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { contexts, utils, ParsedAccount, TokenIcon } from '@oyster/common';
 
 const { getTokenName, formatAmount } = utils;
 const { cache } = contexts.Accounts;

@@ -7,9 +7,8 @@ import { GUTTER, LABELS } from '../../constants';
 import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
 import { useMemo } from 'react';
 
-import { utils, contexts } from '@oyster/common';
+import { utils, contexts, TokenIcon } from '@oyster/common';
 import { useMidPriceInUSD } from '../../contexts/market';
-import { TokenIcon } from '../TokenIcon';
 
 const { formatNumber, fromLamports, wadToLamports } = utils;
 const { useMint } = contexts.Accounts;

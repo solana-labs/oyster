@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 import { EnrichedLendingObligation } from '../../../hooks';
-import { hooks, utils, contexts, ParsedAccount } from '@oyster/common';
+import { hooks, utils, contexts, ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   calculateBorrowAPY,
   collateralToLiquidity,
   healthFactorToRiskColor,
   LendingReserve,
 } from '../../../models/lending';
-import { TokenIcon } from '../../../components/TokenIcon';
 
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';

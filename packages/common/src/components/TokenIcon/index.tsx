@@ -1,8 +1,8 @@
 import React from 'react';
-import { utils, contexts, Identicon } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
-const { getTokenIcon } = utils;
-const { useConnectionConfig } = contexts.Connection;
+import { getTokenIcon } from '../../utils';
+import { useConnectionConfig } from '../../contexts/connection';
+import { Identicon } from '../Identicon';
 
 export const TokenIcon = (props: {
   mintAddress?: string | PublicKey;

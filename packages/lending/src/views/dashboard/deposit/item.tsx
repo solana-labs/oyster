@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
-import { hooks, utils } from '@oyster/common';
+import { hooks, utils, TokenIcon } from '@oyster/common';
 import { UserDeposit } from '../../../hooks';
 import { calculateDepositAPY } from '../../../models/lending';
-import { TokenIcon } from '../../../components/TokenIcon';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../../constants';

@@ -4,12 +4,11 @@ import {
   calculateDepositAPY,
   LendingReserve,
 } from '../../models/lending';
-import { TokenIcon } from '../../components/TokenIcon';
 
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';
 import { TotalItem } from '../../models';
-import { contexts, hooks, utils } from '@oyster/common';
+import { contexts, hooks, utils, TokenIcon } from '@oyster/common';
 const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { useMint } = contexts.Accounts;
 const { useTokenName } = hooks;

@@ -8,11 +8,10 @@ import {
 import { EnrichedLendingObligation } from '../../hooks';
 import { Link } from 'react-router-dom';
 import { Button } from 'antd';
-import { TokenIcon } from '../../components/TokenIcon';
 
 import { LABELS } from '../../constants';
 
-import { contexts, hooks, utils, ParsedAccount } from '@oyster/common';
+import { contexts, hooks, utils, ParsedAccount, TokenIcon } from '@oyster/common';
 const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { useMint, cache } = contexts.Accounts;
 const { useTokenName } = hooks;

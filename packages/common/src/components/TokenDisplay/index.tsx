@@ -1,7 +1,6 @@
 import React from 'react';
-import { contexts } from '@oyster/common';
+import { useAccountByMint, useMint } from '../../contexts/accounts';
 import { TokenIcon } from '../TokenIcon';
-const { useMint, useAccountByMint } = contexts.Accounts;
 
 export const TokenDisplay = (props: {
   name: string;

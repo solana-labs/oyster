@@ -8,3 +8,5 @@ export { AppBar } from './AppBar/index';
 export { Settings } from './Settings/index';
 export { ActionConfirmation } from './ActionConfirmation/index';
 export { BackButton } from './BackButton/index';
+export { TokenIcon } from './TokenIcon';
+export { TokenDisplay } from './TokenDisplay';

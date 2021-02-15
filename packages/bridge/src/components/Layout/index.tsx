@@ -4,8 +4,7 @@ import { Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
-import { AppBar } from '../AppBar';
+import { contexts, AppBar } from '@oyster/common';
 
 
 const { Header, Content } = Layout;

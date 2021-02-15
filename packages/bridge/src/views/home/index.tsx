@@ -6,7 +6,6 @@ import { contexts, ParsedAccount, utils } from '@oyster/common';
 import { useMarkets } from '../../contexts/market';
 
 import { LendingReserveItem } from './item';
-import { AppBar } from './../../components/AppBar';
 import './itemStyle.less';
 import { Totals } from '../../models/totals';
 import { Link } from 'react-router-dom';

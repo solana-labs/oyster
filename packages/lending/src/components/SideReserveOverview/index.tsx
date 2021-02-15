@@ -5,10 +5,9 @@ import {
   calculateUtilizationRatio,
   LendingReserve,
 } from '../../models/lending';
-import { TokenIcon } from '../../components/TokenIcon';
 
 import { Card, Typography } from 'antd';
-import { ParsedAccount, utils, contexts, hooks } from '@oyster/common';
+import { ParsedAccount, utils, contexts, hooks, TokenIcon } from '@oyster/common';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
 const { formatNumber, formatPct, fromLamports } = utils;
