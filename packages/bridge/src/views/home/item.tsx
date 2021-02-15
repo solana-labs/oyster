@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { TokenIcon } from '../../components/TokenIcon';
 
 import { Link } from 'react-router-dom';
 import { PublicKey } from '@solana/web3.js';
-import { contexts, hooks, utils } from '@oyster/common';
+import { contexts, hooks, utils, TokenIcon } from '@oyster/common';
 import { TotalItem } from '../../models/totals';
 const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { useMint } = contexts.Accounts;
