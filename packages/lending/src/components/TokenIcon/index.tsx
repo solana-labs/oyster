@@ -1,6 +1,5 @@
-import { Identicon } from '../Identicon';
 import React from 'react';
-import { utils, contexts } from '@oyster/common';
+import { utils, contexts, Identicon } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 const { getTokenIcon } = utils;
 const { useConnectionConfig } = contexts.Connection;

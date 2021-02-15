@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { contexts, utils, ParsedAccount, NumericInput } from '@oyster/common';
 import {
   useLendingReserves,
   useUserBalance,
@@ -12,7 +12,6 @@ import {
 } from '../../models';
 import { Card, Select } from 'antd';
 import { TokenIcon } from '../TokenIcon';
-import { NumericInput } from '../Input/numeric';
 import './style.less';
 import { TokenDisplay } from '../TokenDisplay';
 const { getTokenName } = utils;

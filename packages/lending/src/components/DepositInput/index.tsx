@@ -5,10 +5,9 @@ import { Card, Slider } from 'antd';
 import { deposit } from '../../actions/deposit';
 import { PublicKey } from '@solana/web3.js';
 import './style.less';
-import { ActionConfirmation } from './../ActionConfirmation';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
-import { contexts, ConnectButton } from '@oyster/common';
+import { contexts, ConnectButton, ActionConfirmation } from '@oyster/common';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 
