@@ -16,7 +16,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc --watch",
+    "start": "npm-run-all --parallel watch watch-css watch-css-src",
+    "watch-css": "less-watch-compiler src/ dist/lib/",
+    "watch-css-src": "less-watch-compiler src/ src/",
     "watch": "tsc --watch",
     "test": "jest test",
     "clean": "rm -rf dist",
@@ -57,6 +59,8 @@
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.62",
     "arweave-deploy": "^1.9.1",
+    "less-watch-compiler": "v1.14.6",
+    "less": "4.1.1",
     "gh-pages": "^3.1.0",
     "prettier": "^2.1.2"
   },
