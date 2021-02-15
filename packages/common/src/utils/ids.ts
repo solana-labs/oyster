@@ -18,6 +18,11 @@ let WORMHOLE_BRIDGE: {
   wrappedMaster: string;
 };
 
+let TIMELOCK: {
+  programId: PublicKey;
+  programAccountId: PublicKey;
+};
+
 let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
 let SWAP_PROGRAM_LAYOUT: any;
@@ -34,6 +39,12 @@ export const ENABLE_FEES_INPUT = false;
 export const PROGRAM_IDS = [
   {
     name: 'mainnet-beta',
+    timelock: () => ({
+      programAccountId: new PublicKey(
+        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+      ),
+      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+    }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -52,6 +63,12 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'testnet',
+    timelock: () => ({
+      programAccountId: new PublicKey(
+        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+      ),
+      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+    }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
       bridge: '0x251bBCD91E84098509beaeAfF0B9951859af66D3',
@@ -67,6 +84,12 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'devnet',
+    timelock: () => ({
+      programAccountId: new PublicKey(
+        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+      ),
+      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+    }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -82,6 +105,12 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'localnet',
+    timelock: () => ({
+      programAccountId: new PublicKey(
+        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+      ),
+      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+    }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -111,6 +140,8 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LAYOUT = swap.current.layout;
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
+  TIMELOCK = instance.timelock();
+
   if (envName === 'mainnet-beta') {
     LENDING_PROGRAM_ID = new PublicKey(
       'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
@@ -125,5 +156,6 @@ export const programIds = () => {
     swapLayout: SWAP_PROGRAM_LAYOUT,
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,
+    timelock: TIMELOCK,
   };
 };

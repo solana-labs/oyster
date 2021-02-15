@@ -1,5 +1,5 @@
 export * as actions from './actions';
-export * from './components';
+export * as components from './components';
 export * as config from './config';
 export * as constants from './constants';
 export * as hooks from './hooks';
