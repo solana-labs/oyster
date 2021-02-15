@@ -72,7 +72,7 @@ export const PROGRAM_IDS = [
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
       bridge: '0x251bBCD91E84098509beaeAfF0B9951859af66D3',
-      wrappedMaster: '0xE39f0b145C0aF079B214c5a8840B2B01eA14794c',
+      wrappedMaster: 'E39f0b145C0aF079B214c5a8840B2B01eA14794c',
     }),
     swap: () => ({
       current: {
