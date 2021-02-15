@@ -14,12 +14,11 @@ import {
 } from '@ant-design/icons';
 
 import BasicLayout from '@ant-design/pro-layout';
-import { AppBar } from './../AppBar';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
-import { contexts } from '@oyster/common';
+import { contexts, AppBar } from '@oyster/common';
 
 const { useConnectionConfig } = contexts.Connection;
 

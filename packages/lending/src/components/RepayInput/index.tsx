@@ -7,11 +7,17 @@ import {
 } from '../../hooks';
 import { LendingReserve } from '../../models';
 import { Card, Slider } from 'antd';
-import { ParsedAccount, contexts, utils, hooks, ConnectButton } from '@oyster/common';
+import {
+  ParsedAccount,
+  contexts,
+  utils,
+  hooks,
+  ConnectButton,
+  ActionConfirmation,
+} from '@oyster/common';
 import { repay } from '../../actions';
 import './style.less';
 import { LABELS, marks } from '../../constants';
-import { ActionConfirmation } from './../ActionConfirmation';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
 
