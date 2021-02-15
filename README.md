@@ -1,12 +1,12 @@
 ## Setup
 
-Be sure to be running Node v12.16.2 and npm version 6.14.4.
+Be sure to be running Node v12.16.2 and yarn version 1.22.10.
 
-`npm run bootstrap`
+`yarn bootstrap`
 
 Then run:
 
-`npm start lending`
+`yarn start lending`
 
 You may have to rebuild your package more than one time to secure a
 running environment.
