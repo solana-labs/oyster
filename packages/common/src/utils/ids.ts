@@ -153,6 +153,7 @@ export const programIds = () => {
   return {
     token: TOKEN_PROGRAM_ID,
     swap: SWAP_PROGRAM_ID,
+    swap_legacy: SWAP_PROGRAM_LEGACY_IDS,
     swapLayout: SWAP_PROGRAM_LAYOUT,
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,

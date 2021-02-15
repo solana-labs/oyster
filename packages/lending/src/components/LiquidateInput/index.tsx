@@ -3,7 +3,13 @@ import Card from 'antd/lib/card';
 import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
 import { LABELS, marks } from '../../constants';
-import { ParsedAccount, contexts, utils, ConnectButton } from '@oyster/common';
+import {
+  ParsedAccount,
+  contexts,
+  utils,
+  ConnectButton,
+  ActionConfirmation,
+} from '@oyster/common';
 import {
   EnrichedLendingObligation,
   InputType,
@@ -11,7 +17,6 @@ import {
   useUserBalance,
 } from '../../hooks';
 import { LendingReserve } from '../../models';
-import { ActionConfirmation } from '../ActionConfirmation';
 import { liquidate } from '../../actions';
 import './style.less';
 import CollateralInput from '../CollateralInput';

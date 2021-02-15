@@ -1,8 +1,7 @@
 import { Button, Card } from 'antd';
 import React, { useState } from 'react';
-import { ActionConfirmation } from '../../../components/ActionConfirmation';
 import { LABELS } from '../../../constants';
-import { contexts, ParsedAccount } from '@oyster/common';
+import { contexts, ParsedAccount, components } from '@oyster/common';
 import {
   LendingReserve,
   LendingReserveParser,
@@ -14,6 +13,7 @@ import { usePoolAndTradeInfoFrom } from './utils';
 import { UserDeposit } from '../../../hooks';
 import { ArrowDownOutlined } from '@ant-design/icons';
 
+const { ActionConfirmation } = components;
 const { cache } = contexts.Accounts;
 const { useWallet } = contexts.Wallet;
 
