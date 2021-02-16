@@ -4,6 +4,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { LABELS } from '../../constants';
 import { contexts, utils, ConnectButton } from '@oyster/common';
 import { useHistory, useLocation } from "react-router-dom";
+import { Transfer } from '../../components/Transfer';
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 const { notify } = utils;
@@ -18,7 +19,7 @@ export const TransferView = () => {
       key: "eth",
       tab: <div style={tabStyle}>Transfer</div>,
       render: () => {
-        return <div>Bring assets to Solana</div>;
+        return <Transfer />;
       },
     },
     {
@@ -32,7 +33,7 @@ export const TransferView = () => {
 
   const location = useLocation();
   const history = useHistory();
-  const activeTab = location.pathname.indexOf("eth") < 0 ? "sol" : "eth";
+  const activeTab = location.pathname.indexOf("sol") >= 0 ? "sol" : "eth";
 
   const handleTabChange = (key: any) => {
     if (activeTab !== key) {
