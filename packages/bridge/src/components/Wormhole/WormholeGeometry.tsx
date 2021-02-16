@@ -28,7 +28,7 @@ const WormholeGeometry = () => {
   const uniforms = React.useMemo(
     () => ({
       // Adapt the color of the WormholeCanvas here.
-      color: { value: new Color("white") },
+      color: { value: new Color("gray") },
       pointTexture: {
         value: pointTexture,
       },

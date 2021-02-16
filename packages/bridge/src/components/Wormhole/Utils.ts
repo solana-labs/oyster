@@ -20,9 +20,7 @@ export const hasWindow =
  * @param particleSize
  * @returns {[]}
  */
-export const calculateTorusProperties = (
-  particleSize: number,
-): [BufferAttribute | InterleavedBufferAttribute, any, any] => {
+export const calculateTorusProperties = (particleSize: number): any => {
   let bufferGeometry: BufferGeometry = new TorusGeometry(60, 45, 160, 160);
 
   // if normal and uv attributes are not removed,
