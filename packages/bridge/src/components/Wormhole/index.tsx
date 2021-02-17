@@ -1,6 +1,6 @@
 import * as React from "react";
 import WormholeCanvas from "./WormholeCanvas";
-import "./wormhole.css";
+import "./wormhole.less";
 
 /**
  * Wormhole encapsulation component.
