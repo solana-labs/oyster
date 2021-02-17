@@ -1,16 +1,23 @@
-import * as React from "react";
-import WormholeCanvas from "./WormholeCanvas";
-import "./wormhole.less";
+import * as React from 'react';
+import WormholeCanvas from './WormholeCanvas';
+import './wormhole.less';
 
 /**
  * Wormhole encapsulation component.
  *
+ * @param onCreated {any}               Function called when Canvas is ready.
  * @param children  {React.ReactNode}   Elements to show above the Wormhole.
  * @constructor
  */
-const Wormhole = ({ children }: { children: React.ReactNode }) => (
+const Wormhole = ({
+  onCreated,
+  children,
+}: {
+  onCreated: any;
+  children: React.ReactNode;
+}) => (
   <>
-    <WormholeCanvas />
+    <WormholeCanvas onCreated={onCreated} />
     <div className="wormhole-overlay">{children}</div>
   </>
 );
