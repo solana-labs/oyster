@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import { contexts, AppBar } from '@oyster/common';
-
+import Wormhole from "../Wormhole";
 
 const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
@@ -23,17 +23,19 @@ export const AppLayout = React.memo((props: any) => {
     '';
   return (
     <div className="App wormhole-bg">
-      <Layout
-        title={LABELS.APP_TITLE}
-      >
-        {location.pathname !== '/' && <Header className="App-Bar">
-          <div className="app-title"><h2>WORMHOLE</h2></div>
-          <AppBar />
-        </Header>}
-        <Content style={{ padding: '0 50px' }}>
-          {props.children}
-        </Content>
-      </Layout>
+      <Wormhole>
+        <Layout title={LABELS.APP_TITLE}>
+          {location.pathname !== '/' && (
+            <Header className="App-Bar">
+              <div className="app-title">
+                <h2>WORMHOLE</h2>
+              </div>
+              <AppBar />
+            </Header>
+          )}
+          <Content style={{ padding: '0 50px' }}>{props.children}</Content>
+        </Layout>
+      </Wormhole>
     </div>
   );
 });

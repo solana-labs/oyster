@@ -5,6 +5,7 @@
     "@ant-design/icons": "^4.4.0",
     "@babel/preset-typescript": "^7.12.13",
     "@craco/craco": "^5.7.0",
+    "@react-three/drei": "^3.8.0",
     "@oyster/common": "0.0.1",
     "@project-serum/serum": "^0.13.11",
     "@project-serum/sol-wallet-adapter": "^0.1.4",
@@ -40,6 +41,8 @@
     "react-intl": "^5.10.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-three-fiber": "^5.3.18",
+    "three": "^0.125.2",
     "typescript": "^4.1.3",
     "web3": "^1.3.0"
   },
