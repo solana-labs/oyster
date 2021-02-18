@@ -2,6 +2,10 @@ import * as Layout from '../utils/layout';
 import * as BufferLayout from 'buffer-layout';
 import BN from 'bn.js';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
+import { utils } from '@oyster/common';
+
+export const DESC_SIZE = 200;
+export const NAME_SIZE = 32;
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
@@ -50,6 +54,8 @@ export interface TimelockState {
   status: TimelockStateStatus;
   totalVotingTokensMinted: BN;
   timelockTransactions: PublicKey[];
+  name: string;
+  descLink: string;
 }
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -63,6 +69,8 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('votingValidation'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalVotingTokensMinted'),
+    BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
+    BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
     Layout.publicKey('timelockTxn1'),
     Layout.publicKey('timelockTxn2'),
     Layout.publicKey('timelockTxn3'),
@@ -133,6 +141,8 @@ export const TimelockSetParser = (
       state: {
         status: TimelockStateStatus[data.timelockStateStatus],
         totalVotingTokensMinted: data.totalVotingTokensMinted,
+        descLink: utils.fromUTF8Array(data.descLink),
+        name: utils.fromUTF8Array(data.name),
         timelockTransactions: [
           data.timelockTxn1,
           data.timelockTxn2,

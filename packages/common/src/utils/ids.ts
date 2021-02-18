@@ -90,9 +90,9 @@ export const PROGRAM_IDS = [
     name: 'devnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '4GQdZW6Un8ffGhhVZ1mx2vFjgiBXoGyCqYGugVwCm6G5',
+        '6RGANF5jrRfrZ6PkxJyCjwhmZK4F4B5b5u46HLeVvvjR',
       ),
-      programId: new PublicKey('GVRKB2HsYmq1JdQiLSSq776NcahBuMprcCDFud9jcg39'),
+      programId: new PublicKey('C5o9rMTn131BVppuAUMQKLBvng1Ukw6Mh1SogTuCcYHC'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),

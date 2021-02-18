@@ -178,6 +178,35 @@ export function createAssociatedTokenAccountInstruction(
   );
 }
 
+export function createMint(
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+  mintRentExempt: number,
+  decimals: number,
+  owner: PublicKey,
+  freezeAuthority: PublicKey,
+  signers: Account[],
+) {
+  const account = createUninitializedMint(
+    instructions,
+    payer,
+    mintRentExempt,
+    signers,
+  );
+
+  instructions.push(
+    Token.createInitMintInstruction(
+      TOKEN_PROGRAM_ID,
+      account,
+      decimals,
+      owner,
+      freezeAuthority,
+    ),
+  );
+
+  return account;
+}
+
 export function createTokenAccount(
   instructions: TransactionInstruction[],
   payer: PublicKey,
