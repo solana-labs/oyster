@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './../../App.less';
 import { Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import { contexts, AppBar } from '@oyster/common';
-import Wormhole from "../Wormhole";
+import Wormhole from '../Wormhole';
 
 const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
@@ -13,6 +13,7 @@ const { useConnectionConfig } = contexts.Connection;
 export const AppLayout = React.memo((props: any) => {
   const { env } = useConnectionConfig();
   const location = useLocation();
+  const [wormholeReady, setWormholeReady] = useState(false);
 
   const paths: { [key: string]: string } = {
     '/faucet': '7',
@@ -22,8 +23,8 @@ export const AppLayout = React.memo((props: any) => {
     [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
     '';
   return (
-    <div className="App wormhole-bg">
-      <Wormhole>
+    <div className={`App${wormholeReady ? `` : ` wormhole-bg`}`}>
+      <Wormhole onCreated={() => setWormholeReady(true)}>
         <Layout title={LABELS.APP_TITLE}>
           {location.pathname !== '/' && (
             <Header className="App-Bar">

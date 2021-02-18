@@ -1,7 +1,7 @@
-import * as React from "react";
-import { Canvas } from "react-three-fiber";
-import Camera from "./Camera";
-import WormholeGeometry from "./WormholeGeometry";
+import * as React from 'react';
+import { Canvas } from 'react-three-fiber';
+import Camera from './Camera';
+import WormholeGeometry from './WormholeGeometry';
 
 /**
  * Three.js wormhole component.
@@ -9,9 +9,9 @@ import WormholeGeometry from "./WormholeGeometry";
  * @returns {JSX.Element}
  * @constructor
  */
-const WormholeCanvas = () => {
+const WormholeCanvas = ({ onCreated }: { onCreated: any }) => {
   return (
-    <Canvas>
+    <Canvas onCreated={onCreated}>
       <Camera />
       <React.Suspense fallback={null}>
         <WormholeGeometry />
