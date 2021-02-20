@@ -4,6 +4,8 @@ import { GUTTER } from '../../constants';
 import { Button } from 'antd';
 import { createProposal } from '../../actions/createProposal';
 import { contexts } from '@oyster/common';
+import { Proposal } from '../../components/Proposal';
+import { ProposalsContext } from '../../contexts/proposals';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 export const HomeView = () => {
@@ -15,6 +17,7 @@ export const HomeView = () => {
         <Button onClick={() => createProposal(connection, wallet.wallet)}>
           Click me
         </Button>
+        <Proposal />
       </Row>
     </div>
   );

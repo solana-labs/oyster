@@ -31,7 +31,7 @@ export const AppLayout = React.memo((props: any) => {
     [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
     '';
   const defaultKey = paths[current] || '1';
-  const theme = 'light';
+  const theme = 'dark';
 
   return (
     <div className="App">
