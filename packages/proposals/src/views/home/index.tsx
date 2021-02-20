@@ -6,6 +6,7 @@ import { createProposal } from '../../actions/createProposal';
 import { contexts } from '@oyster/common';
 import { Proposal } from '../../components/Proposal';
 import { ProposalsContext } from '../../contexts/proposals';
+import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 export const HomeView = () => {
