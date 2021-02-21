@@ -65,7 +65,9 @@ export default function ProposalsProvider({ children = null as any }) {
           ) as ParsedAccount<TimelockSet>;
           setProposals(proposals => ({
             ...proposals,
-            [info.accountId.toBase58()]: cached,
+            [typeof info.accountId === 'string'
+              ? info.accountId
+              : info.accountId.toBase58()]: cached,
           }));
         }
       },

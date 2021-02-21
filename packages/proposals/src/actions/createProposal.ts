@@ -83,7 +83,7 @@ export const createProposal = async (connection: Connection, wallet: any) => {
         consensusAlgorithm: ConsensusAlgorithm.Majority,
         executionType: ExecutionType.AllOrNothing,
       },
-      'Testing',
+      'https://gist.github.com/dummytester123/bd3567f80e13a27b02a2e0fb891ecab1',
       'Name',
     ),
   );

@@ -12,4 +12,7 @@ export const LABELS = {
   WALLET_BALANCE: 'Wallet balance',
   SETTINGS_TOOLTIP: 'Settings',
   DASHBOARD_INFO: 'Connect to a wallet to view proposals.',
+  DESCRIPTION: 'Description',
+  PROPOSAL: 'Proposal',
+  NO_LOAD: 'Unable to load markdown. Click to view.',
 };

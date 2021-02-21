@@ -141,8 +141,8 @@ export const TimelockSetParser = (
       state: {
         status: TimelockStateStatus[data.timelockStateStatus],
         totalVotingTokensMinted: data.totalVotingTokensMinted,
-        descLink: utils.fromUTF8Array(data.descLink),
-        name: utils.fromUTF8Array(data.name),
+        descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
+        name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
         timelockTransactions: [
           data.timelockTxn1,
           data.timelockTxn2,
