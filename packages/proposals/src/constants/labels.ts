@@ -15,4 +15,7 @@ export const LABELS = {
   DESCRIPTION: 'Description',
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
+  SIG_GIVEN: 'Sigs Given',
+  VOTES_REQUIRED: "Votes Req'd",
+  VOTES_CAST: 'Votes Cast',
 };

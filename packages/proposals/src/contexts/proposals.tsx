@@ -14,6 +14,8 @@ import {
   TimelockSetParser,
 } from '../models/timelock';
 
+const { useWallet } = contexts.Wallet;
+
 const { useConnectionConfig } = contexts.Connection;
 const { cache } = contexts.Accounts;
 
@@ -30,9 +32,26 @@ export default function ProposalsProvider({ children = null as any }) {
   const connection = useMemo(() => new Connection(endpoint, 'recent'), [
     endpoint,
   ]);
-  const PROGRAM_IDS = utils.programIds();
 
   const [proposals, setProposals] = useState({});
+
+  useSetupProposalsCache({ connection, setProposals });
+
+  return (
+    <ProposalsContext.Provider value={{ proposals }}>
+      {children}
+    </ProposalsContext.Provider>
+  );
+}
+
+function useSetupProposalsCache({
+  connection,
+  setProposals,
+}: {
+  connection: Connection;
+  setProposals: React.Dispatch<React.SetStateAction<{}>>;
+}) {
+  const PROGRAM_IDS = utils.programIds();
 
   useEffect(() => {
     const queryProposals = async () => {
@@ -77,14 +96,7 @@ export default function ProposalsProvider({ children = null as any }) {
       connection.removeProgramAccountChangeListener(subID);
     };
   }, [connection, PROGRAM_IDS.timelock.programAccountId]);
-
-  return (
-    <ProposalsContext.Provider value={{ proposals }}>
-      {children}
-    </ProposalsContext.Provider>
-  );
 }
-
 export const useProposals = () => {
   const context = useContext(ProposalsContext);
   return context as ProposalsContextState;

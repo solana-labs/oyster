@@ -1,53 +1,64 @@
-import { Col, Row, Space } from 'antd';
-import React, { useMemo } from 'react';
-import { GUTTER } from '../../constants';
-import { Button } from 'antd';
-import { createProposal } from '../../actions/createProposal';
-import { contexts, ParsedAccount } from '@oyster/common';
-import { Proposal } from '../../components/Proposal';
-import { ProposalsContext, useProposals } from '../../contexts/proposals';
+import { Col, List, Row } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { contexts } from '@oyster/common';
+import { useProposals } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { TimelockSet } from '../../models/timelock';
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
-const ROW_SIZE = 3;
+import { StateBadgeRibbon } from '../../components/Proposal/StateBadge';
+import { urlRegex } from '../proposal';
+const PAGE_SIZE = 10;
 
 export const HomeView = () => {
-  const wallet = useWallet();
-  const connection = useConnection();
   const context = useProposals();
+  const [page, setPage] = useState(0);
+  const listData = useMemo(() => {
+    const newListData: any[][] = [[]];
 
-  const rows = useMemo(() => {
-    const newRows: ParsedAccount<TimelockSet>[][] = [[]];
     Object.keys(context.proposals).forEach(key => {
-      newRows[newRows.length - 1].push(context.proposals[key]);
-      if (newRows[newRows.length - 1].length === ROW_SIZE) newRows.push([]);
+      const proposal = context.proposals[key];
+      newListData[newListData.length - 1].push({
+        href: '#/proposal/' + key,
+        title: proposal.info.state.name,
+        proposal,
+        description: proposal.info.state.descLink.match(urlRegex) ? (
+          <a href={proposal.info.state.descLink} target={'_blank'}>
+            Link to markdown
+          </a>
+        ) : (
+          proposal.info.state.descLink
+        ),
+      });
+      if (newListData[newListData.length - 1].length == PAGE_SIZE)
+        newListData.push([]);
     });
-    return newRows;
+    return newListData;
   }, [context.proposals]);
+
   return (
-    <div className="flexColumn">
-      <Row gutter={GUTTER} className="home-info-row">
-        <Button onClick={() => createProposal(connection, wallet.wallet)}>
-          Click me
-        </Button>
-      </Row>
-      <Space direction="vertical" size="large">
-        {rows.map((row, i) => (
-          <Row
-            key={i}
-            gutter={GUTTER}
-            className="home-info-row"
-            justify={'space-around'}
-          >
-            {row.map(proposal => (
-              <Col key={proposal.pubkey.toBase58()} span={6}>
-                <Proposal proposal={proposal} />
-              </Col>
-            ))}
-          </Row>
-        ))}
-      </Space>
-    </div>
+    <Row>
+      <Col flex="auto">
+        <List
+          itemLayout="vertical"
+          size="large"
+          pagination={{
+            onChange: page => {
+              setPage(page);
+            },
+            pageSize: PAGE_SIZE,
+          }}
+          dataSource={listData[page]}
+          renderItem={item => (
+            <StateBadgeRibbon proposal={item.proposal}>
+              <List.Item key={item.title}>
+                <List.Item.Meta
+                  avatar={item.badge}
+                  title={<a href={item.href}>{item.title}</a>}
+                  description={item.description}
+                />
+              </List.Item>
+            </StateBadgeRibbon>
+          )}
+        />
+      </Col>
+    </Row>
   );
 };

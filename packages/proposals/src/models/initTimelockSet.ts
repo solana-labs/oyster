@@ -105,7 +105,6 @@ export const initTimelockSetInstruction = (
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
   ];
-  console.log(data);
   return new TransactionInstruction({
     keys,
     programId: PROGRAM_IDS.timelock.programId,

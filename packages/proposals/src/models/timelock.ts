@@ -6,11 +6,12 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
+export const INSTRUCTION_LIMIT = 255;
+export const TRANSACTION_SLOTS = 10;
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
-  AddSignatoryMint = 11,
-  AddVotingMint = 12,
+  addCustomSingleSignerTransaction = 4,
 }
 
 export interface TimelockConfig {
@@ -50,12 +51,26 @@ export enum TimelockStateStatus {
   Deleted = 4,
 }
 
+export const STATE_COLOR: Record<string, string> = {
+  Draft: 'orange',
+  Voting: 'blue',
+  Executing: 'green',
+  Completed: 'purple',
+  Deleted: 'gray',
+};
+
 export interface TimelockState {
   status: TimelockStateStatus;
   totalVotingTokensMinted: BN;
+  totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
   name: string;
   descLink: string;
+}
+
+const timelockTxns = [];
+for (let i = 0; i < TRANSACTION_SLOTS; i++) {
+  timelockTxns.push(Layout.publicKey('timelockTxn' + i.toString()));
 }
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -69,18 +84,10 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('votingValidation'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalVotingTokensMinted'),
+    Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
-    Layout.publicKey('timelockTxn1'),
-    Layout.publicKey('timelockTxn2'),
-    Layout.publicKey('timelockTxn3'),
-    Layout.publicKey('timelockTxn4'),
-    Layout.publicKey('timelockTxn5'),
-    Layout.publicKey('timelockTxn6'),
-    Layout.publicKey('timelockTxn7'),
-    Layout.publicKey('timelockTxn8'),
-    Layout.publicKey('timelockTxn9'),
-    Layout.publicKey('timelockTxn10'),
+    ...timelockTxns,
     BufferLayout.u8('consensusAlgorithm'),
     BufferLayout.u8('executionType'),
     BufferLayout.u8('timelockType'),
@@ -125,6 +132,11 @@ export const TimelockSetParser = (
   const buffer = Buffer.from(info.data);
   const data = TimelockSetLayout.decode(buffer);
 
+  const timelockTxns = [];
+  for (let i = 0; i < TRANSACTION_SLOTS; i++) {
+    timelockTxns.push(data['timelockTxn' + i.toString()]);
+  }
+
   const details = {
     pubkey: pubKey,
     account: {
@@ -141,20 +153,10 @@ export const TimelockSetParser = (
       state: {
         status: TimelockStateStatus[data.timelockStateStatus],
         totalVotingTokensMinted: data.totalVotingTokensMinted,
+        totalSigningTokensMinted: data.totalSigningTokensMinted,
         descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
         name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-        timelockTransactions: [
-          data.timelockTxn1,
-          data.timelockTxn2,
-          data.timelockTxn3,
-          data.timelockTxn4,
-          data.timelockTxn5,
-          data.timelockTxn6,
-          data.timelockTxn7,
-          data.timelockTxn8,
-          data.timelockTxn9,
-          data.timelockTxn10,
-        ],
+        timelockTransactions: timelockTxns,
       },
       config: {
         consensusAlgorithm: data.consensusAlgorithm,
@@ -166,3 +168,18 @@ export const TimelockSetParser = (
 
   return details;
 };
+
+export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.uint64('slot'),
+    BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
+    Layout.publicKey('authorityKey'),
+  ],
+);
+export interface CustomSingleSignerTimelockTransaction {
+  slot: BN;
+
+  instruction: string;
+
+  authorityKey: PublicKey;
+}
