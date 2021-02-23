@@ -72,8 +72,7 @@ export const initTimelockSetInstruction = (
   for (let i = nameAsBytes.length; i <= NAME_SIZE - 1; i++) {
     nameAsBytes.push(0);
   }
-  console.log(nameAsBytes.length);
-  console.log(descAsBytes.length);
+
   dataLayout.encode(
     {
       instruction: TimelockInstruction.InitTimelockSet,

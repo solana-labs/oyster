@@ -40,6 +40,11 @@ export const addCustomSingleSignerTransaction = async (
     programId: PROGRAM_IDS.timelock.programId,
   });
 
+  const [authority] = await PublicKey.findProgramAddress(
+    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    PROGRAM_IDS.timelock.programId,
+  );
+
   signers.push(txnKey);
 
   instructions.push(uninitializedTxnInstruction);
@@ -50,7 +55,8 @@ export const addCustomSingleSignerTransaction = async (
       proposal.pubkey,
       sigAccount,
       proposal.info.signatoryValidation,
-      '0',
+      authority,
+      '123',
       '12345',
       0,
     ),

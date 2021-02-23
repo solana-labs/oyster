@@ -34,6 +34,7 @@ export const addCustomSingleSignerTransactionInstruction = (
   timelockSetAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryValidationAccount: PublicKey,
+  authority: PublicKey,
   slot: string,
   instruction: string,
   position: number,
@@ -64,7 +65,7 @@ export const addCustomSingleSignerTransactionInstruction = (
   for (let i = instructionAsBytes.length; i <= INSTRUCTION_LIMIT - 1; i++) {
     instructionAsBytes.push(0);
   }
-  console.log('Lenth', instructionAsBytes.length);
+  console.log('Num', new BN(slot).toNumber());
 
   dataLayout.encode(
     {
@@ -81,6 +82,7 @@ export const addCustomSingleSignerTransactionInstruction = (
     { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryValidationAccount, isSigner: false, isWritable: true },
+    { pubkey: authority, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
       isSigner: false,

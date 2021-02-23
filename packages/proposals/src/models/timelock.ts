@@ -171,12 +171,15 @@ export const TimelockSetParser = (
 
 export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    BufferLayout.u8('version'),
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
     Layout.publicKey('authorityKey'),
   ],
 );
 export interface CustomSingleSignerTimelockTransaction {
+  version: number;
+
   slot: BN;
 
   instruction: string;
