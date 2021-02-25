@@ -60,7 +60,6 @@ export const addCustomSingleSignerTransactionInstruction = (
   for (let i = instructionAsBytes.length; i <= INSTRUCTION_LIMIT - 1; i++) {
     instructionAsBytes.push(0);
   }
-  console.log('Num', new BN(slot).toNumber());
 
   dataLayout.encode(
     {

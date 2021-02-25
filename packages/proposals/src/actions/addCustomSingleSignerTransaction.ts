@@ -22,6 +22,9 @@ export const addCustomSingleSignerTransaction = async (
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
   sigAccount: PublicKey,
+  slot: string,
+  instruction: string,
+  position: number,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -67,9 +70,9 @@ export const addCustomSingleSignerTransaction = async (
       proposal.info.signatoryValidation,
       transferAuthority.publicKey,
       authority,
-      '123',
-      '12345',
-      0,
+      slot,
+      instruction,
+      position,
     ),
   );
 

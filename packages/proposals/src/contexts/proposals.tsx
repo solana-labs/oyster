@@ -15,7 +15,7 @@ import {
   TimelockSet,
   TimelockSetLayout,
   TimelockSetParser,
-  Transaction,
+  TimelockTransaction,
 } from '../models/timelock';
 
 const { useConnectionConfig } = contexts.Connection;
@@ -23,7 +23,7 @@ const { cache } = contexts.Accounts;
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<TimelockSet>>;
-  transactions: Record<string, ParsedAccount<Transaction>>;
+  transactions: Record<string, ParsedAccount<TimelockTransaction>>;
 }
 
 export const ProposalsContext = React.createContext<ProposalsContextState | null>(
@@ -72,7 +72,10 @@ function useSetupProposalsCache({
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
       const newProposals: Record<string, ParsedAccount<TimelockSet>> = {};
-      const newTransactions: Record<string, ParsedAccount<Transaction>> = {};
+      const newTransactions: Record<
+        string,
+        ParsedAccount<TimelockTransaction>
+      > = {};
 
       all[0].forEach(a => {
         if (a.account.data.length === TimelockSetLayout.span) {
@@ -89,11 +92,14 @@ function useSetupProposalsCache({
             a.account,
             CustomSingleSignerTimelockTransactionParser,
           );
-          const cached = cache.get(a.pubkey) as ParsedAccount<Transaction>;
+          const cached = cache.get(
+            a.pubkey,
+          ) as ParsedAccount<TimelockTransaction>;
           newTransactions[a.pubkey.toBase58()] = cached;
         }
       });
       setProposals(newProposals);
+      setTransactions(newTransactions);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.timelock.programId,
@@ -112,7 +118,9 @@ function useSetupProposalsCache({
             const cached =
               span === TimelockSetLayout.span
                 ? (cache.get(info.accountId) as ParsedAccount<TimelockSet>)
-                : (cache.get(info.accountId) as ParsedAccount<Transaction>);
+                : (cache.get(
+                    info.accountId,
+                  ) as ParsedAccount<TimelockTransaction>);
             setter((obj: any) => ({
               ...obj,
               [typeof info.accountId === 'string'

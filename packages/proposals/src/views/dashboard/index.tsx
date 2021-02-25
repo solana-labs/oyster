@@ -75,6 +75,9 @@ function InnerDummyView({
             wallet,
             proposal,
             sigAccount.pubkey,
+            '123',
+            '12345',
+            0,
           )
         }
       >

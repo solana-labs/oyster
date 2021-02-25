@@ -203,13 +203,14 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
   ],
 );
 
-export interface Transaction {
+export interface TimelockTransaction {
   version: number;
 
   slot: BN;
 
   instruction: string;
 }
-export interface CustomSingleSignerTimelockTransaction extends Transaction {
+export interface CustomSingleSignerTimelockTransaction
+  extends TimelockTransaction {
   authorityKey: PublicKey;
 }
