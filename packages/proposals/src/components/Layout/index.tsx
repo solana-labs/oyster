@@ -6,6 +6,8 @@ import {
   GithubOutlined,
   HomeOutlined,
   ForkOutlined,
+  BulbOutlined,
+  UploadOutlined,
   // LineChartOutlined
 } from '@ant-design/icons';
 
@@ -15,6 +17,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
 import { contexts, components } from '@oyster/common';
+import { NewFormMenuItem } from '../../views/proposal/new';
 
 const { AppBar } = components;
 const { useConnectionConfig } = contexts.Connection;
@@ -24,6 +27,7 @@ export const AppLayout = React.memo((props: any) => {
   const location = useLocation();
 
   const paths: { [key: string]: string } = {
+    '/': '1',
     '/dashboard': '2',
   };
 
@@ -62,7 +66,7 @@ export const AppLayout = React.memo((props: any) => {
                 defaultSelectedKeys={[defaultKey]}
                 mode="inline"
               >
-                <Menu.Item key="1" icon={<HomeOutlined />}>
+                <Menu.Item key="1" icon={<BulbOutlined />}>
                   <Link
                     to={{
                       pathname: '/',
@@ -71,7 +75,10 @@ export const AppLayout = React.memo((props: any) => {
                     {LABELS.MENU_HOME}
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="2" icon={<PieChartOutlined />}>
+                <Menu.Item key="2" icon={<UploadOutlined />}>
+                  <NewFormMenuItem />
+                </Menu.Item>
+                <Menu.Item key="3" icon={<PieChartOutlined />}>
                   <Link
                     to={{
                       pathname: '/dashboard',

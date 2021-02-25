@@ -169,6 +169,31 @@ export const TimelockSetParser = (
   return details;
 };
 
+export const CustomSingleSignerTimelockTransactionParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = CustomSingleSignerTimelockTransactionLayout.decode(buffer);
+
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: {
+      version: data.version,
+      slot: data.slot,
+      instruction: utils
+        .fromUTF8Array(data.instruction)
+        .replaceAll('\u0000', ''),
+      authorityKey: data.authorityKey,
+    },
+  };
+
+  return details;
+};
+
 export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),
@@ -177,12 +202,14 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
     Layout.publicKey('authorityKey'),
   ],
 );
-export interface CustomSingleSignerTimelockTransaction {
+
+export interface Transaction {
   version: number;
 
   slot: BN;
 
   instruction: string;
-
+}
+export interface CustomSingleSignerTimelockTransaction extends Transaction {
   authorityKey: PublicKey;
 }

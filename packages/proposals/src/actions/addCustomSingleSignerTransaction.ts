@@ -5,7 +5,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
+import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
 import {
   CustomSingleSignerTimelockTransactionLayout,
@@ -15,6 +15,7 @@ import { addCustomSingleSignerTransactionInstruction } from '../models/addCustom
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
+const { approve } = models;
 
 export const addCustomSingleSignerTransaction = async (
   connection: Connection,
@@ -49,12 +50,22 @@ export const addCustomSingleSignerTransaction = async (
 
   instructions.push(uninitializedTxnInstruction);
 
+  const transferAuthority = approve(
+    instructions,
+    [],
+    sigAccount,
+    wallet.publicKey,
+    1,
+  );
+  signers.push(transferAuthority);
+
   instructions.push(
     addCustomSingleSignerTransactionInstruction(
       txnKey.publicKey,
       proposal.pubkey,
       sigAccount,
       proposal.info.signatoryValidation,
+      transferAuthority.publicKey,
       authority,
       '123',
       '12345',

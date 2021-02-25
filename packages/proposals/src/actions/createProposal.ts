@@ -20,7 +20,15 @@ const { sendTransaction } = contexts.Connection;
 const { createMint, createTokenAccount, createUninitializedMint } = actions;
 const { notify } = utils;
 
-export const createProposal = async (connection: Connection, wallet: any) => {
+export const createProposal = async (
+  connection: Connection,
+  wallet: any,
+  name: string,
+  description: string,
+  timelockType: TimelockType,
+  consensusAlgorithm: ConsensusAlgorithm,
+  executionType: ExecutionType,
+): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
 
   let signers: Account[] = [];
@@ -79,12 +87,12 @@ export const createProposal = async (connection: Connection, wallet: any) => {
       sigDestinationAccount,
       authority,
       {
-        timelockType: TimelockType.CustomSingleSignerV1,
-        consensusAlgorithm: ConsensusAlgorithm.Majority,
-        executionType: ExecutionType.AllOrNothing,
+        timelockType,
+        consensusAlgorithm,
+        executionType,
       },
-      'https://gist.github.com/dummytester123/bd3567f80e13a27b02a2e0fb891ecab1',
-      'Name',
+      description,
+      name,
     ),
   );
 
@@ -108,6 +116,8 @@ export const createProposal = async (connection: Connection, wallet: any) => {
       type: 'success',
       description: `Transaction - ${tx}`,
     });
+
+    return timelockSetKey;
   } catch (ex) {
     console.error(ex);
     throw new Error();
@@ -209,7 +219,7 @@ async function createValidationAccountsAndMints(
     wallet.publicKey,
     accountRentExempt,
     adminMint,
-    PROGRAM_IDS.timelock.programAccountId,
+    authority,
     signers,
   );
 
@@ -218,7 +228,7 @@ async function createValidationAccountsAndMints(
     wallet.publicKey,
     accountRentExempt,
     sigMint,
-    PROGRAM_IDS.timelock.programAccountId,
+    authority,
     signers,
   );
 
@@ -227,7 +237,7 @@ async function createValidationAccountsAndMints(
     wallet.publicKey,
     accountRentExempt,
     voteMint,
-    PROGRAM_IDS.timelock.programAccountId,
+    authority,
     signers,
   );
 

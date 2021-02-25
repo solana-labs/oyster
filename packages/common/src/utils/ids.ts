@@ -69,9 +69,9 @@ export const PROGRAM_IDS = [
     name: 'testnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '52goe5j8e25JWzcH6WnAjZ8bWfp4KwxPZsaxQ4fK1Xwx',
+        '32siiZ12jH2i7BM2wtNuTDw2Hs5nBjVQuBh4P8cTSH3i',
       ),
-      programId: new PublicKey('5n4ciqDUt5MwRMFsViBXfQLGfqfg9mSZqgaKLu8zyrgw'),
+      programId: new PublicKey('5KrVJvesyjdMy6Vq5wfuPSMdw7vWuUvtbHG98wBsEkX6'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
@@ -90,9 +90,9 @@ export const PROGRAM_IDS = [
     name: 'devnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        'H59qsZj8wwA9h45UTbVwuYePcXXhKeeAtab3ujdQoqRc',
+        'H4yVRsmzbbE9fMUREPQWsu7auiYgE398iF5rq5nHLdq4',
       ),
-      programId: new PublicKey('DCPZ3VHspU2LGSHs2gaqUXYQykZ9C4iFX68KqATjBcLG'),
+      programId: new PublicKey('2NKCKpE1kNhY3Qr3VGikPQtiENTjSEFsJN6NyAUpoFaD'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -111,9 +111,9 @@ export const PROGRAM_IDS = [
     name: 'localnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+        'GLmfd9F4bEY43Sg35RhvMN3N4uf5MvnTbX1bkKxVJ958',
       ),
-      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+      programId: new PublicKey('Dj4W4ZEs5ATmAjx7pRt2gSTCgPHcjYig6KXZ4vBhPXrr'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),

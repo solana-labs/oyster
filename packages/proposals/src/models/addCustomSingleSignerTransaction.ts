@@ -1,17 +1,10 @@
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
 import {
-  DESC_SIZE,
   INSTRUCTION_LIMIT,
-  NAME_SIZE,
-  TimelockConfig,
   TimelockInstruction,
   TRANSACTION_SLOTS,
 } from './timelock';
@@ -27,13 +20,15 @@ import { toUTF8Array } from '@oyster/common/dist/lib/utils';
 ///   1. `[writable]` Timelock set account.
 ///   2. `[writable]` Signatory account
 ///   3. `[writable]` Signatory validation account.
-///   4. `[]` Timelock program account.
-///   5. `[]` Token program account.
+///   4. `[]` Transfer authority
+///   5. `[]` Timelock program account.
+///   6. `[]` Token program account.
 export const addCustomSingleSignerTransactionInstruction = (
   timelockTransactionAccount: PublicKey,
   timelockSetAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryValidationAccount: PublicKey,
+  transferAuthority: PublicKey,
   authority: PublicKey,
   slot: string,
   instruction: string,
@@ -82,6 +77,7 @@ export const addCustomSingleSignerTransactionInstruction = (
     { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryValidationAccount, isSigner: false, isWritable: true },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
@@ -90,7 +86,7 @@ export const addCustomSingleSignerTransactionInstruction = (
     },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
-  console.log('data', data);
+
   return new TransactionInstruction({
     keys,
     programId: PROGRAM_IDS.timelock.programId,
