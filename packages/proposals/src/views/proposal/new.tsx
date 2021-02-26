@@ -36,7 +36,7 @@ export function NewFormMenuItem() {
   };
 
   if (redirect) {
-    setRedirect('');
+    setTimeout(() => setRedirect(''), 100);
     return <Redirect push to={'/proposal/' + redirect} />;
   }
 

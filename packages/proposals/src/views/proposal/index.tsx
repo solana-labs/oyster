@@ -1,4 +1,4 @@
-import { Col, Divider, Row, Space, Spin, Statistic } from 'antd';
+import { Button, Col, Divider, Row, Space, Spin, Statistic } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount } from '@oyster/common';
@@ -12,12 +12,14 @@ import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useProposals } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
-import { contexts } from '@oyster/common';
+import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
+import SignButton from '../../components/Proposal/SignButton';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
+const { useAccountByMint } = hooks;
 
 export const ProposalView = () => {
   const context = useProposals();
@@ -52,6 +54,7 @@ function InnerProposalView({
   votingMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
 }) {
+  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
@@ -148,6 +151,7 @@ function InnerProposalView({
               }
               suffix={`/ ${proposal.info.state.totalSigningTokensMinted.toNumber()}`}
             />
+            {sigAccount && <SignButton proposal={proposal} />}
           </Col>
           <Col span={8}>
             <Statistic

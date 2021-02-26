@@ -12,6 +12,7 @@ export const TRANSACTION_SLOTS = 10;
 export enum TimelockInstruction {
   InitTimelockSet = 1,
   addCustomSingleSignerTransaction = 4,
+  Sign = 8,
 }
 
 export interface TimelockConfig {

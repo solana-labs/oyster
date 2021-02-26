@@ -48,30 +48,26 @@ export function NewInstructionCard({
       form.resetFields();
     }
   };
-  return (
+  return !sigAccount ? null : (
     <Card
       title="New Instruction"
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
     >
-      {!sigAccount ? (
-        <Spin />
-      ) : (
-        <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-          <Form.Item name="slot" label="Slot" rules={[{ required: true }]}>
-            <Input maxLength={64} />
-          </Form.Item>
-          <Form.Item
-            name="instruction"
-            label="Instruction"
-            rules={[{ required: true }]}
-          >
-            <Input
-              maxLength={INSTRUCTION_LIMIT}
-              placeholder={'Base58 encoded instruction'}
-            />
-          </Form.Item>
-        </Form>
-      )}
+      <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+        <Form.Item name="slot" label="Slot" rules={[{ required: true }]}>
+          <Input maxLength={64} />
+        </Form.Item>
+        <Form.Item
+          name="instruction"
+          label="Instruction"
+          rules={[{ required: true }]}
+        >
+          <Input
+            maxLength={INSTRUCTION_LIMIT}
+            placeholder={'Base58 encoded instruction'}
+          />
+        </Form.Item>
+      </Form>
     </Card>
   );
 }
