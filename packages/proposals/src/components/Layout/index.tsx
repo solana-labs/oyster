@@ -1,6 +1,6 @@
 import React from 'react';
 import './../../App.less';
-import { Menu } from 'antd';
+import { Divider, Menu } from 'antd';
 import {
   PieChartOutlined,
   GithubOutlined,

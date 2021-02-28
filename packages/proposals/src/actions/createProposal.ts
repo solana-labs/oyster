@@ -17,7 +17,7 @@ import {
 } from '../models/timelock';
 
 const { sendTransaction } = contexts.Connection;
-const { createMint, createTokenAccount, createUninitializedMint } = actions;
+const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
 
 export const createProposal = async (

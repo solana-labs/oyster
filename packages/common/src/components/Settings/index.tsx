@@ -3,7 +3,11 @@ import { Button, Select } from 'antd';
 import { useWallet } from '../../contexts/wallet';
 import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
 
-export const Settings = () => {
+export const Settings = ({
+  additionalSettings,
+}: {
+  additionalSettings?: JSX.Element;
+}) => {
   const { connected, disconnect } = useWallet();
   const { endpoint, setEndpoint } = useConnectionConfig();
 
@@ -27,6 +31,7 @@ export const Settings = () => {
             Disconnect
           </Button>
         )}
+        {additionalSettings}
       </div>
     </>
   );

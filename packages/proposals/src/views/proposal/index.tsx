@@ -1,4 +1,4 @@
-import { Button, Col, Divider, Row, Space, Spin, Statistic } from 'antd';
+import { Button, Col, Divider, Grid, Row, Space, Spin, Statistic } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount } from '@oyster/common';
@@ -17,9 +17,11 @@ import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
+import AddSigners from '../../components/Proposal/AddSigners';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
+const { useBreakpoint } = Grid;
 
 export const ProposalView = () => {
   const context = useProposals();
@@ -55,6 +57,7 @@ function InnerProposalView({
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
+  const adminAccount = useAccountByMint(proposal.info.adminMint);
   const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
@@ -66,6 +69,7 @@ function InnerProposalView({
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
+  const breakpoint = useBreakpoint();
 
   useMemo(() => {
     if (loading) {
@@ -119,7 +123,6 @@ function InnerProposalView({
               <StateBadge proposal={proposal} />
             </p>
           </Col>
-          <Col span={2}> </Col>
         </Row>
         <Row>
           <Col span={24}>
@@ -151,7 +154,21 @@ function InnerProposalView({
               }
               suffix={`/ ${proposal.info.state.totalSigningTokensMinted.toNumber()}`}
             />
-            {sigAccount && <SignButton proposal={proposal} />}
+            <Space
+              style={{ marginTop: '10px' }}
+              direction={
+                breakpoint.lg || breakpoint.xl || breakpoint.xxl
+                  ? 'horizontal'
+                  : 'vertical'
+              }
+            >
+              {adminAccount && adminAccount.info.amount.toNumber() === 1 && (
+                <AddSigners proposal={proposal} />
+              )}
+              {sigAccount && sigAccount.info.amount.toNumber() === 1 && (
+                <SignButton proposal={proposal} />
+              )}
+            </Space>
           </Col>
           <Col span={8}>
             <Statistic

@@ -12,6 +12,7 @@ export const AppBar = (props: {
   left?: JSX.Element;
   right?: JSX.Element;
   useWalletBadge?: boolean;
+  additionalSettings?: JSX.Element;
 }) => {
   const { connected, wallet } = useWallet();
 
@@ -19,7 +20,11 @@ export const AppBar = (props: {
     <div className="App-Bar-right">
       {props.left}
       {connected ? (
-        props.useWalletBadge ? <CurrentUserWalletBadge /> : <CurrentUserBadge />
+        props.useWalletBadge ? (
+          <CurrentUserWalletBadge />
+        ) : (
+          <CurrentUserBadge />
+        )
       ) : (
         <ConnectButton
           type="text"
@@ -31,7 +36,7 @@ export const AppBar = (props: {
       <Popover
         placement="topRight"
         title={LABELS.SETTINGS_TOOLTIP}
-        content={<Settings />}
+        content={<Settings additionalSettings={props.additionalSettings} />}
         trigger="click"
       >
         <Button

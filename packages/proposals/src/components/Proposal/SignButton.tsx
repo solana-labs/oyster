@@ -21,7 +21,6 @@ export default function SignButton({
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   return (
     <>
-      <br />
       {sigAccount && sigAccount.info.amount.toNumber() === 0 && (
         <Button disabled={true} type="primary">
           Signed

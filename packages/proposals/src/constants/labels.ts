@@ -19,4 +19,12 @@ export const LABELS = {
   SIG_GIVEN: 'Sigs Given',
   VOTES_REQUIRED: "Votes Req'd",
   VOTES_CAST: 'Votes Cast',
+  ADMIN_PANEL: 'Admin Panel',
+  COPY_FAILED_ADDRESSES_TO_INPUT: 'Copy failed addresses to the input',
+  COPY_FAILED_ADDRESSES_TO_CLIPBOARD: 'Copy failed addresses to clipboard',
+  FAILED_SIGNERS_COPIED_TO_INPUT: 'Failed signers copied to input!',
+  FAILED_SIGNERS_COPIED_TO_CLIPBOARD: 'Failed signers copied to clipboard!',
+  COMMA_SEPARATED_KEYS: 'Comma separated base58 pubkeys',
+  SIGNERS: 'Signers',
+  ADD_SIGNERS: 'Add Signers',
 };
