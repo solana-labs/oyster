@@ -1,39 +1,24 @@
-import { ParsedAccount, TokenAccount } from '@oyster/common';
-import {
-  Button,
-  Modal,
-  Input,
-  Form,
-  Tag,
-  Progress,
-  Col,
-  Row,
-  Space,
-  Switch,
-  Radio,
-} from 'antd';
+import { ParsedAccount } from '@oyster/common';
+import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
 import { TimelockSet } from '../../models/timelock';
 import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
-import { removeSigner } from '../../actions/removeSigner';
-import { AccountLayout } from '@solana/spl-token';
 
 const { notify } = utils;
 const { TextArea } = Input;
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
-const { deserializeAccount } = contexts.Accounts;
 
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 },
 };
 
-export default function EditSigners({
+export default function AddSigners({
   proposal,
 }: {
   proposal: ParsedAccount<TimelockSet>;
@@ -43,7 +28,6 @@ export default function EditSigners({
   const adminAccount = useAccountByMint(proposal.info.adminMint);
   const [saving, setSaving] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const PROGRAM_IDS = utils.programIds();
 
   const [savePerc, setSavePerc] = useState(0);
   const [failedSigners, setFailedSigners] = useState<string[]>([]);
@@ -52,7 +36,6 @@ export default function EditSigners({
   const onSubmit = async (values: {
     signers: string;
     failedSigners: string;
-    type: string;
   }) => {
     const signers = values.signers.split(',').map(s => s.trim());
     setSaving(true);
@@ -75,36 +58,13 @@ export default function EditSigners({
 
     for (let i = 0; i < signers.length; i++) {
       try {
-        if (values.type == LABELS.ADD)
-          await addSigner(
-            connection,
-            wallet.wallet,
-            proposal,
-            adminAccount.pubkey,
-            new PublicKey(signers[i]),
-          );
-        else {
-          const tokenAccounts = await connection.getTokenAccountsByOwner(
-            new PublicKey(signers[i]),
-            {
-              programId: PROGRAM_IDS.token,
-            },
-          );
-          const specificToThisMint = tokenAccounts.value.filter(
-            a =>
-              deserializeAccount(a.account.data).mint.toBase58() ===
-              proposal.info.signatoryMint.toBase58(),
-          );
-          for (let j = 0; j < specificToThisMint.length; j++) {
-            await removeSigner(
-              connection,
-              wallet.wallet,
-              proposal,
-              adminAccount.pubkey,
-              specificToThisMint[j].pubkey,
-            );
-          }
-        }
+        await addSigner(
+          connection,
+          wallet.wallet,
+          proposal,
+          adminAccount.pubkey,
+          new PublicKey(signers[i]),
+        );
         setSavePerc(Math.round(100 * ((i + 1) / signers.length)));
       } catch (e) {
         console.error(e);
@@ -129,11 +89,11 @@ export default function EditSigners({
             setIsModalVisible(true);
           }}
         >
-          {LABELS.EDIT_SIGNERS}
+          {LABELS.ADD_SIGNERS}
         </Button>
       ) : null}
       <Modal
-        title={LABELS.EDIT_SIGNERS}
+        title={LABELS.ADD_SIGNERS}
         visible={isModalVisible}
         destroyOnClose={true}
         onOk={form.submit}
@@ -151,19 +111,6 @@ export default function EditSigners({
         >
           {!saving && (
             <>
-              <Form.Item
-                name="type"
-                label={LABELS.ADDING_OR_REMOVING}
-                initialValue={LABELS.ADD}
-                rules={[{ required: true }]}
-              >
-                <Radio.Group value={layout}>
-                  <Radio.Button value={LABELS.REMOVE}>
-                    {LABELS.REMOVE}
-                  </Radio.Button>
-                  <Radio.Button value={LABELS.ADD}>{LABELS.ADD}</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
               <Form.Item
                 name="signers"
                 label={LABELS.SIGNERS}
