@@ -26,5 +26,12 @@ export const LABELS = {
   FAILED_SIGNERS_COPIED_TO_CLIPBOARD: 'Failed signers copied to clipboard!',
   COMMA_SEPARATED_KEYS: 'Comma separated base58 pubkeys',
   SIGNERS: 'Signers',
-  ADD_SIGNERS: 'Add Signers',
+  EDIT_SIGNERS: 'Edit Signers',
+  ADMIN_ACCOUNT_NOT_DEFINED: 'Admin account is not defined',
+  ENTER_AT_LEAST_ONE_PUB_KEY: 'Please enter at least one pub key.',
+  PUB_KEY_FAILED:
+    " Pub key  failed. Please check your inspector tab for more information. We'll continue onward and add this to a list for you to re-upload in a later save.",
+  ADD: 'Add',
+  REMOVE: 'Remove',
+  ADDING_OR_REMOVING: 'Type',
 };

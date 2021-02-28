@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, TokenAccount } from '@oyster/common';
 import {
   Button,
   Modal,
@@ -9,6 +9,8 @@ import {
   Col,
   Row,
   Space,
+  Switch,
+  Radio,
 } from 'antd';
 import React, { useState } from 'react';
 import { TimelockSet } from '../../models/timelock';
@@ -16,19 +18,22 @@ import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
+import { removeSigner } from '../../actions/removeSigner';
+import { AccountLayout } from '@solana/spl-token';
 
 const { notify } = utils;
 const { TextArea } = Input;
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
+const { deserializeAccount } = contexts.Accounts;
 
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 },
 };
 
-export default function AddSigners({
+export default function EditSigners({
   proposal,
 }: {
   proposal: ParsedAccount<TimelockSet>;
@@ -38,6 +43,7 @@ export default function AddSigners({
   const adminAccount = useAccountByMint(proposal.info.adminMint);
   const [saving, setSaving] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const PROGRAM_IDS = utils.programIds();
 
   const [savePerc, setSavePerc] = useState(0);
   const [failedSigners, setFailedSigners] = useState<string[]>([]);
@@ -46,19 +52,20 @@ export default function AddSigners({
   const onSubmit = async (values: {
     signers: string;
     failedSigners: string;
+    type: string;
   }) => {
     const signers = values.signers.split(',').map(s => s.trim());
     setSaving(true);
     if (!adminAccount) {
       notify({
-        message: 'Admin account is not defined',
+        message: LABELS.ADMIN_ACCOUNT_NOT_DEFINED,
         type: 'error',
       });
       return;
     }
     if (signers.length == 0 || (signers.length == 1 && !signers[0])) {
       notify({
-        message: 'Please enter at least one pub key.',
+        message: LABELS.ENTER_AT_LEAST_ONE_PUB_KEY,
         type: 'error',
       });
       return;
@@ -68,19 +75,42 @@ export default function AddSigners({
 
     for (let i = 0; i < signers.length; i++) {
       try {
-        await addSigner(
-          connection,
-          wallet.wallet,
-          proposal,
-          adminAccount.pubkey,
-          new PublicKey(signers[i]),
-        );
+        if (values.type == LABELS.ADD)
+          await addSigner(
+            connection,
+            wallet.wallet,
+            proposal,
+            adminAccount.pubkey,
+            new PublicKey(signers[i]),
+          );
+        else {
+          const tokenAccounts = await connection.getTokenAccountsByOwner(
+            new PublicKey(signers[i]),
+            {
+              programId: PROGRAM_IDS.token,
+            },
+          );
+          const specificToThisMint = tokenAccounts.value.filter(
+            a =>
+              deserializeAccount(a.account.data).mint.toBase58() ===
+              proposal.info.signatoryMint.toBase58(),
+          );
+          for (let j = 0; j < specificToThisMint.length; j++) {
+            await removeSigner(
+              connection,
+              wallet.wallet,
+              proposal,
+              adminAccount.pubkey,
+              specificToThisMint[j].pubkey,
+            );
+          }
+        }
         setSavePerc(Math.round(100 * ((i + 1) / signers.length)));
       } catch (e) {
         console.error(e);
         failedSignersHold.push(signers[i]);
         notify({
-          message: `Pub key ${signers[i]} failed. Please check your inspector tab for more information. We'll continue onward and add this to a list for you to re-upload in a later save.`,
+          message: signers[i] + LABELS.PUB_KEY_FAILED,
           type: 'error',
         });
       }
@@ -99,11 +129,11 @@ export default function AddSigners({
             setIsModalVisible(true);
           }}
         >
-          {LABELS.ADD_SIGNERS}
+          {LABELS.EDIT_SIGNERS}
         </Button>
       ) : null}
       <Modal
-        title={LABELS.ADD_SIGNERS}
+        title={LABELS.EDIT_SIGNERS}
         visible={isModalVisible}
         destroyOnClose={true}
         onOk={form.submit}
@@ -120,16 +150,31 @@ export default function AddSigners({
           name="control-hooks"
         >
           {!saving && (
-            <Form.Item
-              name="signers"
-              label={LABELS.SIGNERS}
-              rules={[{ required: true }]}
-            >
-              <TextArea
-                id="signers"
-                placeholder={LABELS.COMMA_SEPARATED_KEYS}
-              />
-            </Form.Item>
+            <>
+              <Form.Item
+                name="type"
+                label={LABELS.ADDING_OR_REMOVING}
+                initialValue={LABELS.ADD}
+                rules={[{ required: true }]}
+              >
+                <Radio.Group value={layout}>
+                  <Radio.Button value={LABELS.REMOVE}>
+                    {LABELS.REMOVE}
+                  </Radio.Button>
+                  <Radio.Button value={LABELS.ADD}>{LABELS.ADD}</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                name="signers"
+                label={LABELS.SIGNERS}
+                rules={[{ required: true }]}
+              >
+                <TextArea
+                  id="signers"
+                  placeholder={LABELS.COMMA_SEPARATED_KEYS}
+                />
+              </Form.Item>
+            </>
           )}
         </Form>
         {saving && <Progress percent={savePerc} status="active" />}

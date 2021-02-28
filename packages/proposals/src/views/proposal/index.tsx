@@ -17,7 +17,7 @@ import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
-import AddSigners from '../../components/Proposal/AddSigners';
+import EditSigners from '../../components/Proposal/EditSigners';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -163,7 +163,7 @@ function InnerProposalView({
               }
             >
               {adminAccount && adminAccount.info.amount.toNumber() === 1 && (
-                <AddSigners proposal={proposal} />
+                <EditSigners proposal={proposal} />
               )}
               {sigAccount && sigAccount.info.amount.toNumber() === 1 && (
                 <SignButton proposal={proposal} />
