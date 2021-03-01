@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
+import {
+  contexts,
+  utils,
+  ParsedAccount,
+  NumericInput,
+  TokenDisplay,
+  useUserAccounts,
+  useMint
+} from '@oyster/common';
 import { Card, Select } from 'antd';
 import './style.less';
 const { getTokenName } = utils;
@@ -16,30 +24,50 @@ export function SolanaInput(props: {
   disabled?: boolean;
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
-  useWalletBalance?: boolean;
-  useFirstReserve?: boolean;
-  showLeverageSelector?: boolean;
-  leverage?: number;
+  useFirstToken?: boolean;
+  onMintChange?: (value: string) => void;
 }) {
-  const { tokenMap } = useConnectionConfig();
-  const [acco, setCollateralReserve] = useState<string>();
+  const { tokens, tokenMap } = useConnectionConfig();
+  const { userAccounts } = useUserAccounts();
   const [balance, setBalance] = useState<number>(0);
   const [lastAmount, setLastAmount] = useState<string>('');
+  const [currentMint, setCurrentMint] = useState<string>('')
 
+  const mint = useMint(currentMint);
 
-  const renderReserveAccounts = [].map((reserve: any) => {
-    const mint = reserve.info.liquidityMint.toBase58();
-    const address = reserve.pubkey.toBase58();
-    const name = getTokenName(tokenMap, mint);
+  const renderPopularTokens = tokens.map((item) => {
+    const address = item.mintAddress;
     return (
-      <Option key={address} value={address} name={name} title={address}>
-        <div key={address} style={{ display: 'flex', alignItems: 'center' }}>
-          <TokenIcon mintAddress={mint} />
-          {name}
-        </div>
+      <Option key={address} value={address} name={item.tokenSymbol} title={address}>
+        <TokenDisplay
+          key={address}
+          name={item.tokenSymbol}
+          mintAddress={address}
+          showBalance={true}
+        />
       </Option>
     );
   });
+
+  useEffect(() => {
+    if(!currentMint && tokens.length > 0) {
+      setCurrentMint(tokens[0].mintAddress)
+    }
+  }, [tokens, currentMint])
+
+  useEffect(() => {
+
+    const currentAccount = userAccounts?.find(
+      (a) => a.info.mint.toBase58() === currentMint
+    );
+    if (currentAccount && mint) {
+      setBalance(
+        currentAccount.info.amount.toNumber() / Math.pow(10, mint.decimals)
+      );
+    } else {
+      setBalance(0);
+    }
+  }, [currentMint, mint, userAccounts])
 
   return (
     <Card
@@ -88,16 +116,16 @@ export function SolanaInput(props: {
               showSearch
               style={{ minWidth: 150 }}
               placeholder="CCY"
-              // value={collateralReserve}
-              // onChange={item => {
-              //   if (props.onCollateralReserve) props.onCollateralReserve(item);
-              //   setCollateralReserve(item);
-              // }}
+              value={currentMint}
+              onChange={item => {
+                if (props.onMintChange) props.onMintChange(item);
+                setCurrentMint(item);
+              }}
               filterOption={(input, option) =>
                 option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              {renderReserveAccounts}
+              {renderPopularTokens}
             </Select>
           ) : (
             <TokenDisplay
