@@ -5,6 +5,7 @@ import { LABELS } from '../../constants';
 import { contexts, utils, ConnectButton } from '@oyster/common';
 import { useHistory, useLocation } from "react-router-dom";
 import { Transfer } from '../../components/Transfer';
+import { Wrap } from "../../components/Wrap";
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 const { notify } = utils;
@@ -26,7 +27,7 @@ export const TransferView = () => {
       key: "sol",
       tab: <div style={tabStyle}>Wrap</div>,
       render: () => {
-        return <div>Bring assets to Solana</div>;
+        return <Wrap />;
       },
     },
   ];
