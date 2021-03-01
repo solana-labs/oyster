@@ -1,7 +1,11 @@
 import { ParsedAccount } from '@oyster/common';
 import { Badge, Tag } from 'antd';
 import React from 'react';
-import { STATE_COLOR, TimelockSet } from '../../models/timelock';
+import {
+  STATE_COLOR,
+  TimelockSet,
+  TimelockStateStatus,
+} from '../../models/timelock';
 
 export function StateBadgeRibbon({
   proposal,
@@ -26,5 +30,5 @@ export function StateBadge({
 }) {
   const status = proposal.info.state.status;
   let color = STATE_COLOR[status];
-  return <Tag color={color}>{status}</Tag>;
+  return <Tag color={color}>{TimelockStateStatus[status]}</Tag>;
 }

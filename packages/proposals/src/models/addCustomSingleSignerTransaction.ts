@@ -63,7 +63,7 @@ export const addCustomSingleSignerTransactionInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.addCustomSingleSignerTransaction,
+      instruction: TimelockInstruction.AddCustomSingleSignerTransaction,
       slot: new BN(slot),
       instructions: instructionAsBytes,
       position: position,

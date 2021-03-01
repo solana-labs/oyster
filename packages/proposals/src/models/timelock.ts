@@ -13,8 +13,9 @@ export enum TimelockInstruction {
   InitTimelockSet = 1,
   AddSigner = 2,
   RemoveSigner = 3,
-  addCustomSingleSignerTransaction = 4,
+  AddCustomSingleSignerTransaction = 4,
   Sign = 8,
+  MintVotingTokens = 10,
 }
 
 export interface TimelockConfig {
@@ -55,11 +56,11 @@ export enum TimelockStateStatus {
 }
 
 export const STATE_COLOR: Record<string, string> = {
-  Draft: 'orange',
-  Voting: 'blue',
-  Executing: 'green',
-  Completed: 'purple',
-  Deleted: 'gray',
+  [TimelockStateStatus.Draft]: 'orange',
+  [TimelockStateStatus.Voting]: 'blue',
+  [TimelockStateStatus.Executing]: 'green',
+  [TimelockStateStatus.Completed]: 'purple',
+  [TimelockStateStatus.Deleted]: 'gray',
 };
 
 export interface TimelockState {
@@ -154,7 +155,7 @@ export const TimelockSetParser = (
       adminValidation: data.adminValidation,
       votingValidation: data.votingValidation,
       state: {
-        status: TimelockStateStatus[data.timelockStateStatus],
+        status: data.timelockStateStatus,
         totalVotingTokensMinted: data.totalVotingTokensMinted,
         totalSigningTokensMinted: data.totalSigningTokensMinted,
         descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),

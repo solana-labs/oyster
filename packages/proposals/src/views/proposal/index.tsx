@@ -6,6 +6,7 @@ import {
   ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
   TimelockSet,
+  TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
 import { useParams } from 'react-router-dom';
@@ -18,6 +19,7 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
+import AddVotes from '../../components/Proposal/AddVotes';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -162,12 +164,16 @@ function InnerProposalView({
                   : 'vertical'
               }
             >
-              {adminAccount && adminAccount.info.amount.toNumber() === 1 && (
-                <AddSigners proposal={proposal} />
-              )}
-              {sigAccount && sigAccount.info.amount.toNumber() === 1 && (
-                <SignButton proposal={proposal} />
-              )}
+              {adminAccount &&
+                adminAccount.info.amount.toNumber() === 1 &&
+                proposal.info.state.status === TimelockStateStatus.Draft && (
+                  <AddSigners proposal={proposal} />
+                )}
+              {sigAccount &&
+                sigAccount.info.amount.toNumber() === 1 &&
+                proposal.info.state.status === TimelockStateStatus.Draft && (
+                  <SignButton proposal={proposal} />
+                )}
             </Space>
           </Col>
           <Col span={8}>
@@ -179,6 +185,20 @@ function InnerProposalView({
               }
               suffix={`/ ${proposal.info.state.totalVotingTokensMinted}`}
             />
+            <Space
+              style={{ marginTop: '10px' }}
+              direction={
+                breakpoint.lg || breakpoint.xl || breakpoint.xxl
+                  ? 'horizontal'
+                  : 'vertical'
+              }
+            >
+              {sigAccount &&
+                sigAccount.info.amount.toNumber() === 1 &&
+                proposal.info.state.status === TimelockStateStatus.Draft && (
+                  <AddVotes proposal={proposal} />
+                )}
+            </Space>
           </Col>
           <Col span={8}>
             <Statistic
@@ -218,11 +238,15 @@ function InnerProposalView({
 
 function getVotesRequired(proposal: ParsedAccount<TimelockSet>): number {
   if (proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return proposal.info.state.totalVotingTokensMinted.toNumber() * 0.5;
+    return Math.ceil(
+      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.5,
+    );
   } else if (
     proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
-    return proposal.info.state.totalVotingTokensMinted.toNumber() * 0.6;
+    return Math.ceil(
+      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.5,
+    );
   } else if (
     proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
   ) {

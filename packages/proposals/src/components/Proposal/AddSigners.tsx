@@ -38,7 +38,6 @@ export default function AddSigners({
     failedSigners: string;
   }) => {
     const signers = values.signers.split(',').map(s => s.trim());
-    setSaving(true);
     if (!adminAccount) {
       notify({
         message: LABELS.ADMIN_ACCOUNT_NOT_DEFINED,
@@ -46,13 +45,15 @@ export default function AddSigners({
       });
       return;
     }
-    if (signers.length == 0 || (signers.length == 1 && !signers[0])) {
+    if (!signers.find(s => s)) {
       notify({
         message: LABELS.ENTER_AT_LEAST_ONE_PUB_KEY,
         type: 'error',
       });
+
       return;
     }
+    setSaving(true);
 
     const failedSignersHold: string[] = [];
 
@@ -79,6 +80,7 @@ export default function AddSigners({
     setSaving(false);
     setSavePerc(0);
     setIsModalVisible(failedSignersHold.length > 0);
+    if (failedSignersHold.length === 0) form.resetFields();
   };
 
   return (
