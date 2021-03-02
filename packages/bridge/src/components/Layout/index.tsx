@@ -19,14 +19,16 @@ export const AppLayout = React.memo((props: any) => {
     '/faucet': '7',
   };
 
+  const isRoot = location.pathname !== '/';
+
   const current =
     [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
     '';
   return (
-    <div className={`App${wormholeReady ? `` : ` wormhole-bg`}`}>
-      <Wormhole onCreated={() => setWormholeReady(true)}>
+    <div className={`App`}>
+      <Wormhole onCreated={() => setWormholeReady(true)} show={isRoot}>
         <Layout title={LABELS.APP_TITLE}>
-          {location.pathname !== '/' && (
+          {isRoot && (
             <Header className="App-Bar">
               <div className="app-title">
                 <h2>WORMHOLE</h2>

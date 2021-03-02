@@ -1,7 +1,7 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { MarketProvider } from './contexts/market';
+import { MarketProvider, TokenPairProvider, EthereumProvider } from './contexts';
 import { AppLayout } from './components/Layout';
 
 import {
@@ -19,17 +19,21 @@ export function Routes() {
       <HashRouter basename={'/'}>
         <ConnectionProvider>
           <WalletProvider>
-            <AccountsProvider>
-              <MarketProvider>
-                  <AppLayout>
-                    <Switch>
-                      <Route exact path="/" component={() => <HomeView />} />
-                      <Route path="/move" children={<TransferView />} />
-                      <Route exact path="/faucet" children={<FaucetView />} />
-                    </Switch>
-                  </AppLayout>
-              </MarketProvider>
-            </AccountsProvider>
+            <EthereumProvider>
+              <AccountsProvider>
+                <MarketProvider>
+                  <TokenPairProvider>
+                      <AppLayout>
+                        <Switch>
+                          <Route exact path="/" component={() => <HomeView />} />
+                          <Route path="/move" children={<TransferView />} />
+                          <Route exact path="/faucet" children={<FaucetView />} />
+                        </Switch>
+                      </AppLayout>
+                    </TokenPairProvider>
+                </MarketProvider>
+              </AccountsProvider>
+            </EthereumProvider>
           </WalletProvider>
         </ConnectionProvider>
       </HashRouter>

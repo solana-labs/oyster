@@ -21,7 +21,7 @@ export const hasWindow =
  * @returns {[]}
  */
 export const calculateTorusProperties = (particleSize: number): any => {
-  let bufferGeometry: BufferGeometry = new TorusGeometry(60, 45, 160, 160);
+  let bufferGeometry: BufferGeometry = new TorusGeometry(60, 45, 60, 80);
 
   // if normal and uv attributes are not removed,
   // mergeVertices() can't consolidate identical vertices

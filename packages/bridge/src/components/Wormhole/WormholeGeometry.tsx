@@ -12,7 +12,7 @@ import {
 import disc from "./disc.png";
 
 // The individual "particle size".
-const PARTICLE_SIZE = 15;
+const PARTICLE_SIZE = 10;
 
 /**
  * Three JS Point Geometry calculating points around a Torus.
@@ -28,7 +28,7 @@ const WormholeGeometry = () => {
   const uniforms = React.useMemo(
     () => ({
       // Adapt the color of the WormholeCanvas here.
-      color: { value: new Color("gray") },
+      color: { value: new Color("dimgrey") },
       pointTexture: {
         value: pointTexture,
       },
@@ -47,7 +47,7 @@ const WormholeGeometry = () => {
     if (mesh.current) {
       // x-Axis defines the "top" we're looking at, try e.g. 30.5
       mesh.current.rotation.x = 30;
-      mesh.current.rotation.z += 0.001;
+      mesh.current.rotation.z += 0.0005;
     }
   });
 

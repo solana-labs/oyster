@@ -8,8 +8,10 @@ const { useConnectionConfig } = contexts.Connection;
 
 const { Option } = Select;
 
-// User can choose a collateral they want to use, and then this will display the balance they have in Oyster's lending
-// reserve for that collateral type.
+// TODO: add way to add new token account
+
+
+
 export function SolanaInput(props: {
   title: string;
   amount?: number | null;
@@ -27,7 +29,7 @@ export function SolanaInput(props: {
   const [lastAmount, setLastAmount] = useState<string>('');
 
 
-  const renderReserveAccounts = [].map((reserve: any) => {
+  const renderTokens = [].map((reserve: any) => {
     const mint = reserve.info.liquidityMint.toBase58();
     const address = reserve.pubkey.toBase58();
     const name = getTokenName(tokenMap, mint);
@@ -97,7 +99,7 @@ export function SolanaInput(props: {
                 option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              {renderReserveAccounts}
+              {renderTokens}
             </Select>
           ) : (
             <TokenDisplay

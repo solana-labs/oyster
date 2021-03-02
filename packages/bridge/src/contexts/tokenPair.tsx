@@ -73,7 +73,7 @@ export const useCurrencyLeg = (defaultMint?: string) => {
   );
 };
 
-export function CurrencyPairProvider({ children = null as any }) {
+export function TokenPairProvider({ children = null as any }) {
   const connection = useConnection();
   const { tokens } = useConnectionConfig();
 

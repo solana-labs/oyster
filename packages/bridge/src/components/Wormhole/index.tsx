@@ -12,10 +12,13 @@ import './wormhole.less';
 const Wormhole = ({
   onCreated,
   children,
+  show,
 }: {
   onCreated: any;
+  show: boolean;
   children: React.ReactNode;
 }) => (
+  show ? <>{children}</> :
   <>
     <WormholeCanvas onCreated={onCreated} />
     <div className="wormhole-overlay">{children}</div>

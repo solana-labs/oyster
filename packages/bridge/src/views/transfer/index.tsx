@@ -1,17 +1,16 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Card } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { LABELS } from '../../constants';
-import { contexts, utils, ConnectButton } from '@oyster/common';
+import { contexts, utils, ConnectButton, useConnection, useWallet } from '@oyster/common';
 import { useHistory, useLocation } from "react-router-dom";
 import { Transfer } from '../../components/Transfer';
-const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
-const { notify } = utils;
+import { useEthereum } from '../../contexts';
 
 export const TransferView = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
+  const { connect: connectEth } = useEthereum();
 
   const tabStyle: React.CSSProperties = { width: 120 };
   const tabList = [
@@ -30,6 +29,12 @@ export const TransferView = () => {
       },
     },
   ];
+
+  useEffect(() => {
+
+    // connectEth();
+
+  }, [connected, connectEth])
 
   const location = useLocation();
   const history = useHistory();

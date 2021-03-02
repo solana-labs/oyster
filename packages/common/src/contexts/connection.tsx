@@ -1,10 +1,11 @@
-import { KnownToken, useLocalStorageState } from '../utils/utils';
+import { useLocalStorageState } from '../utils/utils';
 import { Account, clusterApiUrl, Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { notify } from '../utils/notifications';
 import { ExplorerLink } from '../components/ExplorerLink';
 import LocalTokens from '../config/tokens.json';
 import { setProgramIds } from '../utils/ids';
+import { KnownToken, TokenListProvider } from '@solana/spl-token-registry';
 
 export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet' | 'lending';
 
@@ -67,13 +68,11 @@ export function ConnectionProvider({ children = undefined as any }) {
   const [tokenMap, setTokenMap] = useState<Map<string, KnownToken>>(new Map());
   useEffect(() => {
     // fetch token files
-    window
-      .fetch(`https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/${env}.json`)
-      .then((res) => {
-        return res.json();
-      })
-      .catch((err) => [])
-      .then((list: KnownToken[]) => {
+
+
+
+    new TokenListProvider().resolve(env)
+      .then((list) => {
         const knownMints = [...LocalTokens, ...list].reduce((map, item) => {
           map.set(item.mintAddress, item);
           return map;
