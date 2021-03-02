@@ -17,7 +17,10 @@ export function StateBadgeRibbon({
   const status = proposal.info.state.status;
   let color = STATE_COLOR[status];
   return (
-    <Badge.Ribbon style={{ backgroundColor: color }} text={status}>
+    <Badge.Ribbon
+      style={{ backgroundColor: color }}
+      text={TimelockStateStatus[status]}
+    >
       {children}
     </Badge.Ribbon>
   );

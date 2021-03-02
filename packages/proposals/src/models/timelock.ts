@@ -15,6 +15,7 @@ export enum TimelockInstruction {
   RemoveSigner = 3,
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
+  Vote = 9,
   MintVotingTokens = 10,
 }
 

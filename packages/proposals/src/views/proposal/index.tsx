@@ -20,6 +20,7 @@ import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import AddVotes from '../../components/Proposal/AddVotes';
+import { Vote } from '../../components/Proposal/Vote';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -60,6 +61,8 @@ function InnerProposalView({
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
+  const voteAccount = useAccountByMint(proposal.info.votingMint);
+
   const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
@@ -198,6 +201,11 @@ function InnerProposalView({
                 proposal.info.state.status === TimelockStateStatus.Draft && (
                   <AddVotes proposal={proposal} />
                 )}
+              {voteAccount &&
+                voteAccount.info.amount.toNumber() > 0 &&
+                proposal.info.state.status === TimelockStateStatus.Voting && (
+                  <Vote proposal={proposal} />
+                )}
             </Space>
           </Col>
           <Col span={8}>
@@ -222,14 +230,15 @@ function InnerProposalView({
               />
             </Col>
           ))}
-          {instructionsForProposal.length < INSTRUCTION_LIMIT && (
-            <Col xs={24} sm={24} md={12} lg={8}>
-              <NewInstructionCard
-                proposal={proposal}
-                position={instructionsForProposal.length}
-              />
-            </Col>
-          )}
+          {instructionsForProposal.length < INSTRUCTION_LIMIT &&
+            proposal.info.state.status === TimelockStateStatus.Draft && (
+              <Col xs={24} sm={24} md={12} lg={8}>
+                <NewInstructionCard
+                  proposal={proposal}
+                  position={instructionsForProposal.length}
+                />
+              </Col>
+            )}
         </Row>
       </Space>
     </>
@@ -245,7 +254,7 @@ function getVotesRequired(proposal: ParsedAccount<TimelockSet>): number {
     proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
     return Math.ceil(
-      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.5,
+      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.66,
     );
   } else if (
     proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.FullConsensus

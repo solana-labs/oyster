@@ -52,4 +52,7 @@ export const LABELS = {
   BULK: 'Bulk',
   SINGLE: 'Single',
   ADD_VOTES: 'Add Votes',
+  BURNING_VOTES: 'Burning your votes...',
+  VOTES_BURNED: 'Votes burned',
+  VOTE: 'Vote',
 };
