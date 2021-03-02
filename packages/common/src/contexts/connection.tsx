@@ -68,9 +68,6 @@ export function ConnectionProvider({ children = undefined as any }) {
   const [tokenMap, setTokenMap] = useState<Map<string, KnownToken>>(new Map());
   useEffect(() => {
     // fetch token files
-
-
-
     new TokenListProvider().resolve(env)
       .then((list) => {
         const knownMints = [...LocalTokens, ...list].reduce((map, item) => {

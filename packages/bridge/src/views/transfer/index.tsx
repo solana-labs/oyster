@@ -6,6 +6,8 @@ import { contexts, utils, ConnectButton, useConnection, useWallet } from '@oyste
 import { useHistory, useLocation } from "react-router-dom";
 import { Transfer } from '../../components/Transfer';
 import { useEthereum } from '../../contexts';
+import { Wrap } from "../../components/Wrap";
+const { notify } = utils;
 
 export const TransferView = () => {
   const connection = useConnection();
@@ -25,7 +27,7 @@ export const TransferView = () => {
       key: "sol",
       tab: <div style={tabStyle}>Wrap</div>,
       render: () => {
-        return <div>Bring assets to Solana</div>;
+        return <Wrap />;
       },
     },
   ];
