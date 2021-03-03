@@ -1,14 +1,16 @@
 import { MintInfo } from '@solana/spl-token';
 import { Table, Tag, Space, Card, Col, Row, Statistic, Button } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { contexts, ParsedAccount, utils } from '@oyster/common';
+import {contexts, ExplorerLink, ParsedAccount, utils} from '@oyster/common';
 import { useMarkets } from '../../contexts/market';
 
 import { LendingReserveItem } from './item';
 import './itemStyle.less';
 import { Totals } from '../../models/totals';
 import { Link } from 'react-router-dom';
+import {useLockedFundsAccounts} from "../../hooks/useLockedFundsAccounts";
+import {EtherscanLink} from "@oyster/common/dist/lib/components/EtherscanLink";
 const { fromLamports, getTokenName, wadToLamports } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -16,6 +18,7 @@ const { useConnectionConfig } = contexts.Connection;
 export const HomeView = () => {
   const { marketEmitter, midPriceInUSD } = useMarkets();
   const { tokenMap } = useConnectionConfig();
+  const {loading: loadingLockedAccounts, lockedSolanaAccounts, total: totalLocked } = useLockedFundsAccounts();
   const [totals, setTotals] = useState<Totals>({
     marketSize: 0,
     numberOfAssets: 0,
@@ -76,36 +79,50 @@ export const HomeView = () => {
     };
   }, [marketEmitter, midPriceInUSD, setTotals, tokenMap]);
 
-  const dataSource = [
-    {
-      key: '1',
-      name: 'Mike',
-      age: 32,
-      address: '10 Downing Street',
-    },
-    {
-      key: '2',
-      name: 'John',
-      age: 42,
-      address: '10 Downing Street',
-    },
-  ];
+  const dataSource = useMemo(() => {
+    if (loadingLockedAccounts) return [];
+    console.log(lockedSolanaAccounts)
+    return lockedSolanaAccounts.map((acc, index) => {
+      return {
+        key: index.toString(),
+        symbol: acc.tokenSymbol,
+        name: acc.tokenName,
+        amount: acc.amountInUSD,
+        sourceAddress: acc.parsedAccount.assetChain === 1 ?
+          <ExplorerLink address={acc.sourceAddress} type={"address"} /> :
+          <EtherscanLink address={acc.sourceAddress} type={"address"} />,
+        targetAddress: acc.parsedAccount.toChain === 1 ?
+          <ExplorerLink address={acc.targetAddress} type={"address"} /> :
+          <EtherscanLink address={acc.targetAddress} type={"address"} />,
+      }
+    })
+  }, [loadingLockedAccounts, lockedSolanaAccounts])
 
   const columns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+    },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: 'Source Address',
+      dataIndex: 'sourceAddress',
+      key: 'sourceAddress',
+    },
+    {
+      title: 'Target Address',
+      dataIndex: 'targetAddress',
+      key: 'targetAddress',
     },
   ];
 
@@ -127,7 +144,7 @@ export const HomeView = () => {
         <Col xs={24} xl={12}>
           <Statistic
             className="home-statistic"
-            title="$1,231"
+            title={`$${totalLocked}`}
             value="TOTAL VALUE LOCKED"
           />
         </Col>
