@@ -19,3 +19,8 @@ export const getAssetAmountInUSD = (
 ) => {
   return amount;
 };
+
+export enum ASSET_CHAIN {
+  Solana = 1,
+  Ethereum = 2,
+}

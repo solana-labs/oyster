@@ -11,6 +11,7 @@ import { Totals } from '../../models/totals';
 import { Link } from 'react-router-dom';
 import {useLockedFundsAccounts} from "../../hooks/useLockedFundsAccounts";
 import {EtherscanLink} from "@oyster/common/dist/lib/components/EtherscanLink";
+import {ASSET_CHAIN} from "../../utils/assets";
 const { fromLamports, getTokenName, wadToLamports } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -87,10 +88,10 @@ export const HomeView = () => {
         symbol: acc.tokenSymbol,
         name: acc.tokenName,
         amount: acc.amountInUSD,
-        sourceAddress: acc.parsedAccount.assetChain === 1 ?
+        sourceAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.sourceAddress} type={"address"} /> :
           <EtherscanLink address={acc.sourceAddress} type={"address"} />,
-        targetAddress: acc.parsedAccount.toChain === 1 ?
+        targetAddress: acc.parsedAccount.toChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.targetAddress} type={"address"} /> :
           <EtherscanLink address={acc.targetAddress} type={"address"} />,
       }

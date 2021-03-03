@@ -3,7 +3,7 @@ import {contexts} from "@oyster/common";
 import * as BufferLayout from 'buffer-layout'
 import {WORMHOLE_PROGRAM_ID} from "../utils/ids";
 import BN from "bn.js";
-import {getAssetAmountInUSD, getAssetName, getAssetTokenSymbol} from "../utils/assets";
+import {ASSET_CHAIN, getAssetAmountInUSD, getAssetName, getAssetTokenSymbol} from "../utils/assets";
 
 const { useConnection } = contexts.Connection;
 
@@ -53,9 +53,9 @@ export const useLockedFundsAccounts = () => {
       programAccounts.map(acc => {
         try {
           const parsedAccount = dataLayout.decode(acc.account.data)
-
-          if ((parsedAccount.assetChain === 1 || parsedAccount.assetChain ===2 ) &&
-            (parsedAccount.toChain === 1 || parsedAccount.toChain === 2)) {
+          const chains = [ASSET_CHAIN.Solana, ASSET_CHAIN.Ethereum]
+          if (chains.indexOf(parsedAccount.assetChain) >= 0 &&
+            chains.indexOf(parsedAccount.toChain) >= 0) {
             const dec = new BN(10).pow(new BN(parsedAccount.assetDecimals));
             const rawAmount = new BN(parsedAccount.amount, 2, "le")
             const amount = rawAmount.div(dec).toNumber();
