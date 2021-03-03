@@ -24,7 +24,7 @@ export const Transfer = () => {
           title="From Ethereum"
           onInputChange={() => {}}
           />
-      <Button type="primary" className="swap-button">
+      <Button type="primary" className="swap-button" disabled={true}>
         ⇅
       </Button>
       <SolanaInput

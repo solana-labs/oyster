@@ -2,39 +2,41 @@ import React, { useEffect, useState } from 'react';
 import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
 import { Card, Select } from 'antd';
 import './style.less';
+import { TokenList, TokenInfo } from '@uniswap/token-lists';
 const { getTokenName } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
 const { Option } = Select;
 
-// User can choose a collateral they want to use, and then this will display the balance they have in Oyster's lending
-// reserve for that collateral type.
 export function EthereumInput(props: {
   title: string;
   amount?: number | null;
   disabled?: boolean;
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
-  useWalletBalance?: boolean;
-  useFirstReserve?: boolean;
-  showLeverageSelector?: boolean;
-  leverage?: number;
 }) {
-  const { tokenMap } = useConnectionConfig();
-  const [acco, setCollateralReserve] = useState<string>();
   const [balance, setBalance] = useState<number>(0);
   const [lastAmount, setLastAmount] = useState<string>('');
+  const [tokens, setTokens] = useState<TokenInfo[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const listResponse = await fetch('https://tokens.coingecko.com/uniswap/all.json');
+      const tokenList: TokenList = await listResponse.json();
+
+      setTokens(tokenList.tokens);
+    })();
+  }, [setTokens])
 
 
-  const renderReserveAccounts = [].map((reserve: any) => {
-    const mint = reserve.info.liquidityMint.toBase58();
-    const address = reserve.pubkey.toBase58();
-    const name = getTokenName(tokenMap, mint);
+  const renderReserveAccounts = tokens.map((token) => {
+    const mint = token.address;
+    const name = token.symbol;
     return (
-      <Option key={address} value={address} name={name} title={address}>
-        <div key={address} style={{ display: 'flex', alignItems: 'center' }}>
-          <TokenIcon mintAddress={mint} />
+      <Option key={mint} value={mint} name={name} title={mint}>
+        <div key={mint} style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={token.logoURI}/>
           {name}
         </div>
       </Option>
@@ -102,10 +104,7 @@ export function EthereumInput(props: {
           ) : (
             <TokenDisplay
               // key={props.reserve.liquidityMint.toBase58()}
-              name={getTokenName(
-                tokenMap,
-                '',
-              )}
+              name={''}
               mintAddress={''}
               showBalance={false}
             />

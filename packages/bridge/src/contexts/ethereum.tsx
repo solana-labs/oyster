@@ -8,7 +8,8 @@ import Fortmatic from "fortmatic";
 import Torus from "@toruslabs/torus-embed";
 import Authereum from "authereum";
 import { Bitski } from "bitski";
-import { useWallet } from "@oyster/common";
+import { useConnectionConfig, useWallet } from "@oyster/common";
+import { ENV } from "@solana/spl-token-registry";
 
 const providerOptions = {
   walletconnect: {
@@ -49,12 +50,13 @@ export const EthereumContext = createContext<EthereumContextState>({
 
 export const EthereumProvider: FunctionComponent = ({children}) => {
   const [web3, setWeb3] = useState<Web3>();
+  const { env } = useConnectionConfig();
   const { connected } = useWallet();
 
   const connect = useCallback(async () => {
     const web3Modal = new Web3Modal({
       theme: "dark",
-      network: "mainnet", // optional (TODO: add network selector)
+      network: env === ENV.MainnetBeta ? "mainnet" : "goerli", // optional (TODO: add network selector)
       cacheProvider: false, // optional
       providerOptions // required
     });
@@ -64,11 +66,23 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
     provider.on('error', (e: any) => console.error('WS Error', e));
     provider.on('end', (e: any) => console.error('WS End', e));
 
-    provider.on('disconnect', (error: { code: number; message: string }) => {
-      console.log(error);
+    provider.on("accountsChanged", (accounts: string[]) => {
+      console.log(accounts);
     });
-    provider.on('connect', (info: { chainId: number }) => {
+
+    // Subscribe to chainId change
+    provider.on("chainChanged", (chainId: number) => {
+      console.log(chainId);
+    });
+
+    // Subscribe to provider connection
+    provider.on("connect", (info: { chainId: number }) => {
       console.log(info);
+    });
+
+    // Subscribe to provider disconnection
+    provider.on("disconnect", (error: { code: number; message: string }) => {
+      console.log(error);
     });
 
     const instance = new Web3(provider);
