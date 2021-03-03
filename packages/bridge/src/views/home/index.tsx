@@ -81,7 +81,6 @@ export const HomeView = () => {
 
   const dataSource = useMemo(() => {
     if (loadingLockedAccounts) return [];
-    console.log(lockedSolanaAccounts)
     return lockedSolanaAccounts.map((acc, index) => {
       return {
         key: index.toString(),
