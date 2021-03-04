@@ -4,6 +4,8 @@ import * as BufferLayout from 'buffer-layout'
 import {WORMHOLE_PROGRAM_ID} from "../utils/ids";
 import BN from "bn.js";
 import {ASSET_CHAIN, getAssetAmountInUSD, getAssetName, getAssetTokenSymbol} from "../utils/assets";
+import { useEthereum } from "../contexts";
+import { PublicKey } from "@solana/web3.js";
 
 const { useConnection } = contexts.Connection;
 
@@ -13,8 +15,8 @@ interface ParsedData {
   parsedAssetAddress: string,
   parsedAccount: any,
   assetDecimals: number,
-  tokenName: string,
-  tokenSymbol: string,
+  name: string,
+  symbol: string,
   sourceAddress: string,
   targetAddress: string,
   amountInUSD: number,
@@ -22,6 +24,7 @@ interface ParsedData {
 
 export const useLockedFundsAccounts = () => {
   const connection = useConnection();
+  const { tokenMap: ethTokens } = useEthereum();
 
   const [lockedSolanaAccounts, setLockedSolanaAccounts] = useState<ParsedData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -59,17 +62,21 @@ export const useLockedFundsAccounts = () => {
             const dec = new BN(10).pow(new BN(parsedAccount.assetDecimals));
             const rawAmount = new BN(parsedAccount.amount, 2, "le")
             const amount = rawAmount.div(dec).toNumber();
-            const parsedAssetAddress: string = new Buffer(parsedAccount.assetAddress.slice(12)).toString("hex")
+            const parsedAssetAddress: string = parsedAccount.assetChain === ASSET_CHAIN.Solana ?
+                        new PublicKey(parsedAccount.targetAddress).toString() :
+                        new Buffer(parsedAccount.assetAddress.slice(12)).toString("hex")
             const parsedData: ParsedData = {
               amount: amount,
               rawAmount: rawAmount.toString(),
               parsedAssetAddress: parsedAssetAddress,
               parsedAccount: parsedAccount,
               assetDecimals: parsedAccount.assetDecimals,
-              sourceAddress: new Buffer(parsedAccount.sourceAddress.slice(12)).toString("hex"),
-              targetAddress: new Buffer(parsedAccount.targetAddress.slice(12)).toString("hex"),
-              tokenName: getAssetName(parsedAssetAddress, parsedAccount.assetChain),
-              tokenSymbol: getAssetTokenSymbol(parsedAssetAddress, parsedAccount.assetChain),
+              sourceAddress: new PublicKey(parsedAccount.sourceAddress).toString(),
+              targetAddress: parsedAccount.toChain === ASSET_CHAIN.Solana ?
+                new PublicKey(parsedAccount.targetAddress).toString()
+                : new Buffer(parsedAccount.targetAddress.slice(12)).toString("hex"),
+              name: getAssetName(parsedAssetAddress, parsedAccount.assetChain),
+              symbol: getAssetTokenSymbol(parsedAssetAddress, parsedAccount.assetChain),
               amountInUSD: getAssetAmountInUSD(amount, parsedAssetAddress, parsedAccount.assetChain),
             };
             filteredParsedAccounts.push(parsedData)

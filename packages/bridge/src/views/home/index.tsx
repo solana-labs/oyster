@@ -86,12 +86,13 @@ export const HomeView = () => {
     return lockedSolanaAccounts.map((acc, index) => {
       return {
         key: index.toString(),
-        symbol: acc.tokenSymbol,
-        name: acc.tokenName,
+        symbol: acc.symbol,
+        name: acc.name,
         amount: acc.amountInUSD,
-        sourceAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
-          <ExplorerLink address={acc.sourceAddress} type={"address"} /> :
-          <EtherscanLink address={acc.sourceAddress} type={"address"} />,
+        assetAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
+          <ExplorerLink address={acc.parsedAssetAddress} type={"address"} /> :
+          <EtherscanLink address={acc.parsedAssetAddress} type={"address"} />,
+          sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} />,
         targetAddress: acc.parsedAccount.toChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.targetAddress} type={"address"} /> :
           <EtherscanLink address={acc.targetAddress} type={"address"} />,
@@ -114,6 +115,11 @@ export const HomeView = () => {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
+    },
+    {
+      title: 'Asset Address',
+      dataIndex: 'assetAddress',
+      key: 'assetAddress',
     },
     {
       title: 'Source Address',
