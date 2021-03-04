@@ -1,5 +1,6 @@
 import React from 'react';
-import { useAccountByMint, useMint } from '../../contexts/accounts';
+import { useMint } from '../../contexts/accounts';
+import { useAccountByMint } from '../../hooks';
 import { TokenIcon } from '../TokenIcon';
 
 export const TokenDisplay = (props: {

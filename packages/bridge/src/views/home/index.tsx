@@ -10,7 +10,7 @@ import './itemStyle.less';
 import { Totals } from '../../models/totals';
 import { Link } from 'react-router-dom';
 import {useLockedFundsAccounts} from "../../hooks/useLockedFundsAccounts";
-import {EtherscanLink} from "@oyster/common/dist/lib/components/EtherscanLink";
+import { EtherscanLink } from "@oyster/common";
 import {ASSET_CHAIN} from "../../utils/assets";
 const { fromLamports, getTokenName, wadToLamports } = utils;
 const { cache } = contexts.Accounts;

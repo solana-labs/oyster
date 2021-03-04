@@ -8,7 +8,8 @@ import React, {
 import { MintInfo } from "@solana/spl-token";
 import { useHistory, useLocation } from "react-router-dom";
 import bs58 from "bs58";
-import { KnownToken, TokenAccount } from "@oyster/common";
+import { TokenAccount } from "@oyster/common";
+import { KnownToken } from '@solana/spl-token-registry';
 import { useConnection, useConnectionConfig, useAccountByMint, useMint, getTokenName, getTokenIcon, convert } from "@oyster/common";
 
 export interface TokenContextState {

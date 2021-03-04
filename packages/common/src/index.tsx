@@ -14,4 +14,4 @@ export * as walletAdapters from './wallet-adapters';
 
 export { TokenAccount } from './models';
 export { ParsedAccount, ParsedAccountBase } from './contexts';
-export { KnownTokenMap, EventEmitter, KnownToken, Layout } from './utils';
+export { KnownTokenMap, EventEmitter, Layout } from './utils';

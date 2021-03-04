@@ -501,17 +501,6 @@ export function useMint(key?: string | PublicKey) {
   return mint;
 }
 
-export const useAccountByMint = (mint: string) => {
-  const { userAccounts } = useUserAccounts();
-  const index = userAccounts.findIndex((acc) => acc.info.mint.toBase58() === mint);
-
-  if (index !== -1) {
-    return userAccounts[index];
-  }
-
-  return;
-};
-
 export function useAccount(pubKey?: PublicKey) {
   const connection = useConnection();
   const [account, setAccount] = useState<TokenAccount>();

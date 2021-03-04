@@ -2,7 +2,9 @@ import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { LendingReserve, LendingReserveParser } from '../models/lending';
 
-import { contexts, utils, ParsedAccount, KnownToken } from '@oyster/common';
+import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { KnownToken } from '@solana/spl-token-registry';
+
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 const { getTokenByName } = utils;

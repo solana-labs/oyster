@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
 import { Card, Select } from 'antd';
 import './style.less';
-import { TokenList, TokenInfo } from '@uniswap/token-lists';
+import { useEthereum } from '../../contexts';
 const { getTokenName } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -18,17 +18,7 @@ export function EthereumInput(props: {
 }) {
   const [balance, setBalance] = useState<number>(0);
   const [lastAmount, setLastAmount] = useState<string>('');
-  const [tokens, setTokens] = useState<TokenInfo[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const listResponse = await fetch('https://tokens.coingecko.com/uniswap/all.json');
-      const tokenList: TokenList = await listResponse.json();
-
-      setTokens(tokenList.tokens);
-    })();
-  }, [setTokens])
-
+  const { tokens } = useEthereum();
 
   const renderReserveAccounts = tokens.map((token) => {
     const mint = token.address;

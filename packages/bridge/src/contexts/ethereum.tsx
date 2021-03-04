@@ -10,6 +10,7 @@ import Authereum from "authereum";
 import { Bitski } from "bitski";
 import { useConnectionConfig, useWallet } from "@oyster/common";
 import { ENV } from "@solana/spl-token-registry";
+import { TokenList, TokenInfo } from '@uniswap/token-lists';
 
 const providerOptions = {
   walletconnect: {
@@ -41,17 +42,43 @@ const providerOptions = {
 
 export interface EthereumContextState {
   connect: () => Promise<void>;
-  web3?: Web3
+  web3?: Web3;
+  tokens: TokenInfo[];
+  tokenMap: Map<string, TokenInfo>;
 }
 
 export const EthereumContext = createContext<EthereumContextState>({
   connect: async () => {  },
+  tokens: [],
+  tokenMap: new Map<string, TokenInfo>(),
 });
 
 export const EthereumProvider: FunctionComponent = ({children}) => {
   const [web3, setWeb3] = useState<Web3>();
   const { env } = useConnectionConfig();
   const { connected } = useWallet();
+  const [tokens, setTokens] = useState<{
+    map: Map<string, TokenInfo>,
+    list: TokenInfo[],
+  }>({
+    map: new Map<string, TokenInfo>(),
+    list: [],
+  });
+
+  useEffect(() => {
+    (async () => {
+      const listResponse = await fetch('https://tokens.coingecko.com/uniswap/all.json');
+      const tokenList: TokenList = await listResponse.json();
+
+      setTokens({
+        map: tokenList.tokens.reduce((acc, val) => {
+          acc.set(val.address, val);
+          return acc;
+        }, new Map<string, TokenInfo>()),
+        list: tokenList.tokens,
+      });
+    })();
+  }, [setTokens]);
 
   const connect = useCallback(async () => {
     const web3Modal = new Web3Modal({
@@ -96,7 +123,7 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
   }, [connect, connected])
 
   return (
-    <EthereumContext.Provider value={{ web3, connect }}>
+    <EthereumContext.Provider value={{ web3, connect, tokens: tokens.list, tokenMap: tokens.map }}>
       {children}
     </EthereumContext.Provider>
   );
