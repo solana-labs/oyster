@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import {useLockedFundsAccounts} from "../../hooks/useLockedFundsAccounts";
 import { EtherscanLink } from "@oyster/common";
 import {ASSET_CHAIN} from "../../utils/assets";
+import { debug } from 'console';
 const { fromLamports, getTokenName, wadToLamports } = utils;
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -126,6 +127,8 @@ export const HomeView = () => {
     },
   ];
 
+  debugger;
+
   return (
     <div className="flexColumn">
       <Row
@@ -149,7 +152,7 @@ export const HomeView = () => {
           />
         </Col>
       </Row>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table dataSource={dataSource} columns={columns} loading={loadingLockedAccounts} />
     </div>
   );
 };

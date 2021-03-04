@@ -6,19 +6,16 @@ import {
   NumericInput,
   TokenDisplay,
   useUserAccounts,
-  useMint
+  useMint,
+  useConnectionConfig
 } from '@oyster/common';
 import { Card, Select } from 'antd';
 import './style.less';
 const { getTokenName } = utils;
-const { cache } = contexts.Accounts;
-const { useConnectionConfig } = contexts.Connection;
 
 const { Option } = Select;
 
 // TODO: add way to add new token account
-
-
 
 export function SolanaInput(props: {
   title: string;
@@ -38,12 +35,12 @@ export function SolanaInput(props: {
   const mint = useMint(currentMint);
 
   const renderPopularTokens = tokens.map((item) => {
-    const address = item.mintAddress;
+    const address = item.address;
     return (
-      <Option key={address} value={address} name={item.tokenSymbol} title={address}>
+      <Option key={address} value={address} name={item.symbol} title={address}>
         <TokenDisplay
           key={address}
-          name={item.tokenSymbol}
+          name={item.symbol}
           mintAddress={address}
           showBalance={true}
         />
@@ -53,7 +50,7 @@ export function SolanaInput(props: {
 
   useEffect(() => {
     if(!currentMint && tokens.length > 0) {
-      setCurrentMint(tokens[0].mintAddress)
+      setCurrentMint(tokens[0].address)
     }
   }, [tokens, currentMint])
 

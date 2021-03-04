@@ -2967,10 +2967,10 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@solana/spl-token-registry@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.1.10.tgz#4c412437e2fbf44993d11a4d0c07d8290540f316"
-  integrity sha512-uof1R915HhlA8RrsZWj0n62HSto3X4dPo28aYBhXwKWvzgEccsXN7CI8eLIyR6tlQp1hpJVUEoQqWZUCAn/LJg==
+"@solana/spl-token-registry@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.0.tgz#cd32d13c6056b0b6d722880e240663ebc5b39ad7"
+  integrity sha512-DC1gQDthODgCa0Nd5sPuoGpgEG3xdxQRoggfFFLQpwX689zILabvmVj6v6hF8bN8fGEpADZK1Fp8pwD427jkUQ==
   dependencies:
     cross-fetch "^3.0.6"
 

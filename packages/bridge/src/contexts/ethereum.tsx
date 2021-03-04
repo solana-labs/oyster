@@ -8,8 +8,7 @@ import Fortmatic from "fortmatic";
 import Torus from "@toruslabs/torus-embed";
 import Authereum from "authereum";
 import { Bitski } from "bitski";
-import { useConnectionConfig, useWallet } from "@oyster/common";
-import { ENV } from "@solana/spl-token-registry";
+import { useConnectionConfig, useWallet, ENV } from "@oyster/common";
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 
 const providerOptions = {
@@ -83,7 +82,7 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
   const connect = useCallback(async () => {
     const web3Modal = new Web3Modal({
       theme: "dark",
-      network: env === ENV.MainnetBeta ? "mainnet" : "goerli", // optional (TODO: add network selector)
+      network: env === "mainnet-beta" ? "mainnet" : "goerli", // optional (TODO: add network selector)
       cacheProvider: false, // optional
       providerOptions // required
     });

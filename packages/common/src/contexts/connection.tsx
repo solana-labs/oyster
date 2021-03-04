@@ -3,9 +3,8 @@ import { Account, clusterApiUrl, Connection, Transaction, TransactionInstruction
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { notify } from '../utils/notifications';
 import { ExplorerLink } from '../components/ExplorerLink';
-import LocalTokens from '../config/tokens.json';
 import { setProgramIds } from '../utils/ids';
-import { KnownToken, TokenListProvider } from '@solana/spl-token-registry';
+import { TokenInfo, TokenListProvider, ENV as ChainId } from '@solana/spl-token-registry';
 
 export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet' | 'lending';
 
@@ -13,17 +12,25 @@ export const ENDPOINTS = [
   {
     name: 'mainnet-beta' as ENV,
     endpoint: 'https://solana-api.projectserum.com/',
+    ChainId: ChainId.MainnetBeta,
   },
-  { name: 'testnet' as ENV, endpoint: clusterApiUrl('testnet') },
-  { name: 'devnet' as ENV, endpoint: clusterApiUrl('devnet') },
-  { name: 'localnet' as ENV, endpoint: 'http://127.0.0.1:8899' },
+  {
+    name: 'testnet' as ENV,
+    endpoint: clusterApiUrl('testnet'),
+    ChainId: ChainId.Testnet,
+  },
+  { name: 'devnet' as ENV, endpoint: clusterApiUrl('devnet'),
+    ChainId: ChainId.Devnet, },
+  { name: 'localnet' as ENV, endpoint: 'http://127.0.0.1:8899', ChainId: ChainId.Devnet, },
   {
     name: 'Oyster Dev' as ENV,
     endpoint: 'http://oyster-dev.solana.com/',
+    ChainId: ChainId.Devnet,
   },
   {
     name: 'Lending' as ENV,
     endpoint: 'https://tln.solana.com/',
+    ChainId: ChainId.Devnet,
   },
 ];
 
@@ -38,8 +45,8 @@ interface ConnectionConfig {
   setSlippage: (val: number) => void;
   env: ENV;
   setEndpoint: (val: string) => void;
-  tokens: KnownToken[];
-  tokenMap: Map<string, KnownToken>;
+  tokens: TokenInfo[];
+  tokenMap: Map<string, TokenInfo>;
 }
 
 const ConnectionContext = React.createContext<ConnectionConfig>({
@@ -51,7 +58,7 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
   sendConnection: new Connection(DEFAULT, 'recent'),
   env: ENDPOINTS[0].name,
   tokens: [],
-  tokenMap: new Map<string, KnownToken>(),
+  tokenMap: new Map<string, TokenInfo>(),
 });
 
 export function ConnectionProvider({ children = undefined as any }) {
@@ -64,16 +71,18 @@ export function ConnectionProvider({ children = undefined as any }) {
 
   const env = ENDPOINTS.find((end) => end.endpoint === endpoint)?.name || ENDPOINTS[0].name;
 
-  const [tokens, setTokens] = useState<KnownToken[]>([]);
-  const [tokenMap, setTokenMap] = useState<Map<string, KnownToken>>(new Map());
+  const [tokens, setTokens] = useState<TokenInfo[]>([]);
+  const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   useEffect(() => {
     // fetch token files
-    new TokenListProvider().resolve(env)
-      .then((list) => {
-        const knownMints = [...LocalTokens, ...list].reduce((map, item) => {
-          map.set(item.mintAddress, item);
+    new TokenListProvider().resolve()
+      .then((container) => {
+        const list = container.excludeByTag("nft").filterByChainId(ENDPOINTS.find((end) => end.endpoint === endpoint)?.ChainId || ChainId.MainnetBeta).getList();
+
+        const knownMints = [...list].reduce((map, item) => {
+          map.set(item.address, item);
           return map;
-        }, new Map<string, KnownToken>());
+        }, new Map<string, TokenInfo>());
 
         setTokenMap(knownMints);
         setTokens(list);

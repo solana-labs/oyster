@@ -5,9 +5,9 @@ import { TokenAccount } from './../models';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { WAD, ZERO } from '../constants';
-import { KnownToken } from '@solana/spl-token-registry';
+import { TokenInfo } from '@solana/spl-token-registry';
 
-export type KnownTokenMap = Map<string, KnownToken>;
+export type KnownTokenMap = Map<string, TokenInfo>;
 
 export const formatPriceNumber = new Intl.NumberFormat('en-US', {
   style: 'decimal',
@@ -60,7 +60,7 @@ export function getTokenName(
     return 'N/A';
   }
 
-  const knownSymbol = map.get(mintAddress)?.tokenSymbol;
+  const knownSymbol = map.get(mintAddress)?.symbol;
   if (knownSymbol) {
     return knownSymbol;
   }
@@ -69,9 +69,9 @@ export function getTokenName(
 }
 
 export function getTokenByName(tokenMap: KnownTokenMap, name: string) {
-  let token: KnownToken | null = null;
+  let token: TokenInfo | null = null;
   for (const val of tokenMap.values()) {
-    if (val.tokenSymbol === name) {
+    if (val.symbol === name) {
       token = val;
       break;
     }
@@ -89,7 +89,7 @@ export function getTokenIcon(
     return;
   }
 
-  return map.get(address)?.icon;
+  return map.get(address)?.logoURI;
 }
 
 export function isKnownMint(map: KnownTokenMap, mintAddress: string) {
