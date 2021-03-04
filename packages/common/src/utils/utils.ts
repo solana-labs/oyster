@@ -67,6 +67,24 @@ export function getTokenName(
 
   return shorten ? `${mintAddress.substring(0, 5)}...` : mintAddress;
 }
+export function getVerboseTokenName(
+  map: KnownTokenMap,
+  mint?: string | PublicKey,
+  shorten = true,
+): string {
+  const mintAddress = typeof mint === 'string' ? mint : mint?.toBase58();
+
+  if (!mintAddress) {
+    return 'N/A';
+  }
+
+  const knownName = map.get(mintAddress)?.name;
+  if (knownName) {
+    return knownName;
+  }
+
+  return shorten ? `${mintAddress.substring(0, 5)}...` : mintAddress;
+}
 
 export function getTokenByName(tokenMap: KnownTokenMap, name: string) {
   let token: TokenInfo | null = null;
