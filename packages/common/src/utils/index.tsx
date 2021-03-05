@@ -4,3 +4,4 @@ export * as Layout from './layout';
 export * from './notifications';
 export * from './utils';
 export * from './strings';
+export * as shortvec from './shortvec';

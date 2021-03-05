@@ -1,4 +1,4 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Message, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
@@ -10,6 +10,7 @@ import {
 } from './timelock';
 import BN from 'bn.js';
 import { toUTF8Array } from '@oyster/common/dist/lib/utils';
+import { pingInstruction } from './ping';
 
 /// [Requires Signatory token]
 /// Adds a Transaction to the Timelock Set. Max of 10 of any Transaction type. More than 10 will throw error.
@@ -35,6 +36,7 @@ export const addCustomSingleSignerTransactionInstruction = (
   position: number,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
+  // need to get a pda, move blockhash out of here...
 
   const instructionAsBytes = toUTF8Array(instruction);
   if (instructionAsBytes.length > INSTRUCTION_LIMIT) {
@@ -54,12 +56,15 @@ export const addCustomSingleSignerTransactionInstruction = (
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instructions'),
     BufferLayout.u8('position'),
+    BufferLayout.u8('instructionEndIndex'),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
+  const instructionEndIndex = instructionAsBytes.length - 1;
   for (let i = instructionAsBytes.length; i <= INSTRUCTION_LIMIT - 1; i++) {
     instructionAsBytes.push(0);
   }
+  console.log('Instruction end index', instructionEndIndex);
 
   dataLayout.encode(
     {
@@ -67,6 +72,7 @@ export const addCustomSingleSignerTransactionInstruction = (
       slot: new BN(slot),
       instructions: instructionAsBytes,
       position: position,
+      instructionEndIndex: instructionEndIndex,
     },
     data,
   );

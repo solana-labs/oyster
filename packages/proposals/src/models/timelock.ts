@@ -17,6 +17,8 @@ export enum TimelockInstruction {
   Sign = 8,
   Vote = 9,
   MintVotingTokens = 10,
+  Ping = 11,
+  Execute = 12,
 }
 
 export interface TimelockConfig {
@@ -189,10 +191,12 @@ export const CustomSingleSignerTimelockTransactionParser = (
     info: {
       version: data.version,
       slot: data.slot,
-      instruction: utils
-        .fromUTF8Array(data.instruction)
-        .replaceAll('\u0000', ''),
+      instruction: utils.fromUTF8Array(
+        data.instruction.slice(0, data.instructionEndIndex),
+      ),
       authorityKey: data.authorityKey,
+      executed: data.executed,
+      instructionEndIndex: data.instructionEndIndex,
     },
   };
 
@@ -205,6 +209,8 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
     Layout.publicKey('authorityKey'),
+    BufferLayout.u8('executed'),
+    BufferLayout.u8('instructionEndIndex'),
   ],
 );
 
@@ -214,6 +220,10 @@ export interface TimelockTransaction {
   slot: BN;
 
   instruction: string;
+
+  executed: number;
+
+  instructionEndIndex: number;
 }
 export interface CustomSingleSignerTimelockTransaction
   extends TimelockTransaction {

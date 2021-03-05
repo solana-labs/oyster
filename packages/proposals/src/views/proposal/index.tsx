@@ -225,6 +225,7 @@ function InnerProposalView({
           {instructionsForProposal.map((instruction, position) => (
             <Col xs={24} sm={24} md={12} lg={8} key={position}>
               <InstructionCard
+                proposal={proposal}
                 position={position + 1}
                 instruction={instruction}
               />
