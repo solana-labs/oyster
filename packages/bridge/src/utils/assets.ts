@@ -1,15 +1,31 @@
+import {
+  getTokenName,
+  getVerboseTokenName,
+  KnownTokenMap,
+  TokenIcon,
+} from '@oyster/common';
+import React from 'react';
+
 export const getAssetName = (
   parsedAssetAddress: string,
   assetChain: number,
+  solanaTokens: KnownTokenMap,
+  ethTokens: KnownTokenMap,
 ) => {
-  return parsedAssetAddress.slice(0, 5);
+  if (assetChain === ASSET_CHAIN.Solana)
+    return getVerboseTokenName(solanaTokens, parsedAssetAddress);
+  else return getVerboseTokenName(ethTokens, `0x${parsedAssetAddress}`);
 };
 
 export const getAssetTokenSymbol = (
   parsedAssetAddress: string,
   assetChain: number,
+  solanaTokens: KnownTokenMap,
+  ethTokens: KnownTokenMap,
 ) => {
-  return parsedAssetAddress.slice(0, 5);
+  if (assetChain === ASSET_CHAIN.Solana)
+    return getTokenName(solanaTokens, parsedAssetAddress);
+  else return getTokenName(ethTokens, `0x${parsedAssetAddress}`);
 };
 
 export const getAssetAmountInUSD = (

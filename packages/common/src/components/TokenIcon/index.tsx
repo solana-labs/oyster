@@ -1,6 +1,6 @@
 import React from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { getTokenIcon } from '../../utils';
+import {getTokenIcon, KnownTokenMap} from '../../utils';
 import { useConnectionConfig } from '../../contexts/connection';
 import { Identicon } from '../Identicon';
 
@@ -9,9 +9,15 @@ export const TokenIcon = (props: {
   style?: React.CSSProperties;
   size?: number;
   className?: string;
+  tokenMap?: KnownTokenMap,
 }) => {
-  const { tokenMap } = useConnectionConfig();
-  const icon = getTokenIcon(tokenMap, props.mintAddress);
+  let icon: string | undefined = '';
+  if (props.tokenMap) {
+    icon = getTokenIcon(props.tokenMap, props.mintAddress);
+  } else {
+    const { tokenMap } = useConnectionConfig();
+    icon = getTokenIcon(tokenMap, props.mintAddress);
+  }
 
   const size = props.size || 20;
 
@@ -35,7 +41,6 @@ export const TokenIcon = (props: {
       />
     );
   }
-
   return (
     <Identicon
       address={props.mintAddress}

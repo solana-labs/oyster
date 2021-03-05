@@ -2,7 +2,7 @@ import { MintInfo } from '@solana/spl-token';
 import { Table, Tag, Space, Card, Col, Row, Statistic, Button } from 'antd';
 import React, {useEffect, useMemo, useState} from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import {contexts, ExplorerLink, ParsedAccount, utils} from '@oyster/common';
+import {contexts, ExplorerLink, ParsedAccount, TokenIcon, utils} from '@oyster/common';
 import { useMarkets } from '../../contexts/market';
 
 import { LendingReserveItem } from './item';
@@ -86,13 +86,13 @@ export const HomeView = () => {
     return lockedSolanaAccounts.map((acc, index) => {
       return {
         key: index.toString(),
-        symbol: acc.symbol,
+        symbol: <div>{acc.assetIcon} {acc.symbol}</div>,
         name: acc.name,
         amount: acc.amountInUSD,
         assetAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.parsedAssetAddress} type={"address"} /> :
           <EtherscanLink address={acc.parsedAssetAddress} type={"address"} />,
-          sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} />,
+        sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} />,
         targetAddress: acc.parsedAccount.toChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.targetAddress} type={"address"} /> :
           <EtherscanLink address={acc.targetAddress} type={"address"} />,
@@ -132,8 +132,6 @@ export const HomeView = () => {
       key: 'targetAddress',
     },
   ];
-
-  debugger;
 
   return (
     <div className="flexColumn">
