@@ -9,6 +9,7 @@ import {
   HomeView,
   TransferView,
 } from './views';
+import {CoingeckoProvider} from "./contexts/coingecko";
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
@@ -22,15 +23,17 @@ export function Routes() {
             <EthereumProvider>
               <AccountsProvider>
                 <MarketProvider>
-                  <TokenPairProvider>
-                      <AppLayout>
-                        <Switch>
-                          <Route exact path="/" component={() => <HomeView />} />
-                          <Route path="/move" children={<TransferView />} />
-                          <Route exact path="/faucet" children={<FaucetView />} />
-                        </Switch>
-                      </AppLayout>
+                  <CoingeckoProvider>
+                    <TokenPairProvider>
+                        <AppLayout>
+                          <Switch>
+                            <Route exact path="/" component={() => <HomeView />} />
+                            <Route path="/move" children={<TransferView />} />
+                            <Route exact path="/faucet" children={<FaucetView />} />
+                          </Switch>
+                        </AppLayout>
                     </TokenPairProvider>
+                  </CoingeckoProvider>
                 </MarketProvider>
               </AccountsProvider>
             </EthereumProvider>
