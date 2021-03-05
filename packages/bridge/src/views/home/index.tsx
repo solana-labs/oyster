@@ -23,8 +23,9 @@ export const HomeView = () => {
   const {coinList} = useCoingecko();
 
   const dataSourcePriceQuery = useCallback(async () => {
-    const tempDataSources: any[] = [];
+    const tempDataSources = new Map();
     const tempTotalPerCoin = new Map();
+    const tempTotalPerAsset = new Map();
     for (const index in lockedSolanaAccounts) {
       const acc = lockedSolanaAccounts[index];
 
@@ -42,26 +43,26 @@ export const HomeView = () => {
       } else {
         tempTotalPerCoin.set(acc.symbol, {amount: acc.amount, amountInUSD: price * acc.amount})
       }
-
-      tempDataSources.push({
+      tempTotalPerAsset.set(
+        acc.parsedAssetAddress,
+        (tempTotalPerAsset.get(acc.parsedAssetAddress) || 0) + acc.amount
+      )
+      tempDataSources.set(acc.parsedAssetAddress, {
         key: index.toString(),
         symbol: <div>{acc.assetIcon} {acc.symbol}</div>,
         name: acc.name,
-        amount: acc.amount,
+        amount: tempTotalPerAsset.get(acc.parsedAssetAddress),
         price: price,
-        amountInUSD: `$${price * acc.amount}`,
+        amountInUSD: `$${tempTotalPerAsset.get(acc.parsedAssetAddress)  * price}`,
         assetAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
           <ExplorerLink address={acc.parsedAssetAddress} type={"address"} length={5} /> :
           <EtherscanLink address={acc.parsedAssetAddress} type={"address"} length={5} />,
-        sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} length={5} />,
-        targetAddress: acc.parsedAccount.toChain === ASSET_CHAIN.Solana ?
-          <ExplorerLink address={acc.targetAddress} type={"address"} length={5} /> :
-          <EtherscanLink address={acc.targetAddress} type={"address"} length={5} />,
       });
     }
-    setDataSource(tempDataSources);
+    const dataSourceValues = Array.from(tempDataSources.values())
+    setDataSource(dataSourceValues);
     setTotalPerCoin(tempTotalPerCoin);
-    setTotal(tempDataSources.reduce((acc, source) => acc + source.amount * source.price, 0));
+    setTotal(dataSourceValues.reduce((acc, source) => acc + source.amount * source.price, 0));
     coingeckoTimer.current = window.setTimeout(
       () => dataSourcePriceQuery(),
       COINGECKO_POOL_INTERVAL
@@ -102,17 +103,7 @@ export const HomeView = () => {
       title: 'Asset Address',
       dataIndex: 'assetAddress',
       key: 'assetAddress',
-    },
-    {
-      title: 'Source Address',
-      dataIndex: 'sourceAddress',
-      key: 'sourceAddress',
-    },
-    {
-      title: 'Target Address',
-      dataIndex: 'targetAddress',
-      key: 'targetAddress',
-    },
+    }
   ];
 
   return (
