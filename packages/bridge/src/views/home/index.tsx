@@ -1,104 +1,81 @@
-import { MintInfo } from '@solana/spl-token';
-import { Table, Tag, Space, Card, Col, Row, Statistic, Button } from 'antd';
-import React, {useEffect, useMemo, useState} from 'react';
-import { GUTTER, LABELS } from '../../constants';
-import {contexts, ExplorerLink, ParsedAccount, TokenIcon, utils} from '@oyster/common';
-import { useMarkets } from '../../contexts/market';
 
-import { LendingReserveItem } from './item';
+import { Table, Col, Row, Statistic, Button } from 'antd';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import { GUTTER, LABELS } from '../../constants';
+import {ExplorerLink, formatNumber} from '@oyster/common';
 import './itemStyle.less';
-import { Totals } from '../../models/totals';
 import { Link } from 'react-router-dom';
 import {useLockedFundsAccounts} from "../../hooks/useLockedFundsAccounts";
 import { EtherscanLink } from "@oyster/common";
 import {ASSET_CHAIN} from "../../utils/assets";
-import { debug } from 'console';
-const { fromLamports, getTokenName, wadToLamports } = utils;
-const { cache } = contexts.Accounts;
-const { useConnectionConfig } = contexts.Connection;
+import {COINGECKO_COIN_PRICE_API, COINGECKO_POOL_INTERVAL, useCoingecko} from "../../contexts/coingecko";
 
 export const HomeView = () => {
-  const { marketEmitter, midPriceInUSD } = useMarkets();
-  const { tokenMap } = useConnectionConfig();
-  const {loading: loadingLockedAccounts, lockedSolanaAccounts, total: totalLocked } = useLockedFundsAccounts();
-  const [totals, setTotals] = useState<Totals>({
-    marketSize: 0,
-    numberOfAssets: 0,
-    items: [],
-  });
+  const [dataSource, setDataSource] = useState<any[]>([]);
+  const [total, setTotal] = useState<number>(0)
+  const [totalPerCoin, setTotalPerCoin] = useState<Map<string, {amount: number, amountInUSD: number}>>(new Map())
+  const {
+    loading: loadingLockedAccounts,
+    lockedSolanaAccounts
+  } = useLockedFundsAccounts();
 
-  useEffect(() => {
-    const refreshTotal = () => {
-      let newTotals: Totals = {
-        marketSize: 0,
-        numberOfAssets: 0,
-        items: [],
-      };
+  const coingeckoTimer = useRef<number>(0);
+  const {coinList} = useCoingecko();
 
-      [].forEach(item => {
-        const address = ''; // item.pubkey.toBase58()
+  const dataSourcePriceQuery = useCallback(async () => {
+    const tempDataSources: any[] = [];
+    const tempTotalPerCoin = new Map();
+    for (const index in lockedSolanaAccounts) {
+      const acc = lockedSolanaAccounts[index];
 
-        const localCache = cache;
-        const liquidityMint = localCache.get(
-          address,
-        ) as ParsedAccount<MintInfo>;
+      const coinInfo = coinList.get(acc.symbol.toLowerCase());
+      const parameters = `?ids=${coinInfo?.id}&vs_currencies=usd`;
+      const resp = await window.fetch(COINGECKO_COIN_PRICE_API+parameters);
+      const data = await resp.json();
+      const price = coinInfo?.id ? data[coinInfo.id]?.usd || 1 : 1;
+      const coinTotal = tempTotalPerCoin.get(acc.symbol);
+      if (coinTotal) {
+        tempTotalPerCoin.set(acc.symbol, {
+          amount: acc.amount + coinTotal.amount,
+          amountInUSD: (price * acc.amount) + coinTotal.amountInUSD
+        })
+      } else {
+        tempTotalPerCoin.set(acc.symbol, {amount: acc.amount, amountInUSD: price * acc.amount})
+      }
 
-        if (!liquidityMint) {
-          return;
-        }
-
-        const price = midPriceInUSD(liquidityMint?.pubkey.toBase58());
-        const marketCapLamports = 0;
-        const marketSize =
-          fromLamports(marketCapLamports, liquidityMint?.info) * price;
-        let leaf = {
-          key: address,
-          marketSize,
-          nativeSize: 0,
-          name: getTokenName(tokenMap, address),
-        };
-
-        newTotals.items.push(leaf);
-
-        newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
-      });
-
-      newTotals.items = newTotals.items.sort(
-        (a, b) => b.marketSize - a.marketSize,
-      );
-
-      setTotals(newTotals);
-    };
-
-    const dispose = marketEmitter.onMarket(() => {
-      refreshTotal();
-    });
-
-    refreshTotal();
-
-    return () => {
-      dispose();
-    };
-  }, [marketEmitter, midPriceInUSD, setTotals, tokenMap]);
-
-  const dataSource = useMemo(() => {
-    if (loadingLockedAccounts) return [];
-    return lockedSolanaAccounts.map((acc, index) => {
-      return {
+      tempDataSources.push({
         key: index.toString(),
         symbol: <div>{acc.assetIcon} {acc.symbol}</div>,
         name: acc.name,
-        amount: acc.amountInUSD,
+        amount: acc.amount,
+        price: price,
+        amountInUSD: `$${price * acc.amount}`,
         assetAddress: acc.parsedAccount.assetChain === ASSET_CHAIN.Solana ?
-          <ExplorerLink address={acc.parsedAssetAddress} type={"address"} /> :
-          <EtherscanLink address={acc.parsedAssetAddress} type={"address"} />,
-        sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} />,
+          <ExplorerLink address={acc.parsedAssetAddress} type={"address"} length={5} /> :
+          <EtherscanLink address={acc.parsedAssetAddress} type={"address"} length={5} />,
+        sourceAddress: <ExplorerLink address={acc.sourceAddress} type={"address"} length={5} />,
         targetAddress: acc.parsedAccount.toChain === ASSET_CHAIN.Solana ?
-          <ExplorerLink address={acc.targetAddress} type={"address"} /> :
-          <EtherscanLink address={acc.targetAddress} type={"address"} />,
-      }
-    })
-  }, [loadingLockedAccounts, lockedSolanaAccounts])
+          <ExplorerLink address={acc.targetAddress} type={"address"} length={5} /> :
+          <EtherscanLink address={acc.targetAddress} type={"address"} length={5} />,
+      });
+    }
+    setDataSource(tempDataSources);
+    setTotalPerCoin(tempTotalPerCoin);
+    setTotal(tempDataSources.reduce((acc, source) => acc + source.amount * source.price, 0));
+    coingeckoTimer.current = window.setTimeout(
+      () => dataSourcePriceQuery(),
+      COINGECKO_POOL_INTERVAL
+    );
+  }, [lockedSolanaAccounts])
+  useEffect(() => {
+    if (!loadingLockedAccounts && coinList) {
+      dataSourcePriceQuery();
+    }
+    return () => {
+      window.clearTimeout(coingeckoTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedSolanaAccounts]);
 
   const columns = [
     {
@@ -115,6 +92,11 @@ export const HomeView = () => {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
+    },
+    {
+      title: 'Amount In USD',
+      dataIndex: 'amountInUSD',
+      key: 'amountInUSD',
     },
     {
       title: 'Asset Address',
@@ -151,9 +133,19 @@ export const HomeView = () => {
         <Col xs={24} xl={12}>
           <Statistic
             className="home-statistic"
-            title={`$${totalLocked}`}
+            title={`$${formatNumber.format(total)}`}
             value="TOTAL VALUE LOCKED"
           />
+          {Array.from(totalPerCoin, ([key, value]) => {
+            return (
+              <div style={{display: "inline-block", margin: "0 10px 0 10px"}}>
+                <div>
+                  <em>{value.amount}</em> {key}
+                </div>
+                <div className="dashboard-amount-quote">${formatNumber.format(value.amountInUSD)}</div>
+              </div>
+            );
+          })}
         </Col>
       </Row>
       <Table dataSource={dataSource} columns={columns} loading={loadingLockedAccounts} />

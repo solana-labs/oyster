@@ -2,9 +2,7 @@ import {
   getTokenName,
   getVerboseTokenName,
   KnownTokenMap,
-  TokenIcon,
 } from '@oyster/common';
-import React from 'react';
 
 export const getAssetName = (
   parsedAssetAddress: string,
