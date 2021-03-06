@@ -1,20 +1,16 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import { useConnection, TokenIcon, useConnectionConfig, MintParser, cache, TokenAccountParser, getMultipleAccounts, ParsedAccount} from "@oyster/common";
+import {useCallback, useEffect, useRef, useState} from "react";
+import { useConnection, useConnectionConfig, MintParser, cache, getMultipleAccounts, ParsedAccount} from "@oyster/common";
 import {WORMHOLE_PROGRAM_ID} from "../utils/ids";
-import BN from "bn.js";
-import {ASSET_CHAIN, getAssetAmountInUSD, getAssetName, getAssetTokenSymbol} from "../utils/assets";
+import {ASSET_CHAIN} from "../utils/assets";
 import { useEthereum } from "../contexts";
-import { ParsedAccountData, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { models } from "@oyster/common";
-import { AccountLayout, MintInfo, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { BridgeLayout, GuardianSetLayout, WrappedMetaLayout, TransferOutProposalLayout } from './../models/bridge';
+import { MintInfo } from "@solana/spl-token";
+import { WrappedMetaLayout } from './../models/bridge';
 import { AssetMeta } from "../core";
-import { TokenInfo } from "@solana/spl-token-registry";
 import bs58 from "bs58";
-import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import { COINGECKO_COIN_PRICE_API, COINGECKO_POOL_INTERVAL, useCoingecko } from "../contexts/coingecko";
 
-const ParsedDataLayout = models.ParsedDataLayout
 
 const getConfigKey = async () => {
   // @ts-ignore
@@ -43,7 +39,7 @@ const getWrappedAssetMint = async (configKey: PublicKey, asset: AssetMeta) => {
   )[0];
 }
 
-const getWrappedAssetMeta = async (configKey: PublicKey, mint: PublicKey) => {
+export const getWrappedAssetMeta = async (configKey: PublicKey, mint: PublicKey) => {
   let seeds: Array<Buffer> = [
     Buffer.from('meta'),
     configKey.toBuffer(),
@@ -67,9 +63,8 @@ export const useWormholeAccounts = () => {
   const connection = useConnection();
   const { tokenMap: ethTokens } = useEthereum();
   const {coinList} = useCoingecko();
-  const {tokenMap: solanaTokens} = useConnectionConfig();
 
-  const [lockedSolanaAccounts, setLockedSolanaAccounts] = useState<models.ParsedDataAccount[]>([]);
+  const [] = useState<models.ParsedDataAccount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [externalAssets, setExternalAssets] = useState<WrappedAssetMeta[]>([]);
