@@ -92,6 +92,8 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
     provider.on('error', (e: any) => console.error('WS Error', e));
     provider.on('end', (e: any) => console.error('WS End', e));
 
+
+
     provider.on("accountsChanged", (accounts: string[]) => {
       console.log(accounts);
     });

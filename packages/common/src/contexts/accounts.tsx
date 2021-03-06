@@ -447,8 +447,7 @@ export const getMultipleAccounts = async (connection: any, keys: string[], commi
               data: Buffer.from(data[0], 'base64'),
             } as AccountInfo<Buffer>;
             return obj;
-          })
-          .filter((_) => _) as AccountInfo<Buffer>[]
+          }) as AccountInfo<Buffer>[]
     )
     .flat();
   return { keys, array };

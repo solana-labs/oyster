@@ -16,6 +16,7 @@ export const Transfer = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
 
+  // TODO:
 
   return (
     <>
@@ -24,7 +25,7 @@ export const Transfer = () => {
           title="From Ethereum"
           onInputChange={() => {}}
           />
-      <Button type="primary" className="swap-button" disabled={true}>
+      <Button type="primary" className="swap-button">
         ⇅
       </Button>
       <SolanaInput
