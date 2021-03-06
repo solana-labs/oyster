@@ -2,7 +2,7 @@ import {EventEmitter} from "@oyster/common";
 import React, {useContext, useEffect, useState} from "react";
 import {MarketsContextState} from "./market";
 
-export const COINGECKO_POOL_INTERVAL = 2 * 60_000; // 2 min
+export const COINGECKO_POOL_INTERVAL = 10000; // 2 min
 export const COINGECKO_API = "https://api.coingecko.com/api/v3/"
 export const COINGECKO_COIN_LIST_API = `${COINGECKO_API}coins/list`
 export const COINGECKO_COIN_PRICE_API = `${COINGECKO_API}simple/price`

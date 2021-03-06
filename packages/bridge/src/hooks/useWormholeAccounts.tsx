@@ -61,7 +61,7 @@ function padBuffer(b: Buffer, len: number): Buffer {
   return zeroPad;
 }
 
-type WrappedAssetMeta = { chain: number, decimals: number, address: string, mintKey: string, mint?: ParsedAccount<MintInfo>, amount: number, amountInUSD: number, logo?: string, symbol?: string };
+type WrappedAssetMeta = { chain: number, decimals: number, address: string, mintKey: string, mint?: ParsedAccount<MintInfo>, amount: number, amountInUSD: number, logo?: string, symbol?: string, price?: number };
 
 export const useWormholeAccounts = () => {
   const connection = useConnection();
@@ -98,7 +98,7 @@ export const useWormholeAccounts = () => {
 
       const filters = [
         {
-          dataSize: TransferOutProposalLayout.span,
+          dataSize: WrappedMetaLayout.span,
         },
         // {
         //   memcmp: {
@@ -116,7 +116,6 @@ export const useWormholeAccounts = () => {
         },
       ]);
 
-
       const assets = new Map<string, WrappedAssetMeta>();
       const assetsByMint = new Map<string, WrappedAssetMeta>();
 
@@ -130,20 +129,19 @@ export const useWormholeAccounts = () => {
           lamports: acc.account.lamports,
         },
       })).map((acc: any) => {
-        if(acc.account.data.length === TransferOutProposalLayout.span) {
-          const parsedAccount = TransferOutProposalLayout.decode(acc.account.data)
-          if (parsedAccount.assetChain !== ASSET_CHAIN.Solana) {
-            const assetAddress: string = new Buffer(parsedAccount.assetAddress.slice(12)).toString("hex");
-            if(!assets.has(assetAddress)) {
-              assets.set(assetAddress, {
-                chain: parsedAccount.assetChain,
-                address: assetAddress,
-                decimals: parsedAccount.assetDecimals,
-                mintKey: '',
-                amount: 0,
-                amountInUSD: 0,
-              });
-            }
+        if(acc.account.data.length === WrappedMetaLayout.span) {
+          const metaAccount = WrappedMetaLayout.decode(acc.account.data);
+          if (metaAccount.chain !== ASSET_CHAIN.Solana) {
+            const assetAddress: string = new Buffer(metaAccount.address.slice(12)).toString("hex");
+
+            assets.set(assetAddress, {
+              chain: metaAccount.chain,
+              address: assetAddress,
+              decimals: 9,
+              mintKey: '',
+              amount: 0,
+              amountInUSD: 0,
+            });
           }
         }
       });
@@ -171,18 +169,25 @@ export const useWormholeAccounts = () => {
 
       // cache mints and listen for changes
       mints.keys.forEach((key, index) => {
+        if(!mints.array[index]) {
+          return;
+        }
+
         const asset = assetsByMint.get(key);
         if(!asset) {
           throw new Error('missing mint');
         }
 
-        if(!mints.array[index]) {
-          debugger;
+        try {
+          cache.add(key, mints.array[index], MintParser);
+        } catch {
+          return;
         }
-
-        cache.add(key, mints.array[index], MintParser);
         asset.mint = cache.get(key);
-        asset.amount = asset.mint?.info.supply.toNumber() || 0;
+
+        if(asset.mint) {
+
+        asset.amount = asset.mint?.info.supply.toNumber() / Math.pow(10, asset.mint?.info.decimals) || 0;
 
         if(!asset.mint) {
           throw new Error('missing mint')
@@ -196,6 +201,7 @@ export const useWormholeAccounts = () => {
 
           setExternalAssets([...assets.values()]);
         });
+      }
 
         setExternalAssets([...assets.values()]);
       });
@@ -227,8 +233,6 @@ export const useWormholeAccounts = () => {
 
       let coinInfo = coinList.get(token.symbol.toLowerCase());
 
-
-
       if(coinInfo) {
         idToAsset.set(coinInfo.id, asset);
         addressToId.set(asset.address, coinInfo.id);
@@ -243,9 +247,7 @@ export const useWormholeAccounts = () => {
     const parameters = `?ids=${ids.join(',')}&vs_currencies=usd`;
     const resp = await window.fetch(COINGECKO_COIN_PRICE_API+parameters);
     const data = await resp.json();
-
     let totalInUSD = 0;
-    debugger;
 
     Object.keys(data).forEach(key => {
       let asset = idToAsset.get(key);
@@ -253,7 +255,8 @@ export const useWormholeAccounts = () => {
         return;
       }
 
-      asset.amountInUSD = asset.amount * (data[key]?.usd || 1);
+      asset.price = data[key]?.usd || 1;
+      asset.amountInUSD = Math.round(asset.amount * (asset.price || 1) * 100) / 100;
       totalInUSD += asset.amountInUSD;
     });
 

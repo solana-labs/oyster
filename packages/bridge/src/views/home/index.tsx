@@ -37,6 +37,11 @@ export const HomeView = () => {
       key: 'amountInUSD',
     },
     {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+    },
+    {
       title: 'Asset Address',
       dataIndex: 'address',
       key: 'address',
