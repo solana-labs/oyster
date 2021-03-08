@@ -1,20 +1,25 @@
 import React from 'react';
 import { Button, Popover } from 'antd';
 import { CurrentUserBadge } from '../CurrentUserBadge';
+import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';
 import { LABELS } from '../../constants/labels';
 import { ConnectButton } from '..';
 import { useWallet } from '../../contexts/wallet';
 import './style.css';
-export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
+export const AppBar = (props: {
+  left?: JSX.Element;
+  right?: JSX.Element;
+  useWalletBadge?: boolean;
+}) => {
   const { connected, wallet } = useWallet();
 
   const TopBar = (
     <div className="App-Bar-right">
       {props.left}
       {connected ? (
-        <CurrentUserBadge />
+        props.useWalletBadge ? <CurrentUserWalletBadge /> : <CurrentUserBadge />
       ) : (
         <ConnectButton
           type="text"
