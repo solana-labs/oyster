@@ -8,7 +8,6 @@ import {
   cache,
   TokenAccountParser,
   ParsedAccount,
-  TokenAccount,
 } from '@oyster/common';
 
 import { ethers } from 'ethers';
@@ -16,11 +15,7 @@ import { ASSET_CHAIN } from '../../utils/assets';
 import { BigNumber } from 'ethers/utils';
 import { Erc20Factory } from '../../contracts/Erc20Factory';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
-import {
-  AssetMeta,
-  createWrappedAssetInstruction,
-  WrappedMetaLayout,
-} from './meta';
+import { AssetMeta, createWrappedAssetInstruction } from './meta';
 import { bridgeAuthorityKey, wrappedAssetMintKey } from './helpers';
 import {
   Account,
@@ -28,13 +23,8 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import BN from 'bn.js';
 import { createTokenAccount } from '@oyster/common/dist/lib/actions';
-import { AccountInfo, AccountLayout, Token } from '@solana/spl-token';
-
-const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
-const { notify } = utils;
+import { AccountInfo, AccountLayout } from '@solana/spl-token';
 
 export interface ProgressUpdate {
   message: string;
@@ -56,6 +46,7 @@ export interface TransferRequestInfo {
 }
 
 export interface TransferRequest {
+  nonce?: number;
   signer?: ethers.Signer;
   asset?: string;
   amount?: number;
@@ -81,8 +72,17 @@ export const transfer = async (
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,
 ) => {
+  if (!request.asset) {
+    return;
+  }
+
   const walletName = 'MetaMask';
   request.signer = provider?.getSigner();
+
+  request.nonce = await provider.getTransactionCount(
+    request.signer.getAddress(),
+    'pending',
+  );
 
   let counter = 0;
   // check difference between lock/approve (invoke lock if allowance < amount)
@@ -108,7 +108,6 @@ export const transfer = async (
       }
 
       const group = 'Initiate transfer';
-
       try {
         const bridgeId = programIds().wormhole.pubkey;
         const authority = await bridgeAuthorityKey(bridgeId);
@@ -214,9 +213,7 @@ export const transfer = async (
       }
 
       const group = 'Approve assets';
-
       try {
-        debugger;
         if (request.info?.allowance.lt(request.amountBN)) {
           let e = Erc20Factory.connect(request.asset, request.signer);
           setProgress({
@@ -270,7 +267,8 @@ export const transfer = async (
         !request.signer ||
         !request.recipient ||
         !request.toChain ||
-        !request.info
+        !request.info ||
+        !request.nonce
       ) {
         return;
       }
@@ -293,7 +291,7 @@ export const transfer = async (
           request.amountBN,
           request.recipient,
           request.toChain,
-          10,
+          request.nonce,
           false,
         );
         setProgress({

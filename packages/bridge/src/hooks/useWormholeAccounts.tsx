@@ -203,34 +203,32 @@ export const useWormholeAccounts = () => {
     const assetsToQueryNames: WrappedAssetMeta[] = [];
 
     const ids = externalAssets.map(asset => {
+      // TODO: add different nets/clusters
       asset.explorer = `https://etherscan.io/address/0x${asset.address}`;
-      // TODO: add
       asset.wrappedExplorer = `https://explorer.solana.com/address/${asset.mintKey}`;
 
       let knownToken = tokenMap.get(asset.mintKey);
-      if(knownToken) {
+      if (knownToken) {
         asset.logo = knownToken.logoURI;
         asset.symbol = knownToken.symbol;
         asset.name = knownToken.name;
       }
 
-
       let token = ethTokens.get(`0x${asset.address || ''}`);
-      if(!token) {
-        assetsToQueryNames.push(asset);
-        return;
+      if (token) {
+        asset.logo = token.logoURI;
+        asset.symbol = token.symbol;
+        asset.name = token.name;
       }
 
-      asset.logo = token.logoURI;
-      asset.symbol = token.symbol;
-      asset.name = token.name;
+      if (asset.symbol) {
+        let coinInfo = coinList.get(asset.symbol.toLowerCase());
 
-      let coinInfo = coinList.get(token.symbol.toLowerCase());
-
-      if(coinInfo) {
-        idToAsset.set(coinInfo.id, asset);
-        addressToId.set(asset.address, coinInfo.id);
-        return coinInfo.id;
+        if(coinInfo) {
+          idToAsset.set(coinInfo.id, asset);
+          addressToId.set(asset.address, coinInfo.id);
+          return coinInfo.id;
+        }
       }
     }).filter(_ => _);
 
