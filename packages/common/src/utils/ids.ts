@@ -12,6 +12,10 @@ export let LENDING_PROGRAM_ID = new PublicKey(
   'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
 );
 
+export let SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey(
+  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
+);
+
 let WORMHOLE_BRIDGE: {
   pubkey: PublicKey;
   bridge: string;
@@ -158,5 +162,6 @@ export const programIds = () => {
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,
     timelock: TIMELOCK,
+    associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
   };
 };

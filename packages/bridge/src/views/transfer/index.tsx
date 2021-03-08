@@ -12,13 +12,12 @@ const { notify } = utils;
 export const TransferView = () => {
   const connection = useConnection();
   const { wallet, connected } = useWallet();
-  const { connect: connectEth } = useEthereum();
 
   useEffect(() => {
 
     // connectEth();
 
-  }, [connected, connectEth])
+  }, [connected])
 
   return (
     <div className="flexColumn" style={{ flex: 1 }}>

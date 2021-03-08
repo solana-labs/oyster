@@ -12,6 +12,7 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
 
   const TopBar = (
     <div className="App-Bar-right">
+      {props.left}
       {connected ? (
         <CurrentUserBadge />
       ) : (

@@ -27,10 +27,10 @@ export const Wrap = () => {
       <Button type="primary" className="swap-button">
         ⇅
       </Button>
-      <EthereumInput
+      {/* <EthereumInput
           title="To Ethereum"
           onInputChange={() => {}}
-          />
+          /> */}
     </div>
     <ConnectButton type="primary">
       Wrap

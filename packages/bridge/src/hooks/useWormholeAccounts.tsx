@@ -1,68 +1,159 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import { useConnection, useConnectionConfig, MintParser, cache, getMultipleAccounts, ParsedAccount} from "@oyster/common";
+import { useConnection, useConnectionConfig, MintParser, cache, getMultipleAccounts, ParsedAccount, TokenAccountParser, programIds} from "@oyster/common";
 import {WORMHOLE_PROGRAM_ID} from "../utils/ids";
 import {ASSET_CHAIN} from "../utils/assets";
 import { useEthereum } from "../contexts";
-import { PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { models } from "@oyster/common";
 import { MintInfo } from "@solana/spl-token";
-import { WrappedMetaLayout } from './../models/bridge';
-import { AssetMeta } from "../core";
+import { bridgeAuthorityKey, wrappedAssetMintKey, WrappedMetaLayout } from './../models/bridge';
+
 import bs58 from "bs58";
 import { COINGECKO_COIN_PRICE_API, COINGECKO_POOL_INTERVAL, useCoingecko } from "../contexts/coingecko";
 
 
-const getConfigKey = async () => {
-  // @ts-ignore
-  return (
-    await PublicKey.findProgramAddress(
-      [Buffer.from('bridge')],
-      WORMHOLE_PROGRAM_ID,
-    )
-  )[0];
-}
-const getWrappedAssetMint = async (configKey: PublicKey, asset: AssetMeta) => {
-  if (asset.chain === 1) {
-    return new PublicKey(asset.address);
+type WrappedAssetMeta = {
+  chain: number,
+  decimals: number,
+  address: string,
+  mintKey: string,
+  mint?: ParsedAccount<MintInfo>,
+  amount: number,
+  amountInUSD: number,
+  logo?: string,
+  symbol?: string,
+  name?: string,
+  price?: number,
+  explorer?: string,
+  wrappedExplorer?: string,
+};
+
+
+const queryWrappedMetaAccounts = async (
+  connection: Connection,
+  setExternalAssets: (arr: WrappedAssetMeta[]) => void
+  ) => {
+  // authority -> query for token accounts to get locked assets
+  let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
+
+  const filters = [
+    {
+      dataSize: WrappedMetaLayout.span,
+    },
+    // {
+    //   memcmp: {
+    //     offset: TransferOutProposalLayout.offsetOf('assetChain'),
+    //     bytes: 2,
+    //   },
+    // },
+  ];
+
+  let resp = await (connection as any)._rpcRequest('getProgramAccounts', [
+    WORMHOLE_PROGRAM_ID.toBase58(),
+    {
+      commitment: connection.commitment,
+      filters,
+    },
+  ]);
+
+  const assets = new Map<string, WrappedAssetMeta>();
+  const assetsByMint = new Map<string, WrappedAssetMeta>();
+
+  // aggregate all assets that are not from Solana
+  resp.result.map((acc: any) => ({
+    publicKey: new PublicKey(acc.pubkey),
+    account: {
+      data: bs58.decode(acc.account.data),
+      executable: acc.account.executable,
+      owner: new PublicKey(acc.account.owner),
+      lamports: acc.account.lamports,
+    },
+  })).map((acc: any) => {
+    if(acc.account.data.length === WrappedMetaLayout.span) {
+      const metaAccount = WrappedMetaLayout.decode(acc.account.data);
+      if (metaAccount.chain !== ASSET_CHAIN.Solana) {
+        const assetAddress: string = new Buffer(metaAccount.address.slice(12)).toString("hex");
+
+        assets.set(assetAddress, {
+          chain: metaAccount.chain,
+          address: assetAddress,
+          decimals: 9,
+          mintKey: '',
+          amount: 0,
+          amountInUSD: 0,
+        });
+      }
+    }
+  });
+
+  // build PDAs for mints
+  await Promise.all([...assets.keys()].map(async key => {
+    const meta = assets.get(key);
+    if(!meta) {
+      throw new Error('missing key');
+    }
+
+    meta.mintKey = (await wrappedAssetMintKey(programIds().wormhole.pubkey, authorityKey, {
+      chain: meta.chain,
+      address: Buffer.from(meta.address, "hex"),
+      decimals: Math.min(meta.decimals, 9)
+    })).toBase58();
+
+    assetsByMint.set(meta.mintKey, meta);
+
+    return meta;
+  }));
+
+  // query for all mints
+  const mints = await getMultipleAccounts(connection, [...assetsByMint.keys()], 'singleGossip');
+
+  // cache mints and listen for changes
+  mints.keys.forEach((key, index) => {
+    if(!mints.array[index]) {
+      return;
+    }
+
+    const asset = assetsByMint.get(key);
+    if(!asset) {
+      throw new Error('missing mint');
+    }
+
+    try {
+      cache.add(key, mints.array[index], MintParser);
+    } catch {
+      return;
+    }
+    asset.mint = cache.get(key);
+
+    if(asset.mint) {
+
+    asset.amount = asset.mint?.info.supply.toNumber() / Math.pow(10, asset.mint?.info.decimals) || 0;
+
+    if(!asset.mint) {
+      throw new Error('missing mint')
+    }
+
+    // monitor updates for mints
+    connection.onAccountChange(asset.mint?.pubkey, (acc) => {
+      cache.add(key, acc);
+      asset.mint = cache.get(key);
+      asset.amount = asset.mint?.info.supply.toNumber() || 0;
+
+      setExternalAssets([...assets.values()]);
+    });
   }
 
-  let seeds: Array<Buffer> = [
-    Buffer.from('wrapped'),
-    configKey.toBuffer(),
-    Buffer.of(asset.chain),
-    Buffer.of(asset.decimals),
-    padBuffer(asset.address, 32),
-  ];
-  // @ts-ignore
-  return (
-    await PublicKey.findProgramAddress(seeds, WORMHOLE_PROGRAM_ID)
-  )[0];
-}
+    setExternalAssets([...assets.values()]);
+  });
+};
 
-export const getWrappedAssetMeta = async (configKey: PublicKey, mint: PublicKey) => {
-  let seeds: Array<Buffer> = [
-    Buffer.from('meta'),
-    configKey.toBuffer(),
-    mint.toBuffer(),
-  ];
-  // @ts-ignore
-  return (
-    await PublicKey.findProgramAddress(seeds, WORMHOLE_PROGRAM_ID)
-  )[0];
-}
 
-function padBuffer(b: Buffer, len: number): Buffer {
-  const zeroPad = Buffer.alloc(len);
-  b.copy(zeroPad, len - b.length);
-  return zeroPad;
-}
-
-type WrappedAssetMeta = { chain: number, decimals: number, address: string, mintKey: string, mint?: ParsedAccount<MintInfo>, amount: number, amountInUSD: number, logo?: string, symbol?: string, price?: number };
 
 export const useWormholeAccounts = () => {
   const connection = useConnection();
   const { tokenMap: ethTokens } = useEthereum();
-  const {coinList} = useCoingecko();
+  const { tokenMap } = useConnectionConfig();
+  const { coinList } = useCoingecko();
 
   const [] = useState<models.ParsedDataAccount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,130 +172,23 @@ export const useWormholeAccounts = () => {
   // 2. find the asset in the coingecko list or call abi? []
   // 3. build mint address using PDA [x]
   // 4. query all mints [x]
-  // 5. multiply mint supply by asset price from coingecko
-  // 6. aggregate all assets
+  // 5. multiply mint supply by asset price from coingecko [x]
+  // 6. aggregate all assets [x]
   // 7. subscribe to program accounts
   useEffect(() => {
-    const queryTxs = async () => {
-      setLoading(true);
+    setLoading(true);
 
-      // authority -> query for token accounts to get locked assets
-      let configKey = await getConfigKey();
+    queryWrappedMetaAccounts(connection, setExternalAssets).then(() => setLoading(false));
 
-      const filters = [
-        {
-          dataSize: WrappedMetaLayout.span,
-        },
-        // {
-        //   memcmp: {
-        //     offset: TransferOutProposalLayout.offsetOf('assetChain'),
-        //     bytes: 2,
-        //   },
-        // },
-      ];
-
-      let resp = await (connection as any)._rpcRequest('getProgramAccounts', [
-        WORMHOLE_PROGRAM_ID.toBase58(),
-        {
-          commitment: connection.commitment,
-          filters,
-        },
-      ]);
-
-      const assets = new Map<string, WrappedAssetMeta>();
-      const assetsByMint = new Map<string, WrappedAssetMeta>();
-
-      // aggregate all assets that are not from Solana
-      resp.result.map((acc: any) => ({
-        publicKey: new PublicKey(acc.pubkey),
-        account: {
-          data: bs58.decode(acc.account.data),
-          executable: acc.account.executable,
-          owner: new PublicKey(acc.account.owner),
-          lamports: acc.account.lamports,
-        },
-      })).map((acc: any) => {
-        if(acc.account.data.length === WrappedMetaLayout.span) {
-          const metaAccount = WrappedMetaLayout.decode(acc.account.data);
-          if (metaAccount.chain !== ASSET_CHAIN.Solana) {
-            const assetAddress: string = new Buffer(metaAccount.address.slice(12)).toString("hex");
-
-            assets.set(assetAddress, {
-              chain: metaAccount.chain,
-              address: assetAddress,
-              decimals: 9,
-              mintKey: '',
-              amount: 0,
-              amountInUSD: 0,
-            });
-          }
-        }
-      });
-
-      // build PDAs for mints
-      await Promise.all([...assets.keys()].map(async key => {
-        const meta = assets.get(key);
-        if(!meta) {
-          throw new Error('missing key');
-        }
-
-        meta.mintKey = (await getWrappedAssetMint(configKey, {
-          chain: meta.chain,
-          address: new Buffer(meta.address, "hex"),
-          decimals: Math.min(meta.decimals, 9)
-        })).toBase58();
-
-        assetsByMint.set(meta.mintKey, meta);
-
-        return meta;
-      }));
-
-      // query for all mints
-      const mints = await getMultipleAccounts(connection, [...assetsByMint.keys()], 'singleGossip');
-
-      // cache mints and listen for changes
-      mints.keys.forEach((key, index) => {
-        if(!mints.array[index]) {
-          return;
-        }
-
-        const asset = assetsByMint.get(key);
-        if(!asset) {
-          throw new Error('missing mint');
-        }
-
-        try {
-          cache.add(key, mints.array[index], MintParser);
-        } catch {
-          return;
-        }
-        asset.mint = cache.get(key);
-
-        if(asset.mint) {
-
-        asset.amount = asset.mint?.info.supply.toNumber() / Math.pow(10, asset.mint?.info.decimals) || 0;
-
-        if(!asset.mint) {
-          throw new Error('missing mint')
-        }
-
-        // monitor updates for mints
-        connection.onAccountChange(asset.mint?.pubkey, (acc) => {
-          cache.add(key, acc);
-          asset.mint = cache.get(key);
-          asset.amount = asset.mint?.info.supply.toNumber() || 0;
-
-          setExternalAssets([...assets.values()]);
-        });
+    const subId = connection.onProgramAccountChange(WORMHOLE_PROGRAM_ID, (info) => {
+      if (info.accountInfo.data.length === WrappedMetaLayout.span) {
+        // TODO: check if new account and update external assets
       }
+    });
 
-        setExternalAssets([...assets.values()]);
-      });
-
-      setLoading(false);
+    return () => {
+      connection.removeProgramAccountChangeListener(subId);
     };
-
-    queryTxs();
   }, [connection, setExternalAssets]);
 
   const coingeckoTimer = useRef<number>(0);
@@ -216,15 +200,30 @@ export const useWormholeAccounts = () => {
     const addressToId = new Map<string, string>();
     const idToAsset = new Map<string, WrappedAssetMeta>();
 
+    const assetsToQueryNames: WrappedAssetMeta[] = [];
+
     const ids = externalAssets.map(asset => {
+      asset.explorer = `https://etherscan.io/address/0x${asset.address}`;
+      // TODO: add
+      asset.wrappedExplorer = `https://explorer.solana.com/address/${asset.mintKey}`;
+
+      let knownToken = tokenMap.get(asset.mintKey);
+      if(knownToken) {
+        asset.logo = knownToken.logoURI;
+        asset.symbol = knownToken.symbol;
+        asset.name = knownToken.name;
+      }
+
 
       let token = ethTokens.get(`0x${asset.address || ''}`);
       if(!token) {
+        assetsToQueryNames.push(asset);
         return;
       }
 
       asset.logo = token.logoURI;
       asset.symbol = token.symbol;
+      asset.name = token.name;
 
       let coinInfo = coinList.get(token.symbol.toLowerCase());
 
@@ -234,6 +233,10 @@ export const useWormholeAccounts = () => {
         return coinInfo.id;
       }
     }).filter(_ => _);
+
+    assetsToQueryNames.map(() => {
+      // TODO: query names using ERC-20?
+    });
 
     if(ids.length === 0) {
       return;

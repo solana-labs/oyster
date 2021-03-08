@@ -2,7 +2,7 @@
 import { Table, Col, Row, Statistic, Button } from 'antd';
 import React from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { formatNumber} from '@oyster/common';
+import { formatNumber, formatTokenAmount, formatUSD, shortenAddress} from '@oyster/common';
 import './itemStyle.less';
 import { Link } from 'react-router-dom';
 import {useWormholeAccounts} from "../../hooks/useWormholeAccounts";
@@ -20,6 +20,16 @@ export const HomeView = () => {
       title: 'Symbol',
       dataIndex: 'symbol',
       key: 'symbol',
+      render(text: string, record: any) {
+        return {
+          props: {
+            style: {},
+          },
+          children: (
+            <span>{record.logo && <img style={{ width: 30, height: 30, margin: 4 }} src={record.logo} />} {record.symbol}</span>
+          ),
+        };
+      },
     },
     {
       title: 'Name',
@@ -32,19 +42,55 @@ export const HomeView = () => {
       key: 'amount',
     },
     {
-      title: 'Amount In USD',
+      title: 'Amount ($)',
       dataIndex: 'amountInUSD',
       key: 'amountInUSD',
     },
     {
       title: 'Price',
       dataIndex: 'price',
+      width: 100,
       key: 'price',
+      render(text: string, record: any) {
+        return {
+          props: {
+            style: { textAlign: 'right' },
+          },
+          children: (
+            record.price ? formatUSD.format(record.price) : '--'
+          ),
+        };
+      },
     },
     {
       title: 'Asset Address',
       dataIndex: 'address',
       key: 'address',
+      render(text: string, record: any) {
+        return {
+          props: {
+            style: {},
+          },
+          children: (
+            <a href={record.explorer} target="_blank">{shortenAddress(text, 6)}</a>
+          ),
+        };
+      },
+    },
+    {
+      title: 'Wrapped Address',
+      dataIndex: 'mintKey',
+      key: 'mintKey',
+      render(text: string, record: any) {
+        return {
+          props: {
+            style: {},
+          },
+          children: (
+            <a href={record.wrappedExplorer} target="_blank">{shortenAddress(text, 6)}</a>
+          ),
+        };
+      },
     }
   ];
 
@@ -71,7 +117,7 @@ export const HomeView = () => {
           />
         </Col>
       </Row>
-      <Table dataSource={externalAssets} columns={columns} loading={loadingLockedAccounts} />
+      <Table dataSource={externalAssets.filter(a => a.name)} columns={columns} loading={loadingLockedAccounts} />
     </div>
   );
 };

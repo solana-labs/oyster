@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import { contexts, AppBar } from '@oyster/common';
 import Wormhole from '../Wormhole';
+import { useEthereum } from '../../contexts';
 
 const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
@@ -14,6 +15,7 @@ export const AppLayout = React.memo((props: any) => {
   const { env } = useConnectionConfig();
   const location = useLocation();
   const [wormholeReady, setWormholeReady] = useState(false);
+  const { accounts } = useEthereum();
 
   const paths: { [key: string]: string } = {
     '/faucet': '7',
@@ -33,7 +35,11 @@ export const AppLayout = React.memo((props: any) => {
               <div className="app-title">
                 <Link to="/"><h2>WORMHOLE</h2></Link>
               </div>
-              <AppBar />
+              <AppBar left={
+                <>
+                  <div>{accounts[0]}</div>
+                </>
+              } />
             </Header>
           )}
           <Content style={{ padding: '0 50px' }}>{props.children}</Content>

@@ -19,8 +19,8 @@ const { Option } = Select;
 
 export function SolanaInput(props: {
   title: string;
-  amount?: number | null;
   disabled?: boolean;
+  amount?: number | null;
   onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
   useFirstToken?: boolean;

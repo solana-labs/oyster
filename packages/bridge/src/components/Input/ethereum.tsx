@@ -1,37 +1,88 @@
 import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
+import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay, programIds } from '@oyster/common';
 import { Card, Select } from 'antd';
 import './style.less';
 import { useEthereum } from '../../contexts';
-const { getTokenName } = utils;
-const { cache } = contexts.Accounts;
-const { useConnectionConfig } = contexts.Connection;
+import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
+import { ASSET_CHAIN } from '../../utils/assets';
+import { TransferRequestInfo } from '../../models/bridge';
+import BN from 'bn.js';
 
 const { Option } = Select;
 
 export function EthereumInput(props: {
   title: string;
-  amount?: number | null;
   disabled?: boolean;
-  onInputChange: (value: number | null) => void;
   hideBalance?: boolean;
+
+  asset?: string;
+  setAsset: (asset: string) => void;
+
+  setInfo: (info: TransferRequestInfo) => void;
+  amount?: number | null;
+  onInputChange: (value: number | null) => void;
 }) {
   const [balance, setBalance] = useState<number>(0);
   const [lastAmount, setLastAmount] = useState<string>('');
-  const { tokens } = useEthereum();
+  const { tokens, provider } = useEthereum();
 
-  const renderReserveAccounts = tokens.map((token) => {
+  const renderReserveAccounts = tokens.filter(t => (t.tags?.indexOf('longList') || -1) < 0).map((token) => {
     const mint = token.address;
     const name = token.symbol;
     return (
       <Option key={mint} value={mint} name={name} title={mint}>
         <div key={mint} style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={token.logoURI}/>
+          <img style={{ width: 30, height: 30 }} src={token.logoURI}/>
           {name}
         </div>
       </Option>
     );
   });
+
+  const updateBalance = async (fromAddress: string) => {
+    props.setAsset(fromAddress);
+
+    if(!provider) {
+      return;
+    }
+
+    const bridgeAddress  = programIds().wormhole.bridge;
+
+    let signer = provider.getSigner();
+    let e = WrappedAssetFactory.connect(fromAddress, provider);
+    let addr = await signer.getAddress();
+    let balance = await e.balanceOf(addr);
+    let decimals = await e.decimals();
+    let symbol = await e.symbol();
+
+    let allowance = await e.allowance(addr, bridgeAddress);
+
+    let info = {
+        address: fromAddress,
+        name: symbol,
+        balance: balance,
+        allowance: allowance,
+        decimals: decimals,
+        isWrapped: false,
+        chainID: ASSET_CHAIN.Ethereum,
+        assetAddress: Buffer.from(fromAddress.slice(2), "hex"),
+        mint: "",
+    }
+
+    setBalance(new BN(info.balance.toString()).div(new BN(10).pow(new BN(info.decimals))).toNumber());
+
+    let b = WormholeFactory.connect(bridgeAddress, provider);
+
+    let isWrapped = await b.isWrappedAsset(fromAddress)
+    if (isWrapped) {
+        info.chainID = await e.assetChain()
+        info.assetAddress = Buffer.from((await e.assetAddress()).slice(2), "hex")
+        info.isWrapped = true
+    }
+
+    props.setInfo(info);
+  };
 
   return (
     <Card
@@ -54,7 +105,7 @@ export function EthereumInput(props: {
       <div className="ccy-input-header" style={{ padding: '0px 10px 5px 7px' }}>
         <NumericInput
           value={
-            parseFloat(lastAmount || '0.00') === props.amount
+            parseFloat(lastAmount || '0.00') ===  props.amount
               ? lastAmount
               : props.amount?.toFixed(6)?.toString()
           }
@@ -80,11 +131,10 @@ export function EthereumInput(props: {
               showSearch
               style={{ minWidth: 150 }}
               placeholder="CCY"
-              // value={collateralReserve}
-              // onChange={item => {
-              //   if (props.onCollateralReserve) props.onCollateralReserve(item);
-              //   setCollateralReserve(item);
-              // }}
+              value={props.asset}
+              onChange={(item: string) => {
+                updateBalance(item);
+              }}
               filterOption={(input, option) =>
                 option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }

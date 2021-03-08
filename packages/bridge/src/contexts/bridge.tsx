@@ -1,6 +1,6 @@
 import React, {createContext, FunctionComponent, useContext, useEffect} from "react"
 import {Connection, PublicKey} from "@solana/web3.js";
-import {AssetMeta, SolanaBridge} from "../core";
+import { SolanaBridge} from "../core";
 import { useConnection, useConnectionConfig } from "@oyster/common/dist/lib/contexts/connection";
 import { utils } from '@oyster/common';
 import { MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
