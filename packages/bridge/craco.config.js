@@ -11,16 +11,12 @@ const appDirectory = fs.realpathSync(process.cwd());
 const resolvePackage = relativePath => path.resolve(appDirectory, relativePath);
 
 module.exports = {
-  /* webpack: {
-    configure: webpackConfig => {
-      const scopePluginIndex = webpackConfig.resolve.plugins.findIndex(
-        ({ constructor }) =>
-          constructor && constructor.name === 'ModuleScopePlugin',
-      );
-      webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
+  webpack: {
+    configure: (webpackConfig, { env, paths }) => {
+      paths.appBuild = webpackConfig.output.path = path.resolve('./../../build/bridge');
       return webpackConfig;
     },
-  },*/
+  },
   plugins: [
     /*{
       plugin: CracoBabelLoader,
