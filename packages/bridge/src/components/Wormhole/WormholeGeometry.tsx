@@ -20,7 +20,7 @@ const PARTICLE_SIZE = 10;
  * @returns {JSX.Element}
  * @constructor
  */
-const WormholeGeometry = () => {
+const WormholeGeometry = ({ rotate }: { rotate?: boolean }) => {
   const mesh = React.useRef<Mesh>();
   const pointTexture = useTexture(disc);
 
@@ -47,7 +47,9 @@ const WormholeGeometry = () => {
     if (mesh.current) {
       // x-Axis defines the "top" we're looking at, try e.g. 30.5
       mesh.current.rotation.x = 30;
-      mesh.current.rotation.z += 0.0005;
+      if(!rotate) {
+        mesh.current.rotation.z += 0.0005;
+      }
     }
   });
 

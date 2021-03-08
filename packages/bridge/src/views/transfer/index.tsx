@@ -1,24 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import { Card } from 'antd';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { LABELS } from '../../constants';
-import { contexts, utils, ConnectButton, useConnection, useWallet } from '@oyster/common';
-import { useHistory, useLocation } from "react-router-dom";
 import { Transfer } from '../../components/Transfer';
-import { useEthereum } from '../../contexts';
-import { Wrap } from "../../components/Wrap";
-const { notify } = utils;
 
 export const TransferView = () => {
-  const connection = useConnection();
-  const { wallet, connected } = useWallet();
-
-  useEffect(() => {
-
-    // connectEth();
-
-  }, [connected])
-
   return (
     <div className="flexColumn" style={{ flex: 1 }}>
       <Card

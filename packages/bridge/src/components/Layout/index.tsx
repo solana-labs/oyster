@@ -28,7 +28,7 @@ export const AppLayout = React.memo((props: any) => {
     '';
   return (
     <div className={`App`}>
-      <Wormhole onCreated={() => setWormholeReady(true)} show={isRoot}>
+      <Wormhole onCreated={() => setWormholeReady(true)} show={true} rotate={isRoot}>
         <Layout title={LABELS.APP_TITLE}>
           {isRoot && (
             <Header className="App-Bar">

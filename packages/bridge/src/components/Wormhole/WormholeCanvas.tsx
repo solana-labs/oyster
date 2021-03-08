@@ -9,12 +9,12 @@ import WormholeGeometry from './WormholeGeometry';
  * @returns {JSX.Element}
  * @constructor
  */
-const WormholeCanvas = ({ onCreated }: { onCreated: any }) => {
+const WormholeCanvas = ({ onCreated, rotate }: { onCreated: any, rotate?: boolean }) => {
   return (
     <Canvas onCreated={onCreated}>
       <Camera />
       <React.Suspense fallback={null}>
-        <WormholeGeometry />
+        <WormholeGeometry rotate={rotate} />
       </React.Suspense>
     </Canvas>
   );
