@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import './../../App.less';
+import './index.less';
 import { Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
+import metamaskIcon from "../../assets/metamask.svg"
 
 import { LABELS } from '../../constants';
-import { contexts, AppBar } from '@oyster/common';
+import { contexts, AppBar, shortenAddress } from '@oyster/common';
 import Wormhole from '../Wormhole';
 import { useEthereum } from '../../contexts';
 
@@ -35,9 +37,22 @@ export const AppLayout = React.memo((props: any) => {
               <div className="app-title">
                 <Link to="/"><h2>WORMHOLE</h2></Link>
               </div>
-              <AppBar left={
+              <AppBar
+                useWalletBadge={true}
+                left={
                 <>
-                  <div>{accounts[0]}</div>
+                  {accounts[0] && (
+                    <div>
+                      <img
+                        alt={"metamask-icon"}
+                        width={20}
+                        height={20}
+                        src={metamaskIcon}
+                        style={{ marginRight: 8 }}
+                      />
+                      {shortenAddress(accounts[0], 4)}
+                    </div>
+                  )}
                 </>
               } />
             </Header>
