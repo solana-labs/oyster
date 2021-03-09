@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay, programIds } from '@oyster/common';
-import { Card, Select } from 'antd';
+import React, {useState} from 'react';
+import {NumericInput, programIds} from '@oyster/common';
+import {Card, Select} from 'antd';
 import './style.less';
-import { useEthereum } from '../../contexts';
-import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
-import { ASSET_CHAIN } from '../../utils/assets';
-import { TransferRequestInfo } from '../../models/bridge';
+import {useEthereum} from '../../contexts';
+import {WrappedAssetFactory} from '../../contracts/WrappedAssetFactory';
+import {WormholeFactory} from '../../contracts/WormholeFactory';
+import {TransferRequestInfo} from '../../models/bridge';
+import {TokenDisplay} from '../TokenDisplay'
 import BN from 'bn.js';
+import {ASSET_CHAIN} from "../../models/bridge/constants";
 
 const { Option } = Select;
 
 export function EthereumInput(props: {
   title: string;
-  disabled?: boolean;
   hideBalance?: boolean;
 
   asset?: string;
@@ -31,10 +31,8 @@ export function EthereumInput(props: {
     const mint = token.address;
     return (
       <Option key={mint} value={mint} name={token.symbol} title={token.name}>
-        <div key={mint} style={{ display: 'flex', alignItems: 'center' }}>
-          <img style={{ width: 30, height: 30 }} src={token.logoURI}/>
-          {token.symbol}
-        </div>
+        <TokenDisplay asset={props.asset} token={token} chain={ASSET_CHAIN.Ethereum}/>
+        <span className={"token-name"}>{token.name}</span>
       </Option>
     );
   });
@@ -85,7 +83,7 @@ export function EthereumInput(props: {
 
   return (
     <Card
-      className="ccy-input"
+      className="ccy-input from-input"
       style={{ borderRadius: 20 }}
       bodyStyle={{ padding: 0 }}
     >
@@ -124,30 +122,21 @@ export function EthereumInput(props: {
           placeholder="0.00"
         />
         <div className="ccy-input-header-right" style={{ display: 'flex' }}>
-          {!props.disabled ? (
-            <Select
-              size="large"
-              showSearch
-              style={{ minWidth: 150 }}
-              placeholder="CCY"
-              value={props.asset}
-              onChange={(item: string) => {
-                updateBalance(item);
-              }}
-              filterOption={(input, option) =>
-                option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {renderReserveAccounts}
-            </Select>
-          ) : (
-            <TokenDisplay
-              // key={props.reserve.liquidityMint.toBase58()}
-              name={''}
-              mintAddress={''}
-              showBalance={false}
-            />
-          )}
+          <Select
+            size="large"
+            showSearch
+            style={{ minWidth: 150 }}
+            placeholder="CCY"
+            value={props.asset}
+            onChange={(item: string) => {
+              updateBalance(item);
+            }}
+            filterOption={(input, option) =>
+              option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+          >
+            {renderReserveAccounts}
+          </Select>
         </div>
       </div>
     </Card>

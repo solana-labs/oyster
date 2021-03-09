@@ -28,15 +28,13 @@ export function Routes() {
                   <AccountsProvider>
                     <MarketProvider>
                       <CoingeckoProvider>
-                        <TokenPairProvider>
-                            <AppLayout>
-                              <Switch>
-                                <Route exact path="/" component={() => <HomeView />} />
-                                <Route path="/move" children={<TransferView />} />
-                                <Route exact path="/faucet" children={<FaucetView />} />
-                              </Switch>
-                            </AppLayout>
-                        </TokenPairProvider>
+                        <AppLayout>
+                          <Switch>
+                            <Route exact path="/" component={() => <HomeView />} />
+                            <Route path="/move" children={<TransferView />} />
+                            <Route exact path="/faucet" children={<FaucetView />} />
+                          </Switch>
+                        </AppLayout>
                       </CoingeckoProvider>
                     </MarketProvider>
                   </AccountsProvider>

@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import {
-  contexts,
-  utils,
-  ParsedAccount,
-  NumericInput,
-  TokenDisplay,
-  useUserAccounts,
-  useMint,
-  useConnectionConfig
-} from '@oyster/common';
-import { Card, Select } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {NumericInput, useConnectionConfig, useMint, useUserAccounts, utils} from '@oyster/common';
+import {Card, Select} from 'antd';
+import { TokenInfo } from '@uniswap/token-lists';
 import './style.less';
-const { getTokenName } = utils;
+import {TokenDisplay} from '../TokenDisplay'
+import {ASSET_CHAIN} from "../../models/bridge/constants";
 
 const { Option } = Select;
 
@@ -19,6 +12,7 @@ const { Option } = Select;
 
 export function SolanaInput(props: {
   title: string;
+  toToken?: TokenInfo;
   disabled?: boolean;
   amount?: number | null;
   onInputChange: (value: number | null) => void;
@@ -40,9 +34,9 @@ export function SolanaInput(props: {
       <Option key={address} value={address} name={item.symbol} title={address}>
         <TokenDisplay
           key={address}
-          name={item.symbol}
-          mintAddress={address}
-          showBalance={true}
+          asset={address}
+          token={item}
+          chain={ASSET_CHAIN.Solana}
         />
       </Option>
     );
@@ -70,7 +64,7 @@ export function SolanaInput(props: {
 
   return (
     <Card
-      className="ccy-input"
+      className="ccy-input to-input"
       style={{ borderRadius: 20 }}
       bodyStyle={{ padding: 0 }}
     >
@@ -86,7 +80,7 @@ export function SolanaInput(props: {
           </div>
         )}
       </div>
-      <div className="ccy-input-header" style={{ padding: '0px 10px 5px 7px' }}>
+      <div className="ccy-input-header" style={{ padding: '0px 10px 10px 7px' }}>
         <NumericInput
           value={
             parseFloat(lastAmount || '0.00') === props.amount
@@ -126,15 +120,13 @@ export function SolanaInput(props: {
             >
               {renderPopularTokens}
             </Select>
-          ) : (
+          ) : ( props.toToken &&
             <TokenDisplay
-              // key={props.reserve.liquidityMint.toBase58()}
-              name={getTokenName(
-                tokenMap,
-                '',
-              )}
-              mintAddress={''}
-              showBalance={false}
+
+              key={props.toToken.address}
+              asset={props.toToken.address}
+              token={props.toToken}
+              chain={ASSET_CHAIN.Solana}
             />
           )}
         </div>
