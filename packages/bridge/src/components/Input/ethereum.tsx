@@ -30,9 +30,13 @@ export function EthereumInput(props: {
   const renderReserveAccounts = tokens.filter(t => (t.tags?.indexOf('longList') || -1) < 0).map((token) => {
     const mint = token.address;
     return (
-      <Option key={mint} value={mint} name={token.symbol} title={token.name}>
-        <TokenDisplay asset={props.asset} token={token} chain={ASSET_CHAIN.Ethereum}/>
-        <span className={"token-name"}>{token.name}</span>
+      <Option key={mint} className="multichain-option" value={mint} name={token.symbol} title={token.name}>
+        <div className="multichain-option-content">
+          <TokenDisplay asset={props.asset} token={token} chain={ASSET_CHAIN.Ethereum}/>
+          <div  className="multichain-option-name">
+              <span className={"token-name"}>{token.symbol}</span>
+          </div>
+        </div>
       </Option>
     );
   });
@@ -99,7 +103,7 @@ export function EthereumInput(props: {
           </div>
         )}
       </div>
-      <div className="ccy-input-header" style={{ padding: '0px 10px 5px 7px' }}>
+      <div className="ccy-input-header" style={{ padding: '0px 10px 5px 7px', height: 80 }}>
         <NumericInput
           value={
             parseFloat(lastAmount || '0.00') ===  props.amount
@@ -114,7 +118,7 @@ export function EthereumInput(props: {
             setLastAmount(val);
           }}
           style={{
-            fontSize: 20,
+            fontSize: 24,
             boxShadow: 'none',
             borderColor: 'transparent',
             outline: 'transparent',
