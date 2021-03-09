@@ -62,7 +62,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "deploy": "gh-pages -d ../../build/bridge --repp https://github.com/solana-labs/oyster-bridge",
+    "deploy": "gh-pages -d ../../build/bridge --repo https://github.com/solana-labs/oyster-bridge",
     "deploy:ar": "arweave deploy-dir build --key-file ",
     "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
     "ethers": "typechain --target ethers-v4 --outDir src/contracts 'contracts/*.json'"
