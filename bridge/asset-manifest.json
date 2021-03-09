@@ -1,0 +1,37 @@
+{
+  "files": {
+    "static/js/0.777debaa.chunk.js": "./static/js/0.777debaa.chunk.js",
+    "static/js/1.fff4dd3b.chunk.js": "./static/js/1.fff4dd3b.chunk.js",
+    "main.css": "./static/css/main.5d738a05.chunk.css",
+    "main.js": "./static/js/main.c2de8fb2.chunk.js",
+    "runtime-main.js": "./static/js/runtime-main.7cfb9342.js",
+    "static/js/4.2f1eeddd.chunk.js": "./static/js/4.2f1eeddd.chunk.js",
+    "static/js/5.3d5e884f.chunk.js": "./static/js/5.3d5e884f.chunk.js",
+    "static/js/6.e6e98e1e.chunk.js": "./static/js/6.e6e98e1e.chunk.js",
+    "static/js/7.0a79856d.chunk.js": "./static/js/7.0a79856d.chunk.js",
+    "static/js/8.f0c9d709.chunk.js": "./static/js/8.f0c9d709.chunk.js",
+    "static/js/9.f9e9985a.chunk.js": "./static/js/9.f9e9985a.chunk.js",
+    "static/js/10.38a242e1.chunk.js": "./static/js/10.38a242e1.chunk.js",
+    "static/js/11.711038e8.chunk.js": "./static/js/11.711038e8.chunk.js",
+    "static/js/12.9ac8c380.chunk.js": "./static/js/12.9ac8c380.chunk.js",
+    "static/js/13.548c9873.chunk.js": "./static/js/13.548c9873.chunk.js",
+    "static/js/14.aa4cabf9.chunk.js": "./static/js/14.aa4cabf9.chunk.js",
+    "static/js/15.79ad0e86.chunk.js": "./static/js/15.79ad0e86.chunk.js",
+    "index.html": "./index.html",
+    "precache-manifest.e9ab0ddc53e6f3dec6da71d3cbc41835.js": "./precache-manifest.e9ab0ddc53e6f3dec6da71d3cbc41835.js",
+    "service-worker.js": "./service-worker.js",
+    "static/js/10.38a242e1.chunk.js.LICENSE.txt": "./static/js/10.38a242e1.chunk.js.LICENSE.txt",
+    "static/js/11.711038e8.chunk.js.LICENSE.txt": "./static/js/11.711038e8.chunk.js.LICENSE.txt",
+    "static/js/12.9ac8c380.chunk.js.LICENSE.txt": "./static/js/12.9ac8c380.chunk.js.LICENSE.txt",
+    "static/js/13.548c9873.chunk.js.LICENSE.txt": "./static/js/13.548c9873.chunk.js.LICENSE.txt",
+    "static/js/4.2f1eeddd.chunk.js.LICENSE.txt": "./static/js/4.2f1eeddd.chunk.js.LICENSE.txt",
+    "static/media/metamask.svg": "./static/media/metamask.a357c69f.svg",
+    "static/media/index.css": "./static/media/wormhole.b1048062.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.7cfb9342.js",
+    "static/js/4.2f1eeddd.chunk.js",
+    "static/css/main.5d738a05.chunk.css",
+    "static/js/main.c2de8fb2.chunk.js"
+  ]
+}
