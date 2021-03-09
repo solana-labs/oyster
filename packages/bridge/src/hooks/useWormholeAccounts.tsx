@@ -139,11 +139,13 @@ const queryWrappedMetaAccounts = async (
       asset.mint = cache.get(key);
       asset.amount = asset.mint?.info.supply.toNumber() || 0;
 
-      setExternalAssets([...assets.values()]);
+      setExternalAssets([...assets.values()]
+        .sort((a, b) => a?.symbol?.localeCompare(b.symbol || '') || 0));
     });
   }
 
-    setExternalAssets([...assets.values()]);
+    setExternalAssets([...assets.values()]
+        .sort((a, b) => a?.symbol?.localeCompare(b.symbol || '') || 0));
   });
 };
 
@@ -263,6 +265,7 @@ export const useWormholeAccounts = () => {
       COINGECKO_POOL_INTERVAL
     );
   }, [externalAssets, setAmountInUSD])
+
   useEffect(() => {
     if (externalAssets && coinList) {
       dataSourcePriceQuery();

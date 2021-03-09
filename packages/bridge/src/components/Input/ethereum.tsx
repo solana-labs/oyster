@@ -29,12 +29,11 @@ export function EthereumInput(props: {
 
   const renderReserveAccounts = tokens.filter(t => (t.tags?.indexOf('longList') || -1) < 0).map((token) => {
     const mint = token.address;
-    const name = token.symbol;
     return (
-      <Option key={mint} value={mint} name={name} title={mint}>
+      <Option key={mint} value={mint} name={token.symbol} title={token.name}>
         <div key={mint} style={{ display: 'flex', alignItems: 'center' }}>
           <img style={{ width: 30, height: 30 }} src={token.logoURI}/>
-          {name}
+          {token.symbol}
         </div>
       </Option>
     );

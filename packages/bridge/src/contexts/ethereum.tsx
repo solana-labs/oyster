@@ -50,13 +50,16 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
 
 
       listResponse.forEach((list, i) => list.tokens.reduce((acc, val) => {
-        const extraTag = i === 2 ? '' : 'longList';
+        const address = val.address.toLowerCase();
+        const extraTag = i === 2 && !acc.has(address) ? 'longList' : '';
+
         const item = {
           ...val,
           logoURI: val.logoURI ? val.logoURI?.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/') : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png `,
           tags: val.tags ? [...val.tags, extraTag] : [extraTag]
         };
-        acc.set(val.address.toLowerCase(), item);
+
+        acc.set(address, item);
         return acc;
       }, map));
 
