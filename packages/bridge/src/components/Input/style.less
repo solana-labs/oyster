@@ -1,7 +1,9 @@
 .ccy-input {
   margin-top: 10px;
   margin-bottom: 10px;
-
+  .ant-select-single.ant-select-lg:not(.ant-select-customize-input) .ant-select-selector {
+      height: 52px;
+  }
   .ant-select-selector,
   .ant-select-selector:focus,
   .ant-select-selector:active {
@@ -10,13 +12,23 @@
   }
   .ant-select-selection-item {
     display: flex;
-
+    .token-name {
+      display: none;
+    }
     .token-balance {
       display: none;
     }
   }
 }
 
+.from-input .token-chain-logo{
+    position: absolute;
+    right: 20px;
+}
+.to-input .token-chain-logo{
+    position: absolute;
+    right: 40px;
+}
 .token-balance {
   color: grey;
 }
@@ -55,6 +67,7 @@
   align-items: center;
   justify-self: flex-end;
   justify-content: flex-end;
+
 }
 
 .ant-select-dropdown {

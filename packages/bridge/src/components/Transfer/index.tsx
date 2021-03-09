@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, notification, Spin, Button } from 'antd';
+import { TokenInfo } from '@uniswap/token-lists';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { LABELS } from '../../constants';
 import { contexts, utils, ConnectButton, programIds, formatAmount } from '@oyster/common';
@@ -39,6 +40,14 @@ export const Transfer = () => {
     from: ASSET_CHAIN.Ethereum,
     toChain: ASSET_CHAIN.Solana,
   });
+  const [toToken, setToToken] = useState<TokenInfo | undefined>()
+
+  const setAssetInformation = (asset:string) => {
+    request.asset = asset;
+    setRequest(request)
+
+    setToToken(tokenMap.get(request?.asset || ""))
+  }
 
   return (
     <>
@@ -47,7 +56,7 @@ export const Transfer = () => {
           title="From Ethereum"
           setInfo={(info) => { request.info = info }}
           asset={request.asset}
-          setAsset={(asset) => request.asset = asset}
+          setAsset={(asset) => setAssetInformation(asset)}
           amount={request.amount}
           onInputChange={(amount) => {
             request.amount = amount || 0;
@@ -57,9 +66,11 @@ export const Transfer = () => {
         ⇅
       </Button>
       <SolanaInput
-          title="To Solana"
-          onInputChange={() => {}}
-          />
+        title="To Solana"
+        disabled={true}
+        toToken={toToken}
+        onInputChange={() => {}}
+        />
     </div>
     <ConnectButton type="primary" onClick={async () => {
         if(!wallet || !provider) {
