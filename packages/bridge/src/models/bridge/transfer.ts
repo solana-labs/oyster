@@ -144,7 +144,6 @@ export const transfer = async (
               )
             )[0];
 
-        console.log('Recipient: ', recipient.toBase58());
         request.recipient = recipient.toBuffer();
 
         const accounts = await getMultipleAccounts(
@@ -152,7 +151,6 @@ export const transfer = async (
           [mintKey.toBase58(), recipient.toBase58()],
           'single',
         );
-        debugger;
         const instructions: TransactionInstruction[] = [];
         const signers: Account[] = [];
 

@@ -13,6 +13,7 @@ import { BigNumber } from 'ethers/utils';
 import { Erc20Factory } from '../../contracts/Erc20Factory';
 import { ProgressUpdate, transfer, TransferRequest } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
+import { TokenDisplay } from './../TokenDisplay';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -32,7 +33,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 export const Transfer = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const { provider } = useEthereum();
+  const { provider, tokenMap } = useEthereum();
   const [request, setRequest] = useState<TransferRequest>({
     // TODO: update based on selected asset
     from: ASSET_CHAIN.Ethereum,
@@ -88,10 +89,15 @@ export const Transfer = () => {
           }, [setActiveSteps]);
 
           return <div>
-              <div>
+              <div style={{ display: 'flex' }}>
                 <div>
-                  <h6>{`ETH Mainnet -> Solana Mainnet`}</h6>
+                  <h5>{`ETH Mainnet -> Solana Mainnet`}</h5>
                   <h2>{formatAmount(request.amount || 0, 2)} {request.info?.name}</h2>
+                </div>
+                <div style={{ display: 'flex', marginLeft: 'auto', marginRight: 10 }}>
+                  <TokenDisplay asset={request.asset} chain={request.from} token={tokenMap.get(request.asset || '')} />
+                  <span style={{ margin: 15 }}>{'➔'}</span>
+                  <TokenDisplay asset={request.asset} chain={request.toChain} token={tokenMap.get(request.asset || '')} />
                 </div>
               </div>
               <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
@@ -119,7 +125,7 @@ export const Transfer = () => {
           description: <NotificationContent />,
           className: 'custom-class',
           style: {
-            width: 600,
+            width: 500,
           },
         });
 
