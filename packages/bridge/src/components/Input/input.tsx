@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
-import {NumericInput, programIds} from '@oyster/common';
-import {Card, Select} from 'antd';
+import React, { useState } from 'react';
+import { NumericInput, programIds } from '@oyster/common';
+import { Card, Select } from 'antd';
 import './style.less';
-import {useEthereum} from '../../contexts';
-import {WrappedAssetFactory} from '../../contracts/WrappedAssetFactory';
-import {WormholeFactory} from '../../contracts/WormholeFactory';
-import {TransferRequestInfo} from '../../models/bridge';
-import {TokenDisplay} from '../TokenDisplay'
+import { useEthereum } from '../../contexts';
+import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
+import { TransferRequestInfo } from '../../models/bridge';
+import { TokenDisplay } from '../TokenDisplay';
 import BN from 'bn.js';
-import {ASSET_CHAIN} from "../../models/bridge/constants";
+import { ASSET_CHAIN } from '../../models/bridge/constants';
 
 const { Option } = Select;
 
@@ -17,6 +17,7 @@ export function EthereumInput(props: {
   hideBalance?: boolean;
 
   asset?: string;
+  chain?: ASSET_CHAIN;
   setAsset: (asset: string) => void;
 
   setInfo: (info: TransferRequestInfo) => void;
@@ -27,28 +28,40 @@ export function EthereumInput(props: {
   const [lastAmount, setLastAmount] = useState<string>('');
   const { tokens, provider } = useEthereum();
 
-  const renderReserveAccounts = tokens.filter(t => (t.tags?.indexOf('longList') || -1) < 0).map((token) => {
-    const mint = token.address;
-    return (
-      <Option key={mint} className="multichain-option" value={mint} name={token.symbol} title={token.name}>
-        <div className="multichain-option-content">
-          <TokenDisplay asset={props.asset} token={token} chain={ASSET_CHAIN.Ethereum}/>
-          <div  className="multichain-option-name">
-              <span className={"token-name"}>{token.symbol}</span>
+  const renderReserveAccounts = tokens
+    .filter(t => (t.tags?.indexOf('longList') || -1) < 0)
+    .map(token => {
+      const mint = token.address;
+      return (
+        <Option
+          key={mint}
+          className="multichain-option"
+          value={mint}
+          name={token.symbol}
+          title={token.name}
+        >
+          <div className="multichain-option-content">
+            <TokenDisplay
+              asset={props.asset}
+              token={token}
+              chain={props.chain}
+            />
+            <div className="multichain-option-name">
+              <span className={'token-name'}>{token.symbol}</span>
+            </div>
           </div>
-        </div>
-      </Option>
-    );
-  });
+        </Option>
+      );
+    });
 
   const updateBalance = async (fromAddress: string) => {
     props.setAsset(fromAddress);
 
-    if(!provider) {
+    if (!provider) {
       return;
     }
 
-    const bridgeAddress  = programIds().wormhole.bridge;
+    const bridgeAddress = programIds().wormhole.bridge;
 
     let signer = provider.getSigner();
     let e = WrappedAssetFactory.connect(fromAddress, provider);
@@ -60,26 +73,30 @@ export function EthereumInput(props: {
     let allowance = await e.allowance(addr, bridgeAddress);
 
     let info = {
-        address: fromAddress,
-        name: symbol,
-        balance: balance,
-        allowance: allowance,
-        decimals: decimals,
-        isWrapped: false,
-        chainID: ASSET_CHAIN.Ethereum,
-        assetAddress: Buffer.from(fromAddress.slice(2), "hex"),
-        mint: "",
-    }
+      address: fromAddress,
+      name: symbol,
+      balance: balance,
+      allowance: allowance,
+      decimals: decimals,
+      isWrapped: false,
+      chainID: ASSET_CHAIN.Ethereum,
+      assetAddress: Buffer.from(fromAddress.slice(2), 'hex'),
+      mint: '',
+    };
 
-    setBalance(new BN(info.balance.toString()).div(new BN(10).pow(new BN(info.decimals))).toNumber());
+    setBalance(
+      new BN(info.balance.toString())
+        .div(new BN(10).pow(new BN(info.decimals)))
+        .toNumber(),
+    );
 
     let b = WormholeFactory.connect(bridgeAddress, provider);
 
-    let isWrapped = await b.isWrappedAsset(fromAddress)
+    let isWrapped = await b.isWrappedAsset(fromAddress);
     if (isWrapped) {
-        info.chainID = await e.assetChain()
-        info.assetAddress = Buffer.from((await e.assetAddress()).slice(2), "hex")
-        info.isWrapped = true
+      info.chainID = await e.assetChain();
+      info.assetAddress = Buffer.from((await e.assetAddress()).slice(2), 'hex');
+      info.isWrapped = true;
     }
 
     props.setInfo(info);
@@ -103,10 +120,13 @@ export function EthereumInput(props: {
           </div>
         )}
       </div>
-      <div className="ccy-input-header" style={{ padding: '0px 10px 5px 7px', height: 80 }}>
+      <div
+        className="ccy-input-header"
+        style={{ padding: '0px 10px 5px 7px', height: 80 }}
+      >
         <NumericInput
           value={
-            parseFloat(lastAmount || '0.00') ===  props.amount
+            parseFloat(lastAmount || '0.00') === props.amount
               ? lastAmount
               : props.amount?.toFixed(6)?.toString()
           }

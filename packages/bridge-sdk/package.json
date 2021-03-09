@@ -1,5 +1,5 @@
 {
-  "name": "@solana/bridge-ethereum",
+  "name": "@solana/bridge-sdk",
   "version": "0.0.1",
   "dependencies": {
     "@oyster/common": "0.0.1",

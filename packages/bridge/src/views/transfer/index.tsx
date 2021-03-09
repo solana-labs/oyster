@@ -8,9 +8,9 @@ export const TransferView = () => {
       <Card
         className="bridge-card"
         headStyle={{ padding: 0 }}
-        bodyStyle={{ position: "relative" }}
-        >
-          <Transfer />
+        bodyStyle={{ position: 'relative' }}
+      >
+        <Transfer />
       </Card>
     </div>
   );

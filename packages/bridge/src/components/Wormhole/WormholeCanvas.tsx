@@ -9,7 +9,13 @@ import WormholeGeometry from './WormholeGeometry';
  * @returns {JSX.Element}
  * @constructor
  */
-const WormholeCanvas = ({ onCreated, rotate }: { onCreated: any, rotate?: boolean }) => {
+const WormholeCanvas = ({
+  onCreated,
+  rotate,
+}: {
+  onCreated: any;
+  rotate?: boolean;
+}) => {
   return (
     <Canvas onCreated={onCreated}>
       <Camera />

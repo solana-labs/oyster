@@ -1,6 +1,6 @@
-import * as React from "react";
-import { PerspectiveCamera } from "@react-three/drei";
-import { hasWindow } from "./Utils";
+import * as React from 'react';
+import { PerspectiveCamera } from '@react-three/drei';
+import { hasWindow } from './Utils';
 
 /**
  * Creates the perspective Camera for our WormholeCanvas.

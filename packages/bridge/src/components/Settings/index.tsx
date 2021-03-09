@@ -11,8 +11,8 @@ export const Settings = () => {
 
   return (
     <>
-      <div style={{ display: "grid" }}>
-        Network:{" "}
+      <div style={{ display: 'grid' }}>
+        Network:{' '}
         <Select
           onSelect={setEndpoint}
           value={endpoint}
@@ -24,7 +24,11 @@ export const Settings = () => {
             </Select.Option>
           ))}
         </Select>
-        {connected && <Button type="primary" onClick={disconnect}>Disconnect</Button>}
+        {connected && (
+          <Button type="primary" onClick={disconnect}>
+            Disconnect
+          </Button>
+        )}
       </div>
     </>
   );

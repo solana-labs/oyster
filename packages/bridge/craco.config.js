@@ -13,7 +13,9 @@ const resolvePackage = relativePath => path.resolve(appDirectory, relativePath);
 module.exports = {
   webpack: {
     configure: (webpackConfig, { env, paths }) => {
-      paths.appBuild = webpackConfig.output.path = path.resolve('./../../build/bridge');
+      paths.appBuild = webpackConfig.output.path = path.resolve(
+        './../../build/bridge',
+      );
       return webpackConfig;
     },
   },

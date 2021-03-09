@@ -19,12 +19,14 @@ const Wormhole = ({
   show: boolean;
   rotate?: boolean;
   children: React.ReactNode;
-}) => (
-  !show ? <>{children}</> :
-  <>
-    <WormholeCanvas onCreated={onCreated} rotate={rotate} />
-    <div className="wormhole-overlay">{children}</div>
-  </>
-);
+}) =>
+  !show ? (
+    <>{children}</>
+  ) : (
+    <>
+      <WormholeCanvas onCreated={onCreated} rotate={rotate} />
+      <div className="wormhole-overlay">{children}</div>
+    </>
+  );
 
 export default Wormhole;

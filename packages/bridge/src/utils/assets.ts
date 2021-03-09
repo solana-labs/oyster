@@ -38,3 +38,12 @@ export enum ASSET_CHAIN {
   Solana = 1,
   Ethereum = 2,
 }
+
+const CHAIN_NAME = {
+  [ASSET_CHAIN.Solana]: 'Solana',
+  [ASSET_CHAIN.Ethereum]: 'Ethereum',
+};
+
+export const chainToName = (chain?: ASSET_CHAIN) => {
+  return CHAIN_NAME[chain || ASSET_CHAIN.Ethereum];
+};

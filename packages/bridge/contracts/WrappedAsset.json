@@ -389,9 +389,7 @@
   "ast": {
     "absolutePath": "/home/hhofstadt/Dev/certus/wormhole/ethereum/contracts/WrappedAsset.sol",
     "exportedSymbols": {
-      "WrappedAsset": [
-        1728
-      ]
+      "WrappedAsset": [1728]
     },
     "id": 1729,
     "license": "Apache 2",
@@ -399,12 +397,7 @@
     "nodes": [
       {
         "id": 1186,
-        "literals": [
-          "solidity",
-          "^",
-          "0.6",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.6", ".0"],
         "nodeType": "PragmaDirective",
         "src": "67:23:3"
       },
@@ -492,19 +485,12 @@
             "src": "337:7:3"
           }
         ],
-        "contractDependencies": [
-          1751,
-          2025
-        ],
+        "contractDependencies": [1751, 2025],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
         "id": 1728,
-        "linearizedBaseContracts": [
-          1728,
-          1751,
-          2025
-        ],
+        "linearizedBaseContracts": [1728, 1751, 2025],
         "name": "WrappedAsset",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -697,10 +683,7 @@
                       "id": 1209,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "549:7:3",
                       "typeDescriptions": {
@@ -1275,10 +1258,7 @@
                       "id": 1252,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "915:7:3",
                       "typeDescriptions": {
@@ -1568,10 +1548,7 @@
                       "id": 1273,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "1097:7:3",
                       "typeDescriptions": {
@@ -2319,9 +2296,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1956
-            ],
+            "baseFunctions": [1956],
             "body": {
               "id": 1348,
               "nodeType": "Block",
@@ -2415,9 +2390,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1964
-            ],
+            "baseFunctions": [1964],
             "body": {
               "id": 1362,
               "nodeType": "Block",
@@ -2568,9 +2541,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1974
-            ],
+            "baseFunctions": [1974],
             "body": {
               "id": 1383,
               "nodeType": "Block",
@@ -2834,9 +2805,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1984
-            ],
+            "baseFunctions": [1984],
             "body": {
               "id": 1401,
               "nodeType": "Block",
@@ -3043,9 +3012,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1994
-            ],
+            "baseFunctions": [1994],
             "body": {
               "id": 1422,
               "nodeType": "Block",
@@ -3309,9 +3276,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              2006
-            ],
+            "baseFunctions": [2006],
             "body": {
               "id": 1460,
               "nodeType": "Block",
@@ -4768,10 +4733,7 @@
                       "id": 1528,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "6587:7:3",
                       "typeDescriptions": {
@@ -4933,10 +4895,7 @@
                       "id": 1538,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "6667:7:3",
                       "typeDescriptions": {
@@ -5641,10 +5600,7 @@
                       "id": 1586,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "7299:7:3",
                       "typeDescriptions": {
@@ -6297,10 +6253,7 @@
                       "id": 1632,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "7920:7:3",
                       "typeDescriptions": {
@@ -6975,10 +6928,7 @@
                       "id": 1681,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "8705:7:3",
                       "typeDescriptions": {
@@ -7140,10 +7090,7 @@
                       "id": 1691,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "8783:7:3",
                       "typeDescriptions": {
@@ -7603,9 +7550,7 @@
   "legacyAST": {
     "absolutePath": "/home/hhofstadt/Dev/certus/wormhole/ethereum/contracts/WrappedAsset.sol",
     "exportedSymbols": {
-      "WrappedAsset": [
-        1728
-      ]
+      "WrappedAsset": [1728]
     },
     "id": 1729,
     "license": "Apache 2",
@@ -7613,12 +7558,7 @@
     "nodes": [
       {
         "id": 1186,
-        "literals": [
-          "solidity",
-          "^",
-          "0.6",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.6", ".0"],
         "nodeType": "PragmaDirective",
         "src": "67:23:3"
       },
@@ -7706,19 +7646,12 @@
             "src": "337:7:3"
           }
         ],
-        "contractDependencies": [
-          1751,
-          2025
-        ],
+        "contractDependencies": [1751, 2025],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
         "id": 1728,
-        "linearizedBaseContracts": [
-          1728,
-          1751,
-          2025
-        ],
+        "linearizedBaseContracts": [1728, 1751, 2025],
         "name": "WrappedAsset",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -7911,10 +7844,7 @@
                       "id": 1209,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "549:7:3",
                       "typeDescriptions": {
@@ -8489,10 +8419,7 @@
                       "id": 1252,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "915:7:3",
                       "typeDescriptions": {
@@ -8782,10 +8709,7 @@
                       "id": 1273,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "1097:7:3",
                       "typeDescriptions": {
@@ -9533,9 +9457,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1956
-            ],
+            "baseFunctions": [1956],
             "body": {
               "id": 1348,
               "nodeType": "Block",
@@ -9629,9 +9551,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1964
-            ],
+            "baseFunctions": [1964],
             "body": {
               "id": 1362,
               "nodeType": "Block",
@@ -9782,9 +9702,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1974
-            ],
+            "baseFunctions": [1974],
             "body": {
               "id": 1383,
               "nodeType": "Block",
@@ -10048,9 +9966,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1984
-            ],
+            "baseFunctions": [1984],
             "body": {
               "id": 1401,
               "nodeType": "Block",
@@ -10257,9 +10173,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              1994
-            ],
+            "baseFunctions": [1994],
             "body": {
               "id": 1422,
               "nodeType": "Block",
@@ -10523,9 +10437,7 @@
             "visibility": "public"
           },
           {
-            "baseFunctions": [
-              2006
-            ],
+            "baseFunctions": [2006],
             "body": {
               "id": 1460,
               "nodeType": "Block",
@@ -11982,10 +11894,7 @@
                       "id": 1528,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "6587:7:3",
                       "typeDescriptions": {
@@ -12147,10 +12056,7 @@
                       "id": 1538,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "6667:7:3",
                       "typeDescriptions": {
@@ -12855,10 +12761,7 @@
                       "id": 1586,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "7299:7:3",
                       "typeDescriptions": {
@@ -13511,10 +13414,7 @@
                       "id": 1632,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "7920:7:3",
                       "typeDescriptions": {
@@ -14189,10 +14089,7 @@
                       "id": 1681,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "8705:7:3",
                       "typeDescriptions": {
@@ -14354,10 +14251,7 @@
                       "id": 1691,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "8783:7:3",
                       "typeDescriptions": {

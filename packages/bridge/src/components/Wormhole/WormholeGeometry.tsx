@@ -1,15 +1,15 @@
-import * as React from "react";
-import { Color, Float32BufferAttribute } from "three";
-import type { Mesh, BufferGeometry } from "three";
-import { useTexture } from "@react-three/drei";
-import { useFrame, useUpdate } from "react-three-fiber";
+import * as React from 'react';
+import { Color, Float32BufferAttribute } from 'three';
+import type { Mesh, BufferGeometry } from 'three';
+import { useTexture } from '@react-three/drei';
+import { useFrame, useUpdate } from 'react-three-fiber';
 
 import {
   calculateTorusProperties,
   fragmentShader,
   vertexShader,
-} from "./Utils";
-import disc from "./disc.png";
+} from './Utils';
+import disc from './disc.png';
 
 // The individual "particle size".
 const PARTICLE_SIZE = 10;
@@ -28,18 +28,18 @@ const WormholeGeometry = ({ rotate }: { rotate?: boolean }) => {
   const uniforms = React.useMemo(
     () => ({
       // Adapt the color of the WormholeCanvas here.
-      color: { value: new Color("dimgrey") },
+      color: { value: new Color('dimgrey') },
       pointTexture: {
         value: pointTexture,
       },
     }),
-    [pointTexture]
+    [pointTexture],
   );
 
   // The calculated torus properties.
   const [positionAttribute, colors, sizes] = React.useMemo(
     () => calculateTorusProperties(PARTICLE_SIZE),
-    []
+    [],
   );
 
   // Rotate mesh around the y axis every frame.
@@ -47,7 +47,7 @@ const WormholeGeometry = ({ rotate }: { rotate?: boolean }) => {
     if (mesh.current) {
       // x-Axis defines the "top" we're looking at, try e.g. 30.5
       mesh.current.rotation.x = 30;
-      if(!rotate) {
+      if (!rotate) {
         mesh.current.rotation.z += 0.0005;
       }
     }
@@ -55,9 +55,9 @@ const WormholeGeometry = ({ rotate }: { rotate?: boolean }) => {
 
   // Calculate the geometry.
   const geometry = useUpdate((geo: BufferGeometry) => {
-    geo.setAttribute("position", positionAttribute);
-    geo.setAttribute("customColor", new Float32BufferAttribute(colors, 3));
-    geo.setAttribute("size", new Float32BufferAttribute(sizes, 1));
+    geo.setAttribute('position', positionAttribute);
+    geo.setAttribute('customColor', new Float32BufferAttribute(colors, 3));
+    geo.setAttribute('size', new Float32BufferAttribute(sizes, 1));
   }, []);
 
   return (

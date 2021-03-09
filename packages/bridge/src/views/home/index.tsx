@@ -1,18 +1,17 @@
-
 import { Table, Col, Row, Statistic, Button } from 'antd';
 import React from 'react';
 import { GUTTER } from '../../constants';
-import { formatNumber, formatUSD, shortenAddress} from '@oyster/common';
+import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
 import { Link } from 'react-router-dom';
-import {useWormholeAccounts} from "../../hooks/useWormholeAccounts";
+import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
 import { TokenDisplay } from '../../components/TokenDisplay';
 
 export const HomeView = () => {
   const {
     loading: loadingLockedAccounts,
     externalAssets,
-    totalInUSD
+    totalInUSD,
   } = useWormholeAccounts();
 
   const columns = [
@@ -26,7 +25,12 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <span style={{ display: 'inline-flex', alignItems: 'center' }}>{record.logo && <TokenDisplay logo={record.logo} chain={record.chain} />} {record.symbol}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {record.logo && (
+                <TokenDisplay logo={record.logo} chain={record.chain} />
+              )}{' '}
+              {record.symbol}
+            </span>
           ),
         };
       },
@@ -56,9 +60,7 @@ export const HomeView = () => {
           props: {
             style: { textAlign: 'right' },
           },
-          children: (
-            record.price ? formatUSD.format(record.price) : '--'
-          ),
+          children: record.price ? formatUSD.format(record.price) : '--',
         };
       },
     },
@@ -72,7 +74,9 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <a href={record.explorer} target="_blank">{shortenAddress(text, 6)}</a>
+            <a href={record.explorer} target="_blank">
+              {shortenAddress(text, 6)}
+            </a>
           ),
         };
       },
@@ -87,11 +91,13 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <a href={record.wrappedExplorer} target="_blank">{shortenAddress(text, 6)}</a>
+            <a href={record.wrappedExplorer} target="_blank">
+              {shortenAddress(text, 6)}
+            </a>
           ),
         };
       },
-    }
+    },
   ];
 
   return (
@@ -104,7 +110,9 @@ export const HomeView = () => {
       >
         <Col xs={24} xl={12} className="app-title">
           <h1>Wormhole</h1>
-          <h2><span>Ethereum + Solana Bridge</span></h2>
+          <h2>
+            <span>Ethereum + Solana Bridge</span>
+          </h2>
           <Link to="/move">
             <Button className="app-action">Get Started</Button>
           </Link>
@@ -117,7 +125,11 @@ export const HomeView = () => {
           />
         </Col>
       </Row>
-      <Table dataSource={externalAssets.filter(a => a.name)} columns={columns} loading={loadingLockedAccounts} />
+      <Table
+        dataSource={externalAssets.filter(a => a.name)}
+        columns={columns}
+        loading={loadingLockedAccounts}
+      />
     </div>
   );
 };

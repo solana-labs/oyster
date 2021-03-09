@@ -3,7 +3,7 @@ import './../../App.less';
 import './index.less';
 import { Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
-import metamaskIcon from "../../assets/metamask.svg"
+import metamaskIcon from '../../assets/metamask.svg';
 
 import { LABELS } from '../../constants';
 import { contexts, AppBar, shortenAddress } from '@oyster/common';
@@ -30,31 +30,38 @@ export const AppLayout = React.memo((props: any) => {
     '';
   return (
     <div className={`App`}>
-      <Wormhole onCreated={() => setWormholeReady(true)} show={true} rotate={isRoot}>
+      <Wormhole
+        onCreated={() => setWormholeReady(true)}
+        show={true}
+        rotate={isRoot}
+      >
         <Layout title={LABELS.APP_TITLE}>
           {isRoot && (
             <Header className="App-Bar">
               <div className="app-title">
-                <Link to="/"><h2>WORMHOLE</h2></Link>
+                <Link to="/">
+                  <h2>WORMHOLE</h2>
+                </Link>
               </div>
               <AppBar
                 useWalletBadge={true}
                 left={
-                <>
-                  {accounts[0] && (
-                    <div>
-                      <img
-                        alt={"metamask-icon"}
-                        width={20}
-                        height={20}
-                        src={metamaskIcon}
-                        style={{ marginRight: 8 }}
-                      />
-                      {shortenAddress(accounts[0], 4)}
-                    </div>
-                  )}
-                </>
-              } />
+                  <>
+                    {accounts[0] && (
+                      <div>
+                        <img
+                          alt={'metamask-icon'}
+                          width={20}
+                          height={20}
+                          src={metamaskIcon}
+                          style={{ marginRight: 8 }}
+                        />
+                        {shortenAddress(accounts[0], 4)}
+                      </div>
+                    )}
+                  </>
+                }
+              />
             </Header>
           )}
           <Content style={{ padding: '0 50px' }}>{props.children}</Content>

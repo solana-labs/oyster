@@ -1,15 +1,15 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { MarketProvider, TokenPairProvider, EthereumProvider } from './contexts';
+import {
+  MarketProvider,
+  TokenPairProvider,
+  EthereumProvider,
+} from './contexts';
 import { AppLayout } from './components/Layout';
 
-import {
-  FaucetView,
-  HomeView,
-  TransferView,
-} from './views';
-import {CoingeckoProvider} from "./contexts/coingecko";
+import { FaucetView, HomeView, TransferView } from './views';
+import { CoingeckoProvider } from './contexts/coingecko';
 import { BridgeProvider } from './contexts/bridge';
 import { UseWalletProvider } from 'use-wallet';
 const { WalletProvider } = contexts.Wallet;
@@ -30,9 +30,17 @@ export function Routes() {
                       <CoingeckoProvider>
                         <AppLayout>
                           <Switch>
-                            <Route exact path="/" component={() => <HomeView />} />
+                            <Route
+                              exact
+                              path="/"
+                              component={() => <HomeView />}
+                            />
                             <Route path="/move" children={<TransferView />} />
-                            <Route exact path="/faucet" children={<FaucetView />} />
+                            <Route
+                              exact
+                              path="/faucet"
+                              children={<FaucetView />}
+                            />
                           </Switch>
                         </AppLayout>
                       </CoingeckoProvider>
