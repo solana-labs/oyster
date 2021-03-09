@@ -1,4 +1,5 @@
 export * as actions from './actions';
+export * from './actions';
 export * as components from './components';
 export * from './components'; // Allow direct exports too
 export * as constants from './constants';

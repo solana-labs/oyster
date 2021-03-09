@@ -8,6 +8,9 @@ import {
   cache,
   TokenAccountParser,
   ParsedAccount,
+  formatNumber,
+  formatAmount,
+  createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
 
 import { ethers } from 'ethers';
@@ -23,7 +26,6 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { createTokenAccount } from '@oyster/common/dist/lib/actions';
 import { AccountInfo, AccountLayout } from '@solana/spl-token';
 
 export interface ProgressUpdate {
@@ -92,11 +94,10 @@ export const transfer = async (
         return;
       }
 
-      const multiplier = ethers.utils
-        .bigNumberify(10)
-        .pow(ethers.utils.bigNumberify(request.info.decimals));
-      let amountBN = ethers.utils.bigNumberify(request.amount).mul(multiplier);
-      request.amountBN = amountBN;
+      request.amountBN = ethers.utils.parseUnits(
+        formatAmount(request.amount, 9),
+        request.info.decimals,
+      );
 
       return steps.prepare(request);
     },
@@ -142,6 +143,8 @@ export const transfer = async (
                 programIds().associatedToken,
               )
             )[0];
+
+        console.log('Recipient: ', recipient.toBase58());
         request.recipient = recipient.toBuffer();
 
         const accounts = await getMultipleAccounts(
@@ -149,6 +152,7 @@ export const transfer = async (
           [mintKey.toBase58(), recipient.toBase58()],
           'single',
         );
+        debugger;
         const instructions: TransactionInstruction[] = [];
         const signers: Account[] = [];
 
@@ -166,15 +170,12 @@ export const transfer = async (
         }
 
         if (!accounts.array[1]) {
-          createTokenAccount(
+          createAssociatedTokenAccountInstruction(
             instructions,
+            recipient,
             wallet.publicKey,
-            await connection.getMinimumBalanceForRentExemption(
-              AccountLayout.span,
-            ),
+            wallet.publicKey,
             mintKey,
-            wallet.publicKey,
-            signers,
           );
         }
 

@@ -56,7 +56,7 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
           logoURI: val.logoURI ? val.logoURI?.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/') : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png `,
           tags: val.tags ? [...val.tags, extraTag] : [extraTag]
         };
-        acc.set(val.address, item);
+        acc.set(val.address.toLowerCase(), item);
         return acc;
       }, map));
 
