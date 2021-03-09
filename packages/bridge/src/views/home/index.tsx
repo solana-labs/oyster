@@ -1,11 +1,12 @@
 
 import { Table, Col, Row, Statistic, Button } from 'antd';
 import React from 'react';
-import { GUTTER, LABELS } from '../../constants';
-import { formatNumber, formatTokenAmount, formatUSD, shortenAddress} from '@oyster/common';
+import { GUTTER } from '../../constants';
+import { formatNumber, formatUSD, shortenAddress} from '@oyster/common';
 import './itemStyle.less';
 import { Link } from 'react-router-dom';
 import {useWormholeAccounts} from "../../hooks/useWormholeAccounts";
+import { TokenDisplay } from '../../components/TokenDisplay';
 
 export const HomeView = () => {
   const {
@@ -13,7 +14,6 @@ export const HomeView = () => {
     externalAssets,
     totalInUSD
   } = useWormholeAccounts();
-
 
   const columns = [
     {
@@ -26,7 +26,7 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <span>{record.logo && <img style={{ width: 30, height: 30, margin: 4 }} src={record.logo} />} {record.symbol}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center' }}>{record.logo && <TokenDisplay logo={record.logo} chain={record.chain} />} {record.symbol}</span>
           ),
         };
       },

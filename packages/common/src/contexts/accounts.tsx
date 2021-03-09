@@ -187,52 +187,7 @@ export const cache = {
     }
 
     return pubkey;
-  },
-  queryMint: async (connection: Connection, pubKey: string | PublicKey) => {
-    let id: PublicKey;
-    if (typeof pubKey === 'string') {
-      id = new PublicKey(pubKey);
-    } else {
-      id = pubKey;
-    }
-
-    const address = id.toBase58();
-    let mint = mintCache.get(address);
-    if (mint) {
-      return mint;
-    }
-
-    let query = pendingMintCalls.get(address);
-    if (query) {
-      return query;
-    }
-
-    query = getMintInfo(connection, id).then((data) => {
-      pendingMintCalls.delete(address);
-
-      mintCache.set(address, data);
-      return data;
-    }) as Promise<MintInfo>;
-    pendingMintCalls.set(address, query as any);
-
-    return query;
-  },
-  getMint: (pubKey: string | PublicKey) => {
-    let key: string;
-    if (typeof pubKey !== 'string') {
-      key = pubKey.toBase58();
-    } else {
-      key = pubKey;
-    }
-
-    return mintCache.get(key);
-  },
-  addMint: (pubKey: PublicKey, obj: AccountInfo<Buffer>) => {
-    const mint = deserializeMint(obj.data);
-    const id = pubKey.toBase58();
-    mintCache.set(id, mint);
-    return mint;
-  },
+  }
 };
 
 export const useAccountsContext = () => {

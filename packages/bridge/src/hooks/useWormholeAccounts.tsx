@@ -1,11 +1,11 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import { useConnection, useConnectionConfig, MintParser, cache, getMultipleAccounts, ParsedAccount, TokenAccountParser, programIds} from "@oyster/common";
+import { useConnection, useConnectionConfig, MintParser, cache, getMultipleAccounts, ParsedAccount, TokenAccountParser, programIds, formatTokenAmount, fromLamports} from "@oyster/common";
 import {WORMHOLE_PROGRAM_ID} from "../utils/ids";
 import {ASSET_CHAIN} from "../utils/assets";
 import { useEthereum } from "../contexts";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { models } from "@oyster/common";
-import { MintInfo } from "@solana/spl-token";
+import { AccountInfo, MintInfo } from "@solana/spl-token";
 import { bridgeAuthorityKey, wrappedAssetMintKey, WrappedMetaLayout } from './../models/bridge';
 
 import bs58 from "bs58";
@@ -30,11 +30,11 @@ type WrappedAssetMeta = {
 
 
 const queryWrappedMetaAccounts = async (
+  authorityKey: PublicKey,
   connection: Connection,
   setExternalAssets: (arr: WrappedAssetMeta[]) => void
   ) => {
-  // authority -> query for token accounts to get locked assets
-  let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
+
 
   const filters = [
     {
@@ -81,6 +81,8 @@ const queryWrappedMetaAccounts = async (
           mintKey: '',
           amount: 0,
           amountInUSD: 0,
+          // TODO: customize per chain
+          explorer: `https://etherscan.io/address/0x${assetAddress}`
         });
       }
     }
@@ -124,6 +126,7 @@ const queryWrappedMetaAccounts = async (
       return;
     }
     asset.mint = cache.get(key);
+    asset.wrappedExplorer = `https://explorer.solana.com/address/${asset.mintKey}`;
 
     if(asset.mint) {
 
@@ -139,17 +142,48 @@ const queryWrappedMetaAccounts = async (
       asset.mint = cache.get(key);
       asset.amount = asset.mint?.info.supply.toNumber() || 0;
 
-      setExternalAssets([...assets.values()]
-        .sort((a, b) => a?.symbol?.localeCompare(b.symbol || '') || 0));
+      setExternalAssets([...assets.values()]);
     });
   }
 
-    setExternalAssets([...assets.values()]
-        .sort((a, b) => a?.symbol?.localeCompare(b.symbol || '') || 0));
+    setExternalAssets([...assets.values()]);
   });
 };
 
+const  queryCustodyAccounts = async (authorityKey: PublicKey, connection: Connection) => {
+  debugger;
+  const tokenAccounts = await connection.getTokenAccountsByOwner(
+    authorityKey,
+    {
+      programId: programIds().token,
+    }).then(acc => acc.value.map(a => cache.add(a.pubkey, a.account, TokenAccountParser) as ParsedAccount<AccountInfo>));
 
+  // query for mints
+  await getMultipleAccounts(connection, tokenAccounts.map(a => a.info.mint.toBase58()), 'single').then(({ keys, array }) => {
+    keys.forEach((key, index) => {
+      if(!array[index]) {
+        return;
+      }
+
+      return cache.add(key, array[index], MintParser);
+    })
+  });
+
+  return tokenAccounts.map(token => {
+    const mint = cache.get(token.info.mint) as ParsedAccount<MintInfo>;
+    const asset = mint.pubkey.toBase58()
+    return {
+      address: asset,
+      chain: ASSET_CHAIN.Solana,
+      amount: fromLamports(token, mint.info),
+      mintKey: asset,
+      mint,
+      decimals: 9,
+      amountInUSD: 0,
+      explorer: `https://explorer.solana.com/address/${asset}`,
+    } as WrappedAssetMeta;
+  })
+};
 
 export const useWormholeAccounts = () => {
   const connection = useConnection();
@@ -163,33 +197,35 @@ export const useWormholeAccounts = () => {
   const [externalAssets, setExternalAssets] = useState<WrappedAssetMeta[]>([]);
   const [amountInUSD, setAmountInUSD] = useState<number>(0);
 
-  /// TODO:
-  /// assets that left Solana
-  // 1. getTokenAccountsByOwner with bridge PDA
-  // 2. get prices from serum ?
-  // 3. multiply account balances by
-
-  /// assets locked from ETH
-  // 1. get asset address from proposal [x]
-  // 2. find the asset in the coingecko list or call abi? []
-  // 3. build mint address using PDA [x]
-  // 4. query all mints [x]
-  // 5. multiply mint supply by asset price from coingecko [x]
-  // 6. aggregate all assets [x]
-  // 7. subscribe to program accounts
   useEffect(() => {
     setLoading(true);
 
-    queryWrappedMetaAccounts(connection, setExternalAssets).then(() => setLoading(false));
+    let wormholeSubId = 0;
+    (async () => {
+      // authority -> query for token accounts to get locked assets
+      let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
 
-    const subId = connection.onProgramAccountChange(WORMHOLE_PROGRAM_ID, (info) => {
-      if (info.accountInfo.data.length === WrappedMetaLayout.span) {
-        // TODO: check if new account and update external assets
-      }
-    });
+      // get all accounts that moved assets from solana to other chains
+      const custodyAccounts = await queryCustodyAccounts(authorityKey, connection);
+
+      // query wrapped assets that were imported to solana from other chains
+      queryWrappedMetaAccounts(authorityKey, connection, (assets) => {
+        setExternalAssets([...custodyAccounts, ...assets]
+          .sort((a, b) => a?.symbol?.localeCompare(b.symbol || '') || 0))
+      }).then(() => setLoading(false));
+
+      // TODO: listen to solana accounts for updates
+
+      wormholeSubId = connection.onProgramAccountChange(WORMHOLE_PROGRAM_ID, (info) => {
+        if (info.accountInfo.data.length === WrappedMetaLayout.span) {
+          // TODO: check if new account and update external assets
+        }
+      });
+
+    })();
 
     return () => {
-      connection.removeProgramAccountChangeListener(subId);
+      connection.removeProgramAccountChangeListener(wormholeSubId);
     };
   }, [connection, setExternalAssets]);
 
@@ -200,14 +236,13 @@ export const useWormholeAccounts = () => {
     }
 
     const addressToId = new Map<string, string>();
-    const idToAsset = new Map<string, WrappedAssetMeta>();
+    const idToAsset = new Map<string, WrappedAssetMeta[]>();
 
     const assetsToQueryNames: WrappedAssetMeta[] = [];
 
     const ids = externalAssets.map(asset => {
       // TODO: add different nets/clusters
-      asset.explorer = `https://etherscan.io/address/0x${asset.address}`;
-      asset.wrappedExplorer = `https://explorer.solana.com/address/${asset.mintKey}`;
+
 
       let knownToken = tokenMap.get(asset.mintKey);
       if (knownToken) {
@@ -227,7 +262,7 @@ export const useWormholeAccounts = () => {
         let coinInfo = coinList.get(asset.symbol.toLowerCase());
 
         if(coinInfo) {
-          idToAsset.set(coinInfo.id, asset);
+          idToAsset.set(coinInfo.id, [...(idToAsset.get(coinInfo.id) || []), asset]);
           addressToId.set(asset.address, coinInfo.id);
           return coinInfo.id;
         }
@@ -248,14 +283,17 @@ export const useWormholeAccounts = () => {
     let totalInUSD = 0;
 
     Object.keys(data).forEach(key => {
-      let asset = idToAsset.get(key);
-      if(!asset) {
+      let assets = idToAsset.get(key);
+
+      if(!assets) {
         return;
       }
 
-      asset.price = data[key]?.usd || 1;
-      asset.amountInUSD = Math.round(asset.amount * (asset.price || 1) * 100) / 100;
-      totalInUSD += asset.amountInUSD;
+      assets.forEach(asset => {
+        asset.price = data[key]?.usd || 1;
+        asset.amountInUSD = Math.round(asset.amount * (asset.price || 1) * 100) / 100;
+        totalInUSD += asset.amountInUSD;
+      });
     });
 
     setAmountInUSD(totalInUSD);

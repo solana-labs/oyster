@@ -79,7 +79,6 @@ export const EthereumProvider: FunctionComponent = ({children}) => {
         const signer = provider.getSigner();
         signer.getAddress().then(account => setAccounts([account]));
 
-
         setProvider(provider);
     }
   }, [connected])
