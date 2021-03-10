@@ -52,7 +52,7 @@ export const fromSolana = async (
       }
 
       request.amountBN = ethers.utils.parseUnits(
-        formatAmount(request.amount, 9),
+        request.amount.toString(),
         request.info.decimals,
       );
 

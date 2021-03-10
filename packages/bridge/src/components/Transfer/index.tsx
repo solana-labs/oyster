@@ -169,6 +169,8 @@ export const Transfer = () => {
             return;
           }
 
+          const token = tokenMap.get(request.asset?.toLowerCase() || '');
+          debugger;
           const NotificationContent = () => {
             const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
               [],
@@ -223,13 +225,13 @@ export const Transfer = () => {
                     <TokenDisplay
                       asset={request.asset}
                       chain={request.from}
-                      token={tokenMap.get(request.asset || '')}
+                      token={token}
                     />
                     <span style={{ margin: 15 }}>{'➔'}</span>
                     <TokenDisplay
                       asset={request.asset}
                       chain={request.toChain}
-                      token={tokenMap.get(request.asset || '')}
+                      token={token}
                     />
                   </div>
                 </div>
