@@ -12,6 +12,7 @@ import { FaucetView, HomeView, TransferView } from './views';
 import { CoingeckoProvider } from './contexts/coingecko';
 import { BridgeProvider } from './contexts/bridge';
 import { UseWalletProvider } from 'use-wallet';
+import { TokenChainPairProvider } from './contexts/chainPair';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
@@ -28,21 +29,23 @@ export function Routes() {
                   <AccountsProvider>
                     <MarketProvider>
                       <CoingeckoProvider>
-                        <AppLayout>
-                          <Switch>
-                            <Route
-                              exact
-                              path="/"
-                              component={() => <HomeView />}
-                            />
-                            <Route path="/move" children={<TransferView />} />
-                            <Route
-                              exact
-                              path="/faucet"
-                              children={<FaucetView />}
-                            />
-                          </Switch>
-                        </AppLayout>
+                        <TokenChainPairProvider>
+                          <AppLayout>
+                            <Switch>
+                              <Route
+                                exact
+                                path="/"
+                                component={() => <HomeView />}
+                              />
+                              <Route path="/move" children={<TransferView />} />
+                              <Route
+                                exact
+                                path="/faucet"
+                                children={<FaucetView />}
+                              />
+                            </Switch>
+                          </AppLayout>
+                        </TokenChainPairProvider>
                       </CoingeckoProvider>
                     </MarketProvider>
                   </AccountsProvider>

@@ -16,6 +16,7 @@ import { TokenDisplay } from './../TokenDisplay';
 import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
 import BN from 'bn.js';
+import { useTokenChainPairState } from '../../contexts/chainPair';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -40,26 +41,44 @@ export const Transfer = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
   const { provider, tokenMap, tokens } = useEthereum();
+  const {
+    A,
+    B,
+    mintAddress,
+    setMintAddress,
+    setLastTypedAccount,
+  } = useTokenChainPairState();
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
     toChain: ASSET_CHAIN.Solana,
   });
 
   useEffect(() => {
-    if (tokens && !request.asset) {
+    if (mintAddress && !request.asset) {
       setRequest({
         ...request,
-        asset: tokens?.[0]?.address,
+        asset: mintAddress,
       });
     }
-  }, [request, tokens, setRequest]);
+  }, [mintAddress]);
 
   const setAssetInformation = async (asset: string) => {
+    setMintAddress(asset);
     setRequest({
       ...request,
-      asset,
+      asset: asset,
     });
   };
+
+  useEffect(() => {
+    setRequest({
+      ...request,
+      amount: A.amount,
+      asset: mintAddress,
+      from: A.chain,
+      toChain: B.chain,
+    });
+  }, [A, B, mintAddress]);
 
   useEffect(() => {
     const asset = request.asset;
@@ -125,29 +144,26 @@ export const Transfer = () => {
         <Input
           title={`From ${chainToName(request.from)}`}
           asset={request.asset}
-          chain={request.from}
           balance={request.info?.balanceAsNumber || 0}
           setAsset={asset => setAssetInformation(asset)}
-          amount={request.amount}
+          chain={A.chain}
+          amount={A.amount}
           onInputChange={amount => {
-            setRequest({
-              ...request,
-              amount: amount || 0,
-            });
+            setLastTypedAccount(A.chain);
+            A.setAmount(amount || 0);
           }}
         />
         <Button
           type="primary"
           className="swap-button"
-          disabled={true}
+          disabled={false}
           onClick={() => {
-            const from = request.toChain;
-            const toChain = request.from;
-            setRequest({
-              ...request,
-              from,
-              toChain,
-            });
+            const from = A.chain;
+            const toChain = B.chain;
+            if (from !== undefined && toChain !== undefined) {
+              A.setChain(toChain);
+              B.setChain(from);
+            }
           }}
         >
           ⇅
@@ -155,14 +171,12 @@ export const Transfer = () => {
         <Input
           title={`To ${chainToName(request.toChain)}`}
           asset={request.asset}
-          chain={request.toChain}
           setAsset={asset => setAssetInformation(asset)}
-          amount={request.amount}
+          chain={B.chain}
+          amount={B.amount}
           onInputChange={amount => {
-            setRequest({
-              ...request,
-              amount: amount || 0,
-            });
+            setLastTypedAccount(B.chain);
+            B.setAmount(amount || 0);
           }}
         />
       </div>

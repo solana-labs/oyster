@@ -182,7 +182,7 @@ const queryCustodyAccounts = async (
   authorityKey: PublicKey,
   connection: Connection,
 ) => {
-  debugger;
+  //debugger;
   const tokenAccounts = await connection
     .getTokenAccountsByOwner(authorityKey, {
       programId: programIds().token,
