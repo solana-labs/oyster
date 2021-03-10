@@ -15,7 +15,6 @@ export const TokenSelectModal = (props: {
 }) => {
   const { tokens } = useEthereum();
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>('');
   const [search, setSearch] = useState<string>('');
 
   const tokenList = useMemo(() => {
@@ -38,11 +37,8 @@ export const TokenSelectModal = (props: {
     setIsModalVisible(false);
   };
   const firstToken = useMemo(() => {
-    if (!selected) {
-      return tokens.find(el => el.address === props.asset);
-    }
-    return tokens.find(el => el.address === selected);
-  }, [selected, tokens, props.asset]);
+    return tokens.find(el => el.address === props.asset);
+  }, [tokens, props.asset]);
 
   const delayedSearchChange = _.debounce(val => {
     setSearch(val);
@@ -58,7 +54,6 @@ export const TokenSelectModal = (props: {
         title={token.name}
         onClick={() => {
           props.onSelectToken(mint);
-          setSelected(mint);
           hideModal();
         }}
         style={{ ...rowProps.style, cursor: 'pointer' }}

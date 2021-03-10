@@ -6,6 +6,7 @@ import './itemStyle.less';
 import { Link } from 'react-router-dom';
 import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
 import { TokenDisplay } from '../../components/TokenDisplay';
+import { toChainSymbol } from '../../contexts/chainPair';
 
 export const HomeView = () => {
   const {
@@ -25,12 +26,18 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-              {record.logo && (
-                <TokenDisplay logo={record.logo} chain={record.chain} />
-              )}{' '}
-              {record.symbol}
-            </span>
+            <Link
+              to={`/move?from=${toChainSymbol(record.chain)}&token=${
+                record.symbol
+              }`}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {record.logo && (
+                  <TokenDisplay logo={record.logo} chain={record.chain} />
+                )}{' '}
+                {record.symbol}
+              </span>
+            </Link>
           ),
         };
       },
