@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { NumericInput } from '@oyster/common';
-import { Card, Select } from 'antd';
+import { Card } from 'antd';
 import './style.less';
-import { useEthereum } from '../../contexts';
-import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../models/bridge/constants';
-
-const { Option } = Select;
+import { TokenSelectModal } from '../TokenSelectModal';
 
 export function Input(props: {
   title: string;
@@ -18,33 +15,6 @@ export function Input(props: {
   onInputChange: (value: number | undefined) => void;
 }) {
   const [lastAmount, setLastAmount] = useState<string>('');
-  const { tokens } = useEthereum();
-
-  const renderReserveAccounts = tokens
-    .filter(t => (t.tags?.indexOf('longList') || -1) < 0)
-    .map(token => {
-      const mint = token.address;
-      return (
-        <Option
-          key={mint}
-          className="multichain-option"
-          value={mint}
-          name={token.symbol}
-          title={token.name}
-        >
-          <div className="multichain-option-content">
-            <TokenDisplay
-              asset={props.asset}
-              token={token}
-              chain={props.chain}
-            />
-            <div className="multichain-option-name">
-              <span className={'token-name'}>{token.symbol}</span>
-            </div>
-          </div>
-        </Option>
-      );
-    });
 
   return (
     <Card
@@ -58,7 +28,9 @@ export function Input(props: {
         {!!props.balance && (
           <div
             className="ccy-input-header-right"
-            onClick={() => props.onInputChange && props.onInputChange(props.balance)}
+            onClick={() =>
+              props.onInputChange && props.onInputChange(props.balance)
+            }
           >
             Balance: {props.balance.toFixed(6)}
           </div>
@@ -90,21 +62,11 @@ export function Input(props: {
           placeholder="0.00"
         />
         <div className="ccy-input-header-right" style={{ display: 'flex' }}>
-          <Select
-            size="large"
-            showSearch
-            style={{ minWidth: 150 }}
-            placeholder="CCY"
-            value={props.asset}
-            onChange={(item: string) => {
-              props.setAsset(item);
-            }}
-            filterOption={(input, option) =>
-              option?.name?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {renderReserveAccounts}
-          </Select>
+          <TokenSelectModal
+            onSelectToken={token => props.setAsset(token)}
+            asset={props.asset}
+            chain={props.chain}
+          />
         </div>
       </div>
     </Card>

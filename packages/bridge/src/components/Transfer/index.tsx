@@ -46,13 +46,13 @@ export const Transfer = () => {
   });
 
   useEffect(() => {
-    if(tokens && !request.asset) {
+    if (tokens && !request.asset) {
       setRequest({
         ...request,
         asset: tokens?.[0]?.address,
       });
     }
-  }, [request, tokens, setRequest])
+  }, [request, tokens, setRequest]);
 
   const setAssetInformation = async (asset: string) => {
     setRequest({
@@ -63,7 +63,7 @@ export const Transfer = () => {
 
   useEffect(() => {
     const asset = request.asset;
-    if(!asset || asset === request?.info?.address) {
+    if (!asset || asset === request?.info?.address) {
       return;
     }
 
@@ -87,9 +87,10 @@ export const Transfer = () => {
         address: asset,
         name: symbol,
         balance: balance,
-        balanceAsNumber: (new BN(balance.toString())
-          .div(new BN(10).pow(new BN(decimals - 2)))
-          .toNumber()) / 100,
+        balanceAsNumber:
+          new BN(balance.toString())
+            .div(new BN(10).pow(new BN(decimals - 2)))
+            .toNumber() / 100,
         allowance: allowance,
         decimals: decimals,
         isWrapped: false,
@@ -103,7 +104,10 @@ export const Transfer = () => {
       let isWrapped = await b.isWrappedAsset(asset);
       if (isWrapped) {
         info.chainID = await e.assetChain();
-        info.assetAddress = Buffer.from((await e.assetAddress()).slice(2), 'hex');
+        info.assetAddress = Buffer.from(
+          (await e.assetAddress()).slice(2),
+          'hex',
+        );
         info.isWrapped = true;
       }
 
@@ -113,7 +117,7 @@ export const Transfer = () => {
         info,
       });
     })();
-  }, [request, provider])
+  }, [request, provider]);
 
   return (
     <>
@@ -122,7 +126,7 @@ export const Transfer = () => {
           title={`From ${chainToName(request.from)}`}
           asset={request.asset}
           chain={request.from}
-          balance={request.info?.balanceAsNumber || 0 }
+          balance={request.info?.balanceAsNumber || 0}
           setAsset={asset => setAssetInformation(asset)}
           amount={request.amount}
           onInputChange={amount => {
@@ -179,7 +183,7 @@ export const Transfer = () => {
               (async () => {
                 let steps: ProgressUpdate[] = [];
                 try {
-                  if(request.toChain === ASSET_CHAIN.Solana) {
+                  if (request.toChain === ASSET_CHAIN.Solana) {
                     await toSolana(
                       connection,
                       wallet,
@@ -209,8 +213,7 @@ export const Transfer = () => {
                   <div>
                     <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(request.toChain)} Mainnet`}</h5>
                     <h2>
-                      {request.amount?.toString()}{' '}
-                      {request.info?.name}
+                      {request.amount?.toString()} {request.info?.name}
                     </h2>
                   </div>
                   <div
