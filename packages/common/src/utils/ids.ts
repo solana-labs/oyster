@@ -15,6 +15,9 @@ export let LENDING_PROGRAM_ID = new PublicKey(
 export let SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
 );
+export let BPF_UPGRADE_LOADER_ID = new PublicKey(
+  'BPFLoaderUpgradeab1e11111111111111111111111',
+);
 
 let WORMHOLE_BRIDGE: {
   pubkey: PublicKey;
@@ -90,9 +93,9 @@ export const PROGRAM_IDS = [
     name: 'devnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        'rgq8xnCzKtGcaWCqbb9nAiJkk7vgjohTbJVgPRQoxQc',
+        'FNsF5k1dGz8mrq7unFeeNx8LqFn9bhKg6n6N5DLgQmfb',
       ),
-      programId: new PublicKey('DwFgNNwigPgAiiexQXcXnKi4JU7UUtfk9vfcFrQ5sDTc'),
+      programId: new PublicKey('6FyMHpXABKVSt4DmqUYLMgWChJV8HFXJuF6CsgucbZ3G'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -163,5 +166,6 @@ export const programIds = () => {
     wormhole: WORMHOLE_BRIDGE,
     timelock: TIMELOCK,
     associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+    bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
   };
 };

@@ -6,8 +6,9 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
-export const INSTRUCTION_LIMIT = 255;
+export const INSTRUCTION_LIMIT = 500;
 export const TRANSACTION_SLOTS = 10;
+export const TEMP_FILE_TXN_SIZE = 1000;
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
@@ -19,6 +20,7 @@ export enum TimelockInstruction {
   MintVotingTokens = 10,
   Ping = 11,
   Execute = 12,
+  UploadTempFile = 13,
 }
 
 export interface TimelockConfig {
@@ -191,10 +193,8 @@ export const CustomSingleSignerTimelockTransactionParser = (
     info: {
       version: data.version,
       slot: data.slot,
-      instruction: utils.fromUTF8Array(
-        data.instruction.slice(0, data.instructionEndIndex),
-      ),
-      authorityKey: data.authorityKey,
+      instruction: data.instruction.slice(0, data.instructionEndIndex + 1),
+
       executed: data.executed,
       instructionEndIndex: data.instructionEndIndex,
     },
@@ -208,9 +208,8 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
     BufferLayout.u8('version'),
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
-    Layout.publicKey('authorityKey'),
     BufferLayout.u8('executed'),
-    BufferLayout.u8('instructionEndIndex'),
+    BufferLayout.u16('instructionEndIndex'),
   ],
 );
 
@@ -219,13 +218,11 @@ export interface TimelockTransaction {
 
   slot: BN;
 
-  instruction: string;
+  instruction: number[];
 
   executed: number;
 
   instructionEndIndex: number;
 }
 export interface CustomSingleSignerTimelockTransaction
-  extends TimelockTransaction {
-  authorityKey: PublicKey;
-}
+  extends TimelockTransaction {}

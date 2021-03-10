@@ -55,4 +55,6 @@ export const LABELS = {
   BURNING_VOTES: 'Burning your votes...',
   VOTES_BURNED: 'Votes burned',
   VOTE: 'Vote',
+  EXECUTING: 'Executing...',
+  EXECUTED: 'Executed.',
 };

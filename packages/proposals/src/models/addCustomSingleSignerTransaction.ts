@@ -32,13 +32,19 @@ export const addCustomSingleSignerTransactionInstruction = (
   transferAuthority: PublicKey,
   authority: PublicKey,
   slot: string,
-  instruction: string,
+  instruction: string, // base64 encoded
   position: number,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
   // need to get a pda, move blockhash out of here...
 
-  const instructionAsBytes = toUTF8Array(instruction);
+  let binaryString = atob(instruction);
+  let len = binaryString.length;
+  let bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  const instructionAsBytes = [...bytes];
   if (instructionAsBytes.length > INSTRUCTION_LIMIT) {
     throw new Error(
       'Instruction length in bytes is more than ' + INSTRUCTION_LIMIT,
@@ -56,7 +62,7 @@ export const addCustomSingleSignerTransactionInstruction = (
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instructions'),
     BufferLayout.u8('position'),
-    BufferLayout.u8('instructionEndIndex'),
+    BufferLayout.u16('instructionEndIndex'),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
@@ -64,7 +70,6 @@ export const addCustomSingleSignerTransactionInstruction = (
   for (let i = instructionAsBytes.length; i <= INSTRUCTION_LIMIT - 1; i++) {
     instructionAsBytes.push(0);
   }
-  console.log('Instruction end index', instructionEndIndex);
 
   dataLayout.encode(
     {

@@ -206,7 +206,10 @@ export function useSlippageConfig() {
   return { slippage, setSlippage };
 }
 
-const getErrorForTransaction = async (connection: Connection, txid: string) => {
+export const getErrorForTransaction = async (
+  connection: Connection,
+  txid: string,
+) => {
   // wait for all confirmation before geting transaction
   await connection.confirmTransaction(txid, 'max');
 
@@ -239,6 +242,7 @@ export const sendTransaction = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   awaitConfirmation = true,
+  commitment = 'singleGossip',
 ) => {
   let transaction = new Transaction();
   instructions.forEach(instruction => transaction.add(instruction));
@@ -257,7 +261,7 @@ export const sendTransaction = async (
   const rawTransaction = transaction.serialize();
   let options = {
     skipPreflight: true,
-    commitment: 'singleGossip',
+    commitment,
   };
 
   const txid = await connection.sendRawTransaction(rawTransaction, options);

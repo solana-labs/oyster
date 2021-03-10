@@ -4,13 +4,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  contexts,
-  utils,
-  models,
-  ParsedAccount,
-  actions,
-} from '@oyster/common';
+import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
 import { TimelockSet } from '../models/timelock';
 import { removeSignerInstruction } from '../models/removeSigner';

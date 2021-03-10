@@ -30,18 +30,21 @@ export const execute = async (
   );
 
   const actualMessage = decodeBufferIntoMessage(transaction.info.instruction);
-  console.log(actualMessage);
+  console.log('Actual message', actualMessage);
+  const accountInfos = getAccountInfos(actualMessage);
+
   instructions.push(
     executeInstruction(
       transaction.pubkey,
       proposal.pubkey,
       actualMessage.accountKeys[actualMessage.instructions[0].programIdIndex],
       authority,
+      accountInfos,
     ),
   );
 
   notify({
-    message: LABELS.ADDING_VOTES_TO_VOTER,
+    message: LABELS.EXECUTING,
     description: LABELS.PLEASE_WAIT,
     type: 'warn',
   });
@@ -56,7 +59,7 @@ export const execute = async (
     );
 
     notify({
-      message: LABELS.VOTES_ADDED,
+      message: LABELS.EXECUTED,
       type: 'success',
       description: LABELS.TRANSACTION + ` ${tx}`,
     });
@@ -66,15 +69,68 @@ export const execute = async (
   }
 };
 
-function decodeBufferIntoMessage(instruction: string): Message {
-  // stored as a base64, we need to convert back from base64(via atob), then convert that decoded
-  // to a utf8 array, then decode that buffer into instruction
+function decodeBufferIntoMessage(instruction: number[]): Message {
+  return Message.from(instruction);
+}
 
-  let binaryString = atob(instruction);
-  let len = binaryString.length;
-  let byteArray = new Uint8Array(len);
-  for (var i = 0; i < len; i++) {
-    byteArray[i] = binaryString.charCodeAt(i);
+function getAccountInfos(
+  actualMessage: Message,
+): { pubkey: PublicKey; isSigner: boolean; isWritable: boolean }[] {
+  console.log(actualMessage);
+  // From Solana docs:
+  /*
+  
+    The addresses that require signatures appear at the beginning of the account address array, 
+    with addresses requesting write access first and read-only accounts following. 
+    The addresses that do not require signatures follow the addresses that do, 
+    again with read-write accounts first and read-only accounts following.
+  */
+  const accountInfosInOrder = actualMessage.instructions[0].accounts.map(
+    a => actualMessage.accountKeys[a],
+  );
+  const requireSigsOnlyNotWritable =
+    actualMessage.header.numReadonlySignedAccounts;
+  const requireNietherSigsNorWrite =
+    actualMessage.header.numReadonlyUnsignedAccounts;
+  const writableOnly =
+    accountInfosInOrder.length -
+    requireSigsOnlyNotWritable -
+    requireNietherSigsNorWrite;
+  const readOnly = requireSigsOnlyNotWritable + requireNietherSigsNorWrite;
+
+  let position = 0;
+
+  let finalArray: {
+    pubkey: PublicKey;
+    isSigner: boolean;
+    isWritable: boolean;
+  }[] = [];
+  for (let i = 0; i < writableOnly; i++) {
+    finalArray.push({
+      pubkey: accountInfosInOrder[position],
+      isWritable: true,
+      isSigner: false, // We force signer to false because you realistically as executor wont
+      // have any of these keys present unless it happens to be your own
+      // WE dont care about required signers or not
+    });
+    position++;
   }
-  return Message.from(byteArray);
+
+  for (let i = 0; i < readOnly; i++) {
+    finalArray.push({
+      pubkey: accountInfosInOrder[position],
+      isWritable: false,
+      isSigner: false,
+    });
+    position++;
+  }
+
+  for (; position < accountInfosInOrder.length; position++) {
+    finalArray.push({
+      pubkey: accountInfosInOrder[position],
+      isWritable: false,
+      isSigner: false,
+    });
+  }
+  return finalArray;
 }
