@@ -211,7 +211,7 @@ export const Transfer = () => {
                       request.from,
                     )} Mainnet`}</h5>
                     <h2>
-                      {formatAmount(request.amount || 0, 2)}{' '}
+                      {request.amount?.toString()}{' '}
                       {request.info?.name}
                     </h2>
                   </div>
