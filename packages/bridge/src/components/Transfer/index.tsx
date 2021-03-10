@@ -208,7 +208,7 @@ export const Transfer = () => {
                 <div style={{ display: 'flex' }}>
                   <div>
                     <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
-                      request.from,
+                      request.toChain,
                     )} Mainnet`}</h5>
                     <h2>
                       {request.amount?.toString()}{' '}
