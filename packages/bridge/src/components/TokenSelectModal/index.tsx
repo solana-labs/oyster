@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import List from 'react-virtualized/dist/commonjs/List';
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
+import _ from 'lodash';
 import './style.less';
 import { Modal, Input } from 'antd';
 import { useEthereum } from '../../contexts';
@@ -15,6 +18,18 @@ export const TokenSelectModal = (props: {
   const [selected, setSelected] = useState<string>('');
   const [search, setSearch] = useState<string>('');
 
+  const tokenList = useMemo(() => {
+    if (tokens && search) {
+      return tokens.filter(token => {
+        return (
+          (token.tags?.indexOf('longList') || -1) < 0 &&
+          token.symbol.includes(search.toUpperCase())
+        );
+      });
+    }
+    return tokens;
+  }, [tokens, search]);
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -29,43 +44,38 @@ export const TokenSelectModal = (props: {
     return tokens.find(el => el.address === selected);
   }, [selected, tokens, props.asset]);
 
-  const renderTokensChain = useMemo(() => {
-    return tokens
-      .filter(
-        t =>
-          (t.tags?.indexOf('longList') || -1) < 0 &&
-          search &&
-          search.length >= 3 &&
-          t.symbol.includes(search.toUpperCase()),
-      )
-      .map(token => {
-        const mint = token.address;
-        return (
+  const delayedSearchChange = _.debounce(val => {
+    setSearch(val);
+  });
+
+  const rowRender = (rowProps: { index: number; key: string; style: any }) => {
+    const token = tokenList[rowProps.index];
+    const mint = token.address;
+    return (
+      <div
+        key={rowProps.key}
+        className="multichain-option"
+        title={token.name}
+        onClick={() => {
+          props.onSelectToken(mint);
+          setSelected(mint);
+          hideModal();
+        }}
+        style={{ ...rowProps.style, cursor: 'pointer' }}
+      >
+        <div className="multichain-option-content">
+          <TokenDisplay asset={props.asset} token={token} chain={props.chain} />
           <div
-            key={mint}
-            className="multichain-option"
-            title={token.name}
-            onClick={() => {
-              props.onSelectToken(mint);
-              setSelected(mint);
-              hideModal();
-            }}
-            style={{ cursor: 'pointer' }}
+            className="multichain-option-name"
+            style={{ marginLeft: '20px' }}
           >
-            <div className="multichain-option-content">
-              <TokenDisplay
-                asset={props.asset}
-                token={token}
-                chain={props.chain}
-              />
-              <div className="multichain-option-name">
-                <span className={'token-name'}>{token.symbol}</span>
-              </div>
-            </div>
+            <em className={'token-symbol'}>{token.symbol}</em>
+            <span className={'token-name'}>{token.name}</span>
           </div>
-        );
-      });
-  }, [search, tokens]);
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -93,11 +103,28 @@ export const TokenSelectModal = (props: {
       >
         <Input
           className={'input-token-search'}
-          placeholder={'ETH, SOL, ... etc'}
+          placeholder={'SOL, SRM, ... etc'}
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => {
+            e.persist();
+            delayedSearchChange(e.target.value);
+          }}
         />
-        <div className={'assets-scroll'}>{[...renderTokensChain]}</div>
+        <div style={{ height: '90%' }}>
+          <AutoSizer>
+            {({ width, height }) => (
+              <List
+                ref="List"
+                height={height}
+                rowHeight={70}
+                rowCount={tokenList.length || 0}
+                rowRenderer={rowRender}
+                width={width}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        {/*<div className={'assets-scroll'}>{[...renderTokensChain]}</div>*/}
       </Modal>
     </>
   );

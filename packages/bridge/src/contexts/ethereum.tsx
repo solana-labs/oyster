@@ -53,7 +53,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
         fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org').then(_ =>
           _.json(),
         ),
-        fetch('https://tokenlist.aave.eth.link/').then(_ => _.json()),
+        //fetch('https://tokenlist.aave.eth.link/').then(_ => _.json()),
         fetch('https://tokens.coingecko.com/uniswap/all.json').then(_ =>
           _.json(),
         ),
