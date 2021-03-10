@@ -1,6 +1,4 @@
 import {
-  contexts,
-  utils,
   programIds,
   WalletAdapter,
   getMultipleAccounts,
@@ -8,66 +6,26 @@ import {
   cache,
   TokenAccountParser,
   ParsedAccount,
-  formatNumber,
   formatAmount,
   createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
-
 import { ethers } from 'ethers';
-import { ASSET_CHAIN } from '../../utils/assets';
+import { ASSET_CHAIN } from '../../../utils/assets';
 import { BigNumber } from 'ethers/utils';
-import { Erc20Factory } from '../../contracts/Erc20Factory';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
-import { AssetMeta, createWrappedAssetInstruction } from './meta';
-import { bridgeAuthorityKey, wrappedAssetMintKey } from './helpers';
+import { Erc20Factory } from '../../../contracts/Erc20Factory';
+import { WormholeFactory } from '../../../contracts/WormholeFactory';
+import { AssetMeta, createWrappedAssetInstruction } from './../meta';
+import { bridgeAuthorityKey, wrappedAssetMintKey } from './../helpers';
 import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { AccountInfo, AccountLayout } from '@solana/spl-token';
+import { AccountInfo } from '@solana/spl-token';
+import { ProgressUpdate, TransferRequest } from './interface';
 
-export interface ProgressUpdate {
-  message: string;
-  type: string;
-  step: number;
-  group: string;
-  replace?: boolean;
-}
-
-export interface TransferRequestInfo {
-  name: string;
-  balance: BigNumber;
-  decimals: number;
-  allowance: BigNumber;
-  isWrapped: boolean;
-  chainID: number;
-  assetAddress: Buffer;
-  mint: string;
-}
-
-export interface TransferRequest {
-  nonce?: number;
-  signer?: ethers.Signer;
-  asset?: string;
-  amount?: number;
-  amountBN?: BigNumber;
-
-  recipient?: Buffer;
-
-  info?: TransferRequestInfo;
-
-  from?: ASSET_CHAIN;
-  toChain?: ASSET_CHAIN;
-}
-
-// type of updates
-// 1. info
-// 2. user
-// 3. wait (progress bar)
-
-export const transfer = async (
+export const fromSolana = async (
   connection: Connection,
   wallet: WalletAdapter,
   request: TransferRequest,
@@ -77,7 +35,6 @@ export const transfer = async (
   if (!request.asset) {
     return;
   }
-
   const walletName = 'MetaMask';
   request.signer = provider?.getSigner();
 
@@ -384,8 +341,6 @@ export const transfer = async (
         );
       });
     },
-    //
-    vaa: async (request: TransferRequest) => {},
   };
 
   return steps.transfer(request);

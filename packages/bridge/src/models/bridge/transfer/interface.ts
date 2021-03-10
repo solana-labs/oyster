@@ -1,0 +1,39 @@
+import { ethers } from 'ethers';
+import { BigNumber } from 'ethers/utils';
+import { ASSET_CHAIN } from '../constants';
+
+export interface ProgressUpdate {
+  message: string;
+  type: string;
+  step: number;
+  group: string;
+  replace?: boolean;
+}
+
+export interface TransferRequestInfo {
+  address: string;
+  name: string;
+  balance: BigNumber;
+  balanceAsNumber: number;
+  decimals: number;
+  allowance: BigNumber;
+  isWrapped: boolean;
+  chainID: number;
+  assetAddress: Buffer;
+  mint: string;
+}
+
+export interface TransferRequest {
+  nonce?: number;
+  signer?: ethers.Signer;
+  asset?: string;
+  amount?: number;
+  amountBN?: BigNumber;
+
+  recipient?: Buffer;
+
+  info?: TransferRequestInfo;
+
+  from?: ASSET_CHAIN;
+  toChain?: ASSET_CHAIN;
+}

@@ -1,26 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Card, notification, Spin, Button } from 'antd';
-import { TokenInfo } from '@uniswap/token-lists';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { LABELS } from '../../constants';
+import React, { useEffect, useState } from 'react';
+import { notification, Spin, Button } from 'antd';
 import {
   contexts,
-  utils,
   ConnectButton,
   programIds,
   formatAmount,
 } from '@oyster/common';
-import { useHistory, useLocation } from 'react-router-dom';
 import { EthereumInput } from './../Input';
 
 import './style.less';
-import { ethers } from 'ethers';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
-import { BigNumber } from 'ethers/utils';
-import { Erc20Factory } from '../../contracts/Erc20Factory';
-import { ProgressUpdate, transfer, TransferRequest } from '../../models/bridge';
+import { ProgressUpdate, toSolana, TransferRequest } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from './../TokenDisplay';
+import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
+import BN from 'bn.js';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -51,23 +46,75 @@ export const Transfer = () => {
     toChain: ASSET_CHAIN.Solana,
   });
 
-  const setAssetInformation = (asset: string) => {
+  const setAssetInformation = async (asset: string) => {
     setRequest({
       ...request,
       asset,
     });
   };
 
+  useEffect(() => {
+    const asset = request.asset;
+    if(!asset || asset === request?.info?.address) {
+      return;
+    }
+
+    (async () => {
+      if (!provider) {
+        return;
+      }
+
+      const bridgeAddress = programIds().wormhole.bridge;
+
+      let signer = provider.getSigner();
+      let e = WrappedAssetFactory.connect(asset, provider);
+      let addr = await signer.getAddress();
+      let balance = await e.balanceOf(addr);
+      let decimals = await e.decimals();
+      let symbol = await e.symbol();
+
+      let allowance = await e.allowance(addr, bridgeAddress);
+
+      let info = {
+        address: asset,
+        name: symbol,
+        balance: balance,
+        balanceAsNumber: (new BN(balance.toString())
+          .div(new BN(10).pow(new BN(decimals - 2)))
+          .toNumber()) / 100,
+        allowance: allowance,
+        decimals: decimals,
+        isWrapped: false,
+        chainID: ASSET_CHAIN.Ethereum,
+        assetAddress: Buffer.from(asset.slice(2), 'hex'),
+        mint: '',
+      };
+
+      let b = WormholeFactory.connect(bridgeAddress, provider);
+
+      let isWrapped = await b.isWrappedAsset(asset);
+      if (isWrapped) {
+        info.chainID = await e.assetChain();
+        info.assetAddress = Buffer.from((await e.assetAddress()).slice(2), 'hex');
+        info.isWrapped = true;
+      }
+
+      setRequest({
+        ...request,
+        asset,
+        info,
+      });
+    })();
+  }, [request, provider])
+
   return (
     <>
       <div className="exchange-card">
         <EthereumInput
-          title="From Ethereum"
-          setInfo={info => {
-            request.info = info;
-          }}
+          title={`From ${chainToName(request.from)}`}
           asset={request.asset}
           chain={request.from}
+          balance={request.info?.balanceAsNumber || 0 }
           setAsset={asset => setAssetInformation(asset)}
           amount={request.amount}
           onInputChange={amount => {
@@ -94,13 +141,9 @@ export const Transfer = () => {
           ⇅
         </Button>
         <EthereumInput
-          title="To Solana"
-          setInfo={info => {
-            request.info = info;
-          }}
+          title={`To ${chainToName(request.toChain)}`}
           asset={request.asset}
           chain={request.toChain}
-          hideBalance={true}
           setAsset={asset => setAssetInformation(asset)}
           amount={request.amount}
           onInputChange={amount => {
@@ -126,22 +169,24 @@ export const Transfer = () => {
               (async () => {
                 let steps: ProgressUpdate[] = [];
                 try {
-                  await transfer(
-                    connection,
-                    wallet,
-                    request,
-                    provider,
-                    update => {
-                      if (update.replace) {
-                        steps.pop();
-                        steps = [...steps, update];
-                      } else {
-                        steps = [...steps, update];
-                      }
+                  if(request.toChain === ASSET_CHAIN.Solana) {
+                    await toSolana(
+                      connection,
+                      wallet,
+                      request,
+                      provider,
+                      update => {
+                        if (update.replace) {
+                          steps.pop();
+                          steps = [...steps, update];
+                        } else {
+                          steps = [...steps, update];
+                        }
 
-                      setActiveSteps(steps);
-                    },
-                  );
+                        setActiveSteps(steps);
+                      },
+                    );
+                  }
                 } catch {
                   // TODO...
                 }
