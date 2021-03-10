@@ -8,7 +8,7 @@ import { ASSET_CHAIN } from '../../models/bridge/constants';
 
 const { Option } = Select;
 
-export function EthereumInput(props: {
+export function Input(props: {
   title: string;
   balance?: number;
   asset?: string;

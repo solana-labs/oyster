@@ -6,7 +6,7 @@ import {
   programIds,
   formatAmount,
 } from '@oyster/common';
-import { EthereumInput } from './../Input';
+import { Input } from './../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
@@ -41,10 +41,18 @@ export const Transfer = () => {
   const { wallet } = useWallet();
   const { provider, tokenMap, tokens } = useEthereum();
   const [request, setRequest] = useState<TransferRequest>({
-    asset: tokens?.[0]?.address,
     from: ASSET_CHAIN.Ethereum,
     toChain: ASSET_CHAIN.Solana,
   });
+
+  useEffect(() => {
+    if(tokens && !request.asset) {
+      setRequest({
+        ...request,
+        asset: tokens?.[0]?.address,
+      });
+    }
+  }, [request, tokens, setRequest])
 
   const setAssetInformation = async (asset: string) => {
     setRequest({
@@ -110,7 +118,7 @@ export const Transfer = () => {
   return (
     <>
       <div className="exchange-card">
-        <EthereumInput
+        <Input
           title={`From ${chainToName(request.from)}`}
           asset={request.asset}
           chain={request.from}
@@ -140,7 +148,7 @@ export const Transfer = () => {
         >
           ⇅
         </Button>
-        <EthereumInput
+        <Input
           title={`To ${chainToName(request.toChain)}`}
           asset={request.asset}
           chain={request.toChain}
