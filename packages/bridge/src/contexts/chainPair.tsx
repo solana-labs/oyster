@@ -7,9 +7,9 @@ import React, {
 } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import bs58 from 'bs58';
-import { useConnection } from '@oyster/common';
+import { useConnection, useConnectionConfig } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
-import { ASSET_CHAIN } from '../utils/assets';
+import { ASSET_CHAIN, filterModalSolTokens } from '../utils/assets';
 import { useEthereum } from './ethereum';
 
 export interface TokenChainContextState {
@@ -88,7 +88,8 @@ export const useCurrencyLeg = () => {
 };
 
 export function TokenChainPairProvider({ children = null as any }) {
-  const { tokens } = useEthereum();
+  const { tokens: ethTokens } = useEthereum();
+  const { tokens: solTokens } = useConnectionConfig();
 
   const history = useHistory();
   const location = useLocation();
@@ -106,6 +107,11 @@ export function TokenChainPairProvider({ children = null as any }) {
   const setAmountB = quote.setAmount;
   const chainB = quote.chain;
   const setChainB = quote.setChain;
+
+  const tokens = useMemo(
+    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    [ethTokens, solTokens],
+  );
 
   // updates browser history on token changes
   useEffect(() => {

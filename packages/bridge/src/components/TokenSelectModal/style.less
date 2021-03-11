@@ -5,7 +5,9 @@
   height: 60vh;
   overflow: auto;
 }
-
+.multichain-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
 .ant-modal-body {
   height: 80vh;
   ::-webkit-scrollbar-track {
@@ -13,7 +15,7 @@
 	background-color: transparent;
   }
   ::-webkit-scrollbar {
-	width: 7px;
+	width: 10px;
 	background-color: transparent;
   }
   ::-webkit-scrollbar-thumb {
@@ -22,4 +24,8 @@
 	-webkit-box-shadow: inset 0 0 30px rgba(0,0,0,.3);
 	background-color: #555;
   }
+}
+
+.ReactVirtualized__Grid.ReactVirtualized__List:focus {
+  outline: none !important;
 }

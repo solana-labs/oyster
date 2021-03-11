@@ -47,3 +47,7 @@ const CHAIN_NAME = {
 export const chainToName = (chain?: ASSET_CHAIN) => {
   return CHAIN_NAME[chain || ASSET_CHAIN.Ethereum];
 };
+
+export const filterModalSolTokens = (tokens: any[]) => {
+  return tokens;
+};

@@ -50,13 +50,17 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     (async () => {
       const map = new Map<string, TokenInfo>();
       const listResponse: TokenList[] = await Promise.all([
-        fetch('https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/tokenlist.json').then(_ =>
-          _.json(),
-        ).catch(_ => []),
-        fetch('https://tokenlist.aave.eth.link/').then(_ => _.json()).catch(() => []),
-        fetch('https://tokens.coingecko.com/uniswap/all.json').then(_ =>
-          _.json(),
-        ).catch(() => []),
+        fetch(
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/tokenlist.json',
+        )
+          .then(_ => _.json())
+          .catch(_ => ({ tokens: [] })),
+        fetch('https://tokenlist.aave.eth.link/')
+          .then(_ => _.json())
+          .catch(() => ({ tokens: [] })),
+        fetch('https://tokens.coingecko.com/uniswap/all.json')
+          .then(_ => _.json())
+          .catch(() => ({ tokens: [] })),
       ]);
 
       listResponse.forEach((list, i) =>
@@ -67,12 +71,14 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
 
           const item = {
             ...val,
-            logoURI: current?.logoURI || (val.logoURI
-              ? val.logoURI?.replace(
-                  'ipfs://',
-                  'https://cloudflare-ipfs.com/ipfs/',
-                )
-              : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png`),
+            logoURI:
+              current?.logoURI ||
+              (val.logoURI
+                ? val.logoURI?.replace(
+                    'ipfs://',
+                    'https://cloudflare-ipfs.com/ipfs/',
+                  )
+                : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png`),
             tags: val.tags ? [...val.tags, extraTag] : [extraTag],
           };
 
