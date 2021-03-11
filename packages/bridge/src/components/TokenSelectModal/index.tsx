@@ -145,7 +145,6 @@ export const TokenSelectModal = (props: {
             )}
           </AutoSizer>
         </div>
-        {/*<div className={'assets-scroll'}>{[...renderTokensChain]}</div>*/}
       </Modal>
     </>
   );

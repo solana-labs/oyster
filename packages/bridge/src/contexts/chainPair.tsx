@@ -50,7 +50,7 @@ export const toChainSymbol = (chain: number | null) => {
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
   let defaultChain = 'ETH';
-  let defaultToken = 'SRM';
+  let defaultToken = tokens[0].symbol;
 
   const nameToToken = tokens.reduce((map, item) => {
     map.set(item.symbol, item);
@@ -61,7 +61,7 @@ function getDefaultTokens(tokens: TokenInfo[], search: string) {
     const urlParams = new URLSearchParams(search);
     const from = urlParams.get('from');
     defaultChain = from === 'SOL' ? from : 'ETH';
-    const token = urlParams.get('token') || 'SRM';
+    const token = urlParams.get('token') || defaultToken;
     if (nameToToken.has(token) || isValidAddress(token)) {
       defaultToken = token;
     }
@@ -137,6 +137,7 @@ export function TokenChainPairProvider({ children = null as any }) {
   // Updates tokens on location change
   useEffect(() => {
     if (
+      !tokens.length ||
       (!location.search && mintAddress) ||
       location.pathname.indexOf('move') < 0
     ) {

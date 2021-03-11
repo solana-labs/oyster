@@ -161,7 +161,7 @@ export const Transfer = () => {
         <Button
           type="primary"
           className="swap-button"
-          style={{ paddingLeft: '11px' }}
+          style={{ padding: 0 }}
           disabled={false}
           onClick={() => {
             const from = A.chain;
