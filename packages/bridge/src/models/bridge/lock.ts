@@ -27,8 +27,8 @@ export const createLockAssetInstruction = async (
   const programId = programIds().wormhole.pubkey;
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
-    // TODO: fix
-    // uint256('amount'),
+    // uint256
+    BufferLayout.blob(32, 'amount'),
     BufferLayout.u8('targetChain'),
     BufferLayout.blob(32, 'assetAddress'),
     BufferLayout.u8('assetChain'),
@@ -45,9 +45,9 @@ export const createLockAssetInstruction = async (
   let seeds: Array<Buffer> = [
     Buffer.from('transfer'),
     authorityKey.toBuffer(),
-    new Buffer([asset.chain]),
+    Buffer.from([asset.chain]),
     padBuffer(asset.address, 32),
-    new Buffer([targetChain]),
+    Buffer.from([targetChain]),
     padBuffer(targetAddress, 32),
     tokenAccount.toBuffer(),
     nonceBuffer,
@@ -59,7 +59,7 @@ export const createLockAssetInstruction = async (
   dataLayout.encode(
     {
       instruction: 1, // TransferOut instruction
-      amount: padBuffer(new Buffer(amount.toArray()), 32),
+      amount: padBuffer(Buffer.from(amount.toArray()), 32),
       targetChain: targetChain,
       assetAddress: padBuffer(asset.address, 32),
       assetChain: asset.chain,

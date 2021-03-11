@@ -197,7 +197,7 @@ export const sendTransaction = async (
   wallet: any,
   instructions: TransactionInstruction[],
   signers: Account[],
-  awaitConfirmation = true
+  awaitConfirmation = true,
 ) => {
   let transaction = new Transaction();
   instructions.forEach((instruction) => transaction.add(instruction));
@@ -218,9 +218,12 @@ export const sendTransaction = async (
   };
 
   const txid = await connection.sendRawTransaction(rawTransaction, options);
+  let slot = 0;
 
   if (awaitConfirmation) {
-    const status = (await connection.confirmTransaction(txid, options && (options.commitment as any))).value;
+    const confirmation = (await connection.confirmTransaction(txid, options && (options.commitment as any)));
+    const status = confirmation.value;
+    slot = confirmation.context.slot;
 
     if (status?.err) {
       const errors = await getErrorForTransaction(connection, txid);
@@ -241,5 +244,5 @@ export const sendTransaction = async (
     }
   }
 
-  return txid;
+  return { txid, slot };
 };

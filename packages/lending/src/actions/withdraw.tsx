@@ -85,7 +85,7 @@ export const withdraw = async (
   );
 
   try {
-    let tx = await sendTransaction(
+    let { txid }  = await sendTransaction(
       connection,
       wallet,
       instructions.concat(cleanupInstructions),
@@ -96,7 +96,7 @@ export const withdraw = async (
     notify({
       message: 'Funds deposited.',
       type: 'success',
-      description: `Transaction - ${tx}`,
+      description: `Transaction - ${txid}`,
     });
   } catch {
     // TODO:

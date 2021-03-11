@@ -8,6 +8,7 @@ import {
   ParsedAccount,
   formatAmount,
   createAssociatedTokenAccountInstruction,
+  toLamports,
 } from '@oyster/common';
 import { ethers } from 'ethers';
 import { ASSET_CHAIN } from '../../../utils/assets';
@@ -20,10 +21,14 @@ import {
   Account,
   Connection,
   PublicKey,
+  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { AccountInfo } from '@solana/spl-token';
+import { AccountInfo, Token } from '@solana/spl-token';
 import { ProgressUpdate, TransferRequest } from './interface';
+import BN from 'bn.js';
+import { createLockAssetInstruction } from '../lock';
+import { TransferOutProposalLayout } from '../transferOutProposal';
 
 export const fromSolana = async (
   connection: Connection,
@@ -47,8 +52,12 @@ export const fromSolana = async (
   // check difference between lock/approve (invoke lock if allowance < amount)
   const steps = {
     transfer: async (request: TransferRequest) => {
-      if (!request.info || !request.amount) {
-        return;
+      if (!request.info) {
+        throw new Error('Missing info');
+      }
+
+      if (!request.amount) {
+        throw new Error('Missing amount');
       }
 
       request.amountBN = ethers.utils.parseUnits(
@@ -142,7 +151,7 @@ export const fromSolana = async (
             step: counter++,
           });
 
-          const tx = await sendTransaction(
+          const { txid } = await sendTransaction(
             connection,
             wallet,
             instructions,
@@ -160,188 +169,161 @@ export const fromSolana = async (
         throw err;
       }
 
-      return steps.approve(request);
-    },
-    // approves assets for transfer
-    approve: async (request: TransferRequest) => {
-      if (!request.amountBN || !request.asset || !request.signer) {
-        return;
-      }
-
-      const group = 'Approve assets';
-      try {
-        if (request.info?.allowance.lt(request.amountBN)) {
-          let e = Erc20Factory.connect(request.asset, request.signer);
-          setProgress({
-            message: `Waiting for ${walletName} approval`,
-            type: 'user',
-            group,
-            step: counter++,
-          });
-          let res = await e.approve(
-            programIds().wormhole.bridge,
-            request.amountBN,
-          );
-          setProgress({
-            message: 'Waiting for ETH transaction to be minted...',
-            type: 'wait',
-            group,
-            step: counter++,
-          });
-          await res.wait(1);
-          setProgress({
-            message: 'Approval on ETH succeeded!',
-            type: 'done',
-            group,
-            step: counter++,
-          });
-        } else {
-          setProgress({
-            message: 'Already approved on ETH!',
-            type: 'done',
-            group,
-            step: counter++,
-          });
-        }
-      } catch (err) {
-        setProgress({
-          message: 'Approval failed!',
-          type: 'error',
-          group,
-          step: counter++,
-        });
-        throw err;
-      }
-
       return steps.lock(request);
     },
+
     // locks assets in the bridge
     lock: async (request: TransferRequest) => {
       if (
-        !request.amountBN ||
+        !request.amount ||
         !request.asset ||
         !request.signer ||
         !request.recipient ||
         !request.toChain ||
         !request.info ||
-        !request.nonce
+        !request.nonce ||
+        !wallet.publicKey
       ) {
         return;
       }
 
       let group = 'Lock assets';
+      let transferProposal: PublicKey;
+      let transferVAA = new Uint8Array(0);
 
-      try {
-        let wh = WormholeFactory.connect(
-          programIds().wormhole.bridge,
-          request.signer,
-        );
-        setProgress({
-          message: `Waiting for ${walletName} transfer approval`,
-          type: 'user',
-          group,
-          step: counter++,
-        });
-        let res = await wh.lockAssets(
-          request.asset,
-          request.amountBN,
-          request.recipient,
-          request.toChain,
-          request.nonce,
-          false,
-        );
-        setProgress({
-          message: 'Waiting for ETH transaction to be minted...',
-          type: 'wait',
-          group,
-          step: counter++,
-        });
-        await res.wait(1);
-        setProgress({
-          message: 'Transfer on ETH succeeded!',
-          type: 'done',
-          group,
-          step: counter++,
-        });
-      } catch (err) {
-        setProgress({
-          message: 'Transfer failed!',
-          type: 'error',
-          group,
-          step: counter++,
-        });
-        throw err;
-      }
+      const programs = programIds();
+      const bridgeId = programs.wormhole.pubkey;
+      const authorityKey = await bridgeAuthorityKey(bridgeId);
 
-      return steps.wait(request);
+      const precision = Math.pow(10, request.info?.decimals || 0);
+      const amount = Math.floor(request.amount * precision);
+
+      let { ix: lock_ix, transferKey } = await createLockAssetInstruction(
+        authorityKey,
+        wallet.publicKey,
+        new PublicKey(request.info.address),
+        new PublicKey(request.info.mint),
+        new BN(request.amount.toString()),
+        request.toChain,
+        request.recipient,
+        {
+          chain: request.info.chainID,
+          address: request.info.assetAddress,
+          decimals: request.info.decimals,
+        },
+        // TODO: should this is use durable nonce account?
+        Math.random() * 100000,
+      );
+
+      let ix = Token.createApproveInstruction(
+        programs.token,
+        new PublicKey(request.info.address),
+        authorityKey,
+        wallet.publicKey,
+        [],
+        amount,
+      );
+
+      let fee_ix = SystemProgram.transfer({
+        fromPubkey: wallet.publicKey,
+        toPubkey: authorityKey,
+        lamports: await getTransferFee(connection),
+      });
+
+      const { slot } = await sendTransaction(
+        connection,
+        wallet,
+        [ix, fee_ix, lock_ix],
+        [],
+        true,
+      );
+
+      return steps.wait(request, transferKey, slot);
     },
-    wait: async (request: TransferRequest) => {
-      let startBlock = provider.blockNumber;
+    wait: async (
+      request: TransferRequest,
+      proposalKey: PublicKey,
+      slot: number,
+    ) => {
       let completed = false;
-      let group = 'Finalizing transfer';
+      let startSlot = slot;
 
-      const ethConfirmationMessage = (current: number) =>
-        `Awaiting ETH confirmations: ${current} out of 15`;
+      let group = 'Lock assets';
 
-      setProgress({
-        message: ethConfirmationMessage(0),
-        type: 'wait',
-        step: counter++,
-        group,
+      let slotUpdateListener = connection.onSlotChange(slot => {
+        if (completed) return;
+        const passedSlots = slot.slot - startSlot;
+        const isLast = passedSlots - 1 === 31;
+        if (passedSlots < 32) {
+          // setLoading({
+          //     loading: true,
+          //     message: "Awaiting confirmations",
+          //     progress: {
+          //         completion: (slot.slot - startSlot) / 32 * 100,
+          //         content: `${slot.slot - startSlot}/${32}`
+          //     }
+          // })
+          // setProgress({
+          //   message: ethConfirmationMessage(passedBlocks),
+          //   type: isLast ? 'done' : 'wait',
+          //   step: counter++,
+          //   group,
+          //   replace: passedBlocks > 0,
+          // });
+        } else {
+          //setLoading({loading: true, message: "Awaiting guardian confirmation"})
+        }
       });
 
-      let blockHandler = (blockNumber: number) => {
-        let passedBlocks = blockNumber - startBlock;
-        const isLast = passedBlocks === 14;
-        if (passedBlocks < 15) {
-          setProgress({
-            message: ethConfirmationMessage(passedBlocks),
-            type: isLast ? 'done' : 'wait',
-            step: counter++,
-            group,
-            replace: passedBlocks > 0,
-          });
+      let accountChangeListener = connection.onAccountChange(
+        proposalKey,
+        async a => {
+          if (completed) return;
 
-          if (isLast) {
-            setProgress({
-              message: 'Awaiting completion on Solana...',
-              type: 'wait',
-              group,
-              step: counter++,
-            });
+          let lockup = TransferOutProposalLayout.decode(a.data);
+          let vaa = lockup.vaa;
+
+          for (let i = vaa.length; i > 0; i--) {
+            if (vaa[i] == 0xff) {
+              vaa = vaa.slice(0, i);
+              break;
+            }
           }
-        } else if (!completed) {
-          provider.removeListener('block', blockHandler);
-        }
-      };
-      provider.on('block', blockHandler);
 
-      return new Promise<void>((resolve, reject) => {
-        if (!request.recipient) {
-          return;
-        }
+          // Probably a poke
+          if (vaa.filter((v: number) => v !== 0).length == 0) {
+            return;
+          }
 
-        let accountChangeListener = connection.onAccountChange(
-          new PublicKey(request.recipient),
-          () => {
-            if (completed) return;
+          completed = true;
+          connection.removeAccountChangeListener(accountChangeListener);
+          connection.removeSlotChangeListener(slotUpdateListener);
 
-            completed = true;
-            provider.removeListener('block', blockHandler);
-            connection.removeAccountChangeListener(accountChangeListener);
-            setProgress({
-              message: 'Transfer completed on Solana',
-              type: 'info',
-              group,
-              step: counter++,
-            });
-            resolve();
-          },
-          'single',
-        );
-      });
+          // let signatures = await bridge.fetchSignatureStatus(lockup.signatureAccount);
+          // let sigData = Buffer.of(...signatures.reduce((previousValue, currentValue) => {
+          //     previousValue.push(currentValue.index)
+          //     previousValue.push(...currentValue.signature)
+
+          //     return previousValue
+          // }, new Array<number>()))
+
+          // vaa = Buffer.concat([vaa.slice(0, 5), Buffer.of(signatures.length), sigData, vaa.slice(6)])
+          // transferVAA = vaa
+        },
+        'single',
+      );
     },
+    postVAA: async (request: TransferRequest) => {},
   };
 
   return steps.transfer(request);
+};
+
+const getTransferFee = async (connection: Connection) => {
+  // claim + signature
+  // Reference processor.rs::Bridge::transfer_fee
+  return (
+    (await connection.getMinimumBalanceForRentExemption((40 + 1340) * 2)) +
+    18 * 10000 * 2
+  );
 };

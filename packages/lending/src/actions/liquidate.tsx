@@ -141,7 +141,7 @@ export const liquidate = async (
     ),
   );
 
-  let tx = await sendTransaction(
+  let { txid }  = await sendTransaction(
     connection,
     wallet,
     instructions.concat(cleanupInstructions),
@@ -152,6 +152,6 @@ export const liquidate = async (
   notify({
     message: 'Funds liquidated.',
     type: 'success',
-    description: `Transaction - ${tx}`,
+    description: `Transaction - ${txid}`,
   });
 };

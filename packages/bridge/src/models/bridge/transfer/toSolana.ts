@@ -140,7 +140,7 @@ export const toSolana = async (
             step: counter++,
           });
 
-          const tx = await sendTransaction(
+          const { txid } = await sendTransaction(
             connection,
             wallet,
             instructions,
@@ -181,7 +181,7 @@ export const toSolana = async (
             request.amountBN,
           );
           setProgress({
-            message: 'Waiting for ETH transaction to be minted...',
+            message: 'Waiting for ETH transaction to be mined...',
             type: 'wait',
             group,
             step: counter++,
@@ -249,7 +249,7 @@ export const toSolana = async (
           false,
         );
         setProgress({
-          message: 'Waiting for ETH transaction to be minted...',
+          message: 'Waiting for ETH transaction to be mined...',
           type: 'wait',
           group,
           step: counter++,

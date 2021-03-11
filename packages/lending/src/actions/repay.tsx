@@ -141,7 +141,7 @@ export const repay = async (
     ),
   );
 
-  let tx = await sendTransaction(
+  let { txid }  = await sendTransaction(
     connection,
     wallet,
     instructions.concat(cleanupInstructions),
@@ -152,6 +152,6 @@ export const repay = async (
   notify({
     message: 'Funds repaid.',
     type: 'success',
-    description: `Transaction - ${tx}`,
+    description: `Transaction - ${txid}`,
   });
 };

@@ -182,13 +182,13 @@ export const borrow = async (
 
   if (instructions.length > 0) {
     // create all accounts in one transaction
-    let tx = await sendTransaction(connection, wallet, instructions, [
+    let { txid }  = await sendTransaction(connection, wallet, instructions, [
       ...signers,
     ]);
 
     notify({
       message: 'Obligation accounts created',
-      description: `Transaction ${tx}`,
+      description: `Transaction ${txid}`,
       type: 'success',
     });
   }
@@ -273,7 +273,7 @@ export const borrow = async (
     ),
   );
   try {
-    let tx = await sendTransaction(
+    let { txid }  = await sendTransaction(
       connection,
       wallet,
       instructions.concat(cleanupInstructions),
@@ -284,7 +284,7 @@ export const borrow = async (
     notify({
       message: 'Funds borrowed.',
       type: 'success',
-      description: `Transaction - ${tx}`,
+      description: `Transaction - ${txid}`,
     });
   } catch (ex) {
     console.error(ex);

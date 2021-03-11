@@ -50,28 +50,29 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     (async () => {
       const map = new Map<string, TokenInfo>();
       const listResponse: TokenList[] = await Promise.all([
-        fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org').then(_ =>
+        fetch('https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/tokenlist.json').then(_ =>
           _.json(),
-        ),
-        //fetch('https://tokenlist.aave.eth.link/').then(_ => _.json()),
+        ).catch(_ => []),
+        fetch('https://tokenlist.aave.eth.link/').then(_ => _.json()).catch(() => []),
         fetch('https://tokens.coingecko.com/uniswap/all.json').then(_ =>
           _.json(),
-        ),
+        ).catch(() => []),
       ]);
 
       listResponse.forEach((list, i) =>
         list.tokens.reduce((acc, val) => {
           const address = val.address.toLowerCase();
-          const extraTag = i === 2 && !acc.has(address) ? 'longList' : '';
+          const current = acc.get(address);
+          const extraTag = i === 2 && !current ? 'longList' : '';
 
           const item = {
             ...val,
-            logoURI: val.logoURI
+            logoURI: current?.logoURI || (val.logoURI
               ? val.logoURI?.replace(
                   'ipfs://',
                   'https://cloudflare-ipfs.com/ipfs/',
                 )
-              : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png `,
+              : ` https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${val.address}/logo.png`),
             tags: val.tags ? [...val.tags, extraTag] : [extraTag],
           };
 

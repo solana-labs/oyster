@@ -1,10 +1,11 @@
+import { publicKey } from '@oyster/common/dist/lib/utils/layout';
 import * as BufferLayout from 'buffer-layout';
 
 // 1184 TransferOutProposal
 export const TransferOutProposalLayout = BufferLayout.struct([
   BufferLayout.blob(32, 'amount'),
   BufferLayout.u8('toChain'),
-  BufferLayout.blob(32, 'sourceAddress'),
+  publicKey('sourceAddress'),
   BufferLayout.blob(32, 'targetAddress'),
   BufferLayout.blob(32, 'assetAddress'),
   BufferLayout.u8('assetChain'),
@@ -16,7 +17,7 @@ export const TransferOutProposalLayout = BufferLayout.struct([
   BufferLayout.u32('vaaTime'),
   BufferLayout.u32('lockupTime'),
   BufferLayout.u8('pokeCounter'),
-  BufferLayout.blob(32, 'signatureAccount'),
+  publicKey('signatureAccount'),
   BufferLayout.u8('initialized'),
   BufferLayout.seq(BufferLayout.u8(), 2), // 2 byte alignment
 ]);
