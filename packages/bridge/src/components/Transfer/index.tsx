@@ -10,7 +10,7 @@ import { Input } from './../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
-import { ProgressUpdate, toSolana, TransferRequest } from '../../models/bridge';
+import { fromSolana, ProgressUpdate, toSolana, TransferRequest } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from './../TokenDisplay';
 import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
@@ -197,6 +197,26 @@ export const Transfer = () => {
               (async () => {
                 let steps: ProgressUpdate[] = [];
                 try {
+                  if(request.from === ASSET_CHAIN.Solana) {
+                    debugger;
+                    await fromSolana(
+                      connection,
+                      wallet,
+                      request,
+                      provider,
+                      update => {
+                        if (update.replace) {
+                          steps.pop();
+                          steps = [...steps, update];
+                        } else {
+                          steps = [...steps, update];
+                        }
+
+                        setActiveSteps(steps);
+                      },
+                    );
+                  }
+
                   if (request.toChain === ASSET_CHAIN.Solana) {
                     await toSolana(
                       connection,

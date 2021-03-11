@@ -24,7 +24,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { AccountInfo, Token } from '@solana/spl-token';
+import { Token } from '@solana/spl-token';
 import { ProgressUpdate, TransferRequest } from './interface';
 import BN from 'bn.js';
 import { createLockAssetInstruction } from '../lock';
@@ -42,7 +42,10 @@ export const fromSolana = async (
   }
   const walletName = 'MetaMask';
   request.signer = provider?.getSigner();
-
+  request.recipient = Buffer.from(
+    (await request.signer.getAddress()).slice(2),
+    'hex',
+  );
   request.nonce = await provider.getTransactionCount(
     request.signer.getAddress(),
     'pending',
@@ -65,110 +68,6 @@ export const fromSolana = async (
         request.info.decimals,
       );
 
-      return steps.prepare(request);
-    },
-
-    // creates wrapped account on solana
-    prepare: async (request: TransferRequest) => {
-      if (!request.info || !request.from || !wallet.publicKey) {
-        return;
-      }
-
-      const group = 'Initiate transfer';
-      try {
-        const bridgeId = programIds().wormhole.pubkey;
-        const authority = await bridgeAuthorityKey(bridgeId);
-        const meta: AssetMeta = {
-          decimals: Math.min(request.info?.decimals, 9),
-          address: request.info?.assetAddress,
-          chain: request.from,
-        };
-        const mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
-
-        const recipientKey =
-          cache
-            .byParser(TokenAccountParser)
-            .map(key => {
-              let account = cache.get(key) as ParsedAccount<AccountInfo>;
-              if (account?.info.mint.toBase58() === mintKey.toBase58()) {
-                return key;
-              }
-
-              return;
-            })
-            .find(_ => _) || '';
-        const recipient: PublicKey = recipientKey
-          ? new PublicKey(recipientKey)
-          : (
-              await PublicKey.findProgramAddress(
-                [
-                  wallet.publicKey.toBuffer(),
-                  programIds().token.toBuffer(),
-                  mintKey.toBuffer(),
-                ],
-                programIds().associatedToken,
-              )
-            )[0];
-
-        request.recipient = recipient.toBuffer();
-
-        const accounts = await getMultipleAccounts(
-          connection,
-          [mintKey.toBase58(), recipient.toBase58()],
-          'single',
-        );
-        const instructions: TransactionInstruction[] = [];
-        const signers: Account[] = [];
-
-        if (!accounts.array[0]) {
-          // create mint using wormhole instruction
-          instructions.push(
-            await createWrappedAssetInstruction(
-              meta,
-              bridgeId,
-              authority,
-              mintKey,
-              wallet.publicKey,
-            ),
-          );
-        }
-
-        if (!accounts.array[1]) {
-          createAssociatedTokenAccountInstruction(
-            instructions,
-            recipient,
-            wallet.publicKey,
-            wallet.publicKey,
-            mintKey,
-          );
-        }
-
-        if (instructions.length > 0) {
-          setProgress({
-            message: 'Waiting for Solana approval...',
-            type: 'user',
-            group,
-            step: counter++,
-          });
-
-          const { txid } = await sendTransaction(
-            connection,
-            wallet,
-            instructions,
-            signers,
-            true,
-          );
-        }
-      } catch (err) {
-        setProgress({
-          message: `Couldn't create Solana account!`,
-          type: 'error',
-          group,
-          step: counter++,
-        });
-        throw err;
-      }
-
       return steps.lock(request);
     },
 
@@ -176,21 +75,15 @@ export const fromSolana = async (
     lock: async (request: TransferRequest) => {
       if (
         !request.amount ||
-        !request.asset ||
-        !request.signer ||
         !request.recipient ||
         !request.toChain ||
         !request.info ||
-        !request.nonce ||
         !wallet.publicKey
       ) {
         return;
       }
 
       let group = 'Lock assets';
-      let transferProposal: PublicKey;
-      let transferVAA = new Uint8Array(0);
-
       const programs = programIds();
       const bridgeId = programs.wormhole.pubkey;
       const authorityKey = await bridgeAuthorityKey(bridgeId);

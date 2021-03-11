@@ -24,16 +24,18 @@ export interface TransferRequestInfo {
 }
 
 export interface TransferRequest {
+  // ethereum specific fields, TODO: remove
   nonce?: number;
   signer?: ethers.Signer;
-  asset?: string;
-  amount?: number;
   amountBN?: BigNumber;
 
-  recipient?: Buffer;
+  amount?: number;
 
   info?: TransferRequestInfo;
 
   from?: ASSET_CHAIN;
+  asset?: string;
+
   toChain?: ASSET_CHAIN;
+  recipient?: Buffer;
 }
