@@ -148,6 +148,11 @@ export const Transfer = () => {
           setAsset={asset => setAssetInformation(asset)}
           chain={A.chain}
           amount={A.amount}
+          onChain={(chain: ASSET_CHAIN) => {
+            const from = A.chain;
+            A.setChain(chain);
+            B.setChain(from);
+          }}
           onInputChange={amount => {
             setLastTypedAccount(A.chain);
             A.setAmount(amount || 0);
@@ -156,6 +161,7 @@ export const Transfer = () => {
         <Button
           type="primary"
           className="swap-button"
+          style={{ paddingLeft: '11px' }}
           disabled={false}
           onClick={() => {
             const from = A.chain;
@@ -174,6 +180,11 @@ export const Transfer = () => {
           setAsset={asset => setAssetInformation(asset)}
           chain={B.chain}
           amount={B.amount}
+          onChain={(chain: ASSET_CHAIN) => {
+            const to = B.chain;
+            B.setChain(chain);
+            A.setChain(to);
+          }}
           onInputChange={amount => {
             setLastTypedAccount(B.chain);
             B.setAmount(amount || 0);
@@ -225,7 +236,9 @@ export const Transfer = () => {
               <div>
                 <div style={{ display: 'flex' }}>
                   <div>
-                    <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(request.toChain)} Mainnet`}</h5>
+                    <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
+                      request.toChain,
+                    )} Mainnet`}</h5>
                     <h2>
                       {request.amount?.toString()} {request.info?.name}
                     </h2>

@@ -12,6 +12,7 @@ export function Input(props: {
   chain?: ASSET_CHAIN;
   setAsset: (asset: string) => void;
   amount?: number | null;
+  onChain: (chain: ASSET_CHAIN) => void;
   onInputChange: (value: number | undefined) => void;
 }) {
   const [lastAmount, setLastAmount] = useState<string>('');
@@ -64,6 +65,7 @@ export function Input(props: {
         <div className="ccy-input-header-right" style={{ display: 'flex' }}>
           <TokenSelectModal
             onSelectToken={token => props.setAsset(token)}
+            onChain={(chain: ASSET_CHAIN) => props.onChain(chain)}
             asset={props.asset}
             chain={props.chain}
           />

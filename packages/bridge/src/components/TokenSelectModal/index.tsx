@@ -1,21 +1,31 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import List from 'react-virtualized/dist/commonjs/List';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import _ from 'lodash';
 import './style.less';
-import { Modal, Input } from 'antd';
+import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../models/bridge/constants';
+import { useConnectionConfig } from '@oyster/common';
+import { filterModalSolTokens } from '../../utils/assets';
 
 export const TokenSelectModal = (props: {
   onSelectToken: (token: string) => void;
+  onChain: (chain: ASSET_CHAIN) => void;
   asset?: string;
   chain?: ASSET_CHAIN;
 }) => {
-  const { tokens } = useEthereum();
+  const { tokens: ethTokens } = useEthereum();
+  const { tokens: solTokens } = useConnectionConfig();
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
+
+  const inputRef = useRef<Input>(null);
+  const tokens = useMemo(
+    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    [ethTokens, solTokens],
+  );
 
   const tokenList = useMemo(() => {
     if (tokens && search) {
@@ -30,6 +40,9 @@ export const TokenSelectModal = (props: {
   }, [tokens, search]);
 
   const showModal = () => {
+    if (inputRef && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 300);
+    }
     setIsModalVisible(true);
   };
 
@@ -47,29 +60,40 @@ export const TokenSelectModal = (props: {
   const rowRender = (rowProps: { index: number; key: string; style: any }) => {
     const token = tokenList[rowProps.index];
     const mint = token.address;
-    return (
-      <div
-        key={rowProps.key}
-        className="multichain-option"
-        title={token.name}
-        onClick={() => {
-          props.onSelectToken(mint);
-          hideModal();
-        }}
-        style={{ ...rowProps.style, cursor: 'pointer' }}
-      >
-        <div className="multichain-option-content">
-          <TokenDisplay asset={props.asset} token={token} chain={props.chain} />
+    return [ASSET_CHAIN.Solana, ASSET_CHAIN.Ethereum].map((chain, index) => {
+      return (
+        <div
+          key={rowProps.key + mint + chain}
+          className="multichain-option"
+          title={token.name}
+          onClick={() => {
+            props.onSelectToken(mint);
+            props.onChain(chain);
+            hideModal();
+          }}
+          style={{
+            ...rowProps.style,
+            cursor: 'pointer',
+            height: '70px',
+            top: `${rowProps.style.top + 70 * index}px`,
+          }}
+        >
           <div
-            className="multichain-option-name"
-            style={{ marginLeft: '20px' }}
+            className="multichain-option-content"
+            style={{ position: 'relative' }}
           >
-            <em className={'token-symbol'}>{token.symbol}</em>
-            <span className={'token-name'}>{token.name}</span>
+            <TokenDisplay asset={props.asset} token={token} chain={chain} />
+            <div
+              className="multichain-option-name"
+              style={{ marginLeft: '20px' }}
+            >
+              <em className={'token-symbol'}>{token.symbol}</em>
+              <span className={'token-name'}>{token.name}</span>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    });
   };
 
   return (
@@ -97,6 +121,8 @@ export const TokenSelectModal = (props: {
         footer={null}
       >
         <Input
+          autoFocus
+          ref={inputRef}
           className={'input-token-search'}
           placeholder={'SOL, SRM, ... etc'}
           value={search}
@@ -111,7 +137,7 @@ export const TokenSelectModal = (props: {
               <List
                 ref="List"
                 height={height}
-                rowHeight={70}
+                rowHeight={140}
                 rowCount={tokenList.length || 0}
                 rowRenderer={rowRender}
                 width={width}
