@@ -97,15 +97,17 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (connected) {
       // @ts-ignore
-      window.ethereum.enable();
-      // @ts-ignore
-      const provider = new ethers.providers.Web3Provider(
-        (window as any).ethereum,
-      );
-      const signer = provider.getSigner();
-      signer.getAddress().then(account => setAccounts([account]));
-
-      setProvider(provider);
+      window.ethereum.enable().then(() => {
+        // @ts-ignore
+        const provider = new ethers.providers.Web3Provider(
+          (window as any).ethereum,
+        );
+        const signer = provider.getSigner();
+        signer.getAddress().then(account => {
+          setAccounts([account]);
+        });
+        setProvider(provider);
+      });
     }
   }, [connected]);
 
