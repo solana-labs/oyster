@@ -30,15 +30,20 @@ export const toSolana = async (
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,
 ) => {
-  if (!request.asset) {
+  if (!request.asset || !request.amount || !request.info) {
     return;
   }
   const walletName = 'MetaMask';
-  request.signer = provider?.getSigner();
+  const signer = provider?.getSigner();
 
-  request.nonce = await provider.getTransactionCount(
-    request.signer.getAddress(),
+  const nonce = await provider.getTransactionCount(
+    signer.getAddress(),
     'pending',
+  );
+
+  const amountBN = ethers.utils.parseUnits(
+    request.amount.toString(),
+    request.info.decimals,
   );
 
   let counter = 0;
@@ -48,11 +53,6 @@ export const toSolana = async (
       if (!request.info || !request.amount) {
         return;
       }
-
-      request.amountBN = ethers.utils.parseUnits(
-        request.amount.toString(),
-        request.info.decimals,
-      );
 
       return steps.prepare(request);
     },
@@ -162,24 +162,21 @@ export const toSolana = async (
     },
     // approves assets for transfer
     approve: async (request: TransferRequest) => {
-      if (!request.amountBN || !request.asset || !request.signer) {
+      if (!request.asset) {
         return;
       }
 
       const group = 'Approve assets';
       try {
-        if (request.info?.allowance.lt(request.amountBN)) {
-          let e = Erc20Factory.connect(request.asset, request.signer);
+        if (request.info?.allowance.lt(amountBN)) {
+          let e = Erc20Factory.connect(request.asset, signer);
           setProgress({
             message: `Waiting for ${walletName} approval`,
             type: 'user',
             group,
             step: counter++,
           });
-          let res = await e.approve(
-            programIds().wormhole.bridge,
-            request.amountBN,
-          );
+          let res = await e.approve(programIds().wormhole.bridge, amountBN);
           setProgress({
             message: 'Waiting for ETH transaction to be mined...',
             type: 'wait',
@@ -216,13 +213,11 @@ export const toSolana = async (
     // locks assets in the bridge
     lock: async (request: TransferRequest) => {
       if (
-        !request.amountBN ||
+        !amountBN ||
         !request.asset ||
-        !request.signer ||
         !request.recipient ||
         !request.toChain ||
-        !request.info ||
-        !request.nonce
+        !request.info
       ) {
         return;
       }
@@ -230,10 +225,7 @@ export const toSolana = async (
       let group = 'Lock assets';
 
       try {
-        let wh = WormholeFactory.connect(
-          programIds().wormhole.bridge,
-          request.signer,
-        );
+        let wh = WormholeFactory.connect(programIds().wormhole.bridge, signer);
         setProgress({
           message: `Waiting for ${walletName} transfer approval`,
           type: 'user',
@@ -242,10 +234,10 @@ export const toSolana = async (
         });
         let res = await wh.lockAssets(
           request.asset,
-          request.amountBN,
+          amountBN,
           request.recipient,
           request.toChain,
-          request.nonce,
+          nonce,
           false,
         );
         setProgress({

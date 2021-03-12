@@ -24,11 +24,6 @@ export interface TransferRequestInfo {
 }
 
 export interface TransferRequest {
-  // ethereum specific fields, TODO: remove
-  nonce?: number;
-  signer?: ethers.Signer;
-  amountBN?: BigNumber;
-
   amount?: number;
 
   info?: TransferRequestInfo;

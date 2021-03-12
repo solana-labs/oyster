@@ -3,6 +3,7 @@ import {
   getVerboseTokenName,
   KnownTokenMap,
 } from '@oyster/common';
+import { TokenInfo } from '@solana/spl-token-registry';
 
 export const getAssetName = (
   parsedAssetAddress: string,
@@ -48,6 +49,6 @@ export const chainToName = (chain?: ASSET_CHAIN) => {
   return CHAIN_NAME[chain || ASSET_CHAIN.Ethereum];
 };
 
-export const filterModalSolTokens = (tokens: any[]) => {
+export const filterModalSolTokens = (tokens: TokenInfo[]) => {
   return tokens;
 };

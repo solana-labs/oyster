@@ -37,18 +37,26 @@ export const fromSolana = async (
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,
 ) => {
-  if (!request.asset) {
+  if (
+    !request.asset ||
+    !request.amount ||
+    !request.recipient ||
+    !request.toChain ||
+    !request.info
+  ) {
     return;
   }
   const walletName = 'MetaMask';
-  request.signer = provider?.getSigner();
-  request.recipient = Buffer.from(
-    (await request.signer.getAddress()).slice(2),
-    'hex',
-  );
-  request.nonce = await provider.getTransactionCount(
-    request.signer.getAddress(),
+  const signer = provider?.getSigner();
+  request.recipient = Buffer.from((await signer.getAddress()).slice(2), 'hex');
+  const nonce = await provider.getTransactionCount(
+    signer.getAddress(),
     'pending',
+  );
+
+  request.amountBN = ethers.utils.parseUnits(
+    request.amount.toString(),
+    request.info.decimals,
   );
 
   let counter = 0;
@@ -62,11 +70,6 @@ export const fromSolana = async (
       if (!request.amount) {
         throw new Error('Missing amount');
       }
-
-      request.amountBN = ethers.utils.parseUnits(
-        request.amount.toString(),
-        request.info.decimals,
-      );
 
       return steps.lock(request);
     },
@@ -138,75 +141,108 @@ export const fromSolana = async (
       proposalKey: PublicKey,
       slot: number,
     ) => {
-      let completed = false;
-      let startSlot = slot;
+      return new Promise<void>((resolve, reject) => {
+        let completed = false;
+        let startSlot = slot;
 
-      let group = 'Lock assets';
+        let group = 'Lock assets';
 
-      let slotUpdateListener = connection.onSlotChange(slot => {
-        if (completed) return;
-        const passedSlots = slot.slot - startSlot;
-        const isLast = passedSlots - 1 === 31;
-        if (passedSlots < 32) {
-          // setLoading({
-          //     loading: true,
-          //     message: "Awaiting confirmations",
-          //     progress: {
-          //         completion: (slot.slot - startSlot) / 32 * 100,
-          //         content: `${slot.slot - startSlot}/${32}`
-          //     }
-          // })
-          // setProgress({
-          //   message: ethConfirmationMessage(passedBlocks),
-          //   type: isLast ? 'done' : 'wait',
-          //   step: counter++,
-          //   group,
-          //   replace: passedBlocks > 0,
-          // });
-        } else {
-          //setLoading({loading: true, message: "Awaiting guardian confirmation"})
-        }
-      });
-
-      let accountChangeListener = connection.onAccountChange(
-        proposalKey,
-        async a => {
+        let slotUpdateListener = connection.onSlotChange(slot => {
           if (completed) return;
+          const passedSlots = slot.slot - startSlot;
+          const isLast = passedSlots - 1 === 31;
+          if (passedSlots < 32) {
+            // setLoading({
+            //     loading: true,
+            //     message: "Awaiting confirmations",
+            //     progress: {
+            //         completion: (slot.slot - startSlot) / 32 * 100,
+            //         content: `${slot.slot - startSlot}/${32}`
+            //     }
+            // })
+            // setProgress({
+            //   message: ethConfirmationMessage(passedBlocks),
+            //   type: isLast ? 'done' : 'wait',
+            //   step: counter++,
+            //   group,
+            //   replace: passedBlocks > 0,
+            // });
+          } else {
+            //setLoading({loading: true, message: "Awaiting guardian confirmation"})
+          }
+        });
 
-          let lockup = TransferOutProposalLayout.decode(a.data);
-          let vaa = lockup.vaa;
+        let accountChangeListener = connection.onAccountChange(
+          proposalKey,
+          async a => {
+            if (completed) return;
 
-          for (let i = vaa.length; i > 0; i--) {
-            if (vaa[i] == 0xff) {
-              vaa = vaa.slice(0, i);
-              break;
+            let lockup = TransferOutProposalLayout.decode(a.data);
+            let vaa = lockup.vaa;
+
+            for (let i = vaa.length; i > 0; i--) {
+              if (vaa[i] == 0xff) {
+                vaa = vaa.slice(0, i);
+                break;
+              }
             }
-          }
 
-          // Probably a poke
-          if (vaa.filter((v: number) => v !== 0).length == 0) {
-            return;
-          }
+            // Probably a poke
+            if (vaa.filter((v: number) => v !== 0).length == 0) {
+              return;
+            }
 
-          completed = true;
-          connection.removeAccountChangeListener(accountChangeListener);
-          connection.removeSlotChangeListener(slotUpdateListener);
+            completed = true;
+            connection.removeAccountChangeListener(accountChangeListener);
+            connection.removeSlotChangeListener(slotUpdateListener);
 
-          // let signatures = await bridge.fetchSignatureStatus(lockup.signatureAccount);
-          // let sigData = Buffer.of(...signatures.reduce((previousValue, currentValue) => {
-          //     previousValue.push(currentValue.index)
-          //     previousValue.push(...currentValue.signature)
+            let signatures = await bridge.fetchSignatureStatus(
+              lockup.signatureAccount,
+            );
+            let sigData = Buffer.of(
+              ...signatures.reduce((previousValue, currentValue) => {
+                previousValue.push(currentValue.index);
+                previousValue.push(...currentValue.signature);
 
-          //     return previousValue
-          // }, new Array<number>()))
+                return previousValue;
+              }, new Array<number>()),
+            );
 
-          // vaa = Buffer.concat([vaa.slice(0, 5), Buffer.of(signatures.length), sigData, vaa.slice(6)])
-          // transferVAA = vaa
-        },
-        'single',
-      );
+            vaa = Buffer.concat([
+              vaa.slice(0, 5),
+              Buffer.of(signatures.length),
+              sigData,
+              vaa.slice(6),
+            ]);
+            // transferVAA = vaa
+            try {
+              await steps.postVAA(request);
+              resolve();
+            } catch {
+              reject();
+            }
+          },
+          'single',
+        );
+      });
     },
-    postVAA: async (request: TransferRequest) => {},
+    postVAA: async (request: TransferRequest) => {
+      let wh = WormholeFactory.connect(programIds().wormhole.bridge, signer);
+
+      // setLoading({
+      //     ...loading,
+      //     loading: true,
+      //     message: "Sign the claim...",
+      // })
+      let tx = await wh.submitVAA(vaa);
+      // setLoading({
+      //     ...loading,
+      //     loading: true,
+      //     message: "Waiting for tokens unlock to be mined...",
+      // })
+      await tx.wait(1);
+      // message.success({content: "Execution of VAA succeeded", key: "eth_tx"})
+    },
   };
 
   return steps.transfer(request);

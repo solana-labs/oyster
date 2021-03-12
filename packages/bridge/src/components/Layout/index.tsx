@@ -33,7 +33,7 @@ export const AppLayout = React.memo((props: any) => {
       <Wormhole
         onCreated={() => setWormholeReady(true)}
         show={true}
-        rotate={isRoot}
+        rotate={true}
       >
         <Layout title={LABELS.APP_TITLE}>
           {isRoot && (

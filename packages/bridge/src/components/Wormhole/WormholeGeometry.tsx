@@ -47,7 +47,7 @@ const WormholeGeometry = ({ rotate }: { rotate?: boolean }) => {
     if (mesh.current) {
       // x-Axis defines the "top" we're looking at, try e.g. 30.5
       mesh.current.rotation.x = 30;
-      if (!rotate) {
+      if (rotate) {
         mesh.current.rotation.z += 0.0005;
       }
     }
