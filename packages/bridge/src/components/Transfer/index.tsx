@@ -95,50 +95,68 @@ export const Transfer = () => {
         return;
       }
       try {
-        const bridgeAddress = programIds().wormhole.bridge;
 
-        let signer = provider.getSigner();
-        let e = WrappedAssetFactory.connect(asset, provider);
-        let addr = await signer.getAddress();
-        let balance = await e.balanceOf(addr);
-        let decimals = await e.decimals();
-        let symbol = await e.symbol();
+        if(request.from === ASSET_CHAIN.Solana) {
+          const bridgeAddress = programIds().wormhole.bridge;
 
-        let allowance = await e.allowance(addr, bridgeAddress);
+          let signer = provider.getSigner();
+          let e = WrappedAssetFactory.connect(asset, provider);
+          let addr = await signer.getAddress();
+          let balance = await e.balanceOf(addr);
+          let decimals = await e.decimals();
+          let symbol = await e.symbol();
 
-        let info = {
-          address: asset,
-          name: symbol,
-          balance: balance,
-          balanceAsNumber:
-            new BN(balance.toString())
-              .div(new BN(10).pow(new BN(decimals - 2)))
-              .toNumber() / 100,
-          allowance: allowance,
-          decimals: decimals,
-          isWrapped: false,
-          chainID: ASSET_CHAIN.Ethereum,
-          assetAddress: Buffer.from(asset.slice(2), 'hex'),
-          mint: '',
-        };
+          let allowance = await e.allowance(addr, bridgeAddress);
 
-        let b = WormholeFactory.connect(bridgeAddress, provider);
+          let info = {
+            address: asset,
+            name: symbol,
+            balance: balance,
+            balanceAsNumber:
+              new BN(balance.toString())
+                .div(new BN(10).pow(new BN(decimals - 2)))
+                .toNumber() / 100,
+            allowance: allowance,
+            decimals: decimals,
+            isWrapped: false,
+            chainID: ASSET_CHAIN.Ethereum,
+            assetAddress: Buffer.from(asset.slice(2), 'hex'),
+            mint: '',
+          };
 
-        let isWrapped = await b.isWrappedAsset(asset);
-        if (isWrapped) {
-          info.chainID = await e.assetChain();
-          info.assetAddress = Buffer.from(
-            (await e.assetAddress()).slice(2),
-            'hex',
-          );
-          info.isWrapped = true;
+          let b = WormholeFactory.connect(bridgeAddress, provider);
+
+          let isWrapped = await b.isWrappedAsset(asset);
+          if (isWrapped) {
+            info.chainID = await e.assetChain();
+            info.assetAddress = Buffer.from(
+              (await e.assetAddress()).slice(2),
+              'hex',
+            );
+            info.isWrapped = true;
+          }
+
+          setRequest({
+            ...request,
+            asset,
+            info,
+          });
+        } else {
+          console.log(asset);
+          // let info = {
+          //   address: fromAddress,
+          //     name: "",
+          //     balance: acc.balance,
+          //     allowance: 0,
+          //     decimals: acc.assetMeta.decimals,
+          //     isWrapped: acc.assetMeta.chain != ChainID.SOLANA,
+          //     chainID: acc.assetMeta.chain,
+          //     assetAddress: acc.assetMeta.address,
+
+          //     // Solana specific
+          //     mint: acc.mint,
+          // };
         }
-
-        setRequest({
-          ...request,
-          asset,
-          info,
-        });
       } catch (e) {
         console.error(e.toString());
         notify({

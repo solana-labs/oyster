@@ -15,15 +15,8 @@ import { ASSET_CHAIN } from '../../../utils/assets';
 import { BigNumber } from 'ethers/utils';
 import { Erc20Factory } from '../../../contracts/Erc20Factory';
 import { WormholeFactory } from '../../../contracts/WormholeFactory';
-import { AssetMeta, createWrappedAssetInstruction } from './../meta';
-import { bridgeAuthorityKey, wrappedAssetMintKey } from './../helpers';
-import {
-  Account,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { bridgeAuthorityKey } from './../helpers';
+import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import { ProgressUpdate, TransferRequest } from './interface';
 import BN from 'bn.js';
