@@ -54,7 +54,7 @@ export const fromSolana = async (
     'pending',
   );
 
-  request.amountBN = ethers.utils.parseUnits(
+  const amountBN = ethers.utils.parseUnits(
     request.amount.toString(),
     request.info.decimals,
   );
@@ -196,24 +196,24 @@ export const fromSolana = async (
             connection.removeAccountChangeListener(accountChangeListener);
             connection.removeSlotChangeListener(slotUpdateListener);
 
-            let signatures = await bridge.fetchSignatureStatus(
-              lockup.signatureAccount,
-            );
-            let sigData = Buffer.of(
-              ...signatures.reduce((previousValue, currentValue) => {
-                previousValue.push(currentValue.index);
-                previousValue.push(...currentValue.signature);
+            // let signatures = await bridge.fetchSignatureStatus(
+            //   lockup.signatureAccount,
+            // );
+            // let sigData = Buffer.of(
+            //   ...signatures.reduce((previousValue, currentValue) => {
+            //     previousValue.push(currentValue.index);
+            //     previousValue.push(...currentValue.signature);
 
-                return previousValue;
-              }, new Array<number>()),
-            );
+            //     return previousValue;
+            //   }, new Array<number>()),
+            // );
 
-            vaa = Buffer.concat([
-              vaa.slice(0, 5),
-              Buffer.of(signatures.length),
-              sigData,
-              vaa.slice(6),
-            ]);
+            // vaa = Buffer.concat([
+            //   vaa.slice(0, 5),
+            //   Buffer.of(signatures.length),
+            //   sigData,
+            //   vaa.slice(6),
+            // ]);
             // transferVAA = vaa
             try {
               await steps.postVAA(request);
@@ -234,13 +234,13 @@ export const fromSolana = async (
       //     loading: true,
       //     message: "Sign the claim...",
       // })
-      let tx = await wh.submitVAA(vaa);
+      // let tx = await wh.submitVAA(vaa);
       // setLoading({
       //     ...loading,
       //     loading: true,
       //     message: "Waiting for tokens unlock to be mined...",
       // })
-      await tx.wait(1);
+      // await tx.wait(1);
       // message.success({content: "Execution of VAA succeeded", key: "eth_tx"})
     },
   };
