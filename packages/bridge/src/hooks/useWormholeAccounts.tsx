@@ -362,14 +362,14 @@ export const useWormholeAccounts = () => {
   }, [externalAssets, setAmountInUSD]);
 
   useEffect(() => {
-    if (externalAssets && coinList) {
+    if (externalAssets && coinList && !loading) {
       dataSourcePriceQuery();
     }
     return () => {
       window.clearTimeout(coingeckoTimer.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalAssets, coinList, dataSourcePriceQuery]);
+  }, [externalAssets, coinList, loading]);
 
   return {
     loading,
