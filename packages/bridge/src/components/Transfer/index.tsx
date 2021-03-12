@@ -5,6 +5,7 @@ import {
   ConnectButton,
   programIds,
   formatAmount,
+  notify,
 } from '@oyster/common';
 import { Input } from './../Input';
 
@@ -17,6 +18,8 @@ import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
 import BN from 'bn.js';
 import { useTokenChainPairState } from '../../contexts/chainPair';
+import { LABELS } from '../../constants';
+import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -40,7 +43,8 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 export const Transfer = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const { provider, tokenMap, tokens } = useEthereum();
+  const { provider, accounts, tokenMap } = useEthereum();
+  const hasCorrespondingNetworks = useCorrectNetwork();
   const {
     A,
     B,
@@ -87,54 +91,62 @@ export const Transfer = () => {
     }
 
     (async () => {
-      if (!provider) {
+      if (!provider || !accounts[0]) {
         return;
       }
+      try {
+        const bridgeAddress = programIds().wormhole.bridge;
 
-      const bridgeAddress = programIds().wormhole.bridge;
+        let signer = provider.getSigner();
+        let e = WrappedAssetFactory.connect(asset, provider);
+        let addr = await signer.getAddress();
+        let balance = await e.balanceOf(addr);
+        let decimals = await e.decimals();
+        let symbol = await e.symbol();
 
-      let signer = provider.getSigner();
-      let e = WrappedAssetFactory.connect(asset, provider);
-      let addr = await signer.getAddress();
-      let balance = await e.balanceOf(addr);
-      let decimals = await e.decimals();
-      let symbol = await e.symbol();
+        let allowance = await e.allowance(addr, bridgeAddress);
 
-      let allowance = await e.allowance(addr, bridgeAddress);
+        let info = {
+          address: asset,
+          name: symbol,
+          balance: balance,
+          balanceAsNumber:
+            new BN(balance.toString())
+              .div(new BN(10).pow(new BN(decimals - 2)))
+              .toNumber() / 100,
+          allowance: allowance,
+          decimals: decimals,
+          isWrapped: false,
+          chainID: ASSET_CHAIN.Ethereum,
+          assetAddress: Buffer.from(asset.slice(2), 'hex'),
+          mint: '',
+        };
 
-      let info = {
-        address: asset,
-        name: symbol,
-        balance: balance,
-        balanceAsNumber:
-          new BN(balance.toString())
-            .div(new BN(10).pow(new BN(decimals - 2)))
-            .toNumber() / 100,
-        allowance: allowance,
-        decimals: decimals,
-        isWrapped: false,
-        chainID: ASSET_CHAIN.Ethereum,
-        assetAddress: Buffer.from(asset.slice(2), 'hex'),
-        mint: '',
-      };
+        let b = WormholeFactory.connect(bridgeAddress, provider);
 
-      let b = WormholeFactory.connect(bridgeAddress, provider);
+        let isWrapped = await b.isWrappedAsset(asset);
+        if (isWrapped) {
+          info.chainID = await e.assetChain();
+          info.assetAddress = Buffer.from(
+            (await e.assetAddress()).slice(2),
+            'hex',
+          );
+          info.isWrapped = true;
+        }
 
-      let isWrapped = await b.isWrappedAsset(asset);
-      if (isWrapped) {
-        info.chainID = await e.assetChain();
-        info.assetAddress = Buffer.from(
-          (await e.assetAddress()).slice(2),
-          'hex',
-        );
-        info.isWrapped = true;
+        setRequest({
+          ...request,
+          asset,
+          info,
+        });
+      } catch (e) {
+        console.error(e.toString());
+        notify({
+          message: `Error getting asset (${asset}) information`,
+          description: e.toString(),
+          type: 'error',
+        });
       }
-
-      setRequest({
-        ...request,
-        asset,
-        info,
-      });
     })();
   }, [request, provider]);
 
@@ -193,6 +205,9 @@ export const Transfer = () => {
       </div>
       <ConnectButton
         type="primary"
+        size="large"
+        style={{ width: '100%' }}
+        disabled={!(A.amount && B.amount)}
         onClick={async () => {
           if (!wallet || !provider) {
             return;
@@ -327,7 +342,11 @@ export const Transfer = () => {
           });
         }}
       >
-        Transfer
+        {hasCorrespondingNetworks
+          ? !(A.amount && B.amount)
+            ? LABELS.ENTER_AMOUNT
+            : LABELS.TRANSFER
+          : LABELS.SET_CORRECT_WALLET_NETWORK}
       </ConnectButton>
     </>
   );
