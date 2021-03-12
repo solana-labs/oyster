@@ -17,4 +17,7 @@ export const LABELS = {
   SETTINGS_TOOLTIP: 'Settings',
   GO_BACK_ACTION: 'Go back',
   TOTAL_TITLE: 'Total',
+  ENTER_AMOUNT: 'Enter an amount',
+  TRANSFER: 'Transfer',
+  SET_CORRECT_WALLET_NETWORK: 'Set correct wallet network',
 };

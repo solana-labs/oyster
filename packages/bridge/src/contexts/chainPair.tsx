@@ -62,7 +62,7 @@ function getDefaultTokens(tokens: TokenInfo[], search: string) {
     const from = urlParams.get('from');
     defaultChain = from === 'SOL' ? from : 'ETH';
     const token = urlParams.get('token') || defaultToken;
-    if (nameToToken.has(token) || isValidAddress(token)) {
+    if (nameToToken.has(token)) {
       defaultToken = token;
     }
   }
@@ -116,35 +116,26 @@ export function TokenChainPairProvider({ children = null as any }) {
   // updates browser history on token changes
   useEffect(() => {
     // set history
-    const token =
-      tokens.find(t => t.address === mintAddress)?.symbol || mintAddress;
+    const token = tokens.find(t => t.address === mintAddress)?.symbol;
 
     if (token && chainA) {
       history.push({
         search: `?from=${toChainSymbol(chainA)}&token=${token}`,
       });
-    } else {
-      if (mintAddress) {
-        history.push({
-          search: ``,
-        });
-      } else {
-        return;
-      }
     }
   }, [mintAddress, tokens, chainA]);
 
   // Updates tokens on location change
   useEffect(() => {
     if (
-      !tokens.length ||
+      !ethTokens.length ||
       (!location.search && mintAddress) ||
       location.pathname.indexOf('move') < 0
     ) {
       return;
     }
     let { defaultChain, defaultToken } = getDefaultTokens(
-      tokens,
+      ethTokens,
       location.search,
     );
     if (!defaultToken || !defaultChain) {

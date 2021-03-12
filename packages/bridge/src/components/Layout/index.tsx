@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './../../App.less';
 import './index.less';
-import { Layout } from 'antd';
+import { Layout, Button } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import metamaskIcon from '../../assets/metamask.svg';
 
 import { LABELS } from '../../constants';
-import { contexts, AppBar, shortenAddress } from '@oyster/common';
+import { contexts, AppBar, shortenAddress, useWallet } from '@oyster/common';
 import Wormhole from '../Wormhole';
 import { useEthereum } from '../../contexts';
+import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 
 const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
 
 export const AppLayout = React.memo((props: any) => {
-  const { env } = useConnectionConfig();
   const location = useLocation();
   const [wormholeReady, setWormholeReady] = useState(false);
-  const { accounts } = useEthereum();
+  const { accounts, provider } = useEthereum();
+  const hasCorrespondingNetworks = useCorrectNetwork();
 
   const paths: { [key: string]: string } = {
     '/faucet': '7',
@@ -48,15 +49,22 @@ export const AppLayout = React.memo((props: any) => {
                 left={
                   <>
                     {accounts[0] && (
-                      <div>
-                        <img
-                          alt={'metamask-icon'}
-                          width={20}
-                          height={20}
-                          src={metamaskIcon}
-                          style={{ marginRight: 8 }}
-                        />
-                        {shortenAddress(accounts[0], 4)}
+                      <div style={{ marginRight: 8 }}>
+                        {hasCorrespondingNetworks ? (
+                          <>
+                            <img
+                              alt={'metamask-icon'}
+                              width={20}
+                              height={20}
+                              src={metamaskIcon}
+                            />
+                            {shortenAddress(accounts[0], 4)}
+                          </>
+                        ) : (
+                          <Button danger type={'primary'}>
+                            WRONG NETWORK
+                          </Button>
+                        )}
                       </div>
                     )}
                   </>
