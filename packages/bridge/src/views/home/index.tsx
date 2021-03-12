@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
 import { TokenDisplay } from '../../components/TokenDisplay';
 import { toChainSymbol } from '../../contexts/chainPair';
+import { Footer } from '../../components/Footer';
 
 export const HomeView = () => {
   const {
@@ -108,35 +109,38 @@ export const HomeView = () => {
   ];
 
   return (
-    <div className="flexColumn">
-      <Row
-        gutter={GUTTER}
-        justify="center"
-        align="middle"
-        className="home-info-row"
-      >
-        <Col xs={24} xl={12} className="app-title">
-          <h1>Wormhole</h1>
-          <h2>
-            <span>Ethereum + Solana Bridge</span>
-          </h2>
-          <Link to="/move">
-            <Button className="app-action">Get Started</Button>
-          </Link>
-        </Col>
-        <Col xs={24} xl={12}>
-          <Statistic
-            className="home-statistic"
-            title={`$${formatNumber.format(totalInUSD)}`}
-            value="TOTAL VALUE LOCKED"
-          />
-        </Col>
-      </Row>
-      <Table
-        dataSource={externalAssets.filter(a => a.name)}
-        columns={columns}
-        loading={loadingLockedAccounts}
-      />
-    </div>
+    <>
+      <div className="flexColumn" style={{ minHeight: '93vh' }}>
+        <Row
+          gutter={GUTTER}
+          justify="center"
+          align="middle"
+          className="home-info-row"
+        >
+          <Col xs={24} xl={12} className="app-title">
+            <h1>Wormhole</h1>
+            <h2>
+              <span>Ethereum + Solana Bridge</span>
+            </h2>
+            <Link to="/move">
+              <Button className="app-action">Get Started</Button>
+            </Link>
+          </Col>
+          <Col xs={24} xl={12}>
+            <Statistic
+              className="home-statistic"
+              title={`$${formatNumber.format(totalInUSD)}`}
+              value="TOTAL VALUE LOCKED"
+            />
+          </Col>
+        </Row>
+        <Table
+          dataSource={externalAssets.filter(a => a.name)}
+          columns={columns}
+          loading={loadingLockedAccounts}
+        />
+      </div>
+      <Footer />
+    </>
   );
 };
