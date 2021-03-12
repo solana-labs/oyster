@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import {
-  contexts,
-  ConnectButton,
-  programIds,
-  formatAmount,
-  notify,
-} from '@oyster/common';
-import { Input } from './../Input';
+import { contexts, ConnectButton, programIds, notify } from '@oyster/common';
+import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import { ProgressUpdate, toSolana, TransferRequest } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
-import { TokenDisplay } from './../TokenDisplay';
+import { TokenDisplay } from '../TokenDisplay';
 import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
 import BN from 'bn.js';
