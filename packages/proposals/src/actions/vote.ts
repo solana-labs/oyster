@@ -12,9 +12,7 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockSet } from '../models/timelock';
-import { AccountLayout } from '@solana/spl-token';
-import { mintVotingTokensInstruction } from '../models/mintVotingTokens';
+import { TimelockConfig, TimelockSet } from '../models/timelock';
 import { LABELS } from '../constants';
 import { voteInstruction } from '../models/vote';
 const { createTokenAccount } = actions;
@@ -26,8 +24,12 @@ export const vote = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  timelockConfig: ParsedAccount<TimelockConfig>,
   votingAccount: PublicKey,
-  votingTokenAmount: number,
+  yesVotingAccount: PublicKey,
+  noVotingAccount: PublicKey,
+  yesVotingTokenAmount: number,
+  noVotingTokenAmount: number,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -44,7 +46,7 @@ export const vote = async (
     [],
     votingAccount,
     wallet.publicKey,
-    votingTokenAmount,
+    yesVotingTokenAmount + noVotingTokenAmount,
   );
 
   signers.push(transferAuthority);
@@ -53,10 +55,17 @@ export const vote = async (
     voteInstruction(
       proposal.pubkey,
       votingAccount,
+      yesVotingAccount,
+      noVotingAccount,
       proposal.info.votingMint,
+      proposal.info.yesVotingMint,
+      proposal.info.noVotingMint,
+      timelockConfig.info.governanceMint,
+      timelockConfig.pubkey,
       transferAuthority.publicKey,
       mintAuthority,
-      votingTokenAmount,
+      yesVotingTokenAmount,
+      noVotingTokenAmount,
     ),
   );
 

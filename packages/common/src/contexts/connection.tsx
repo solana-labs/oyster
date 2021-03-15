@@ -236,6 +236,79 @@ export const getErrorForTransaction = async (
   return errors;
 };
 
+export const sendTransactions = async (
+  connection: Connection,
+  wallet: any,
+  instructionSet: TransactionInstruction[][],
+  signersSet: Account[][],
+  awaitConfirmation = true,
+  commitment = 'singleGossip',
+  successCallback: (txid: string, ind: number) => void = (txid, ind) => {},
+  failCallback: (txid: string, ind: number) => boolean = (txid, ind) => false,
+) => {
+  const unsignedTxns: Transaction[] = [];
+  for (let i = 0; i < instructionSet.length; i++) {
+    const instructions = instructionSet[i];
+    const signers = signersSet[i];
+    let transaction = new Transaction();
+    instructions.forEach(instruction => transaction.add(instruction));
+    transaction.recentBlockhash = (
+      await connection.getRecentBlockhash('max')
+    ).blockhash;
+    transaction.setSigners(
+      // fee payied by the wallet owner
+      wallet.publicKey,
+      ...signers.map(s => s.publicKey),
+    );
+    if (signers.length > 0) {
+      transaction.partialSign(...signers);
+    }
+    unsignedTxns.push(transaction);
+  }
+  const signedTxns = await wallet.signTransactions(unsignedTxns);
+  const rawTransactions = signedTxns.map((t: Transaction) => t.serialize());
+  let options = {
+    skipPreflight: true,
+    commitment,
+  };
+
+  for (let i = 0; i < rawTransactions.length; i++) {
+    const rawTransaction = rawTransactions[i];
+    const txid = await connection.sendRawTransaction(rawTransaction, options);
+
+    if (awaitConfirmation) {
+      const status = (
+        await connection.confirmTransaction(
+          txid,
+          options && (options.commitment as any),
+        )
+      ).value;
+
+      if (status?.err && !failCallback(txid, i)) {
+        const errors = await getErrorForTransaction(connection, txid);
+        notify({
+          message: 'Transaction failed...',
+          description: (
+            <>
+              {errors.map(err => (
+                <div>{err}</div>
+              ))}
+              <ExplorerLink address={txid} type="transaction" />
+            </>
+          ),
+          type: 'error',
+        });
+
+        throw new Error(
+          `Raw transaction ${txid} failed (${JSON.stringify(status)})`,
+        );
+      } else {
+        successCallback(txid, i);
+      }
+    }
+  }
+};
+
 export const sendTransaction = async (
   connection: Connection,
   wallet: any,

@@ -5,9 +5,11 @@ import { ParsedAccount } from '@oyster/common';
 import {
   ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
+  TimelockConfig,
   TimelockSet,
   TimelockStateStatus,
   TimelockTransaction,
+  VotingEntryRule,
 } from '../../models/timelock';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -19,8 +21,9 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
-import AddVotes from '../../components/Proposal/AddVotes';
+import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
 import { Vote } from '../../components/Proposal/Vote';
+import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -30,13 +33,18 @@ export const ProposalView = () => {
   const context = useProposals();
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
+  const timelockConfig = context.configs[proposal?.info.config.toBase58()];
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
+  const governanceMint = useMint(timelockConfig?.info.governanceMint);
+
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint ? (
+      {proposal && sigMint && votingMint && governanceMint ? (
         <InnerProposalView
           proposal={proposal}
+          timelockConfig={timelockConfig}
+          governanceMint={governanceMint}
           votingMint={votingMint}
           sigMint={sigMint}
           instructions={context.transactions}
@@ -53,10 +61,14 @@ function InnerProposalView({
   sigMint,
   votingMint,
   instructions,
+  timelockConfig,
+  governanceMint,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  timelockConfig: ParsedAccount<TimelockConfig>;
   sigMint: MintInfo;
   votingMint: MintInfo;
+  governanceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
@@ -196,23 +208,20 @@ function InnerProposalView({
                   : 'vertical'
               }
             >
-              {sigAccount &&
-                sigAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state.status === TimelockStateStatus.Draft && (
-                  <AddVotes proposal={proposal} />
-                )}
-              {voteAccount &&
-                voteAccount.info.amount.toNumber() > 0 &&
-                proposal.info.state.status === TimelockStateStatus.Voting && (
-                  <Vote proposal={proposal} />
-                )}
+              <MintGovernanceTokens timelockConfig={timelockConfig} />
+              <RegisterToVote
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+              />
+
+              <Vote proposal={proposal} timelockConfig={timelockConfig} />
             </Space>
           </Col>
           <Col span={8}>
             <Statistic
               valueStyle={{ color: 'green' }}
               title={LABELS.VOTES_REQUIRED}
-              value={getVotesRequired(proposal)}
+              value={getVotesRequired(timelockConfig, governanceMint)}
             />
           </Col>
         </Row>
@@ -246,21 +255,20 @@ function InnerProposalView({
   );
 }
 
-function getVotesRequired(proposal: ParsedAccount<TimelockSet>): number {
-  if (proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return Math.ceil(
-      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.5,
-    );
+function getVotesRequired(
+  timelockConfig: ParsedAccount<TimelockConfig>,
+  governanceMint: MintInfo,
+): number {
+  if (timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.Majority) {
+    return Math.ceil(governanceMint.supply.toNumber() * 0.5);
   } else if (
-    proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
+    timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
-    return Math.ceil(
-      proposal.info.state.totalVotingTokensMinted.toNumber() * 0.66,
-    );
+    return Math.ceil(governanceMint.supply.toNumber() * 0.66);
   } else if (
-    proposal.info.config.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
+    timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
   ) {
-    return proposal.info.state.totalVotingTokensMinted.toNumber();
+    return governanceMint.supply.toNumber();
   }
   return 0;
 }

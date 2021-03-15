@@ -9,9 +9,11 @@ import { useMemo } from 'react';
 
 import { contexts, utils, ParsedAccount } from '@oyster/common';
 import {
-  CustomSingleSignerTimelockTransaction,
   CustomSingleSignerTimelockTransactionLayout,
   CustomSingleSignerTimelockTransactionParser,
+  TimelockConfig,
+  TimelockConfigLayout,
+  TimelockConfigParser,
   TimelockSet,
   TimelockSetLayout,
   TimelockSetParser,
@@ -24,6 +26,7 @@ const { cache } = contexts.Accounts;
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<TimelockSet>>;
   transactions: Record<string, ParsedAccount<TimelockTransaction>>;
+  configs: Record<string, ParsedAccount<TimelockConfig>>;
 }
 
 export const ProposalsContext = React.createContext<ProposalsContextState | null>(
@@ -38,15 +41,17 @@ export default function ProposalsProvider({ children = null as any }) {
 
   const [proposals, setProposals] = useState({});
   const [transactions, setTransactions] = useState({});
+  const [configs, setConfigs] = useState({});
 
   useSetupProposalsCache({
     connection,
     setProposals,
     setTransactions,
+    setConfigs,
   });
 
   return (
-    <ProposalsContext.Provider value={{ proposals, transactions }}>
+    <ProposalsContext.Provider value={{ proposals, transactions, configs }}>
       {children}
     </ProposalsContext.Provider>
   );
@@ -56,10 +61,12 @@ function useSetupProposalsCache({
   connection,
   setProposals,
   setTransactions,
+  setConfigs,
 }: {
   connection: Connection;
   setProposals: React.Dispatch<React.SetStateAction<{}>>;
   setTransactions: React.Dispatch<React.SetStateAction<{}>>;
+  setConfigs: React.Dispatch<React.SetStateAction<{}>>;
 }) {
   const PROGRAM_IDS = utils.programIds();
 
@@ -76,30 +83,36 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<TimelockTransaction>
       > = {};
+      const newConfigs: Record<string, ParsedAccount<TimelockConfig>> = {};
 
       all[0].forEach(a => {
-        if (a.account.data.length === TimelockSetLayout.span) {
-          cache.add(a.pubkey, a.account, TimelockSetParser);
-          const cached = cache.get(a.pubkey) as ParsedAccount<TimelockSet>;
-          newProposals[a.pubkey.toBase58()] = cached;
-        }
-        if (
-          a.account.data.length ===
-          CustomSingleSignerTimelockTransactionLayout.span
-        ) {
-          cache.add(
-            a.pubkey,
-            a.account,
-            CustomSingleSignerTimelockTransactionParser,
-          );
-          const cached = cache.get(
-            a.pubkey,
-          ) as ParsedAccount<TimelockTransaction>;
-          newTransactions[a.pubkey.toBase58()] = cached;
+        let cached;
+        switch (a.account.data.length) {
+          case TimelockSetLayout.span:
+            cache.add(a.pubkey, a.account, TimelockSetParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<TimelockSet>;
+            newProposals[a.pubkey.toBase58()] = cached;
+            break;
+          case CustomSingleSignerTimelockTransactionLayout.span:
+            cache.add(
+              a.pubkey,
+              a.account,
+              CustomSingleSignerTimelockTransactionParser,
+            );
+            cached = cache.get(a.pubkey) as ParsedAccount<TimelockTransaction>;
+            newTransactions[a.pubkey.toBase58()] = cached;
+            break;
+          case TimelockConfigLayout.span:
+            cache.add(a.pubkey, a.account, TimelockConfigParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<TimelockConfig>;
+            newConfigs[a.pubkey.toBase58()] = cached;
+            break;
         }
       });
+
       setProposals(newProposals);
       setTransactions(newTransactions);
+      setConfigs(newConfigs);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.timelock.programId,
@@ -111,6 +124,7 @@ function useSetupProposalsCache({
             CustomSingleSignerTimelockTransactionParser,
             setTransactions,
           ],
+          [TimelockConfigLayout.span, TimelockConfigParser, setConfigs],
         ].forEach(arr => {
           const [span, parser, setter] = arr;
           if (info.accountInfo.data.length === span) {

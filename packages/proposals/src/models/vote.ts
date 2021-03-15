@@ -7,29 +7,43 @@ import { TimelockInstruction } from './timelock';
 import BN from 'bn.js';
 
 /// [Requires Voting tokens]
-/// Burns voting tokens, indicating you approve of running this set of transactions. If you tip the consensus,
-/// then the transactions begin to be run at their time slots.
+/// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the consensus,
+/// then the transactions can begin to be run at their time slots when people click execute.
 ///
 ///   0. `[writable]` Timelock set account.
-///   1. `[writable]` Voting account.
-///   2. `[writable]` Voting mint account.
-///   3. `[]` Transfer authority
-///   4. `[]` Timelock program mint authority
-///   5. `[]` Timelock program account pub key.
-///   6. `[]` Token program account.
+///   1. `[writable]` Your Voting account.
+///   2. `[writable]` Your Yes-Voting account.
+///   3. `[writable]` Your No-Voting account.
+///   4. `[writable]` Voting mint account.
+///   5. `[writable]` Yes Voting mint account.
+///   6. `[writable]` No Voting mint account.
+///   7. `[]` Governance mint account
+///   8. `[]` Timelock config account.
+///   9. `[]` Transfer authority
+///   10. `[]` Timelock program mint authority
+///   11. `[]` Timelock program account pub key.
+///   12. `[]` Token program account.
 export const voteInstruction = (
   timelockSetAccount: PublicKey,
   votingAccount: PublicKey,
+  yesVotingAccount: PublicKey,
+  noVotingAccount: PublicKey,
   votingMint: PublicKey,
+  yesVotingMint: PublicKey,
+  noVotingMint: PublicKey,
+  governanceMint: PublicKey,
+  timelockConfig: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
-  votingTokenAmount: number,
+  yesVotingTokenAmount: number,
+  noVotingTokenAmount: number,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
-    Layout.uint64('votingTokenAmount'),
+    Layout.uint64('yesVotingTokenAmount'),
+    Layout.uint64('noVotingTokenAmount'),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
@@ -37,7 +51,8 @@ export const voteInstruction = (
   dataLayout.encode(
     {
       instruction: TimelockInstruction.Vote,
-      votingTokenAmount: new BN(votingTokenAmount),
+      yesVotingTokenAmount: new BN(yesVotingTokenAmount),
+      noVotingTokenAmount: new BN(noVotingTokenAmount),
     },
     data,
   );
@@ -45,7 +60,13 @@ export const voteInstruction = (
   const keys = [
     { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
+    { pubkey: yesVotingAccount, isSigner: false, isWritable: true },
+    { pubkey: noVotingAccount, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
+    { pubkey: yesVotingMint, isSigner: false, isWritable: true },
+    { pubkey: noVotingMint, isSigner: false, isWritable: true },
+    { pubkey: governanceMint, isSigner: false, isWritable: false },
+    { pubkey: timelockConfig, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {

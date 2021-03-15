@@ -629,7 +629,7 @@ export const deserializeAccount = (data: Buffer) => {
 };
 
 // TODO: expose in spl package
-const deserializeMint = (data: Buffer) => {
+export const deserializeMint = (data: Buffer) => {
   if (data.length !== MintLayout.span) {
     throw new Error('Not a valid Mint');
   }

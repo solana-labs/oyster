@@ -5,18 +5,13 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions } from '@oyster/common';
+import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
-import {
-  ConsensusAlgorithm,
-  ExecutionType,
-  TimelockSetLayout,
-  TimelockType,
-} from '../models/timelock';
+import { TimelockConfig, TimelockSetLayout } from '../models/timelock';
 
-const { sendTransaction } = contexts.Connection;
+const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
 
@@ -25,9 +20,7 @@ export const createProposal = async (
   wallet: any,
   name: string,
   description: string,
-  timelockType: TimelockType,
-  consensusAlgorithm: ConsensusAlgorithm,
-  executionType: ExecutionType,
+  timelockConfig: ParsedAccount<TimelockConfig>,
 ): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -44,18 +37,25 @@ export const createProposal = async (
   const {
     sigMint,
     voteMint,
+    yesVoteMint,
+    noVoteMint,
     adminMint,
     voteValidationAccount,
     sigValidationAccount,
     adminValidationAccount,
     adminDestinationAccount,
     sigDestinationAccount,
+    yesVoteDumpAccount,
+    noVoteDumpAccount,
+    governanceHoldingAccount,
     authority,
-  } = await createValidationAccountsAndMints(
-    connection,
+    instructions: associatedInstructions,
+    signers: associatedSigners,
+  } = await getAssociatedAccountsAndInstructions(
     wallet,
     accountRentExempt,
     mintRentExempt,
+    timelockConfig,
   );
 
   const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -80,17 +80,19 @@ export const createProposal = async (
       sigMint,
       adminMint,
       voteMint,
+      yesVoteMint,
+      noVoteMint,
       sigValidationAccount,
       adminValidationAccount,
       voteValidationAccount,
       adminDestinationAccount,
       sigDestinationAccount,
+      yesVoteDumpAccount,
+      noVoteDumpAccount,
+      governanceHoldingAccount,
+      timelockConfig.info.governanceMint,
+      timelockConfig.pubkey,
       authority,
-      {
-        timelockType,
-        consensusAlgorithm,
-        executionType,
-      },
       description,
       name,
     ),
@@ -103,11 +105,11 @@ export const createProposal = async (
   });
 
   try {
-    let tx = await sendTransaction(
+    let tx = await sendTransactions(
       connection,
       wallet,
-      instructions,
-      signers,
+      [...associatedInstructions, instructions],
+      [...associatedSigners, signers],
       true,
     );
 
@@ -127,165 +129,192 @@ export const createProposal = async (
 interface ValidationReturn {
   sigMint: PublicKey;
   voteMint: PublicKey;
+  yesVoteMint: PublicKey;
+  noVoteMint: PublicKey;
   adminMint: PublicKey;
   voteValidationAccount: PublicKey;
   sigValidationAccount: PublicKey;
   adminValidationAccount: PublicKey;
   adminDestinationAccount: PublicKey;
   sigDestinationAccount: PublicKey;
+  yesVoteDumpAccount: PublicKey;
+  noVoteDumpAccount: PublicKey;
+  governanceHoldingAccount: PublicKey;
   authority: PublicKey;
+  signers: [Account[], Account[], Account[]];
+  instructions: [
+    TransactionInstruction[],
+    TransactionInstruction[],
+    TransactionInstruction[],
+  ];
 }
-async function createValidationAccountsAndMints(
-  connection: Connection,
+
+async function getAssociatedAccountsAndInstructions(
   wallet: any,
   accountRentExempt: number,
   mintRentExempt: number,
+  timelockConfig: ParsedAccount<TimelockConfig>,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
-  notify({
-    message: `Creating mints...`,
-    type: 'warn',
-    description: `Please wait...`,
-  });
 
   const [authority] = await PublicKey.findProgramAddress(
     [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 
-  let signers: Account[] = [];
-  let instructions: TransactionInstruction[] = [];
+  let mintSigners: Account[] = [];
+  let mintInstructions: TransactionInstruction[] = [];
 
   const adminMint = createMint(
-    instructions,
+    mintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    signers,
+    mintSigners,
   );
 
   const sigMint = createMint(
-    instructions,
+    mintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    signers,
+    mintSigners,
   );
 
   const voteMint = createMint(
-    instructions,
+    mintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    signers,
+    mintSigners,
   );
 
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
+  const yesVoteMint = createMint(
+    mintInstructions,
+    wallet.publicKey,
+    mintRentExempt,
+    0,
+    authority,
+    authority,
+    mintSigners,
+  );
 
-    notify({
-      message: `Mints created.`,
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  const noVoteMint = createMint(
+    mintInstructions,
+    wallet.publicKey,
+    mintRentExempt,
+    0,
+    authority,
+    authority,
+    mintSigners,
+  );
 
-  notify({
-    message: `Creating validation accounts...`,
-    type: 'warn',
-    description: `Please wait...`,
-  });
-
-  signers = [];
-  instructions = [];
+  let validationSigners: Account[] = [];
+  let validationInstructions: TransactionInstruction[] = [];
 
   const adminValidationAccount = createTokenAccount(
-    instructions,
+    validationInstructions,
     wallet.publicKey,
     accountRentExempt,
     adminMint,
     authority,
-    signers,
+    validationSigners,
   );
 
   const sigValidationAccount = createTokenAccount(
-    instructions,
+    validationInstructions,
     wallet.publicKey,
     accountRentExempt,
     sigMint,
     authority,
-    signers,
+    validationSigners,
   );
 
   const voteValidationAccount = createTokenAccount(
-    instructions,
+    validationInstructions,
     wallet.publicKey,
     accountRentExempt,
     voteMint,
     authority,
-    signers,
+    validationSigners,
   );
 
+  let destinationSigners: Account[] = [];
+  let destinationInstructions: TransactionInstruction[] = [];
+
   const adminDestinationAccount = createTokenAccount(
-    instructions,
+    destinationInstructions,
     wallet.publicKey,
     accountRentExempt,
     adminMint,
     wallet.publicKey,
-    signers,
+    destinationSigners,
   );
   const sigDestinationAccount = createTokenAccount(
-    instructions,
+    destinationInstructions,
     wallet.publicKey,
     accountRentExempt,
     sigMint,
     wallet.publicKey,
-    signers,
+    destinationSigners,
   );
 
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
+  let holdingSigners: Account[] = [];
+  let holdingInstructions: TransactionInstruction[] = [];
 
-    notify({
-      message: `Admin and signatory accounts created.`,
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  const yesVoteDumpAccount = createTokenAccount(
+    holdingInstructions,
+    wallet.publicKey,
+    accountRentExempt,
+    yesVoteMint,
+    wallet.publicKey,
+    holdingSigners,
+  );
+
+  const noVoteDumpAccount = createTokenAccount(
+    holdingInstructions,
+    wallet.publicKey,
+    accountRentExempt,
+    noVoteMint,
+    wallet.publicKey,
+    holdingSigners,
+  );
+
+  const governanceHoldingAccount = createTokenAccount(
+    holdingInstructions,
+    wallet.publicKey,
+    accountRentExempt,
+    timelockConfig.info.governanceMint,
+    wallet.publicKey,
+    holdingSigners,
+  );
 
   return {
     sigMint,
     voteMint,
     adminMint,
+    yesVoteMint,
+    noVoteMint,
     voteValidationAccount,
     sigValidationAccount,
     adminValidationAccount,
     adminDestinationAccount,
     sigDestinationAccount,
+    yesVoteDumpAccount,
+    noVoteDumpAccount,
+    governanceHoldingAccount,
     authority,
+    signers: [mintSigners, validationSigners, destinationSigners],
+    instructions: [
+      mintInstructions,
+      validationInstructions,
+      destinationInstructions,
+    ],
   };
 }

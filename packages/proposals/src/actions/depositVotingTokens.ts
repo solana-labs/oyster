@@ -14,20 +14,21 @@ import {
 
 import { TimelockSet } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
-import { mintVotingTokensInstruction } from '../models/mintVotingTokens';
+import { depositVotingTokensInstruction } from '../models/depositVotingTokens';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
 const { approve } = models;
 
-export const mintVotingTokens = async (
+export const depositVotingTokens = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
-  signatoryAccount: PublicKey,
-  newVotingAccountOwner: PublicKey,
   existingVoteAccount: PublicKey | undefined,
+  existingYesVoteAccount: PublicKey | undefined,
+  existingNoVoteAccount: PublicKey | undefined,
+  sourceAccount: PublicKey,
   votingTokenAmount: number,
 ) => {
   const PROGRAM_IDS = utils.programIds();
@@ -45,37 +46,31 @@ export const mintVotingTokens = async (
       wallet.publicKey,
       accountRentExempt,
       proposal.info.votingMint,
-      newVotingAccountOwner,
+      wallet.publicKey,
       signers,
     );
+  }
 
-    notify({
-      message: LABELS.ADDING_NEW_VOTE_ACCOUNT,
-      description: LABELS.PLEASE_WAIT,
-      type: 'warn',
-    });
+  if (!existingYesVoteAccount) {
+    createTokenAccount(
+      instructions,
+      wallet.publicKey,
+      accountRentExempt,
+      proposal.info.yesVotingMint,
+      wallet.publicKey,
+      signers,
+    );
+  }
 
-    try {
-      let tx = await sendTransaction(
-        connection,
-        wallet,
-        instructions,
-        signers,
-        true,
-      );
-
-      notify({
-        message: LABELS.NEW_VOTED_ACCOUNT_ADDED,
-        type: 'success',
-        description: LABELS.TRANSACTION + ` ${tx}`,
-      });
-    } catch (ex) {
-      console.error(ex);
-      throw new Error();
-    }
-
-    signers = [];
-    instructions = [];
+  if (!existingNoVoteAccount) {
+    createTokenAccount(
+      instructions,
+      wallet.publicKey,
+      accountRentExempt,
+      proposal.info.noVotingMint,
+      wallet.publicKey,
+      signers,
+    );
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
@@ -86,20 +81,21 @@ export const mintVotingTokens = async (
   const transferAuthority = approve(
     instructions,
     [],
-    signatoryAccount,
+    sourceAccount,
     wallet.publicKey,
-    1,
+    votingTokenAmount,
   );
 
   signers.push(transferAuthority);
 
   instructions.push(
-    mintVotingTokensInstruction(
-      proposal.pubkey,
+    depositVotingTokensInstruction(
       existingVoteAccount,
+      sourceAccount,
+      proposal.info.governanceHolding,
       proposal.info.votingMint,
-      signatoryAccount,
-      proposal.info.signatoryValidation,
+      proposal.pubkey,
+      proposal.info.config,
       transferAuthority.publicKey,
       mintAuthority,
       votingTokenAmount,

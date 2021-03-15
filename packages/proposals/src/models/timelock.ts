@@ -6,8 +6,8 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
-export const INSTRUCTION_LIMIT = 500;
-export const TRANSACTION_SLOTS = 10;
+export const INSTRUCTION_LIMIT = 450;
+export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
 export enum TimelockInstruction {
@@ -17,16 +17,47 @@ export enum TimelockInstruction {
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
   Vote = 9,
-  MintVotingTokens = 10,
   Ping = 11,
   Execute = 12,
-  UploadTempFile = 13,
+  DepositVotingTokens = 13,
+  WithdrawVotingTokens = 14,
 }
 
 export interface TimelockConfig {
+  ///version
+  version: number;
+  /// Consensus Algorithm
   consensusAlgorithm: ConsensusAlgorithm;
+  /// Execution type
   executionType: ExecutionType;
+  /// Timelock Type
   timelockType: TimelockType;
+  /// Voting entry rule
+  votingEntryRule: VotingEntryRule;
+  /// Minimum slot time-distance from creation of proposal for an instruction to be placed
+  minimumSlotWaitingPeriod: BN;
+  /// Governance mint (optional)
+  governanceMint: PublicKey;
+  /// Program ID that is tied to this config (optional)
+  program: PublicKey;
+}
+
+export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    BufferLayout.u8('version'),
+    BufferLayout.u8('consensusAlgorithm'),
+    BufferLayout.u8('executionType'),
+    BufferLayout.u8('timelockType'),
+    BufferLayout.u8('votingEntryRule'),
+    Layout.uint64('minimumSlotWaitingPeriod'),
+    Layout.publicKey('governanceMint'),
+    Layout.publicKey('program'),
+  ],
+);
+
+export enum VotingEntryRule {
+  DraftOnly = 0,
+  Anytime = 1,
 }
 
 export enum ConsensusAlgorithm {
@@ -92,14 +123,10 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
     BufferLayout.u8('timelockStateStatus'),
-    Layout.uint64('totalVotingTokensMinted'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
     ...timelockTxns,
-    BufferLayout.u8('consensusAlgorithm'),
-    BufferLayout.u8('executionType'),
-    BufferLayout.u8('timelockType'),
   ],
 );
 
@@ -118,6 +145,12 @@ export interface TimelockSet {
   /// Mint that creates voting tokens of this instruction
   votingMint: PublicKey;
 
+  /// Mint that creates evidence of voting YES via token creation
+  yesVotingMint: PublicKey;
+
+  /// Mint that creates evidence of voting NO via token creation
+  noVotingMint: PublicKey;
+
   /// Used to validate signatory tokens in a round trip transfer
   signatoryValidation: PublicKey;
 
@@ -127,12 +160,45 @@ export interface TimelockSet {
   /// Used to validate voting tokens in a round trip transfer
   votingValidation: PublicKey;
 
-  /// Reserve state
-  state: TimelockState;
+  /// Governance holding account
+  governanceHolding: PublicKey;
+
+  /// Yes Voting dump account for exchanged vote tokens
+  yesVotingDump: PublicKey;
+
+  /// No Voting dump account for exchanged vote tokens
+  noVotingDump: PublicKey;
 
   /// configuration values
-  config: TimelockConfig;
+  config: PublicKey;
+
+  /// Reserve state
+  state: TimelockState;
 }
+
+export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    BufferLayout.u8('version'),
+    Layout.uint64('slot'),
+    BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
+    BufferLayout.u8('executed'),
+    BufferLayout.u16('instructionEndIndex'),
+  ],
+);
+
+export interface TimelockTransaction {
+  version: number;
+
+  slot: BN;
+
+  instruction: number[];
+
+  executed: number;
+
+  instructionEndIndex: number;
+}
+export interface CustomSingleSignerTimelockTransaction
+  extends TimelockTransaction {}
 
 export const TimelockSetParser = (
   pubKey: PublicKey,
@@ -156,21 +222,21 @@ export const TimelockSetParser = (
       signatoryMint: data.signatoryMint,
       adminMint: data.adminMint,
       votingMint: data.votingMint,
+      yesVotingMint: data.yesVotingMint,
+      noVotingMint: data.noVotingMint,
       signatoryValidation: data.signatoryValidation,
       adminValidation: data.adminValidation,
       votingValidation: data.votingValidation,
+      governanceHolding: data.governanceHolding,
+      yesVotingDump: data.yesVotingDump,
+      noVotingDump: data.noVotingDump,
+      config: data.config,
       state: {
         status: data.timelockStateStatus,
-        totalVotingTokensMinted: data.totalVotingTokensMinted,
         totalSigningTokensMinted: data.totalSigningTokensMinted,
         descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
         name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
         timelockTransactions: timelockTxns,
-      },
-      config: {
-        consensusAlgorithm: data.consensusAlgorithm,
-        executionType: data.executionType,
-        timelockType: data.timelockType,
       },
     },
   };
@@ -203,26 +269,29 @@ export const CustomSingleSignerTimelockTransactionParser = (
   return details;
 };
 
-export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('version'),
-    Layout.uint64('slot'),
-    BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
-    BufferLayout.u8('executed'),
-    BufferLayout.u16('instructionEndIndex'),
-  ],
-);
+export const TimelockConfigParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = TimelockConfigLayout.decode(buffer);
 
-export interface TimelockTransaction {
-  version: number;
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: {
+      version: data.version,
+      consensusAlgorithm: data.consensusAlgorithm,
+      executionType: data.executionType,
+      timelockType: data.timelockType,
+      votingEntryRule: data.votingEntryRule,
+      minimimSlotWaitingPeriod: data.minimimSlotWaitingPeriod,
+      governanceMint: data.governanceMint,
+      program: data.program,
+    },
+  };
 
-  slot: BN;
-
-  instruction: number[];
-
-  executed: number;
-
-  instructionEndIndex: number;
-}
-export interface CustomSingleSignerTimelockTransaction
-  extends TimelockTransaction {}
+  return details;
+};

@@ -1,4 +1,4 @@
-import { Message, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
@@ -9,8 +9,6 @@ import {
   TRANSACTION_SLOTS,
 } from './timelock';
 import BN from 'bn.js';
-import { toUTF8Array } from '@oyster/common/dist/lib/utils';
-import { pingInstruction } from './ping';
 
 /// [Requires Signatory token]
 /// Adds a Transaction to the Timelock Set. Max of 10 of any Transaction type. More than 10 will throw error.
