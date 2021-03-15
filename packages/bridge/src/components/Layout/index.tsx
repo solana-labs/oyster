@@ -10,10 +10,9 @@ import { contexts, AppBar, shortenAddress, useWallet } from '@oyster/common';
 import Wormhole from '../Wormhole';
 import { useEthereum } from '../../contexts';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import { SecurityAuditButton } from '../SecurityAuditButton';
-import { Footer } from '../Footer';
+import { Footer as AppFooter } from './../Footer';
 
-const { Header, Content } = Layout;
+const { Header, Content, Footer } = Layout;
 const { useConnectionConfig } = contexts.Connection;
 
 export const AppLayout = React.memo((props: any) => {
@@ -26,7 +25,7 @@ export const AppLayout = React.memo((props: any) => {
     '/faucet': '7',
   };
 
-  const isRoot = location.pathname !== '/';
+  const isRoot = location.pathname === '/';
 
   const current =
     [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
@@ -40,7 +39,7 @@ export const AppLayout = React.memo((props: any) => {
           rotate={true}
         >
           <Layout title={LABELS.APP_TITLE}>
-            {isRoot && (
+            {!isRoot && (
               <Header className="App-Bar">
                 <div className="app-title">
                   <Link to="/">
@@ -78,6 +77,9 @@ export const AppLayout = React.memo((props: any) => {
             <Content style={{ padding: '0 50px', flexDirection: 'column' }}>
               {props.children}
             </Content>
+            <Footer style={{ textAlign: 'center' }}>
+              <AppFooter />
+            </Footer>
           </Layout>
         </Wormhole>
       </div>

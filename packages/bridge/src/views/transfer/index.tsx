@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card } from 'antd';
 import { Transfer } from '../../components/Transfer';
-import { Footer } from '../../components/Footer';
 
 export const TransferView = () => {
   return (
@@ -15,8 +14,6 @@ export const TransferView = () => {
           <Transfer />
         </Card>
       </div>
-
-      <Footer />
     </>
   );
 };
