@@ -6,8 +6,12 @@ import './index.less';
 
 export const SecurityAuditButton = () => {
   return (
-    <Button className={'audit-button'}>
-      <Link to={'https://github.com/certusone/wormhole'}>Security Audit</Link>
+    <Button
+      className={'audit-button'}
+      target={'_blank'}
+      href={'https://github.com/certusone/wormhole'}
+    >
+      Security Audit
     </Button>
   );
 };

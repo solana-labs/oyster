@@ -12,14 +12,17 @@ export const Footer = () => {
       <SecurityAuditButton />
       <Button
         shape={'circle'}
+        target={'_blank'}
+        href={'https://github.com/solana-labs/oyster'}
         icon={<GithubOutlined />}
         style={{ marginRight: '20px' }}
-      >
-        <Link to={'https://github.com/solana-labs/oyster'}></Link>
-      </Button>
-      <Button shape={'circle'} icon={<TwitterOutlined />}>
-        <Link to={'https://twitter.com/solana'}></Link>
-      </Button>
+      ></Button>
+      <Button
+        shape={'circle'}
+        target={'_blank'}
+        href={'https://twitter.com/solana'}
+        icon={<TwitterOutlined />}
+      ></Button>
     </div>
   );
 };
