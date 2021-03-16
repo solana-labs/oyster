@@ -1,6 +1,5 @@
 import React from 'react';
 import { GithubOutlined, TwitterOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 import { SecurityAuditButton } from '../SecurityAuditButton';
 import { Button } from 'antd';
 
@@ -14,11 +13,12 @@ export const Footer = () => {
         shape={'circle'}
         icon={<GithubOutlined />}
         style={{ marginRight: '20px' }}
+        onClick={() => window.open('https://github.com/solana-labs/oyster', '_blank')}
       >
-        <Link to={'https://github.com/solana-labs/oyster'}></Link>
       </Button>
-      <Button shape={'circle'} icon={<TwitterOutlined />}>
-        <Link to={'https://twitter.com/solana'}></Link>
+      <Button shape={'circle'}
+              icon={<TwitterOutlined />}
+              onClick={() => window.open('https://twitter.com/solana', '_blank')}>
       </Button>
     </div>
   );
