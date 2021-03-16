@@ -1,6 +1,5 @@
 import React from 'react';
 import { GithubOutlined, TwitterOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 import { SecurityAuditButton } from '../SecurityAuditButton';
 import { Button } from 'antd';
 

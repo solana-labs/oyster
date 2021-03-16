@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
 import { TokenDisplay } from '../../components/TokenDisplay';
 import { toChainSymbol } from '../../contexts/chainPair';
-import { Footer } from '../../components/Footer';
 
 export const HomeView = () => {
   const {
@@ -140,7 +139,6 @@ export const HomeView = () => {
           loading={loadingLockedAccounts}
         />
       </div>
-      <Footer />
     </>
   );
 };
