@@ -12,6 +12,7 @@ import { useEthereum } from '../../contexts';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { SecurityAuditButton } from '../SecurityAuditButton';
 import { Footer } from '../Footer';
+import { EthereumConnect } from '../EthereumConnect';
 
 const { Header, Content } = Layout;
 const { useConnectionConfig } = contexts.Connection;
@@ -19,8 +20,6 @@ const { useConnectionConfig } = contexts.Connection;
 export const AppLayout = React.memo((props: any) => {
   const location = useLocation();
   const [wormholeReady, setWormholeReady] = useState(false);
-  const { accounts, provider } = useEthereum();
-  const hasCorrespondingNetworks = useCorrectNetwork();
 
   const paths: { [key: string]: string } = {
     '/faucet': '7',
@@ -47,32 +46,7 @@ export const AppLayout = React.memo((props: any) => {
                     <h2>WORMHOLE</h2>
                   </Link>
                 </div>
-                <AppBar
-                  useWalletBadge={true}
-                  left={
-                    <>
-                      {accounts[0] && (
-                        <div style={{ marginRight: 8 }}>
-                          {hasCorrespondingNetworks ? (
-                            <>
-                              <img
-                                alt={'metamask-icon'}
-                                width={20}
-                                height={20}
-                                src={metamaskIcon}
-                              />
-                              {shortenAddress(accounts[0], 4)}
-                            </>
-                          ) : (
-                            <Button danger type={'primary'}>
-                              WRONG NETWORK
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  }
-                />
+                <AppBar useWalletBadge={true} left={<EthereumConnect />} />
               </Header>
             )}
             <Content style={{ padding: '0 50px', flexDirection: 'column' }}>
