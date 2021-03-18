@@ -78,9 +78,11 @@ export const Transfer = () => {
     });
   }, [A, B, mintAddress]);
 
+  const from = A.chain;
+
   useEffect(() => {
     const asset = request.asset;
-    if (!asset || asset === request?.info?.address) {
+    if (!asset || (asset === request?.info?.address && request.from === from)) {
       return;
     }
 
@@ -89,9 +91,9 @@ export const Transfer = () => {
         return;
       }
       try {
+        const bridgeAddress = programIds().wormhole.bridge;
 
         if(request.from === ASSET_CHAIN.Solana) {
-          const bridgeAddress = programIds().wormhole.bridge;
 
           let signer = provider.getSigner();
           let e = WrappedAssetFactory.connect(asset, provider);
@@ -132,23 +134,29 @@ export const Transfer = () => {
 
           setRequest({
             ...request,
+            from,
             asset,
             info,
           });
         } else {
-          console.log(asset);
+          console.log('Asset: ', asset);
+          debugger;
+
+          // get user address from asset
+          //
+
           // let info = {
           //   address: fromAddress,
-          //     name: "",
-          //     balance: acc.balance,
-          //     allowance: 0,
-          //     decimals: acc.assetMeta.decimals,
-          //     isWrapped: acc.assetMeta.chain != ChainID.SOLANA,
-          //     chainID: acc.assetMeta.chain,
-          //     assetAddress: acc.assetMeta.address,
+          //   name: "",
+          //   balance: acc.balance,
+          //   allowance: 0,
+          //   decimals: acc.assetMeta.decimals,
+          //   isWrapped: acc.assetMeta.chain != ChainID.SOLANA,
+          //   chainID: acc.assetMeta.chain,
+          //   assetAddress: acc.assetMeta.address,
 
-          //     // Solana specific
-          //     mint: acc.mint,
+          //   // Solana specific
+          //   mint: acc.mint,
           // };
         }
       } catch (e) {
@@ -160,7 +168,7 @@ export const Transfer = () => {
         });
       }
     })();
-  }, [request, provider]);
+  }, [request, from, provider]);
 
   return (
     <>

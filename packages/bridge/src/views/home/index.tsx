@@ -81,7 +81,7 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <a href={record.explorer} target="_blank">
+            <a href={record.explorer} target="_blank" rel="noopener noreferrer" >
               {shortenAddress(text, 6)}
             </a>
           ),
@@ -98,7 +98,7 @@ export const HomeView = () => {
             style: {},
           },
           children: (
-            <a href={record.wrappedExplorer} target="_blank">
+            <a href={record.wrappedExplorer} target="_blank" rel="noopener noreferrer" >
               {shortenAddress(text, 6)}
             </a>
           ),
