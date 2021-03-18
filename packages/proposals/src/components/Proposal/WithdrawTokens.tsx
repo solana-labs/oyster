@@ -33,16 +33,20 @@ export function WithdrawTokens({
   const governanceAccount = useAccountByMint(
     timelockConfig.info.governanceMint,
   );
-  const totalTokens =
-    ((voteAccount && voteAccount.info.amount.toNumber()) || 0) +
+  const votingTokens = (voteAccount && voteAccount.info.amount.toNumber()) || 0;
+  let totalTokens = votingTokens;
+  const inEscrow =
     ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
     ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
+  let additionalMsg = '';
+  if (proposal.info.state.status !== TimelockStateStatus.Voting) {
+    totalTokens += inEscrow;
+  } else additionalMsg = LABELS.ADDITIONAL_VOTING_MSG;
 
   const [_, setTokenAmount] = useState(1);
-  return totalTokens > 0 ? (
+  return votingTokens + inEscrow > 0 ? (
     <Button
       type="primary"
-      disabled={!voteAccount}
       onClick={() =>
         confirm({
           title: 'Confirm',
@@ -50,8 +54,14 @@ export function WithdrawTokens({
           content: (
             <Row>
               <Col span={24}>
-                <p>You can withdraw up to {totalTokens} voting tokens.</p>
-
+                <p>You can withdraw up to {totalTokens} voting tokens. </p>
+                {additionalMsg && <p>{additionalMsg}</p>}
+                {additionalMsg && (
+                  <p>
+                    You have {inEscrow} tokens in holding until voting
+                    completes.
+                  </p>
+                )}
                 <Slider min={1} max={totalTokens} onChange={setTokenAmount} />
               </Col>
             </Row>

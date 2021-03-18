@@ -90,4 +90,6 @@ export const LABELS = {
   PUBLIC_KEY: 'Public Key',
   MENU_GOVERNANCE: 'My Governed Programs',
   LEAVE_BLANK_IF_YOU_WANT_ONE: 'Leave blank if you want one made for you',
+  ADDITIONAL_VOTING_MSG:
+    ' Please note that during voting, you cannot withdraw tokens you have used to vote. You must wait for the vote to complete.',
 };

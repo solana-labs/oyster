@@ -12,15 +12,15 @@ import { TimelockInstruction } from './timelock';
 ///   0. `[writable]` Transaction account you wish to execute.
 ///   1. `[]` Timelock set account.
 ///   2. `[]` Program being invoked account
-///   3. `[]` Timelock program authority
-///   4. `[]` Timelock program account pub key.
-///   5. `[]` Clock sysvar.
+///   4. `[]` Timelock config
+///   5. `[]` Timelock program account pub key.
+///   6. `[]` Clock sysvar.
 ///   6+ Any extra accounts that are part of the instruction, in order
 export const executeInstruction = (
   transactionAccount: PublicKey,
   timelockSetAccount: PublicKey,
   programBeingInvokedAccount: PublicKey,
-  timelockAuthority: PublicKey,
+  timelockConfig: PublicKey,
   accountInfos: { pubkey: PublicKey; isWritable: boolean; isSigner: boolean }[],
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
@@ -39,16 +39,12 @@ export const executeInstruction = (
     },
     data,
   );
-  console.log(
-    'Acohjnt',
-    accountInfos.map(a => console.log(a.pubkey.toBase58(), a.isWritable)),
-  );
 
   const keys = [
     { pubkey: transactionAccount, isSigner: false, isWritable: true },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
     { pubkey: programBeingInvokedAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockAuthority, isSigner: false, isWritable: true },
+    { pubkey: timelockConfig, isSigner: false, isWritable: true },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
       isSigner: false,

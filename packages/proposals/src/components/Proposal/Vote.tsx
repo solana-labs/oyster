@@ -71,15 +71,18 @@ export function Vote({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (voteAccount && yesVoteAccount && noVoteAccount) {
-              // tokenAmount is out of date in this scope, so we use a trick to get it here.
-              const valueHolder = { value: 0 };
+              // tokenAmount and mode is out of date in this scope, so we use a trick to get it here.
+              const valueHolder = { value: 0, mode: true };
               await setTokenAmount(amount => {
                 valueHolder.value = amount;
                 return amount;
               });
-              const yesTokenAmount = mode ? valueHolder.value : 0;
-              const noTokenAmount = !mode ? valueHolder.value : 0;
-
+              await setMode(mode => {
+                valueHolder.mode = mode;
+                return mode;
+              });
+              const yesTokenAmount = valueHolder.mode ? valueHolder.value : 0;
+              const noTokenAmount = !valueHolder.mode ? valueHolder.value : 0;
               await vote(
                 connection,
                 wallet.wallet,
