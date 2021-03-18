@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useConnection } from '../contexts/connection';
 import { useWallet } from '../contexts/wallet';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
@@ -7,7 +13,11 @@ import { TokenAccount } from '../models';
 import { chunks } from '../utils/utils';
 import { EventEmitter } from '../utils/eventEmitter';
 import { useUserAccounts } from '../hooks/useUserAccounts';
-import { WRAPPED_SOL_MINT, programIds, LEND_HOST_FEE_ADDRESS } from '../utils/ids';
+import {
+  WRAPPED_SOL_MINT,
+  programIds,
+  LEND_HOST_FEE_ADDRESS,
+} from '../utils/ids';
 
 const AccountsContext = React.createContext<any>(null);
 
@@ -22,7 +32,10 @@ export interface ParsedAccountBase {
   info: any; // TODO: change to unkown
 }
 
-export type AccountParser = (pubkey: PublicKey, data: AccountInfo<Buffer>) => ParsedAccountBase | undefined;
+export type AccountParser = (
+  pubkey: PublicKey,
+  data: AccountInfo<Buffer>,
+) => ParsedAccountBase | undefined;
 
 export interface ParsedAccount<T> extends ParsedAccountBase {
   info: T;
@@ -55,7 +68,10 @@ export const MintParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
   return details;
 };
 
-export const TokenAccountParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+export const TokenAccountParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
   const buffer = Buffer.from(info.data);
   const data = deserializeAccount(buffer);
 
@@ -70,7 +86,10 @@ export const TokenAccountParser = (pubKey: PublicKey, info: AccountInfo<Buffer>)
   return details;
 };
 
-export const GenericAccountParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+export const GenericAccountParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
   const buffer = Buffer.from(info.data);
 
   const details = {
@@ -88,7 +107,11 @@ export const keyToAccountParser = new Map<string, AccountParser>();
 
 export const cache = {
   emitter: new EventEmitter(),
-  query: async (connection: Connection, pubKey: string | PublicKey, parser?: AccountParser) => {
+  query: async (
+    connection: Connection,
+    pubKey: string | PublicKey,
+    parser?: AccountParser,
+  ) => {
     let id: PublicKey;
     if (typeof pubKey === 'string') {
       id = new PublicKey(pubKey);
@@ -109,7 +132,7 @@ export const cache = {
     }
 
     // TODO: refactor to use multiple accounts query with flush like behavior
-    query = connection.getAccountInfo(id).then((data) => {
+    query = connection.getAccountInfo(id).then(data => {
       if (!data) {
         throw new Error('Account not found');
       }
@@ -120,7 +143,11 @@ export const cache = {
 
     return query;
   },
-  add: (id: PublicKey | string, obj: AccountInfo<Buffer>, parser?: AccountParser) => {
+  add: (
+    id: PublicKey | string,
+    obj: AccountInfo<Buffer>,
+    parser?: AccountParser,
+  ) => {
     if (obj.data.length === 0) {
       return;
     }
@@ -128,7 +155,9 @@ export const cache = {
     const address = typeof id === 'string' ? id : id?.toBase58();
     const deserialize = parser ? parser : keyToAccountParser.get(address);
     if (!deserialize) {
-      throw new Error('Deserializer needs to be registered or passed as a parameter');
+      throw new Error(
+        'Deserializer needs to be registered or passed as a parameter',
+      );
     }
 
     cache.registerParser(id, deserialize);
@@ -187,7 +216,52 @@ export const cache = {
     }
 
     return pubkey;
-  }
+  },
+  queryMint: async (connection: Connection, pubKey: string | PublicKey) => {
+    let id: PublicKey;
+    if (typeof pubKey === 'string') {
+      id = new PublicKey(pubKey);
+    } else {
+      id = pubKey;
+    }
+
+    const address = id.toBase58();
+    let mint = mintCache.get(address);
+    if (mint) {
+      return mint;
+    }
+
+    let query = pendingMintCalls.get(address);
+    if (query) {
+      return query;
+    }
+
+    query = getMintInfo(connection, id).then(data => {
+      pendingMintCalls.delete(address);
+
+      mintCache.set(address, data);
+      return data;
+    }) as Promise<MintInfo>;
+    pendingMintCalls.set(address, query as any);
+
+    return query;
+  },
+  getMint: (pubKey: string | PublicKey) => {
+    let key: string;
+    if (typeof pubKey !== 'string') {
+      key = pubKey.toBase58();
+    } else {
+      key = pubKey;
+    }
+
+    return mintCache.get(key);
+  },
+  addMint: (pubKey: PublicKey, obj: AccountInfo<Buffer>) => {
+    const mint = deserializeMint(obj.data);
+    const id = pubKey.toBase58();
+    mintCache.set(id, mint);
+    return mint;
+  },
 };
 
 export const useAccountsContext = () => {
@@ -196,7 +270,10 @@ export const useAccountsContext = () => {
   return context;
 };
 
-function wrapNativeAccount(pubkey: PublicKey, account?: AccountInfo<Buffer>): TokenAccount | undefined {
+function wrapNativeAccount(
+  pubkey: PublicKey,
+  account?: AccountInfo<Buffer>,
+): TokenAccount | undefined {
   if (!account) {
     return undefined;
   }
@@ -219,7 +296,9 @@ function wrapNativeAccount(pubkey: PublicKey, account?: AccountInfo<Buffer>): To
   };
 }
 
-export const getCachedAccount = (predicate: (account: TokenAccount) => boolean) => {
+export const getCachedAccount = (
+  predicate: (account: TokenAccount) => boolean,
+) => {
   for (const account of genericCache.values()) {
     if (predicate(account)) {
       return account as TokenAccount;
@@ -234,8 +313,8 @@ const UseNativeAccount = () => {
   const [nativeAccount, setNativeAccount] = useState<AccountInfo<Buffer>>();
 
   const updateCache = useCallback(
-    (account) => {
-      if(wallet && wallet.publicKey) {
+    account => {
+      if (wallet && wallet.publicKey) {
         const wrapped = wrapNativeAccount(wallet.publicKey, account);
         if (wrapped !== undefined && wallet) {
           const id = wallet.publicKey?.toBase58();
@@ -245,7 +324,7 @@ const UseNativeAccount = () => {
         }
       }
     },
-    [wallet]
+    [wallet],
   );
 
   useEffect(() => {
@@ -253,13 +332,13 @@ const UseNativeAccount = () => {
       return;
     }
 
-    connection.getAccountInfo(wallet.publicKey).then((acc) => {
+    connection.getAccountInfo(wallet.publicKey).then(acc => {
       if (acc) {
         updateCache(acc);
         setNativeAccount(acc);
       }
     });
-    connection.onAccountChange(wallet.publicKey, (acc) => {
+    connection.onAccountChange(wallet.publicKey, acc => {
       if (acc) {
         updateCache(acc);
         setNativeAccount(acc);
@@ -271,7 +350,10 @@ const UseNativeAccount = () => {
 };
 
 const PRECACHED_OWNERS = new Set<string>();
-const precacheUserTokenAccounts = async (connection: Connection, owner?: PublicKey) => {
+const precacheUserTokenAccounts = async (
+  connection: Connection,
+  owner?: PublicKey,
+) => {
   if (!owner) {
     return;
   }
@@ -283,7 +365,7 @@ const precacheUserTokenAccounts = async (connection: Connection, owner?: PublicK
   const accounts = await connection.getTokenAccountsByOwner(owner, {
     programId: programIds().token,
   });
-  accounts.value.forEach((info) => {
+  accounts.value.forEach(info => {
     cache.add(info.pubkey.toBase58(), info.account, TokenAccountParser);
   });
 };
@@ -298,30 +380,34 @@ export function AccountsProvider({ children = null as any }) {
   const selectUserAccounts = useCallback(() => {
     return cache
       .byParser(TokenAccountParser)
-      .map((id) => cache.get(id))
-      .filter((a) => a && a.info.owner.toBase58() === wallet?.publicKey?.toBase58())
-      .map((a) => a as TokenAccount);
+      .map(id => cache.get(id))
+      .filter(
+        a => a && a.info.owner.toBase58() === wallet?.publicKey?.toBase58(),
+      )
+      .map(a => a as TokenAccount);
   }, [wallet]);
 
   useEffect(() => {
-    const accounts = selectUserAccounts().filter((a) => a !== undefined) as TokenAccount[];
+    const accounts = selectUserAccounts().filter(
+      a => a !== undefined,
+    ) as TokenAccount[];
     setUserAccounts(accounts);
   }, [nativeAccount, wallet, tokenAccounts, selectUserAccounts]);
 
   useEffect(() => {
     const subs: number[] = [];
-    cache.emitter.onCache((args) => {
+    cache.emitter.onCache(args => {
       if (args.isNew) {
         let id = args.id;
         let deserialize = args.parser;
-        connection.onAccountChange(new PublicKey(id), (info) => {
+        connection.onAccountChange(new PublicKey(id), info => {
           cache.add(id, info, deserialize);
         });
       }
     });
 
     return () => {
-      subs.forEach((id) => connection.removeAccountChangeListener(id));
+      subs.forEach(id => connection.removeAccountChangeListener(id));
     };
   }, [connection]);
 
@@ -341,7 +427,7 @@ export function AccountsProvider({ children = null as any }) {
       // this should use only filter syntax to only get accounts that are owned by user
       const tokenSubID = connection.onProgramAccountChange(
         programIds().token,
-        (info) => {
+        info => {
           // TODO: fix type in web3.js
           const id = (info.accountId as unknown) as string;
           // TODO: do we need a better way to identify layout (maybe a enum identifing type?)
@@ -354,7 +440,7 @@ export function AccountsProvider({ children = null as any }) {
             }
           }
         },
-        'singleGossip'
+        'singleGossip',
       );
 
       return () => {
@@ -382,38 +468,49 @@ export function useNativeAccount() {
   };
 }
 
-export const getMultipleAccounts = async (connection: any, keys: string[], commitment: string) => {
+export const getMultipleAccounts = async (
+  connection: any,
+  keys: string[],
+  commitment: string,
+) => {
   const result = await Promise.all(
-    chunks(keys, 99).map((chunk) => getMultipleAccountsCore(connection, chunk, commitment))
+    chunks(keys, 99).map(chunk =>
+      getMultipleAccountsCore(connection, chunk, commitment),
+    ),
   );
 
   const array = result
     .map(
-      (a) =>
-        a.array
-          .map((acc) => {
-            if (!acc) {
-              return undefined;
-            }
+      a =>
+        a.array.map(acc => {
+          if (!acc) {
+            return undefined;
+          }
 
-            const { data, ...rest } = acc;
-            const obj = {
-              ...rest,
-              data: Buffer.from(data[0], 'base64'),
-            } as AccountInfo<Buffer>;
-            return obj;
-          }) as AccountInfo<Buffer>[]
+          const { data, ...rest } = acc;
+          const obj = {
+            ...rest,
+            data: Buffer.from(data[0], 'base64'),
+          } as AccountInfo<Buffer>;
+          return obj;
+        }) as AccountInfo<Buffer>[],
     )
     .flat();
   return { keys, array };
 };
 
-const getMultipleAccountsCore = async (connection: any, keys: string[], commitment: string) => {
+const getMultipleAccountsCore = async (
+  connection: any,
+  keys: string[],
+  commitment: string,
+) => {
   const args = connection._buildArgs([keys], commitment, 'base64');
 
   const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args);
   if (unsafeRes.error) {
-    throw new Error('failed to get info about account ' + unsafeRes.error.message);
+    throw new Error(
+      'failed to get info about account ' + unsafeRes.error.message,
+    );
   }
 
   if (unsafeRes.result.value) {
@@ -438,13 +535,15 @@ export function useMint(key?: string | PublicKey) {
 
     cache
       .query(connection, id, MintParser)
-      .then((acc) => setMint(acc.info as any))
-      .catch((err) => console.log(err));
+      .then(acc => setMint(acc.info as any))
+      .catch(err => console.log(err));
 
-    const dispose = cache.emitter.onCache((e) => {
+    const dispose = cache.emitter.onCache(e => {
       const event = e;
       if (event.id === id) {
-        cache.query(connection, id, MintParser).then((mint) => setMint(mint.info as any));
+        cache
+          .query(connection, id, MintParser)
+          .then(mint => setMint(mint.info as any));
       }
     });
     return () => {
@@ -467,7 +566,9 @@ export function useAccount(pubKey?: PublicKey) {
           return;
         }
 
-        const acc = await cache.query(connection, key, TokenAccountParser).catch((err) => console.log(err));
+        const acc = await cache
+          .query(connection, key, TokenAccountParser)
+          .catch(err => console.log(err));
         if (acc) {
           setAccount(acc);
         }
@@ -478,7 +579,7 @@ export function useAccount(pubKey?: PublicKey) {
 
     query();
 
-    const dispose = cache.emitter.onCache((e) => {
+    const dispose = cache.emitter.onCache(e => {
       const event = e;
       if (event.id === key) {
         query();
@@ -493,7 +594,7 @@ export function useAccount(pubKey?: PublicKey) {
 }
 
 // TODO: expose in spl package
-const deserializeAccount = (data: Buffer) => {
+export const deserializeAccount = (data: Buffer) => {
   const accountInfo = AccountLayout.decode(data);
   accountInfo.mint = new PublicKey(accountInfo.mint);
   accountInfo.owner = new PublicKey(accountInfo.owner);
@@ -528,7 +629,7 @@ const deserializeAccount = (data: Buffer) => {
 };
 
 // TODO: expose in spl package
-const deserializeMint = (data: Buffer) => {
+export const deserializeMint = (data: Buffer) => {
   if (data.length !== MintLayout.span) {
     throw new Error('Not a valid Mint');
   }

@@ -15,6 +15,11 @@ export let LENDING_PROGRAM_ID = new PublicKey(
 export let SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
 );
+export let BPF_UPGRADE_LOADER_ID = new PublicKey(
+  'BPFLoaderUpgradeab1e11111111111111111111111',
+);
+
+export let SYSTEM = new PublicKey('11111111111111111111111111111111');
 
 let WORMHOLE_BRIDGE: {
   pubkey: PublicKey;
@@ -69,9 +74,9 @@ export const PROGRAM_IDS = [
     name: 'testnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+        '32siiZ12jH2i7BM2wtNuTDw2Hs5nBjVQuBh4P8cTSH3i',
       ),
-      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+      programId: new PublicKey('5KrVJvesyjdMy6Vq5wfuPSMdw7vWuUvtbHG98wBsEkX6'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
@@ -90,9 +95,9 @@ export const PROGRAM_IDS = [
     name: 'devnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+        'Hn2FtiPy4fYu4WgEeuvF8Y6os412a1iQvam2rrT6ibX1',
       ),
-      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+      programId: new PublicKey('5naVRdHoPFFQd2vTcWywyHthqqYziKvwu8urSxzV6Qj4'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -111,9 +116,9 @@ export const PROGRAM_IDS = [
     name: 'localnet',
     timelock: () => ({
       programAccountId: new PublicKey(
-        '9gBhDCCKV7KELLFRY8sAJZXqDmvUfmNzFzpB2b4FUVVr',
+        'GLmfd9F4bEY43Sg35RhvMN3N4uf5MvnTbX1bkKxVJ958',
       ),
-      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
+      programId: new PublicKey('Dj4W4ZEs5ATmAjx7pRt2gSTCgPHcjYig6KXZ4vBhPXrr'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -163,5 +168,7 @@ export const programIds = () => {
     wormhole: WORMHOLE_BRIDGE,
     timelock: TIMELOCK,
     associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+    bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
+    system: SYSTEM,
   };
 };
