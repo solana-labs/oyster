@@ -41,7 +41,6 @@ export function Vote({
   return eligibleToView ? (
     <Button
       type="primary"
-      disabled={!voteAccount}
       onClick={() =>
         confirm({
           title: 'Confirm',

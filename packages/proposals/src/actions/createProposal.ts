@@ -272,7 +272,7 @@ async function getAssociatedAccountsAndInstructions(
     wallet.publicKey,
     accountRentExempt,
     yesVoteMint,
-    wallet.publicKey,
+    authority,
     holdingSigners,
   );
 
@@ -281,7 +281,7 @@ async function getAssociatedAccountsAndInstructions(
     wallet.publicKey,
     accountRentExempt,
     noVoteMint,
-    wallet.publicKey,
+    authority,
     holdingSigners,
   );
 
@@ -290,7 +290,7 @@ async function getAssociatedAccountsAndInstructions(
     wallet.publicKey,
     accountRentExempt,
     timelockConfig.info.governanceMint,
-    wallet.publicKey,
+    authority,
     holdingSigners,
   );
 
