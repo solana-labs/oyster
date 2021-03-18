@@ -46,7 +46,10 @@ export function RegisterToVote({
   const eligibleToView =
     (timelockConfig.info.votingEntryRule == VotingEntryRule.DraftOnly &&
       proposal.info.state.status == TimelockStateStatus.Draft) ||
-    timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime;
+    (timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
+      [TimelockStateStatus.Draft, TimelockStateStatus.Voting].includes(
+        proposal.info.state.status,
+      ));
   const [_, setTokenAmount] = useState(1);
   return eligibleToView ? (
     <Button

@@ -23,14 +23,7 @@ export const execute = async (
 
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
-
-  const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
-    PROGRAM_IDS.timelock.programId,
-  );
-
   const actualMessage = decodeBufferIntoMessage(transaction.info.instruction);
-  console.log('Actual message', actualMessage);
   const accountInfos = getAccountInfos(actualMessage);
 
   instructions.push(
@@ -38,7 +31,7 @@ export const execute = async (
       transaction.pubkey,
       proposal.pubkey,
       actualMessage.accountKeys[actualMessage.instructions[0].programIdIndex],
-      authority,
+      proposal.info.config,
       accountInfos,
     ),
   );

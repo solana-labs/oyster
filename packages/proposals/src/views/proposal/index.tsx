@@ -41,13 +41,13 @@ export const ProposalView = () => {
 
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && governanceMint ? (
+      {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
         <InnerProposalView
           proposal={proposal}
           timelockConfig={timelockConfig}
           governanceMint={governanceMint}
           votingMint={votingMint}
-          yesVotingMint={votingMint}
+          yesVotingMint={yesVotingMint}
           sigMint={sigMint}
           instructions={context.transactions}
         />
@@ -208,7 +208,6 @@ function InnerProposalView({
                   : 'vertical'
               }
             >
-              <MintGovernanceTokens timelockConfig={timelockConfig} />
               <RegisterToVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
@@ -226,6 +225,16 @@ function InnerProposalView({
               title={LABELS.VOTES_REQUIRED}
               value={getVotesRequired(timelockConfig, governanceMint)}
             />
+            <Space
+              style={{ marginTop: '10px' }}
+              direction={
+                breakpoint.lg || breakpoint.xl || breakpoint.xxl
+                  ? 'horizontal'
+                  : 'vertical'
+              }
+            >
+              <MintGovernanceTokens timelockConfig={timelockConfig} />
+            </Space>
           </Col>
         </Row>
         <Row

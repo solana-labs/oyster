@@ -119,7 +119,6 @@ export const withdrawVotingTokens = async (
       proposal.info.noVotingDump,
       proposal.info.votingMint,
       proposal.pubkey,
-      proposal.info.config,
       transferAuthority.publicKey,
       yesTransferAuthority.publicKey,
       noTransferAuthority.publicKey,
