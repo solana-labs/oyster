@@ -17,7 +17,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
 import { contexts, components } from '@oyster/common';
-import { NewFormMenuItem } from '../../views/proposal/new';
+import { NewProposalMenuItem } from '../../views/proposal/new';
+import { RegisterGovernanceMenuItem } from '../../views/governance/register';
 
 const { AppBar } = components;
 const { useConnectionConfig } = contexts.Connection;
@@ -76,15 +77,18 @@ export const AppLayout = React.memo((props: any) => {
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="2" icon={<UploadOutlined />}>
-                  <NewFormMenuItem />
+                  <NewProposalMenuItem />
                 </Menu.Item>
-                <Menu.Item key="3" icon={<PieChartOutlined />}>
+                <Menu.Item key="3" icon={<UploadOutlined />}>
+                  <RegisterGovernanceMenuItem />
+                </Menu.Item>
+                <Menu.Item key="4" icon={<PieChartOutlined />}>
                   <Link
                     to={{
-                      pathname: '/dashboard',
+                      pathname: '/governance',
                     }}
                   >
-                    {LABELS.MENU_DASHBOARD}
+                    {LABELS.MENU_GOVERNANCE}
                   </Link>
                 </Menu.Item>
               </Menu>

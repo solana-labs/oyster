@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, programIds } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress, InputNumber, Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { TimelockConfig, TimelockSet } from '../../models/timelock';
@@ -51,7 +51,7 @@ export default function MintGovernanceTokens({
       : [];
     const governanceHolders: GovernanceEntryInterface[] = [];
     let failedGovernancesHold: GovernanceEntryInterface[] = [];
-    const zeroKey = new PublicKey('0');
+    const zeroKey = PROGRAM_IDS.system;
     governanceHoldersAndCounts.forEach((value: string, index: number) => {
       if (index % 2 == 0)
         governanceHolders.push({
@@ -64,6 +64,7 @@ export default function MintGovernanceTokens({
           value,
         );
     });
+    console.log(governanceHolders);
 
     if (singleGovernanceHolder)
       governanceHolders.push({
@@ -108,7 +109,7 @@ export default function MintGovernanceTokens({
       try {
         if (governanceHolders[i].owner) {
           const tokenAccounts = await connection.getTokenAccountsByOwner(
-            governanceHolders[i].owner || new PublicKey('0'),
+            governanceHolders[i].owner || PROGRAM_IDS.timelock,
             {
               programId: PROGRAM_IDS.token,
             },
@@ -116,7 +117,7 @@ export default function MintGovernanceTokens({
           const specificToThisMint = tokenAccounts.value.find(
             a =>
               deserializeAccount(a.account.data).mint.toBase58() ===
-              timelockConfig.info.governanceMint,
+              timelockConfig.info.governanceMint.toBase58(),
           );
           governanceHolders[i].governanceAccount = specificToThisMint?.pubkey;
           governanceHoldersToRun.push(governanceHolders[i]);
@@ -146,10 +147,10 @@ export default function MintGovernanceTokens({
     setIsModalVisible(failedGovernancesHold.length > 0);
     if (failedGovernancesHold.length === 0) form.resetFields();
   };
-
   return (
     <>
-      {governanceMint?.mintAuthority == wallet.wallet?.publicKey ? (
+      {governanceMint?.mintAuthority?.toBase58() ===
+      wallet.wallet?.publicKey?.toBase58() ? (
         <Button
           onClick={() => {
             setIsModalVisible(true);
@@ -230,7 +231,7 @@ export default function MintGovernanceTokens({
         </Form>
         {saving && <Progress percent={savePerc} status="active" />}
 
-        {!saving && failedGovernances.length > 0 && (
+        {!saving && failedGovernances.length > 0 && bulkModeVisible && (
           <div
             style={{
               flex: 1,
@@ -258,7 +259,7 @@ export default function MintGovernanceTokens({
                   governances: failedGovernances.join(','),
                 });
                 notify({
-                  message: LABELS.FAILED_HOLDERS_COPIED_TO_CLIPBOARD,
+                  message: LABELS.FAILED_HOLDERS_COPIED_TO_INPUT,
                   type: 'success',
                 });
               }}

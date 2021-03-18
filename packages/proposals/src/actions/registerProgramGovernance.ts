@@ -8,8 +8,17 @@ import {
 import { contexts, utils, actions, models } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import { TimelockConfig, TimelockConfigLayout } from '../models/timelock';
+import {
+  ConsensusAlgorithm,
+  ExecutionType,
+  TimelockConfig,
+  TimelockConfigLayout,
+  TimelockType,
+  VotingEntryRule,
+} from '../models/timelock';
 import { initTimelockConfigInstruction } from '../models/initTimelockConfig';
+import BN from 'bn.js';
+import { createEmptyTimelockConfigInstruction } from '../models/createEmptyTimelockConfig';
 
 const { sendTransaction } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -19,7 +28,7 @@ const { approve } = models;
 export const registerProgramGovernance = async (
   connection: Connection,
   wallet: any,
-  uninitializedTimelockConfig: TimelockConfig,
+  uninitializedTimelockConfig: Partial<TimelockConfig>,
 ): Promise<PublicKey> => {
   const PROGRAM_IDS = utils.programIds();
   let signers: Account[] = [];
@@ -31,6 +40,9 @@ export const registerProgramGovernance = async (
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
     AccountLayout.span,
   );
+
+  if (!uninitializedTimelockConfig.program)
+    uninitializedTimelockConfig.program = new Account().publicKey; // Random generation if none given
 
   if (!uninitializedTimelockConfig.governanceMint) {
     // Initialize the mint, an account for the admin, and give them one governance token
@@ -54,25 +66,16 @@ export const registerProgramGovernance = async (
       signers,
     );
 
-    const addAuthority = approve(
-      instructions,
-      [],
-      adminsGovernanceToken,
-      wallet.publicKey,
-      1,
-    );
-
     instructions.push(
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
         uninitializedTimelockConfig.governanceMint,
         adminsGovernanceToken,
-        addAuthority.publicKey,
+        wallet.publicKey,
         [],
         1,
       ),
     );
-    signers.push(addAuthority);
   }
 
   const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -87,26 +90,28 @@ export const registerProgramGovernance = async (
     PROGRAM_IDS.timelock.programId,
   );
 
-  const uninitializedTimelockConfigInstruction = SystemProgram.createAccount({
-    fromPubkey: wallet.publicKey,
-    newAccountPubkey: timelockConfigKey,
-    lamports: timelockRentExempt,
-    space: TimelockConfigLayout.span,
-    programId: PROGRAM_IDS.timelock.programId,
-  });
-
-  instructions.push(uninitializedTimelockConfigInstruction);
-
+  instructions.push(
+    createEmptyTimelockConfigInstruction(
+      timelockConfigKey,
+      uninitializedTimelockConfig.program,
+      uninitializedTimelockConfig.governanceMint,
+      wallet.publicKey,
+    ),
+  );
   instructions.push(
     initTimelockConfigInstruction(
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
-      uninitializedTimelockConfig.consensusAlgorithm,
-      uninitializedTimelockConfig.executionType,
-      uninitializedTimelockConfig.timelockType,
-      uninitializedTimelockConfig.votingEntryRule,
-      uninitializedTimelockConfig.minimumSlotWaitingPeriod,
+      uninitializedTimelockConfig.consensusAlgorithm ||
+        ConsensusAlgorithm.Majority,
+      uninitializedTimelockConfig.executionType ||
+        ExecutionType.AnyAboveVoteFinishSlot,
+      uninitializedTimelockConfig.timelockType ||
+        TimelockType.CustomSingleSignerV1,
+      uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,
+      uninitializedTimelockConfig.minimumSlotWaitingPeriod || new BN(0),
+      uninitializedTimelockConfig.name || '',
     ),
   );
 

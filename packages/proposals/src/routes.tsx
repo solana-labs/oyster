@@ -3,8 +3,9 @@ import React from 'react';
 import { contexts } from '@oyster/common';
 import { AppLayout } from './components/Layout';
 import ProposalsProvider from './contexts/proposals';
-import { DashboardView, HomeView } from './views';
+import { HomeView } from './views';
 import { ProposalView } from './views/proposal';
+import { GovernanceDashboard } from './views/governance';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
@@ -24,8 +25,8 @@ export function Routes() {
 
                     <Route
                       exact
-                      path="/dashboard"
-                      children={<DashboardView />}
+                      path="/governance"
+                      children={<GovernanceDashboard />}
                     />
                   </Switch>
                 </AppLayout>

@@ -141,12 +141,8 @@ interface ValidationReturn {
   noVoteDumpAccount: PublicKey;
   governanceHoldingAccount: PublicKey;
   authority: PublicKey;
-  signers: [Account[], Account[], Account[]];
-  instructions: [
-    TransactionInstruction[],
-    TransactionInstruction[],
-    TransactionInstruction[],
-  ];
+  signers: Account[][];
+  instructions: TransactionInstruction[][];
 }
 
 async function getAssociatedAccountsAndInstructions(
@@ -185,34 +181,37 @@ async function getAssociatedAccountsAndInstructions(
     mintSigners,
   );
 
+  let voteMintSigners: Account[] = [];
+  let voteMintInstructions: TransactionInstruction[] = [];
+
   const voteMint = createMint(
-    mintInstructions,
+    voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    mintSigners,
+    voteMintSigners,
   );
 
   const yesVoteMint = createMint(
-    mintInstructions,
+    voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    mintSigners,
+    voteMintSigners,
   );
 
   const noVoteMint = createMint(
-    mintInstructions,
+    voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
     0,
     authority,
     authority,
-    mintSigners,
+    voteMintSigners,
   );
 
   let validationSigners: Account[] = [];
@@ -310,11 +309,19 @@ async function getAssociatedAccountsAndInstructions(
     noVoteDumpAccount,
     governanceHoldingAccount,
     authority,
-    signers: [mintSigners, validationSigners, destinationSigners],
+    signers: [
+      mintSigners,
+      voteMintSigners,
+      validationSigners,
+      destinationSigners,
+      holdingSigners,
+    ],
     instructions: [
       mintInstructions,
+      voteMintInstructions,
       validationInstructions,
       destinationInstructions,
+      holdingInstructions,
     ],
   };
 }

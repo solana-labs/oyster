@@ -14,14 +14,14 @@ import {
 
 import { TimelockSet } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
-import { depositVotingTokensInstruction } from '../models/depositVotingTokens';
+import { depositGovernanceTokensInstruction } from '../models/depositGovernanceTokens';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
 const { approve } = models;
 
-export const depositVotingTokens = async (
+export const depositGovernanceTokens = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
@@ -89,7 +89,7 @@ export const depositVotingTokens = async (
   signers.push(transferAuthority);
 
   instructions.push(
-    depositVotingTokensInstruction(
+    depositGovernanceTokensInstruction(
       existingVoteAccount,
       sourceAccount,
       proposal.info.governanceHolding,

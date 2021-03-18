@@ -21,15 +21,15 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///   8. `[writable]` Initialized Voting Validation account
 ///   9. `[writable]` Initialized Destination account for first admin token
 ///   10. `[writable]` Initialized Destination account for first signatory token
-///   12. `[writable]` Initialized Yes voting dump account
-///   13. `[writable]` Initialized No voting dump account
-///   14. `[writable]` Initialized Governance holding account
-///   15. `[]` Governance mint
-///   16. `[]` Timelock config account.
-///   17. `[]` Timelock minting authority
-///   18. `[]` Timelock Program
-///   19. '[]` Token program id
-///   20. `[]` Rent sysvar
+///   11. `[writable]` Initialized Yes voting dump account
+///   12. `[writable]` Initialized No voting dump account
+///   13. `[writable]` Initialized Governance holding account
+///   14. `[]` Governance mint
+///   15. `[]` Timelock config account.
+///   16. `[]` Timelock minting authority
+///   17. `[]` Timelock Program
+///   18. '[]` Token program id
+///   19. `[]` Rent sysvar
 export const initTimelockSetInstruction = (
   timelockSetAccount: PublicKey,
   signatoryMintAccount: PublicKey,
@@ -58,7 +58,7 @@ export const initTimelockSetInstruction = (
   }
 
   if (name.length > NAME_SIZE) {
-    throw new Error('Name is more than ' + DESC_SIZE);
+    throw new Error('Name is more than ' + NAME_SIZE);
   }
 
   const dataLayout = BufferLayout.struct([

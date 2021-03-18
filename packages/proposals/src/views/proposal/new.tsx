@@ -5,15 +5,14 @@ import { Account } from '@solana/web3.js';
 import {
   ConsensusAlgorithm,
   DESC_SIZE,
-  ExecutionType,
   NAME_SIZE,
-  TimelockType,
 } from '../../models/timelock';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
+import { useProposals } from '../../contexts/proposals';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -24,9 +23,10 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-export function NewFormMenuItem() {
+export function NewProposalMenuItem() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
+
   const handleOk = (a: Account) => {
     setIsModalVisible(false);
     setRedirect(a.publicKey.toBase58());
@@ -71,81 +71,51 @@ export function NewForm({
   const [form] = Form.useForm();
   const wallet = useWallet();
   const connection = useConnection();
+  const context = useProposals();
+  const configs = Object.values(context.configs);
+
   const onFinish = async (values: {
     name: string;
     description: string;
-    timelockType: TimelockType;
-    executionType: ExecutionType;
-    consensusAlgorithm: ConsensusAlgorithm;
+    timelockConfigKey: string;
   }) => {
+    const config = context.configs[values.timelockConfigKey];
     const newSet = await createProposal(
       connection,
       wallet.wallet,
       values.name,
       values.description,
-      values.timelockType,
-      values.consensusAlgorithm,
-      values.executionType,
+      config,
     );
     handleOk(newSet);
   };
   return (
     <Modal
-      title="New Proposal"
+      title={LABELS.NEW_PROPOSAL}
       visible={isModalVisible}
       onOk={form.submit}
       onCancel={handleCancel}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+        <Form.Item name="name" label={LABELS.NAME} rules={[{ required: true }]}>
           <Input maxLength={NAME_SIZE} />
         </Form.Item>
         <Form.Item
           name="description"
-          label="Description"
+          label={LABELS.DESCRIPTION}
           rules={[{ required: true }]}
         >
-          <Input maxLength={DESC_SIZE} placeholder="Github Gist link" />
+          <Input maxLength={DESC_SIZE} placeholder={LABELS.GIST_PLACEHOLDER} />
         </Form.Item>
         <Form.Item
-          name="consensusAlgorithm"
-          label="Consensus Algorithm"
+          name="timelockConfigKey"
+          label={LABELS.CONFIG}
           rules={[{ required: true }]}
-          initialValue={ConsensusAlgorithm.Majority}
         >
-          <Select placeholder="Select the Consensus Algorithm">
-            <Option value={ConsensusAlgorithm.Majority}>Majority</Option>
-            <Option value={ConsensusAlgorithm.FullConsensus}>
-              Full Consensus
-            </Option>
-            <Option value={ConsensusAlgorithm.SuperMajority}>
-              Super Majority
-            </Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="executionType"
-          label="Execution Type"
-          rules={[{ required: true }]}
-          initialValue={ExecutionType.AnyAboveVoteFinishSlot}
-        >
-          <Select placeholder="Select the type of execution">
-            <Option value={ExecutionType.AnyAboveVoteFinishSlot}>
-              Any Above Vote Finish Slot
-            </Option>
-            <Option value={ExecutionType.AllOrNothing}>All or Nothing</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="timelockType"
-          label="Proposal Type"
-          rules={[{ required: true }]}
-          initialValue={TimelockType.CustomSingleSignerV1}
-        >
-          <Select placeholder="Select the type of Proposal">
-            <Option value={TimelockType.CustomSingleSignerV1}>
-              Single Signer
-            </Option>
+          <Select placeholder={LABELS.SELECT_CONFIG}>
+            {configs.map(c => (
+              <Option value={c.pubkey.toBase58()}>{c.info.name}</Option>
+            ))}
           </Select>
         </Form.Item>
       </Form>

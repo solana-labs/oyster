@@ -1,4 +1,4 @@
-import { Button, Col, Divider, Grid, Row, Space, Spin, Statistic } from 'antd';
+import { Col, Divider, Grid, Row, Space, Spin, Statistic } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount } from '@oyster/common';
@@ -9,7 +9,6 @@ import {
   TimelockSet,
   TimelockStateStatus,
   TimelockTransaction,
-  VotingEntryRule,
 } from '../../models/timelock';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -24,6 +23,7 @@ import AddSigners from '../../components/Proposal/AddSigners';
 import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
+import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -37,6 +37,7 @@ export const ProposalView = () => {
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
   const governanceMint = useMint(timelockConfig?.info.governanceMint);
+  const yesVotingMint = useMint(proposal?.info.yesVotingMint);
 
   return (
     <div className="flexColumn">
@@ -46,6 +47,7 @@ export const ProposalView = () => {
           timelockConfig={timelockConfig}
           governanceMint={governanceMint}
           votingMint={votingMint}
+          yesVotingMint={votingMint}
           sigMint={sigMint}
           instructions={context.transactions}
         />
@@ -60,6 +62,7 @@ function InnerProposalView({
   proposal,
   sigMint,
   votingMint,
+  yesVotingMint,
   instructions,
   timelockConfig,
   governanceMint,
@@ -68,12 +71,12 @@ function InnerProposalView({
   timelockConfig: ParsedAccount<TimelockConfig>;
   sigMint: MintInfo;
   votingMint: MintInfo;
+  yesVotingMint: MintInfo;
   governanceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
-  const voteAccount = useAccountByMint(proposal.info.votingMint);
 
   const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
     .map(k => instructions[k.toBase58()])
@@ -194,11 +197,8 @@ function InnerProposalView({
           <Col span={8}>
             <Statistic
               title={LABELS.VOTES_CAST}
-              value={
-                proposal.info.state.totalVotingTokensMinted.toNumber() -
-                votingMint.supply.toNumber()
-              }
-              suffix={`/ ${proposal.info.state.totalVotingTokensMinted}`}
+              value={yesVotingMint.supply.toNumber()}
+              suffix={`/ ${governanceMint.supply.toNumber()}`}
             />
             <Space
               style={{ marginTop: '10px' }}
@@ -213,7 +213,10 @@ function InnerProposalView({
                 timelockConfig={timelockConfig}
                 proposal={proposal}
               />
-
+              <WithdrawTokens
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+              />
               <Vote proposal={proposal} timelockConfig={timelockConfig} />
             </Space>
           </Col>

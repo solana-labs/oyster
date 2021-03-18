@@ -25,7 +25,6 @@ export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
-  newVotingAccountOwner: PublicKey,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
@@ -47,7 +46,7 @@ export const withdrawVotingTokens = async (
       wallet.publicKey,
       accountRentExempt,
       proposal.info.votingMint,
-      newVotingAccountOwner,
+      wallet.publicKey,
       signers,
     );
   }
@@ -58,7 +57,7 @@ export const withdrawVotingTokens = async (
       wallet.publicKey,
       accountRentExempt,
       proposal.info.yesVotingMint,
-      newVotingAccountOwner,
+      wallet.publicKey,
       signers,
     );
   }
@@ -69,7 +68,7 @@ export const withdrawVotingTokens = async (
       wallet.publicKey,
       accountRentExempt,
       proposal.info.noVotingMint,
-      newVotingAccountOwner,
+      wallet.publicKey,
       signers,
     );
   }

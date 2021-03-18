@@ -21,7 +21,7 @@ import BN from 'bn.js';
 ///   7. `[]` Timelock program mint authority
 ///   8. `[]` Timelock program account pub key.
 ///   9. `[]` Token program account.
-export const depositVotingTokensInstruction = (
+export const depositGovernanceTokensInstruction = (
   votingAccount: PublicKey,
   sourceAccount: PublicKey,
   governanceHoldingAccount: PublicKey,
@@ -43,7 +43,7 @@ export const depositVotingTokensInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.DepositVotingTokens,
+      instruction: TimelockInstruction.DepositGovernanceTokens,
       votingTokenAmount: new BN(votingTokenAmount),
     },
     data,

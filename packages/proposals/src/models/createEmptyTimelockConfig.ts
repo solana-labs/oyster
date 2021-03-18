@@ -13,66 +13,48 @@ import * as Layout from '../utils/layout';
 ///           program account key, governance mint key, timelock program account key.
 ///   1. `[]` Program account to tie this config to.
 ///   2. `[]` Governance mint to tie this config to
-///   3. `[]` Timelock program account pub key.
-///   4. `[]` Token program account.
-export const initTimelockConfigInstruction = (
+///   3. `[]` Payer
+///   4. `[]` Timelock program account pub key.
+///   5. `[]` Timelock program pub key. Different from program account - is the actual id of the executable.
+///   6. `[]` Token program account.
+///   7. `[]` System account.
+export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
-  consensusAlgorithm: number,
-  executionType: number,
-  timelockType: number,
-  votingEntryRule: number,
-  minimumSlotWaitingPeriod: BN,
-  name: string,
+  payer: PublicKey,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
-  if (name.length > CONFIG_NAME_LENGTH) {
-    throw new Error('Name is more than ' + CONFIG_NAME_LENGTH);
-  }
-
-  const dataLayout = BufferLayout.struct([
-    BufferLayout.u8('instruction'),
-    BufferLayout.u8('consensusAlgorithm'),
-    BufferLayout.u8('executionType'),
-    BufferLayout.u8('timelockType'),
-    BufferLayout.u8('votingEntryRule'),
-    Layout.uint64('minimumSlotWaitingPeriod'),
-    BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
-  ]);
-
-  const nameAsBytes = utils.toUTF8Array(name);
-  for (let i = nameAsBytes.length; i <= CONFIG_NAME_LENGTH - 1; i++) {
-    nameAsBytes.push(0);
-  }
+  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
 
   const data = Buffer.alloc(dataLayout.span);
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.InitTimelockConfig,
-      consensusAlgorithm,
-      executionType,
-      timelockType,
-      votingEntryRule,
-      minimumSlotWaitingPeriod,
-      name: nameAsBytes,
+      instruction: TimelockInstruction.CreateEmptyTimelockConfig,
     },
     data,
   );
 
   const keys = [
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
+    { pubkey: payer, isSigner: true, isWritable: false },
 
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
       isSigner: false,
       isWritable: false,
     },
+    {
+      pubkey: PROGRAM_IDS.timelock.programId,
+      isSigner: false,
+      isWritable: false,
+    },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
+    { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({
     keys,

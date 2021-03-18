@@ -265,7 +265,7 @@ export const sendTransactions = async (
     }
     unsignedTxns.push(transaction);
   }
-  const signedTxns = await wallet.signTransactions(unsignedTxns);
+  const signedTxns = await wallet.signAllTransactions(unsignedTxns);
   const rawTransactions = signedTxns.map((t: Transaction) => t.serialize());
   let options = {
     skipPreflight: true,

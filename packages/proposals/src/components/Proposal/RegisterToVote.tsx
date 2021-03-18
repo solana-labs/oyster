@@ -8,7 +8,7 @@ import {
   VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
-import { depositVotingTokens } from '../../actions/depositVotingTokens';
+import { depositGovernanceTokens } from '../../actions/depositGovernanceTokens';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -29,14 +29,19 @@ export function RegisterToVote({
   const voteAccount = useAccountByMint(proposal.info.votingMint);
   const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
-
+  console.log(
+    'My vote account',
+    voteAccount?.info.amount.toNumber(),
+    yesVoteAccount?.info.amount.toNumber(),
+    noVoteAccount?.info.amount.toNumber(),
+  );
   const governanceAccount = useAccountByMint(
     timelockConfig.info.governanceMint,
   );
   const alreadyHaveTokens =
-    voteAccount?.info?.amount?.toNumber() > 0 ||
-    yesVoteAccount?.info?.amount?.toNumber() > 0 ||
-    noVoteAccount?.info?.amount?.toNumber() > 0;
+    (voteAccount && voteAccount.info.amount.toNumber() > 0) ||
+    (yesVoteAccount && yesVoteAccount.info.amount.toNumber() > 0) ||
+    (noVoteAccount && noVoteAccount.info.amount.toNumber() > 0);
 
   const eligibleToView =
     (timelockConfig.info.votingEntryRule == VotingEntryRule.DraftOnly &&
@@ -46,7 +51,6 @@ export function RegisterToVote({
   return eligibleToView ? (
     <Button
       type="primary"
-      disabled={!voteAccount}
       onClick={() =>
         confirm({
           title: 'Confirm',
@@ -81,7 +85,7 @@ export function RegisterToVote({
                 return amount;
               });
 
-              await depositVotingTokens(
+              await depositGovernanceTokens(
                 connection,
                 wallet.wallet,
                 proposal,
@@ -98,7 +102,7 @@ export function RegisterToVote({
         })
       }
     >
-      {LABELS.REGISTER_TO_VOTE}
+      {alreadyHaveTokens ? LABELS.ADD_MORE_VOTES : LABELS.REGISTER_TO_VOTE}
     </Button>
   ) : null;
 }

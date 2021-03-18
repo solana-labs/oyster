@@ -27,23 +27,7 @@ export const DashboardView = () => {
 
   return (
     <div className="dashboard-container">
-      <Row gutter={GUTTER} className="home-info-row">
-        <Button
-          onClick={() =>
-            createProposal(
-              connection,
-              wallet.wallet,
-              'Billy',
-              'https://gist.github.com/dummytester123/bd3567f80e13a27b02a2e0fb891ecab1',
-              TimelockType.CustomSingleSignerV1,
-              ConsensusAlgorithm.Majority,
-              ExecutionType.AnyAboveVoteFinishSlot,
-            )
-          }
-        >
-          Add Proposal
-        </Button>
-      </Row>
+      <Row gutter={GUTTER} className="home-info-row"></Row>
       {proposal && wallet.wallet && connection && (
         <InnerDummyView
           proposal={proposal}

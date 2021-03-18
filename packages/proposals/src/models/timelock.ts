@@ -6,6 +6,7 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
+export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
@@ -17,10 +18,12 @@ export enum TimelockInstruction {
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
   Vote = 9,
+  InitTimelockConfig = 10,
   Ping = 11,
   Execute = 12,
-  DepositVotingTokens = 13,
+  DepositGovernanceTokens = 13,
   WithdrawVotingTokens = 14,
+  CreateEmptyTimelockConfig = 15,
 }
 
 export interface TimelockConfig {
@@ -40,6 +43,8 @@ export interface TimelockConfig {
   governanceMint: PublicKey;
   /// Program ID that is tied to this config (optional)
   program: PublicKey;
+  /// Optional name
+  name: string;
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -52,6 +57,7 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
     Layout.publicKey('program'),
+    BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
   ],
 );
 
@@ -101,7 +107,6 @@ export const STATE_COLOR: Record<string, string> = {
 
 export interface TimelockState {
   status: TimelockStateStatus;
-  totalVotingTokensMinted: BN;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
   name: string;
@@ -119,9 +124,15 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
     Layout.publicKey('votingMint'),
+    Layout.publicKey('yesVotingMint'),
+    Layout.publicKey('noVotingMint'),
     Layout.publicKey('signatoryValidation'),
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
+    Layout.publicKey('governanceHolding'),
+    Layout.publicKey('yesVotingDump'),
+    Layout.publicKey('noVotingDump'),
+    Layout.publicKey('config'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
@@ -290,6 +301,7 @@ export const TimelockConfigParser = (
       minimimSlotWaitingPeriod: data.minimimSlotWaitingPeriod,
       governanceMint: data.governanceMint,
       program: data.program,
+      name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
     },
   };
 
