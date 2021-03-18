@@ -11,15 +11,17 @@ export const Footer = () => {
       <SecurityAuditButton />
       <Button
         shape={'circle'}
+        target={'_blank'}
+        href={'https://github.com/solana-labs/oyster'}
         icon={<GithubOutlined />}
         style={{ marginRight: '20px' }}
-        onClick={() => window.open('https://github.com/solana-labs/oyster', '_blank')}
-      >
-      </Button>
-      <Button shape={'circle'}
-              icon={<TwitterOutlined />}
-              onClick={() => window.open('https://twitter.com/solana', '_blank')}>
-      </Button>
+      ></Button>
+      <Button
+        shape={'circle'}
+        target={'_blank'}
+        href={'https://twitter.com/solana'}
+        icon={<TwitterOutlined />}
+      ></Button>
     </div>
   );
 };

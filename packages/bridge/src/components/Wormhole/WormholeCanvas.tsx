@@ -20,7 +20,7 @@ const WormholeCanvas = ({
     <Canvas onCreated={onCreated} style={{ opacity: 0.4 }}>
       <Camera />
       <React.Suspense fallback={null}>
-        <WormholeGeometry rotate={rotate}/>
+        <WormholeGeometry rotate={rotate} />
       </React.Suspense>
     </Canvas>
   );

@@ -5,7 +5,12 @@ import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
-import { fromSolana, ProgressUpdate, toSolana, TransferRequest } from '../../models/bridge';
+import {
+  fromSolana,
+  ProgressUpdate,
+  toSolana,
+  TransferRequest,
+} from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
@@ -93,7 +98,7 @@ export const Transfer = () => {
       try {
         const bridgeAddress = programIds().wormhole.bridge;
 
-        if(request.from === ASSET_CHAIN.Solana) {
+        if (request.from === ASSET_CHAIN.Solana) {
 
           let signer = provider.getSigner();
           let e = WrappedAssetFactory.connect(asset, provider);
@@ -243,7 +248,7 @@ export const Transfer = () => {
               (async () => {
                 let steps: ProgressUpdate[] = [];
                 try {
-                  if(request.from === ASSET_CHAIN.Solana) {
+                  if (request.from === ASSET_CHAIN.Solana) {
                     debugger;
                     await fromSolana(
                       connection,
