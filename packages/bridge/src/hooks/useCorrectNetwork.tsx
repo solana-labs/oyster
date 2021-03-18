@@ -7,22 +7,21 @@ export const useCorrectNetwork = () => {
   const [hasCorrespondingNetworks, setHasCorrespondingNetworks] = useState(
     true,
   );
-  const { provider } = useEthereum();
+  const { connected, chainId } = useEthereum();
 
   useEffect(() => {
-    if (provider) {
-      provider.getNetwork().then(network => {
-        if (network.chainId === 5) {
-          setHasCorrespondingNetworks(env === 'testnet');
-        } else if (network.chainId === 1) {
-          setHasCorrespondingNetworks(env === 'mainnet-beta');
-        } else {
-          setHasCorrespondingNetworks(false);
-        }
-      });
+    if (connected) {
+      if (chainId === 5) {
+        setHasCorrespondingNetworks(env === 'testnet');
+      } else if (chainId === 1) {
+        setHasCorrespondingNetworks(env === 'mainnet-beta');
+      } else {
+        setHasCorrespondingNetworks(false);
+      }
+    } else {
+      setHasCorrespondingNetworks(true);
     }
-    setHasCorrespondingNetworks(true);
-  }, [provider, env]);
+  }, [connected, env, chainId]);
 
-  return hasCorrespondingNetworks;
+  return { hasCorrespondingNetworks };
 };

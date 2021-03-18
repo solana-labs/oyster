@@ -13,7 +13,6 @@ import { useWallet as useEthereumWallet } from 'use-wallet';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // @ts-ignore
 import Fortmatic from 'fortmatic';
-import Torus from '@toruslabs/torus-embed';
 import { useConnectionConfig, useWallet, ENV } from '@oyster/common';
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
@@ -24,20 +23,27 @@ export interface EthereumContextState {
   tokens: TokenInfo[];
   tokenMap: Map<string, TokenInfo>;
   accounts: string[];
+  connected: boolean;
+  chainId: number;
+  onConnectEthereum?: () => void;
 }
 
 export const EthereumContext = createContext<EthereumContextState>({
   tokens: [],
   tokenMap: new Map<string, TokenInfo>(),
   accounts: [''],
+  chainId: 0,
+  connected: false,
 });
 
 export const EthereumProvider: FunctionComponent = ({ children }) => {
   const [accounts, setAccounts] = useState<string[]>(['']);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
-  const { env } = useConnectionConfig();
-  const { connected } = useWallet();
-  const wallet = useEthereumWallet();
+  const [connected, setConnected] = useState<boolean>(false);
+  const [chainId, setChainId] = useState<number>(0);
+  //const { env } = useConnectionConfig();
+  const { connected: walletConnected } = useWallet();
+  //const wallet = useEthereumWallet();
   const [tokens, setTokens] = useState<{
     map: Map<string, TokenInfo>;
     list: TokenInfo[];
@@ -94,26 +100,59 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     })();
   }, [setTokens]);
 
+  const onConnectEthereum = () => {
+    // @ts-ignore
+    window.ethereum.request({ method: 'eth_requestAccounts' }).then(() => {
+      // @ts-ignore
+      const provider = new ethers.providers.Web3Provider(
+        (window as any).ethereum,
+      );
+      const signer = provider.getSigner();
+      signer.getAddress().then(account => {
+        setAccounts([account]);
+        setConnected(true);
+      });
+      provider.getNetwork().then(network => {
+        setChainId(network.chainId);
+      });
+      setProvider(provider);
+    });
+  };
+
   useEffect(() => {
     if (connected) {
       // @ts-ignore
-      window.ethereum.enable().then(() => {
-        // @ts-ignore
-        const provider = new ethers.providers.Web3Provider(
-          (window as any).ethereum,
-        );
-        const signer = provider.getSigner();
-        signer.getAddress().then(account => {
-          setAccounts([account]);
-        });
-        setProvider(provider);
+      window.ethereum.on('disconnect', error => {
+        setConnected(false);
+      });
+      // @ts-ignore
+      window.ethereum.on('accountsChanged', accounts => {
+        if (!accounts || !accounts[0]) setConnected(false);
+      });
+      // @ts-ignore
+      window.ethereum.on('chainChanged', (chainId: string) => {
+        setChainId(parseInt(chainId, 16));
       });
     }
   }, [connected]);
 
+  useEffect(() => {
+    if (walletConnected && !connected) {
+      onConnectEthereum();
+    }
+  }, [walletConnected]);
+
   return (
     <EthereumContext.Provider
-      value={{ tokens: tokens.list, tokenMap: tokens.map, accounts, provider }}
+      value={{
+        tokens: tokens.list,
+        tokenMap: tokens.map,
+        accounts,
+        provider,
+        connected,
+        chainId,
+        onConnectEthereum: () => onConnectEthereum(),
+      }}
     >
       {children}
     </EthereumContext.Provider>
