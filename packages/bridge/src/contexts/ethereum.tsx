@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 // @ts-ignore
@@ -13,9 +14,30 @@ import { useWallet as useEthereumWallet } from 'use-wallet';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // @ts-ignore
 import Fortmatic from 'fortmatic';
-import { useConnectionConfig, useWallet, ENV } from '@oyster/common';
+import { useWallet, useLocalStorageState} from '@oyster/common';
+import { WalletAdapter } from '@solana/wallet-base'
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
+import { MetamaskWalletAdapter } from '../wallet-adapters/metamask';
+import { Button, Modal } from 'antd';
+import {WalletConnectWalletAdapter} from "../wallet-adapters/wallet-connect";
+
+const ASSETS_URL =
+  'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
+export const ETH_WALLET_PROVIDERS = [
+  {
+    name: 'Metamask',
+    url: 'https://www.metamask.com',
+    icon: `${ASSETS_URL}metamask.svg`,
+    adapter: MetamaskWalletAdapter,
+  },
+  {
+    name: 'Wallet Connect',
+    url: 'https://walletconnect.org',
+    icon: `/blockchains/walletconnect.svg`,
+    adapter: WalletConnectWalletAdapter,
+  },
+];
 
 export interface EthereumContextState {
   provider?: ethers.providers.Web3Provider;
@@ -25,6 +47,7 @@ export interface EthereumContextState {
   accounts: string[];
   connected: boolean;
   chainId: number;
+  walletProvider: any;
   onConnectEthereum?: () => void;
 }
 
@@ -34,16 +57,22 @@ export const EthereumContext = createContext<EthereumContextState>({
   accounts: [''],
   chainId: 0,
   connected: false,
+  walletProvider: null,
 });
 
 export const EthereumProvider: FunctionComponent = ({ children }) => {
   const [accounts, setAccounts] = useState<string[]>(['']);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
+
+  const [providerUrl, setProviderUrl] = useLocalStorageState(
+    'ethWalletProvider',
+  );
   const [connected, setConnected] = useState<boolean>(false);
   const [chainId, setChainId] = useState<number>(0);
-  //const { env } = useConnectionConfig();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const { connected: walletConnected } = useWallet();
-  //const wallet = useEthereumWallet();
+
   const [tokens, setTokens] = useState<{
     map: Map<string, TokenInfo>;
     list: TokenInfo[];
@@ -51,6 +80,18 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     map: new Map<string, TokenInfo>(),
     list: [],
   });
+  const walletProvider = useMemo(
+    () => ETH_WALLET_PROVIDERS.find(({ url }) => url === providerUrl),
+    [providerUrl],
+  );
+  const wallet = useMemo(
+    function () {
+      if (walletProvider) {
+        return new walletProvider.adapter() as WalletAdapter;
+      }
+    },
+    [walletProvider, providerUrl],
+  );
 
   useEffect(() => {
     (async () => {
@@ -100,47 +141,53 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     })();
   }, [setTokens]);
 
-  const onConnectEthereum = () => {
-    (async () => {
-      // @ts-ignore
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.providers.Web3Provider(
-        (window as any).ethereum,
-      );
-      const signer = provider.getSigner();
-      const account = await signer.getAddress();
-      const network = await provider.getNetwork();
-
-      setChainId(network.chainId);
-      setProvider(provider);
-      setAccounts([account]);
-      setConnected(true);
-    })();
-  };
+  const onConnectEthereum = useCallback(() => {
+    if (wallet && providerUrl) {
+      wallet.connect();
+    } else {
+      select();
+    }
+  }, [wallet, providerUrl]);
 
   useEffect(() => {
-    if (connected) {
-      // @ts-ignore
-      window.ethereum.on('disconnect', error => {
+    if (wallet) {
+      wallet.on('connect', () => {
+        // @ts-ignore
+        setAccounts(wallet.accounts);
+        // @ts-ignore
+        setChainId(wallet.chainID);
+        // @ts-ignore
+        setProvider(wallet.provider);
+        setConnected(true);
+      });
+      wallet.on('disconnect', error => {
         setConnected(false);
       });
       // @ts-ignore
-      window.ethereum.on('accountsChanged', accounts => {
+      wallet.on('accountsChanged', accounts => {
         if (!accounts || !accounts[0]) setConnected(false);
       });
       // @ts-ignore
-      window.ethereum.on('chainChanged', (chainId: string) => {
+      wallet.on('chainChanged', (chainId: string) => {
         setChainId(parseInt(chainId, 16));
       });
     }
-  }, [connected]);
+    return () => {
+      setConnected(false);
+      if (wallet) {
+        wallet.disconnect();
+      }
+    };
+  }, [wallet]);
+
+  const select = useCallback(() => setIsModalVisible(true), []);
+  const close = useCallback(() => setIsModalVisible(false), []);
 
   useEffect(() => {
     if (walletConnected && !connected) {
       onConnectEthereum();
     }
-  }, [walletConnected]);
+  }, [walletConnected, connected, providerUrl]);
 
   return (
     <EthereumContext.Provider
@@ -151,10 +198,51 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
         provider,
         connected,
         chainId,
+        walletProvider,
         onConnectEthereum: () => onConnectEthereum(),
       }}
     >
       {children}
+      <Modal
+        title="Select Ethereum Wallet"
+        okText="Connect"
+        visible={isModalVisible}
+        okButtonProps={{ style: { display: 'none' } }}
+        onCancel={close}
+        width={400}
+      >
+        {ETH_WALLET_PROVIDERS.map(provider => {
+          const onClick = function () {
+            setProviderUrl(provider.url);
+            close();
+          };
+
+          return (
+            <Button
+              size="large"
+              type={providerUrl === provider.url ? 'primary' : 'ghost'}
+              onClick={onClick}
+              icon={
+                <img
+                  alt={`${provider.name}`}
+                  width={20}
+                  height={20}
+                  src={provider.icon}
+                  style={{ marginRight: 8 }}
+                />
+              }
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                marginBottom: 8,
+              }}
+            >
+              {provider.name}
+            </Button>
+          );
+        })}
+      </Modal>
     </EthereumContext.Provider>
   );
 };

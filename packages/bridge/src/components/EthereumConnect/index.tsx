@@ -2,12 +2,11 @@ import React from 'react';
 import { Button } from 'antd';
 
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import metamaskIcon from '../../assets/metamask.svg';
 import { shortenAddress } from '@oyster/common';
 import { useEthereum } from '../../contexts';
 
 export const EthereumConnect = () => {
-  const { accounts, onConnectEthereum, connected } = useEthereum();
+  const { accounts, onConnectEthereum, connected, walletProvider } = useEthereum();
   const { hasCorrespondingNetworks } = useCorrectNetwork();
 
   return (
@@ -16,11 +15,11 @@ export const EthereumConnect = () => {
         hasCorrespondingNetworks ? (
           <>
             <img
-              alt={'metamask-icon'}
+              alt={'ethereum-icon'}
               width={20}
               height={20}
               style={{ marginRight: 5 }}
-              src={metamaskIcon}
+              src={walletProvider.icon}
             />
             {shortenAddress(accounts[0], 4)}
           </>
@@ -31,14 +30,7 @@ export const EthereumConnect = () => {
         )
       ) : (
         <Button onClick={() => onConnectEthereum && onConnectEthereum()}>
-          <img
-            alt={'metamask-icon'}
-            width={20}
-            height={20}
-            style={{ marginRight: 5 }}
-            src={metamaskIcon}
-          />
-          Connect Metamask
+          Connect Ethereum
         </Button>
       )}
     </div>
