@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LendingReserve, LendingReserveParser } from '../models/lending';
 
 import { contexts, utils, ParsedAccount } from '@oyster/common';
-import { KnownToken } from '@solana/spl-token-registry';
+import { TokenInfo } from '@solana/spl-token-registry';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -43,10 +43,10 @@ export function useLendingReserve(address?: string | PublicKey) {
   const { reserveAccounts } = useLendingReserves();
   let addressName = address;
   if (typeof address === 'string') {
-    const token: KnownToken | null = getTokenByName(tokenMap, address);
+    const token: TokenInfo | null = getTokenByName(tokenMap, address);
     if (token) {
       const account = reserveAccounts.filter(
-        acc => acc.info.liquidityMint.toBase58() === token.mintAddress,
+        acc => acc.info.liquidityMint.toBase58() === token.address,
       )[0];
       if (account) {
         addressName = account.pubkey;

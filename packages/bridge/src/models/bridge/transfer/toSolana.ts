@@ -1,6 +1,5 @@
 import {
   programIds,
-  WalletAdapter,
   getMultipleAccounts,
   sendTransaction,
   cache,
@@ -22,6 +21,7 @@ import {
 } from '@solana/web3.js';
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
+import { WalletAdapter } from '@solana/wallet-base';
 
 export const toSolana = async (
   connection: Connection,

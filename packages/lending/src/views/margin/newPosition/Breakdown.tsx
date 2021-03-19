@@ -2,12 +2,12 @@ import { Progress, Slider, Card, Statistic } from 'antd';
 import React, { useState } from 'react';
 import { Position } from './interfaces';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-import { config } from '@oyster/common';
 import GainsChart from './GainsChart';
 import { usePoolAndTradeInfoFrom } from './utils';
-const tokens = config.tokens;
+import { useConnectionConfig } from '@oyster/common';
 
 export default function Breakdown({ item }: { item: Position }) {
+  const { tokens } = useConnectionConfig();
   const { enrichedPools, leverage } = usePoolAndTradeInfoFrom(item);
 
   const exchangeRate =
@@ -22,11 +22,11 @@ export default function Breakdown({ item }: { item: Position }) {
   const gains = 'green';
   const losses = 'red';
   const token = tokens.find(
-    t => t.mintAddress === item.asset.type?.info?.liquidityMint?.toBase58(),
+    t => t.address === item.asset.type?.info?.liquidityMint?.toBase58(),
   );
   const collateralToken = tokens.find(
     t =>
-      t.mintAddress === item.collateral.type?.info?.liquidityMint?.toBase58(),
+      t.address === item.collateral.type?.info?.liquidityMint?.toBase58(),
   );
 
   const [myGain, setMyGain] = useState<number>(10);
@@ -85,7 +85,7 @@ export default function Breakdown({ item }: { item: Position }) {
               value={brokeragePart * exchangeRate}
               precision={2}
               valueStyle={{ color: brokerageColor }}
-              suffix={token?.tokenSymbol}
+              suffix={token?.symbol}
             />
           </Card>
           <Card>
@@ -94,7 +94,7 @@ export default function Breakdown({ item }: { item: Position }) {
               value={myPart}
               precision={2}
               valueStyle={{ color: myColor }}
-              suffix={collateralToken?.tokenSymbol}
+              suffix={collateralToken?.symbol}
             />
           </Card>
           <Card>
@@ -103,7 +103,7 @@ export default function Breakdown({ item }: { item: Position }) {
               value={profitPart * exchangeRate}
               precision={2}
               valueStyle={{ color: profitPart > 0 ? gains : losses }}
-              suffix={token?.tokenSymbol}
+              suffix={token?.symbol}
               prefix={
                 profitPart > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />
               }

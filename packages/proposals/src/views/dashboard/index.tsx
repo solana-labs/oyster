@@ -1,18 +1,15 @@
-import { Button, Card, Col, Row, Spin } from 'antd';
+import { Button, Row, Spin } from 'antd';
 import React from 'react';
-import { GUTTER, LABELS } from '../../constants';
+import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
 import './style.less';
-import { createProposal } from '../../actions/createProposal';
 import { useProposals } from '../../contexts/proposals';
 import {
-  ConsensusAlgorithm,
-  ExecutionType,
   TimelockSet,
-  TimelockType,
 } from '../../models/timelock';
 import { Connection } from '@solana/web3.js';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
+import { WalletAdapter } from '@solana/wallet-base';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
@@ -45,7 +42,7 @@ function InnerDummyView({
   wallet,
 }: {
   connection: Connection;
-  wallet: contexts.Wallet.WalletAdapter;
+  wallet: WalletAdapter;
   proposal: ParsedAccount<TimelockSet>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);

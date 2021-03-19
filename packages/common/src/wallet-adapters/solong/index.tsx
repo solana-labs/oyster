@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import {PublicKey, Transaction} from "@solana/web3.js";
-import { WalletAdapter } from "../../contexts/wallet";
+import { WalletAdapter } from "@solana/wallet-base";
 import { notify } from "../../utils/notifications";
 
 export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
@@ -19,6 +19,10 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
 
   async signTransaction(transaction: Transaction) {
     return (window as any).solong.signTransaction(transaction);
+  }
+
+  async signMultipleTransaction(transactions: Transaction[]) {
+    return transactions;
   }
 
   connect() {

@@ -1,6 +1,5 @@
 import {
   programIds,
-  WalletAdapter,
   getMultipleAccounts,
   sendTransaction,
   cache,
@@ -10,6 +9,7 @@ import {
   createAssociatedTokenAccountInstruction,
   toLamports,
 } from '@oyster/common';
+import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
 import { ASSET_CHAIN } from '../../../utils/assets';
 import { BigNumber } from 'ethers/utils';

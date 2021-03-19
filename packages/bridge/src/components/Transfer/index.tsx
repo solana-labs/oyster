@@ -41,7 +41,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
   const { provider, accounts, tokenMap } = useEthereum();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
@@ -84,10 +84,11 @@ export const Transfer = () => {
   }, [A, B, mintAddress]);
 
   const from = A.chain;
+  const toChain = B.chain;
 
   useEffect(() => {
     const asset = request.asset;
-    if (!asset || (asset === request?.info?.address && request.from === from)) {
+    if (!asset || (asset === request?.info?.address && request.from === from && request.toChain === toChain)) {
       return;
     }
 
@@ -140,6 +141,7 @@ export const Transfer = () => {
           setRequest({
             ...request,
             from,
+            toChain,
             asset,
             info,
           });
@@ -173,7 +175,7 @@ export const Transfer = () => {
         });
       }
     })();
-  }, [request, from, provider]);
+  }, [request, from, toChain, provider, connected]);
 
   return (
     <>

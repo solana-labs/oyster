@@ -19,6 +19,7 @@ export const EthereumConnect = () => {
               alt={'metamask-icon'}
               width={20}
               height={20}
+              style={{ marginRight: 5 }}
               src={metamaskIcon}
             />
             {shortenAddress(accounts[0], 4)}
@@ -34,6 +35,7 @@ export const EthereumConnect = () => {
             alt={'metamask-icon'}
             width={20}
             height={20}
+            style={{ marginRight: 5 }}
             src={metamaskIcon}
           />
           Connect Metamask

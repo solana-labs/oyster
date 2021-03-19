@@ -3,7 +3,6 @@ import './../../App.less';
 import './index.less';
 import { Layout, Button } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
-import metamaskIcon from '../../assets/metamask.svg';
 
 import { LABELS } from '../../constants';
 import { AppBar } from '@oyster/common';
