@@ -240,7 +240,6 @@ export const Transfer = () => {
           }
 
           const token = tokenMap.get(request.asset?.toLowerCase() || '');
-          debugger;
           const NotificationContent = () => {
             const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
               [],
@@ -250,7 +249,6 @@ export const Transfer = () => {
                 let steps: ProgressUpdate[] = [];
                 try {
                   if (request.from === ASSET_CHAIN.Solana) {
-                    debugger;
                     await fromSolana(
                       connection,
                       wallet,
