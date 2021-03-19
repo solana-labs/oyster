@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import { PublicKey, Transaction } from '@solana/web3.js';
-import { notify, WalletAdapter } from '@oyster/common';
+import { notify } from '@oyster/common';
+import { WalletAdapter } from '@solana/wallet-base'
 import { ethers } from 'ethers';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
@@ -38,6 +39,9 @@ export class WalletConnectWalletAdapter
 
   async signTransaction(transaction: Transaction) {
     return this._provider.signTransaction(transaction);
+  }
+  async signMultipleTransaction(transactions: Transaction[]) {
+    return transactions;
   }
 
   connect() {

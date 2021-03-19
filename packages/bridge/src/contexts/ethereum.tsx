@@ -14,7 +14,8 @@ import { useWallet as useEthereumWallet } from 'use-wallet';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // @ts-ignore
 import Fortmatic from 'fortmatic';
-import { useWallet, useLocalStorageState, WalletAdapter } from '@oyster/common';
+import { useWallet, useLocalStorageState} from '@oyster/common';
+import { WalletAdapter } from '@solana/wallet-base'
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
 import { MetamaskWalletAdapter } from '../wallet-adapters/metamask';
@@ -31,9 +32,9 @@ export const ETH_WALLET_PROVIDERS = [
     adapter: MetamaskWalletAdapter,
   },
   {
-    name: 'Wallect Connect',
-    url: 'https://walletconnect.org/',
-    icon: `${ASSETS_URL}walletconnect.svg`,
+    name: 'Wallet Connect',
+    url: 'https://walletconnect.org',
+    icon: `/blockchains/walletconnect.svg`,
     adapter: WalletConnectWalletAdapter,
   },
 ];
@@ -46,6 +47,7 @@ export interface EthereumContextState {
   accounts: string[];
   connected: boolean;
   chainId: number;
+  walletProvider: any;
   onConnectEthereum?: () => void;
 }
 
@@ -55,6 +57,7 @@ export const EthereumContext = createContext<EthereumContextState>({
   accounts: [''],
   chainId: 0,
   connected: false,
+  walletProvider: null,
 });
 
 export const EthereumProvider: FunctionComponent = ({ children }) => {
@@ -184,7 +187,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
     if (walletConnected && !connected) {
       onConnectEthereum();
     }
-  }, [walletConnected, connected]);
+  }, [walletConnected, connected, providerUrl]);
 
   return (
     <EthereumContext.Provider
@@ -195,6 +198,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
         provider,
         connected,
         chainId,
+        walletProvider,
         onConnectEthereum: () => onConnectEthereum(),
       }}
     >

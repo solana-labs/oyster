@@ -147,7 +147,7 @@ export const Transfer = () => {
           });
         } else {
           console.log('Asset: ', asset);
-          debugger;
+          //debugger;
 
           // get user address from asset
           //
