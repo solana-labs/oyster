@@ -2,17 +2,13 @@ import React, {
   createContext,
   FunctionComponent,
   useContext,
-  useEffect,
 } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
 import { SolanaBridge } from '../core';
 import {
   useConnection,
   useConnectionConfig,
 } from '@oyster/common/dist/lib/contexts/connection';
 import { utils } from '@oyster/common';
-import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { WORMHOLE_PROGRAM_ID } from '../utils/ids';
 
 export const BridgeContext = createContext<SolanaBridge | undefined>(undefined);
 

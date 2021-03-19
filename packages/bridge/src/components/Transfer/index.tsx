@@ -67,10 +67,6 @@ export const Transfer = () => {
 
   const setAssetInformation = async (asset: string) => {
     setMintAddress(asset);
-    setRequest({
-      ...request,
-      asset: asset,
-    });
   };
 
   useEffect(() => {
@@ -86,11 +82,15 @@ export const Transfer = () => {
   const from = A.chain;
   const toChain = B.chain;
 
+  console.log(from);
+
   useEffect(() => {
-    const asset = request.asset;
+    const asset = mintAddress;
     if (!asset || (asset === request?.info?.address && request.from === from && request.toChain === toChain)) {
       return;
     }
+
+    console.log(from);
 
     (async () => {
       if (!provider || !accounts[0]) {
@@ -98,8 +98,7 @@ export const Transfer = () => {
       }
       try {
         const bridgeAddress = programIds().wormhole.bridge;
-
-        if (request.from === ASSET_CHAIN.Solana) {
+        if (from === ASSET_CHAIN.Ethereum) {
 
           let signer = provider.getSigner();
           let e = WrappedAssetFactory.connect(asset, provider);
@@ -175,7 +174,7 @@ export const Transfer = () => {
         });
       }
     })();
-  }, [request, from, toChain, provider, connected]);
+  }, [request, mintAddress, from, toChain, provider, accounts, connected]);
 
   return (
     <>

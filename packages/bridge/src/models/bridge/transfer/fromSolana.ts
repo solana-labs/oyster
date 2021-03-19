@@ -11,9 +11,6 @@ import {
 } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
-import { ASSET_CHAIN } from '../../../utils/assets';
-import { BigNumber } from 'ethers/utils';
-import { Erc20Factory } from '../../../contracts/Erc20Factory';
 import { WormholeFactory } from '../../../contracts/WormholeFactory';
 import { bridgeAuthorityKey } from './../helpers';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
