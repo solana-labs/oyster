@@ -8,7 +8,7 @@ export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
-export const TRANSACTION_SLOTS = 5;
+export const TRANSACTION_SLOTS = 4;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
 export enum TimelockInstruction {
@@ -43,6 +43,8 @@ export interface TimelockConfig {
   governanceMint: PublicKey;
   /// Program ID that is tied to this config (optional)
   program: PublicKey;
+  /// Time limit in slots for proposal to be open to voting
+  timeLimit: BN;
   /// Optional name
   name: string;
 }
@@ -57,6 +59,7 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
     Layout.publicKey('program'),
+    Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
   ],
 );
@@ -95,6 +98,9 @@ export enum TimelockStateStatus {
 
   /// Deleted
   Deleted = 4,
+
+  /// Defeated
+  Defeated = 5,
 }
 
 export const STATE_COLOR: Record<string, string> = {
@@ -103,6 +109,7 @@ export const STATE_COLOR: Record<string, string> = {
   [TimelockStateStatus.Executing]: 'green',
   [TimelockStateStatus.Completed]: 'purple',
   [TimelockStateStatus.Deleted]: 'gray',
+  [TimelockStateStatus.Defeated]: 'red',
 };
 
 export interface TimelockState {
@@ -111,6 +118,10 @@ export interface TimelockState {
   timelockTransactions: PublicKey[];
   name: string;
   descLink: string;
+  votingEndedAt: BN;
+  votingBeganAt: BN;
+  executions: number;
+  usedTxnSlots: number;
 }
 
 const timelockTxns = [];
@@ -137,6 +148,10 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
+    Layout.uint64('votingEndedAt'),
+    Layout.uint64('votingBeganAt'),
+    BufferLayout.u8('executions'),
+    BufferLayout.u8('usedTxnSlots'),
     ...timelockTxns,
   ],
 );
@@ -248,6 +263,10 @@ export const TimelockSetParser = (
         descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
         name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
         timelockTransactions: timelockTxns,
+        votingEndedAt: data.votingEndedAt,
+        votingBeganAt: data.votingBeganAt,
+        executions: data.executions,
+        usedTxnSlots: data.usedTxnSlots,
       },
     },
   };
@@ -298,9 +317,10 @@ export const TimelockConfigParser = (
       executionType: data.executionType,
       timelockType: data.timelockType,
       votingEntryRule: data.votingEntryRule,
-      minimimSlotWaitingPeriod: data.minimimSlotWaitingPeriod,
+      minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
       program: data.program,
+      timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
     },
   };
