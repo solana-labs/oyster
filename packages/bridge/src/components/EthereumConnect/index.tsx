@@ -1,13 +1,27 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Dropdown, Menu } from 'antd';
 
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { shortenAddress } from '@oyster/common';
 import { useEthereum } from '../../contexts';
 
 export const EthereumConnect = () => {
-  const { accounts, onConnectEthereum, connected, walletProvider } = useEthereum();
+  const {
+    accounts,
+    onConnectEthereum,
+    connected,
+    walletProvider,
+    select,
+  } = useEthereum();
   const { hasCorrespondingNetworks } = useCorrectNetwork();
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="3" onClick={select}>
+        Change Eth Wallet
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <div style={{ marginRight: 8 }}>
@@ -28,6 +42,13 @@ export const EthereumConnect = () => {
             WRONG NETWORK
           </Button>
         )
+      ) : !!walletProvider ? (
+        <Dropdown.Button
+          onClick={() => onConnectEthereum && onConnectEthereum()}
+          overlay={menu}
+        >
+          Connect Ethereum
+        </Dropdown.Button>
       ) : (
         <Button onClick={() => onConnectEthereum && onConnectEthereum()}>
           Connect Ethereum

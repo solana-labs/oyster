@@ -119,7 +119,7 @@ export const TokenSelectModal = (props: {
         visible={isModalVisible}
         onCancel={() => hideModal()}
         footer={null}
-        className={"token-select-modal"}
+        className={'token-select-modal'}
       >
         <Input
           autoFocus
