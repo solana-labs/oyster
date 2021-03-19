@@ -86,7 +86,12 @@ export const Transfer = () => {
 
   useEffect(() => {
     const asset = mintAddress;
-    if (!asset || (asset === request?.info?.address && request.from === from && request.toChain === toChain)) {
+    if (
+      !asset ||
+      (asset === request?.info?.address &&
+        request.from === from &&
+        request.toChain === toChain)
+    ) {
       return;
     }
 
@@ -99,7 +104,6 @@ export const Transfer = () => {
       try {
         const bridgeAddress = programIds().wormhole.bridge;
         if (from === ASSET_CHAIN.Ethereum) {
-
           let signer = provider.getSigner();
           let e = WrappedAssetFactory.connect(asset, provider);
           let addr = await signer.getAddress();

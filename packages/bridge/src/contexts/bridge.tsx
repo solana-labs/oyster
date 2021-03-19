@@ -1,8 +1,4 @@
-import React, {
-  createContext,
-  FunctionComponent,
-  useContext,
-} from 'react';
+import React, { createContext, FunctionComponent, useContext } from 'react';
 import { SolanaBridge } from '../core';
 import {
   useConnection,
