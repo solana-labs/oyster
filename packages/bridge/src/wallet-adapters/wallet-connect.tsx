@@ -53,7 +53,7 @@ export class WalletConnectWalletAdapter
 
     //  Create WalletConnect Provider
     const walletConnectProvider = new WalletConnectProvider({
-      infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
+      infuraId: "535ab8649e9f40cface13cbded7d647e",
     });
     walletConnectProvider.enable().then(()=>{
       const provider = new ethers.providers.Web3Provider(walletConnectProvider);
