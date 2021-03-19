@@ -2,12 +2,9 @@ import * as solanaWeb3 from '@solana/web3.js';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import assert from 'assert';
-import * as spl from '@solana/spl-token';
-import { Token } from '@solana/spl-token';
 // @ts-ignore
 import * as BufferLayout from 'buffer-layout';
 import * as bs58 from 'bs58';
-import { utils } from '@oyster/common';
 
 export interface Lockup {
   lockupAddress: PublicKey;

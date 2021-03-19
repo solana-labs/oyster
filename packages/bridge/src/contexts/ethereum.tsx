@@ -101,22 +101,22 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
   }, [setTokens]);
 
   const onConnectEthereum = () => {
-    // @ts-ignore
-    window.ethereum.request({ method: 'eth_requestAccounts' }).then(() => {
+    (async () => {
       // @ts-ignore
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
       const provider = new ethers.providers.Web3Provider(
         (window as any).ethereum,
       );
       const signer = provider.getSigner();
-      signer.getAddress().then(account => {
-        setAccounts([account]);
-        setConnected(true);
-      });
-      provider.getNetwork().then(network => {
-        setChainId(network.chainId);
-      });
+      const account = await signer.getAddress();
+      const network = await provider.getNetwork();
+
+      setChainId(network.chainId);
       setProvider(provider);
-    });
+      setAccounts([account]);
+      setConnected(true);
+    })();
   };
 
   useEffect(() => {
