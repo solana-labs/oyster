@@ -92,4 +92,10 @@ export const LABELS = {
   LEAVE_BLANK_IF_YOU_WANT_ONE: 'Leave blank if you want one made for you',
   ADDITIONAL_VOTING_MSG:
     ' Please note that during voting, you cannot withdraw tokens you have used to vote. You must wait for the vote to complete.',
+  SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
+  SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
+  DELAY: 'Slot Delay',
+  MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
+  TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',
+  TIME_LIMIT: 'Voting Time Limit',
 };

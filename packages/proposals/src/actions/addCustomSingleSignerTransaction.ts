@@ -89,6 +89,7 @@ export const addCustomSingleSignerTransaction = async (
       proposal.pubkey,
       sigAccount,
       proposal.info.signatoryValidation,
+      proposal.info.config,
       transferAuthority.publicKey,
       authority,
       slot,

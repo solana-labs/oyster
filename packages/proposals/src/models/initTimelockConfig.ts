@@ -24,6 +24,7 @@ export const initTimelockConfigInstruction = (
   timelockType: number,
   votingEntryRule: number,
   minimumSlotWaitingPeriod: BN,
+  timeLimit: BN,
   name: string,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
@@ -39,6 +40,7 @@ export const initTimelockConfigInstruction = (
     BufferLayout.u8('timelockType'),
     BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
+    Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
   ]);
 
@@ -57,6 +59,7 @@ export const initTimelockConfigInstruction = (
       timelockType,
       votingEntryRule,
       minimumSlotWaitingPeriod,
+      timeLimit,
       name: nameAsBytes,
     },
     data,

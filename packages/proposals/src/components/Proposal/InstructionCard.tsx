@@ -11,6 +11,7 @@ import { Card, Spin } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useState } from 'react';
 import { execute } from '../../actions/execute';
+import { LABELS } from '../../constants';
 import {
   TimelockSet,
   TimelockStateStatus,
@@ -47,7 +48,9 @@ export function InstructionCard({
         description={
           <>
             <p>Instruction: TODO</p>
-            <p>Slot: {instruction.info.slot.toNumber()}</p>
+            <p>
+              {LABELS.DELAY}: {instruction.info.slot.toNumber()}
+            </p>
           </>
         }
       />
@@ -108,7 +111,8 @@ function PlayStatusButton({
   };
 
   if (proposal.info.state.status != TimelockStateStatus.Executing) return null;
-  if (currSlot < instruction.info.slot.toNumber()) return null;
+  const elapsedTime = currSlot - proposal.info.state.votingEndedAt.toNumber();
+  if (elapsedTime < instruction.info.slot.toNumber()) return null;
 
   if (playing === Playstate.Unplayed)
     return (
