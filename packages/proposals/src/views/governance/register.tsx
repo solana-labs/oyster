@@ -79,18 +79,25 @@ export function NewForm({
     consensusAlgorithm: ConsensusAlgorithm;
     votingEntryRule: VotingEntryRule;
     minimumSlotWaitingPeriod: string;
+    timeLimit: string;
     governanceMint: string;
     program: string;
     name: string;
   }) => {
     if (!values.minimumSlotWaitingPeriod.match(/^\d*$/)) {
       notify({
-        message: 'Minimum Slot Waiting Period can only be numeric',
+        message: LABELS.MIN_SLOT_MUST_BE_NUMERIC,
         type: 'error',
       });
       return;
     }
-
+    if (!values.timeLimit.match(/^\d*$/)) {
+      notify({
+        message: LABELS.TIME_LIMIT_MUST_BE_NUMERIC,
+        type: 'error',
+      });
+      return;
+    }
     const uninitializedConfig = {
       timelockType: values.timelockType,
       executionType: values.executionType,
@@ -102,6 +109,7 @@ export function NewForm({
         : undefined,
       program: new PublicKey(values.program),
       name: values.name,
+      timeLimit: new BN(values.timeLimit),
     };
 
     const newConfig = await registerProgramGovernance(
@@ -139,6 +147,13 @@ export function NewForm({
         <Form.Item
           name="minimumSlotWaitingPeriod"
           label={LABELS.MINIMUM_SLOT_WAITING_PERIOD}
+          rules={[{ required: true }]}
+        >
+          <Input maxLength={64} />
+        </Form.Item>
+        <Form.Item
+          name="timeLimit"
+          label={LABELS.TIME_LIMIT}
           rules={[{ required: true }]}
         >
           <Input maxLength={64} />

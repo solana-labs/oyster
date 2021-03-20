@@ -9,10 +9,12 @@ import { AppBar } from '@oyster/common';
 import Wormhole from '../Wormhole';
 import { Footer as AppFooter } from './../Footer';
 import { EthereumConnect } from '../EthereumConnect';
+import { useEthereum } from '../../contexts';
 
 const { Header, Content, Footer } = Layout;
 
 export const AppLayout = React.memo((props: any) => {
+  const { connected, disconnect } = useEthereum();
   const location = useLocation();
   const [wormholeReady, setWormholeReady] = useState(false);
 
@@ -41,7 +43,21 @@ export const AppLayout = React.memo((props: any) => {
                     <h2>WORMHOLE</h2>
                   </Link>
                 </div>
-                <AppBar useWalletBadge={true} left={<EthereumConnect />} />
+                <AppBar
+                  additionalSettings={
+                    connected ? (
+                      <Button
+                        type="primary"
+                        onClick={() => disconnect()}
+                        style={{ marginTop: '8px' }}
+                      >
+                        Disconnect ETH
+                      </Button>
+                    ) : undefined
+                  }
+                  useWalletBadge={true}
+                  left={<EthereumConnect />}
+                />
               </Header>
             )}
             <Content style={{ padding: '0 50px', flexDirection: 'column' }}>

@@ -111,6 +111,7 @@ export const registerProgramGovernance = async (
         TimelockType.CustomSingleSignerV1,
       uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,
       uninitializedTimelockConfig.minimumSlotWaitingPeriod || new BN(0),
+      uninitializedTimelockConfig.timeLimit || new BN(0),
       uninitializedTimelockConfig.name || '',
     ),
   );

@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { notify } from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-base'
+import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
 
 export class MetamaskWalletAdapter
@@ -95,8 +95,9 @@ export class MetamaskWalletAdapter
   }
 
   disconnect() {
-    if (this._publicKey) {
+    if (this._provider) {
       this._publicKey = null;
+      this._provider = null;
       this.emit('disconnect');
     }
   }

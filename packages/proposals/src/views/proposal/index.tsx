@@ -257,6 +257,7 @@ function InnerProposalView({
               <Col xs={24} sm={24} md={12} lg={8}>
                 <NewInstructionCard
                   proposal={proposal}
+                  config={timelockConfig}
                   position={instructionsForProposal.length}
                 />
               </Col>

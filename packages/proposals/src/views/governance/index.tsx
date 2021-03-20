@@ -20,6 +20,7 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
 import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
+import BN from 'bn.js';
 const { useUserAccounts } = hooks;
 const columns = [
   {
@@ -47,14 +48,21 @@ const columns = [
   },
   {
     title: LABELS.VOTING_ENTRY_RULES,
-    dataIndex: 'votingEntryRules',
-    key: 'votingEntryRules',
+    dataIndex: 'votingEntryRule',
+    key: 'votingEntryRule',
     render: (number: number) => <span>{VotingEntryRule[number]}</span>,
   },
   {
     title: LABELS.MINIMUM_SLOT_WAITING_PERIOD,
     dataIndex: 'minimumSlotWaitingPeriod',
     key: 'minimumSlotWaitingPeriod',
+    render: (number: BN) => <span>{number.toNumber()}</span>,
+  },
+  {
+    title: LABELS.TIME_LIMIT,
+    dataIndex: 'timeLimit',
+    key: 'timeLimit',
+    render: (number: BN) => <span>{number.toNumber()}</span>,
   },
   {
     title: LABELS.GOVERNANCE_MINT,

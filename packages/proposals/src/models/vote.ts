@@ -1,4 +1,8 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
@@ -23,6 +27,7 @@ import BN from 'bn.js';
 ///   10. `[]` Timelock program mint authority
 ///   11. `[]` Timelock program account pub key.
 ///   12. `[]` Token program account.
+///   13. `[]` Clock sysvar.
 export const voteInstruction = (
   timelockSetAccount: PublicKey,
   votingAccount: PublicKey,
@@ -75,6 +80,7 @@ export const voteInstruction = (
       isWritable: false,
     },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
   ];
 
   return new TransactionInstruction({

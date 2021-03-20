@@ -70,7 +70,6 @@ export const createProposal = async (
     space: TimelockSetLayout.span,
     programId: PROGRAM_IDS.timelock.programId,
   });
-
   signers.push(timelockSetKey);
   instructions.push(uninitializedTimelockSetInstruction);
 

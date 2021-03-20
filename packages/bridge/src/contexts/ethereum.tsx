@@ -14,13 +14,13 @@ import { useWallet as useEthereumWallet } from 'use-wallet';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // @ts-ignore
 import Fortmatic from 'fortmatic';
-import { useWallet, useLocalStorageState} from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-base'
+import { useWallet, useLocalStorageState } from '@oyster/common';
+import { WalletAdapter } from '@solana/wallet-base';
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
 import { MetamaskWalletAdapter } from '../wallet-adapters/metamask';
 import { Button, Modal } from 'antd';
-import {WalletConnectWalletAdapter} from "../wallet-adapters/wallet-connect";
+import { WalletConnectWalletAdapter } from '../wallet-adapters/wallet-connect';
 
 const ASSETS_URL =
   'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
@@ -48,6 +48,8 @@ export interface EthereumContextState {
   connected: boolean;
   chainId: number;
   walletProvider: any;
+  select: () => void;
+  disconnect: () => void;
   onConnectEthereum?: () => void;
 }
 
@@ -57,6 +59,8 @@ export const EthereumContext = createContext<EthereumContextState>({
   accounts: [''],
   chainId: 0,
   connected: false,
+  select() {},
+  disconnect() {},
   walletProvider: null,
 });
 
@@ -142,12 +146,12 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
   }, [setTokens]);
 
   const onConnectEthereum = useCallback(() => {
-    if (wallet && providerUrl) {
+    if (wallet && providerUrl && !connected) {
       wallet.connect();
-    } else {
+    } else if (!connected) {
       select();
     }
-  }, [wallet, providerUrl]);
+  }, [wallet, connected, providerUrl]);
 
   useEffect(() => {
     if (wallet) {
@@ -162,6 +166,11 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
       });
       wallet.on('disconnect', error => {
         setConnected(false);
+        setAccounts([]);
+        // @ts-ignore
+        setChainId(0);
+        // @ts-ignore
+        setProvider(null);
       });
       // @ts-ignore
       wallet.on('accountsChanged', accounts => {
@@ -184,10 +193,10 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
   const close = useCallback(() => setIsModalVisible(false), []);
 
   useEffect(() => {
-    if (walletConnected && !connected) {
+    if (walletConnected) {
       onConnectEthereum();
     }
-  }, [walletConnected, connected, providerUrl]);
+  }, [walletConnected, providerUrl]);
 
   return (
     <EthereumContext.Provider
@@ -199,6 +208,8 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
         connected,
         chainId,
         walletProvider,
+        select,
+        disconnect: () => wallet?.disconnect(),
         onConnectEthereum: () => onConnectEthereum(),
       }}
     >

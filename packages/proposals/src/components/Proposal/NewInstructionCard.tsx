@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Card, Progress, Spin } from 'antd';
 import { Form, Input } from 'antd';
-import { INSTRUCTION_LIMIT, TimelockSet } from '../../models/timelock';
+import {
+  INSTRUCTION_LIMIT,
+  TimelockConfig,
+  TimelockSet,
+} from '../../models/timelock';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { LABELS } from '../../constants';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -25,8 +30,10 @@ enum UploadType {
 export function NewInstructionCard({
   proposal,
   position,
+  config,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  config: ParsedAccount<TimelockConfig>;
   position: number;
 }) {
   const [form] = Form.useForm();
@@ -41,7 +48,19 @@ export function NewInstructionCard({
   }) => {
     if (!values.slot.match(/^\d*$/)) {
       notify({
-        message: 'Slot can only be numeric',
+        message: LABELS.SLOT_MUST_BE_NUMERIC,
+        type: 'error',
+      });
+      return;
+    }
+
+    if (
+      parseInt(values.slot) < config.info.minimumSlotWaitingPeriod.toNumber()
+    ) {
+      notify({
+        message:
+          LABELS.SLOT_MUST_BE_GREATER_THAN +
+          config.info.minimumSlotWaitingPeriod.toString(),
         type: 'error',
       });
       return;
@@ -69,7 +88,11 @@ export function NewInstructionCard({
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item name="slot" label="Slot" rules={[{ required: true }]}>
+        <Form.Item
+          name="slot"
+          label={LABELS.DELAY}
+          rules={[{ required: true }]}
+        >
           <Input maxLength={64} />
         </Form.Item>
         <Form.Item
