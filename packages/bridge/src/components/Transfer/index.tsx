@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import { contexts, ConnectButton, programIds, notify } from '@oyster/common';
+import { contexts, ConnectButton, programIds, notify, cache, useUserAccounts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import {
+  bridgeAuthorityKey,
+  displayBalance,
   fromSolana,
   ProgressUpdate,
   toSolana,
   TransferRequest,
+  wrappedAssetMintKey,
 } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
@@ -19,6 +22,7 @@ import BN from 'bn.js';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
+import { BigNumber } from 'ethers/utils';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -41,8 +45,8 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
-  const { provider, accounts, tokenMap } = useEthereum();
+  const { wallet } = useWallet();
+  const { provider, tokenMap } = useEthereum();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
     A,
@@ -53,7 +57,7 @@ export const Transfer = () => {
   } = useTokenChainPairState();
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
-    toChain: ASSET_CHAIN.Solana,
+    to: ASSET_CHAIN.Solana,
   });
 
   useEffect(() => {
@@ -75,106 +79,10 @@ export const Transfer = () => {
       amount: A.amount,
       asset: mintAddress,
       from: A.chain,
-      toChain: B.chain,
+      to: B.chain,
+      info: A.info,
     });
   }, [A, B, mintAddress]);
-
-  const from = A.chain;
-  const toChain = B.chain;
-
-  console.log(from);
-
-  useEffect(() => {
-    const asset = mintAddress;
-    if (!asset || (asset === request?.info?.address && request.from === from && request.toChain === toChain)) {
-      return;
-    }
-
-    console.log(from);
-
-    (async () => {
-      if (!provider || !accounts[0]) {
-        return;
-      }
-      try {
-        const bridgeAddress = programIds().wormhole.bridge;
-        if (from === ASSET_CHAIN.Ethereum) {
-
-          let signer = provider.getSigner();
-          let e = WrappedAssetFactory.connect(asset, provider);
-          let addr = await signer.getAddress();
-          let balance = await e.balanceOf(addr);
-          let decimals = await e.decimals();
-          let symbol = await e.symbol();
-
-          let allowance = await e.allowance(addr, bridgeAddress);
-
-          let info = {
-            address: asset,
-            name: symbol,
-            balance: balance,
-            balanceAsNumber:
-              new BN(balance.toString())
-                .div(new BN(10).pow(new BN(decimals - 2)))
-                .toNumber() / 100,
-            allowance: allowance,
-            decimals: decimals,
-            isWrapped: false,
-            chainID: ASSET_CHAIN.Ethereum,
-            assetAddress: Buffer.from(asset.slice(2), 'hex'),
-            mint: '',
-          };
-
-          let b = WormholeFactory.connect(bridgeAddress, provider);
-
-          let isWrapped = await b.isWrappedAsset(asset);
-          if (isWrapped) {
-            info.chainID = await e.assetChain();
-            info.assetAddress = Buffer.from(
-              (await e.assetAddress()).slice(2),
-              'hex',
-            );
-            info.isWrapped = true;
-          }
-
-          setRequest({
-            ...request,
-            from,
-            toChain,
-            asset,
-            info,
-          });
-        } else {
-          console.log('Asset: ', asset);
-          //debugger;
-
-          // get user address from asset
-          //
-
-          // let info = {
-          //   address: fromAddress,
-          //   name: "",
-          //   balance: acc.balance,
-          //   allowance: 0,
-          //   decimals: acc.assetMeta.decimals,
-          //   isWrapped: acc.assetMeta.chain != ChainID.SOLANA,
-          //   chainID: acc.assetMeta.chain,
-          //   assetAddress: acc.assetMeta.address,
-
-          //   // Solana specific
-          //   mint: acc.mint,
-          // };
-        }
-      } catch (e) {
-        console.error(e.toString());
-        notify({
-          message: `Error getting asset (${asset}) information`,
-          description: e.toString(),
-          type: 'error',
-        });
-      }
-    })();
-  }, [request, mintAddress, from, toChain, provider, accounts, connected]);
 
   return (
     <>
@@ -182,7 +90,7 @@ export const Transfer = () => {
         <Input
           title={`From ${chainToName(request.from)}`}
           asset={request.asset}
-          balance={request.info?.balanceAsNumber || 0}
+          balance={displayBalance(A.info)}
           setAsset={asset => setAssetInformation(asset)}
           chain={A.chain}
           amount={A.amount}
@@ -213,8 +121,9 @@ export const Transfer = () => {
           ⇅
         </Button>
         <Input
-          title={`To ${chainToName(request.toChain)}`}
+          title={`To ${chainToName(request.to)}`}
           asset={request.asset}
+          balance={displayBalance(B.info)}
           setAsset={asset => setAssetInformation(asset)}
           chain={B.chain}
           amount={B.amount}
@@ -267,7 +176,7 @@ export const Transfer = () => {
                     );
                   }
 
-                  if (request.toChain === ASSET_CHAIN.Solana) {
+                  if (request.to === ASSET_CHAIN.Solana) {
                     await toSolana(
                       connection,
                       wallet,
@@ -296,7 +205,7 @@ export const Transfer = () => {
                 <div style={{ display: 'flex' }}>
                   <div>
                     <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
-                      request.toChain,
+                      request.to,
                     )} Mainnet`}</h5>
                     <h2>
                       {request.amount?.toString()} {request.info?.name}
@@ -317,7 +226,7 @@ export const Transfer = () => {
                     <span style={{ margin: 15 }}>{'➔'}</span>
                     <TokenDisplay
                       asset={request.asset}
-                      chain={request.toChain}
+                      chain={request.to}
                       token={token}
                     />
                   </div>

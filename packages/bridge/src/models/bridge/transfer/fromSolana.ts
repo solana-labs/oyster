@@ -31,7 +31,7 @@ export const fromSolana = async (
     !request.asset ||
     !request.amount ||
     !request.recipient ||
-    !request.toChain ||
+    !request.to ||
     !request.info
   ) {
     return;
@@ -69,7 +69,7 @@ export const fromSolana = async (
       if (
         !request.amount ||
         !request.recipient ||
-        !request.toChain ||
+        !request.to ||
         !request.info ||
         !wallet.publicKey
       ) {
@@ -90,7 +90,7 @@ export const fromSolana = async (
         new PublicKey(request.info.address),
         new PublicKey(request.info.mint),
         new BN(request.amount.toString()),
-        request.toChain,
+        request.to,
         request.recipient,
         {
           chain: request.info.chainID,

@@ -216,7 +216,7 @@ export const toSolana = async (
         !amountBN ||
         !request.asset ||
         !request.recipient ||
-        !request.toChain ||
+        !request.to ||
         !request.info
       ) {
         return;
@@ -236,7 +236,7 @@ export const toSolana = async (
           request.asset,
           amountBN,
           request.recipient,
-          request.toChain,
+          request.to,
           nonce,
           false,
         );

@@ -7,12 +7,17 @@ import React, {
 } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import bs58 from 'bs58';
-import { useConnection, useConnectionConfig } from '@oyster/common';
+import { programIds, useConnection, useConnectionConfig, useUserAccounts } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
 import { ASSET_CHAIN, filterModalSolTokens } from '../utils/assets';
 import { useEthereum } from './ethereum';
-
+import { BigNumber } from 'ethers/utils';
+import { WrappedAssetFactory } from '../contracts/WrappedAssetFactory';
+import { WormholeFactory } from '../contracts/WormholeFactory';
+import { bridgeAuthorityKey, TransferRequestInfo, wrappedAssetMintKey } from '../models/bridge';
 export interface TokenChainContextState {
+  info?: TransferRequestInfo;
+
   amount: number;
   setAmount: (val: number) => void;
   chain: ASSET_CHAIN;
@@ -72,9 +77,106 @@ function getDefaultTokens(tokens: TokenInfo[], search: string) {
   };
 }
 
-export const useCurrencyLeg = () => {
+export const useCurrencyLeg = (mintAddress: string) => {
   const [amount, setAmount] = useState(0);
   const [chain, setChain] = useState(ASSET_CHAIN.Ethereum);
+  const [info, setInfo] = useState<TransferRequestInfo>();
+  const { userAccounts } = useUserAccounts();
+
+  const { provider, tokens: ethTokens } = useEthereum();
+  const { tokens: solTokens } = useConnectionConfig();
+  const connection = useConnection();
+
+  useEffect(() => {
+    if(!provider || !connection) {
+      return;
+    }
+
+    (async () => {
+      const ethToken = ethTokens.find(t => t.address === mintAddress);
+      const solToken = solTokens.find(t => t.address === mintAddress);
+
+      // eth assets on eth chain
+      // eth asset on sol chain
+      // sol asset on eth chain
+      // sol asset on sol chain
+
+      let ethAddress: string = '';
+      if (solToken) {
+        // let signer = provider.getSigner();
+        // let e = WrappedAssetFactory.connect(asset, provider);
+        // let addr = await signer.getAddress();
+        // let decimals = await e.decimals();
+        // let symbol = await e.symbol();
+
+        // TODO: checked if mint is wrapped mint from eth...
+
+        const accounts = userAccounts
+              .filter(a => a.info.mint.toBase58() === solToken.address)
+              .sort((a, b) => a.info.amount.toNumber() - b.info.amount.toNumber());
+
+        console.log(accounts);
+      }
+
+
+      if (ethToken) {
+        let signer = provider.getSigner();
+        let e = WrappedAssetFactory.connect(mintAddress, provider);
+        let addr = await signer.getAddress();
+        let decimals = await e.decimals();
+        let symbol = await e.symbol();
+        const ethBridgeAddress = programIds().wormhole.bridge;
+        let allowance = await e.allowance(addr, ethBridgeAddress);
+        const assetAddress = Buffer.from(mintAddress.slice(2), 'hex');
+
+        let info = {
+          address: mintAddress,
+          name: symbol,
+          balance: new BigNumber(0),
+          allowance,
+          decimals,
+          isWrapped: false,
+          chainID: ASSET_CHAIN.Ethereum,
+          assetAddress,
+          mint: '',
+        };
+
+        let b = WormholeFactory.connect(ethBridgeAddress, provider);
+        let isWrapped = await b.isWrappedAsset(mintAddress);
+        if (isWrapped) {
+          info.chainID = await e.assetChain();
+          info.assetAddress = Buffer.from(
+            (addr).slice(2),
+            'hex',
+          );
+          info.isWrapped = true;
+        }
+
+        if(chain === ASSET_CHAIN.Ethereum) {
+          info.balance = await e.balanceOf(addr);
+        } else {
+          // TODO: get balance on other chains for assets that came from eth
+
+          const bridgeId = programIds().wormhole.pubkey;
+          const bridgeAuthority = await bridgeAuthorityKey(bridgeId);
+
+          wrappedAssetMintKey(bridgeId, bridgeAuthority, {
+            decimals: Math.min(9, info.decimals),
+            address: info.assetAddress,
+            chain: info.chainID
+          })
+        }
+
+        setInfo(info);
+      }
+
+
+
+    })();
+
+
+
+  }, [connection, provider, setInfo, chain, mintAddress, ethTokens, solTokens, userAccounts])
 
   return useMemo(
     () => ({
@@ -82,6 +184,7 @@ export const useCurrencyLeg = () => {
       setAmount: setAmount,
       chain: chain,
       setChain: setChain,
+      info
     }),
     [amount, setAmount, chain, setChain],
   );
@@ -96,16 +199,15 @@ export function TokenChainPairProvider({ children = null as any }) {
   const [lastTypedAccount, setLastTypedAccount] = useState(0);
   const [mintAddress, setMintAddress] = useState('');
 
-  const base = useCurrencyLeg();
+  const base = useCurrencyLeg(mintAddress);
   const amountA = base.amount;
   const setAmountA = base.setAmount;
   const chainA = base.chain;
   const setChainA = base.setChain;
 
-  const quote = useCurrencyLeg();
+  const quote = useCurrencyLeg(mintAddress);
   const amountB = quote.amount;
   const setAmountB = quote.setAmount;
-  const chainB = quote.chain;
   const setChainB = quote.setChain;
 
   const tokens = useMemo(

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import { ASSET_CHAIN } from '../constants';
@@ -14,7 +15,6 @@ export interface TransferRequestInfo {
   address: string;
   name: string;
   balance: BigNumber;
-  balanceAsNumber: number;
   decimals: number;
   allowance: BigNumber;
   isWrapped: boolean;
@@ -31,6 +31,18 @@ export interface TransferRequest {
   from?: ASSET_CHAIN;
   asset?: string;
 
-  toChain?: ASSET_CHAIN;
+  to?: ASSET_CHAIN;
   recipient?: Buffer;
 }
+
+export const displayBalance = (info?: TransferRequestInfo) => {
+  try {
+    return (
+      new BN(info?.balance?.toString() || 0)
+        .div(new BN(10).pow(new BN(Math.min((info?.decimals || 0) - 2, 0))))
+        .toNumber() / 100
+    );
+  } catch {
+    return 0;
+  }
+};
