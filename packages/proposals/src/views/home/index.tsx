@@ -11,11 +11,11 @@ export const HomeView = () => {
   const context = useProposals();
   const [page, setPage] = useState(0);
   const listData = useMemo(() => {
-    const newListData: any[][] = [[]];
+    const newListData: any[] = [];
 
     Object.keys(context.proposals).forEach(key => {
       const proposal = context.proposals[key];
-      newListData[newListData.length - 1].push({
+      newListData.push({
         href: '#/proposal/' + key,
         title: proposal.info.state.name,
         proposal,
@@ -27,8 +27,6 @@ export const HomeView = () => {
           proposal.info.state.descLink
         ),
       });
-      if (newListData[newListData.length - 1].length == PAGE_SIZE)
-        newListData.push([]);
     });
     return newListData;
   }, [context.proposals]);
@@ -45,7 +43,7 @@ export const HomeView = () => {
             },
             pageSize: PAGE_SIZE,
           }}
-          dataSource={listData[page]}
+          dataSource={listData}
           renderItem={item => (
             <StateBadgeRibbon proposal={item.proposal}>
               <List.Item key={item.title}>
