@@ -7,6 +7,14 @@ const appDirectory = fs.realpathSync(process.cwd());
 const resolvePackage = relativePath => path.resolve(appDirectory, relativePath);
 
 module.exports = {
+  webpack: {
+    configure: (webpackConfig, { env, paths }) => {
+      paths.appBuild = webpackConfig.output.path = path.resolve(
+        './../../build/proposals',
+      );
+      return webpackConfig;
+    },
+  },
   plugins: [
     {
       plugin: CracoLessPlugin,
