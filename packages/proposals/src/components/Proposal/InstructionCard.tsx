@@ -9,7 +9,7 @@ import {
 import { ParsedAccount, contexts } from '@oyster/common';
 import { Card, Spin } from 'antd';
 import Meta from 'antd/lib/card/Meta';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
@@ -96,7 +96,21 @@ function PlayStatusButton({
   const wallet = useWallet();
   const connection = useConnection();
   const [currSlot, setCurrSlot] = useState(0);
-  connection.getSlot().then(setCurrSlot);
+
+  const elapsedTime = currSlot - proposal.info.state.votingEndedAt.toNumber();
+  const ineligibleToSee = elapsedTime < instruction.info.slot.toNumber();
+
+  useEffect(() => {
+    if (ineligibleToSee) {
+      const id = setInterval(() => {
+        connection.getSlot().then(setCurrSlot);
+      }, 400);
+
+      return () => {
+        clearInterval(id);
+      };
+    }
+  }, [ineligibleToSee, connection]);
 
   const run = async () => {
     setPlaying(Playstate.Playing);
@@ -111,8 +125,7 @@ function PlayStatusButton({
   };
 
   if (proposal.info.state.status != TimelockStateStatus.Executing) return null;
-  const elapsedTime = currSlot - proposal.info.state.votingEndedAt.toNumber();
-  if (elapsedTime < instruction.info.slot.toNumber()) return null;
+  if (ineligibleToSee) return null;
 
   if (playing === Playstate.Unplayed)
     return (

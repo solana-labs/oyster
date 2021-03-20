@@ -45,11 +45,6 @@ export const AppLayout = React.memo((props: any) => {
       </div>
       <BasicLayout
         title={LABELS.APP_TITLE}
-        footerRender={() => (
-          <div className="footer" title={LABELS.FOOTER}>
-            {LABELS.FOOTER}
-          </div>
-        )}
         navTheme={theme}
         headerTheme={theme}
         theme={theme}
@@ -126,6 +121,9 @@ export const AppLayout = React.memo((props: any) => {
         }}
       >
         {props.children}
+        <div className="footer" title={LABELS.FOOTER}>
+          {LABELS.FOOTER}
+        </div>
       </BasicLayout>
     </div>
   );

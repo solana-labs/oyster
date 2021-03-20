@@ -78,18 +78,23 @@ function getAccountInfos(
     The addresses that do not require signatures follow the addresses that do, 
     again with read-write accounts first and read-only accounts following.
   */
-  const accountInfosInOrder = actualMessage.instructions[0].accounts.map(
-    a => actualMessage.accountKeys[a],
-  );
+  const { programIdIndex, accounts } = actualMessage.instructions[0];
+  const accountInfosInOrder = accounts.map(a => actualMessage.accountKeys[a]);
+  // If programIdIndex isnt in accountInfos, there's an off-by-one issue that happens here
+  // where one account that should be writable isnt, so we take care of here...
+  const totalSize =
+    accountInfosInOrder.length + (accounts.includes(programIdIndex) ? 0 : 1);
   const requireSigsOnlyNotWritable =
     actualMessage.header.numReadonlySignedAccounts;
   const requireNietherSigsNorWrite =
     actualMessage.header.numReadonlyUnsignedAccounts;
   const writableOnly =
-    accountInfosInOrder.length -
-    requireSigsOnlyNotWritable -
-    requireNietherSigsNorWrite;
-  const readOnly = requireSigsOnlyNotWritable + requireNietherSigsNorWrite;
+    totalSize - requireSigsOnlyNotWritable - requireNietherSigsNorWrite;
+  // and adjust here...
+  const readOnly =
+    requireSigsOnlyNotWritable +
+    requireNietherSigsNorWrite -
+    (totalSize - accountInfosInOrder.length);
 
   let position = 0;
 
@@ -125,5 +130,6 @@ function getAccountInfos(
       isSigner: false,
     });
   }
+
   return finalArray;
 }
