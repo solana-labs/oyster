@@ -1,7 +1,5 @@
 import * as BufferLayout from 'buffer-layout';
 
-/// ForeignAddress u8 - 32
-
 // 420
 export const GuardianSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [

@@ -1,15 +1,6 @@
 // 1340 - SigState - (VerifySignatures - parameter 4)
 // export const NOP = 0;
 
-// pub struct SignatureState {
-//   /// signatures of validators
-//   pub signatures: [[u8; 65]; MAX_LEN_GUARDIAN_KEYS],
-
-//   /// hash of the data
-//   pub hash: [u8; 32],
-
-// }
-
 import * as BufferLayout from 'buffer-layout';
 
 // 1184 TransferOutProposal

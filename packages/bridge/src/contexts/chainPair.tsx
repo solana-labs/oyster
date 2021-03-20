@@ -160,12 +160,16 @@ export const useCurrencyLeg = (mintAddress: string) => {
           const bridgeId = programIds().wormhole.pubkey;
           const bridgeAuthority = await bridgeAuthorityKey(bridgeId);
 
-          wrappedAssetMintKey(bridgeId, bridgeAuthority, {
+          const mint = await wrappedAssetMintKey(bridgeId, bridgeAuthority, {
             decimals: Math.min(9, info.decimals),
             address: info.assetAddress,
             chain: info.chainID
-          })
+          });
+
+          console.log(mint.toBase58());
         }
+
+        console.log(info);
 
         setInfo(info);
       }

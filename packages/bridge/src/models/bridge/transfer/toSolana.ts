@@ -5,7 +5,6 @@ import {
   cache,
   TokenAccountParser,
   ParsedAccount,
-  formatAmount,
   createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
 import { ethers } from 'ethers';
@@ -140,7 +139,7 @@ export const toSolana = async (
             step: counter++,
           });
 
-          const { txid } = await sendTransaction(
+          await sendTransaction(
             connection,
             wallet,
             instructions,
