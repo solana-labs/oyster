@@ -1,13 +1,10 @@
 import React from 'react';
 import './../../App.less';
-import { Divider, Layout, Menu } from 'antd';
+import { Breadcrumb, Layout } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
-import config from './../../../package.json';
 import { contexts, components } from '@oyster/common';
-import { NewProposalMenuItem } from '../../views/proposal/new';
-import { RegisterGovernanceMenuItem } from '../../views/governance/register';
 import { Content, Header } from 'antd/lib/layout/layout';
 import Logo from './dark-horizontal-combined-rainbow.inline.svg';
 
@@ -18,16 +15,30 @@ export const AppLayout = React.memo((props: any) => {
   const { env } = useConnectionConfig();
   const location = useLocation();
 
-  const paths: { [key: string]: string } = {
-    '/': '1',
-    '/dashboard': '2',
+  const breadcrumbNameMap: any = {
+    '/governance': 'Governance',
+    '/apps/1': 'Application1',
+    '/apps/2': 'Application2',
+    '/apps/1/detail': 'Detail',
+    '/apps/2/detail': 'Detail',
   };
 
-  const current =
-    [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
-    '';
-  const defaultKey = paths[current] || '1';
-  const theme = 'dark';
+  const pathSnippets = location.pathname.split('/').filter(i => i);
+  const extraBreadcrumbItems = pathSnippets.map((_, index) => {
+    const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
+    return (
+      <Breadcrumb.Item key={url}>
+        <Link to={url}>{breadcrumbNameMap[url]}</Link>
+      </Breadcrumb.Item>
+    );
+  });
+  const breadcrumbItems = [
+    <Breadcrumb.Item key="home">
+      <Link to="/">Home</Link>
+    </Breadcrumb.Item>,
+  ].concat(extraBreadcrumbItems);
+
+  // TODO: add breadcrumb
 
   return (
     <div className="App">
@@ -46,7 +57,8 @@ export const AppLayout = React.memo((props: any) => {
               useWalletBadge={true}
             />
           </Header>
-        <Content style={{ padding: '0 50px', flexDirection: 'column' }}>
+        <Content>
+          {/* <Breadcrumb>{breadcrumbItems}</Breadcrumb> */}
           {props.children}
         </Content>
       </Layout>

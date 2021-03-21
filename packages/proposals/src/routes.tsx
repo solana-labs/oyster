@@ -23,7 +23,7 @@ export function Routes() {
                   <Switch>
                     <Route exact path="/" component={() => <HomeView />} />
                     <Route path="/proposal/:id" children={<ProposalView />} />
-                    <Route path="/proposals/:id" children={<ProposalsView />} />
+                    <Route path="/governance/:id" children={<ProposalsView />} />
 
                     <Route
                       exact

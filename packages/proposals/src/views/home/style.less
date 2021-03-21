@@ -1,17 +1,23 @@
 @import '~antd/dist/antd.dark.less';
 
+.governance-container {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
 .governance-title {
   font-family: "FF Oxide Solid";
   font-style: normal;
   font-weight: 300;
   letter-spacing: 0px;
   position: absolute;
-  top: 240px;
-  left: calc(20% + 10px);
+  top: -40px;
   z-index: 2;
   display: flex;
   align-items: center;
-  right: calc(20% + 10px);
+  width: 100%;
+  padding: 0px 10px;
 
   h1 {
     font-size: 28px;
@@ -24,13 +30,32 @@
   background-color: #202020;
   padding: 0px !important;
   border-radius: 15px;
-  margin-left: 20%;
-  margin-right: 20%;
 
-  :hover {
-    cursor: pointer;
-    background-color: #252425;
-    border-radius: 15px;
+  .ant-badge-count  {
+    top: 8px !important;
+    right: 12px !important;
+  }
+
+  .ant-list-item-extra {
+    user-select: none;
+    pointer-events: none;
+    display: flex;
+    margin-left: 0px !important;
+    margin-right: auto;
+
+    .ant-statistic {
+      margin-top: 5px;
+      padding: 0px 20px;
+
+      .ant-statistic-content {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .ant-list-item-main {
+    flex: 0 !important;
+    min-width: 250px;
   }
 
   .ant-list-item-meta {
@@ -45,4 +70,10 @@
       margin-bottom: 0px;
     }
   }
+}
+
+.governance-item:hover {
+  cursor: pointer;
+  background-color: #252425;
+  border-radius: 15px;
 }

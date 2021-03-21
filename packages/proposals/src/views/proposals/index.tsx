@@ -2,10 +2,9 @@ import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useConfig, useProposals } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { StateBadge, StateBadgeRibbon } from '../../components/Proposal/StateBadge';
-import { urlRegex } from '../proposal';
+import { StateBadge } from '../../components/Proposal/StateBadge';
 import { useHistory, useParams } from 'react-router-dom';
-import { TokenIcon } from '@oyster/common';
+import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
 import { NewProposalMenuItem } from '../proposal/new';
 const PAGE_SIZE = 10;
 
@@ -15,6 +14,13 @@ export const ProposalsView = () => {
   const { proposals } = useProposals();
   const config = useConfig(id);
   const [page, setPage] = useState(0);
+  const { tokenMap } = useConnectionConfig();
+  const { connected } = useWallet();
+  const token = tokenMap.get(config?.info.governanceMint.toBase58() || '') as any;
+  const tokenBackground = token?.extensions?.background || 'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
+
+  const mint = config?.info.governanceMint.toBase58() || '';
+
   const listData = useMemo(() => {
     const newListData: any[] = [];
 
@@ -24,21 +30,12 @@ export const ProposalsView = () => {
         return;
       }
 
-
-
       newListData.push({
         href: '/proposal/' + key,
         title: proposal.info.state.name,
-        badge: <TokenIcon mintAddress={config?.info.governanceMint} size={30} />,
+        badge: <TokenIcon mintAddress={mint} size={30} />,
         status: proposal.info.state.status,
         proposal,
-        description: proposal.info.state.descLink.match(urlRegex) ? (
-          <a href={proposal.info.state.descLink} target={'_blank'}>
-            Link to markdown
-          </a>
-        ) : (
-          proposal.info.state.descLink
-        ),
       });
     });
     return newListData;
@@ -46,13 +43,18 @@ export const ProposalsView = () => {
 
 
   return (
-    <Row>
-      <Col flex="auto">
+    <Row style={{ background: `url(${tokenBackground})`, height: '100%' }}>
+      <Col flex="auto"  xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          <TokenIcon mintAddress={config?.info.governanceMint} size={40} />
-          <h1>{config?.info.name}</h1>
+          <TokenIcon mintAddress={config?.info.governanceMint} size={60} style={{ marginRight: 20 }} />
+          <div>
+            <h1>{config?.info.name}</h1>
+            <a href={tokenMap.get(mint)?.extensions?.website} target="_blank">
+              {tokenMap.get(mint)?.extensions?.website}
+            </a>
+          </div>
 
-          <NewProposalMenuItem className="proposals-new-btn" />
+          <NewProposalMenuItem className="proposals-new-btn" disabled={!connected} />
         </div>
         <List
           itemLayout="vertical"
