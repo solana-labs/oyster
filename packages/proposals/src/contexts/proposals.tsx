@@ -7,7 +7,7 @@ import {
 } from '@solana/web3.js';
 import { useMemo } from 'react';
 
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { utils, ParsedAccount, useConnectionConfig, cache } from '@oyster/common';
 import {
   CustomSingleSignerTimelockTransactionLayout,
   CustomSingleSignerTimelockTransactionParser,
@@ -19,9 +19,6 @@ import {
   TimelockSetParser,
   TimelockTransaction,
 } from '../models/timelock';
-
-const { useConnectionConfig } = contexts.Connection;
-const { cache } = contexts.Accounts;
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<TimelockSet>>;
@@ -155,3 +152,12 @@ export const useProposals = () => {
   const context = useContext(ProposalsContext);
   return context as ProposalsContextState;
 };
+
+export const useConfig = (id: string) => {
+  const context = useContext(ProposalsContext);
+  if(!context?.configs) {
+    return;
+  }
+
+  return context.configs[id];
+}

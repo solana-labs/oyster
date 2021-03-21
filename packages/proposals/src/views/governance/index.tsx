@@ -96,8 +96,6 @@ export const GovernanceDashboard = () => {
   const myTokenAccts = useUserAccounts()?.userAccounts?.map(a =>
     a.info.mint.toBase58(),
   );
-  console.log('Tokens', myTokenAccts);
-  console.log('Configs', configs);
   useEffect(() => {
     // We look for configs that share a mint with your token accounts - we
     // assume you weren't so dumb as to delete the token account corresponding to

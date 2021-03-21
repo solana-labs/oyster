@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal } from 'antd';
+import { Button, ButtonProps, Modal } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { Account } from '@solana/web3.js';
 import {
@@ -23,7 +23,7 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-export function NewProposalMenuItem() {
+export function NewProposalMenuItem(props: ButtonProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
 
@@ -42,14 +42,12 @@ export function NewProposalMenuItem() {
 
   return (
     <>
-      <Link
-        to={{
-          pathname: '/',
-        }}
+      <Button
         onClick={() => setIsModalVisible(true)}
+        {...props}
       >
         {LABELS.NEW_PROPOSAL}
-      </Link>
+      </Button>
       <NewForm
         handleOk={handleOk}
         handleCancel={handleCancel}

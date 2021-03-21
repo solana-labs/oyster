@@ -12,7 +12,7 @@ export function StateBadgeRibbon({
   children,
 }: {
   proposal: ParsedAccount<TimelockSet>;
-  children: any;
+  children?: any;
 }) {
   const status = proposal.info.state.status;
   let color = STATE_COLOR[status];

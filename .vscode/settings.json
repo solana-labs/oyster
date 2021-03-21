@@ -6,5 +6,8 @@
   },
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "prettier.prettierPath": ".vscode/pnpify/prettier/index.js"
+  "prettier.prettierPath": ".vscode/pnpify/prettier/index.js",
+  "cSpell.words": [
+    "Timelock"
+  ]
 }

@@ -1,8 +1,11 @@
 @import '~antd/dist/antd.dark.less';
 @import './ant-custom.less';
 
+@solana-green: #00FFA3;
+
 body {
   --row-highlight: @background-color-base;
+  background-color: #080808;
 }
 
 .App-logo {
@@ -14,37 +17,34 @@ body {
   width: 32px;
 }
 
-.footer {
-  background-color: black;
-  color: lightgray;
-  padding: 10px 10px;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.app-title {
+  font-family: "FF Oxide Solid";
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
+
+  h1 {
+    font-size: 48px;
+    margin: 0px;
+  }
+
+  h2 {
+    margin: 0px;
+
+    span {
+      display: inline-block;
+      font-size: 16px;
+      margin-bottom: 20px;
+      background: linear-gradient(270deg, @solana-green 0%, #DC1FFF 101.97%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
 }
 
 .action-spinner {
   position: absolute;
   right: 5px;
-}
-
-.Banner {
-  min-height: 30px;
-  width: 100%;
-  background-color: #fff704;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  // z-index: 10;
-}
-
-.Banner-description {
-  color: black;
-  text-align: center;
-  display: flex;
-  align-self: center;
-  align-items: center;
-  height: 100%;
 }
 
 .ant-tabs-nav-scroll {
@@ -121,18 +121,6 @@ em {
   align-items: center;
 }
 
-.flash-positive {
-  color: rgba(0, 255, 0, 0.6);
-}
-
-.flash-negative {
-  color: rgba(255, 0, 0, 0.6);
-}
-
-.ant-pro-basicLayout {
-  min-height: calc(100% - 30px) !important;
-}
-
 .ant-table-cell {
   padding: 6px 16px !important;
 }
@@ -164,6 +152,19 @@ em {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.ant-layout-header {
+  background-color: transparent !important;
+}
+
+.ant-layout {
+  background-color: #080808 !important;
+}
+
+.ant-layout-content {
+  background-color: #080808;
+  position: relative;
 }
 
 .ant-slider {

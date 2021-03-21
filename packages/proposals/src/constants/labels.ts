@@ -5,7 +5,7 @@ export const LABELS = {
   FOOTER:
     'This page was produced by the Solana Foundation ("SF") for internal educational and inspiration purposes only. SF does not encourage, induce or sanction the deployment, integration or use of Oyster or any similar application (including its code) in violation of applicable laws or regulations and hereby prohibits any such deployment, integration or use. Anyone using this code or a derivation thereof must comply with applicable laws and regulations when releasing related software.',
   MENU_HOME: 'Proposals',
-  NEW_PROPOSAL: 'New Proposal',
+  NEW_PROPOSAL: 'Add new proposal',
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Proposals',
   CONNECT_BUTTON: 'Connect',
@@ -70,7 +70,7 @@ export const LABELS = {
   CANCEL: 'Cancel',
   ADD_MORE_VOTES: 'Add More Votes',
   REFUND_TOKENS: 'Refund My Tokens',
-  REGISTER_GOVERNANCE: 'Register your Program with Proposals',
+  REGISTER_GOVERNANCE: 'Register',
   PROGRAM: 'Program ID',
   GOVERNANCE_MINT: 'Governance Mint ID',
   PROPOSAL_TYPE: 'Proposal Type',

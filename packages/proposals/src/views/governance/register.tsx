@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal } from 'antd';
+import { Button, ButtonProps, Modal } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -26,7 +26,7 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-export function RegisterGovernanceMenuItem() {
+export function RegisterGovernanceMenuItem(props: ButtonProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
   const handleOk = (a: PublicKey) => {
@@ -44,14 +44,12 @@ export function RegisterGovernanceMenuItem() {
 
   return (
     <>
-      <Link
-        to={{
-          pathname: '/',
-        }}
+      <Button
         onClick={() => setIsModalVisible(true)}
+        {...props}
       >
         {LABELS.REGISTER_GOVERNANCE}
-      </Link>
+      </Button>
       <NewForm
         handleOk={handleOk}
         handleCancel={handleCancel}

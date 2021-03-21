@@ -1,59 +1,55 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { contexts } from '@oyster/common';
 import { useProposals } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { StateBadgeRibbon } from '../../components/Proposal/StateBadge';
-import { urlRegex } from '../proposal';
-const PAGE_SIZE = 10;
+import { TokenIcon } from '@oyster/common';
+import { Background } from './../../components/Background';
+import { useHistory } from 'react-router-dom';
+import { RegisterGovernanceMenuItem } from '../governance/register';
 
 export const HomeView = () => {
-  const context = useProposals();
+  const history = useHistory();
+  const { configs } = useProposals();
   const [page, setPage] = useState(0);
   const listData = useMemo(() => {
     const newListData: any[] = [];
 
-    Object.keys(context.proposals).forEach(key => {
-      const proposal = context.proposals[key];
+    Object.keys(configs).forEach(key => {
+      const config = configs[key];
+
       newListData.push({
-        href: '#/proposal/' + key,
-        title: proposal.info.state.name,
-        proposal,
-        description: proposal.info.state.descLink.match(urlRegex) ? (
-          <a href={proposal.info.state.descLink} target={'_blank'}>
-            Link to markdown
-          </a>
-        ) : (
-          proposal.info.state.descLink
-        ),
+        href: '/proposals/' + key,
+        title: config.info.name,
+        badge: <TokenIcon mintAddress={config.info.governanceMint} size={40} />,
+        config,
       });
     });
     return newListData;
-  }, [context.proposals]);
+  }, [configs]);
+
 
   return (
     <Row>
       <Col flex="auto">
+        <Background />
+        <div className="governance-title">
+          <h1>Governance</h1>
+          <RegisterGovernanceMenuItem style={{ marginLeft: 'auto', marginRight: 0 }} />
+        </div>
         <List
           itemLayout="vertical"
           size="large"
-          pagination={{
-            onChange: page => {
-              setPage(page);
-            },
-            pageSize: PAGE_SIZE,
-          }}
+          loading={listData.length === 0}
+          pagination={false}
           dataSource={listData}
           renderItem={item => (
-            <StateBadgeRibbon proposal={item.proposal}>
-              <List.Item key={item.title}>
+              <List.Item key={item.title} className="governance-item" onClick={() => history.push(item.href)}>
                 <List.Item.Meta
                   avatar={item.badge}
-                  title={<a href={item.href}>{item.title}</a>}
+                  title={item.title}
                   description={item.description}
                 />
               </List.Item>
-            </StateBadgeRibbon>
           )}
         />
       </Col>
