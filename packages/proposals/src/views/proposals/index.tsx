@@ -43,7 +43,7 @@ export const ProposalsView = () => {
 
 
   return (
-    <Row style={{ background: `url(${tokenBackground})`, height: '100%' }}>
+    <Row style={{ background: `url(${tokenBackground})`, minHeight: '100%', backgroundRepeat: 'repeat-y', backgroundSize: 'cover' }}>
       <Col flex="auto"  xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
           <TokenIcon mintAddress={config?.info.governanceMint} size={60} style={{ marginRight: 20 }} />
@@ -56,6 +56,7 @@ export const ProposalsView = () => {
 
           <NewProposalMenuItem className="proposals-new-btn" disabled={!connected} />
         </div>
+        <h1 className="proposals-list-title">Proposals</h1>
         <List
           itemLayout="vertical"
           size="large"

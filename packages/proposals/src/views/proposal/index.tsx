@@ -24,6 +24,7 @@ import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
+import './style.less';
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -127,7 +128,8 @@ function InnerProposalView({
   }, [loading]);
 
   return (
-    <>
+    <Row>
+        <Col flex="auto" xxl={15} xs={24} className="proposal-container">
       <Space
         size="large"
         split={<Divider type="horizontal" />}
@@ -135,13 +137,8 @@ function InnerProposalView({
       >
         <Row justify="center" align="middle">
           <Col span={24}>
-            <p>
-              <span style={{ fontSize: '21px', marginRight: '20px' }}>
-                {LABELS.PROPOSAL}: {proposal.info.state.name}
-              </span>
-
-              <StateBadge proposal={proposal} />
-            </p>
+            <h1 style={{ fontSize: '1.75rem' }}>{proposal.info.state.name}</h1>
+            <StateBadge proposal={proposal} />
           </Col>
         </Row>
         <Row>
@@ -264,7 +261,9 @@ function InnerProposalView({
             )}
         </Row>
       </Space>
-    </>
+
+        </Col>
+    </Row>
   );
 }
 
