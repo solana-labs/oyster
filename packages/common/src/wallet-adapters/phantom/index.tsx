@@ -61,13 +61,14 @@ export class PhantomWalletAdapter
     return this._provider.signTransaction(transaction);
   }
 
-  connect() {
+  connect = async () => {
     if (this._provider) {
       return;
     }
 
+    let provider: PhantomProvider;
     if ((window as any)?.solana?.isPhantom) {
-      this._provider = (window as any).solana;
+      provider = (window as any).solana;
     } else {
       window.open("https://phantom.app/", "_blank");
       notify({
@@ -77,7 +78,17 @@ export class PhantomWalletAdapter
       return;
     }
 
-    return this._provider?.connect().then(() => this.emit("connect"));
+    provider.on('connect', () => {
+      this._provider = provider;
+      this.emit("connect");
+    })
+
+    if (!provider.isConnected) {
+      await provider.connect();
+    }
+
+    this._provider = provider;
+    this.emit("connect");
   }
 
   disconnect() {
