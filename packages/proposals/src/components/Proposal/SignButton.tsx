@@ -22,13 +22,12 @@ export default function SignButton({
   return (
     <>
       {sigAccount && sigAccount.info.amount.toNumber() === 0 && (
-        <Button disabled={true} type="primary">
+        <Button disabled={true}>
           Signed
         </Button>
       )}
       {sigAccount && sigAccount.info.amount.toNumber() > 0 && (
         <Button
-          type="primary"
           onClick={() => {
             confirm({
               title: 'Do you want to sign this proposal?',

@@ -33,5 +33,5 @@ export function StateBadge({
 }) {
   const status = proposal.info.state.status;
   let color = STATE_COLOR[status];
-  return <Tag color={color}>{TimelockStateStatus[status]}</Tag>;
+  return <Tag color={color} style={{ borderWidth: 0 }}>{TimelockStateStatus[status]}</Tag>;
 }
