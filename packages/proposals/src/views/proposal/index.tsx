@@ -58,21 +58,15 @@ export const ProposalView = () => {
   const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
   const [noVotingAccounts, setNoVotingAccounts] = useState<any>({});
   useEffect(() => {
-    getVoteAccountHolders(
-      proposal.pubkey,
-      proposal.info.votingMint,
-      endpoint,
-    ).then(setVotingAccounts);
-    getVoteAccountHolders(
-      proposal.pubkey,
-      proposal.info.yesVotingMint,
-      endpoint,
-    ).then(setYesVotingAccounts);
-    getVoteAccountHolders(
-      proposal.pubkey,
-      proposal.info.noVotingMint,
-      endpoint,
-    ).then(setNoVotingAccounts);
+    getVoteAccountHolders(proposal?.info.votingMint, endpoint).then(
+      setVotingAccounts,
+    );
+    getVoteAccountHolders(proposal?.info.yesVotingMint, endpoint).then(
+      setYesVotingAccounts,
+    );
+    getVoteAccountHolders(proposal?.info.noVotingMint, endpoint).then(
+      setNoVotingAccounts,
+    );
   }, [proposal]);
   console.log(
     'Voting accounts',

@@ -6,12 +6,16 @@ import * as bs58 from 'bs58';
 const { deserializeAccount } = contexts.Accounts;
 
 export async function getVoteAccountHolders(
-  proposalKey: PublicKey,
-  mint: PublicKey,
-  endpoint: string,
+  mint?: PublicKey,
+  endpoint?: string,
 ): Promise<Record<string, Account>> {
   const PROGRAM_IDS = utils.programIds();
-  if (!mint) return {};
+  if (!mint || !endpoint) return {};
+
+  const [authority] = await PublicKey.findProgramAddress(
+    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    PROGRAM_IDS.timelock.programId,
+  );
 
   let accountRes = await fetch(endpoint, {
     method: 'POST',
@@ -43,11 +47,12 @@ export async function getVoteAccountHolders(
   let raw = (await accountRes.json())['result'];
   if (!raw) return {};
   let accounts: Record<string, Account> = {};
-  /* for (let acc of raw) {
-    const account: Account = deserializeAccount(bs58.decode(acc.account.data));
-    if account
-    accounts[acc.pubkey] = ;
-  }*/
+  const authorityBase58 = authority.toBase58();
+  for (let acc of raw) {
+    const account = deserializeAccount(bs58.decode(acc.account.data));
+    if (account.owner.toBase58() !== authorityBase58)
+      accounts[acc.pubkey] = account;
+  }
 
   return accounts;
 }
