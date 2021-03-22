@@ -42,7 +42,7 @@ export class WalletConnectWalletAdapter
   async signTransaction(transaction: Transaction) {
     return this._provider.signTransaction(transaction);
   }
-  async signMultipleTransaction(transactions: Transaction[]) {
+  async signAllTransactions(transactions: Transaction[]) {
     return transactions;
   }
 

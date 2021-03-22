@@ -38,7 +38,7 @@ export class MetamaskWalletAdapter
   async signTransaction(transaction: Transaction) {
     return (window as any).ethereum.signTransaction(transaction);
   }
-  async signMultipleTransaction(transactions: Transaction[]) {
+  async signAllTransactions(transactions: Transaction[]) {
     return transactions;
   }
 

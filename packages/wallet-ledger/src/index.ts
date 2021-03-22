@@ -36,7 +36,7 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
     return transaction;
   }
 
-  async signMultipleTransaction(transactions: Transaction[]) {
+  async signAllTransactions(transactions: Transaction[]) {
     return transactions;
   }
 
