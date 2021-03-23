@@ -36,6 +36,8 @@ import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
 import { getVoteAccountHolders } from '../../utils/lookups';
+import BN from 'bn.js';
+import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 const { TabPane } = Tabs;
 
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
@@ -68,12 +70,6 @@ export const ProposalView = () => {
       setNoVotingAccounts,
     );
   }, [proposal]);
-  console.log(
-    'Voting accounts',
-    votingAccounts,
-    yesVotingAccounts,
-    noVotingAccounts,
-  );
   return (
     <div className="flexColumn">
       {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
@@ -83,6 +79,9 @@ export const ProposalView = () => {
           governanceMint={governanceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
+          votingAccounts={votingAccounts}
+          yesVotingAccounts={yesVotingAccounts}
+          noVotingAccounts={noVotingAccounts}
           sigMint={sigMint}
           instructions={context.transactions}
         />
@@ -101,6 +100,9 @@ function InnerProposalView({
   instructions,
   timelockConfig,
   governanceMint,
+  votingAccounts,
+  yesVotingAccounts,
+  noVotingAccounts,
 }: {
   proposal: ParsedAccount<TimelockSet>;
   timelockConfig: ParsedAccount<TimelockConfig>;
@@ -109,6 +111,9 @@ function InnerProposalView({
   yesVotingMint: MintInfo;
   governanceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
+  votingAccounts: Record<string, { amount: BN }>;
+  yesVotingAccounts: Record<string, { amount: BN }>;
+  noVotingAccounts: Record<string, { amount: BN }>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
