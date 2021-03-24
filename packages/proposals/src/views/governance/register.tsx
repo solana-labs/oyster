@@ -44,10 +44,7 @@ export function RegisterGovernanceMenuItem(props: ButtonProps) {
 
   return (
     <>
-      <Button
-        onClick={() => setIsModalVisible(true)}
-        {...props}
-      >
+      <Button onClick={() => setIsModalVisible(true)} {...props}>
         {LABELS.REGISTER_GOVERNANCE}
       </Button>
       <NewForm
@@ -176,13 +173,10 @@ export function NewForm({
           name="executionType"
           label={LABELS.EXECUTION_TYPE}
           rules={[{ required: true }]}
-          initialValue={ExecutionType.AnyAboveVoteFinishSlot}
+          initialValue={ExecutionType.Independent}
         >
           <Select placeholder={LABELS.SELECT_EXECUTION_TYPE}>
-            <Option value={ExecutionType.AnyAboveVoteFinishSlot}>
-              Any Above Vote Finish Slot
-            </Option>
-            <Option value={ExecutionType.AllOrNothing}>All or Nothing</Option>
+            <Option value={ExecutionType.Independent}>Independent</Option>
           </Select>
         </Form.Item>
         <Form.Item
@@ -205,9 +199,6 @@ export function NewForm({
         >
           <Select placeholder={LABELS.SELECT_VOTING_ENTRY_RULE}>
             <Option value={VotingEntryRule.Anytime}>At any time</Option>
-            <Option value={VotingEntryRule.DraftOnly}>
-              Only before voting begins
-            </Option>
           </Select>
         </Form.Item>
       </Form>

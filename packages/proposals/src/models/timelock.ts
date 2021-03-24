@@ -61,12 +61,12 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
 export enum VotingEntryRule {
-  DraftOnly = 0,
-  Anytime = 1,
+  Anytime = 0,
 }
 
 export enum ConsensusAlgorithm {
@@ -76,8 +76,7 @@ export enum ConsensusAlgorithm {
 }
 
 export enum ExecutionType {
-  AllOrNothing = 0,
-  AnyAboveVoteFinishSlot = 1,
+  Independent = 0,
 }
 
 export enum TimelockType {
@@ -150,6 +149,7 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('governanceHolding'),
     Layout.publicKey('yesVotingDump'),
     Layout.publicKey('noVotingDump'),
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
@@ -169,6 +169,7 @@ export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.s
     BufferLayout.u8('executions'),
     BufferLayout.u8('usedTxnSlots'),
     ...timelockTxns,
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
@@ -225,6 +226,7 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
     BufferLayout.u8('executed'),
     BufferLayout.u16('instructionEndIndex'),
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 

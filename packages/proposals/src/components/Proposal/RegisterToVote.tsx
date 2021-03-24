@@ -42,12 +42,11 @@ export function RegisterToVote({
     (noVoteAccount && noVoteAccount.info.amount.toNumber() > 0);
 
   const eligibleToView =
-    (timelockConfig.info.votingEntryRule == VotingEntryRule.DraftOnly &&
-      state.info.status == TimelockStateStatus.Draft) ||
-    (timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
-      [TimelockStateStatus.Draft, TimelockStateStatus.Voting].includes(
-        state.info.status,
-      ));
+    timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
+    [TimelockStateStatus.Draft, TimelockStateStatus.Voting].includes(
+      state.info.status,
+    );
+
   const [_, setTokenAmount] = useState(1);
   return eligibleToView ? (
     <Button
@@ -90,7 +89,6 @@ export function RegisterToVote({
                 connection,
                 wallet.wallet,
                 proposal,
-                state,
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,

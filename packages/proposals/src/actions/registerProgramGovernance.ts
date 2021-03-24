@@ -105,8 +105,7 @@ export const registerProgramGovernance = async (
       uninitializedTimelockConfig.governanceMint,
       uninitializedTimelockConfig.consensusAlgorithm ||
         ConsensusAlgorithm.Majority,
-      uninitializedTimelockConfig.executionType ||
-        ExecutionType.AnyAboveVoteFinishSlot,
+      uninitializedTimelockConfig.executionType || ExecutionType.Independent,
       uninitializedTimelockConfig.timelockType ||
         TimelockType.CustomSingleSignerV1,
       uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,

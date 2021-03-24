@@ -15,21 +15,17 @@ import BN from 'bn.js';
 ///   1. `[writable]` Source governance token account to deposit tokens from.
 ///   2. `[writable]` Governance holding account for timelock that will accept the tokens in escrow.
 ///   3. `[writable]` Voting mint account.
-///   4. `[]` Timelock state account.
-///   5. `[]` Timelock set account.
-///   6. `[]` Timelock config account.
-///   7. `[]` Transfer authority
-///   8. `[]` Timelock program mint authority
-///   9. `[]` Timelock program account pub key.
-///   10. `[]` Token program account.
+///   4. `[]` Timelock set account.
+///   5. `[]` Transfer authority
+///   6. `[]` Timelock program mint authority
+///   7. `[]` Timelock program account pub key.
+///   8. `[]` Token program account.
 export const depositGovernanceTokensInstruction = (
   votingAccount: PublicKey,
   sourceAccount: PublicKey,
   governanceHoldingAccount: PublicKey,
   votingMint: PublicKey,
-  timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
-  timelockConfigAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
   votingTokenAmount: number,
@@ -56,9 +52,7 @@ export const depositGovernanceTokensInstruction = (
     { pubkey: sourceAccount, isSigner: false, isWritable: true },
     { pubkey: governanceHoldingAccount, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: false, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {
