@@ -11,12 +11,13 @@ import {
 } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenDisplay, TokenIcon } from '@oyster/common';
+import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
@@ -51,6 +52,7 @@ export const ProposalView = () => {
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
   const timelockConfig = context.configs[proposal?.info.config.toBase58()];
+  const timelockState = context.states[proposal?.info.state.toBase58()];
   const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
@@ -75,6 +77,7 @@ export const ProposalView = () => {
       {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
         <InnerProposalView
           proposal={proposal}
+          timelockState={timelockState}
           timelockConfig={timelockConfig}
           governanceMint={governanceMint}
           votingMint={votingMint}
@@ -94,6 +97,7 @@ export const ProposalView = () => {
 
 function InnerProposalView({
   proposal,
+  timelockState,
   sigMint,
   votingMint,
   yesVotingMint,
@@ -106,6 +110,7 @@ function InnerProposalView({
 }: {
   proposal: ParsedAccount<TimelockSet>;
   timelockConfig: ParsedAccount<TimelockConfig>;
+  timelockState: ParsedAccount<TimelockState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
@@ -119,14 +124,14 @@ function InnerProposalView({
   const adminAccount = useAccountByMint(proposal.info.adminMint);
   const config = useConfig(proposal.info.config.toBase58());
 
-  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
+  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
-  const isUrl = !!proposal.info.state.descLink.match(urlRegex);
+  const isUrl = !!timelockState.info.descLink.match(urlRegex);
   const isGist =
-    !!proposal.info.state.descLink.match(/gist/i) &&
-    !!proposal.info.state.descLink.match(/github/i);
-  const [content, setContent] = useState(proposal.info.state.descLink);
+    !!timelockState.info.descLink.match(/gist/i) &&
+    !!timelockState.info.descLink.match(/github/i);
+  const [content, setContent] = useState(timelockState.info.descLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -134,7 +139,7 @@ function InnerProposalView({
 
   useMemo(() => {
     if (loading) {
-      let toFetch = proposal.info.state.descLink;
+      let toFetch = timelockState.info.descLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -178,8 +183,8 @@ function InnerProposalView({
                 size={60}
               />
               <Col>
-                <h1>{proposal.info.state.name}</h1>
-                <StateBadge proposal={proposal} />
+                <h1>{timelockState.info.name}</h1>
+                <StateBadge state={timelockState} />
               </Col>
             </Row>
           </Col>
@@ -187,24 +192,30 @@ function InnerProposalView({
             <div className="proposal-actions">
               {adminAccount &&
                 adminAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state.status === TimelockStateStatus.Draft && (
-                  <AddSigners proposal={proposal} />
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <AddSigners proposal={proposal} state={timelockState} />
                 )}
               {sigAccount &&
                 sigAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state.status === TimelockStateStatus.Draft && (
-                  <SignButton proposal={proposal} />
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <SignButton proposal={proposal} state={timelockState} />
                 )}
               <MintGovernanceTokens timelockConfig={timelockConfig} />
               <RegisterToVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
+                state={timelockState}
               />
               <WithdrawTokens
                 timelockConfig={timelockConfig}
                 proposal={proposal}
+                state={timelockState}
               />
-              <Vote proposal={proposal} timelockConfig={timelockConfig} />
+              <Vote
+                proposal={proposal}
+                timelockConfig={timelockConfig}
+                state={timelockState}
+              />
             </div>
           </Col>
         </Row>
@@ -215,10 +226,10 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.SIG_GIVEN}
                 value={
-                  proposal.info.state.totalSigningTokensMinted.toNumber() -
+                  timelockState.info.totalSigningTokensMinted.toNumber() -
                   sigMint.supply.toNumber()
                 }
-                suffix={`/ ${proposal.info.state.totalSigningTokensMinted.toNumber()}`}
+                suffix={`/ ${timelockState.info.totalSigningTokensMinted.toNumber()}`}
               />
             </Card>
           </Col>
@@ -256,7 +267,7 @@ function InnerProposalView({
                   failed ? (
                     <p>
                       {LABELS.DESCRIPTION}:{' '}
-                      <a href={proposal.info.state.descLink} target="_blank">
+                      <a href={timelockState.info.descLink} target="_blank">
                         {msg ? msg : LABELS.NO_LOAD}
                       </a>
                     </p>
@@ -280,15 +291,16 @@ function InnerProposalView({
                         proposal={proposal}
                         position={position + 1}
                         instruction={instruction}
+                        state={timelockState}
                       />
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    proposal.info.state.status ===
-                      TimelockStateStatus.Draft && (
+                    timelockState.info.status === TimelockStateStatus.Draft && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
+                          state={timelockState}
                           config={timelockConfig}
                           position={instructionsForProposal.length}
                         />

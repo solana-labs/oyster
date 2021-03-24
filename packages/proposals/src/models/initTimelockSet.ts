@@ -10,27 +10,29 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 /// Initializes a new empty Timelocked set of Instructions that will be executed at various slots in the future in draft mode.
 /// Grants Admin token to caller.
 ///
-///   0. `[writable]` Uninitialized Timelock set account .
-///   1. `[writable]` Initialized Signatory Mint account
-///   2. `[writable]` Initialized Admin Mint account
-///   3. `[writable]` Initialized Voting Mint account
-///   4. `[writable]` Initialized Yes Voting Mint account
-///   5. `[writable]` Initialized No Voting Mint account
-///   6. `[writable]` Initialized Signatory Validation account
-///   7. `[writable]` Initialized Admin Validation account
-///   8. `[writable]` Initialized Voting Validation account
-///   9. `[writable]` Initialized Destination account for first admin token
-///   10. `[writable]` Initialized Destination account for first signatory token
-///   11. `[writable]` Initialized Yes voting dump account
-///   12. `[writable]` Initialized No voting dump account
-///   13. `[writable]` Initialized Governance holding account
-///   14. `[]` Governance mint
-///   15. `[]` Timelock config account.
-///   16. `[]` Timelock minting authority
-///   17. `[]` Timelock Program
-///   18. '[]` Token program id
-///   19. `[]` Rent sysvar
+///   0. `[writable]` Uninitialized Timelock state account .
+///   1. `[writable]` Uninitialized Timelock set account .
+///   2. `[writable]` Initialized Signatory Mint account
+///   3. `[writable]` Initialized Admin Mint account
+///   4. `[writable]` Initialized Voting Mint account
+///   5. `[writable]` Initialized Yes Voting Mint account
+///   6. `[writable]` Initialized No Voting Mint account
+///   7. `[writable]` Initialized Signatory Validation account
+///   8. `[writable]` Initialized Admin Validation account
+///   9. `[writable]` Initialized Voting Validation account
+///   10. `[writable]` Initialized Destination account for first admin token
+///   11. `[writable]` Initialized Destination account for first signatory token
+///   12. `[writable]` Initialized Yes voting dump account
+///   13. `[writable]` Initialized No voting dump account
+///   14. `[writable]` Initialized Governance holding account
+///   15. `[]` Governance mint
+///   16. `[]` Timelock config account.
+///   17. `[]` Timelock minting authority
+///   18. `[]` Timelock Program
+///   19. '[]` Token program id
+///   20. `[]` Rent sysvar
 export const initTimelockSetInstruction = (
+  timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminMintAccount: PublicKey,
@@ -87,6 +89,7 @@ export const initTimelockSetInstruction = (
   );
 
   const keys = [
+    { pubkey: timelockStateAccount, isSigner: true, isWritable: true },
     { pubkey: timelockSetAccount, isSigner: true, isWritable: true },
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminMintAccount, isSigner: false, isWritable: true },

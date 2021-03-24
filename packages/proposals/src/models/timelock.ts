@@ -8,7 +8,7 @@ export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
-export const TRANSACTION_SLOTS = 4;
+export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
 export enum TimelockInstruction {
@@ -113,6 +113,8 @@ export const STATE_COLOR: Record<string, string> = {
 };
 
 export interface TimelockState {
+  timelockSet: PublicKey;
+  version: number;
   status: TimelockStateStatus;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
@@ -120,6 +122,9 @@ export interface TimelockState {
   descLink: string;
   votingEndedAt: BN;
   votingBeganAt: BN;
+  createdAt: BN;
+  completedAt: BN;
+  deletedAt: BN;
   executions: number;
   usedTxnSlots: number;
 }
@@ -131,6 +136,8 @@ for (let i = 0; i < TRANSACTION_SLOTS; i++) {
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    Layout.publicKey('config'),
+    Layout.publicKey('state'),
     BufferLayout.u8('version'),
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
@@ -143,13 +150,22 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('governanceHolding'),
     Layout.publicKey('yesVotingDump'),
     Layout.publicKey('noVotingDump'),
-    Layout.publicKey('config'),
+  ],
+);
+
+export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.publicKey('timelockSet'),
+    BufferLayout.u8('version'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
     Layout.uint64('votingEndedAt'),
     Layout.uint64('votingBeganAt'),
+    Layout.uint64('createdAt'),
+    Layout.uint64('completedAt'),
+    Layout.uint64('deletedAt'),
     BufferLayout.u8('executions'),
     BufferLayout.u8('usedTxnSlots'),
     ...timelockTxns,
@@ -157,6 +173,12 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
 );
 
 export interface TimelockSet {
+  /// configuration values
+  config: PublicKey;
+
+  /// state values
+  state: PublicKey;
+
   /// Version of the struct
   version: number;
 
@@ -194,12 +216,6 @@ export interface TimelockSet {
 
   /// No Voting dump account for exchanged vote tokens
   noVotingDump: PublicKey;
-
-  /// configuration values
-  config: PublicKey;
-
-  /// Reserve state
-  state: TimelockState;
 }
 
 export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -232,18 +248,14 @@ export const TimelockSetParser = (
 ) => {
   const buffer = Buffer.from(info.data);
   const data = TimelockSetLayout.decode(buffer);
-
-  const timelockTxns = [];
-  for (let i = 0; i < TRANSACTION_SLOTS; i++) {
-    timelockTxns.push(data['timelockTxn' + i.toString()]);
-  }
-
   const details = {
     pubkey: pubKey,
     account: {
       ...info,
     },
     info: {
+      config: data.config,
+      state: data.state,
       version: data.version,
       signatoryMint: data.signatoryMint,
       adminMint: data.adminMint,
@@ -256,18 +268,43 @@ export const TimelockSetParser = (
       governanceHolding: data.governanceHolding,
       yesVotingDump: data.yesVotingDump,
       noVotingDump: data.noVotingDump,
-      config: data.config,
-      state: {
-        status: data.timelockStateStatus,
-        totalSigningTokensMinted: data.totalSigningTokensMinted,
-        descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
-        name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-        timelockTransactions: timelockTxns,
-        votingEndedAt: data.votingEndedAt,
-        votingBeganAt: data.votingBeganAt,
-        executions: data.executions,
-        usedTxnSlots: data.usedTxnSlots,
-      },
+    },
+  };
+
+  return details;
+};
+
+export const TimelockStateParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = TimelockStateLayout.decode(buffer);
+
+  const timelockTxns = [];
+  for (let i = 0; i < TRANSACTION_SLOTS; i++) {
+    timelockTxns.push(data['timelockTxn' + i.toString()]);
+  }
+
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: {
+      timelockSet: data.timelockSet,
+      status: data.timelockStateStatus,
+      totalSigningTokensMinted: data.totalSigningTokensMinted,
+      descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
+      name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
+      timelockTransactions: timelockTxns,
+      votingEndedAt: data.votingEndedAt,
+      votingBeganAt: data.votingBeganAt,
+      createdAt: data.createdAt,
+      completedAt: data.completedAt,
+      deletedAt: data.deletedAt,
+      executions: data.executions,
+      usedTxnSlots: data.usedTxnSlots,
     },
   };
 

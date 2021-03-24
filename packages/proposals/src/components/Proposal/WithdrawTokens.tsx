@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import {
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
-  VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
@@ -20,8 +20,10 @@ const { confirm } = Modal;
 export function WithdrawTokens({
   proposal,
   timelockConfig,
+  state,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   timelockConfig: ParsedAccount<TimelockConfig>;
 }) {
   const wallet = useWallet();
@@ -39,7 +41,7 @@ export function WithdrawTokens({
     ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
     ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
   let additionalMsg = '';
-  if (proposal.info.state.status !== TimelockStateStatus.Voting) {
+  if (state.info.status !== TimelockStateStatus.Voting) {
     totalTokens += inEscrow;
   } else additionalMsg = LABELS.ADDITIONAL_VOTING_MSG;
 
@@ -81,6 +83,7 @@ export function WithdrawTokens({
                 connection,
                 wallet.wallet,
                 proposal,
+                state,
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,

@@ -7,7 +7,11 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, ParsedAccount } from '@oyster/common';
 
-import { TimelockSet, TimelockTransaction } from '../models/timelock';
+import {
+  TimelockSet,
+  TimelockState,
+  TimelockTransaction,
+} from '../models/timelock';
 import { executeInstruction } from '../models/execute';
 import { LABELS } from '../constants';
 const { sendTransaction } = contexts.Connection;
@@ -17,6 +21,7 @@ export const execute = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  state: ParsedAccount<TimelockState>,
   transaction: ParsedAccount<TimelockTransaction>,
 ) => {
   const PROGRAM_IDS = utils.programIds();
@@ -29,6 +34,7 @@ export const execute = async (
   instructions.push(
     executeInstruction(
       transaction.pubkey,
+      state.pubkey,
       proposal.pubkey,
       actualMessage.accountKeys[actualMessage.instructions[0].programIdIndex],
       proposal.info.config,

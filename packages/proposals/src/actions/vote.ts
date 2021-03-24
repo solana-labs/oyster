@@ -12,7 +12,7 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockConfig, TimelockSet } from '../models/timelock';
+import { TimelockConfig, TimelockSet, TimelockState } from '../models/timelock';
 import { LABELS } from '../constants';
 import { voteInstruction } from '../models/vote';
 const { createTokenAccount } = actions;
@@ -25,6 +25,7 @@ export const vote = async (
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
   timelockConfig: ParsedAccount<TimelockConfig>,
+  state: ParsedAccount<TimelockState>,
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
   noVotingAccount: PublicKey,
@@ -53,7 +54,7 @@ export const vote = async (
 
   instructions.push(
     voteInstruction(
-      proposal.pubkey,
+      state.pubkey,
       votingAccount,
       yesVotingAccount,
       noVotingAccount,
@@ -61,6 +62,7 @@ export const vote = async (
       proposal.info.yesVotingMint,
       proposal.info.noVotingMint,
       timelockConfig.info.governanceMint,
+      proposal.pubkey,
       timelockConfig.pubkey,
       transferAuthority.publicKey,
       mintAuthority,

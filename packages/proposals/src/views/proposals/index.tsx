@@ -11,13 +11,17 @@ const PAGE_SIZE = 10;
 export const ProposalsView = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const { proposals } = useProposals();
+  const { proposals, states } = useProposals();
   const config = useConfig(id);
   const [page, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
   const { connected } = useWallet();
-  const token = tokenMap.get(config?.info.governanceMint.toBase58() || '') as any;
-  const tokenBackground = token?.extensions?.background || 'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
+  const token = tokenMap.get(
+    config?.info.governanceMint.toBase58() || '',
+  ) as any;
+  const tokenBackground =
+    token?.extensions?.background ||
+    'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
 
   const mint = config?.info.governanceMint.toBase58() || '';
 
@@ -26,27 +30,38 @@ export const ProposalsView = () => {
 
     Object.keys(proposals).forEach(key => {
       const proposal = proposals[key];
-      if(proposal.info.config.toBase58() !== id) {
+      const state = states[proposal.info.state.toBase58()];
+      if (proposal.info.config.toBase58() !== id || !state) {
         return;
       }
 
       newListData.push({
         href: '/proposal/' + key,
-        title: proposal.info.state.name,
+        title: state.info.name,
         badge: <TokenIcon mintAddress={mint} size={30} />,
-        status: proposal.info.state.status,
-        proposal,
+        status: state.info.status,
+        state,
       });
     });
     return newListData;
   }, [proposals]);
 
-
   return (
-    <Row style={{ background: `url(${tokenBackground})`, minHeight: '100%', backgroundRepeat: 'repeat-y', backgroundSize: 'cover' }}>
-      <Col flex="auto"  xxl={15} xs={24} className="proposals-container">
+    <Row
+      style={{
+        background: `url(${tokenBackground})`,
+        minHeight: '100%',
+        backgroundRepeat: 'repeat-y',
+        backgroundSize: 'cover',
+      }}
+    >
+      <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          <TokenIcon mintAddress={config?.info.governanceMint} size={60} style={{ marginRight: 20 }} />
+          <TokenIcon
+            mintAddress={config?.info.governanceMint}
+            size={60}
+            style={{ marginRight: 20 }}
+          />
           <div>
             <h1>{config?.info.name}</h1>
             <a href={tokenMap.get(mint)?.extensions?.website} target="_blank">
@@ -54,7 +69,10 @@ export const ProposalsView = () => {
             </a>
           </div>
 
-          <NewProposalMenuItem className="proposals-new-btn" disabled={!connected} />
+          <NewProposalMenuItem
+            className="proposals-new-btn"
+            disabled={!connected}
+          />
         </div>
         <h1 className="proposals-list-title">Proposals</h1>
         <List
@@ -68,13 +86,17 @@ export const ProposalsView = () => {
           }}
           dataSource={listData}
           renderItem={item => (
-              <List.Item key={item.title}className="proposal-item" onClick={() => history.push(item.href)}>
-                <List.Item.Meta
-                  avatar={item.badge}
-                  title={item.title}
-                  description={<StateBadge proposal={item.proposal} />}
-                />
-              </List.Item>
+            <List.Item
+              key={item.title}
+              className="proposal-item"
+              onClick={() => history.push(item.href)}
+            >
+              <List.Item.Meta
+                avatar={item.badge}
+                title={item.title}
+                description={<StateBadge state={item.state} />}
+              />
+            </List.Item>
           )}
         />
       </Col>

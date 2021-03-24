@@ -12,7 +12,7 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockSet } from '../models/timelock';
+import { TimelockSet, TimelockState } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { addSignerInstruction } from '../models/addSigner';
 const { createTokenAccount } = actions;
@@ -24,6 +24,7 @@ export const addSigner = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  state: ParsedAccount<TimelockState>,
   adminAccount: PublicKey,
   newSignatoryAccountOwner: PublicKey,
 ) => {
@@ -65,6 +66,7 @@ export const addSigner = async (
       proposal.info.signatoryMint,
       adminAccount,
       proposal.info.adminValidation,
+      state.pubkey,
       proposal.pubkey,
       transferAuthority.publicKey,
       mintAuthority,

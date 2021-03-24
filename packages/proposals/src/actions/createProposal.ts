@@ -9,7 +9,11 @@ import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
-import { TimelockConfig, TimelockSetLayout } from '../models/timelock';
+import {
+  TimelockConfig,
+  TimelockSetLayout,
+  TimelockStateLayout,
+} from '../models/timelock';
 
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -58,10 +62,32 @@ export const createProposal = async (
     timelockConfig,
   );
 
+  let createTimelockAccountsSigners: Account[] = [];
+  let createTimelockAccountsInstructions: TransactionInstruction[] = [];
+
   const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
     TimelockSetLayout.span,
   );
+
+  const timelockStateRentExempt = await connection.getMinimumBalanceForRentExemption(
+    TimelockStateLayout.span,
+  );
+
   const timelockSetKey = new Account();
+  const timelockStateKey = new Account();
+
+  const uninitializedTimelockStateInstruction = SystemProgram.createAccount({
+    fromPubkey: wallet.publicKey,
+    newAccountPubkey: timelockStateKey.publicKey,
+    lamports: timelockStateRentExempt,
+    space: TimelockStateLayout.span,
+    programId: PROGRAM_IDS.timelock.programId,
+  });
+  signers.push(timelockStateKey);
+  createTimelockAccountsSigners.push(timelockStateKey);
+  createTimelockAccountsInstructions.push(
+    uninitializedTimelockStateInstruction,
+  );
 
   const uninitializedTimelockSetInstruction = SystemProgram.createAccount({
     fromPubkey: wallet.publicKey,
@@ -71,10 +97,12 @@ export const createProposal = async (
     programId: PROGRAM_IDS.timelock.programId,
   });
   signers.push(timelockSetKey);
-  instructions.push(uninitializedTimelockSetInstruction);
+  createTimelockAccountsSigners.push(timelockSetKey);
+  createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
 
   instructions.push(
     initTimelockSetInstruction(
+      timelockStateKey.publicKey,
       timelockSetKey.publicKey,
       sigMint,
       adminMint,
@@ -107,8 +135,12 @@ export const createProposal = async (
     let tx = await sendTransactions(
       connection,
       wallet,
-      [...associatedInstructions, instructions],
-      [...associatedSigners, signers],
+      [
+        ...associatedInstructions,
+        createTimelockAccountsInstructions,
+        instructions,
+      ],
+      [...associatedSigners, createTimelockAccountsSigners, signers],
       true,
     );
 

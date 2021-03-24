@@ -107,6 +107,7 @@ export default function MintGovernanceTokens({
     const governanceHoldersToRun = [];
     for (let i = 0; i < governanceHolders.length; i++) {
       try {
+        console.log('Running', governanceHolders[i]);
         if (governanceHolders[i].owner) {
           const tokenAccounts = await connection.getTokenAccountsByOwner(
             governanceHolders[i].owner || PROGRAM_IDS.timelock,

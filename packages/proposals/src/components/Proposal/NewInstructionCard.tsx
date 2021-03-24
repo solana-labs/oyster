@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Card, Progress, Spin } from 'antd';
+import React from 'react';
+import { Card } from 'antd';
 import { Form, Input } from 'antd';
 import {
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
+  TimelockState,
 } from '../../models/timelock';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';
-import { Connection, PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
 
 const { useWallet } = contexts.Wallet;
@@ -22,17 +22,14 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-enum UploadType {
-  Base64 = 'Base64',
-  Upgrade = 'Upgrade',
-}
-
 export function NewInstructionCard({
   proposal,
+  state,
   position,
   config,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   config: ParsedAccount<TimelockConfig>;
   position: number;
 }) {
@@ -73,6 +70,7 @@ export function NewInstructionCard({
         connection,
         wallet.wallet,
         proposal,
+        state,
         sigAccount.pubkey,
         values.slot,
         instruction,

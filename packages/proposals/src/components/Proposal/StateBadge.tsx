@@ -3,18 +3,18 @@ import { Badge, Tag } from 'antd';
 import React from 'react';
 import {
   STATE_COLOR,
-  TimelockSet,
+  TimelockState,
   TimelockStateStatus,
 } from '../../models/timelock';
 
 export function StateBadgeRibbon({
-  proposal,
+  state,
   children,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   children?: any;
 }) {
-  const status = proposal.info.state.status;
+  const status = state.info.status;
   let color = STATE_COLOR[status];
   return (
     <Badge.Ribbon
@@ -26,12 +26,12 @@ export function StateBadgeRibbon({
   );
 }
 
-export function StateBadge({
-  proposal,
-}: {
-  proposal: ParsedAccount<TimelockSet>;
-}) {
-  const status = proposal.info.state.status;
+export function StateBadge({ state }: { state: ParsedAccount<TimelockState> }) {
+  const status = state.info.status;
   let color = STATE_COLOR[status];
-  return <Tag color={color} style={{ borderWidth: 0 }}>{TimelockStateStatus[status]}</Tag>;
+  return (
+    <Tag color={color} style={{ borderWidth: 0 }}>
+      {TimelockStateStatus[status]}
+    </Tag>
+  );
 }

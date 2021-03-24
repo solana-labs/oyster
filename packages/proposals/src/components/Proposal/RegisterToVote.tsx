@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
   VotingEntryRule,
 } from '../../models/timelock';
@@ -19,9 +20,11 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function RegisterToVote({
   proposal,
+  state,
   timelockConfig,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   timelockConfig: ParsedAccount<TimelockConfig>;
 }) {
   const wallet = useWallet();
@@ -29,12 +32,7 @@ export function RegisterToVote({
   const voteAccount = useAccountByMint(proposal.info.votingMint);
   const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
-  console.log(
-    'My vote account',
-    voteAccount?.info.amount.toNumber(),
-    yesVoteAccount?.info.amount.toNumber(),
-    noVoteAccount?.info.amount.toNumber(),
-  );
+
   const governanceAccount = useAccountByMint(
     timelockConfig.info.governanceMint,
   );
@@ -45,10 +43,10 @@ export function RegisterToVote({
 
   const eligibleToView =
     (timelockConfig.info.votingEntryRule == VotingEntryRule.DraftOnly &&
-      proposal.info.state.status == TimelockStateStatus.Draft) ||
+      state.info.status == TimelockStateStatus.Draft) ||
     (timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
       [TimelockStateStatus.Draft, TimelockStateStatus.Voting].includes(
-        proposal.info.state.status,
+        state.info.status,
       ));
   const [_, setTokenAmount] = useState(1);
   return eligibleToView ? (
@@ -92,6 +90,7 @@ export function RegisterToVote({
                 connection,
                 wallet.wallet,
                 proposal,
+                state,
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,

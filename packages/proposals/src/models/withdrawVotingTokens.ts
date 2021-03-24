@@ -14,13 +14,14 @@ import BN from 'bn.js';
 ///   5. `[writable]` Initialized Yes Voting dump account owned by timelock set to which to send your voting tokens.
 ///   6. `[writable]` Initialized No Voting dump account owned by timelock set to which to send your voting tokens.
 ///   7. `[]` Voting mint account.
-///   8. `[]` Timelock set account.
-///   9. `[]` Transfer authority
-///   10. `[]` Yes Transfer authority
-///   11. `[]` No Transfer authority
-///   12. `[]` Timelock program mint authority
-///   13. `[]` Timelock program account pub key.
-///   14. `[]` Token program account.
+///   8. `[]` Timelock state account.
+///   9. `[]` Timelock set account.
+///   10. `[]` Transfer authority
+///   11. `[]` Yes Transfer authority
+///   12. `[]` No Transfer authority
+///   13. `[]` Timelock program mint authority
+///   14. `[]` Timelock program account pub key.
+///   15. `[]` Token program account.
 export const withdrawVotingTokensInstruction = (
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
@@ -30,6 +31,7 @@ export const withdrawVotingTokensInstruction = (
   yesVotingDump: PublicKey,
   noVotingDump: PublicKey,
   votingMint: PublicKey,
+  timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   transferAuthority: PublicKey,
   yesTransferAuthority: PublicKey,
@@ -63,6 +65,7 @@ export const withdrawVotingTokensInstruction = (
     { pubkey: yesVotingDump, isSigner: false, isWritable: true },
     { pubkey: noVotingDump, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: false, isWritable: false },
     { pubkey: yesTransferAuthority, isSigner: false, isWritable: false },

@@ -4,9 +4,7 @@ import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
 import './style.less';
 import { useProposals } from '../../contexts/proposals';
-import {
-  TimelockSet,
-} from '../../models/timelock';
+import { TimelockSet } from '../../models/timelock';
 import { Connection } from '@solana/web3.js';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { WalletAdapter } from '@solana/wallet-base';
@@ -47,23 +45,5 @@ function InnerDummyView({
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   if (!sigAccount) return <Spin />;
-  return (
-    <Row gutter={GUTTER} className="home-info-row">
-      <Button
-        onClick={() =>
-          addCustomSingleSignerTransaction(
-            connection,
-            wallet,
-            proposal,
-            sigAccount.pubkey,
-            '123',
-            '12345',
-            0,
-          )
-        }
-      >
-        Add transaction to {proposal.pubkey.toBase58()}
-      </Button>
-    </Row>
-  );
+  return <Row gutter={GUTTER} className="home-info-row"></Row>;
 }
