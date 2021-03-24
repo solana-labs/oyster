@@ -47,6 +47,8 @@ export interface TimelockConfig {
   timeLimit: BN;
   /// Optional name
   name: string;
+  /// Running count of proposals
+  count: number;
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -61,7 +63,8 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
-    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
+    BufferLayout.u32('count'),
+    BufferLayout.seq(BufferLayout.u8(), 296, 'padding'),
   ],
 );
 
@@ -361,6 +364,7 @@ export const TimelockConfigParser = (
       program: data.program,
       timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
+      count: data.count,
     },
   };
 

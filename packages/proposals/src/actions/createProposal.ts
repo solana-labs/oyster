@@ -104,6 +104,7 @@ export const createProposal = async (
     initTimelockSetInstruction(
       timelockStateKey.publicKey,
       timelockSetKey.publicKey,
+      timelockConfig.pubkey,
       sigMint,
       adminMint,
       voteMint,
@@ -118,7 +119,6 @@ export const createProposal = async (
       noVoteDumpAccount,
       governanceHoldingAccount,
       timelockConfig.info.governanceMint,
-      timelockConfig.pubkey,
       authority,
       description,
       name,

@@ -2,17 +2,15 @@ import {
   Account,
   Connection,
   PublicKey,
-  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, models } from '@oyster/common';
+import { contexts, utils, actions } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
   ConsensusAlgorithm,
   ExecutionType,
   TimelockConfig,
-  TimelockConfigLayout,
   TimelockType,
   VotingEntryRule,
 } from '../models/timelock';
@@ -23,7 +21,6 @@ import { createEmptyTimelockConfigInstruction } from '../models/createEmptyTimel
 const { sendTransaction } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
-const { approve } = models;
 
 export const registerProgramGovernance = async (
   connection: Connection,
@@ -78,9 +75,6 @@ export const registerProgramGovernance = async (
     );
   }
 
-  const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
-    TimelockConfigLayout.span,
-  );
   const [timelockConfigKey] = await PublicKey.findProgramAddress(
     [
       PROGRAM_IDS.timelock.programAccountId.toBuffer(),

@@ -12,21 +12,21 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///
 ///   0. `[writable]` Uninitialized Timelock state account .
 ///   1. `[writable]` Uninitialized Timelock set account .
-///   2. `[writable]` Initialized Signatory Mint account
-///   3. `[writable]` Initialized Admin Mint account
-///   4. `[writable]` Initialized Voting Mint account
-///   5. `[writable]` Initialized Yes Voting Mint account
-///   6. `[writable]` Initialized No Voting Mint account
-///   7. `[writable]` Initialized Signatory Validation account
-///   8. `[writable]` Initialized Admin Validation account
-///   9. `[writable]` Initialized Voting Validation account
-///   10. `[writable]` Initialized Destination account for first admin token
-///   11. `[writable]` Initialized Destination account for first signatory token
-///   12. `[writable]` Initialized Yes voting dump account
-///   13. `[writable]` Initialized No voting dump account
-///   14. `[writable]` Initialized Governance holding account
-///   15. `[]` Governance mint
-///   16. `[]` Timelock config account.
+///   2. `[writable]` Timelock config account.
+///   3. `[writable]` Initialized Signatory Mint account
+///   4. `[writable]` Initialized Admin Mint account
+///   5. `[writable]` Initialized Voting Mint account
+///   6. `[writable]` Initialized Yes Voting Mint account
+///   7. `[writable]` Initialized No Voting Mint account
+///   8. `[writable]` Initialized Signatory Validation account
+///   9. `[writable]` Initialized Admin Validation account
+///   10. `[writable]` Initialized Voting Validation account
+///   11. `[writable]` Initialized Destination account for first admin token
+///   12. `[writable]` Initialized Destination account for first signatory token
+///   13. `[writable]` Initialized Yes voting dump account
+///   14. `[writable]` Initialized No voting dump account
+///   15. `[writable]` Initialized Governance holding account
+///   16. `[]` Governance mint
 ///   17. `[]` Timelock minting authority
 ///   18. `[]` Timelock Program
 ///   19. '[]` Token program id
@@ -34,6 +34,7 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 export const initTimelockSetInstruction = (
   timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
+  timelockConfigAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminMintAccount: PublicKey,
   votingMintAccount: PublicKey,
@@ -48,7 +49,6 @@ export const initTimelockSetInstruction = (
   noVotingDumpAccount: PublicKey,
   governanceHoldingAccount: PublicKey,
   governanceMintAccount: PublicKey,
-  timelockConfigAccount: PublicKey,
   authority: PublicKey,
   descLink: string,
   name: string,
@@ -91,6 +91,7 @@ export const initTimelockSetInstruction = (
   const keys = [
     { pubkey: timelockStateAccount, isSigner: true, isWritable: true },
     { pubkey: timelockSetAccount, isSigner: true, isWritable: true },
+    { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminMintAccount, isSigner: false, isWritable: true },
     { pubkey: votingMintAccount, isSigner: false, isWritable: true },
@@ -109,7 +110,6 @@ export const initTimelockSetInstruction = (
       isSigner: false,
       isWritable: false,
     },
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
