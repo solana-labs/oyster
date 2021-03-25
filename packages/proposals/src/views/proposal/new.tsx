@@ -107,7 +107,11 @@ export function NewForm({
       onCancel={handleCancel}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item label={LABELS.PROPOSAL_MINT_TYPE} name="proposalMintType">
+        <Form.Item
+          label={LABELS.PROPOSAL_MINT_TYPE}
+          name="proposalMintType"
+          rules={[{ required: true }]}
+        >
           <Radio.Group>
             <Radio.Button value={ProposalMintType.Governance}>
               {LABELS.GOVERNANCE}

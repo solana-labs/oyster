@@ -61,6 +61,7 @@ export const createProposal = async (
     accountRentExempt,
     mintRentExempt,
     timelockConfig,
+    useGovernance,
   );
 
   let createTimelockAccountsSigners: Account[] = [];
@@ -100,7 +101,7 @@ export const createProposal = async (
   signers.push(timelockSetKey);
   createTimelockAccountsSigners.push(timelockSetKey);
   createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
-
+  console.log('useGov ernance is', useGovernance, timelockConfig);
   instructions.push(
     initTimelockSetInstruction(
       timelockStateKey.publicKey,
@@ -184,6 +185,7 @@ async function getAssociatedAccountsAndInstructions(
   accountRentExempt: number,
   mintRentExempt: number,
   timelockConfig: ParsedAccount<TimelockConfig>,
+  useGovernance: boolean,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
 
@@ -323,7 +325,9 @@ async function getAssociatedAccountsAndInstructions(
     holdingInstructions,
     wallet.publicKey,
     accountRentExempt,
-    timelockConfig.info.governanceMint,
+    useGovernance
+      ? timelockConfig.info.governanceMint
+      : timelockConfig.info.councilMint,
     authority,
     holdingSigners,
   );

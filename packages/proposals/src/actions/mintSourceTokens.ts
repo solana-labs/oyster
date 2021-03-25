@@ -59,7 +59,9 @@ export const mintSourceTokens = async (
     instructions.push(
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
-        timelockConfig.info.governanceMint,
+        useGovernance
+          ? timelockConfig.info.governanceMint
+          : timelockConfig.info.councilMint,
         e.sourceAccount,
         wallet.publicKey,
         [],

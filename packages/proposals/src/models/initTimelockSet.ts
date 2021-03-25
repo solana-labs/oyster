@@ -12,7 +12,7 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///
 ///   0. `[writable]` Uninitialized Timelock state account .
 ///   1. `[writable]` Uninitialized Timelock set account .
-///   2. `[writable]` Timelock config account.
+///   2. `[writable]` Initialized Timelock config account.
 ///   3. `[writable]` Initialized Signatory Mint account
 ///   4. `[writable]` Initialized Admin Mint account
 ///   5. `[writable]` Initialized Voting Mint account
@@ -25,7 +25,7 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///   12. `[writable]` Initialized Destination account for first signatory token
 ///   13. `[writable]` Initialized Yes voting dump account
 ///   14. `[writable]` Initialized No voting dump account
-///   15. `[writable]` Initialized Governance holding account
+///   15. `[writable]` Initialized source holding account
 ///   16. `[]` Source mint
 ///   17. `[]` Timelock minting authority
 ///   18. `[]` Timelock Program

@@ -56,7 +56,7 @@ export const ProposalView = () => {
   const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
-  const governanceMint = useMint(timelockConfig?.info.governanceMint);
+  const sourceMint = useMint(proposal?.info.sourceMint);
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
   const [votingAccounts, setVotingAccounts] = useState<any>({});
   const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
@@ -74,12 +74,12 @@ export const ProposalView = () => {
   }, [proposal]);
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
+      {proposal && sigMint && votingMint && sourceMint && yesVotingMint ? (
         <InnerProposalView
           proposal={proposal}
           timelockState={timelockState}
           timelockConfig={timelockConfig}
-          governanceMint={governanceMint}
+          sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
           votingAccounts={votingAccounts}
@@ -103,7 +103,7 @@ function InnerProposalView({
   yesVotingMint,
   instructions,
   timelockConfig,
-  governanceMint,
+  sourceMint,
   votingAccounts,
   yesVotingAccounts,
   noVotingAccounts,
@@ -114,7 +114,7 @@ function InnerProposalView({
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
-  governanceMint: MintInfo;
+  sourceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
   votingAccounts: Record<string, { amount: BN }>;
   yesVotingAccounts: Record<string, { amount: BN }>;
@@ -179,7 +179,7 @@ function InnerProposalView({
           <Col md={12} xs={24}>
             <Row>
               <TokenIcon
-                mintAddress={config?.info.governanceMint.toBase58()}
+                mintAddress={proposal?.info.sourceMint.toBase58()}
                 size={60}
               />
               <Col>
@@ -244,7 +244,7 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.VOTES_CAST}
                 value={yesVotingMint.supply.toNumber()}
-                suffix={`/ ${governanceMint.supply.toNumber()}`}
+                suffix={`/ ${sourceMint.supply.toNumber()}`}
               />
             </Card>
           </Col>
@@ -253,7 +253,7 @@ function InnerProposalView({
               <Statistic
                 valueStyle={{ color: 'green' }}
                 title={LABELS.VOTES_REQUIRED}
-                value={getVotesRequired(timelockConfig, governanceMint)}
+                value={getVotesRequired(timelockConfig, sourceMint)}
               />
             </Card>
           </Col>
@@ -324,18 +324,18 @@ function InnerProposalView({
 
 function getVotesRequired(
   timelockConfig: ParsedAccount<TimelockConfig>,
-  governanceMint: MintInfo,
+  sourceMint: MintInfo,
 ): number {
   if (timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.5);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.5);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.66);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.66);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
   ) {
-    return governanceMint.supply.toNumber();
+    return sourceMint.supply.toNumber();
   }
   return 0;
 }

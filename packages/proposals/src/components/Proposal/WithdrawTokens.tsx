@@ -32,9 +32,7 @@ export function WithdrawTokens({
   const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
-  const governanceAccount = useAccountByMint(
-    timelockConfig.info.governanceMint,
-  );
+  const userAccount = useAccountByMint(proposal.info.sourceMint);
   const votingTokens = (voteAccount && voteAccount.info.amount.toNumber()) || 0;
   let totalTokens = votingTokens;
   const inEscrow =
@@ -71,7 +69,7 @@ export function WithdrawTokens({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (governanceAccount) {
+            if (userAccount) {
               // tokenAmount is out of date in this scope, so we use a trick to get it here.
               const valueHolder = { value: 0 };
               await setTokenAmount(amount => {
@@ -87,7 +85,7 @@ export function WithdrawTokens({
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,
-                governanceAccount.pubkey,
+                userAccount.pubkey,
                 valueHolder.value,
               );
               // reset
