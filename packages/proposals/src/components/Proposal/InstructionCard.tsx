@@ -104,7 +104,7 @@ function PlayStatusButton({
     if (ineligibleToSee) {
       const id = setInterval(() => {
         connection.getSlot().then(setCurrSlot);
-      }, 400);
+      }, 5000);
 
       return () => {
         clearInterval(id);
