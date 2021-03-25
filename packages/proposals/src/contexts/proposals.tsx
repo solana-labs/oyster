@@ -7,7 +7,12 @@ import {
 } from '@solana/web3.js';
 import { useMemo } from 'react';
 
-import { utils, ParsedAccount, useConnectionConfig, cache } from '@oyster/common';
+import {
+  utils,
+  ParsedAccount,
+  useConnectionConfig,
+  cache,
+} from '@oyster/common';
 import {
   CustomSingleSignerTimelockTransactionLayout,
   CustomSingleSignerTimelockTransactionParser,
@@ -146,7 +151,7 @@ function useSetupProposalsCache({
     return () => {
       connection.removeProgramAccountChangeListener(subID);
     };
-  }, [connection, PROGRAM_IDS.timelock.programAccountId]);
+  }, [connection, PROGRAM_IDS.timelock.programAccountId.toBase58()]);
 }
 export const useProposals = () => {
   const context = useContext(ProposalsContext);
@@ -155,9 +160,9 @@ export const useProposals = () => {
 
 export const useConfig = (id: string) => {
   const context = useContext(ProposalsContext);
-  if(!context?.configs) {
+  if (!context?.configs) {
     return;
   }
 
   return context.configs[id];
-}
+};
