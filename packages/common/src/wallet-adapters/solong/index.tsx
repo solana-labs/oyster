@@ -21,7 +21,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
     return (window as any).solong.signTransaction(transaction);
   }
 
-  async signMultipleTransaction(transactions: Transaction[]) {
+  async signAllTransactions(transactions: Transaction[]) {
     return transactions;
   }
 

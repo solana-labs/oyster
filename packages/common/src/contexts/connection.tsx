@@ -25,6 +25,11 @@ export type ENV =
 
 export const ENDPOINTS = [
   {
+    name: 'devnet' as ENV,
+    endpoint: clusterApiUrl('devnet'),
+    ChainId: ChainId.Devnet,
+  },
+  {
     name: 'mainnet-beta' as ENV,
     endpoint: 'https://solana-api.projectserum.com/',
     ChainId: ChainId.MainnetBeta,
@@ -33,11 +38,6 @@ export const ENDPOINTS = [
     name: 'testnet' as ENV,
     endpoint: clusterApiUrl('testnet'),
     ChainId: ChainId.Testnet,
-  },
-  {
-    name: 'devnet' as ENV,
-    endpoint: clusterApiUrl('devnet'),
-    ChainId: ChainId.Devnet,
   },
   {
     name: 'localnet' as ENV,
@@ -85,7 +85,7 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
 
 export function ConnectionProvider({ children = undefined as any }) {
   const [endpoint, setEndpoint] = useLocalStorageState(
-    'connectionEndpts',
+    'connectionEndpoint',
     ENDPOINTS[0].endpoint,
   );
 
