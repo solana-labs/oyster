@@ -11,12 +11,13 @@ import {
 } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenDisplay, TokenIcon } from '@oyster/common';
+import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
@@ -30,7 +31,7 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
-import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
+import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
@@ -51,10 +52,12 @@ export const ProposalView = () => {
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
   const timelockConfig = context.configs[proposal?.info.config.toBase58()];
+  const timelockState = context.states[proposal?.info.state.toBase58()];
   const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
-  const governanceMint = useMint(timelockConfig?.info.governanceMint);
+
+  const sourceMint = useMint(proposal?.info.sourceMint);
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
   const [votingAccounts, setVotingAccounts] = useState<any>({});
   const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
@@ -72,11 +75,12 @@ export const ProposalView = () => {
   }, [proposal]);
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
+      {proposal && sigMint && votingMint && sourceMint && yesVotingMint ? (
         <InnerProposalView
           proposal={proposal}
+          timelockState={timelockState}
           timelockConfig={timelockConfig}
-          governanceMint={governanceMint}
+          sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
           votingAccounts={votingAccounts}
@@ -94,22 +98,24 @@ export const ProposalView = () => {
 
 function InnerProposalView({
   proposal,
+  timelockState,
   sigMint,
   votingMint,
   yesVotingMint,
   instructions,
   timelockConfig,
-  governanceMint,
+  sourceMint,
   votingAccounts,
   yesVotingAccounts,
   noVotingAccounts,
 }: {
   proposal: ParsedAccount<TimelockSet>;
   timelockConfig: ParsedAccount<TimelockConfig>;
+  timelockState: ParsedAccount<TimelockState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
-  governanceMint: MintInfo;
+  sourceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
   votingAccounts: Record<string, { amount: BN }>;
   yesVotingAccounts: Record<string, { amount: BN }>;
@@ -119,14 +125,14 @@ function InnerProposalView({
   const adminAccount = useAccountByMint(proposal.info.adminMint);
   const config = useConfig(proposal.info.config.toBase58());
 
-  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
+  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
-  const isUrl = !!proposal.info.state.descLink.match(urlRegex);
+  const isUrl = !!timelockState.info.descLink.match(urlRegex);
   const isGist =
-    !!proposal.info.state.descLink.match(/gist/i) &&
-    !!proposal.info.state.descLink.match(/github/i);
-  const [content, setContent] = useState(proposal.info.state.descLink);
+    !!timelockState.info.descLink.match(/gist/i) &&
+    !!timelockState.info.descLink.match(/github/i);
+  const [content, setContent] = useState(timelockState.info.descLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -134,7 +140,7 @@ function InnerProposalView({
 
   useMemo(() => {
     if (loading) {
-      let toFetch = proposal.info.state.descLink;
+      let toFetch = timelockState.info.descLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -174,12 +180,12 @@ function InnerProposalView({
           <Col md={12} xs={24}>
             <Row>
               <TokenIcon
-                mintAddress={config?.info.governanceMint.toBase58()}
+                mintAddress={proposal?.info.sourceMint.toBase58()}
                 size={60}
               />
               <Col>
-                <h1>{proposal.info.state.name}</h1>
-                <StateBadge proposal={proposal} />
+                <h1>{timelockState.info.name}</h1>
+                <StateBadge state={timelockState} />
               </Col>
             </Row>
           </Col>
@@ -187,38 +193,64 @@ function InnerProposalView({
             <div className="proposal-actions">
               {adminAccount &&
                 adminAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state.status === TimelockStateStatus.Draft && (
-                  <AddSigners proposal={proposal} />
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <AddSigners proposal={proposal} state={timelockState} />
                 )}
               {sigAccount &&
                 sigAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state.status === TimelockStateStatus.Draft && (
-                  <SignButton proposal={proposal} />
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <SignButton proposal={proposal} state={timelockState} />
                 )}
-              <MintGovernanceTokens timelockConfig={timelockConfig} />
+              <MintSourceTokens
+                timelockConfig={timelockConfig}
+                useGovernance={
+                  proposal.info.sourceMint.toBase58() ===
+                  timelockConfig.info.governanceMint.toBase58()
+                }
+              />
               <RegisterToVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
+                state={timelockState}
               />
               <WithdrawTokens
                 timelockConfig={timelockConfig}
                 proposal={proposal}
+                state={timelockState}
               />
-              <Vote proposal={proposal} timelockConfig={timelockConfig} />
+              <Vote
+                proposal={proposal}
+                timelockConfig={timelockConfig}
+                state={timelockState}
+              />
             </div>
           </Col>
         </Row>
-
+        {false && (
+          <Row className="proposals-visual">
+            <Col md={24} xs={24}>
+              <Card>
+                <VoterBubbleGraph
+                  width={400}
+                  height={400}
+                  noVotingAccounts={{}}
+                  yesVotingAccounts={{}}
+                  votingAccounts={{ '1': { amount: new BN(100) } }}
+                />
+              </Card>
+            </Col>
+          </Row>
+        )}
         <Row className="proposals-stats">
           <Col md={7} xs={24}>
             <Card>
               <Statistic
                 title={LABELS.SIG_GIVEN}
                 value={
-                  proposal.info.state.totalSigningTokensMinted.toNumber() -
+                  timelockState.info.totalSigningTokensMinted.toNumber() -
                   sigMint.supply.toNumber()
                 }
-                suffix={`/ ${proposal.info.state.totalSigningTokensMinted.toNumber()}`}
+                suffix={`/ ${timelockState.info.totalSigningTokensMinted.toNumber()}`}
               />
             </Card>
           </Col>
@@ -227,7 +259,7 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.VOTES_CAST}
                 value={yesVotingMint.supply.toNumber()}
-                suffix={`/ ${governanceMint.supply.toNumber()}`}
+                suffix={`/ ${sourceMint.supply.toNumber()}`}
               />
             </Card>
           </Col>
@@ -236,7 +268,7 @@ function InnerProposalView({
               <Statistic
                 valueStyle={{ color: 'green' }}
                 title={LABELS.VOTES_REQUIRED}
-                value={getVotesRequired(timelockConfig, governanceMint)}
+                value={getVotesRequired(timelockConfig, sourceMint)}
               />
             </Card>
           </Col>
@@ -256,7 +288,7 @@ function InnerProposalView({
                   failed ? (
                     <p>
                       {LABELS.DESCRIPTION}:{' '}
-                      <a href={proposal.info.state.descLink} target="_blank">
+                      <a href={timelockState.info.descLink} target="_blank">
                         {msg ? msg : LABELS.NO_LOAD}
                       </a>
                     </p>
@@ -280,15 +312,16 @@ function InnerProposalView({
                         proposal={proposal}
                         position={position + 1}
                         instruction={instruction}
+                        state={timelockState}
                       />
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    proposal.info.state.status ===
-                      TimelockStateStatus.Draft && (
+                    timelockState.info.status === TimelockStateStatus.Draft && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
+                          state={timelockState}
                           config={timelockConfig}
                           position={instructionsForProposal.length}
                         />
@@ -306,18 +339,18 @@ function InnerProposalView({
 
 function getVotesRequired(
   timelockConfig: ParsedAccount<TimelockConfig>,
-  governanceMint: MintInfo,
+  sourceMint: MintInfo,
 ): number {
   if (timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.5);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.5);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.66);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.66);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
   ) {
-    return governanceMint.supply.toNumber();
+    return sourceMint.supply.toNumber();
   }
   return 0;
 }

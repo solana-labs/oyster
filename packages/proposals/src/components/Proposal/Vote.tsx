@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
@@ -22,9 +23,11 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function Vote({
   proposal,
+  state,
   timelockConfig,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   timelockConfig: ParsedAccount<TimelockConfig>;
 }) {
   const wallet = useWallet();
@@ -37,7 +40,7 @@ export function Vote({
   const eligibleToView =
     voteAccount &&
     voteAccount.info.amount.toNumber() > 0 &&
-    proposal.info.state.status === TimelockStateStatus.Voting;
+    state.info.status === TimelockStateStatus.Voting;
   return eligibleToView ? (
     <Button
       type="primary"
@@ -88,6 +91,7 @@ export function Vote({
                 wallet.wallet,
                 proposal,
                 timelockConfig,
+                state,
                 voteAccount.pubkey,
                 yesVoteAccount.pubkey,
                 noVoteAccount.pubkey,

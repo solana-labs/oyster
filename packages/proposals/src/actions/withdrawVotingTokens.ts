@@ -12,7 +12,7 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockSet } from '../models/timelock';
+import { TimelockSet, TimelockState } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
 import { LABELS } from '../constants';
@@ -25,6 +25,7 @@ export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  state: ParsedAccount<TimelockState>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
@@ -114,10 +115,11 @@ export const withdrawVotingTokens = async (
       existingYesVoteAccount,
       existingNoVoteAccount,
       destinationAccount,
-      proposal.info.governanceHolding,
+      proposal.info.sourceHolding,
       proposal.info.yesVotingDump,
       proposal.info.noVotingDump,
       proposal.info.votingMint,
+      state.pubkey,
       proposal.pubkey,
       transferAuthority.publicKey,
       yesTransferAuthority.publicKey,

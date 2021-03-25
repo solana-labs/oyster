@@ -1,14 +1,14 @@
-import { ParsedAccount, programIds } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress, InputNumber, Radio } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { TimelockConfig, TimelockSet } from '../../models/timelock';
-import { utils, contexts, hooks } from '@oyster/common';
+import React, { useState } from 'react';
+import { TimelockConfig } from '../../models/timelock';
+import { utils, contexts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
 import {
-  GovernanceEntryInterface,
-  mintGovernanceTokens,
-} from '../../actions/mintGovernanceTokens';
+  SourceEntryInterface,
+  mintSourceTokens,
+} from '../../actions/mintSourceTokens';
 
 const { notify } = utils;
 const { TextArea } = Input;
@@ -21,61 +21,61 @@ const layout = {
   wrapperCol: { span: 19 },
 };
 
-export default function MintGovernanceTokens({
+export default function MintSourceTokens({
   timelockConfig,
+  useGovernance,
 }: {
   timelockConfig: ParsedAccount<TimelockConfig>;
+  useGovernance: boolean;
 }) {
   const PROGRAM_IDS = utils.programIds();
   const wallet = useWallet();
   const connection = useConnection();
-  const governanceMint = useMint(timelockConfig.info.governanceMint);
-
+  const mintKey = useGovernance
+    ? timelockConfig.info.governanceMint
+    : timelockConfig.info.councilMint;
+  const mint = useMint(mintKey);
   const [saving, setSaving] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [bulkModeVisible, setBulkModeVisible] = useState(false);
   const [savePerc, setSavePerc] = useState(0);
-  const [failedGovernances, setFailedGovernances] = useState<any>([]);
+  const [failedSources, setFailedSources] = useState<any>([]);
   const [form] = Form.useForm();
 
   const onSubmit = async (values: {
-    governanceHolders: string;
-    failedGovernances: string;
-    singleGovernanceHolder: string;
-    singleGovernanceCount: number;
+    sourceHolders: string;
+    failedSources: string;
+    singleSourceHolder: string;
+    singleSourceCount: number;
   }) => {
-    const { singleGovernanceHolder, singleGovernanceCount } = values;
-    const governanceHoldersAndCounts = values.governanceHolders
-      ? values.governanceHolders.split(',').map(s => s.trim())
+    const { singleSourceHolder, singleSourceCount } = values;
+    const sourceHoldersAndCounts = values.sourceHolders
+      ? values.sourceHolders.split(',').map(s => s.trim())
       : [];
-    const governanceHolders: GovernanceEntryInterface[] = [];
-    let failedGovernancesHold: GovernanceEntryInterface[] = [];
+    const sourceHolders: SourceEntryInterface[] = [];
+    let failedSourcesHold: SourceEntryInterface[] = [];
     const zeroKey = PROGRAM_IDS.system;
-    governanceHoldersAndCounts.forEach((value: string, index: number) => {
+    sourceHoldersAndCounts.forEach((value: string, index: number) => {
       if (index % 2 == 0)
-        governanceHolders.push({
+        sourceHolders.push({
           owner: value ? new PublicKey(value) : zeroKey,
           tokenAmount: 0,
-          governanceAccount: undefined,
+          sourceAccount: undefined,
         });
       else
-        governanceHolders[governanceHolders.length - 1].tokenAmount = parseInt(
-          value,
-        );
+        sourceHolders[sourceHolders.length - 1].tokenAmount = parseInt(value);
     });
-    console.log(governanceHolders);
+    console.log(sourceHolders);
 
-    if (singleGovernanceHolder)
-      governanceHolders.push({
-        owner: singleGovernanceHolder
-          ? new PublicKey(singleGovernanceHolder)
-          : zeroKey,
-        tokenAmount: singleGovernanceCount,
-        governanceAccount: undefined,
+    if (singleSourceHolder)
+      sourceHolders.push({
+        owner: singleSourceHolder ? new PublicKey(singleSourceHolder) : zeroKey,
+        tokenAmount: singleSourceCount,
+        sourceAccount: undefined,
       });
 
-    if (!governanceHolders.find(v => v.owner != zeroKey)) {
+    if (!sourceHolders.find(v => v.owner != zeroKey)) {
       notify({
         message: LABELS.ENTER_AT_LEAST_ONE_PUB_KEY,
         type: 'error',
@@ -83,7 +83,7 @@ export default function MintGovernanceTokens({
       return;
     }
 
-    if (governanceHolders.find(v => v.tokenAmount === 0)) {
+    if (sourceHolders.find(v => v.tokenAmount === 0)) {
       notify({
         message: LABELS.CANT_GIVE_ZERO_TOKENS,
         type: 'error',
@@ -94,22 +94,21 @@ export default function MintGovernanceTokens({
 
     setSaving(true);
 
-    const failedGovernanceCatch = (index: number, error: any) => {
+    const failedSourceCatch = (index: number, error: any) => {
       if (error) console.error(error);
-      failedGovernancesHold.push(governanceHolders[index]);
+      failedSourcesHold.push(sourceHolders[index]);
       notify({
-        message:
-          governanceHolders[index].owner?.toBase58() + LABELS.PUB_KEY_FAILED,
+        message: sourceHolders[index].owner?.toBase58() + LABELS.PUB_KEY_FAILED,
         type: 'error',
       });
     };
 
-    const governanceHoldersToRun = [];
-    for (let i = 0; i < governanceHolders.length; i++) {
+    const sourceHoldersToRun = [];
+    for (let i = 0; i < sourceHolders.length; i++) {
       try {
-        if (governanceHolders[i].owner) {
+        if (sourceHolders[i].owner) {
           const tokenAccounts = await connection.getTokenAccountsByOwner(
-            governanceHolders[i].owner || PROGRAM_IDS.timelock,
+            sourceHolders[i].owner || PROGRAM_IDS.timelock,
             {
               programId: PROGRAM_IDS.token,
             },
@@ -117,50 +116,57 @@ export default function MintGovernanceTokens({
           const specificToThisMint = tokenAccounts.value.find(
             a =>
               deserializeAccount(a.account.data).mint.toBase58() ===
-              timelockConfig.info.governanceMint.toBase58(),
+              mintKey.toBase58(),
           );
-          governanceHolders[i].governanceAccount = specificToThisMint?.pubkey;
-          governanceHoldersToRun.push(governanceHolders[i]);
+          sourceHolders[i].sourceAccount = specificToThisMint?.pubkey;
+          sourceHoldersToRun.push(sourceHolders[i]);
         }
       } catch (e) {
-        failedGovernanceCatch(i, e);
+        failedSourceCatch(i, e);
       }
     }
 
     try {
-      await mintGovernanceTokens(
+      await mintSourceTokens(
         connection,
         wallet.wallet,
         timelockConfig,
-        governanceHoldersToRun,
+        useGovernance,
+        sourceHoldersToRun,
         setSavePerc,
-        index => failedGovernanceCatch(index, null),
+        index => failedSourceCatch(index, null),
       );
     } catch (e) {
       console.error(e);
-      failedGovernancesHold = governanceHolders;
+      failedSourcesHold = sourceHolders;
     }
 
-    setFailedGovernances(failedGovernancesHold);
+    setFailedSources(failedSourcesHold);
     setSaving(false);
     setSavePerc(0);
-    setIsModalVisible(failedGovernancesHold.length > 0);
-    if (failedGovernancesHold.length === 0) form.resetFields();
+    setIsModalVisible(failedSourcesHold.length > 0);
+    if (failedSourcesHold.length === 0) form.resetFields();
   };
   return (
     <>
-      {governanceMint?.mintAuthority?.toBase58() ===
+      {mint?.mintAuthority?.toBase58() ===
       wallet.wallet?.publicKey?.toBase58() ? (
         <Button
           onClick={() => {
             setIsModalVisible(true);
           }}
         >
-          {LABELS.ADD_GOVERNANCE_TOKENS}
+          {useGovernance
+            ? LABELS.ADD_GOVERNANCE_TOKENS
+            : LABELS.ADD_COUNCIL_TOKENS}
         </Button>
       ) : null}
       <Modal
-        title={LABELS.ADD_GOVERNANCE_TOKENS}
+        title={
+          useGovernance
+            ? LABELS.ADD_GOVERNANCE_TOKENS
+            : LABELS.ADD_COUNCIL_TOKENS
+        }
         visible={isModalVisible}
         destroyOnClose={true}
         onOk={form.submit}
@@ -170,7 +176,7 @@ export default function MintGovernanceTokens({
         }}
       >
         <Form
-          className={'governance-form'}
+          className={'source-form'}
           {...layout}
           form={form}
           onFinish={onSubmit}
@@ -199,14 +205,14 @@ export default function MintGovernanceTokens({
               {!bulkModeVisible && (
                 <>
                   <Form.Item
-                    name="singleGovernanceHolder"
+                    name="singleSourceHolder"
                     label={LABELS.SINGLE_HOLDER}
                     rules={[{ required: false }]}
                   >
                     <Input placeholder={LABELS.SINGLE_KEY} />
                   </Form.Item>
                   <Form.Item
-                    name="singleGovernanceCount"
+                    name="singleSourceCount"
                     label={LABELS.AMOUNT}
                     initialValue={0}
                     rules={[{ required: false }]}
@@ -217,7 +223,7 @@ export default function MintGovernanceTokens({
               )}
               {bulkModeVisible && (
                 <Form.Item
-                  name="governanceHolders"
+                  name="sourceHolders"
                   label={LABELS.BULK_TOKENS}
                   rules={[{ required: false }]}
                 >
@@ -231,7 +237,7 @@ export default function MintGovernanceTokens({
         </Form>
         {saving && <Progress percent={savePerc} status="active" />}
 
-        {!saving && failedGovernances.length > 0 && bulkModeVisible && (
+        {!saving && failedSources.length > 0 && bulkModeVisible && (
           <div
             style={{
               flex: 1,
@@ -243,7 +249,7 @@ export default function MintGovernanceTokens({
           >
             <Button
               onClick={() => {
-                navigator.clipboard.writeText(failedGovernances.join(','));
+                navigator.clipboard.writeText(failedSources.join(','));
                 notify({
                   message: LABELS.FAILED_HOLDERS_COPIED_TO_CLIPBOARD,
                   type: 'success',
@@ -256,7 +262,7 @@ export default function MintGovernanceTokens({
             <Button
               onClick={() => {
                 form.setFieldsValue({
-                  governances: failedGovernances.join(','),
+                  sources: failedSources.join(','),
                 });
                 notify({
                   message: LABELS.FAILED_HOLDERS_COPIED_TO_INPUT,

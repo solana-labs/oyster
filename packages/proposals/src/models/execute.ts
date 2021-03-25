@@ -10,14 +10,16 @@ import { TimelockInstruction } from './timelock';
 /// Executes a command in the timelock set.
 ///
 ///   0. `[writable]` Transaction account you wish to execute.
-///   1. `[]` Timelock set account.
+///   1. `[writable]` Timelock state account.
 ///   2. `[]` Program being invoked account
+///   3. `[]` Timelock set account.
 ///   4. `[]` Timelock config
 ///   5. `[]` Timelock program account pub key.
 ///   6. `[]` Clock sysvar.
-///   6+ Any extra accounts that are part of the instruction, in order
+///   7+ Any extra accounts that are part of the instruction, in order
 export const executeInstruction = (
   transactionAccount: PublicKey,
+  timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   programBeingInvokedAccount: PublicKey,
   timelockConfig: PublicKey,
@@ -41,10 +43,12 @@ export const executeInstruction = (
   );
 
   const keys = [
+    // just a note this were all set to writable true...come back and check on this
     { pubkey: transactionAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
-    { pubkey: programBeingInvokedAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockConfig, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: programBeingInvokedAccount, isSigner: false, isWritable: false },
+    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
+    { pubkey: timelockConfig, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
       isSigner: false,

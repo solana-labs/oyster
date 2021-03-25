@@ -75,7 +75,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
     leaf
       .append('circle')
       //@ts-ignore
-      .attr('id', d => (d.leafUid = DOM.uid('leaf')).id)
+      .attr('id', d => (d.leafUid = { id: d.name }).id)
       .attr('r', d => d.r)
       .attr('fill-opacity', 0.7)
       //@ts-ignore
@@ -84,7 +84,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
     leaf
       .append('clipPath')
       //@ts-ignore
-      .attr('id', d => (d.clipUid = DOM.uid('clip')).id)
+      .attr('id', d => (d.clipUid = { id: d.name }).id)
       .append('use')
       //@ts-ignore
       .attr('xlink:href', d => d.leafUid.href);

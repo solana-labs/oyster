@@ -8,8 +8,10 @@ export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
-export const TRANSACTION_SLOTS = 4;
+export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
+// Key chosen to represent an unused key, a dummy empty. Points to system program.
+export const ZERO_KEY = '11111111111111111111111111111111';
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
@@ -39,14 +41,18 @@ export interface TimelockConfig {
   votingEntryRule: VotingEntryRule;
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
   minimumSlotWaitingPeriod: BN;
-  /// Governance mint (optional)
+  /// Governance mint
   governanceMint: PublicKey;
+  /// Council mint (Optional)
+  councilMint: PublicKey;
   /// Program ID that is tied to this config (optional)
   program: PublicKey;
   /// Time limit in slots for proposal to be open to voting
   timeLimit: BN;
   /// Optional name
   name: string;
+  /// Running count of proposals
+  count: number;
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -58,15 +64,17 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
+    Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
+    BufferLayout.u32('count'),
+    BufferLayout.seq(BufferLayout.u8(), 296, 'padding'),
   ],
 );
 
 export enum VotingEntryRule {
-  DraftOnly = 0,
-  Anytime = 1,
+  Anytime = 0,
 }
 
 export enum ConsensusAlgorithm {
@@ -76,8 +84,7 @@ export enum ConsensusAlgorithm {
 }
 
 export enum ExecutionType {
-  AllOrNothing = 0,
-  AnyAboveVoteFinishSlot = 1,
+  Independent = 0,
 }
 
 export enum TimelockType {
@@ -113,6 +120,8 @@ export const STATE_COLOR: Record<string, string> = {
 };
 
 export interface TimelockState {
+  timelockSet: PublicKey;
+  version: number;
   status: TimelockStateStatus;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
@@ -120,6 +129,9 @@ export interface TimelockState {
   descLink: string;
   votingEndedAt: BN;
   votingBeganAt: BN;
+  createdAt: BN;
+  completedAt: BN;
+  deletedAt: BN;
   executions: number;
   usedTxnSlots: number;
 }
@@ -131,32 +143,52 @@ for (let i = 0; i < TRANSACTION_SLOTS; i++) {
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    Layout.publicKey('config'),
+    Layout.publicKey('state'),
     BufferLayout.u8('version'),
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
     Layout.publicKey('votingMint'),
     Layout.publicKey('yesVotingMint'),
     Layout.publicKey('noVotingMint'),
+    Layout.publicKey('sourceMint'),
     Layout.publicKey('signatoryValidation'),
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
-    Layout.publicKey('governanceHolding'),
+    Layout.publicKey('sourceHolding'),
     Layout.publicKey('yesVotingDump'),
     Layout.publicKey('noVotingDump'),
-    Layout.publicKey('config'),
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
+  ],
+);
+
+export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.publicKey('timelockSet'),
+    BufferLayout.u8('version'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
     Layout.uint64('votingEndedAt'),
     Layout.uint64('votingBeganAt'),
+    Layout.uint64('createdAt'),
+    Layout.uint64('completedAt'),
+    Layout.uint64('deletedAt'),
     BufferLayout.u8('executions'),
     BufferLayout.u8('usedTxnSlots'),
     ...timelockTxns,
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
 export interface TimelockSet {
+  /// configuration values
+  config: PublicKey;
+
+  /// state values
+  state: PublicKey;
+
   /// Version of the struct
   version: number;
 
@@ -177,6 +209,9 @@ export interface TimelockSet {
   /// Mint that creates evidence of voting NO via token creation
   noVotingMint: PublicKey;
 
+  /// Source mint - either governance or council mint from config
+  sourceMint: PublicKey;
+
   /// Used to validate signatory tokens in a round trip transfer
   signatoryValidation: PublicKey;
 
@@ -187,19 +222,13 @@ export interface TimelockSet {
   votingValidation: PublicKey;
 
   /// Governance holding account
-  governanceHolding: PublicKey;
+  sourceHolding: PublicKey;
 
   /// Yes Voting dump account for exchanged vote tokens
   yesVotingDump: PublicKey;
 
   /// No Voting dump account for exchanged vote tokens
   noVotingDump: PublicKey;
-
-  /// configuration values
-  config: PublicKey;
-
-  /// Reserve state
-  state: TimelockState;
 }
 
 export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -209,6 +238,7 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
     BufferLayout.u8('executed'),
     BufferLayout.u16('instructionEndIndex'),
+    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
@@ -232,6 +262,39 @@ export const TimelockSetParser = (
 ) => {
   const buffer = Buffer.from(info.data);
   const data = TimelockSetLayout.decode(buffer);
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: {
+      config: data.config,
+      state: data.state,
+      version: data.version,
+      signatoryMint: data.signatoryMint,
+      adminMint: data.adminMint,
+      votingMint: data.votingMint,
+      yesVotingMint: data.yesVotingMint,
+      noVotingMint: data.noVotingMint,
+      sourceMint: data.sourceMint,
+      signatoryValidation: data.signatoryValidation,
+      adminValidation: data.adminValidation,
+      votingValidation: data.votingValidation,
+      sourceHolding: data.sourceHolding,
+      yesVotingDump: data.yesVotingDump,
+      noVotingDump: data.noVotingDump,
+    },
+  };
+
+  return details;
+};
+
+export const TimelockStateParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = TimelockStateLayout.decode(buffer);
 
   const timelockTxns = [];
   for (let i = 0; i < TRANSACTION_SLOTS; i++) {
@@ -244,30 +307,19 @@ export const TimelockSetParser = (
       ...info,
     },
     info: {
-      version: data.version,
-      signatoryMint: data.signatoryMint,
-      adminMint: data.adminMint,
-      votingMint: data.votingMint,
-      yesVotingMint: data.yesVotingMint,
-      noVotingMint: data.noVotingMint,
-      signatoryValidation: data.signatoryValidation,
-      adminValidation: data.adminValidation,
-      votingValidation: data.votingValidation,
-      governanceHolding: data.governanceHolding,
-      yesVotingDump: data.yesVotingDump,
-      noVotingDump: data.noVotingDump,
-      config: data.config,
-      state: {
-        status: data.timelockStateStatus,
-        totalSigningTokensMinted: data.totalSigningTokensMinted,
-        descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
-        name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-        timelockTransactions: timelockTxns,
-        votingEndedAt: data.votingEndedAt,
-        votingBeganAt: data.votingBeganAt,
-        executions: data.executions,
-        usedTxnSlots: data.usedTxnSlots,
-      },
+      timelockSet: data.timelockSet,
+      status: data.timelockStateStatus,
+      totalSigningTokensMinted: data.totalSigningTokensMinted,
+      descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
+      name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
+      timelockTransactions: timelockTxns,
+      votingEndedAt: data.votingEndedAt,
+      votingBeganAt: data.votingBeganAt,
+      createdAt: data.createdAt,
+      completedAt: data.completedAt,
+      deletedAt: data.deletedAt,
+      executions: data.executions,
+      usedTxnSlots: data.usedTxnSlots,
     },
   };
 
@@ -319,9 +371,11 @@ export const TimelockConfigParser = (
       votingEntryRule: data.votingEntryRule,
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
+      councilMint: data.councilMint,
       program: data.program,
       timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
+      count: data.count,
     },
   };
 

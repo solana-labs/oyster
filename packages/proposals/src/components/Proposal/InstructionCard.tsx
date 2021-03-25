@@ -7,13 +7,14 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { ParsedAccount, contexts } from '@oyster/common';
-import { Card, Spin } from 'antd';
+import { Card } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
@@ -31,10 +32,12 @@ enum Playstate {
 export function InstructionCard({
   instruction,
   proposal,
+  state,
   position,
 }: {
   instruction: ParsedAccount<TimelockTransaction>;
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
@@ -65,6 +68,7 @@ export function InstructionCard({
           playing={playing}
           setPlaying={setPlaying}
           proposal={proposal}
+          state={state}
           instruction={instruction}
         />
       }
@@ -84,11 +88,13 @@ export function InstructionCard({
 
 function PlayStatusButton({
   proposal,
+  state,
   playing,
   setPlaying,
   instruction,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   instruction: ParsedAccount<TimelockTransaction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
@@ -97,25 +103,21 @@ function PlayStatusButton({
   const connection = useConnection();
   const [currSlot, setCurrSlot] = useState(0);
 
-  const elapsedTime = currSlot - proposal.info.state.votingEndedAt.toNumber();
+  const elapsedTime = currSlot - state.info.votingEndedAt.toNumber();
   const ineligibleToSee = elapsedTime < instruction.info.slot.toNumber();
 
   useEffect(() => {
     if (ineligibleToSee) {
-      const id = setInterval(() => {
+      const id = setTimeout(() => {
         connection.getSlot().then(setCurrSlot);
       }, 5000);
-
-      return () => {
-        clearInterval(id);
-      };
     }
-  }, [ineligibleToSee, connection]);
+  }, [ineligibleToSee, connection, currSlot]);
 
   const run = async () => {
     setPlaying(Playstate.Playing);
     try {
-      await execute(connection, wallet.wallet, proposal, instruction);
+      await execute(connection, wallet.wallet, proposal, state, instruction);
     } catch (e) {
       console.error(e);
       setPlaying(Playstate.Error);
@@ -124,7 +126,11 @@ function PlayStatusButton({
     setPlaying(Playstate.Played);
   };
 
-  if (proposal.info.state.status != TimelockStateStatus.Executing) return null;
+  if (
+    state.info.status != TimelockStateStatus.Executing &&
+    state.info.status != TimelockStateStatus.Completed
+  )
+    return null;
   if (ineligibleToSee) return null;
 
   if (playing === Playstate.Unplayed)

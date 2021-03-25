@@ -20,14 +20,19 @@ import {
   TimelockConfigLayout,
   TimelockConfigParser,
   TimelockSet,
+  TimelockState,
   TimelockSetLayout,
   TimelockSetParser,
   TimelockTransaction,
+  TimelockStateParser,
+  TimelockStateLayout,
+  CustomSingleSignerTimelockTransaction,
 } from '../models/timelock';
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<TimelockSet>>;
   transactions: Record<string, ParsedAccount<TimelockTransaction>>;
+  states: Record<string, ParsedAccount<TimelockState>>;
   configs: Record<string, ParsedAccount<TimelockConfig>>;
 }
 
@@ -43,17 +48,21 @@ export default function ProposalsProvider({ children = null as any }) {
 
   const [proposals, setProposals] = useState({});
   const [transactions, setTransactions] = useState({});
+  const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
 
   useSetupProposalsCache({
     connection,
     setProposals,
     setTransactions,
+    setStates,
     setConfigs,
   });
 
   return (
-    <ProposalsContext.Provider value={{ proposals, transactions, configs }}>
+    <ProposalsContext.Provider
+      value={{ proposals, transactions, configs, states }}
+    >
       {children}
     </ProposalsContext.Provider>
   );
@@ -63,11 +72,13 @@ function useSetupProposalsCache({
   connection,
   setProposals,
   setTransactions,
+  setStates,
   setConfigs,
 }: {
   connection: Connection;
   setProposals: React.Dispatch<React.SetStateAction<{}>>;
   setTransactions: React.Dispatch<React.SetStateAction<{}>>;
+  setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
 }) {
   const PROGRAM_IDS = utils.programIds();
@@ -85,6 +96,7 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<TimelockTransaction>
       > = {};
+      const newStates: Record<string, ParsedAccount<TimelockState>> = {};
       const newConfigs: Record<string, ParsedAccount<TimelockConfig>> = {};
 
       all[0].forEach(a => {
@@ -109,11 +121,17 @@ function useSetupProposalsCache({
             cached = cache.get(a.pubkey) as ParsedAccount<TimelockConfig>;
             newConfigs[a.pubkey.toBase58()] = cached;
             break;
+          case TimelockStateLayout.span:
+            cache.add(a.pubkey, a.account, TimelockStateParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<TimelockState>;
+            newStates[a.pubkey.toBase58()] = cached;
+            break;
         }
       });
 
       setProposals(newProposals);
       setTransactions(newTransactions);
+      setStates(newStates);
       setConfigs(newConfigs);
     });
     const subID = connection.onProgramAccountChange(
@@ -126,17 +144,35 @@ function useSetupProposalsCache({
             CustomSingleSignerTimelockTransactionParser,
             setTransactions,
           ],
+          [TimelockStateLayout.span, TimelockStateParser, setStates],
           [TimelockConfigLayout.span, TimelockConfigParser, setConfigs],
         ].forEach(arr => {
           const [span, parser, setter] = arr;
           if (info.accountInfo.data.length === span) {
             cache.add(info.accountId, info.accountInfo, parser);
-            const cached =
-              span === TimelockSetLayout.span
-                ? (cache.get(info.accountId) as ParsedAccount<TimelockSet>)
-                : (cache.get(
-                    info.accountId,
-                  ) as ParsedAccount<TimelockTransaction>);
+            let cached: any;
+            switch (info.accountInfo.data.length) {
+              case TimelockSetLayout.span:
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<TimelockSet>;
+                break;
+              case CustomSingleSignerTimelockTransactionLayout.span:
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<CustomSingleSignerTimelockTransaction>;
+                break;
+              case TimelockConfigLayout.span:
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<TimelockConfig>;
+                break;
+              case TimelockStateLayout.span:
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<TimelockState>;
+                break;
+            }
             setter((obj: any) => ({
               ...obj,
               [typeof info.accountId === 'string'

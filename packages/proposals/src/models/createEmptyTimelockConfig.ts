@@ -10,18 +10,20 @@ import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
 ///   0. `[writable]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
-///           program account key, governance mint key, timelock program account key.
+///           program account key, governance mint key, council mint key, and timelock program account key.
 ///   1. `[]` Program account to tie this config to.
 ///   2. `[]` Governance mint to tie this config to
-///   3. `[]` Payer
-///   4. `[]` Timelock program account pub key.
-///   5. `[]` Timelock program pub key. Different from program account - is the actual id of the executable.
-///   6. `[]` Token program account.
-///   7. `[]` System account.
+///   3. `[]` Council mint [optional] to tie this config to [Pass in 0s otherwise]
+///   4. `[]` Payer
+///   5. `[]` Timelock program account pub key.
+///   6. `[]` Timelock program pub key. Different from program account - is the actual id of the executable.
+///   7. `[]` Token program account.
+///   8. `[]` System account.
 export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
+  councilMint: PublicKey,
   payer: PublicKey,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
@@ -41,6 +43,7 @@ export const createEmptyTimelockConfigInstruction = (
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
+    { pubkey: councilMint, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
 
     {
