@@ -56,6 +56,7 @@ export const ProposalView = () => {
   const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
+
   const sourceMint = useMint(proposal?.info.sourceMint);
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
   const [votingAccounts, setVotingAccounts] = useState<any>({});
@@ -225,7 +226,21 @@ function InnerProposalView({
             </div>
           </Col>
         </Row>
-
+        {false && (
+          <Row className="proposals-visual">
+            <Col md={24} xs={24}>
+              <Card>
+                <VoterBubbleGraph
+                  width={400}
+                  height={400}
+                  noVotingAccounts={{}}
+                  yesVotingAccounts={{}}
+                  votingAccounts={{ '1': { amount: new BN(100) } }}
+                />
+              </Card>
+            </Col>
+          </Row>
+        )}
         <Row className="proposals-stats">
           <Col md={7} xs={24}>
             <Card>
