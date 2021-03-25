@@ -24,6 +24,7 @@ export const createProposal = async (
   wallet: any,
   name: string,
   description: string,
+  useGovernance: boolean,
   timelockConfig: ParsedAccount<TimelockConfig>,
 ): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
@@ -51,7 +52,7 @@ export const createProposal = async (
     sigDestinationAccount,
     yesVoteDumpAccount,
     noVoteDumpAccount,
-    governanceHoldingAccount,
+    sourceHoldingAccount,
     authority,
     instructions: associatedInstructions,
     signers: associatedSigners,
@@ -117,8 +118,10 @@ export const createProposal = async (
       sigDestinationAccount,
       yesVoteDumpAccount,
       noVoteDumpAccount,
-      governanceHoldingAccount,
-      timelockConfig.info.governanceMint,
+      sourceHoldingAccount,
+      useGovernance
+        ? timelockConfig.info.governanceMint
+        : timelockConfig.info.councilMint,
       authority,
       description,
       name,
@@ -170,7 +173,7 @@ interface ValidationReturn {
   sigDestinationAccount: PublicKey;
   yesVoteDumpAccount: PublicKey;
   noVoteDumpAccount: PublicKey;
-  governanceHoldingAccount: PublicKey;
+  sourceHoldingAccount: PublicKey;
   authority: PublicKey;
   signers: Account[][];
   instructions: TransactionInstruction[][];
@@ -316,7 +319,7 @@ async function getAssociatedAccountsAndInstructions(
     holdingSigners,
   );
 
-  const governanceHoldingAccount = createTokenAccount(
+  const sourceHoldingAccount = createTokenAccount(
     holdingInstructions,
     wallet.publicKey,
     accountRentExempt,
@@ -338,7 +341,7 @@ async function getAssociatedAccountsAndInstructions(
     sigDestinationAccount,
     yesVoteDumpAccount,
     noVoteDumpAccount,
-    governanceHoldingAccount,
+    sourceHoldingAccount,
     authority,
     signers: [
       mintSigners,

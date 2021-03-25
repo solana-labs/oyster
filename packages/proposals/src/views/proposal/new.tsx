@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, Modal } from 'antd';
+import { Button, ButtonProps, Modal, Radio } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { Account } from '@solana/web3.js';
-import {
-  ConsensusAlgorithm,
-  DESC_SIZE,
-  NAME_SIZE,
-} from '../../models/timelock';
-import { Link } from 'react-router-dom';
+import { DESC_SIZE, NAME_SIZE, ZERO_KEY } from '../../models/timelock';
 import { LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
+import { contexts, utils } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 import { useProposals } from '../../contexts/proposals';
@@ -17,6 +12,12 @@ import { useProposals } from '../../contexts/proposals';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { Option } = Select;
+const { notify } = utils;
+
+enum ProposalMintType {
+  Governance = 'governance',
+  Council = 'council',
+}
 
 const layout = {
   labelCol: { span: 8 },
@@ -42,10 +43,7 @@ export function NewProposalMenuItem(props: ButtonProps) {
 
   return (
     <>
-      <Button
-        onClick={() => setIsModalVisible(true)}
-        {...props}
-      >
+      <Button onClick={() => setIsModalVisible(true)} {...props}>
         {LABELS.NEW_PROPOSAL}
       </Button>
       <NewForm
@@ -74,15 +72,29 @@ export function NewForm({
 
   const onFinish = async (values: {
     name: string;
+    proposalMintType: string;
     description: string;
     timelockConfigKey: string;
   }) => {
     const config = context.configs[values.timelockConfigKey];
+
+    if (
+      values.proposalMintType === ProposalMintType.Council &&
+      config.info.councilMint.toBase58() === ZERO_KEY
+    ) {
+      notify({
+        message: LABELS.THIS_CONFIG_LACKS_COUNCIL,
+        type: 'error',
+      });
+      return;
+    }
+
     const newSet = await createProposal(
       connection,
       wallet.wallet,
       values.name,
       values.description,
+      values.proposalMintType === ProposalMintType.Governance,
       config,
     );
     handleOk(newSet);
@@ -95,6 +107,16 @@ export function NewForm({
       onCancel={handleCancel}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+        <Form.Item label={LABELS.PROPOSAL_MINT_TYPE} name="proposalMintType">
+          <Radio.Group>
+            <Radio.Button value={ProposalMintType.Governance}>
+              {LABELS.GOVERNANCE}
+            </Radio.Button>
+            <Radio.Button value={ProposalMintType.Council}>
+              {LABELS.COUNCIL}
+            </Radio.Button>
+          </Radio.Group>
+        </Form.Item>
         <Form.Item name="name" label={LABELS.NAME} rules={[{ required: true }]}>
           <Input maxLength={NAME_SIZE} />
         </Form.Item>

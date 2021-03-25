@@ -24,8 +24,6 @@ export const execute = async (
   state: ParsedAccount<TimelockState>,
   transaction: ParsedAccount<TimelockTransaction>,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
   const actualMessage = decodeBufferIntoMessage(transaction.info.instruction);

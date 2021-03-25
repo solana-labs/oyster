@@ -18,16 +18,17 @@ import { LABELS } from '../constants';
 const { createTokenAccount } = actions;
 const { sendTransactions } = contexts.Connection;
 const { notify } = utils;
-export interface GovernanceEntryInterface {
+export interface SourceEntryInterface {
   owner: PublicKey;
-  governanceAccount: PublicKey | undefined;
+  sourceAccount: PublicKey | undefined;
   tokenAmount: number;
 }
-export const mintGovernanceTokens = async (
+export const mintSourceTokens = async (
   connection: Connection,
   wallet: any,
   timelockConfig: ParsedAccount<TimelockConfig>,
-  entries: GovernanceEntryInterface[],
+  useGovernance: boolean,
+  entries: SourceEntryInterface[],
   setSavePerc: (num: number) => void,
   onFailedTxn: (index: number) => void,
 ) => {
@@ -43,12 +44,14 @@ export const mintGovernanceTokens = async (
   entries.forEach(e => {
     const signers: Account[] = [];
     const instructions: TransactionInstruction[] = [];
-    if (!e.governanceAccount)
-      e.governanceAccount = createTokenAccount(
+    if (!e.sourceAccount)
+      e.sourceAccount = createTokenAccount(
         instructions,
         wallet.publicKey,
         accountRentExempt,
-        timelockConfig.info.governanceMint,
+        useGovernance
+          ? timelockConfig.info.governanceMint
+          : timelockConfig.info.councilMint,
         e.owner,
         signers,
       );
@@ -57,7 +60,7 @@ export const mintGovernanceTokens = async (
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
         timelockConfig.info.governanceMint,
-        e.governanceAccount,
+        e.sourceAccount,
         wallet.publicKey,
         [],
         e.tokenAmount,

@@ -10,6 +10,8 @@ export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
+// Key chosen to represent an unused key, a dummy empty. Points to system program.
+export const ZERO_KEY = '11111111111111111111111111111111';
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
@@ -39,8 +41,10 @@ export interface TimelockConfig {
   votingEntryRule: VotingEntryRule;
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
   minimumSlotWaitingPeriod: BN;
-  /// Governance mint (optional)
+  /// Governance mint
   governanceMint: PublicKey;
+  /// Council mint (Optional)
+  councilMint: PublicKey;
   /// Program ID that is tied to this config (optional)
   program: PublicKey;
   /// Time limit in slots for proposal to be open to voting
@@ -60,6 +64,7 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
+    Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
@@ -146,10 +151,11 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
     Layout.publicKey('votingMint'),
     Layout.publicKey('yesVotingMint'),
     Layout.publicKey('noVotingMint'),
+    Layout.publicKey('sourceMint'),
     Layout.publicKey('signatoryValidation'),
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
-    Layout.publicKey('governanceHolding'),
+    Layout.publicKey('sourceHolding'),
     Layout.publicKey('yesVotingDump'),
     Layout.publicKey('noVotingDump'),
     BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
@@ -203,6 +209,9 @@ export interface TimelockSet {
   /// Mint that creates evidence of voting NO via token creation
   noVotingMint: PublicKey;
 
+  /// Source mint - either governance or council mint from config
+  sourceMint: PublicKey;
+
   /// Used to validate signatory tokens in a round trip transfer
   signatoryValidation: PublicKey;
 
@@ -213,7 +222,7 @@ export interface TimelockSet {
   votingValidation: PublicKey;
 
   /// Governance holding account
-  governanceHolding: PublicKey;
+  sourceHolding: PublicKey;
 
   /// Yes Voting dump account for exchanged vote tokens
   yesVotingDump: PublicKey;
@@ -267,10 +276,11 @@ export const TimelockSetParser = (
       votingMint: data.votingMint,
       yesVotingMint: data.yesVotingMint,
       noVotingMint: data.noVotingMint,
+      sourceMint: data.sourceMint,
       signatoryValidation: data.signatoryValidation,
       adminValidation: data.adminValidation,
       votingValidation: data.votingValidation,
-      governanceHolding: data.governanceHolding,
+      sourceHolding: data.sourceHolding,
       yesVotingDump: data.yesVotingDump,
       noVotingDump: data.noVotingDump,
     },
@@ -361,6 +371,7 @@ export const TimelockConfigParser = (
       votingEntryRule: data.votingEntryRule,
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
+      councilMint: data.councilMint,
       program: data.program,
       timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),

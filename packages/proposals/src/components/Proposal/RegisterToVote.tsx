@@ -9,7 +9,7 @@ import {
   VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
-import { depositGovernanceTokens } from '../../actions/depositGovernanceTokens';
+import { depositSourceTokens } from '../../actions/depositSourceTokens';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -33,9 +33,7 @@ export function RegisterToVote({
   const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
-  const governanceAccount = useAccountByMint(
-    timelockConfig.info.governanceMint,
-  );
+  const userTokenAccount = useAccountByMint(proposal.info.sourceMint);
   const alreadyHaveTokens =
     (voteAccount && voteAccount.info.amount.toNumber() > 0) ||
     (yesVoteAccount && yesVoteAccount.info.amount.toNumber() > 0) ||
@@ -60,14 +58,14 @@ export function RegisterToVote({
               <Col span={24}>
                 <p>
                   You can convert up to{' '}
-                  {governanceAccount?.info.amount.toNumber() || 0} tokens to
+                  {userTokenAccount?.info.amount.toNumber() || 0} tokens to
                   voting tokens to vote on this proposal. You can refund these
                   at any time.
                 </p>
-                {governanceAccount?.info.amount.toNumber() && (
+                {userTokenAccount?.info.amount.toNumber() && (
                   <Slider
                     min={1}
-                    max={governanceAccount?.info.amount.toNumber() || 0}
+                    max={userTokenAccount?.info.amount.toNumber() || 0}
                     onChange={setTokenAmount}
                   />
                 )}
@@ -77,7 +75,7 @@ export function RegisterToVote({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (governanceAccount) {
+            if (userTokenAccount) {
               // tokenAmount is out of date in this scope, so we use a trick to get it here.
               const valueHolder = { value: 0 };
               await setTokenAmount(amount => {
@@ -85,14 +83,14 @@ export function RegisterToVote({
                 return amount;
               });
 
-              await depositGovernanceTokens(
+              await depositSourceTokens(
                 connection,
                 wallet.wallet,
                 proposal,
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,
-                governanceAccount.pubkey,
+                userTokenAccount.pubkey,
                 valueHolder.value,
               );
               // reset

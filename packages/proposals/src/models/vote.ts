@@ -21,7 +21,7 @@ import BN from 'bn.js';
 ///   4. `[writable]` Voting mint account.
 ///   5. `[writable]` Yes Voting mint account.
 ///   6. `[writable]` No Voting mint account.
-///   7. `[]` Governance mint account
+///   7. `[]` Source mint account
 ///   8. `[]` Timelock set account.
 ///   9. `[]` Timelock config account.
 ///   10. `[]` Transfer authority
@@ -37,7 +37,7 @@ export const voteInstruction = (
   votingMint: PublicKey,
   yesVotingMint: PublicKey,
   noVotingMint: PublicKey,
-  governanceMint: PublicKey,
+  sourceMint: PublicKey,
   timelockSetAccount: PublicKey,
   timelockConfig: PublicKey,
   transferAuthority: PublicKey,
@@ -72,7 +72,7 @@ export const voteInstruction = (
     { pubkey: votingMint, isSigner: false, isWritable: true },
     { pubkey: yesVotingMint, isSigner: false, isWritable: true },
     { pubkey: noVotingMint, isSigner: false, isWritable: true },
-    { pubkey: governanceMint, isSigner: false, isWritable: false },
+    { pubkey: sourceMint, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: timelockConfig, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },

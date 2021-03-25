@@ -61,7 +61,7 @@ export const vote = async (
       proposal.info.votingMint,
       proposal.info.yesVotingMint,
       proposal.info.noVotingMint,
-      timelockConfig.info.governanceMint,
+      proposal.info.sourceMint,
       proposal.pubkey,
       timelockConfig.pubkey,
       transferAuthority.publicKey,

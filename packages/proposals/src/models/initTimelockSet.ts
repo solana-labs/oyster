@@ -26,7 +26,7 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///   13. `[writable]` Initialized Yes voting dump account
 ///   14. `[writable]` Initialized No voting dump account
 ///   15. `[writable]` Initialized Governance holding account
-///   16. `[]` Governance mint
+///   16. `[]` Source mint
 ///   17. `[]` Timelock minting authority
 ///   18. `[]` Timelock Program
 ///   19. '[]` Token program id
@@ -47,8 +47,8 @@ export const initTimelockSetInstruction = (
   destinationSignatoryAccount: PublicKey,
   yesVotingDumpAccount: PublicKey,
   noVotingDumpAccount: PublicKey,
-  governanceHoldingAccount: PublicKey,
-  governanceMintAccount: PublicKey,
+  sourceHoldingAccount: PublicKey,
+  sourceMintAccount: PublicKey,
   authority: PublicKey,
   descLink: string,
   name: string,
@@ -104,9 +104,9 @@ export const initTimelockSetInstruction = (
     { pubkey: destinationSignatoryAccount, isSigner: false, isWritable: true },
     { pubkey: yesVotingDumpAccount, isSigner: false, isWritable: true },
     { pubkey: noVotingDumpAccount, isSigner: false, isWritable: true },
-    { pubkey: governanceHoldingAccount, isSigner: false, isWritable: true },
+    { pubkey: sourceHoldingAccount, isSigner: false, isWritable: true },
     {
-      pubkey: governanceMintAccount,
+      pubkey: sourceMintAccount,
       isSigner: false,
       isWritable: false,
     },

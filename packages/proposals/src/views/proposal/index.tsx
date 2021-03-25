@@ -31,7 +31,7 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
-import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
+import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
@@ -200,7 +200,13 @@ function InnerProposalView({
                 timelockState.info.status === TimelockStateStatus.Draft && (
                   <SignButton proposal={proposal} state={timelockState} />
                 )}
-              <MintGovernanceTokens timelockConfig={timelockConfig} />
+              <MintSourceTokens
+                timelockConfig={timelockConfig}
+                useGovernance={
+                  proposal.info.sourceMint.toBase58() ===
+                  timelockConfig.info.governanceMint.toBase58()
+                }
+              />
               <RegisterToVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}

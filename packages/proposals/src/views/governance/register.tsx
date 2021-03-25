@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, Modal } from 'antd';
+import { Button, ButtonProps, Modal, Switch } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -8,6 +8,7 @@ import {
   ExecutionType,
   TimelockType,
   VotingEntryRule,
+  ZERO_KEY,
 } from '../../models/timelock';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
@@ -66,6 +67,7 @@ export function NewForm({
   isModalVisible: boolean;
 }) {
   const [form] = Form.useForm();
+  const [councilVisible, setCouncilVisible] = useState(false);
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
@@ -76,6 +78,7 @@ export function NewForm({
     minimumSlotWaitingPeriod: string;
     timeLimit: string;
     governanceMint: string;
+    councilMint: string;
     program: string;
     name: string;
   }) => {
@@ -102,6 +105,11 @@ export function NewForm({
       governanceMint: values.governanceMint
         ? new PublicKey(values.governanceMint)
         : undefined,
+      councilMint: values.councilMint
+        ? new PublicKey(values.councilMint)
+        : councilVisible
+        ? undefined // if visible but empty, set undefined so we instantiate one
+        : new PublicKey(ZERO_KEY), // default empty case, just make it padding since user doesnt want one.
       program: new PublicKey(values.program),
       name: values.name,
       timeLimit: new BN(values.timeLimit),
@@ -139,6 +147,18 @@ export function NewForm({
         >
           <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />
         </Form.Item>
+        <Form.Item label={LABELS.USE_COUNCIL_MINT}>
+          <Switch onChange={setCouncilVisible} defaultChecked={false} />
+        </Form.Item>
+        {councilVisible && (
+          <Form.Item
+            name="councilMint"
+            label={LABELS.COUNCIL_MINT}
+            rules={[{ required: false }]}
+          >
+            <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />
+          </Form.Item>
+        )}
         <Form.Item
           name="minimumSlotWaitingPeriod"
           label={LABELS.MINIMUM_SLOT_WAITING_PERIOD}
