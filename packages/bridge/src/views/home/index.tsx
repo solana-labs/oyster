@@ -4,37 +4,45 @@ import { GUTTER } from '../../constants';
 import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
 import { Link } from 'react-router-dom';
-import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
+import { useWormholeTransactions } from '../../hooks/useWormholeTransactions';
 import { TokenDisplay } from '../../components/TokenDisplay';
 import { toChainSymbol } from '../../contexts/chainPair';
 
 export const HomeView = () => {
   const {
     loading: loadingLockedAccounts,
-    externalAssets,
+    transfers,
     totalInUSD,
-  } = useWormholeAccounts();
+  } = useWormholeTransactions();
 
   const columns = [
     {
-      title: 'Symbol',
+      title: '',
+      dataIndex: 'logo',
+      key: 'logo',
+      render(text: string, record: any) {
+        return {
+          props: { style: {} },
+          children: (
+            <Link to={`/move?from=${toChainSymbol(record.chain)}&token=${record.symbol}`}>
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {record.logo && <TokenDisplay logo={record.logo} chain={record.chain} />}
+              </span>
+            </Link>
+          ),
+        }
+      }
+    },
+    {
+      title: 'Asset',
       dataIndex: 'symbol',
       key: 'symbol',
       render(text: string, record: any) {
         return {
-          props: {
-            style: {},
-          },
+          props: { style: {} },
           children: (
-            <Link
-              to={`/move?from=${toChainSymbol(record.chain)}&token=${
-                record.symbol
-              }`}
-            >
+            <Link to={`/move?from=${toChainSymbol(record.chain)}&token=${record.symbol}`}>
               <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {record.logo && (
-                  <TokenDisplay logo={record.logo} chain={record.chain} />
-                )}{' '}
                 {record.symbol}
               </span>
             </Link>
@@ -43,73 +51,31 @@ export const HomeView = () => {
       },
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Amount',
+      title: 'Tokens moved',
       dataIndex: 'amount',
       key: 'amount',
     },
     {
-      title: 'Amount ($)',
-      dataIndex: 'amountInUSD',
-      key: 'amountInUSD',
+      title: '$, value',
+      dataIndex: 'value',
+      key: 'value',
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
-      width: 100,
-      key: 'price',
-      render(text: string, record: any) {
-        return {
-          props: {
-            style: { textAlign: 'right' },
-          },
-          children: record.price ? formatUSD.format(record.price) : '--',
-        };
-      },
+      title: 'TX hash',
+      dataIndex: 'txhash',
+      key: 'txhash',
     },
     {
-      title: 'Asset Address',
-      dataIndex: 'address',
-      key: 'address',
-      render(text: string, record: any) {
-        return {
-          props: {
-            style: {},
-          },
-          children: (
-            <a href={record.explorer} target="_blank" rel="noopener noreferrer">
-              {shortenAddress(text, 6)}
-            </a>
-          ),
-        };
-      },
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
     },
     {
-      title: 'Wrapped Address',
-      dataIndex: 'mintKey',
-      key: 'mintKey',
-      render(text: string, record: any) {
-        return {
-          props: {
-            style: {},
-          },
-          children: (
-            <a
-              href={record.wrappedExplorer}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {shortenAddress(text, 6)}
-            </a>
-          ),
-        };
-      },
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
     },
-  ];
+  ]
 
   return (
     <>
@@ -138,7 +104,7 @@ export const HomeView = () => {
           </Col>
         </Row>
         <Table
-          dataSource={externalAssets.filter(a => a.name)}
+          dataSource={transfers.filter(a => a.symbol)}
           columns={columns}
           loading={loadingLockedAccounts}
         />
