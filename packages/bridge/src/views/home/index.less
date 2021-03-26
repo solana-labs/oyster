@@ -1,0 +1,43 @@
+@surge-20: #00CC82;
+.get-started {
+  background: url("/home/get-started.svg") center  center no-repeat;
+  background-size: 100%;
+  cursor: pointer;
+  width: 224px;
+  height: 64px;
+  display: inline-block;
+}
+.down-arrow {
+  background: url("/home/icons/down-arrow.svg") center  center no-repeat;
+  background-size: 150%;
+  cursor: pointer;
+  display: inline-block;
+  width: 25px;
+  height: 21px;
+}
+
+.home-container {
+  max-width: 1420px;
+  width: 100%;
+  margin: auto;
+}
+
+.justify-bottom-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 802px;
+
+  & > div {
+    font-size: 16px;
+    line-height: 160%;
+    width: auto;
+    margin: 30px 0 30px 0;
+  }
+}
+
+.grow-effect:hover {
+  transition: ease-out 100ms;
+  transform: scale(1.1);
+}

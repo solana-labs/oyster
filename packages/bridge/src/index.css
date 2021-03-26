@@ -1,8 +1,11 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+
+  font-style: normal;
+  font-weight: normal;
+  font-family: DM Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -21,9 +24,16 @@ code {
 .home-info-row {
   min-height: 75vh;
 }
+.img-svg-absolute {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  top: 0;
+}
 
 .wormhole-bg {
-  background-image: url('../src/assets/wormhole.svg');
-  background-size: cover;
-  background-position: center;
+  background-image: url('/home/background.svg');
+  background-size: 100% auto;
+  background-color: #06101a;
 }

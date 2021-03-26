@@ -7,14 +7,23 @@ import React, {
 } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import bs58 from 'bs58';
-import { programIds, useConnection, useConnectionConfig, useUserAccounts } from '@oyster/common';
+import {
+  programIds,
+  useConnection,
+  useConnectionConfig,
+  useUserAccounts,
+} from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
 import { ASSET_CHAIN, filterModalSolTokens } from '../utils/assets';
 import { useEthereum } from './ethereum';
 import { BigNumber } from 'ethers/utils';
 import { WrappedAssetFactory } from '../contracts/WrappedAssetFactory';
 import { WormholeFactory } from '../contracts/WormholeFactory';
-import { bridgeAuthorityKey, TransferRequestInfo, wrappedAssetMintKey } from '../models/bridge';
+import {
+  bridgeAuthorityKey,
+  TransferRequestInfo,
+  wrappedAssetMintKey,
+} from '../models/bridge';
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
 
@@ -88,7 +97,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
   const connection = useConnection();
 
   useEffect(() => {
-    if(!provider || !connection) {
+    if (!provider || !connection) {
       return;
     }
 
@@ -112,12 +121,11 @@ export const useCurrencyLeg = (mintAddress: string) => {
         // TODO: checked if mint is wrapped mint from eth...
 
         const accounts = userAccounts
-              .filter(a => a.info.mint.toBase58() === solToken.address)
-              .sort((a, b) => a.info.amount.toNumber() - b.info.amount.toNumber());
+          .filter(a => a.info.mint.toBase58() === solToken.address)
+          .sort((a, b) => a.info.amount.toNumber() - b.info.amount.toNumber());
 
         console.log(accounts);
       }
-
 
       if (ethToken) {
         let signer = provider.getSigner();
@@ -145,14 +153,11 @@ export const useCurrencyLeg = (mintAddress: string) => {
         let isWrapped = await b.isWrappedAsset(mintAddress);
         if (isWrapped) {
           info.chainID = await e.assetChain();
-          info.assetAddress = Buffer.from(
-            (addr).slice(2),
-            'hex',
-          );
+          info.assetAddress = Buffer.from(addr.slice(2), 'hex');
           info.isWrapped = true;
         }
 
-        if(chain === ASSET_CHAIN.Ethereum) {
+        if (chain === ASSET_CHAIN.Ethereum) {
           info.balance = await e.balanceOf(addr);
         } else {
           // TODO: get balance on other chains for assets that came from eth
@@ -163,7 +168,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
           const mint = await wrappedAssetMintKey(bridgeId, bridgeAuthority, {
             decimals: Math.min(9, info.decimals),
             address: info.assetAddress,
-            chain: info.chainID
+            chain: info.chainID,
           });
 
           console.log(mint.toBase58());
@@ -173,14 +178,17 @@ export const useCurrencyLeg = (mintAddress: string) => {
 
         setInfo(info);
       }
-
-
-
     })();
-
-
-
-  }, [connection, provider, setInfo, chain, mintAddress, ethTokens, solTokens, userAccounts])
+  }, [
+    connection,
+    provider,
+    setInfo,
+    chain,
+    mintAddress,
+    ethTokens,
+    solTokens,
+    userAccounts,
+  ]);
 
   return useMemo(
     () => ({
@@ -188,7 +196,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
       setAmount: setAmount,
       chain: chain,
       setChain: setChain,
-      info
+      info,
     }),
     [amount, setAmount, chain, setChain],
   );

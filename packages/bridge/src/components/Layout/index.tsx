@@ -30,44 +30,38 @@ export const AppLayout = React.memo((props: any) => {
   return (
     <>
       <div className={`App`}>
-        <Wormhole
-          onCreated={() => setWormholeReady(true)}
-          show={true}
-          rotate={true}
-        >
-          <Layout title={LABELS.APP_TITLE}>
-            {!isRoot && (
-              <Header className="App-Bar">
-                <div className="app-title">
-                  <Link to="/">
-                    <h2>WORMHOLE</h2>
-                  </Link>
-                </div>
-                <AppBar
-                  additionalSettings={
-                    connected ? (
-                      <Button
-                        type="primary"
-                        onClick={() => disconnect()}
-                        style={{ marginTop: '8px' }}
-                      >
-                        Disconnect ETH
-                      </Button>
-                    ) : undefined
-                  }
-                  useWalletBadge={true}
-                  left={<EthereumConnect />}
-                />
-              </Header>
-            )}
-            <Content style={{ padding: '0 50px', flexDirection: 'column' }}>
-              {props.children}
-            </Content>
-            <Footer style={{ textAlign: 'center' }}>
-              <AppFooter />
-            </Footer>
-          </Layout>
-        </Wormhole>
+        <Layout title={LABELS.APP_TITLE}>
+          {!isRoot && (
+            <Header className="App-Bar">
+              <div className="app-title">
+                <Link to="/">
+                  <h2>WORMHOLE</h2>
+                </Link>
+              </div>
+              <AppBar
+                additionalSettings={
+                  connected ? (
+                    <Button
+                      type="primary"
+                      onClick={() => disconnect()}
+                      style={{ marginTop: '8px' }}
+                    >
+                      Disconnect ETH
+                    </Button>
+                  ) : undefined
+                }
+                useWalletBadge={true}
+                left={<EthereumConnect />}
+              />
+            </Header>
+          )}
+          <Content style={{ flexDirection: 'column' }}>
+            {props.children}
+          </Content>
+          {/*<Footer style={{ textAlign: 'center' }}>*/}
+          {/*  <AppFooter />*/}
+          {/*</Footer>*/}
+        </Layout>
       </div>
     </>
   );

@@ -1,8 +1,9 @@
 import { Table, Col, Row, Statistic, Button } from 'antd';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GUTTER } from '../../constants';
 import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
+import './index.less';
 import { Link } from 'react-router-dom';
 import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
 import { TokenDisplay } from '../../components/TokenDisplay';
@@ -110,38 +111,32 @@ export const HomeView = () => {
       },
     },
   ];
-
+  const s = () => {
+    return true;
+  };
   return (
     <>
-      <div className="flexColumn" style={{ minHeight: '93vh' }}>
-        <Row
-          gutter={GUTTER}
-          justify="center"
-          align="middle"
-          className="home-info-row"
-        >
-          <Col xs={24} xl={12} className="app-title">
-            <h1>Wormhole</h1>
-            <h2>
-              <span>Ethereum + Solana Bridge</span>
-            </h2>
+      <div className="flexColumn home-container wormhole-bg">
+        <div className={'justify-bottom-container'}>
+          <div>
+            A decentralized and bi-directional bridge for
+            <br /> ERC-20 and SPL tokens
+          </div>
+          <div className={'grow-effect'}>
             <Link to="/move">
-              <Button className="app-action">Get Started</Button>
+              <span className={'get-started'}></span>
             </Link>
-          </Col>
-          <Col xs={24} xl={12}>
-            <Statistic
-              className="home-statistic"
-              title={`$${formatNumber.format(totalInUSD)}`}
-              value="TOTAL VALUE LOCKED"
-            />
-          </Col>
-        </Row>
-        <Table
-          dataSource={externalAssets.filter(a => a.name)}
-          columns={columns}
-          loading={loadingLockedAccounts}
-        />
+          </div>
+          <div className={'grow-effect'}>
+            <span className={'down-arrow'}></span>
+          </div>
+        </div>
+        <div style={{ height: '500px', background: '#0D1B28' }}></div>
+        {/*<Table*/}
+        {/*  dataSource={transfers.filter(a => a.symbol)}*/}
+        {/*  columns={columns}*/}
+        {/*  loading={loadingLockedAccounts}*/}
+        {/*/>*/}
       </div>
     </>
   );
