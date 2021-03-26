@@ -51,7 +51,7 @@ export async function getVoteAccountHolders(
   for (let acc of raw) {
     const account = deserializeAccount(bs58.decode(acc.account.data));
     if (account.owner.toBase58() !== authorityBase58)
-      accounts[acc.pubkey] = account;
+      accounts[account.owner.toBase58()] = account;
   }
 
   return accounts;

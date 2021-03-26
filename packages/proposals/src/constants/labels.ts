@@ -106,4 +106,12 @@ export const LABELS = {
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',
   TIME_LIMIT: 'Voting Time Limit',
   THIS_CONFIG_LACKS_COUNCIL: 'This program does not have a council.',
+  GIT_CONTENT_EXCEEDED:
+    'Gist Github API limit exceeded. Click to view on Github directly.',
+  ACCOUNT: 'Account',
+  COUNT: 'Count',
+  VOTE_TYPE: 'Vote Type',
+  LARGEST_VOTERS_BUBBLE: 'Top Voters Visualization',
+  LARGEST_VOTERS_TABLE: 'Top Voters',
+  PERCENTAGE: 'Percentage',
 };
