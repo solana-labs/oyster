@@ -3436,6 +3436,11 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
+"@types/javascript-time-ago@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/javascript-time-ago/-/javascript-time-ago-2.0.2.tgz#875569ced6fa170dea36e6b6efe3c9f498e3d553"
+  integrity sha512-uBUXwIG8YzPuWw5c6yV5RGvskkNOxnR+9hctOv8cptyMlB0IgfzeqFo0jkK+Ich8zGchvWghOT3Ryqr3bZmH3A==
+
 "@types/jest@^24.0.0", "@types/jest@^24.9.1":
   version "24.9.1"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.9.1.tgz#02baf9573c78f1b9974a5f36778b366aa77bd534"
@@ -11427,6 +11432,13 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
+javascript-time-ago@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/javascript-time-ago/-/javascript-time-ago-2.3.4.tgz#811f203df7998283f4d55305677b40b6e7742779"
+  integrity sha512-Tmy9C4MBGtC19AYhV8updznKqtiRSwJHIbDMeypsy3F0vxqgX5ytln4jwXRLVh82WW6ig4VGegi/Qhykpr4YQw==
+  dependencies:
+    relative-time-format "^1.0.5"
+
 jayson@^3.0.1:
   version "3.4.4"
   resolved "https://registry.yarnpkg.com/jayson/-/jayson-3.4.4.tgz#dcedffba0c02785c4aa22dbff8c28966cae59773"
@@ -16719,6 +16731,11 @@ relateurl@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/relateurl/-/relateurl-0.2.7.tgz#54dbf377e51440aca90a4cd274600d3ff2d888a9"
   integrity sha1-VNvzd+UUQKypCkzSdGANP/LYiKk=
+
+relative-time-format@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/relative-time-format/-/relative-time-format-1.0.5.tgz#3fb7c76ae39156afe0a3a7ff0cb7bf30aa0f0fb6"
+  integrity sha512-MAgx/YKcUQYJpIaWcfetPstElnWf26JxVis4PirdwVrrymFdbxyCSm6yENpfB1YuwFbtHSHksN3aBajVNxk10Q==
 
 remark-parse@^9.0.0:
   version "9.0.0"

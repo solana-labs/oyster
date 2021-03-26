@@ -1,5 +1,7 @@
 import { Table, Col, Row, Statistic, Button } from 'antd';
 import React from 'react';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 import { GUTTER } from '../../constants';
 import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
@@ -7,6 +9,9 @@ import { Link } from 'react-router-dom';
 import { useWormholeTransactions } from '../../hooks/useWormholeTransactions';
 import { TokenDisplay } from '../../components/TokenDisplay';
 import { toChainSymbol } from '../../contexts/chainPair';
+
+TimeAgo.addDefaultLocale(en)
+const timeAgo = new TimeAgo('en-US')
 
 export const HomeView = () => {
   const {
@@ -59,16 +64,38 @@ export const HomeView = () => {
       title: '$, value',
       dataIndex: 'value',
       key: 'value',
+      render(text: string, record: any) {
+        return {
+          props: { style: {} },
+          children: record.value ? formatUSD.format(record.value) : '--',
+        };
+      },
     },
     {
       title: 'TX hash',
       dataIndex: 'txhash',
       key: 'txhash',
+      render(text: string, record: any) {
+        return {
+          props: { style: {} },
+          children: (
+            <a href={record.explorer} target="_blank" rel="noopener noreferrer">
+              {shortenAddress(text, 6)}
+            </a>
+          ),
+        };
+      },
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      render(text: string, record: any) {
+        return {
+          props: { style: {} },
+          children: timeAgo.format(new Date(record.date * 1000)),
+        };
+      },
     },
     {
       title: 'Status',
@@ -104,7 +131,7 @@ export const HomeView = () => {
           </Col>
         </Row>
         <Table
-          dataSource={transfers.filter(a => a.symbol)}
+          dataSource={transfers.filter(a => a.symbol).sort((a, b) => b.date - a.date)}
           columns={columns}
           loading={loadingLockedAccounts}
         />

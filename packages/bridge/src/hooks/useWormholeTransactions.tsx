@@ -43,7 +43,7 @@ type WrappedTransferMeta = {
   // symbol?: string;
   coinId?: string;
   price?: number;
-  // explorer?: string;
+  explorer?: string;
   // wrappedExplorer?: string;
 
   logo?: string;
@@ -98,39 +98,40 @@ const queryWrappedMetaTransactions = async (
       if (acc.account.data.length === TransferOutProposalLayout.span) {
         const metaTransfer = TransferOutProposalLayout.decode(acc.account.data);
 
-        console.log("JOSE", {metaTransfer})
+        // console.log("JOSE", { metaTransfer })
         // if (metaTransfer.chain !== ASSET_CHAIN.Solana) {
-          let assetAddress: string = "";
-          if (metaTransfer.assetChain !== ASSET_CHAIN.Solana) {
-            assetAddress = Buffer.from(
-              metaTransfer.assetAddress.slice(12)
-            ).toString('hex');
-          } else {
-            assetAddress = new PublicKey(metaTransfer.assetAddress).toBase58()
-          }
+        let assetAddress: string = "";
+        if (metaTransfer.assetChain !== ASSET_CHAIN.Solana) {
+          assetAddress = Buffer.from(
+            metaTransfer.assetAddress.slice(12)
+          ).toString('hex');
+        } else {
+          assetAddress = new PublicKey(metaTransfer.assetAddress).toBase58()
+        }
 
-          const dec = new BN(10).pow(new BN(metaTransfer.assetDecimals));
-          const rawAmount = new BN(metaTransfer.amount, 2, "le")
-          const amount = rawAmount.div(dec).toNumber();
+        const dec = new BN(10).pow(new BN(metaTransfer.assetDecimals));
+        const rawAmount = new BN(metaTransfer.amount, 2, "le")
+        const amount = rawAmount.div(dec).toNumber()
+        const txhash = acc.publicKey.toBase58()
 
-          transfers.set(assetAddress, {
-            amount,
-            date: metaTransfer.vaaTime,
+        transfers.set(assetAddress, {
+          amount,
+          date: metaTransfer.vaaTime,
 
-            chain: metaTransfer.assetChain,
-            address: assetAddress,
-            decimals: 9,
-            // mintKey: '',
-            // amount: 0,
-            // amountInUSD: 0,
-            // TODO: customize per chain
-            // explorer: `https://etherscan.io/address/0x${assetAddress}`,
-          });
+          chain: metaTransfer.assetChain,
+          address: assetAddress,
+          decimals: 9,
+          txhash,
+          // amount: 0,
+          // amountInUSD: 0,
+          // TODO: customize per chain
+          explorer: `https://explorer.solana.com/address/${txhash}`,
+        });
         // }
       }
     });
   // console.log("JOSE", {transfers})
-  
+
   // build PDAs for mints
   // await Promise.all(
   //   [...transfers.keys()].map(async key => {
@@ -146,13 +147,13 @@ const queryWrappedMetaTransactions = async (
   //         decimals: Math.min(meta.decimals, 9),
   //       })
   //     ).toBase58();
-        
+
   //     transfersByMint.set(meta.mintKey, meta);
-        
+
   //     return meta;
   //   }),
   // );
-      
+
   // console.log("JOSE", {transfersByMint})
 
   // // query for all mints
@@ -201,7 +202,7 @@ const queryWrappedMetaTransactions = async (
   //   }
 
 
-    // console.log("setExternalAssets", {assets})
+  // console.log("setExternalAssets", {assets})
   //   setExternalAssets([...assets.values()]);
   // });
   setTransfers([...transfers.values()])
@@ -285,14 +286,7 @@ export const useWormholeTransactions = () => {
       // );
 
       // query wrapped assets that were imported to solana from other chains
-      queryWrappedMetaTransactions(authorityKey, connection, transfers => {
-        setTransfers(
-          transfers
-          // transfers.sort(
-          //   (a, b) => a.date - b.date,
-          // ),
-        );
-      }).then(() => setLoading(false));
+      queryWrappedMetaTransactions(authorityKey, connection, setTransfers).then(() => setLoading(false));
 
       // TODO: listen to solana accounts for updates
 
@@ -317,41 +311,39 @@ export const useWormholeTransactions = () => {
 
     // const transfersByCoinId = new Map<string, WrappedTransferMeta[]>();
 
-    const ids = transfers
-      .map(transfer => {
+    const ids = [...new Set(transfers.map(transfer => {
+      let knownToken = tokenMap.get(transfer.address);
+      if (knownToken) {
+        // console.log("knownToken", { transfer, knownToken })
+        transfer.logo = knownToken.logoURI;
+        transfer.symbol = knownToken.symbol;
+        // transfer.name = knownToken.name;
+      }
 
-        let knownToken = tokenMap.get(transfer.address);
-        if (knownToken) {
-          console.log("knownToken", {transfer, knownToken})
-          transfer.logo = knownToken.logoURI;
-          transfer.symbol = knownToken.symbol;
-          // transfer.name = knownToken.name;
+      let token = ethTokens.get(`0x${transfer.address || ''}`);
+      if (token) {
+        // console.log("ethToken", { transfer, token })
+        transfer.logo = token.logoURI;
+        transfer.symbol = token.symbol;
+        // transfer.name = token.name;
+      }
+
+      if (transfer.symbol) {
+        let coinInfo = coinList.get(transfer.symbol.toLowerCase());
+
+        if (coinInfo) {
+          transfer.coinId = coinInfo.id
+          // transfersByCoinId.set(coinInfo.id, [
+          //   ...(transfersByCoinId.get(coinInfo.id) || []),
+          //   transfer,
+          // ]);
+          return coinInfo.id;
         }
-
-        let token = ethTokens.get(`0x${transfer.address || ''}`);
-        if (token) {
-          console.log("ethToken", {transfer, token})
-          transfer.logo = token.logoURI;
-          transfer.symbol = token.symbol;
-          // transfer.name = token.name;
-        }
-
-        if (transfer.symbol) {
-          let coinInfo = coinList.get(transfer.symbol.toLowerCase());
-
-          if (coinInfo) {
-            transfer.coinId = coinInfo.id
-            // transfersByCoinId.set(coinInfo.id, [
-            //   ...(transfersByCoinId.get(coinInfo.id) || []),
-            //   transfer,
-            // ]);
-            return coinInfo.id;
-          }
-        }
-      })
-      .filter(a => a?.length)
+      }
+    }).filter(a => a?.length))]
 
     if (ids.length === 0) return
+    // console.log({ids})
 
     const parameters = `?ids=${ids.join(',')}&vs_currencies=usd`;
     const resp = await window.fetch(COINGECKO_COIN_PRICE_API + parameters);
@@ -365,18 +357,18 @@ export const useWormholeTransactions = () => {
     })
 
     // Object.keys(usdByCoidId).forEach(key => {
-      // let transfers = transfersByCoinId.get(key);
+    // let transfers = transfersByCoinId.get(key);
 
-      // if (!transfers) {
-      //   return;
-      // }
+    // if (!transfers) {
+    //   return;
+    // }
 
-      // transfers.forEach(asset => {
-      //   asset.price = usdByCoidId[key]?.usd || 1;
-      //   asset.amountInUSD =
-      //     Math.round(asset.amount * (asset.price || 1) * 100) / 100;
-      //   totalInUSD += asset.amountInUSD;
-      // });
+    // transfers.forEach(asset => {
+    //   asset.price = usdByCoidId[key]?.usd || 1;
+    //   asset.amountInUSD =
+    //     Math.round(asset.amount * (asset.price || 1) * 100) / 100;
+    //   totalInUSD += asset.amountInUSD;
+    // });
     // });
 
     setAmountInUSD(10);
