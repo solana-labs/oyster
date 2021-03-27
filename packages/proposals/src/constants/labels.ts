@@ -98,7 +98,7 @@ export const LABELS = {
   MENU_GOVERNANCE: 'My Governed Programs',
   LEAVE_BLANK_IF_YOU_WANT_ONE: 'Leave blank if you want one made for you',
   ADDITIONAL_VOTING_MSG:
-    ' Please note that during voting, you cannot withdraw tokens you have used to vote. You must wait for the vote to complete.',
+    ' Please note that during voting, if you withdraw your tokens, your vote will not count towards the voting total. You must wait for the vote to complete in order for your withdrawal to not affect the voting.',
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
   DELAY: 'Slot Delay',

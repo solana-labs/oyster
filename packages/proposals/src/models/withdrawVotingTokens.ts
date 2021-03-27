@@ -9,19 +9,21 @@ import BN from 'bn.js';
 ///   0. `[writable]` Initialized Voting account from which to remove your voting tokens.
 ///   1. `[writable]` Initialized Yes Voting account from which to remove your voting tokens.
 ///   2. `[writable]` Initialized No Voting account from which to remove your voting tokens.
-///   3. `[writable]` Governance token account that you wish your actual tokens to be returned to.
-///   4. `[writable]` Governance holding account owned by the timelock that will has the actual tokens in escrow.
+///   3. `[writable]` User token account that you wish your actual tokens to be returned to.
+///   4. `[writable]` Source holding account owned by the timelock that will has the actual tokens in escrow.
 ///   5. `[writable]` Initialized Yes Voting dump account owned by timelock set to which to send your voting tokens.
 ///   6. `[writable]` Initialized No Voting dump account owned by timelock set to which to send your voting tokens.
-///   7. `[]` Voting mint account.
-///   8. `[]` Timelock state account.
-///   9. `[]` Timelock set account.
-///   10. `[]` Transfer authority
-///   11. `[]` Yes Transfer authority
-///   12. `[]` No Transfer authority
-///   13. `[]` Timelock program mint authority
-///   14. `[]` Timelock program account pub key.
-///   15. `[]` Token program account.
+///   7. `[writable]` Voting mint account.
+///   8. `[writable]` Yes Voting mint account.
+///   9. `[writable]` No Voting mint account.
+///   10. `[]` Timelock state account.
+///   11. `[]` Timelock set account.
+///   12. `[]` Transfer authority
+///   13. `[]` Yes Transfer authority
+///   14. `[]` No Transfer authority
+///   15. `[]` Timelock program mint authority
+///   16. `[]` Timelock program account pub key.
+///   17. `[]` Token program account.
 export const withdrawVotingTokensInstruction = (
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
@@ -31,6 +33,8 @@ export const withdrawVotingTokensInstruction = (
   yesVotingDump: PublicKey,
   noVotingDump: PublicKey,
   votingMint: PublicKey,
+  yesVotingMint: PublicKey,
+  noVotingMint: PublicKey,
   timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   transferAuthority: PublicKey,
@@ -65,6 +69,8 @@ export const withdrawVotingTokensInstruction = (
     { pubkey: yesVotingDump, isSigner: false, isWritable: true },
     { pubkey: noVotingDump, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
+    { pubkey: yesVotingMint, isSigner: false, isWritable: true },
+    { pubkey: noVotingMint, isSigner: false, isWritable: true },
     { pubkey: timelockStateAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: false, isWritable: false },
