@@ -42,6 +42,15 @@ export const vote = async (
     PROGRAM_IDS.timelock.programId,
   );
 
+  const [governanceVotingRecord] = await PublicKey.findProgramAddress(
+    [
+      PROGRAM_IDS.timelock.programAccountId.toBuffer(),
+      proposal.pubkey.toBuffer(),
+      votingAccount.toBuffer(),
+    ],
+    PROGRAM_IDS.timelock.programId,
+  );
+
   const transferAuthority = approve(
     instructions,
     [],
@@ -54,6 +63,7 @@ export const vote = async (
 
   instructions.push(
     voteInstruction(
+      governanceVotingRecord,
       state.pubkey,
       votingAccount,
       yesVotingAccount,

@@ -6,25 +6,27 @@ import * as BufferLayout from 'buffer-layout';
 import { TimelockInstruction } from './timelock';
 import BN from 'bn.js';
 
-///   0. `[writable]` Initialized Voting account from which to remove your voting tokens.
-///   1. `[writable]` Initialized Yes Voting account from which to remove your voting tokens.
-///   2. `[writable]` Initialized No Voting account from which to remove your voting tokens.
-///   3. `[writable]` User token account that you wish your actual tokens to be returned to.
-///   4. `[writable]` Source holding account owned by the timelock that will has the actual tokens in escrow.
-///   5. `[writable]` Initialized Yes Voting dump account owned by timelock set to which to send your voting tokens.
-///   6. `[writable]` Initialized No Voting dump account owned by timelock set to which to send your voting tokens.
-///   7. `[writable]` Voting mint account.
-///   8. `[writable]` Yes Voting mint account.
-///   9. `[writable]` No Voting mint account.
-///   10. `[]` Timelock state account.
-///   11. `[]` Timelock set account.
-///   12. `[]` Transfer authority
-///   13. `[]` Yes Transfer authority
-///   14. `[]` No Transfer authority
-///   15. `[]` Timelock program mint authority
-///   16. `[]` Timelock program account pub key.
-///   17. `[]` Token program account.
+///   0. `[writable]` Governance voting record account. See Vote docs for more detail.
+///   1. `[writable]` Initialized Voting account from which to remove your voting tokens.
+///   2. `[writable]` Initialized Yes Voting account from which to remove your voting tokens.
+///   3. `[writable]` Initialized No Voting account from which to remove your voting tokens.
+///   4. `[writable]` User token account that you wish your actual tokens to be returned to.
+///   5. `[writable]` Source holding account owned by the timelock that will has the actual tokens in escrow.
+///   6. `[writable]` Initialized Yes Voting dump account owned by timelock set to which to send your voting tokens.
+///   7. `[writable]` Initialized No Voting dump account owned by timelock set to which to send your voting tokens.
+///   8. `[writable]` Voting mint account.
+///   9. `[writable]` Yes Voting mint account.
+///   10. `[writable]` No Voting mint account.
+///   11. `[]` Timelock state account.
+///   12. `[]` Timelock set account.
+///   13. `[]` Transfer authority
+///   14. `[]` Yes Transfer authority
+///   15. `[]` No Transfer authority
+///   16. `[]` Timelock program mint authority
+///   17. `[]` Timelock program account pub key.
+///   18. `[]` Token program account.
 export const withdrawVotingTokensInstruction = (
+  governanceVotingRecord: PublicKey,
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
   noVotingAccount: PublicKey,
@@ -61,6 +63,7 @@ export const withdrawVotingTokensInstruction = (
   );
 
   const keys = [
+    { pubkey: governanceVotingRecord, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
     { pubkey: yesVotingAccount, isSigner: false, isWritable: true },
     { pubkey: noVotingAccount, isSigner: false, isWritable: true },

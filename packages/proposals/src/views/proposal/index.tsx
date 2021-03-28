@@ -4,6 +4,7 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
+  GovernanceVotingRecord,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
@@ -26,7 +27,7 @@ import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
-import { getVoteAccountHolders } from '../../utils/lookups';
+import { getGovernanceVotingRecords } from '../../utils/lookups';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
@@ -56,23 +57,22 @@ export const ProposalView = () => {
 
   const sourceMint = useMint(proposal?.info.sourceMint);
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
-  const [votingAccounts, setVotingAccounts] = useState<any>({});
-  const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
-  const [noVotingAccounts, setNoVotingAccounts] = useState<any>({});
+  const noVotingMint = useMint(proposal?.info.noVotingMint);
+
+  const [votingDisplayData, setVotingDisplayData] = useState<any>({});
   useEffect(() => {
-    getVoteAccountHolders(proposal?.info.votingMint, endpoint).then(
-      setVotingAccounts,
-    );
-    getVoteAccountHolders(proposal?.info.yesVotingMint, endpoint).then(
-      setYesVotingAccounts,
-    );
-    getVoteAccountHolders(proposal?.info.noVotingMint, endpoint).then(
-      setNoVotingAccounts,
+    getGovernanceVotingRecords(proposal?.pubkey, endpoint).then(records =>
+      setVotingDisplayData(voterDisplayData(records)),
     );
   }, [proposal]);
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && sourceMint && yesVotingMint ? (
+      {proposal &&
+      sigMint &&
+      votingMint &&
+      sourceMint &&
+      yesVotingMint &&
+      noVotingMint ? (
         <InnerProposalView
           proposal={proposal}
           timelockState={timelockState}
@@ -80,9 +80,8 @@ export const ProposalView = () => {
           sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
-          votingAccounts={votingAccounts}
-          yesVotingAccounts={yesVotingAccounts}
-          noVotingAccounts={noVotingAccounts}
+          noVotingMint={noVotingMint}
+          votingDisplayData={votingDisplayData}
           sigMint={sigMint}
           instructions={context.transactions}
           endpoint={endpoint}
@@ -144,6 +143,70 @@ function useLoadGist({
     }
   }, [loading]);
 }
+interface PartialGovernanceRecord {
+  info: { yesCount: BN; noCount: BN; undecidedCount: BN };
+}
+
+export interface VoterDisplayData {
+  name: string;
+  title: string;
+  group: string;
+  value: number;
+}
+
+function voterDisplayData(
+  governanceVotingRecords: Record<string, PartialGovernanceRecord>,
+): Array<VoterDisplayData> {
+  const mapper = (key: string, amount: number, label: string) => ({
+    name: key,
+    title: key,
+    group: label,
+    value: amount,
+  });
+
+  const undecidedData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(
+        key => governanceVotingRecords[key].info.undecidedCount.toNumber() > 0,
+      )
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.undecidedCount.toNumber(),
+          VoteType.Undecided,
+        ),
+      ),
+  ];
+
+  const noData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(key => governanceVotingRecords[key].info.noCount.toNumber() > 0)
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.noCount.toNumber(),
+          VoteType.No,
+        ),
+      ),
+  ];
+
+  const yesData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(key => governanceVotingRecords[key].info.yesCount.toNumber() > 0)
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.yesCount.toNumber(),
+          VoteType.Yes,
+        ),
+      ),
+  ];
+
+  const data = [...undecidedData, ...yesData, ...noData].sort(
+    (a, b) => b.value - a.value,
+  );
+  return data;
+}
 
 function InnerProposalView({
   proposal,
@@ -151,12 +214,11 @@ function InnerProposalView({
   sigMint,
   votingMint,
   yesVotingMint,
+  noVotingMint,
   instructions,
   timelockConfig,
   sourceMint,
-  votingAccounts,
-  yesVotingAccounts,
-  noVotingAccounts,
+  votingDisplayData,
   endpoint,
 }: {
   proposal: ParsedAccount<TimelockSet>;
@@ -165,11 +227,10 @@ function InnerProposalView({
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
+  noVotingMint: MintInfo;
   sourceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
-  votingAccounts: Record<string, { amount: BN }>;
-  yesVotingAccounts: Record<string, { amount: BN }>;
-  noVotingAccounts: Record<string, { amount: BN }>;
+  votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
@@ -254,103 +315,56 @@ function InnerProposalView({
           </Col>
         </Row>
 
-        <Row
-          gutter={[
-            { xs: 8, sm: 16, md: 24, lg: 32 },
-            { xs: 8, sm: 16, md: 24, lg: 32 },
-          ]}
-          className="proposals-visual"
-        >
-          <Col md={12} sm={24} xs={24}>
-            <Card
-              style={{ height: '100%' }}
-              title={LABELS.LARGEST_VOTERS_BUBBLE}
-            >
-              {width && height && (
-                <VoterBubbleGraph
-                  endpoint={endpoint}
-                  width={width}
-                  height={height}
-                  noVotingAccounts={{
-                    zU3YkmiaCgYHVebfdNq1U09DiNVHf1kxWuY5InWHv: {
-                      amount: new BN(1),
-                    },
-                    bGarqsCCUzDBzHjjeehZIMknIMj5zJ6O9R5tK: {
-                      amount: new BN(5),
-                    },
-                    UTj29mKAAAAAAan1RcYx3TJKFZjmGkdXraLXrijm0ttX: {
-                      amount: new BN(3),
-                    },
-                    rGArIdkGp9UXGSxcUSGMyUw9SvF: { amount: new BN(8) },
-                  }}
-                  yesVotingAccounts={{
-                    '9qR84VknBPtVyRw9XwCYRP6B1GiBtZohNo6TqETzw9Jv': {
-                      amount: new BN(50),
-                    },
-                    CpJTMoYFzhVn94TypvR3oNZukeo82C64urf2Pdcwewv2: {
-                      amount: new BN(20),
-                    },
-                  }}
-                  votingAccounts={{
-                    ArfPb6WNcGc9kUar2qiukS57g5M2x5o8kfa65SQvrCMn: {
-                      amount: new BN(100),
-                    },
-                    ArfPb6WNc9kUar2qiukS57g5M2x5o8kfa65SQvrCMn: {
-                      amount: new BN(302),
-                    },
-                  }}
-                />
-              )}
-            </Card>
-          </Col>
-          <Col md={12} sm={24} xs={24}>
-            <Card
-              style={{ height: '100%' }}
-              title={LABELS.LARGEST_VOTERS_TABLE}
-            >
-              <div
-                ref={r => {
-                  if (r) {
-                    setHeight(r.clientHeight);
-                    setWidth(r.clientWidth);
-                  }
-                }}
+        {votingDisplayData.length > 0 && (
+          <Row
+            gutter={[
+              { xs: 8, sm: 16, md: 24, lg: 32 },
+              { xs: 8, sm: 16, md: 24, lg: 32 },
+            ]}
+            className="proposals-visual"
+          >
+            <Col md={12} sm={24} xs={24}>
+              <Card
+                style={{ height: '100%' }}
+                title={LABELS.LARGEST_VOTERS_BUBBLE}
               >
-                <VoterTable
-                  endpoint={endpoint}
-                  noVotingAccounts={{
-                    zU3YkmiaCgYHVebfdNq1U09DiNVHf1kxWuY5InWHv: {
-                      amount: new BN(1),
-                    },
-                    bGarqsCCUzDBzHjjeehZIMknIMj5zJ6O9R5tK: {
-                      amount: new BN(5),
-                    },
-                    UTj29mKAAAAAAan1RcYx3TJKFZjmGkdXraLXrijm0ttX: {
-                      amount: new BN(3),
-                    },
-                    rGArIdkGp9UXGSxcUSGMyUw9SvF: { amount: new BN(8) },
+                {width && height && (
+                  <VoterBubbleGraph
+                    endpoint={endpoint}
+                    width={width}
+                    height={height}
+                    data={votingDisplayData}
+                  />
+                )}
+              </Card>
+            </Col>
+            <Col md={12} sm={24} xs={24}>
+              <Card
+                style={{ height: '100%' }}
+                title={LABELS.LARGEST_VOTERS_TABLE}
+              >
+                <div
+                  ref={r => {
+                    if (r) {
+                      setHeight(r.clientHeight);
+                      setWidth(r.clientWidth);
+                    }
                   }}
-                  yesVotingAccounts={{
-                    '9qR84VknBPtVyRw9XwCYRP6B1GiBtZohNo6TqETzw9Jv': {
-                      amount: new BN(50),
-                    },
-                    CpJTMoYFzhVn94TypvR3oNZukeo82C64urf2Pdcwewv2: {
-                      amount: new BN(20),
-                    },
-                  }}
-                  votingAccounts={{
-                    ArfPb6WNcGc9kUar2qiukS57g5M2x5o8kfa65SQvrCMn: {
-                      amount: new BN(100),
-                    },
-                    ArfPb6WNc9kUar2qiukS57g5M2x5o8kfa65SQvrCMn: {
-                      amount: new BN(302),
-                    },
-                  }}
-                />
-              </div>
-            </Card>
-          </Col>
-        </Row>
+                >
+                  <VoterTable
+                    endpoint={endpoint}
+                    total={
+                      votingMint.supply.toNumber() +
+                      yesVotingMint.supply.toNumber() +
+                      noVotingMint.supply.toNumber()
+                    }
+                    data={votingDisplayData}
+                  />
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        )}
 
         <Row className="proposals-stats">
           <Col md={7} xs={24}>

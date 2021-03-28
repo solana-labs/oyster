@@ -2,9 +2,7 @@ import React from 'react';
 import { LABELS } from '../../constants';
 
 import { Table, Grid } from 'antd';
-import BN from 'bn.js';
-import { VoteType } from '../../views/proposal';
-import { Breakpoint } from 'antd/lib/_util/responsiveObserve';
+import { VoterDisplayData, VoteType } from '../../views/proposal';
 
 function shortNumber(num: number) {
   if (Math.abs(num) < 1000) {
@@ -40,56 +38,24 @@ function shortNumber(num: number) {
 
 const { useBreakpoint } = Grid;
 interface IVoterTable {
-  votingAccounts: Record<string, { amount: BN }>;
-  yesVotingAccounts: Record<string, { amount: BN }>;
-  noVotingAccounts: Record<string, { amount: BN }>;
+  data: Array<VoterDisplayData>;
+  total: number;
   endpoint: string;
 }
 
-const MAX_TABLE_AMOUNT = 5000;
-
 export const VoterTable = (props: IVoterTable) => {
-  const {
-    votingAccounts,
-    yesVotingAccounts,
-    noVotingAccounts,
-    endpoint,
-  } = props;
+  const { data, total, endpoint } = props;
   const breakpoint = useBreakpoint();
   const subdomain = endpoint
     .replace('http://', '')
     .replace('https://', '')
     .split('.')[0];
 
-  let total = 0;
-  const mapper = (key: string, account: { amount: BN }, label: string) => {
-    total += account.amount.toNumber();
-    return {
-      key: key,
-      type: label,
-      count: account.amount.toNumber(),
-    };
-  };
-
-  const data = [
-    ...Object.keys(votingAccounts).map(key =>
-      mapper(key, votingAccounts[key], VoteType.Undecided),
-    ),
-    ...Object.keys(yesVotingAccounts).map(key =>
-      mapper(key, yesVotingAccounts[key], VoteType.Yes),
-    ),
-    ...Object.keys(noVotingAccounts).map(key =>
-      mapper(key, noVotingAccounts[key], VoteType.No),
-    ),
-  ]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, MAX_TABLE_AMOUNT);
-
   const columns = [
     {
       title: LABELS.ACCOUNT,
-      dataIndex: 'key',
-      key: 'key',
+      dataIndex: 'name',
+      key: 'name',
       align: 'center',
       render: (key: string) => (
         <a
@@ -117,18 +83,15 @@ export const VoterTable = (props: IVoterTable) => {
     },
     {
       title: LABELS.COUNT,
-      dataIndex: 'count',
-      key: 'count',
+      dataIndex: 'value',
+      key: 'value',
       align: 'center',
-      render: (
-        count: number,
-        record: { key: string; count: number; type: VoteType },
-      ) => (
+      render: (count: number, record: VoterDisplayData) => (
         <span
           style={
-            record.type == VoteType.Undecided
+            record.group == VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.type === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
         >
           {shortNumber(count)}
@@ -137,18 +100,15 @@ export const VoterTable = (props: IVoterTable) => {
     },
     {
       title: LABELS.PERCENTAGE,
-      dataIndex: 'count',
-      key: 'count',
+      dataIndex: 'value',
+      key: 'value',
       align: 'center',
-      render: (
-        count: number,
-        record: { key: string; count: number; type: VoteType },
-      ) => (
+      render: (count: number, record: VoterDisplayData) => (
         <span
           style={
-            record.type == VoteType.Undecided
+            record.group == VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.type === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
         >
           {Math.round((count * 100) / total)}%

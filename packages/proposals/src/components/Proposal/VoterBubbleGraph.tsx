@@ -1,12 +1,10 @@
-import BN from 'bn.js';
 import * as d3 from 'd3';
 import React, { useEffect, useState } from 'react';
-import { VoteType } from '../../views/proposal';
+import { VoterDisplayData, VoteType } from '../../views/proposal';
 //https://observablehq.com/d/86d91b23534992ff
+
 interface IVoterBubbleGraph {
-  votingAccounts: Record<string, { amount: BN }>;
-  yesVotingAccounts: Record<string, { amount: BN }>;
-  noVotingAccounts: Record<string, { amount: BN }>;
+  data: Array<VoterDisplayData>;
   width: number;
   height: number;
   endpoint: string;
@@ -15,52 +13,31 @@ interface IVoterBubbleGraph {
 const MAX_BUBBLE_AMOUNT = 50;
 
 export function VoterBubbleGraph(props: IVoterBubbleGraph) {
-  const {
-    votingAccounts,
-    yesVotingAccounts,
-    noVotingAccounts,
-    width,
-    height,
-    endpoint,
-  } = props;
+  const { data, width, height, endpoint } = props;
   const subdomain = endpoint
     .replace('http://', '')
     .replace('https://', '')
     .split('.')[0];
 
-  const mapper = (key: string, account: { amount: BN }, label: string) => ({
-    name: key.slice(0, 3) + '...' + key.slice(key.length - 3, key.length),
-    title: key,
-    group: label,
-    value: account.amount.toNumber(),
-  });
   // For some reason giving this a type causes an issue where setRef
   // cant be used with ref={} prop...not sure why. SetStateAction nonsense.
   const [ref, setRef] = useState<any>();
 
-  const data = [
-    ...Object.keys(votingAccounts).map(key =>
-      mapper(key, votingAccounts[key], VoteType.Undecided),
-    ),
-    ...Object.keys(yesVotingAccounts).map(key =>
-      mapper(key, yesVotingAccounts[key], VoteType.Yes),
-    ),
-    ...Object.keys(noVotingAccounts).map(key =>
-      mapper(key, noVotingAccounts[key], VoteType.No),
-    ),
-  ]
-    .sort((a, b) => b.value - a.value)
-    .slice(0, MAX_BUBBLE_AMOUNT);
-
+  const limitedData = data.slice(0, MAX_BUBBLE_AMOUNT).map(d => ({
+    ...d,
+    name:
+      d.name.slice(0, 3) +
+      '...' +
+      d.name.slice(d.name.length - 3, d.name.length),
+  }));
+  console.log('Data', limitedData);
   const format = d3.format(',d');
   const color = d3
     .scaleOrdinal()
     .domain([VoteType.Undecided, VoteType.Yes, VoteType.No])
     .range(['grey', 'green', 'red']);
 
-  const pack = (
-    data: Array<{ name: string; title: string; group: string; value: number }>,
-  ) => {
+  const pack = (data: Array<VoterDisplayData>) => {
     return d3
       .pack()
       .size([width - 2, height - 2])
@@ -73,7 +50,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
   useEffect(() => {
     if (ref) {
       ref.innerHTML = '';
-      const root = pack(data);
+      const root = pack(limitedData);
       console.log('Re-rendered');
       const newSvg = d3
         .select(ref)
@@ -150,7 +127,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
           }${format(d.value)}`,
       );
     }
-  }, [ref, votingAccounts, yesVotingAccounts, noVotingAccounts, height, width]);
+  }, [ref, limitedData, height, width]);
 
   return (
     <div
