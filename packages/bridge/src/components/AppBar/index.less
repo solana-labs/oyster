@@ -1,0 +1,21 @@
+@import "_colors";
+
+.app-bar-inner {
+  display: flex;
+  min-width: 50%;
+  justify-content: center;
+  height: auto;
+  .app-bar-item {
+    cursor: pointer;
+    padding: 0 30px;
+    color: @tungsten-60;
+    font-size: 18px;
+
+    &.active {
+      color: white;
+      a {
+        color: inherit;
+      }
+    }
+  }
+}

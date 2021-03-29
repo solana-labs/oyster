@@ -5,7 +5,7 @@ import { Layout, Button } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
-import { AppBar } from '@oyster/common';
+import { AppBar } from '../AppBar';
 import Wormhole from '../Wormhole';
 import { Footer as AppFooter } from './../Footer';
 import { EthereumConnect } from '../EthereumConnect';
@@ -31,30 +31,16 @@ export const AppLayout = React.memo((props: any) => {
     <>
       <div className={`App`}>
         <Layout title={LABELS.APP_TITLE}>
-          {!isRoot && (
-            <Header className="App-Bar">
+          <Header className="App-Bar">
+            {!isRoot && (
               <div className="app-title">
                 <Link to="/">
                   <h2>WORMHOLE</h2>
                 </Link>
               </div>
-              <AppBar
-                additionalSettings={
-                  connected ? (
-                    <Button
-                      type="primary"
-                      onClick={() => disconnect()}
-                      style={{ marginTop: '8px' }}
-                    >
-                      Disconnect ETH
-                    </Button>
-                  ) : undefined
-                }
-                useWalletBadge={true}
-                left={<EthereumConnect />}
-              />
-            </Header>
-          )}
+            )}
+            <AppBar />
+          </Header>
           <Content style={{ flexDirection: 'column' }}>
             {props.children}
           </Content>

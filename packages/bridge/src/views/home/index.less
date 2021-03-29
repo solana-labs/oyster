@@ -1,11 +1,23 @@
-@surge-20: #00CC82;
-@tungsten-100: #06101a;
-@tungsten-50: #0D1B28;
+@import '_colors';
 
 .App {
   height: auto;
 }
+section.ant-layout {
+  max-width: 1420px;
+  width: 100%;
+  margin: auto;
+  position: relative;
+}
+header.ant-layout-header.App-Bar {
+  position: absolute;
+  width: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  height: 80px;
 
+}
 
 .get-started {
   background: url("/home/get-started.svg") center  center no-repeat;
@@ -32,12 +44,10 @@
 .description-text {
   font-size: 14px;
   line-height: 160%;
-  color: #7BA4C7;
+  color: @tungsten-40;
 }
 .home-container {
-  max-width: 1420px;
   width: 100%;
-  margin: auto;
 
   #how-it-works-container {
     display: flex;
@@ -73,6 +83,9 @@
 
   #recent-tx-container {
     padding-bottom: 70px;
+    .description-text {
+      color: @tungsten-60
+    }
     .ant-table-pagination.ant-pagination {
       margin: 16px 100px;
     }
@@ -121,8 +134,6 @@ footer.ant-layout-footer {
   background-image: url('/home/footer.svg');
   background-size: 100% auto;
   background-repeat: no-repeat;
-  max-width: 1420px;
   width: 100%;
-  margin: auto;
   background-color: @tungsten-100;
 }
