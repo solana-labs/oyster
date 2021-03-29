@@ -1,21 +1,19 @@
-import { Account, PublicKey } from '@solana/web3.js';
-import { contexts, utils } from '@oyster/common';
-import { AccountLayout } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
+import { ParsedAccount, utils } from '@oyster/common';
+import {
+  GovernanceVotingRecord,
+  GovernanceVotingRecordLayout,
+  GovernanceVotingRecordParser,
+} from '../models/timelock';
 
-const { deserializeAccount } = contexts.Accounts;
-
-export async function getVoteAccountHolders(
-  mint?: PublicKey,
+const MAX_LOOKUPS = 5000;
+export async function getGovernanceVotingRecords(
+  proposal?: PublicKey,
   endpoint?: string,
-): Promise<Record<string, Account>> {
+): Promise<Record<string, ParsedAccount<GovernanceVotingRecord>>> {
   const PROGRAM_IDS = utils.programIds();
-  if (!mint || !endpoint) return {};
-
-  const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
-    PROGRAM_IDS.timelock.programId,
-  );
+  if (!proposal || !endpoint) return {};
 
   let accountRes = await fetch(endpoint, {
     method: 'POST',
@@ -27,16 +25,16 @@ export async function getVoteAccountHolders(
       id: 1,
       method: 'getProgramAccounts',
       params: [
-        PROGRAM_IDS.token.toBase58(),
+        PROGRAM_IDS.timelock.programId.toBase58(),
         {
           commitment: 'single',
           filters: [
-            { dataSize: AccountLayout.span },
+            { dataSize: GovernanceVotingRecordLayout.span },
             {
               memcmp: {
-                // Mint is first thing in the account data
+                // Proposal key is first thing in the account data
                 offset: 0,
-                bytes: mint.toString(),
+                bytes: proposal.toString(),
               },
             },
           ],
@@ -46,12 +44,16 @@ export async function getVoteAccountHolders(
   });
   let raw = (await accountRes.json())['result'];
   if (!raw) return {};
-  let accounts: Record<string, Account> = {};
-  const authorityBase58 = authority.toBase58();
+  let accounts: Record<string, ParsedAccount<GovernanceVotingRecord>> = {};
+  let i = 0;
   for (let acc of raw) {
-    const account = deserializeAccount(bs58.decode(acc.account.data));
-    if (account.owner.toBase58() !== authorityBase58)
-      accounts[acc.pubkey] = account;
+    const account = GovernanceVotingRecordParser(acc.pubkey, {
+      ...acc.account,
+      data: bs58.decode(acc.account.data),
+    }) as ParsedAccount<GovernanceVotingRecord>;
+    if (i > MAX_LOOKUPS) break;
+    accounts[account.info.owner.toBase58()] = account;
+    i++;
   }
 
   return accounts;

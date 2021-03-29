@@ -1,19 +1,10 @@
-import {
-  Card,
-  Col,
-  Divider,
-  Grid,
-  Row,
-  Space,
-  Spin,
-  Statistic,
-  Tabs,
-} from 'antd';
+import { Card, Col, Grid, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
+  GovernanceVotingRecord,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
@@ -36,9 +27,10 @@ import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
-import { getVoteAccountHolders } from '../../utils/lookups';
+import { getGovernanceVotingRecords } from '../../utils/lookups';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
+import { VoterTable } from '../../components/Proposal/VoterTable';
 const { TabPane } = Tabs;
 
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
@@ -46,6 +38,12 @@ const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 const { useAccountByMint } = hooks;
 const { useBreakpoint } = Grid;
+
+export enum VoteType {
+  Undecided = 'Undecided',
+  Yes = 'Yay',
+  No = 'Nay',
+}
 
 export const ProposalView = () => {
   const context = useProposals();
@@ -59,23 +57,22 @@ export const ProposalView = () => {
 
   const sourceMint = useMint(proposal?.info.sourceMint);
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
-  const [votingAccounts, setVotingAccounts] = useState<any>({});
-  const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
-  const [noVotingAccounts, setNoVotingAccounts] = useState<any>({});
+  const noVotingMint = useMint(proposal?.info.noVotingMint);
+
+  const [votingDisplayData, setVotingDisplayData] = useState<any>({});
   useEffect(() => {
-    getVoteAccountHolders(proposal?.info.votingMint, endpoint).then(
-      setVotingAccounts,
-    );
-    getVoteAccountHolders(proposal?.info.yesVotingMint, endpoint).then(
-      setYesVotingAccounts,
-    );
-    getVoteAccountHolders(proposal?.info.noVotingMint, endpoint).then(
-      setNoVotingAccounts,
+    getGovernanceVotingRecords(proposal?.pubkey, endpoint).then(records =>
+      setVotingDisplayData(voterDisplayData(records)),
     );
   }, [proposal]);
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && sourceMint && yesVotingMint ? (
+      {proposal &&
+      sigMint &&
+      votingMint &&
+      sourceMint &&
+      yesVotingMint &&
+      noVotingMint ? (
         <InnerProposalView
           proposal={proposal}
           timelockState={timelockState}
@@ -83,11 +80,11 @@ export const ProposalView = () => {
           sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
-          votingAccounts={votingAccounts}
-          yesVotingAccounts={yesVotingAccounts}
-          noVotingAccounts={noVotingAccounts}
+          noVotingMint={noVotingMint}
+          votingDisplayData={votingDisplayData}
           sigMint={sigMint}
           instructions={context.transactions}
+          endpoint={endpoint}
         />
       ) : (
         <Spin />
@@ -96,48 +93,23 @@ export const ProposalView = () => {
   );
 };
 
-function InnerProposalView({
-  proposal,
+function useLoadGist({
+  loading,
+  setLoading,
+  setFailed,
+  setMsg,
+  setContent,
+  isGist,
   timelockState,
-  sigMint,
-  votingMint,
-  yesVotingMint,
-  instructions,
-  timelockConfig,
-  sourceMint,
-  votingAccounts,
-  yesVotingAccounts,
-  noVotingAccounts,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  timelockConfig: ParsedAccount<TimelockConfig>;
+  loading: boolean;
+  setLoading: (b: boolean) => void;
+  setMsg: (b: string) => void;
+  setFailed: (b: boolean) => void;
+  setContent: (b: string) => void;
+  isGist: boolean;
   timelockState: ParsedAccount<TimelockState>;
-  sigMint: MintInfo;
-  votingMint: MintInfo;
-  yesVotingMint: MintInfo;
-  sourceMint: MintInfo;
-  instructions: Record<string, ParsedAccount<TimelockTransaction>>;
-  votingAccounts: Record<string, { amount: BN }>;
-  yesVotingAccounts: Record<string, { amount: BN }>;
-  noVotingAccounts: Record<string, { amount: BN }>;
 }) {
-  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
-  const adminAccount = useAccountByMint(proposal.info.adminMint);
-  const config = useConfig(proposal.info.config.toBase58());
-
-  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
-    .map(k => instructions[k.toBase58()])
-    .filter(k => k);
-  const isUrl = !!timelockState.info.descLink.match(urlRegex);
-  const isGist =
-    !!timelockState.info.descLink.match(/gist/i) &&
-    !!timelockState.info.descLink.match(/github/i);
-  const [content, setContent] = useState(timelockState.info.descLink);
-  const [loading, setLoading] = useState(isUrl);
-  const [failed, setFailed] = useState(false);
-  const [msg, setMsg] = useState('');
-  const breakpoint = useBreakpoint();
-
   useMemo(() => {
     if (loading) {
       let toFetch = timelockState.info.descLink;
@@ -159,19 +131,135 @@ function InnerProposalView({
             } else setContent(await resp.text());
           } else {
             if (resp.status == 403 && isGist)
-              setMsg(
-                'Gist Github API limit exceeded. Click to view on Github directly.',
-              );
+              setMsg(LABELS.GIT_CONTENT_EXCEEDED);
             setFailed(true);
           }
           setLoading(false);
         })
-        .catch(response => {
+        .catch(_ => {
           setFailed(true);
           setLoading(false);
         });
     }
   }, [loading]);
+}
+interface PartialGovernanceRecord {
+  info: { yesCount: BN; noCount: BN; undecidedCount: BN };
+}
+
+export interface VoterDisplayData {
+  name: string;
+  title: string;
+  group: string;
+  value: number;
+}
+
+function voterDisplayData(
+  governanceVotingRecords: Record<string, PartialGovernanceRecord>,
+): Array<VoterDisplayData> {
+  const mapper = (key: string, amount: number, label: string) => ({
+    name: key,
+    title: key,
+    group: label,
+    value: amount,
+  });
+
+  const undecidedData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(
+        key => governanceVotingRecords[key].info.undecidedCount.toNumber() > 0,
+      )
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.undecidedCount.toNumber(),
+          VoteType.Undecided,
+        ),
+      ),
+  ];
+
+  const noData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(key => governanceVotingRecords[key].info.noCount.toNumber() > 0)
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.noCount.toNumber(),
+          VoteType.No,
+        ),
+      ),
+  ];
+
+  const yesData = [
+    ...Object.keys(governanceVotingRecords)
+      .filter(key => governanceVotingRecords[key].info.yesCount.toNumber() > 0)
+      .map(key =>
+        mapper(
+          key,
+          governanceVotingRecords[key].info.yesCount.toNumber(),
+          VoteType.Yes,
+        ),
+      ),
+  ];
+
+  const data = [...undecidedData, ...yesData, ...noData].sort(
+    (a, b) => b.value - a.value,
+  );
+  return data;
+}
+
+function InnerProposalView({
+  proposal,
+  timelockState,
+  sigMint,
+  votingMint,
+  yesVotingMint,
+  noVotingMint,
+  instructions,
+  timelockConfig,
+  sourceMint,
+  votingDisplayData,
+  endpoint,
+}: {
+  proposal: ParsedAccount<TimelockSet>;
+  timelockConfig: ParsedAccount<TimelockConfig>;
+  timelockState: ParsedAccount<TimelockState>;
+  sigMint: MintInfo;
+  votingMint: MintInfo;
+  yesVotingMint: MintInfo;
+  noVotingMint: MintInfo;
+  sourceMint: MintInfo;
+  instructions: Record<string, ParsedAccount<TimelockTransaction>>;
+  votingDisplayData: Array<VoterDisplayData>;
+  endpoint: string;
+}) {
+  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
+  const adminAccount = useAccountByMint(proposal.info.adminMint);
+
+  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
+    .map(k => instructions[k.toBase58()])
+    .filter(k => k);
+  const isUrl = !!timelockState.info.descLink.match(urlRegex);
+  const isGist =
+    !!timelockState.info.descLink.match(/gist/i) &&
+    !!timelockState.info.descLink.match(/github/i);
+  const [content, setContent] = useState(timelockState.info.descLink);
+  const [loading, setLoading] = useState(isUrl);
+  const [failed, setFailed] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [width, setWidth] = useState<number>();
+  const [height, setHeight] = useState<number>();
+  const breakpoint = useBreakpoint();
+
+  useLoadGist({
+    loading,
+    setLoading,
+    setFailed,
+    setMsg,
+    setContent,
+    isGist,
+    timelockState,
+  });
 
   return (
     <Row>
@@ -226,21 +314,58 @@ function InnerProposalView({
             </div>
           </Col>
         </Row>
-        {false && (
-          <Row className="proposals-visual">
-            <Col md={24} xs={24}>
-              <Card>
-                <VoterBubbleGraph
-                  width={400}
-                  height={400}
-                  noVotingAccounts={{}}
-                  yesVotingAccounts={{}}
-                  votingAccounts={{ '1': { amount: new BN(100) } }}
-                />
+
+        {votingDisplayData.length > 0 && (
+          <Row
+            gutter={[
+              { xs: 8, sm: 16, md: 24, lg: 32 },
+              { xs: 8, sm: 16, md: 24, lg: 32 },
+            ]}
+            className="proposals-visual"
+          >
+            <Col md={12} sm={24} xs={24}>
+              <Card
+                style={{ height: '100%' }}
+                title={LABELS.LARGEST_VOTERS_BUBBLE}
+              >
+                {width && height && (
+                  <VoterBubbleGraph
+                    endpoint={endpoint}
+                    width={width}
+                    height={height}
+                    data={votingDisplayData}
+                  />
+                )}
+              </Card>
+            </Col>
+            <Col md={12} sm={24} xs={24}>
+              <Card
+                style={{ height: '100%' }}
+                title={LABELS.LARGEST_VOTERS_TABLE}
+              >
+                <div
+                  ref={r => {
+                    if (r) {
+                      setHeight(r.clientHeight);
+                      setWidth(r.clientWidth);
+                    }
+                  }}
+                >
+                  <VoterTable
+                    endpoint={endpoint}
+                    total={
+                      votingMint.supply.toNumber() +
+                      yesVotingMint.supply.toNumber() +
+                      noVotingMint.supply.toNumber()
+                    }
+                    data={votingDisplayData}
+                  />
+                </div>
               </Card>
             </Col>
           </Row>
         )}
+
         <Row className="proposals-stats">
           <Col md={7} xs={24}>
             <Card>

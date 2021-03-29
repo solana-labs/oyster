@@ -9,7 +9,7 @@ import { CONFIG_NAME_LENGTH, TimelockInstruction } from './timelock';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
-///   0. `[writable]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
+///   0. `[]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
 ///           program account key, governance mint key, council mint key, and timelock program account key.
 ///   1. `[]` Program account to tie this config to.
 ///   2. `[]` Governance mint to tie this config to

@@ -26,8 +26,35 @@ export enum TimelockInstruction {
   DepositGovernanceTokens = 13,
   WithdrawVotingTokens = 14,
   CreateEmptyTimelockConfig = 15,
+  CreateGovernanceVotingRecord = 16,
 }
 
+export interface GovernanceVotingRecord {
+  /// proposal
+  proposal: PublicKey;
+  /// owner
+  owner: PublicKey;
+  ///version
+  version: number;
+  /// How many votes were unspent
+  undecidedCount: BN;
+  /// How many votes were spent yes
+  yesCount: BN;
+  /// How many votes were spent no
+  noCount: BN;
+}
+
+export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.publicKey('proposal'),
+    Layout.publicKey('owner'),
+    BufferLayout.u8('version'),
+    Layout.uint64('undecidedCount'),
+    Layout.uint64('yesCount'),
+    Layout.uint64('noCount'),
+    BufferLayout.seq(BufferLayout.u8(), 100, 'padding'),
+  ],
+);
 export interface TimelockConfig {
   ///version
   version: number;
@@ -289,6 +316,31 @@ export const TimelockSetParser = (
   return details;
 };
 
+export const GovernanceVotingRecordParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = GovernanceVotingRecordLayout.decode(buffer);
+  console.log('Data', data);
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: {
+      proposal: data.proposal,
+      owner: data.owner,
+      version: data.version,
+      undecidedCount: data.undecidedCount,
+      yesCount: data.yesCount,
+      noCount: data.noCount,
+    },
+  };
+
+  return details;
+};
+
 export const TimelockStateParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
@@ -307,6 +359,7 @@ export const TimelockStateParser = (
       ...info,
     },
     info: {
+      version: data.version,
       timelockSet: data.timelockSet,
       status: data.timelockStateStatus,
       totalSigningTokensMinted: data.totalSigningTokensMinted,

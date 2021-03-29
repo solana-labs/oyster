@@ -16,6 +16,7 @@ import { TimelockSet } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { depositSourceTokensInstruction } from '../models/depositSourceTokens';
 import { LABELS } from '../constants';
+import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEmptyGovernanceVotingRecord';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -40,6 +41,7 @@ export const depositSourceTokens = async (
     AccountLayout.span,
   );
 
+  let needToCreateGovAccountToo = !existingVoteAccount;
   if (!existingVoteAccount) {
     existingVoteAccount = createTokenAccount(
       instructions,
@@ -48,6 +50,26 @@ export const depositSourceTokens = async (
       proposal.info.votingMint,
       wallet.publicKey,
       signers,
+    );
+  }
+
+  const [governanceVotingRecord] = await PublicKey.findProgramAddress(
+    [
+      PROGRAM_IDS.timelock.programAccountId.toBuffer(),
+      proposal.pubkey.toBuffer(),
+      existingVoteAccount.toBuffer(),
+    ],
+    PROGRAM_IDS.timelock.programId,
+  );
+
+  if (needToCreateGovAccountToo) {
+    instructions.push(
+      createEmptyGovernanceVotingRecordInstruction(
+        governanceVotingRecord,
+        proposal.pubkey,
+        existingVoteAccount,
+        wallet.publicKey,
+      ),
     );
   }
 
@@ -90,6 +112,7 @@ export const depositSourceTokens = async (
 
   instructions.push(
     depositSourceTokensInstruction(
+      governanceVotingRecord,
       existingVoteAccount,
       sourceAccount,
       proposal.info.sourceHolding,
