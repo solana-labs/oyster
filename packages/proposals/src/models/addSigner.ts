@@ -12,16 +12,18 @@ import { TimelockInstruction } from './timelock';
 ///   1. `[writable]` Initialized Signatory mint account.
 ///   2. `[writable]` Admin account.
 ///   3. `[writable]` Admin validation account.
-///   4. `[]` Timelock set account.
-///   5. `[]` Transfer authority
-///   6. `[]` Timelock program mint authority
-///   7. `[]` Timelock program account.
-///   8. '[]` Token program id.
+///   4. `[writable]` Timelock set account.
+///   5. `[]` Timelock set account.
+///   6. `[]` Transfer authority
+///   7. `[]` Timelock program mint authority
+///   8. `[]` Timelock program account.
+///   9. '[]` Token program id.
 export const addSignerInstruction = (
   signatoryAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminAccount: PublicKey,
   adminValidationAccount: PublicKey,
+  timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
@@ -44,7 +46,8 @@ export const addSignerInstruction = (
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminAccount, isSigner: false, isWritable: true },
     { pubkey: adminValidationAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {

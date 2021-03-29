@@ -19,16 +19,18 @@ import BN from 'bn.js';
 ///   1. `[writable]` Timelock set account.
 ///   2. `[writable]` Signatory account
 ///   3. `[writable]` Signatory validation account.
-///   4. `[]` Timelock Config account.
-///   5. `[]` Transfer authority
-///   6. `[]` Timelock mint authority
-///   7. `[]` Timelock program account.
-///   8. `[]` Token program account.
+///   4. `[]` Timelock Set account.
+///   5. `[]` Timelock Config account.
+///   6. `[]` Transfer authority
+///   7. `[]` Timelock mint authority
+///   8. `[]` Timelock program account.
+///   9. `[]` Token program account.
 export const addCustomSingleSignerTransactionInstruction = (
   timelockTransactionAccount: PublicKey,
-  timelockSetAccount: PublicKey,
+  timelockStateAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryValidationAccount: PublicKey,
+  timelockSetAccount: PublicKey,
   timelockConfigAccount: PublicKey,
   transferAuthority: PublicKey,
   authority: PublicKey,
@@ -85,9 +87,10 @@ export const addCustomSingleSignerTransactionInstruction = (
 
   const keys = [
     { pubkey: timelockTransactionAccount, isSigner: true, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryValidationAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },

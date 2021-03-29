@@ -2,17 +2,15 @@ import {
   Account,
   Connection,
   PublicKey,
-  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, models } from '@oyster/common';
+import { contexts, utils, actions } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
   ConsensusAlgorithm,
   ExecutionType,
   TimelockConfig,
-  TimelockConfigLayout,
   TimelockType,
   VotingEntryRule,
 } from '../models/timelock';
@@ -20,10 +18,9 @@ import { initTimelockConfigInstruction } from '../models/initTimelockConfig';
 import BN from 'bn.js';
 import { createEmptyTimelockConfigInstruction } from '../models/createEmptyTimelockConfig';
 
-const { sendTransaction } = contexts.Connection;
+const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
-const { approve } = models;
 
 export const registerProgramGovernance = async (
   connection: Connection,
@@ -33,6 +30,8 @@ export const registerProgramGovernance = async (
   const PROGRAM_IDS = utils.programIds();
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
+  let mintSigners: Account[] = [];
+  let mintInstructions: TransactionInstruction[] = [];
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
     MintLayout.span,
@@ -44,29 +43,63 @@ export const registerProgramGovernance = async (
   if (!uninitializedTimelockConfig.program)
     uninitializedTimelockConfig.program = new Account().publicKey; // Random generation if none given
 
-  if (!uninitializedTimelockConfig.governanceMint) {
-    // Initialize the mint, an account for the admin, and give them one governance token
+  if (!uninitializedTimelockConfig.councilMint) {
+    // Initialize the mint, an account for the admin, and give them one council token
     // to start their lives with.
-    uninitializedTimelockConfig.governanceMint = createMint(
-      instructions,
+    uninitializedTimelockConfig.councilMint = createMint(
+      mintInstructions,
       wallet.publicKey,
       mintRentExempt,
       0,
       wallet.publicKey,
       wallet.publicKey,
-      signers,
+      mintSigners,
+    );
+
+    const adminsCouncilToken = createTokenAccount(
+      mintInstructions,
+      wallet.publicKey,
+      accountRentExempt,
+      uninitializedTimelockConfig.councilMint,
+      wallet.publicKey,
+      mintSigners,
+    );
+
+    mintInstructions.push(
+      Token.createMintToInstruction(
+        PROGRAM_IDS.token,
+        uninitializedTimelockConfig.councilMint,
+        adminsCouncilToken,
+        wallet.publicKey,
+        [],
+        1,
+      ),
+    );
+  }
+
+  if (!uninitializedTimelockConfig.governanceMint) {
+    // Initialize the mint, an account for the admin, and give them one governance token
+    // to start their lives with.
+    uninitializedTimelockConfig.governanceMint = createMint(
+      mintInstructions,
+      wallet.publicKey,
+      mintRentExempt,
+      0,
+      wallet.publicKey,
+      wallet.publicKey,
+      mintSigners,
     );
 
     const adminsGovernanceToken = createTokenAccount(
-      instructions,
+      mintInstructions,
       wallet.publicKey,
       accountRentExempt,
       uninitializedTimelockConfig.governanceMint,
       wallet.publicKey,
-      signers,
+      mintSigners,
     );
 
-    instructions.push(
+    mintInstructions.push(
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
         uninitializedTimelockConfig.governanceMint,
@@ -78,13 +111,11 @@ export const registerProgramGovernance = async (
     );
   }
 
-  const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
-    TimelockConfigLayout.span,
-  );
   const [timelockConfigKey] = await PublicKey.findProgramAddress(
     [
       PROGRAM_IDS.timelock.programAccountId.toBuffer(),
       uninitializedTimelockConfig.governanceMint.toBuffer(),
+      uninitializedTimelockConfig.councilMint.toBuffer(),
       uninitializedTimelockConfig.program.toBuffer(),
     ],
     PROGRAM_IDS.timelock.programId,
@@ -95,6 +126,7 @@ export const registerProgramGovernance = async (
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
+      uninitializedTimelockConfig.councilMint,
       wallet.publicKey,
     ),
   );
@@ -103,10 +135,10 @@ export const registerProgramGovernance = async (
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
+      uninitializedTimelockConfig.councilMint,
       uninitializedTimelockConfig.consensusAlgorithm ||
         ConsensusAlgorithm.Majority,
-      uninitializedTimelockConfig.executionType ||
-        ExecutionType.AnyAboveVoteFinishSlot,
+      uninitializedTimelockConfig.executionType || ExecutionType.Independent,
       uninitializedTimelockConfig.timelockType ||
         TimelockType.CustomSingleSignerV1,
       uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,
@@ -123,11 +155,13 @@ export const registerProgramGovernance = async (
   });
 
   try {
-    let tx = await sendTransaction(
+    let tx = await sendTransactions(
       connection,
       wallet,
-      instructions,
-      signers,
+      mintInstructions.length
+        ? [mintInstructions, instructions]
+        : [instructions],
+      mintInstructions.length ? [mintSigners, signers] : [signers],
       true,
     );
 

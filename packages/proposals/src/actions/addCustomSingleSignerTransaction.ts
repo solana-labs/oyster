@@ -10,6 +10,7 @@ import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
   CustomSingleSignerTimelockTransactionLayout,
   TimelockSet,
+  TimelockState,
 } from '../models/timelock';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
 import { pingInstruction } from '../models/ping';
@@ -23,6 +24,7 @@ export const addCustomSingleSignerTransaction = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  state: ParsedAccount<TimelockState>,
   sigAccount: PublicKey,
   slot: string,
   instruction: string,
@@ -86,9 +88,10 @@ export const addCustomSingleSignerTransaction = async (
   instructions.push(
     addCustomSingleSignerTransactionInstruction(
       txnKey.publicKey,
-      proposal.pubkey,
+      state.pubkey,
       sigAccount,
       proposal.info.signatoryValidation,
+      proposal.pubkey,
       proposal.info.config,
       transferAuthority.publicKey,
       authority,

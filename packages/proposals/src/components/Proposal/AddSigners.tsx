@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
-import { TimelockSet } from '../../models/timelock';
+import { TimelockSet, TimelockState } from '../../models/timelock';
 import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
@@ -20,8 +20,10 @@ const layout = {
 
 export default function AddSigners({
   proposal,
+  state,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
@@ -63,6 +65,7 @@ export default function AddSigners({
           connection,
           wallet.wallet,
           proposal,
+          state,
           adminAccount.pubkey,
           new PublicKey(signers[i]),
         );

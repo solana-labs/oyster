@@ -1,12 +1,23 @@
-import { Card, Col, Divider, Grid, Row, Space, Spin, Statistic, Tabs } from 'antd';
-import React, { useMemo, useState } from 'react';
+import {
+  Card,
+  Col,
+  Divider,
+  Grid,
+  Row,
+  Space,
+  Spin,
+  Statistic,
+  Tabs,
+} from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenDisplay, TokenIcon } from '@oyster/common';
+import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
@@ -20,15 +31,19 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
-import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
+import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
+import { getVoteAccountHolders } from '../../utils/lookups';
+import BN from 'bn.js';
+import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 const { TabPane } = Tabs;
 
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
+const { useConnectionConfig } = contexts.Connection;
 const { useAccountByMint } = hooks;
 const { useBreakpoint } = Grid;
 
@@ -37,20 +52,40 @@ export const ProposalView = () => {
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
   const timelockConfig = context.configs[proposal?.info.config.toBase58()];
+  const timelockState = context.states[proposal?.info.state.toBase58()];
+  const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
-  const governanceMint = useMint(timelockConfig?.info.governanceMint);
-  const yesVotingMint = useMint(proposal?.info.yesVotingMint);
 
+  const sourceMint = useMint(proposal?.info.sourceMint);
+  const yesVotingMint = useMint(proposal?.info.yesVotingMint);
+  const [votingAccounts, setVotingAccounts] = useState<any>({});
+  const [yesVotingAccounts, setYesVotingAccounts] = useState<any>({});
+  const [noVotingAccounts, setNoVotingAccounts] = useState<any>({});
+  useEffect(() => {
+    getVoteAccountHolders(proposal?.info.votingMint, endpoint).then(
+      setVotingAccounts,
+    );
+    getVoteAccountHolders(proposal?.info.yesVotingMint, endpoint).then(
+      setYesVotingAccounts,
+    );
+    getVoteAccountHolders(proposal?.info.noVotingMint, endpoint).then(
+      setNoVotingAccounts,
+    );
+  }, [proposal]);
   return (
     <div className="flexColumn">
-      {proposal && sigMint && votingMint && governanceMint && yesVotingMint ? (
+      {proposal && sigMint && votingMint && sourceMint && yesVotingMint ? (
         <InnerProposalView
           proposal={proposal}
+          timelockState={timelockState}
           timelockConfig={timelockConfig}
-          governanceMint={governanceMint}
+          sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
+          votingAccounts={votingAccounts}
+          yesVotingAccounts={yesVotingAccounts}
+          noVotingAccounts={noVotingAccounts}
           sigMint={sigMint}
           instructions={context.transactions}
         />
@@ -63,33 +98,41 @@ export const ProposalView = () => {
 
 function InnerProposalView({
   proposal,
+  timelockState,
   sigMint,
   votingMint,
   yesVotingMint,
   instructions,
   timelockConfig,
-  governanceMint,
+  sourceMint,
+  votingAccounts,
+  yesVotingAccounts,
+  noVotingAccounts,
 }: {
   proposal: ParsedAccount<TimelockSet>;
   timelockConfig: ParsedAccount<TimelockConfig>;
+  timelockState: ParsedAccount<TimelockState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
-  governanceMint: MintInfo;
+  sourceMint: MintInfo;
   instructions: Record<string, ParsedAccount<TimelockTransaction>>;
+  votingAccounts: Record<string, { amount: BN }>;
+  yesVotingAccounts: Record<string, { amount: BN }>;
+  noVotingAccounts: Record<string, { amount: BN }>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
   const config = useConfig(proposal.info.config.toBase58());
 
-  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = proposal.info.state.timelockTransactions
+  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
-  const isUrl = !!proposal.info.state.descLink.match(urlRegex);
+  const isUrl = !!timelockState.info.descLink.match(urlRegex);
   const isGist =
-    !!proposal.info.state.descLink.match(/gist/i) &&
-    !!proposal.info.state.descLink.match(/github/i);
-  const [content, setContent] = useState(proposal.info.state.descLink);
+    !!timelockState.info.descLink.match(/gist/i) &&
+    !!timelockState.info.descLink.match(/github/i);
+  const [content, setContent] = useState(timelockState.info.descLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -97,7 +140,7 @@ function InnerProposalView({
 
   useMemo(() => {
     if (loading) {
-      let toFetch = proposal.info.state.descLink;
+      let toFetch = timelockState.info.descLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -132,148 +175,182 @@ function InnerProposalView({
 
   return (
     <Row>
-        <Col flex="auto" xxl={15} xs={24} className="proposal-container">
-          <Row justify="center" align="middle" className="proposal-header">
-            <Col md={12} xs={24}>
-              <Row>
-                <TokenIcon mintAddress={config?.info.governanceMint.toBase58()} size={60} />
-                <Col>
-                  <h1>{proposal.info.state.name}</h1>
-                <StateBadge proposal={proposal} />
-                </Col>
-              </Row>
-            </Col>
-            <Col md={12} xs={24}>
-              <div className="proposal-actions">
-                {adminAccount &&
-                  adminAccount.info.amount.toNumber() === 1 &&
-                  proposal.info.state.status === TimelockStateStatus.Draft && (
-                    <AddSigners proposal={proposal} />
-                  )}
-                {sigAccount &&
-                  sigAccount.info.amount.toNumber() === 1 &&
-                  proposal.info.state.status === TimelockStateStatus.Draft && (
-                    <SignButton proposal={proposal} />
-                  )}
-                <MintGovernanceTokens timelockConfig={timelockConfig} />
-                <RegisterToVote
-                  timelockConfig={timelockConfig}
-                  proposal={proposal}
-                />
-                <WithdrawTokens
-                  timelockConfig={timelockConfig}
-                  proposal={proposal}
-                />
-                <Vote proposal={proposal} timelockConfig={timelockConfig} />
-              </div>
-            </Col>
-          </Row>
-
-          <Row className="proposals-stats">
-            <Col md={7} xs={24}>
+      <Col flex="auto" xxl={15} xs={24} className="proposal-container">
+        <Row justify="center" align="middle" className="proposal-header">
+          <Col md={12} xs={24}>
+            <Row>
+              <TokenIcon
+                mintAddress={proposal?.info.sourceMint.toBase58()}
+                size={60}
+              />
+              <Col>
+                <h1>{timelockState.info.name}</h1>
+                <StateBadge state={timelockState} />
+              </Col>
+            </Row>
+          </Col>
+          <Col md={12} xs={24}>
+            <div className="proposal-actions">
+              {adminAccount &&
+                adminAccount.info.amount.toNumber() === 1 &&
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <AddSigners proposal={proposal} state={timelockState} />
+                )}
+              {sigAccount &&
+                sigAccount.info.amount.toNumber() === 1 &&
+                timelockState.info.status === TimelockStateStatus.Draft && (
+                  <SignButton proposal={proposal} state={timelockState} />
+                )}
+              <MintSourceTokens
+                timelockConfig={timelockConfig}
+                useGovernance={
+                  proposal.info.sourceMint.toBase58() ===
+                  timelockConfig.info.governanceMint.toBase58()
+                }
+              />
+              <RegisterToVote
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+              />
+              <WithdrawTokens
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+              />
+              <Vote
+                proposal={proposal}
+                timelockConfig={timelockConfig}
+                state={timelockState}
+              />
+            </div>
+          </Col>
+        </Row>
+        {false && (
+          <Row className="proposals-visual">
+            <Col md={24} xs={24}>
               <Card>
-                <Statistic
-                  title={LABELS.SIG_GIVEN}
-                  value={
-                    proposal.info.state.totalSigningTokensMinted.toNumber() -
-                    sigMint.supply.toNumber()
-                  }
-                  suffix={`/ ${proposal.info.state.totalSigningTokensMinted.toNumber()}`}
-                />
-              </Card>
-            </Col>
-            <Col md={7} xs={24}>
-              <Card>
-                <Statistic
-                  title={LABELS.VOTES_CAST}
-                  value={yesVotingMint.supply.toNumber()}
-                  suffix={`/ ${governanceMint.supply.toNumber()}`}
-                />
-              </Card>
-            </Col>
-            <Col md={7} xs={24}>
-              <Card>
-                <Statistic
-                  valueStyle={{ color: 'green' }}
-                  title={LABELS.VOTES_REQUIRED}
-                  value={getVotesRequired(timelockConfig, governanceMint)}
+                <VoterBubbleGraph
+                  width={400}
+                  height={400}
+                  noVotingAccounts={{}}
+                  yesVotingAccounts={{}}
+                  votingAccounts={{ '1': { amount: new BN(100) } }}
                 />
               </Card>
             </Col>
           </Row>
+        )}
+        <Row className="proposals-stats">
+          <Col md={7} xs={24}>
+            <Card>
+              <Statistic
+                title={LABELS.SIG_GIVEN}
+                value={
+                  timelockState.info.totalSigningTokensMinted.toNumber() -
+                  sigMint.supply.toNumber()
+                }
+                suffix={`/ ${timelockState.info.totalSigningTokensMinted.toNumber()}`}
+              />
+            </Card>
+          </Col>
+          <Col md={7} xs={24}>
+            <Card>
+              <Statistic
+                title={LABELS.VOTES_CAST}
+                value={yesVotingMint.supply.toNumber()}
+                suffix={`/ ${sourceMint.supply.toNumber()}`}
+              />
+            </Card>
+          </Col>
+          <Col md={7} xs={24}>
+            <Card>
+              <Statistic
+                valueStyle={{ color: 'green' }}
+                title={LABELS.VOTES_REQUIRED}
+                value={getVotesRequired(timelockConfig, sourceMint)}
+              />
+            </Card>
+          </Col>
+        </Row>
 
-          <Row>
-            <Col span={24}>
-              <Tabs defaultActiveKey="1" size="large" style={{ marginBottom: 32 }}>
-                <TabPane tab="Description" key="1">
-                  {loading ? (
-                    <Spin />
-                  ) : isUrl ? (
-                    failed ? (
-                      <p>
-                        {LABELS.DESCRIPTION}:{' '}
-                        <a href={proposal.info.state.descLink} target="_blank">
-                          {msg ? msg : LABELS.NO_LOAD}
-                        </a>
-                      </p>
-                    ) : (
-                      <ReactMarkdown children={content} />
-                    )
+        <Row>
+          <Col span={24}>
+            <Tabs
+              defaultActiveKey="1"
+              size="large"
+              style={{ marginBottom: 32 }}
+            >
+              <TabPane tab="Description" key="1">
+                {loading ? (
+                  <Spin />
+                ) : isUrl ? (
+                  failed ? (
+                    <p>
+                      {LABELS.DESCRIPTION}:{' '}
+                      <a href={timelockState.info.descLink} target="_blank">
+                        {msg ? msg : LABELS.NO_LOAD}
+                      </a>
+                    </p>
                   ) : (
-                    content
-                  )}
-                </TabPane>
-                <TabPane tab="Executable" key="2">
+                    <ReactMarkdown children={content} />
+                  )
+                ) : (
+                  content
+                )}
+              </TabPane>
+              <TabPane tab="Executable" key="2">
                 <Row
-                    gutter={[
-                      { xs: 8, sm: 16, md: 24, lg: 32 },
-                      { xs: 8, sm: 16, md: 24, lg: 32 },
-                    ]}
-                  >
-                    {instructionsForProposal.map((instruction, position) => (
-                      <Col xs={24} sm={24} md={12} lg={8} key={position}>
-                        <InstructionCard
+                  gutter={[
+                    { xs: 8, sm: 16, md: 24, lg: 32 },
+                    { xs: 8, sm: 16, md: 24, lg: 32 },
+                  ]}
+                >
+                  {instructionsForProposal.map((instruction, position) => (
+                    <Col xs={24} sm={24} md={12} lg={8} key={position}>
+                      <InstructionCard
+                        proposal={proposal}
+                        position={position + 1}
+                        instruction={instruction}
+                        state={timelockState}
+                      />
+                    </Col>
+                  ))}
+                  {instructionsForProposal.length < INSTRUCTION_LIMIT &&
+                    timelockState.info.status === TimelockStateStatus.Draft && (
+                      <Col xs={24} sm={24} md={12} lg={8}>
+                        <NewInstructionCard
                           proposal={proposal}
-                          position={position + 1}
-                          instruction={instruction}
+                          state={timelockState}
+                          config={timelockConfig}
+                          position={instructionsForProposal.length}
                         />
                       </Col>
-                    ))}
-                    {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                      proposal.info.state.status === TimelockStateStatus.Draft && (
-                        <Col xs={24} sm={24} md={12} lg={8}>
-                          <NewInstructionCard
-                            proposal={proposal}
-                            config={timelockConfig}
-                            position={instructionsForProposal.length}
-                          />
-                        </Col>
-                      )}
-                  </Row>
-                </TabPane>
-              </Tabs>
-
-            </Col>
-          </Row>
-        </Col>
+                    )}
+                </Row>
+              </TabPane>
+            </Tabs>
+          </Col>
+        </Row>
+      </Col>
     </Row>
   );
 }
 
 function getVotesRequired(
   timelockConfig: ParsedAccount<TimelockConfig>,
-  governanceMint: MintInfo,
+  sourceMint: MintInfo,
 ): number {
   if (timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.5);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.5);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
   ) {
-    return Math.ceil(governanceMint.supply.toNumber() * 0.66);
+    return Math.ceil(sourceMint.supply.toNumber() * 0.66);
   } else if (
     timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
   ) {
-    return governanceMint.supply.toNumber();
+    return sourceMint.supply.toNumber();
   }
   return 0;
 }

@@ -11,18 +11,20 @@ import { TimelockInstruction } from './timelock';
 /// Burns signatory token, indicating you approve of moving this Timelock set from Draft state to Voting state.
 /// The last Signatory token to be burned moves the state to Voting.
 ///
-///   0. `[writable]` Timelock set account pub key.
+///   0. `[writable]` Timelock state account pub key.
 ///   1. `[writable]` Signatory account
 ///   2. `[writable]` Signatory mint account.
-///   3. `[]` Transfer authority
-///   4. `[]` Timelock mint authority
-///   5. `[]` Timelock program account pub key.
-///   6. `[]` Token program account.
-///   7. `[]` Clock sysvar.
+///   3. `[]` Timelock set account pub key.
+///   4. `[]` Transfer authority
+///   5. `[]` Timelock mint authority
+///   6. `[]` Timelock program account pub key.
+///   7. `[]` Token program account.
+///   8. `[]` Clock sysvar.
 export const signInstruction = (
-  timelockSetAccount: PublicKey,
+  timelockStateAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryMintAccount: PublicKey,
+  timelockSetAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
 ): TransactionInstruction => {
@@ -40,9 +42,10 @@ export const signInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {

@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import { TimelockSet } from '../models/timelock';
+import { TimelockSet, TimelockState } from '../models/timelock';
 import { signInstruction } from '../models/sign';
 
 const { sendTransaction } = contexts.Connection;
@@ -17,6 +17,7 @@ export const sign = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<TimelockSet>,
+  state: ParsedAccount<TimelockState>,
   sigAccount: PublicKey,
 ) => {
   const PROGRAM_IDS = utils.programIds();
@@ -40,9 +41,10 @@ export const sign = async (
 
   instructions.push(
     signInstruction(
-      proposal.pubkey,
+      state.pubkey,
       sigAccount,
       proposal.info.signatoryMint,
+      proposal.pubkey,
       transferAuthority.publicKey,
       mintAuthority,
     ),

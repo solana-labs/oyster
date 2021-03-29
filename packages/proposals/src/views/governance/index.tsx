@@ -16,10 +16,11 @@ import {
   TimelockConfig,
   TimelockType,
   VotingEntryRule,
+  ZERO_KEY,
 } from '../../models/timelock';
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
-import MintGovernanceTokens from '../../components/Proposal/MintGovernanceTokens';
+import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import BN from 'bn.js';
 const { useUserAccounts } = hooks;
 const columns = [
@@ -71,6 +72,12 @@ const columns = [
     render: (key: PublicKey) => <span>{key.toBase58()}</span>,
   },
   {
+    title: LABELS.COUNCIL_MINT,
+    dataIndex: 'councilMint',
+    key: 'councilMint',
+    render: (key: PublicKey) => <span>{key.toBase58()}</span>,
+  },
+  {
     title: LABELS.PROGRAM,
     dataIndex: 'program',
     key: 'program',
@@ -78,11 +85,16 @@ const columns = [
   },
 
   {
-    title: LABELS.ADD_GOVERNANCE_TOKENS,
+    title: LABELS.ACTIONS,
     dataIndex: 'config',
     key: 'config',
     render: (config: ParsedAccount<TimelockConfig>) => (
-      <MintGovernanceTokens timelockConfig={config} />
+      <>
+        <MintSourceTokens timelockConfig={config} useGovernance={true} />
+        {config.info.councilMint.toBase58() != ZERO_KEY && (
+          <MintSourceTokens timelockConfig={config} useGovernance={false} />
+        )}
+      </>
     ),
   },
 ];

@@ -9,7 +9,11 @@ import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
-import { TimelockConfig, TimelockSetLayout } from '../models/timelock';
+import {
+  TimelockConfig,
+  TimelockSetLayout,
+  TimelockStateLayout,
+} from '../models/timelock';
 
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -20,6 +24,7 @@ export const createProposal = async (
   wallet: any,
   name: string,
   description: string,
+  useGovernance: boolean,
   timelockConfig: ParsedAccount<TimelockConfig>,
 ): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
@@ -47,7 +52,7 @@ export const createProposal = async (
     sigDestinationAccount,
     yesVoteDumpAccount,
     noVoteDumpAccount,
-    governanceHoldingAccount,
+    sourceHoldingAccount,
     authority,
     instructions: associatedInstructions,
     signers: associatedSigners,
@@ -56,12 +61,35 @@ export const createProposal = async (
     accountRentExempt,
     mintRentExempt,
     timelockConfig,
+    useGovernance,
   );
+
+  let createTimelockAccountsSigners: Account[] = [];
+  let createTimelockAccountsInstructions: TransactionInstruction[] = [];
 
   const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
     TimelockSetLayout.span,
   );
+
+  const timelockStateRentExempt = await connection.getMinimumBalanceForRentExemption(
+    TimelockStateLayout.span,
+  );
+
   const timelockSetKey = new Account();
+  const timelockStateKey = new Account();
+
+  const uninitializedTimelockStateInstruction = SystemProgram.createAccount({
+    fromPubkey: wallet.publicKey,
+    newAccountPubkey: timelockStateKey.publicKey,
+    lamports: timelockStateRentExempt,
+    space: TimelockStateLayout.span,
+    programId: PROGRAM_IDS.timelock.programId,
+  });
+  signers.push(timelockStateKey);
+  createTimelockAccountsSigners.push(timelockStateKey);
+  createTimelockAccountsInstructions.push(
+    uninitializedTimelockStateInstruction,
+  );
 
   const uninitializedTimelockSetInstruction = SystemProgram.createAccount({
     fromPubkey: wallet.publicKey,
@@ -71,11 +99,14 @@ export const createProposal = async (
     programId: PROGRAM_IDS.timelock.programId,
   });
   signers.push(timelockSetKey);
-  instructions.push(uninitializedTimelockSetInstruction);
-
+  createTimelockAccountsSigners.push(timelockSetKey);
+  createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
+  console.log('useGov ernance is', useGovernance, timelockConfig);
   instructions.push(
     initTimelockSetInstruction(
+      timelockStateKey.publicKey,
       timelockSetKey.publicKey,
+      timelockConfig.pubkey,
       sigMint,
       adminMint,
       voteMint,
@@ -88,9 +119,10 @@ export const createProposal = async (
       sigDestinationAccount,
       yesVoteDumpAccount,
       noVoteDumpAccount,
-      governanceHoldingAccount,
-      timelockConfig.info.governanceMint,
-      timelockConfig.pubkey,
+      sourceHoldingAccount,
+      useGovernance
+        ? timelockConfig.info.governanceMint
+        : timelockConfig.info.councilMint,
       authority,
       description,
       name,
@@ -107,8 +139,12 @@ export const createProposal = async (
     let tx = await sendTransactions(
       connection,
       wallet,
-      [...associatedInstructions, instructions],
-      [...associatedSigners, signers],
+      [
+        ...associatedInstructions,
+        createTimelockAccountsInstructions,
+        instructions,
+      ],
+      [...associatedSigners, createTimelockAccountsSigners, signers],
       true,
     );
 
@@ -138,7 +174,7 @@ interface ValidationReturn {
   sigDestinationAccount: PublicKey;
   yesVoteDumpAccount: PublicKey;
   noVoteDumpAccount: PublicKey;
-  governanceHoldingAccount: PublicKey;
+  sourceHoldingAccount: PublicKey;
   authority: PublicKey;
   signers: Account[][];
   instructions: TransactionInstruction[][];
@@ -149,6 +185,7 @@ async function getAssociatedAccountsAndInstructions(
   accountRentExempt: number,
   mintRentExempt: number,
   timelockConfig: ParsedAccount<TimelockConfig>,
+  useGovernance: boolean,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
 
@@ -284,11 +321,13 @@ async function getAssociatedAccountsAndInstructions(
     holdingSigners,
   );
 
-  const governanceHoldingAccount = createTokenAccount(
+  const sourceHoldingAccount = createTokenAccount(
     holdingInstructions,
     wallet.publicKey,
     accountRentExempt,
-    timelockConfig.info.governanceMint,
+    useGovernance
+      ? timelockConfig.info.governanceMint
+      : timelockConfig.info.councilMint,
     authority,
     holdingSigners,
   );
@@ -306,7 +345,7 @@ async function getAssociatedAccountsAndInstructions(
     sigDestinationAccount,
     yesVoteDumpAccount,
     noVoteDumpAccount,
-    governanceHoldingAccount,
+    sourceHoldingAccount,
     authority,
     signers: [
       mintSigners,

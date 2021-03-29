@@ -3,7 +3,7 @@ import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { sign } from '../../actions/sign';
-import { TimelockSet } from '../../models/timelock';
+import { TimelockSet, TimelockState } from '../../models/timelock';
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
@@ -13,8 +13,10 @@ const { notify } = utils;
 
 export default function SignButton({
   proposal,
+  state,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
@@ -22,9 +24,7 @@ export default function SignButton({
   return (
     <>
       {sigAccount && sigAccount.info.amount.toNumber() === 0 && (
-        <Button disabled={true}>
-          Signed
-        </Button>
+        <Button disabled={true}>Signed</Button>
       )}
       {sigAccount && sigAccount.info.amount.toNumber() > 0 && (
         <Button
@@ -46,6 +46,7 @@ export default function SignButton({
                   connection,
                   wallet.wallet,
                   proposal,
+                  state,
                   sigAccount.pubkey,
                 );
               },

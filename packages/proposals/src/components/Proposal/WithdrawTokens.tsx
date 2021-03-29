@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import {
   TimelockConfig,
   TimelockSet,
+  TimelockState,
   TimelockStateStatus,
-  VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
@@ -20,8 +20,10 @@ const { confirm } = Modal;
 export function WithdrawTokens({
   proposal,
   timelockConfig,
+  state,
 }: {
   proposal: ParsedAccount<TimelockSet>;
+  state: ParsedAccount<TimelockState>;
   timelockConfig: ParsedAccount<TimelockConfig>;
 }) {
   const wallet = useWallet();
@@ -30,16 +32,14 @@ export function WithdrawTokens({
   const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
-  const governanceAccount = useAccountByMint(
-    timelockConfig.info.governanceMint,
-  );
+  const userAccount = useAccountByMint(proposal.info.sourceMint);
   const votingTokens = (voteAccount && voteAccount.info.amount.toNumber()) || 0;
   let totalTokens = votingTokens;
   const inEscrow =
     ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
     ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
   let additionalMsg = '';
-  if (proposal.info.state.status !== TimelockStateStatus.Voting) {
+  if (state.info.status !== TimelockStateStatus.Voting) {
     totalTokens += inEscrow;
   } else additionalMsg = LABELS.ADDITIONAL_VOTING_MSG;
 
@@ -69,7 +69,7 @@ export function WithdrawTokens({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (governanceAccount) {
+            if (userAccount) {
               // tokenAmount is out of date in this scope, so we use a trick to get it here.
               const valueHolder = { value: 0 };
               await setTokenAmount(amount => {
@@ -81,10 +81,11 @@ export function WithdrawTokens({
                 connection,
                 wallet.wallet,
                 proposal,
+                state,
                 voteAccount?.pubkey,
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,
-                governanceAccount.pubkey,
+                userAccount.pubkey,
                 valueHolder.value,
               );
               // reset

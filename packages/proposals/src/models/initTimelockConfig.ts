@@ -10,15 +10,17 @@ import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
 ///   0. `[writable]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
-///           program account key, governance mint key, timelock program account key.
-///   1. `[]` Program account to tie this config to.
-///   2. `[]` Governance mint to tie this config to
-///   3. `[]` Timelock program account pub key.
-///   4. `[]` Token program account.
+///           program account key, governance mint key, council mint key, timelock program account key.
+///   1. `[]` Program account that this config uses
+///   2. `[]` Governance mint that this config uses
+///   3. `[]` Council mint that this config uses [Optional] [Pass in 0s otherwise]
+///   4. `[]` Timelock program account pub key.
+///   5. `[]` Token program account.
 export const initTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
+  councilMint: PublicKey,
   consensusAlgorithm: number,
   executionType: number,
   timelockType: number,
@@ -69,7 +71,7 @@ export const initTimelockConfigInstruction = (
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
-
+    { pubkey: councilMint, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
       isSigner: false,

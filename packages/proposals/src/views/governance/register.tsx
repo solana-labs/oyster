@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, Modal } from 'antd';
+import { Button, ButtonProps, Modal, Switch } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -8,6 +8,7 @@ import {
   ExecutionType,
   TimelockType,
   VotingEntryRule,
+  ZERO_KEY,
 } from '../../models/timelock';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
@@ -44,10 +45,7 @@ export function RegisterGovernanceMenuItem(props: ButtonProps) {
 
   return (
     <>
-      <Button
-        onClick={() => setIsModalVisible(true)}
-        {...props}
-      >
+      <Button onClick={() => setIsModalVisible(true)} {...props}>
         {LABELS.REGISTER_GOVERNANCE}
       </Button>
       <NewForm
@@ -69,6 +67,7 @@ export function NewForm({
   isModalVisible: boolean;
 }) {
   const [form] = Form.useForm();
+  const [councilVisible, setCouncilVisible] = useState(false);
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
@@ -79,6 +78,7 @@ export function NewForm({
     minimumSlotWaitingPeriod: string;
     timeLimit: string;
     governanceMint: string;
+    councilMint: string;
     program: string;
     name: string;
   }) => {
@@ -105,6 +105,11 @@ export function NewForm({
       governanceMint: values.governanceMint
         ? new PublicKey(values.governanceMint)
         : undefined,
+      councilMint: values.councilMint
+        ? new PublicKey(values.councilMint)
+        : councilVisible
+        ? undefined // if visible but empty, set undefined so we instantiate one
+        : new PublicKey(ZERO_KEY), // default empty case, just make it padding since user doesnt want one.
       program: new PublicKey(values.program),
       name: values.name,
       timeLimit: new BN(values.timeLimit),
@@ -142,6 +147,18 @@ export function NewForm({
         >
           <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />
         </Form.Item>
+        <Form.Item label={LABELS.USE_COUNCIL_MINT}>
+          <Switch onChange={setCouncilVisible} defaultChecked={false} />
+        </Form.Item>
+        {councilVisible && (
+          <Form.Item
+            name="councilMint"
+            label={LABELS.COUNCIL_MINT}
+            rules={[{ required: false }]}
+          >
+            <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />
+          </Form.Item>
+        )}
         <Form.Item
           name="minimumSlotWaitingPeriod"
           label={LABELS.MINIMUM_SLOT_WAITING_PERIOD}
@@ -176,13 +193,10 @@ export function NewForm({
           name="executionType"
           label={LABELS.EXECUTION_TYPE}
           rules={[{ required: true }]}
-          initialValue={ExecutionType.AnyAboveVoteFinishSlot}
+          initialValue={ExecutionType.Independent}
         >
           <Select placeholder={LABELS.SELECT_EXECUTION_TYPE}>
-            <Option value={ExecutionType.AnyAboveVoteFinishSlot}>
-              Any Above Vote Finish Slot
-            </Option>
-            <Option value={ExecutionType.AllOrNothing}>All or Nothing</Option>
+            <Option value={ExecutionType.Independent}>Independent</Option>
           </Select>
         </Form.Item>
         <Form.Item
@@ -205,9 +219,6 @@ export function NewForm({
         >
           <Select placeholder={LABELS.SELECT_VOTING_ENTRY_RULE}>
             <Option value={VotingEntryRule.Anytime}>At any time</Option>
-            <Option value={VotingEntryRule.DraftOnly}>
-              Only before voting begins
-            </Option>
           </Select>
         </Form.Item>
       </Form>

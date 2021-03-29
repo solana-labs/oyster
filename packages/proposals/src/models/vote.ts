@@ -14,29 +14,31 @@ import BN from 'bn.js';
 /// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the consensus,
 /// then the transactions can begin to be run at their time slots when people click execute.
 ///
-///   0. `[writable]` Timelock set account.
+///   0. `[writable]` Timelock state account.
 ///   1. `[writable]` Your Voting account.
 ///   2. `[writable]` Your Yes-Voting account.
 ///   3. `[writable]` Your No-Voting account.
 ///   4. `[writable]` Voting mint account.
 ///   5. `[writable]` Yes Voting mint account.
 ///   6. `[writable]` No Voting mint account.
-///   7. `[]` Governance mint account
-///   8. `[]` Timelock config account.
-///   9. `[]` Transfer authority
-///   10. `[]` Timelock program mint authority
-///   11. `[]` Timelock program account pub key.
-///   12. `[]` Token program account.
-///   13. `[]` Clock sysvar.
+///   7. `[]` Source mint account
+///   8. `[]` Timelock set account.
+///   9. `[]` Timelock config account.
+///   10. `[]` Transfer authority
+///   11. `[]` Timelock program mint authority
+///   12. `[]` Timelock program account pub key.
+///   13. `[]` Token program account.
+///   14. `[]` Clock sysvar.
 export const voteInstruction = (
-  timelockSetAccount: PublicKey,
+  timelockStateAccount: PublicKey,
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
   noVotingAccount: PublicKey,
   votingMint: PublicKey,
   yesVotingMint: PublicKey,
   noVotingMint: PublicKey,
-  governanceMint: PublicKey,
+  sourceMint: PublicKey,
+  timelockSetAccount: PublicKey,
   timelockConfig: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
@@ -63,14 +65,15 @@ export const voteInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
+    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
     { pubkey: yesVotingAccount, isSigner: false, isWritable: true },
     { pubkey: noVotingAccount, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
     { pubkey: yesVotingMint, isSigner: false, isWritable: true },
     { pubkey: noVotingMint, isSigner: false, isWritable: true },
-    { pubkey: governanceMint, isSigner: false, isWritable: false },
+    { pubkey: sourceMint, isSigner: false, isWritable: false },
+    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: timelockConfig, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
