@@ -1,4 +1,12 @@
 @surge-20: #00CC82;
+@tungsten-100: #06101a;
+@tungsten-50: #0D1B28;
+
+.App {
+  height: auto;
+}
+
+
 .get-started {
   background: url("/home/get-started.svg") center  center no-repeat;
   background-size: 100%;
@@ -16,10 +24,76 @@
   height: 21px;
 }
 
+.home-subtitle {
+  font-size: 32px;
+  line-height: 160%;
+  margin-top: 80px;
+}
+.description-text {
+  font-size: 14px;
+  line-height: 160%;
+  color: #7BA4C7;
+}
 .home-container {
   max-width: 1420px;
   width: 100%;
   margin: auto;
+
+  #how-it-works-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+    background: @tungsten-50;
+    padding-bottom: 120px;
+
+    & > div:first-child {
+      margin-bottom: 80px;
+    }
+
+    .home-description {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+
+      .home-description-item {
+        padding: 0 100px 0 100px;
+        .description-title {
+          font-size: 20px;
+          line-height: 160%;
+          margin: 22px 0 22px 0;
+        }
+
+        .description-text {
+          text-align: justify;
+        }
+      }
+    }
+  }
+
+  #recent-tx-container {
+    padding-bottom: 70px;
+    .ant-table-pagination.ant-pagination {
+      margin: 16px 100px;
+    }
+    .ant-table {
+      margin: 0 100px;
+      thead {
+        tr > th.ant-table-cell {
+          background-color: @tungsten-100;
+          border: none;
+        }
+      }
+      tbody > tr:nth-child(even) > td.ant-table-cell {
+        background-color: @tungsten-100;
+        border: none;
+      }
+      tbody > tr:nth-child(odd) > td.ant-table-cell {
+        background-color: @tungsten-50;
+        border: none;
+      }
+    }
+  }
 }
 
 .justify-bottom-container {
@@ -40,4 +114,15 @@
 .grow-effect:hover {
   transition: ease-out 100ms;
   transform: scale(1.1);
+}
+
+footer.ant-layout-footer {
+  padding: 30px 0;
+  background-image: url('/home/footer.svg');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  max-width: 1420px;
+  width: 100%;
+  margin: auto;
+  background-color: @tungsten-100;
 }

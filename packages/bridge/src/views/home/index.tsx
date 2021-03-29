@@ -1,4 +1,5 @@
 import { Table, Col, Row, Statistic, Button } from 'antd';
+import anime from 'animejs';
 import React, { useMemo } from 'react';
 import { GUTTER } from '../../constants';
 import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
@@ -111,8 +112,18 @@ export const HomeView = () => {
       },
     },
   ];
-  const s = () => {
-    return true;
+  const handleDownArrow = () => {
+    const scrollTo = document.getElementById('how-it-works-container');
+    const scrollElement =
+      window.document.scrollingElement ||
+      window.document.body ||
+      window.document.documentElement;
+    anime({
+      targets: scrollElement,
+      scrollTop: scrollTo?.offsetTop,
+      duration: 1000,
+      easing: 'easeInOutQuad',
+    });
   };
   return (
     <>
@@ -127,16 +138,67 @@ export const HomeView = () => {
               <span className={'get-started'}></span>
             </Link>
           </div>
-          <div className={'grow-effect'}>
+          <div
+            className={'grow-effect'}
+            onClick={() => {
+              handleDownArrow();
+            }}
+          >
             <span className={'down-arrow'}></span>
           </div>
         </div>
-        <div style={{ height: '500px', background: '#0D1B28' }}></div>
-        {/*<Table*/}
-        {/*  dataSource={transfers.filter(a => a.symbol)}*/}
-        {/*  columns={columns}*/}
-        {/*  loading={loadingLockedAccounts}*/}
-        {/*/>*/}
+        <div id="how-it-works-container">
+          <div className={'home-subtitle'}>How it works</div>
+          <div className={'home-description'}>
+            <div className={'home-description-item'}>
+              <div className={'description-icon'}>
+                <img src={'/home/icons/bridge-direction.svg'} />
+              </div>
+              <div className={'description-title'}>Bridge in any direction</div>
+              <div className={'description-text'}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                nisi at praesent sed sollicitudin ullamcorper malesuada in.
+                Molestie sed morbi vitae in amet ultrices.
+              </div>
+            </div>
+            <div className={'home-description-item'}>
+              <div className={'description-icon'}>
+                <img src={'/home/icons/sd-card.svg'} />
+              </div>
+              <div className={'description-title'}>Staking & Validation</div>
+              <div className={'description-text'}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                nisi at praesent sed sollicitudin ullamcorper malesuada in.
+                Molestie sed morbi vitae in amet ultrices.
+              </div>
+            </div>
+            <div className={'home-description-item'}>
+              <div className={'description-icon'}>
+                <img src={'/home/icons/layers.svg'} />
+              </div>
+              <div className={'description-title'}>Layers and Capabilities</div>
+              <div className={'description-text'}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                nisi at praesent sed sollicitudin ullamcorper malesuada in.
+                Molestie sed morbi vitae in amet ultrices.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id={'recent-tx-container'}>
+          <div className={'home-subtitle'}>Recent Transactions</div>
+          <div className={'description-text'} style={{ marginBottom: '70px' }}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          </div>
+          <Table
+            scroll={{
+              scrollToFirstRowOnChange: false,
+            }}
+            dataSource={externalAssets.filter(a => a.name)}
+            columns={columns}
+            loading={loadingLockedAccounts}
+          />
+        </div>
       </div>
     </>
   );

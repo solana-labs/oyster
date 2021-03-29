@@ -58,9 +58,11 @@ export const AppLayout = React.memo((props: any) => {
           <Content style={{ flexDirection: 'column' }}>
             {props.children}
           </Content>
-          {/*<Footer style={{ textAlign: 'center' }}>*/}
-          {/*  <AppFooter />*/}
-          {/*</Footer>*/}
+          <Footer>
+            <div className={'description-text'} style={{ color: '#2F506F' }}>
+              © Solana Foundation
+            </div>
+          </Footer>
         </Layout>
       </div>
     </>
