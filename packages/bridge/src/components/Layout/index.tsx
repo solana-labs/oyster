@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './../../App.less';
 import './index.less';
-import { Layout, Button } from 'antd';
+import { Layout, Button, Popover } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
-import { AppBar } from '@oyster/common';
+import { AppBar } from '../AppBar';
 import Wormhole from '../Wormhole';
 import { Footer as AppFooter } from './../Footer';
 import { EthereumConnect } from '../EthereumConnect';
 import { useEthereum } from '../../contexts';
+import { Settings } from '@oyster/common';
+import { SettingOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 
@@ -30,44 +32,42 @@ export const AppLayout = React.memo((props: any) => {
   return (
     <>
       <div className={`App`}>
-        <Wormhole
-          onCreated={() => setWormholeReady(true)}
-          show={true}
-          rotate={true}
-        >
-          <Layout title={LABELS.APP_TITLE}>
+        <Layout title={LABELS.APP_TITLE}>
+          <Header className="App-Bar">
             {!isRoot && (
-              <Header className="App-Bar">
-                <div className="app-title">
-                  <Link to="/">
-                    <h2>WORMHOLE</h2>
-                  </Link>
-                </div>
-                <AppBar
-                  additionalSettings={
-                    connected ? (
-                      <Button
-                        type="primary"
-                        onClick={() => disconnect()}
-                        style={{ marginTop: '8px' }}
-                      >
-                        Disconnect ETH
-                      </Button>
-                    ) : undefined
-                  }
-                  useWalletBadge={true}
-                  left={<EthereumConnect />}
-                />
-              </Header>
+              <div className="app-title app-left">
+                <Link to="/">
+                  <img src={'/appbar/logo.svg'} />
+                </Link>
+              </div>
             )}
-            <Content style={{ padding: '0 50px', flexDirection: 'column' }}>
-              {props.children}
-            </Content>
-            <Footer style={{ textAlign: 'center' }}>
-              <AppFooter />
-            </Footer>
-          </Layout>
-        </Wormhole>
+            <AppBar />
+            {!isRoot && (
+              <Popover
+                placement="topRight"
+                title={LABELS.SETTINGS_TOOLTIP}
+                content={<Settings />}
+                trigger="click"
+              >
+                <Button
+                  className={'app-right'}
+                  shape="circle"
+                  size="large"
+                  type="text"
+                  icon={<SettingOutlined />}
+                />
+              </Popover>
+            )}
+          </Header>
+          <Content style={{ flexDirection: 'column' }}>
+            {props.children}
+          </Content>
+          <Footer>
+            <div className={'description-text'} style={{ color: '#2F506F' }}>
+              © Solana Foundation
+            </div>
+          </Footer>
+        </Layout>
       </div>
     </>
   );
