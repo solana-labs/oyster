@@ -14,22 +14,26 @@ import BN from 'bn.js';
 /// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the consensus,
 /// then the transactions can begin to be run at their time slots when people click execute.
 ///
-///   0. `[writable]` Timelock state account.
-///   1. `[writable]` Your Voting account.
-///   2. `[writable]` Your Yes-Voting account.
-///   3. `[writable]` Your No-Voting account.
-///   4. `[writable]` Voting mint account.
-///   5. `[writable]` Yes Voting mint account.
-///   6. `[writable]` No Voting mint account.
-///   7. `[]` Source mint account
-///   8. `[]` Timelock set account.
-///   9. `[]` Timelock config account.
-///   10. `[]` Transfer authority
-///   11. `[]` Timelock program mint authority
-///   12. `[]` Timelock program account pub key.
-///   13. `[]` Token program account.
-///   14. `[]` Clock sysvar.
+///   0. `[writable]` Governance voting record account.
+///                   Can be uninitialized or initialized(if already used once in this proposal)
+///                   Must have address with PDA having seed tuple [timelock acct key, proposal key, your voting account key]
+///   1. `[writable]` Timelock state account.
+///   2. `[writable]` Your Voting account.
+///   3. `[writable]` Your Yes-Voting account.
+///   4. `[writable]` Your No-Voting account.
+///   5. `[writable]` Voting mint account.
+///   6. `[writable]` Yes Voting mint account.
+///   7. `[writable]` No Voting mint account.
+///   8. `[]` Source mint account
+///   9. `[]` Timelock set account.
+///   10. `[]` Timelock config account.
+///   12. `[]` Transfer authority
+///   13. `[]` Timelock program mint authority
+///   14. `[]` Timelock program account pub key.
+///   15. `[]` Token program account.
+///   16. `[]` Clock sysvar.
 export const voteInstruction = (
+  governanceVotingRecord: PublicKey,
   timelockStateAccount: PublicKey,
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
@@ -65,6 +69,7 @@ export const voteInstruction = (
   );
 
   const keys = [
+    { pubkey: governanceVotingRecord, isSigner: false, isWritable: true },
     { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
     { pubkey: yesVotingAccount, isSigner: false, isWritable: true },

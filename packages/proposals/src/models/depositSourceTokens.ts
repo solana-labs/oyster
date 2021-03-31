@@ -11,16 +11,18 @@ import BN from 'bn.js';
 /// These tokens are removed from your account and can be returned by withdrawing
 /// them from the timelock (but then you will miss the vote.)
 ///
-///   0. `[writable]` Initialized Voting account to hold your received voting tokens.
-///   1. `[writable]` User token account to deposit tokens from.
-///   2. `[writable]` Source holding account for timelock that will accept the tokens in escrow.
-///   3. `[writable]` Voting mint account.
-///   4. `[]` Timelock set account.
-///   5. `[]` Transfer authority
-///   6. `[]` Timelock program mint authority
-///   7. `[]` Timelock program account pub key.
-///   8. `[]` Token program account.
+///   0. `[writable]` Governance voting record account. See Vote docs for more detail.
+///   1. `[writable]` Initialized Voting account to hold your received voting tokens.
+///   2. `[writable]` User token account to deposit tokens from.
+///   3. `[writable]` Source holding account for timelock that will accept the tokens in escrow.
+///   4. `[writable]` Voting mint account.
+///   5. `[]` Timelock set account.
+///   6. `[]` Transfer authority
+///   7. `[]` Timelock program mint authority
+///   8. `[]` Timelock program account pub key.
+///   9. `[]` Token program account.
 export const depositSourceTokensInstruction = (
+  governanceVotingRecord: PublicKey,
   votingAccount: PublicKey,
   sourceAccount: PublicKey,
   sourceHoldingAccount: PublicKey,
@@ -48,6 +50,7 @@ export const depositSourceTokensInstruction = (
   );
 
   const keys = [
+    { pubkey: governanceVotingRecord, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
     { pubkey: sourceAccount, isSigner: false, isWritable: true },
     { pubkey: sourceHoldingAccount, isSigner: false, isWritable: true },

@@ -105,12 +105,22 @@ export const withdrawVotingTokens = async (
     votingTokenAmount,
   );
 
+  const [governanceVotingRecord] = await PublicKey.findProgramAddress(
+    [
+      PROGRAM_IDS.timelock.programAccountId.toBuffer(),
+      proposal.pubkey.toBuffer(),
+      existingVoteAccount.toBuffer(),
+    ],
+    PROGRAM_IDS.timelock.programId,
+  );
+
   signers.push(transferAuthority);
   signers.push(yesTransferAuthority);
   signers.push(noTransferAuthority);
 
   instructions.push(
     withdrawVotingTokensInstruction(
+      governanceVotingRecord,
       existingVoteAccount,
       existingYesVoteAccount,
       existingNoVoteAccount,
@@ -119,6 +129,8 @@ export const withdrawVotingTokens = async (
       proposal.info.yesVotingDump,
       proposal.info.noVotingDump,
       proposal.info.votingMint,
+      proposal.info.yesVotingMint,
+      proposal.info.noVotingMint,
       state.pubkey,
       proposal.pubkey,
       transferAuthority.publicKey,

@@ -33,18 +33,18 @@ export function WithdrawTokens({
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
   const userAccount = useAccountByMint(proposal.info.sourceMint);
-  const votingTokens = (voteAccount && voteAccount.info.amount.toNumber()) || 0;
-  let totalTokens = votingTokens;
-  const inEscrow =
-    ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
-    ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
-  let additionalMsg = '';
-  if (state.info.status !== TimelockStateStatus.Voting) {
-    totalTokens += inEscrow;
-  } else additionalMsg = LABELS.ADDITIONAL_VOTING_MSG;
+  const votingTokens =
+    (voteAccount && voteAccount.info.amount.toNumber()) ||
+    0 +
+      ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
+      ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
+  let additionalMsg =
+    state.info.status !== TimelockStateStatus.Voting
+      ? ''
+      : LABELS.ADDITIONAL_VOTING_MSG;
 
   const [_, setTokenAmount] = useState(1);
-  return votingTokens + inEscrow > 0 ? (
+  return votingTokens > 0 ? (
     <Button
       type="primary"
       onClick={() =>
@@ -54,15 +54,10 @@ export function WithdrawTokens({
           content: (
             <Row>
               <Col span={24}>
-                <p>You can withdraw up to {totalTokens} voting tokens. </p>
+                <p>You can withdraw up to {votingTokens} voting tokens. </p>
                 {additionalMsg && <p>{additionalMsg}</p>}
-                {additionalMsg && (
-                  <p>
-                    You have {inEscrow} tokens in holding until voting
-                    completes.
-                  </p>
-                )}
-                <Slider min={1} max={totalTokens} onChange={setTokenAmount} />
+
+                <Slider min={1} max={votingTokens} onChange={setTokenAmount} />
               </Col>
             </Row>
           ),
