@@ -28,11 +28,11 @@ export function Routes() {
                         path="/"
                         component={() => <HomeView />}
                       />
-                      <Route
+                      {/* <Route
                         exact
                         path="/faucet"
                         children={<FaucetView />}
-                      />
+                      /> */}
                     </Switch>
                   </AppLayout>
                 </MarketProvider>

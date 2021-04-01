@@ -13,20 +13,12 @@ const { Header, Content, Footer } = Layout;
 
 export const AppLayout = React.memo((props: any) => {
   const location = useLocation();
-  const [wormholeReady, setWormholeReady] = useState(false);
-
-  const paths: { [key: string]: string } = {
-    '/faucet': '7',
-  };
 
   const isRoot = location.pathname === '/';
 
-  const current =
-    [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
-    '';
   return (
     <>
-      <div className={`App`}>
+      <div className="App">
         <Layout title={LABELS.APP_TITLE}>
           <Header className="App-Bar">
             {!isRoot && (
