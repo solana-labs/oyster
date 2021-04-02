@@ -74,8 +74,9 @@ export function Vote({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
+            const vote = await getLatestVote();
+
             if (userTokenAccount && vote != 0) {
-              const vote = await getLatestVote();
               const voteAmount = userTokenAccount.info.amount.toNumber();
 
               const yesTokenAmount = vote > 0 ? voteAmount : 0;

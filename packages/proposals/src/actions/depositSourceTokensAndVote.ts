@@ -1,10 +1,31 @@
-import { Connection, PublicKey } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js';
+import {
+  contexts,
+  utils,
+  models,
+  ParsedAccount,
+  actions,
+} from '@oyster/common';
 
 import { TimelockConfig, TimelockSet, TimelockState } from '../models/timelock';
 
-import { vote } from './vote';
-import { depositSourceTokens } from './depositSourceTokens';
+import { AccountLayout } from '@solana/spl-token';
+
+import { LABELS } from '../constants';
+
+import { depositSourceTokensInstruction } from '../models/depositSourceTokens';
+import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEmptyGovernanceVotingRecord';
+import { voteInstruction } from '../models/vote';
+
+const { createTokenAccount } = actions;
+const { sendTransactions } = contexts.Connection;
+const { notify } = utils;
+const { approve } = models;
 
 export const depositSourceTokensAndVote = async (
   connection: Connection,
@@ -22,31 +43,156 @@ export const depositSourceTokensAndVote = async (
   const votingTokenAmount =
     yesVotingTokenAmount > 0 ? yesVotingTokenAmount : noVotingTokenAmount;
 
-  const {
-    voteAccount,
-    yesVoteAccount,
-    noVoteAccount,
-  } = await depositSourceTokens(
-    connection,
-    wallet,
-    proposal,
-    existingVoteAccount,
-    existingYesVoteAccount,
-    existingNoVoteAccount,
+  const PROGRAM_IDS = utils.programIds();
+
+  let depositSigners: Account[] = [];
+  let depositInstructions: TransactionInstruction[] = [];
+
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
+  );
+
+  let needToCreateGovAccountToo = !existingVoteAccount;
+  if (!existingVoteAccount) {
+    existingVoteAccount = createTokenAccount(
+      depositInstructions,
+      wallet.publicKey,
+      accountRentExempt,
+      proposal.info.votingMint,
+      wallet.publicKey,
+      depositSigners,
+    );
+  }
+
+  const [governanceVotingRecord] = await PublicKey.findProgramAddress(
+    [
+      PROGRAM_IDS.timelock.programAccountId.toBuffer(),
+      proposal.pubkey.toBuffer(),
+      existingVoteAccount.toBuffer(),
+    ],
+    PROGRAM_IDS.timelock.programId,
+  );
+
+  if (needToCreateGovAccountToo) {
+    depositInstructions.push(
+      createEmptyGovernanceVotingRecordInstruction(
+        governanceVotingRecord,
+        proposal.pubkey,
+        existingVoteAccount,
+        wallet.publicKey,
+      ),
+    );
+  }
+
+  if (!existingYesVoteAccount) {
+    existingYesVoteAccount = createTokenAccount(
+      depositInstructions,
+      wallet.publicKey,
+      accountRentExempt,
+      proposal.info.yesVotingMint,
+      wallet.publicKey,
+      depositSigners,
+    );
+  }
+
+  if (!existingNoVoteAccount) {
+    existingNoVoteAccount = createTokenAccount(
+      depositInstructions,
+      wallet.publicKey,
+      accountRentExempt,
+      proposal.info.noVotingMint,
+      wallet.publicKey,
+      depositSigners,
+    );
+  }
+
+  const [mintAuthority] = await PublicKey.findProgramAddress(
+    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    PROGRAM_IDS.timelock.programId,
+  );
+
+  const depositAuthority = approve(
+    depositInstructions,
+    [],
     sourceAccount,
+    wallet.publicKey,
     votingTokenAmount,
   );
 
-  await vote(
-    connection,
-    wallet,
-    proposal,
-    timelockConfig,
-    state,
-    voteAccount,
-    yesVoteAccount,
-    noVoteAccount,
-    yesVotingTokenAmount,
-    noVotingTokenAmount,
+  depositSigners.push(depositAuthority);
+
+  depositInstructions.push(
+    depositSourceTokensInstruction(
+      governanceVotingRecord,
+      existingVoteAccount,
+      sourceAccount,
+      proposal.info.sourceHolding,
+      proposal.info.votingMint,
+      proposal.pubkey,
+      depositAuthority.publicKey,
+      mintAuthority,
+      votingTokenAmount,
+    ),
   );
+
+  let voteSigners: Account[] = [];
+  let voteInstructions: TransactionInstruction[] = [];
+
+  const voteAuthority = approve(
+    voteInstructions,
+    [],
+    existingVoteAccount,
+    wallet.publicKey,
+    yesVotingTokenAmount + noVotingTokenAmount,
+  );
+
+  voteSigners.push(voteAuthority);
+
+  voteInstructions.push(
+    voteInstruction(
+      governanceVotingRecord,
+      state.pubkey,
+      existingVoteAccount,
+      existingYesVoteAccount,
+      existingNoVoteAccount,
+      proposal.info.votingMint,
+      proposal.info.yesVotingMint,
+      proposal.info.noVotingMint,
+      proposal.info.sourceMint,
+      proposal.pubkey,
+      timelockConfig.pubkey,
+      voteAuthority.publicKey,
+      mintAuthority,
+      yesVotingTokenAmount,
+      noVotingTokenAmount,
+    ),
+  );
+
+  notify({
+    message: LABELS.VOTING_FOR_PROPOSAL,
+    description: LABELS.PLEASE_WAIT,
+    type: 'warn',
+  });
+
+  try {
+    await sendTransactions(
+      connection,
+      wallet,
+      [depositInstructions, voteInstructions],
+      [depositSigners, voteSigners],
+      true,
+    );
+
+    notify({
+      message: LABELS.PROPOSAL_VOTED,
+      type: 'success',
+      description:
+        yesVotingTokenAmount > 0
+          ? `${yesVotingTokenAmount} ${LABELS.TOKENS_VOTED_FOR_THE_PROPOSAL}.`
+          : `${noVotingTokenAmount} ${LABELS.TOKENS_VOTED_AGAINST_THE_PROPOSAL}.`,
+    });
+  } catch (ex) {
+    console.error(ex);
+    throw new Error();
+  }
 };

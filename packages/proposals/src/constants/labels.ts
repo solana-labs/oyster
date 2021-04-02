@@ -39,8 +39,12 @@ export const LABELS = {
   ADD: 'Add',
   REMOVE: 'Remove',
   ADDING_OR_REMOVING: 'Type',
-  ADDING_VOTES_TO_VOTER: 'Converting governance tokens to voting tokens',
-  VOTES_ADDED: 'Governance tokens converted.',
+
+  VOTING_FOR_PROPOSAL: 'Voting for proposal.',
+  PROPOSAL_VOTED: 'Proposal voted.',
+  TOKENS_VOTED_FOR_THE_PROPOSAL: 'tokens voted for the proposal',
+  TOKENS_VOTED_AGAINST_THE_PROPOSAL: 'tokens voted against the proposal',
+
   ADDING_GOVERNANCE_TOKENS: 'Adding governance tokens',
   PLEASE_WAIT: 'Please wait...',
   GOVERNANCE_TOKENS_ADDED: 'Governance tokens added.',
@@ -61,8 +65,6 @@ export const LABELS = {
   ADD_GOVERNANCE_TOKENS: 'Add Governance Tokens',
   ADD_COUNCIL_TOKENS: 'Add Council Tokens',
   ACTIONS: 'Actions',
-  BURNING_VOTES: 'Burning your votes...',
-  VOTES_BURNED: 'Votes burned',
   VOTE: 'Vote',
   EXECUTING: 'Executing...',
   EXECUTED: 'Executed.',
