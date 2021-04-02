@@ -44,10 +44,9 @@ export function Vote({
   const [_, setMode, getLatestMode] = useLatestState(true);
 
   const eligibleToView =
-    timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
-    [TimelockStateStatus.Draft, TimelockStateStatus.Voting].includes(
-      state.info.status,
-    );
+    userTokenAccount &&
+    userTokenAccount.info.amount.toNumber() > 0 &&
+    state.info.status === TimelockStateStatus.Voting;
 
   return eligibleToView ? (
     <Button
