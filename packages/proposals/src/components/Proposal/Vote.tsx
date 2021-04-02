@@ -1,22 +1,18 @@
 import { ParsedAccount } from '@oyster/common';
-import { Button, Col, Modal, Row, Switch } from 'antd';
-import React, { useState } from 'react';
+import { Button, Col, Modal, Row, Switch, Radio } from 'antd';
+import React from 'react';
 import {
   TimelockConfig,
   TimelockSet,
   TimelockState,
   TimelockStateStatus,
-  VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
 import { contexts, hooks } from '@oyster/common';
-import {
-  CheckOutlined,
-  CloseOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useLatestState } from '../../hooks/useLatestState';
+import './style.less';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -41,7 +37,7 @@ export function Vote({
 
   const userTokenAccount = useAccountByMint(proposal.info.sourceMint);
 
-  const [_, setMode, getLatestMode] = useLatestState(true);
+  const [vote, setVote, getLatestVote] = useLatestState(0);
 
   const eligibleToView =
     userTokenAccount &&
@@ -53,34 +49,37 @@ export function Vote({
       type="primary"
       onClick={() =>
         confirm({
-          title: 'Confirm',
+          title: LABELS.VOTE,
           icon: <ExclamationCircleOutlined />,
           content: (
             <Row>
               <Col span={24}>
                 <p>
-                  Use {userTokenAccount?.info.amount.toNumber() || 0} tokens to
-                  vote in favor OR against this proposal. You can refund these
-                  at any time. Use the switch to indicate preference.
+                  Use {userTokenAccount?.info.amount.toNumber()} tokens to vote
+                  in favor or against this proposal. You can refund these at any
+                  time.
                 </p>
-                <Switch
-                  checkedChildren={<CheckOutlined />}
-                  unCheckedChildren={<CloseOutlined />}
-                  defaultChecked
-                  onChange={setMode}
-                />
+
+                <Radio.Group
+                  onChange={e => setVote(e.target.value)}
+                  buttonStyle="solid"
+                  className="vote-radio-group"
+                >
+                  <Radio.Button value={1}>Yea</Radio.Button>
+                  <Radio.Button value={-1}>Nay</Radio.Button>
+                </Radio.Group>
               </Col>
             </Row>
           ),
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (userTokenAccount) {
-              const modeValue = await getLatestMode();
+            if (userTokenAccount && vote != 0) {
+              const vote = await getLatestVote();
               const voteAmount = userTokenAccount.info.amount.toNumber();
 
-              const yesTokenAmount = modeValue ? voteAmount : 0;
-              const noTokenAmount = !modeValue ? voteAmount : 0;
+              const yesTokenAmount = vote > 0 ? voteAmount : 0;
+              const noTokenAmount = vote < 0 ? voteAmount : 0;
 
               await depositSourceTokensAndVote(
                 connection,
