@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Layout, Button, Popover } from 'antd';
+
 import './../../App.less';
 import './index.less';
-import { Layout, Button, Popover } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
 
-import { LABELS } from '../../constants';
-import { AppBar } from '../AppBar';
 import { Settings } from '@oyster/common';
 import { SettingOutlined } from '@ant-design/icons';
+import { LABELS } from '../../constants';
+import { AppBar } from '../AppBar';
 
 const { Header, Content, Footer } = Layout;
 
@@ -46,7 +47,7 @@ export const AppLayout = React.memo((props: any) => {
               </Popover>
             )}
           </Header>
-          <Content style={{ flexDirection: 'column' }}>
+          <Content style={{ marginLeft: '2rem', marginRight: '2rem' }}>
             {props.children}
           </Content>
           <Footer>
