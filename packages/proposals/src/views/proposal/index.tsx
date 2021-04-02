@@ -25,6 +25,7 @@ import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
 import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
+import { QuickVote } from '../../components/Proposal/QuickVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
 import { getGovernanceVotingRecords } from '../../utils/lookups';
@@ -302,6 +303,11 @@ function InnerProposalView({
                 state={timelockState}
               />
               <WithdrawTokens
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+              />
+              <QuickVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}

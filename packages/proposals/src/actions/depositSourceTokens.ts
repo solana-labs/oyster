@@ -13,10 +13,12 @@ import {
 } from '@oyster/common';
 
 import { TimelockSet } from '../models/timelock';
+
 import { AccountLayout } from '@solana/spl-token';
 import { depositSourceTokensInstruction } from '../models/depositSourceTokens';
 import { LABELS } from '../constants';
 import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEmptyGovernanceVotingRecord';
+
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -31,7 +33,11 @@ export const depositSourceTokens = async (
   existingNoVoteAccount: PublicKey | undefined,
   sourceAccount: PublicKey,
   votingTokenAmount: number,
-) => {
+): Promise<{
+  voteAccount: PublicKey;
+  yesVoteAccount: PublicKey;
+  noVoteAccount: PublicKey;
+}> => {
   const PROGRAM_IDS = utils.programIds();
 
   let signers: Account[] = [];
@@ -74,7 +80,7 @@ export const depositSourceTokens = async (
   }
 
   if (!existingYesVoteAccount) {
-    createTokenAccount(
+    existingYesVoteAccount = createTokenAccount(
       instructions,
       wallet.publicKey,
       accountRentExempt,
@@ -85,7 +91,7 @@ export const depositSourceTokens = async (
   }
 
   if (!existingNoVoteAccount) {
-    createTokenAccount(
+    existingNoVoteAccount = createTokenAccount(
       instructions,
       wallet.publicKey,
       accountRentExempt,
@@ -148,4 +154,10 @@ export const depositSourceTokens = async (
     console.error(ex);
     throw new Error();
   }
+
+  return {
+    voteAccount: existingVoteAccount,
+    yesVoteAccount: existingYesVoteAccount,
+    noVoteAccount: existingNoVoteAccount,
+  };
 };
