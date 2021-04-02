@@ -23,8 +23,6 @@ import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
-import { Vote } from '../../components/Proposal/Vote';
-import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
 import { QuickVote } from '../../components/Proposal/QuickVote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
@@ -297,11 +295,6 @@ function InnerProposalView({
                   timelockConfig.info.governanceMint.toBase58()
                 }
               />
-              <RegisterToVote
-                timelockConfig={timelockConfig}
-                proposal={proposal}
-                state={timelockState}
-              />
               <WithdrawTokens
                 timelockConfig={timelockConfig}
                 proposal={proposal}
@@ -310,11 +303,6 @@ function InnerProposalView({
               <QuickVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
-                state={timelockState}
-              />
-              <Vote
-                proposal={proposal}
-                timelockConfig={timelockConfig}
                 state={timelockState}
               />
             </div>
