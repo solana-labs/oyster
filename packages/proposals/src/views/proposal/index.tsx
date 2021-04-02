@@ -23,7 +23,7 @@ import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
-import { QuickVote } from '../../components/Proposal/QuickVote';
+import { Vote } from '../../components/Proposal/Vote';
 import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
 import './style.less';
 import { getGovernanceVotingRecords } from '../../utils/lookups';
@@ -300,7 +300,7 @@ function InnerProposalView({
                 proposal={proposal}
                 state={timelockState}
               />
-              <QuickVote
+              <Vote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}

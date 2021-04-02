@@ -68,7 +68,6 @@ export const LABELS = {
   EXECUTED: 'Executed.',
   WITHDRAWING_VOTING_TOKENS: 'Refunding voting tokens as Source Tokens',
   TOKENS_WITHDRAWN: 'Voting tokens refunded as Source Tokens',
-  QUICK_VOTE: 'Quick Vote',
   CONFIRM: 'Confirm',
   CANCEL: 'Cancel',
   REFUND_TOKENS: 'Refund My Tokens',

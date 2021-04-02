@@ -21,10 +21,8 @@ const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 
-const { cache } = contexts.Accounts;
-
 const { confirm } = Modal;
-export function QuickVote({
+export function Vote({
   proposal,
   state,
   timelockConfig,
@@ -41,10 +39,6 @@ export function QuickVote({
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
   const userTokenAccount = useAccountByMint(proposal.info.sourceMint);
-  const alreadyHaveTokens =
-    (voteAccount && voteAccount.info.amount.toNumber() > 0) ||
-    (yesVoteAccount && yesVoteAccount.info.amount.toNumber() > 0) ||
-    (noVoteAccount && noVoteAccount.info.amount.toNumber() > 0);
 
   const [mode, setMode] = useState(true);
 
@@ -112,7 +106,7 @@ export function QuickVote({
         })
       }
     >
-      {LABELS.QUICK_VOTE}
+      {LABELS.VOTE}
     </Button>
   ) : null;
 }
