@@ -16,6 +16,7 @@ import {
   CloseOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
+import { useLatestState } from '../../hooks/useLatestState';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -40,7 +41,7 @@ export function Vote({
 
   const userTokenAccount = useAccountByMint(proposal.info.sourceMint);
 
-  const [mode, setMode] = useState(true);
+  const [_, setMode, getLatestMode] = useLatestState(true);
 
   const eligibleToView =
     timelockConfig.info.votingEntryRule == VotingEntryRule.Anytime &&
@@ -76,17 +77,11 @@ export function Vote({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (userTokenAccount) {
-              // mode is out of date in this scope, so we use a trick to get it here.
-              const valueHolder = { mode: true };
-              await setMode(mode => {
-                valueHolder.mode = mode;
-                return mode;
-              });
-
+              const modeValue = await getLatestMode();
               const voteAmount = userTokenAccount.info.amount.toNumber();
 
-              const yesTokenAmount = valueHolder.mode ? voteAmount : 0;
-              const noTokenAmount = !valueHolder.mode ? voteAmount : 0;
+              const yesTokenAmount = modeValue ? voteAmount : 0;
+              const noTokenAmount = !modeValue ? voteAmount : 0;
 
               await depositSourceTokensAndVote(
                 connection,
