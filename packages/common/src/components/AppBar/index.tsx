@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Popover } from 'antd';
 import { CurrentUserBadge } from '../CurrentUserBadge';
-import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';
 import { LABELS } from '../../constants/labels';
@@ -19,13 +18,11 @@ export const AppBar = (props: {
   const TopBar = (
     <div className="App-Bar-right">
       {props.left}
-      {connected ? (
-        props.useWalletBadge ? (
-          <CurrentUserWalletBadge />
-        ) : (
+      {connected ?
+        (
           <CurrentUserBadge />
         )
-      ) : (
+     : (
         <ConnectButton
           type="text"
           size="large"

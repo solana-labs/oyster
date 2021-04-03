@@ -22,13 +22,6 @@ export const AppLayout = React.memo((props: any) => {
       <div className="App">
         <Layout title={LABELS.APP_TITLE}>
           <Header className="App-Bar">
-            {!isRoot && (
-              <div className="app-title app-left">
-                <Link to="/">
-                  <img src={'/appbar/logo.svg'} />
-                </Link>
-              </div>
-            )}
             <AppBar />
             {!isRoot && (
               <Popover
@@ -47,7 +40,7 @@ export const AppLayout = React.memo((props: any) => {
               </Popover>
             )}
           </Header>
-          <Content style={{ marginLeft: '2rem', marginRight: '2rem' }}>
+          <Content>
             {props.children}
           </Content>
           <Footer>

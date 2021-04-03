@@ -1,16 +1,47 @@
 @import "_colors";
-.app-left {
-  position: absolute;
-  left: 10%;
+
+.App-Bar {
+  padding: 0px;
+  justify-content: space-between !important;
 }
-.app-right {
+
+.title {
+  /* META */
   position: absolute;
-  right: 10%;
+  width: 102px;
+  height: 44px;
+  left: 669px;
+  top: 36px;
+
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 44px;
+  /* identical to box height */
+
+  /* text-icons/emphasized */
+  color: #000000;
 }
+
+.app-btn {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 19px;
+
+  /* text-icons/muted */
+
+  color: rgba(0, 0, 0, 0.7);
+  border-width: 0px;
+}
+
 .app-bar-inner {
   display: flex;
   min-width: 50%;
   justify-content: center;
+  position: relative;
   height: auto;
   .app-bar-item {
     cursor: pointer;
@@ -25,3 +56,5 @@
     }
   }
 }
+
+

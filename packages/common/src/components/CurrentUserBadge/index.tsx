@@ -5,8 +5,9 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useWallet } from '../../contexts/wallet';
 import { useNativeAccount } from '../../contexts/accounts';
 import { formatNumber, shortenAddress } from '../../utils';
+import './styles.css';
 
-export const CurrentUserBadge = (props: {}) => {
+export const CurrentUserBadge = (props: { showBalance?: boolean }) => {
   const { wallet } = useWallet();
   const { account } = useNativeAccount();
 
@@ -18,9 +19,9 @@ export const CurrentUserBadge = (props: {}) => {
 
   return (
     <div className="wallet-wrapper">
-      <span>
+      {props.showBalance && <span>
         {formatNumber.format((account?.lamports || 0) / LAMPORTS_PER_SOL)} SOL
-      </span>
+      </span>}
       <div className="wallet-key">
         {shortenAddress(`${wallet.publicKey}`)}
         <Identicon

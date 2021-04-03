@@ -3,10 +3,11 @@ import React from 'react';
 import { contexts } from '@oyster/common';
 import {
   MarketProvider,
+  VinciAccountsProvider,
 } from './contexts';
 import { AppLayout } from './components/Layout';
 
-import { FaucetView, HomeView } from './views';
+import { HomeView } from './views';
 import { UseWalletProvider } from 'use-wallet';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -21,20 +22,22 @@ export function Routes() {
             <UseWalletProvider chainId={5}>
               <AccountsProvider>
                 <MarketProvider>
-                  <AppLayout>
-                    <Switch>
-                      <Route
-                        exact
-                        path="/"
-                        component={() => <HomeView />}
-                      />
-                      {/* <Route
-                        exact
-                        path="/faucet"
-                        children={<FaucetView />}
-                      /> */}
-                    </Switch>
-                  </AppLayout>
+                  <VinciAccountsProvider>
+                    <AppLayout>
+                      <Switch>
+                        <Route
+                          exact
+                          path="/"
+                          component={() => <HomeView />}
+                        />
+                        {/* <Route
+                          exact
+                          path="/faucet"
+                          children={<FaucetView />}
+                        /> */}
+                      </Switch>
+                    </AppLayout>
+                  </VinciAccountsProvider>
                 </MarketProvider>
               </AccountsProvider>
             </UseWalletProvider>
