@@ -7,7 +7,7 @@ import {
 } from './contexts';
 import { AppLayout } from './components/Layout';
 
-import { HomeView } from './views';
+import { ArtCreateView, ArtistsView, ArtistView, ArtView, AuctionCreateView, AuctionView, HomeView, UserView } from './views';
 import { UseWalletProvider } from 'use-wallet';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -30,11 +30,41 @@ export function Routes() {
                           path="/"
                           component={() => <HomeView />}
                         />
-                        {/* <Route
+                        <Route
                           exact
-                          path="/faucet"
-                          children={<FaucetView />}
-                        /> */}
+                          path="/art/create"
+                          component={() => <ArtCreateView />}
+                        />
+                        <Route
+                          exact
+                          path="/user/:id"
+                          component={() => <UserView />}
+                        />
+                        <Route
+                          exact
+                          path="/art/:id"
+                          component={() => <ArtView />}
+                        />
+                        <Route
+                          exact
+                          path="/artist/:id"
+                          component={() => <ArtistView />}
+                        />
+                        <Route
+                          exact
+                          path="/artists"
+                          component={() => <ArtistsView />}
+                        />
+                        <Route
+                          exact
+                          path="/auction/:id"
+                          component={() => <AuctionView />}
+                        />
+                        <Route
+                          exact
+                          path="/auction/create"
+                          component={() => <AuctionCreateView />}
+                        />
                       </Switch>
                     </AppLayout>
                   </VinciAccountsProvider>
