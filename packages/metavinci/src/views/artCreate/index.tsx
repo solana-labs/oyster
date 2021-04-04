@@ -21,7 +21,7 @@ export const ArtCreateView = () => {
   return (
     <>
       <Row>
-        <Steps progressDot current={step} style={{ width: 200 }}>
+        <Steps progressDot current={step} style={{ width: 200, marginTop: 20 }}>
           <Step title="Category" />
           <Step title="Upload" />
           <Step title="Mint" />

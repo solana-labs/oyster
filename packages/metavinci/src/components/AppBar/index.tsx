@@ -28,20 +28,21 @@ export const AppBar = () => {
   return (
     <>
       <div className='app-left'>
-        <SearchBox />
+        <h1 className="title">M</h1>
+        <div className="divider" />
         <Link to={`/`}>
           <Button className="app-btn">Explore</Button>
+        </Link>
+        <Link to={`/user`}>
+          <Button className="app-btn">Artworks</Button>
         </Link>
         <Link to={`/artists`}>
           <Button className="app-btn">Creators</Button>
         </Link>
       </div>
-      <div className="app-title title">
-        <h1>META</h1>
-      </div>
       <div className='app-right'>
         {connected && <UserActions />}
-        {connected && <CurrentUserBadge showBalance={false} iconSize={24}  />}
+        {connected && <CurrentUserBadge showBalance={false} showAddress={false} iconSize={24}  />}
         {!connected && <ConnectButton type="primary" />}
       </div>
     </>

@@ -9,7 +9,7 @@ import './styles.css';
 import { Popover } from 'antd';
 import { Settings } from '../Settings';
 
-export const CurrentUserBadge = (props: { showBalance?: boolean, iconSize?: number }) => {
+export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: boolean, iconSize?: number }) => {
   const { wallet } = useWallet();
   const { account } = useNativeAccount();
 
@@ -18,6 +18,22 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, iconSize?: numb
   }
 
   // should use SOL ◎ ?
+
+  const iconStyle = props.showAddress ?
+  {
+    marginLeft: '0.5rem',
+    display: 'flex',
+    width: props.iconSize
+  } :{
+    display: 'flex',
+    width: props.iconSize,
+    paddingLeft: 0,
+  };
+
+  const baseWalletKey = { height: props.iconSize, cursor: 'pointer', userSelect: 'none' };
+  const walletKeyStyle = props.showAddress ?
+  baseWalletKey
+  :{ ...baseWalletKey, paddingLeft: 0 };
 
   return (
     <div className="wallet-wrapper">
@@ -31,11 +47,11 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, iconSize?: numb
           content={<Settings />}
           trigger="click"
             >
-        <div className="wallet-key" style={{ height: props.iconSize, cursor: 'pointer', userSelect: 'none' }}>
-          {shortenAddress(`${wallet.publicKey}`)}
+        <div className="wallet-key" style={walletKeyStyle}>
+          {props.showAddress && shortenAddress(`${wallet.publicKey}`)}
           <Identicon
             address={wallet.publicKey?.toBase58()}
-            style={{ marginLeft: '0.5rem', display: 'flex', width: props.iconSize }}
+            style={iconStyle}
           />
         </div>
       </Popover>
