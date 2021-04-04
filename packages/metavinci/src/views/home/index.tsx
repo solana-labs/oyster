@@ -4,6 +4,7 @@ import { Layout, Card, Avatar } from 'antd'
 import { Auction } from '../../types'
 import { MainAuctionCard } from '../../components/MainAuctionCard'
 import './index.less'
+import { ArtCard } from '../../components/ArtCard'
 const { Meta } = Card;
 
 const { Content, Sider } = Layout
@@ -18,24 +19,6 @@ const sampleAuction: Auction = {
   image: "http://localhost:3000/img/auction1.jpg",
 }
 
-const ExampleCard = () => {
-  return <Card
-  className="custom-card"
-  cover={
-    <img
-      alt="example"
-      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-    />
-  }
->
-  <Meta
-    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-    title="Card title"
-    description="This is the description"
-  />
-</Card>;
-}
-
 export const HomeView = () => {
 
   return (
@@ -43,14 +26,14 @@ export const HomeView = () => {
       <MainAuctionCard auction={sampleAuction} />
       <Layout>
         <Content style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', flexWrap: 'wrap' }}>
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
-          <ExampleCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
+          <ArtCard />
         </Content>
       </Layout>
     </Layout>
