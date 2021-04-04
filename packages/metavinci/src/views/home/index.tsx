@@ -85,7 +85,7 @@ export const HomeView = () => {
     <Layout style={{ margin: 0 }}>
       <MainAuctionCard auction={auction} />
       <Layout>
-        <Content>
+        <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col>
             <Row style={{ marginBottom: 10 }}>Trending Auctions</Row>
             <Row gutter={16} justify="space-around" style={{ marginRight: 0 }}>
