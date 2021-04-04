@@ -89,8 +89,8 @@ export const HomeView = () => {
           <Col>
             <Row style={{ marginBottom: 10 }}>Trending Auctions</Row>
             <Row gutter={16} justify="space-around" style={{ marginRight: 0 }}>
-              {auctions.map(auction => (
-                <Col className="gutter-row" style={{ marginBottom: 15 }}>
+              {auctions.map((auction, idx) => (
+                <Col key={idx} className="gutter-row" style={{ marginBottom: 15 }}>
                   <AuctionCard auction={auction} />
                 </Col>
               ))}
