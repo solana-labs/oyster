@@ -16,9 +16,8 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import crypto from 'crypto';
+import { getAssetCostToStore } from '../utils/assets';
 import { AR_SOL_HOLDER_ID } from '../utils/ids';
-const LAMPORT_MULTIPLIER = 10 ** 9;
-const WINSTON_MULTIPLIER = 10 ** 12;
 
 interface IArweaveResult {
   error?: string;
@@ -179,43 +178,15 @@ export const prepPayForFilesTxn = async (
 }> => {
   const memo = programIds().memo;
 
-  const totalBytes = files.reduce((sum, f) => (sum += f.size), 0);
-
-  const txnFeeInWinstons = parseInt(
-    await (await fetch('https://arweave.net/price/0')).text(),
-  );
-  const byteCostInWinstons = parseInt(
-    await (
-      await fetch('https://arweave.net/price/' + totalBytes.toString())
-    ).text(),
-  );
-  const totalArCost =
-    (txnFeeInWinstons * files.length + byteCostInWinstons) / WINSTON_MULTIPLIER;
-
-  const conversionRates = JSON.parse(
-    await (
-      await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=solana,arweave&vs_currencies=usd',
-      )
-    ).text(),
-  );
-
-  // To figure out how many lamports are required, multiply ar byte cost by this number
-  const arMultiplier = conversionRates.arweave.usd / conversionRates.solana.usd;
-
   const instructions: TransactionInstruction[] = [];
   const signers: Account[] = [];
-
-  // Add 10% padding for safety and slippage in price.
-  const costToStoreInLamports =
-    LAMPORT_MULTIPLIER * totalArCost * arMultiplier * 1.1;
 
   if (wallet.publicKey)
     instructions.push(
       SystemProgram.transfer({
         fromPubkey: wallet.publicKey,
         toPubkey: AR_SOL_HOLDER_ID,
-        lamports: costToStoreInLamports,
+        lamports: await getAssetCostToStore(files),
       }),
     );
 

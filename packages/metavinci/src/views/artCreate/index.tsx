@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Steps,
   Row,
@@ -7,28 +7,34 @@ import {
   Col,
   Input,
   Statistic,
-  Descriptions,
+  Slider,
 } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
 import { mintNFT } from '../../models';
 import { useConnection, useWallet } from '@oyster/common';
+import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 
 const { Step } = Steps;
 const { Dragger } = Upload;
 
+enum Category {
+  Audio = 'audio',
+  Video = 'video',
+  Image = 'image',
+}
 interface IProps {
-  type: string;
   name: string;
-  symbol: String;
+  symbol: string;
   description: string;
   // preview image
   image: string;
   // stores link to item on meta
-  external_url: string;
+  externalUrl: string;
   royalty: number;
   files: File[];
+  category: Category;
 }
 
 export const ArtCreateView = () => {
@@ -36,19 +42,23 @@ export const ArtCreateView = () => {
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
   const [attributes, setAttributes] = useState<IProps>({
-    type: 'image',
     name: '',
     symbol: '',
     description: '',
-    external_url: '',
+    externalUrl: '',
     image: '',
     royalty: 0,
     files: [],
+    category: Category.Image,
   });
 
   // store files
   const mint = () => {
-    mintNFT(connection, wallet, attributes.files, attributes);
+    const metadata = {
+      ...(attributes as any),
+      files: attributes.files.map(f => f.name),
+    };
+    mintNFT(connection, wallet, attributes.files, metadata);
   };
 
   return (
@@ -71,10 +81,10 @@ export const ArtCreateView = () => {
         <Col xl={16}>
           {step === 0 && (
             <CategoryStep
-              confirm={type => {
+              confirm={(category: Category) => {
                 setAttributes({
                   ...attributes,
-                  type,
+                  category,
                 });
                 setStep(1);
               }}
@@ -111,7 +121,7 @@ export const ArtCreateView = () => {
   );
 };
 
-const CategoryStep = (props: { confirm: (type: string) => void }) => {
+const CategoryStep = (props: { confirm: (category: Category) => void }) => {
   return (
     <>
       <Row className="call-to-action">
@@ -126,21 +136,21 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm('image')}
+          onClick={() => props.confirm(Category.Image)}
         >
           Image
         </Button>
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm('video')}
+          onClick={() => props.confirm(Category.Video)}
         >
           Video
         </Button>
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm('audio')}
+          onClick={() => props.confirm(Category.Audio)}
         >
           Audio
         </Button>
@@ -245,6 +255,21 @@ const InfoStep = (props: {
             />
           </label>
           <label className="action-field">
+            <span className="field-title">Symbol</span>
+            <Input
+              className="input"
+              placeholder="Max 10 characters"
+              allowClear
+              value={props.attributes.symbol}
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                  symbol: info.target.value,
+                })
+              }
+            />
+          </label>
+          <label className="action-field">
             <span className="field-title">Description</span>
             <Input.TextArea
               className="input textarea"
@@ -287,19 +312,29 @@ const RoyaltiesStep = (props: {
       <Row className="call-to-action">
         <h2>Set royalties for the creation</h2>
         <p>
-          A royalty is a payment made by one the seller of this item to the
-          creator. It is charged after every successful auction.
+          A royalty is a payment made by the seller of this item to the creator.
+          It is charged after every successful auction.
         </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
+        <Col xl={12}>
+          {file && (
+            <ArtCard
+              file={file}
+              name={props.attributes.name}
+              symbol={props.attributes.symbol}
+            />
+          )}
+        </Col>
         <Col className="section" xl={12}>
           <label className="action-field">
-            <span className="field-title">Description</span>
-            <Input
-              className="input"
-              placeholder="Max 50 characters"
-              allowClear
+            <span className="field-title">Royalty Percentage</span>
+            <Slider
+              min={0}
+              max={100}
+              onChange={(val: number) => {
+                props.setAttributes({ ...props.attributes, royalty: val });
+              }}
             />
           </label>
         </Col>
@@ -320,7 +355,20 @@ const RoyaltiesStep = (props: {
 
 const LaunchStep = (props: { confirm: () => void; attributes: IProps }) => {
   const file = props.attributes.files[0];
-
+  const metadata = {
+    ...(props.attributes as any),
+    files: props.attributes.files.map(f => f.name),
+  };
+  const [cost, setCost] = useState(0);
+  useEffect(() => {
+    getAssetCostToStore([
+      ...props.attributes.files,
+      new File([JSON.stringify(metadata)], 'metadata.json'),
+    ]).then(lamports => {
+      const sol = lamports / LAMPORT_MULTIPLIER;
+      setCost(sol);
+    });
+  }, [file]);
   return (
     <>
       <Row className="call-to-action">
@@ -331,18 +379,26 @@ const LaunchStep = (props: { confirm: () => void; attributes: IProps }) => {
         </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
+        <Col xl={12}>
+          {file && (
+            <ArtCard
+              file={file}
+              name={props.attributes.name}
+              symbol={props.attributes.symbol}
+            />
+          )}
+        </Col>
         <Col className="section" xl={12}>
           <Statistic
             className="create-statistic"
             title="Royalty Percentage"
-            value={20}
+            value={props.attributes.royalty}
             suffix="%"
           />
           <Statistic
             className="create-statistic"
             title="Cost to Create"
-            value={20}
+            value={cost}
             prefix="◎"
           />
         </Col>
