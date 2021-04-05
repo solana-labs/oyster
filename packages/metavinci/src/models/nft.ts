@@ -2,8 +2,10 @@ import {
   createAssociatedTokenAccountInstruction,
   createMint,
   createMetadata,
+  updateMetadata,
   programIds,
   sendTransactions,
+  sendTransaction,
 } from '@oyster/common';
 import { MintLayout, Token } from '@solana/spl-token';
 import { WalletAdapter } from '@solana/wallet-base';
@@ -12,12 +14,12 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
 import crypto from 'crypto';
 import { getAssetCostToStore } from '../utils/assets';
 import { AR_SOL_HOLDER_ID } from '../utils/ids';
+import { IMetadata } from '../views/artCreate';
 
 interface IArweaveResult {
   error?: string;
@@ -32,7 +34,7 @@ export const mintNFT = async (
   connection: Connection,
   wallet: WalletAdapter | undefined,
   files: File[],
-  metadata: any,
+  metadata: { name: string; symbol: string },
 ): Promise<IArweaveResult> => {
   if (!wallet?.publicKey) {
     return { error: 'No wallet' };
@@ -99,8 +101,8 @@ export const mintNFT = async (
   );
 
   await createMetadata(
-    `🥭🧢#`,
-    `name: jjjdsfsk🥭🧢#`,
+    metadata.symbol,
+    metadata.name,
     `https://google.com`,
     mintKey,
     owner.publicKey,
@@ -109,18 +111,6 @@ export const mintNFT = async (
     wallet.publicKey,
     signers,
   );
-
-  // For Jordan -> Transfer SOL
-  console.log(files.length);
-  // TODO:
-  // instructions.push(
-  //   Token.createSetAuthorityInstruction(
-  //     TOKEN_PROGRAM_ID,
-  //     mintKey,
-  //     owner.publicKey,
-  //     owner.publicKey,
-  //     []));
-
   return new Promise(async res => {
     const txId = await sendTransactions(
       connection,
@@ -157,6 +147,33 @@ export const mintNFT = async (
               },
             )
           ).json();
+
+          const metadataFile = result.messages?.find(
+            m => m.filename == 'metadata.json',
+          );
+          if (metadataFile?.transactionId && wallet.publicKey) {
+            const updateInstructions: TransactionInstruction[] = [];
+            const updateSigners: Account[] = [];
+
+            await updateMetadata(
+              metadata.symbol,
+              metadata.name,
+              `https://arweave.net/${metadataFile.transactionId}`,
+              mintKey,
+              wallet.publicKey,
+              updateInstructions,
+              updateSigners,
+            );
+
+            await sendTransaction(
+              connection,
+              wallet,
+              updateInstructions,
+              updateSigners,
+              true,
+              'singleGossip',
+            );
+          }
           console.log('Result', result);
           res(result);
         }

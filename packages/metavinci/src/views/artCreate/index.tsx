@@ -27,7 +27,7 @@ enum Category {
   Video = 'video',
   Image = 'image',
 }
-interface IProps {
+export interface IMetadata {
   name: string;
   symbol: string;
   description: string;
@@ -45,7 +45,7 @@ export const ArtCreateView = () => {
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [attributes, setAttributes] = useState<IProps>({
+  const [attributes, setAttributes] = useState<IMetadata>({
     name: '',
     symbol: '',
     description: '',
@@ -178,8 +178,8 @@ const CategoryStep = (props: { confirm: (category: Category) => void }) => {
 };
 
 const UploadStep = (props: {
-  attributes: IProps;
-  setAttributes: (attr: IProps) => void;
+  attributes: IMetadata;
+  setAttributes: (attr: IMetadata) => void;
   confirm: () => void;
 }) => {
   return (
@@ -232,8 +232,8 @@ const UploadStep = (props: {
 };
 
 const InfoStep = (props: {
-  attributes: IProps;
-  setAttributes: (attr: IProps) => void;
+  attributes: IMetadata;
+  setAttributes: (attr: IMetadata) => void;
   confirm: () => void;
 }) => {
   const file = props.attributes.files[0];
@@ -319,8 +319,8 @@ const InfoStep = (props: {
 };
 
 const RoyaltiesStep = (props: {
-  attributes: IProps;
-  setAttributes: (attr: IProps) => void;
+  attributes: IMetadata;
+  setAttributes: (attr: IMetadata) => void;
   confirm: () => void;
 }) => {
   const file = props.attributes.files[0];
@@ -371,7 +371,7 @@ const RoyaltiesStep = (props: {
   );
 };
 
-const LaunchStep = (props: { confirm: () => void; attributes: IProps }) => {
+const LaunchStep = (props: { confirm: () => void; attributes: IMetadata }) => {
   const file = props.attributes.files[0];
   const metadata = {
     ...(props.attributes as any),
