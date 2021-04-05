@@ -29,7 +29,7 @@ export const HomeView = () => {
         artistName={"RAC"}
         productName={"THE BOY COLLECTION"}
         preSaleTS={1618690343000}
-        image="/img/banner1.jpeg"
+        image="img/banner1.jpeg"
       />
       <Layout>
         <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
