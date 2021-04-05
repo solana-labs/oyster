@@ -24,17 +24,17 @@ export const HomeView = () => {
   }
 
   return (
-    <Layout style={{ margin: 0 }}>
+    <Layout style={{ margin: 0, marginTop: 30 }}>
       <PreSaleBanner
         artistName={"RAC"}
         productName={"THE BOY COLLECTION"}
         preSaleTS={1618690343000}
-        image="http://localhost:3000/img/banner1.jpeg"
+        image="img/banner1.jpeg"
       />
       <Layout>
         <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <Col style={{ margin: 'auto' }}>
-            <Row style={{ marginBottom: 10 }}>Featured</Row>
+          <Col>
+            <Row style={{ marginBottom: 30, marginTop: 20, fontSize: 20, fontWeight: 600 }}>Featured</Row>
 
             <Row>
               <Masonry
