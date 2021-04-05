@@ -26,7 +26,7 @@ export const ArtCard = ({
 
   return (
     <Card className="custom-card" cover={<img src={imgSrc} />}>
-      <Meta title={`Title: ${title}`} description={`Symbol: ${symbol}`} />
+      <Meta title={`Title: ${name}`} description={`Symbol: ${symbol}`} />
     </Card>
   );
 };
