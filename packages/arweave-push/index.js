@@ -225,7 +225,8 @@ exports.uploadFile = async (req, res) => {
     const arMultiplier =
       conversionRates.arweave.usd / conversionRates.solana.usd;
 
-    filepaths.forEach(async f => {
+    for (let i = 0; i < filepaths.length; i++) {
+      const f = filepaths[i];
       if (f.status == FAIL) {
         body.messages.push(f);
       } else {
@@ -239,13 +240,16 @@ exports.uploadFile = async (req, res) => {
           hashSum.update(data);
           const hex = hashSum.digest('hex');
 
-          /* if (!fields.transaction.memoMessages.find(m => m === hex)) {
+          if (!txn.memoMessages.find(m => m === hex)) {
             body.messages.push({
               filename,
               status: FAIL,
-              error: 'Unable to find proof that you paid for this file',
+              error: `Unable to find proof that you paid for this file, your hash is ${hex}, comparing to ${txn.memoMessages.join(
+                ',',
+              )}`,
             });
-          }*/
+            continue;
+          }
 
           const stats = fs.statSync(filepath);
           const fileSizeInBytes = stats.size;
@@ -285,17 +289,9 @@ exports.uploadFile = async (req, res) => {
               transaction,
               arweaveWallet,
             );
-
-            let uploader = await arweaveConnection.transactions.getUploader(
-              transaction,
-            );
-
-            while (!uploader.isComplete) {
-              await uploader.uploadChunk();
-              console.log(
-                `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`,
-              );
-            }
+            console.log('About to');
+            await arweaveConnection.transactions.post(transaction);
+            console.log('Finished');
             body.messages.push({
               filename,
               status: SUCCESS,
@@ -313,8 +309,9 @@ exports.uploadFile = async (req, res) => {
           body.messages.push({ filename, status: FAIL, error: e.toString() });
         }
       }
-      res.end(JSON.stringify(body));
-    });
+    }
+    console.log('Returning');
+    res.end(JSON.stringify(body));
   });
   busboy.end(req.rawBody);
 };
