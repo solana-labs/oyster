@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Steps, Row, Button, Upload, Col, Input, Statistic } from 'antd';
+import { Steps, Row, Button, Upload, Col, Input, Statistic, Descriptions } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
@@ -127,11 +127,18 @@ const InfoStep = (props: { confirm: () => void }) => {
           <ArtCard />
         </Col>
         <Col className="section" xl={12}>
-          <Input className="input" placeholder="Title" />
-          <Input.TextArea
-            className="input textarea"
-            placeholder="Description"
-          />
+          <label className="action-field">
+            <span className="field-title">Title</span>
+            <Input className="input" placeholder="Max 50 characters" allowClear />
+          </label>
+          <label className="action-field">
+            <span className="field-title">Description</span>
+            <Input.TextArea
+              className="input textarea"
+              placeholder="Max 500 characters"
+              allowClear
+            />
+          </label>
         </Col>
       </Row>
       <Row>
@@ -155,11 +162,10 @@ const RoyaltiesStep = (props: { confirm: () => void }) => {
           <ArtCard />
         </Col>
         <Col className="section" xl={12}>
-          <Input className="input" placeholder="Title" />
-          <Input.TextArea
-            className="input textarea"
-            placeholder="Description"
-          />
+          <label className="action-field">
+            <span className="field-title">Description</span>
+            <Input className="input" placeholder="Max 50 characters" allowClear />
+          </label>
         </Col>
       </Row>
       <Row>
