@@ -1,0 +1,1 @@
+gcloud functions deploy uploadFile --runtime nodejs12 --trigger-http --allow-unauthenticated
