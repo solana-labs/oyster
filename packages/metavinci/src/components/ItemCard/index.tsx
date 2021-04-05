@@ -17,7 +17,7 @@ export const ItemCard = ({ art }: { art: Art }) => {
   return (
     <Card
       hoverable
-      style={{ width: 210, textAlign: 'left', borderRadius: '10%' }}
+      style={{ width: 312, textAlign: 'left', borderRadius: '8px', overflow: 'hidden' }}
       cover={<img alt={art.title} src={art.image} onClick={handleCoverClick} />}
     >
       <div style={{backgroundColor: '#282828', padding: '1vw'}}>
