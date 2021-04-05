@@ -16,3 +16,13 @@ export interface Artist {
   itemsAvailable?: number,
   itemsSold?: number,
 }
+
+export interface Art {
+  image: string,
+  link: string,
+  title: string,
+  artist: string,
+  priceSOL: number,
+  priceUSD?: number,
+  endingTS?: number,
+}
