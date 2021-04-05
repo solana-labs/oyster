@@ -3,6 +3,38 @@
   padding: 1px;
 }
 
+.call-to-action {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 36px;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+
+    color: #FFFFFF;
+  }
+
+  p {
+    color: #6d6d6d;
+  }
+
+  margin-bottom: 50px;
+}
+
+.content-action {
+  margin-bottom: 50px;
+
+  :first-child{
+    width: 100%;
+  }
+}
+
 .input {
   background: #F7F7F7;
   border-radius: 8px;
@@ -13,4 +45,13 @@
 
 .textarea {
   height: 230px !important;
+}
+
+.type-btn {
+  height: 300px;
+  width: calc(100% - 20px);
+  border-radius: 8px;
+  background-color: #1d1d1d;
+  border-width: 0px;
+  margin-right: 20px;
 }
