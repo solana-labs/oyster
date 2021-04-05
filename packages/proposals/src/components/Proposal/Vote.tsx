@@ -11,12 +11,12 @@ import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { useLatestState } from '../../hooks/useLatestState';
+
 import './style.less';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
-const { useAccountByMint } = hooks;
+const { useAccountByMint, useThatState } = hooks;
 
 const { confirm } = Modal;
 export function Vote({
@@ -37,7 +37,7 @@ export function Vote({
 
   const userTokenAccount = useAccountByMint(proposal.info.sourceMint);
 
-  const [vote, setVote, getLatestVote] = useLatestState(0);
+  const [vote, setVote, getLatestVote] = useThatState(0);
 
   const eligibleToView =
     userTokenAccount &&
