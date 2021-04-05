@@ -20,20 +20,33 @@ import { AR_SOL_HOLDER_ID } from '../utils/ids';
 const LAMPORT_MULTIPLIER = 10 ** 9;
 const WINSTON_MULTIPLIER = 10 ** 12;
 
+interface IArweaveResult {
+  error?: string;
+  messages?: Array<{
+    filename: string;
+    status: 'success' | 'fail';
+    transactionId?: string;
+    error?: string;
+  }>;
+}
 export const mintNFT = async (
   connection: Connection,
   wallet: WalletAdapter | undefined,
   files: File[],
   metadata: any,
-) => {
+): Promise<IArweaveResult> => {
   if (!wallet?.publicKey) {
-    return;
+    return { error: 'No wallet' };
   }
+  const realFiles: File[] = [
+    ...files,
+    new File([JSON.stringify(metadata)], 'metadata.json'),
+  ];
 
   const {
     instructions: pushInstructions,
     signers: pushSigners,
-  } = await prepPayForFilesTxn(wallet, files, metadata);
+  } = await prepPayForFilesTxn(wallet, realFiles, metadata);
 
   const TOKEN_PROGRAM_ID = programIds().token;
 
@@ -88,7 +101,7 @@ export const mintNFT = async (
 
   await createMetadata(
     `🥭🧢#`,
-    `name: 🥭🧢#`,
+    `name: jjjdsfsk🥭🧢#`,
     `https://google.com`,
     mintKey,
     owner.publicKey,
@@ -109,14 +122,48 @@ export const mintNFT = async (
   //     owner.publicKey,
   //     []));
 
-  const txId = await sendTransactions(
-    connection,
-    wallet,
-    [instructions, pushInstructions],
-    [signers, pushSigners],
-    true,
-  );
+  return new Promise(async res => {
+    const txId = await sendTransactions(
+      connection,
+      wallet,
+      [instructions, pushInstructions],
+      [signers, pushSigners],
+      true,
+      'max',
+      async (txid: string, ind: number) => {
+        if (ind == 1) {
+          // this means we're done getting AR txn setup. Ship it off to ARWeave!
+          const data = new FormData();
 
+          const tags = realFiles.reduce(
+            (
+              acc: Record<string, Array<{ name: string; value: string }>>,
+              f,
+            ) => {
+              acc[f.name] = [{ name: 'mint', value: mintKey.toBase58() }];
+              return acc;
+            },
+            {},
+          );
+          data.append('tags', JSON.stringify(tags));
+          data.append('transaction', txid);
+          realFiles.map(f => data.append('file[]', f));
+
+          const result: IArweaveResult = await (
+            await fetch(
+              'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
+              {
+                method: 'POST',
+                body: data,
+              },
+            )
+          ).json();
+          console.log('Result', result);
+          res(result);
+        }
+      },
+    );
+  });
   // TODO:
   // 1. Jordan: --- upload file and metadata to storage API
   // 2. pay for storage by hashing files and attaching memo for each file
@@ -131,11 +178,8 @@ export const prepPayForFilesTxn = async (
   signers: Account[];
 }> => {
   const memo = programIds().memo;
-  const realFiles: File[] = [
-    ...files,
-    new File([JSON.stringify(metadata)], 'metadata.json'),
-  ];
-  const totalBytes = realFiles.reduce((sum, f) => (sum += f.size), 0);
+
+  const totalBytes = files.reduce((sum, f) => (sum += f.size), 0);
 
   const txnFeeInWinstons = parseInt(
     await (await fetch('https://arweave.net/price/0')).text(),
@@ -146,8 +190,7 @@ export const prepPayForFilesTxn = async (
     ).text(),
   );
   const totalArCost =
-    (txnFeeInWinstons * realFiles.length + byteCostInWinstons) /
-    WINSTON_MULTIPLIER;
+    (txnFeeInWinstons * files.length + byteCostInWinstons) / WINSTON_MULTIPLIER;
 
   const conversionRates = JSON.parse(
     await (
@@ -176,9 +219,9 @@ export const prepPayForFilesTxn = async (
       }),
     );
 
-  for (let i = 0; i < realFiles.length; i++) {
+  for (let i = 0; i < files.length; i++) {
     const hashSum = crypto.createHash('sha256');
-    hashSum.update(await realFiles[i].text());
+    hashSum.update(await files[i].text());
     const hex = hashSum.digest('hex');
     instructions.push(
       new TransactionInstruction({
