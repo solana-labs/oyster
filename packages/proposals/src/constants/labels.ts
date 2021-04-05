@@ -72,7 +72,14 @@ export const LABELS = {
   TOKENS_WITHDRAWN: 'Voting tokens refunded as Source Tokens',
   CONFIRM: 'Confirm',
   CANCEL: 'Cancel',
-  REFUND_TOKENS: 'Refund My Tokens',
+
+  WITHDRAW_VOTE: 'Withdraw My Vote',
+  WITHDRAW: 'Withdraw',
+
+  WITHDRAW_YOUR_VOTE_QUESTION: 'Withdraw your vote?',
+  WITHDRAW_YOUR_VOTE_MSG:
+    'Once you withdraw your vote it won’t count towards the proposal voting outcome.',
+
   REGISTER_GOVERNANCE: 'Register',
   PROGRAM: 'Program ID',
   GOVERNANCE: 'Governance Token Holders',

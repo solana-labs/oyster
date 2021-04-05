@@ -24,7 +24,7 @@ import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
-import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
+import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
 import { getGovernanceVotingRecords } from '../../utils/lookups';
 import BN from 'bn.js';
@@ -295,7 +295,7 @@ function InnerProposalView({
                   timelockConfig.info.governanceMint.toBase58()
                 }
               />
-              <WithdrawTokens
+              <WithdrawVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
