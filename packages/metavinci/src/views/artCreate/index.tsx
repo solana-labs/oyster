@@ -10,9 +10,14 @@ const { Step } = Steps;
 const { Dragger } = Upload;
 
 interface IProps {
-  type: String;
-  title: String;
-  description: String;
+  type: string;
+  name: string;
+  description: string;
+  // preview image
+  image: string;
+  // stores link to item on meta
+  external_url: string;
+  royalty: number;
   files: File[];
 }
 
@@ -22,9 +27,11 @@ export const ArtCreateView = () => {
   const [step, setStep] = useState(0);
   const [attributes, setAttributes] = useState<IProps>({
     type: 'image',
-    title: '',
+    name: '',
     description: '',
-
+    external_url: '',
+    image: '',
+    royalty: 0,
     files: [],
   });
 
@@ -64,7 +71,7 @@ export const ArtCreateView = () => {
           )}
           {step === 1 && (
             <UploadStep
-              attributes
+              attributes={attributes}
               setAttributes={setAttributes}
               confirm={() => setStep(2)}
             />
@@ -73,11 +80,13 @@ export const ArtCreateView = () => {
           {step === 2 && (
             <InfoStep
               attributes={attributes}
+              setAttributes={setAttributes}
               confirm={() =>  setStep(3)}
             />)}
           {step === 3 && (
             <RoyaltiesStep
               attributes={attributes}
+              setAttributes={setAttributes}
               confirm={() =>  setStep(4)} />)}
           {step === 4 && (
             <LaunchStep
@@ -129,8 +138,8 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
 };
 
 const UploadStep = (props: {
-  attributes: any;
-  setAttributes: (attr: any) => void;
+  attributes: IProps;
+  setAttributes: (attr: IProps) => void;
   confirm: () => void;
 }) => {
   return (
@@ -182,7 +191,11 @@ const UploadStep = (props: {
   );
 };
 
-const InfoStep = (props: { confirm: () => void; attributes: IProps }) => {
+const InfoStep = (props: {
+  attributes: IProps;
+  setAttributes: (attr: IProps) => void;
+  confirm: () => void;
+}) => {
   const file = props.attributes.files[0];
   return (
     <>
@@ -198,13 +211,27 @@ const InfoStep = (props: { confirm: () => void; attributes: IProps }) => {
         <Col className="section" xl={12}>
           <label className="action-field">
             <span className="field-title">Title</span>
-            <Input className="input" placeholder="Max 50 characters" allowClear />
+            <Input
+              className="input"
+              placeholder="Max 50 characters"
+              allowClear
+              value={props.attributes.name}
+              onChange={info => props.setAttributes({
+                ...props.attributes,
+                name: info.target.value,
+              })}
+             />
           </label>
           <label className="action-field">
             <span className="field-title">Description</span>
             <Input.TextArea
               className="input textarea"
               placeholder="Max 500 characters"
+              value={props.attributes.description}
+              onChange={info => props.setAttributes({
+                ...props.attributes,
+                description: info.target.value,
+              })}
               allowClear
             />
           </label>
@@ -224,7 +251,11 @@ const InfoStep = (props: { confirm: () => void; attributes: IProps }) => {
   );
 };
 
-const RoyaltiesStep = (props: { confirm: () => void; attributes: IProps }) => {
+const RoyaltiesStep = (props: {
+  attributes: IProps;
+  setAttributes: (attr: IProps) => void;
+  confirm: () => void;
+}) => {
   const file = props.attributes.files[0];
 
   return (
@@ -240,8 +271,8 @@ const RoyaltiesStep = (props: { confirm: () => void; attributes: IProps }) => {
         <Col xl={12}>{file && <ArtCard file={file} />}</Col>
         <Col className="section" xl={12}>
           <label className="action-field">
-            <span className="field-title">Description</span>
-            <Input className="input" placeholder="Max 50 characters" allowClear />
+            <span className="field-title">Royalty Percentage</span>
+            <Input className="input" placeholder="Between 0 and 100" value={props.attributes.royalty.toFixed(0)} allowClear max={100} min={0} />
           </label>
         </Col>
       </Row>
