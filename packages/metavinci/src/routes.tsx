@@ -3,7 +3,7 @@ import React from 'react';
 import { contexts } from '@oyster/common';
 import {
   MarketProvider,
-  VinciAccountsProvider,
+  MetaProvider,
 } from './contexts';
 import { AppLayout } from './components/Layout';
 
@@ -22,7 +22,7 @@ export function Routes() {
             <UseWalletProvider chainId={5}>
               <AccountsProvider>
                 <MarketProvider>
-                  <VinciAccountsProvider>
+                  <MetaProvider>
                     <AppLayout>
                       <Switch>
                         <Route
@@ -67,7 +67,7 @@ export function Routes() {
                         />
                       </Switch>
                     </AppLayout>
-                  </VinciAccountsProvider>
+                  </MetaProvider>
                 </MarketProvider>
               </AccountsProvider>
             </UseWalletProvider>

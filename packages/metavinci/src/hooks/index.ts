@@ -1,1 +1,1 @@
-export const nop = () => {};
+export * from './useArt';
