@@ -207,6 +207,7 @@ exports.uploadFile = async (req, res) => {
 
     if (!txn || !txn.amount) {
       body.error = 'No transaction found with payment';
+      res.end(JSON.stringify(body));
       return;
     }
 
