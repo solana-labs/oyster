@@ -19,7 +19,7 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: b
 
   // should use SOL ◎ ?
 
-  const iconStyle = props.showAddress ?
+  const iconStyle: React.CSSProperties = props.showAddress ?
   {
     marginLeft: '0.5rem',
     display: 'flex',
@@ -30,8 +30,8 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: b
     paddingLeft: 0,
   };
 
-  const baseWalletKey = { height: props.iconSize, cursor: 'pointer', userSelect: 'none' };
-  const walletKeyStyle = props.showAddress ?
+  const baseWalletKey: React.CSSProperties = { height: props.iconSize, cursor: 'pointer', userSelect: 'none' };
+  const walletKeyStyle: React.CSSProperties = props.showAddress ?
   baseWalletKey
   :{ ...baseWalletKey, paddingLeft: 0 };
 

@@ -7,8 +7,6 @@ import { useMemo } from 'react';
 import {
   contexts,
   utils,
-  ParsedAccount,
-  KnownTokenMap,
   EventEmitter,
 } from '@oyster/common';
 

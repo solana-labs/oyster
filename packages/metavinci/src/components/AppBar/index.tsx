@@ -25,7 +25,7 @@ export const AppBar = () => {
 
   return (
     <>
-      <div className='app-left'>
+      <div className='app-left app-bar-box'>
         <h1 className="title">M</h1>
         <div className="divider" />
         <Link to={`/`}>
@@ -38,11 +38,11 @@ export const AppBar = () => {
           <Button className="app-btn">Creators</Button>
         </Link>
       </div>
-      <div className='app-right'>
-        {connected && <UserActions />}
-        {connected && <CurrentUserBadge showBalance={false} showAddress={false} iconSize={24} />}
-        {!connected && <ConnectButton type="primary" />}
-      </div>
+      {!connected && <ConnectButton type="primary" />}
+      {connected && <div className='app-right app-bar-box'>
+        <UserActions />
+        <CurrentUserBadge showBalance={false} showAddress={false} iconSize={24}  />
+      </div>}
     </>
   );
 };
