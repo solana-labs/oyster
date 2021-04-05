@@ -304,6 +304,13 @@ function InnerProposalView({
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
+                yeahVote={true}
+              />
+              <Vote
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+                yeahVote={false}
               />
             </div>
           </Col>

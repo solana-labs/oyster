@@ -65,7 +65,14 @@ export const LABELS = {
   ADD_GOVERNANCE_TOKENS: 'Add Governance Tokens',
   ADD_COUNCIL_TOKENS: 'Add Council Tokens',
   ACTIONS: 'Actions',
-  VOTE: 'Vote',
+
+  VOTE_YEAH: 'Yeah',
+  VOTE_NAY: 'Nay',
+  VOTE_YEAH_QUESTION: 'Vote Yeah?',
+  VOTE_YEAH_MSG: 'Vote in favour of the proposal.',
+  VOTE_NAY_QUESTION: 'Vote Nay?',
+  VOTE_NAY_MSG: 'Vote against the proposal.',
+
   EXECUTING: 'Executing...',
   EXECUTED: 'Executed.',
   WITHDRAWING_VOTING_TOKENS: 'Refunding voting tokens as Source Tokens',
