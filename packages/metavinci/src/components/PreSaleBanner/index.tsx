@@ -18,10 +18,21 @@ export const PreSaleBanner = ({ artistName, productName, preSaleTS, image }: IPr
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // TODO: compute remaining days, hours and minutes from preSaleTS
-      setDays(12)
-      setHours(23)
-      setMinutes(8)
+      const now = (new Date()).getTime()
+      let delta = Math.abs(preSaleTS - now) / 1000
+
+      const days = Math.floor(delta / 86400)
+      delta -= days * 86400
+
+      const hours = Math.floor(delta / 3600) % 24
+      delta -= hours * 3600
+
+      const minutes = Math.floor(delta / 60) % 60
+      delta -= minutes * 60
+
+      setDays(days)
+      setHours(hours)
+      setMinutes(minutes)
     }, 1000)
     return () => clearInterval(interval)
   }, [])
