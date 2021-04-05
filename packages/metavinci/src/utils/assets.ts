@@ -62,14 +62,17 @@ export async function getAssetCostToStore(files: File[]) {
   const txnFeeInWinstons = parseInt(
     await (await fetch('https://arweave.net/price/0')).text(),
   );
+  console.log('txn fee', txnFeeInWinstons);
   const byteCostInWinstons = parseInt(
     await (
       await fetch('https://arweave.net/price/' + totalBytes.toString())
     ).text(),
   );
+  console.log('byte cost', byteCostInWinstons);
   const totalArCost =
     (txnFeeInWinstons * files.length + byteCostInWinstons) / WINSTON_MULTIPLIER;
 
+  console.log('total ar', totalArCost);
   const conversionRates = JSON.parse(
     await (
       await fetch(
@@ -80,7 +83,7 @@ export async function getAssetCostToStore(files: File[]) {
 
   // To figure out how many lamports are required, multiply ar byte cost by this number
   const arMultiplier = conversionRates.arweave.usd / conversionRates.solana.usd;
-
+  console.log('Ar mult', arMultiplier);
   // Add 10% padding for safety and slippage in price.
   return LAMPORT_MULTIPLIER * totalArCost * arMultiplier * 1.1;
 }

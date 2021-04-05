@@ -8,6 +8,9 @@ import {
   Input,
   Statistic,
   Slider,
+  Modal,
+  Progress,
+  Spin,
 } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
@@ -41,6 +44,7 @@ export const ArtCreateView = () => {
   const connection = useConnection();
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [attributes, setAttributes] = useState<IProps>({
     name: '',
     symbol: '',
@@ -53,16 +57,30 @@ export const ArtCreateView = () => {
   });
 
   // store files
-  const mint = () => {
+  const mint = async () => {
     const metadata = {
       ...(attributes as any),
       files: attributes.files.map(f => f.name),
     };
-    mintNFT(connection, wallet, attributes.files, metadata);
+    setSaving(true);
+    await mintNFT(connection, wallet, attributes.files, metadata);
+    setSaving(false);
   };
 
   return (
     <>
+      <Modal title="Saving..." footer={null} closable={false} visible={saving}>
+        <Progress
+          percent={100}
+          strokeWidth={20}
+          status="active"
+          strokeColor={{
+            '0%': '#108ee9',
+            '100%': '#87d068',
+          }}
+          showInfo={false}
+        />
+      </Modal>
       <Row style={{ paddingTop: 50 }}>
         <Col xl={5}>
           <Steps
@@ -395,12 +413,16 @@ const LaunchStep = (props: { confirm: () => void; attributes: IProps }) => {
             value={props.attributes.royalty}
             suffix="%"
           />
-          <Statistic
-            className="create-statistic"
-            title="Cost to Create"
-            value={cost}
-            prefix="◎"
-          />
+          {cost ? (
+            <Statistic
+              className="create-statistic"
+              title="Cost to Create"
+              value={cost}
+              prefix="◎"
+            />
+          ) : (
+            <Spin />
+          )}
         </Col>
       </Row>
       <Row>
