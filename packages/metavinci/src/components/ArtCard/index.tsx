@@ -1,10 +1,17 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Card, Avatar } from 'antd';
+import { Card } from 'antd';
 
 const { Meta } = Card;
 
-export const ArtCard = ({ file }: { file?: File }) => {
+export const ArtCard = ({
+  file,
+  name,
+  symbol,
+}: {
+  file?: File;
+  name?: String;
+  symbol?: String;
+}) => {
   const [imgSrc, setImgSrc] = useState<string>();
 
   useLayoutEffect(() => {
@@ -19,13 +26,7 @@ export const ArtCard = ({ file }: { file?: File }) => {
 
   return (
     <Card className="custom-card" cover={<img src={imgSrc} />}>
-      <Meta
-        avatar={
-          <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-        }
-        title="Card title"
-        description="This is the description"
-      />
+      <Meta title={`Title: ${title}`} description={`Symbol: ${symbol}`} />
     </Card>
   );
 };

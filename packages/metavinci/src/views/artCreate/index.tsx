@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Steps, Row, Button, Upload, Col, Input, Statistic, Descriptions } from 'antd';
+import {
+  Steps,
+  Row,
+  Button,
+  Upload,
+  Col,
+  Input,
+  Statistic,
+  Descriptions,
+} from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
@@ -12,6 +21,7 @@ const { Dragger } = Upload;
 interface IProps {
   type: string;
   name: string;
+  symbol: String;
   description: string;
   // preview image
   image: string;
@@ -28,6 +38,7 @@ export const ArtCreateView = () => {
   const [attributes, setAttributes] = useState<IProps>({
     type: 'image',
     name: '',
+    symbol: '',
     description: '',
     external_url: '',
     image: '',
@@ -81,18 +92,19 @@ export const ArtCreateView = () => {
             <InfoStep
               attributes={attributes}
               setAttributes={setAttributes}
-              confirm={() =>  setStep(3)}
-            />)}
+              confirm={() => setStep(3)}
+            />
+          )}
           {step === 3 && (
             <RoyaltiesStep
               attributes={attributes}
+              confirm={() => setStep(4)}
               setAttributes={setAttributes}
-              confirm={() =>  setStep(4)} />)}
+            />
+          )}
           {step === 4 && (
-            <LaunchStep
-              attributes={attributes}
-              confirm={() => mint()}
-            />)}
+            <LaunchStep attributes={attributes} confirm={() => mint()} />
+          )}
         </Col>
       </Row>
     </>
@@ -111,27 +123,27 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
         </p>
       </Row>
       <Row>
-          <Button
-            className="type-btn"
-            size="large"
-            onClick={() => props.confirm('image')}
-          >
-            Image
-          </Button>
-          <Button
-            className="type-btn"
-            size="large"
-            onClick={() => props.confirm('video')}
-          >
-            Video
-          </Button>
-          <Button
-            className="type-btn"
-            size="large"
-            onClick={() => props.confirm('audio')}
-          >
-            Audio
-          </Button>
+        <Button
+          className="type-btn"
+          size="large"
+          onClick={() => props.confirm('image')}
+        >
+          Image
+        </Button>
+        <Button
+          className="type-btn"
+          size="large"
+          onClick={() => props.confirm('video')}
+        >
+          Video
+        </Button>
+        <Button
+          className="type-btn"
+          size="large"
+          onClick={() => props.confirm('audio')}
+        >
+          Audio
+        </Button>
       </Row>
     </>
   );
@@ -207,7 +219,15 @@ const InfoStep = (props: {
         </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
+        <Col xl={12}>
+          {file && (
+            <ArtCard
+              file={file}
+              name={props.attributes.name}
+              symbol={props.attributes.symbol}
+            />
+          )}
+        </Col>
         <Col className="section" xl={12}>
           <label className="action-field">
             <span className="field-title">Title</span>
@@ -216,11 +236,13 @@ const InfoStep = (props: {
               placeholder="Max 50 characters"
               allowClear
               value={props.attributes.name}
-              onChange={info => props.setAttributes({
-                ...props.attributes,
-                name: info.target.value,
-              })}
-             />
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                  name: info.target.value,
+                })
+              }
+            />
           </label>
           <label className="action-field">
             <span className="field-title">Description</span>
@@ -228,10 +250,12 @@ const InfoStep = (props: {
               className="input textarea"
               placeholder="Max 500 characters"
               value={props.attributes.description}
-              onChange={info => props.setAttributes({
-                ...props.attributes,
-                description: info.target.value,
-              })}
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                  description: info.target.value,
+                })
+              }
               allowClear
             />
           </label>
@@ -271,8 +295,12 @@ const RoyaltiesStep = (props: {
         <Col xl={12}>{file && <ArtCard file={file} />}</Col>
         <Col className="section" xl={12}>
           <label className="action-field">
-            <span className="field-title">Royalty Percentage</span>
-            <Input className="input" placeholder="Between 0 and 100" value={props.attributes.royalty.toFixed(0)} allowClear max={100} min={0} />
+            <span className="field-title">Description</span>
+            <Input
+              className="input"
+              placeholder="Max 50 characters"
+              allowClear
+            />
           </label>
         </Col>
       </Row>
