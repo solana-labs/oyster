@@ -69,9 +69,21 @@ export const ArtCreateView = () => {
               confirm={() => setStep(2)}
             />
           )}
+
           {step === 2 && (
-            <InfoStep confirm={() => mint()} attributes={attributes} />
-          )}
+            <InfoStep
+              attributes={attributes}
+              confirm={() =>  setStep(3)}
+            />)}
+          {step === 3 && (
+            <RoyaltiesStep
+              attributes={attributes}
+              confirm={() =>  setStep(4)} />)}
+          {step === 4 && (
+            <LaunchStep
+              attributes={attributes}
+              confirm={() => mint()}
+            />)}
         </Col>
       </Row>
     </>
@@ -90,7 +102,6 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
         </p>
       </Row>
       <Row>
-        <Col xl={6}>
           <Button
             className="type-btn"
             size="large"
@@ -98,8 +109,6 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
           >
             Image
           </Button>
-        </Col>
-        <Col xl={6}>
           <Button
             className="type-btn"
             size="large"
@@ -107,8 +116,6 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
           >
             Video
           </Button>
-        </Col>
-        <Col xl={6}>
           <Button
             className="type-btn"
             size="large"
@@ -116,7 +123,6 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
           >
             Audio
           </Button>
-        </Col>
       </Row>
     </>
   );
