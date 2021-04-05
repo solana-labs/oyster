@@ -6,6 +6,7 @@ import { Art } from '../../types'
 import { PreSaleBanner } from '../../components/PreSaleBanner'
 import { ItemCard } from '../../components/ItemCard'
 import { sampleArts } from './sampleData'
+import { useMeta } from '../../contexts/meta'
 
 import './index.less'
 
@@ -14,6 +15,7 @@ const { Content } = Layout
 
 export const HomeView = () => {
   // TODO: fetch real data
+  const { accounts } = useMeta()
   const arts: Array<Art> = sampleArts
 
   const breakpointColumnsObj = {
