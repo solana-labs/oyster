@@ -22,6 +22,10 @@ export let METADATA_PROGRAM_ID = new PublicKey(
   'meta75ZHbozdG3sYzM6PdN7PNK6w9PgsAEEjVYKoAKr',
 );
 
+export const MEMO_ID = new PublicKey(
+  'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
+);
+
 export let SYSTEM = new PublicKey('11111111111111111111111111111111');
 
 let WORMHOLE_BRIDGE: {
@@ -174,5 +178,6 @@ export const programIds = () => {
     bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
     system: SYSTEM,
     metadata: METADATA_PROGRAM_ID,
+    memo: MEMO_ID,
   };
 };

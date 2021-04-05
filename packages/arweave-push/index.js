@@ -26,6 +26,8 @@ const MEMO = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
 const KEYHOLDER = {};
 const FAIL = 'fail';
 const SUCCESS = 'success';
+const LAMPORT_MULTIPLIER = 10 ** 9;
+const WINSTON_MULTIPLIER = 10 ** 12;
 
 const getKey = async function (name) {
   if (KEYHOLDER[name]) return KEYHOLDER[name];
@@ -232,18 +234,17 @@ exports.uploadFile = async (req, res) => {
         try {
           const data = fs.readFileSync(filepath);
           // Have to get separate Buffer since buffers are stateful
-          const cryptoBuffer = fs.readFileSync(filepath);
           const hashSum = crypto.createHash('sha256');
-          hashSum.update(cryptoBuffer);
+          hashSum.update(data);
           const hex = hashSum.digest('hex');
 
-          if (!fields.transaction.memoMessages.find(m => m === hex)) {
+          /* if (!fields.transaction.memoMessages.find(m => m === hex)) {
             body.messages.push({
               filename,
               status: FAIL,
               error: 'Unable to find proof that you paid for this file',
             });
-          }
+          }*/
 
           const stats = fs.statSync(filepath);
           const fileSizeInBytes = stats.size;
@@ -251,7 +252,7 @@ exports.uploadFile = async (req, res) => {
 
           const mime = mimeType.lookup(filepath);
 
-          const costSize = parseInt(
+          const costSizeInWinstons = parseInt(
             await (
               await fetch(
                 'https://arweave.net/price/' + fileSizeInBytes.toString(),
@@ -259,8 +260,14 @@ exports.uploadFile = async (req, res) => {
             ).text(),
           );
 
-          const costToStoreInSolana = costSize * arMultiplier;
-          runningTotal -= costToStoreInSolana;
+          const costToStoreInSolana =
+            (costSizeInWinstons * arMultiplier) / WINSTON_MULTIPLIER;
+          console.log(
+            `With ar multiplier of ${arMultiplier} cost size ${costSizeInWinstons} cost to store is ${costToStoreInSolana} so in lamports is ${
+              costToStoreInSolana * LAMPORT_MULTIPLIER
+            } my amount was ${runningTotal}`,
+          );
+          runningTotal -= costToStoreInSolana * LAMPORT_MULTIPLIER;
           if (runningTotal > 0) {
             const transaction = await arweaveConnection.createTransaction(
               { data: data },
