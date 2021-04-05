@@ -3,41 +3,50 @@ import { Steps, Row, Button, Upload, Col, Input } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
+import { mintNFT } from '../../models';
+import { useConnection, useWallet } from '@oyster/common';
 
 const { Step } = Steps;
 const { Dragger } = Upload;
 
 
 export const ArtCreateView = () => {
+  const connection = useConnection();
+  const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
   const [attributes, setAttributes] = useState({
 
-  })
+  });
 
+  // store files
   const mint = () => {
-    alert('Minting NFT');
+    mintNFT(connection, wallet, []);
   };
 
   return (
     <>
-      <Row>
-        <Steps progressDot current={step} style={{ width: 200, marginTop: 20 }}>
-          <Step title="Category" />
-          <Step title="Upload" />
-          <Step title="Mint" />
-        </Steps>
+      <Row style={{ paddingTop: 50 }}>
+        <Col>
+          <Steps progressDot direction="vertical" current={step} style={{ width: 200, marginLeft: 20 }}>
+            <Step title="Category" />
+            <Step title="Upload" />
+            <Step title="Mint" />
+          </Steps>
+        </Col>
+        <Col>
+          {step === 0 && <CategoryStep confirm={() => setStep(1)} />}
+          {step === 1 && <UploadStep confirm={() => setStep(2)} />}
+          {step === 2 && <MintStep confirm={() => mint()} />}
+        </Col>
       </Row>
-      {step === 0 && <CategoryStep confirm={() => setStep(1)} />}
-      {step === 1 && <UploadStep confirm={() => setStep(2)} />}
-      {step === 2 && <MintStep confirm={() => mint()} />}
     </>
   );
 };
 
 const CategoryStep = (props: { confirm: () => void }) => {
   return (<>
-    <Row>
-      <h2>Select what type of NFT artwork you’re creating</h2>
+    <Row className="call-to-action">
+      <h2>What type of artwork are you creating?</h2>
     </Row>
     <Row>
       <Button size="large">Image</Button>
@@ -52,7 +61,7 @@ const CategoryStep = (props: { confirm: () => void }) => {
 
 const UploadStep = (props: { confirm: () => void }) => {
   return (<>
-    <Row>
+    <Row className="call-to-action">
       <h2>Add an image or video loop to your NFT</h2>
     </Row>
     <Row>
@@ -71,7 +80,7 @@ const UploadStep = (props: { confirm: () => void }) => {
 
 const MintStep = (props: { confirm: () => void }) => {
   return (<>
-    <Row>
+    <Row className="call-to-action">
       <h2>Add details about your artwork</h2>
     </Row>
     <Row>

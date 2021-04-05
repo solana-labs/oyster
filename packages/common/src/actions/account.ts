@@ -7,12 +7,15 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
+  programIds,
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   WRAPPED_SOL_MINT,
 } from '../utils/ids';
 import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
+// @ts-ignore
+import * as BufferLayout from 'buffer-layout';
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -205,6 +208,114 @@ export function createMint(
   );
 
   return account;
+}
+
+export async function createMetadata(
+  symbol: string,
+  name: string,
+  uri: string,
+  mintKey: PublicKey,
+  mintAuthorityKey: PublicKey,
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+  owner: PublicKey,
+  signers: Account[],
+) {
+  const metadataProgramId = programIds().metadata;
+
+  const metadataAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        mintKey.toBuffer(),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const metadataOwnerAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        Buffer.from(name),
+        Buffer.from(symbol),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const dataLayout = BufferLayout.struct([
+    BufferLayout.u8('instruction'),
+    BufferLayout.u8('allow_duplicates'),
+    BufferLayout.blob(32, 'name'),
+    BufferLayout.blob(10, 'symbol'),
+    BufferLayout.blob(200, 'uri'),
+  ]);
+
+  const data = Buffer.alloc(dataLayout.span);
+
+  dataLayout.encode(
+    {
+      instruction: 0,
+      allow_duplicates: false,
+      name: Buffer.from(name, 0, 32),
+      symbol: Buffer.from(symbol, 0, 10),
+      uri: Buffer.from(uri, 0, 200),
+    },
+    data,
+  );
+
+  const keys = [
+    {
+      pubkey: metadataOwnerAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: metadataAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: mintKey,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: mintAuthorityKey,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: payer,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: payer,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: SystemProgram.programId,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SYSVAR_RENT_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data,
+    }),
+  );
 }
 
 export function createTokenAccount(
