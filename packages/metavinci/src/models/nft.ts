@@ -1,6 +1,7 @@
 import {
   createAssociatedTokenAccountInstruction,
   createMint,
+  createMetadata,
   programIds,
   sendTransaction,
 } from '@oyster/common';
