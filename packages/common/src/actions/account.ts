@@ -194,6 +194,17 @@ class CreateMetadataArgs {
     this.uri = args.uri;
   }
 }
+class UpdateMetadataArgs {
+  instruction: number = 1;
+  uri: string;
+  // Not used by this app, just required for instruction
+  non_unique_specific_update_authority: number;
+
+  constructor(args: { uri: string }) {
+    this.uri = args.uri;
+    this.non_unique_specific_update_authority = 0;
+  }
+}
 
 export class Metadata {
   updateAuthority?: PublicKey;
@@ -230,6 +241,17 @@ export const SCHEMA = new Map<any, any>([
         ['name', 'string'],
         ['symbol', 'string'],
         ['uri', 'string'],
+      ],
+    },
+  ],
+  [
+    UpdateMetadataArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['uri', 'string'],
+        ['non_unique_specific_update_authority', 'u8'],
       ],
     },
   ],
@@ -280,6 +302,68 @@ export function createMint(
 
   return account;
 }
+export async function updateMetadata(
+  symbol: string,
+  name: string,
+  uri: string,
+  mintKey: PublicKey,
+  updateAuthority: PublicKey,
+  instructions: TransactionInstruction[],
+  signers: Account[],
+) {
+  const metadataProgramId = programIds().metadata;
+
+  const metadataAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        mintKey.toBuffer(),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const metadataOwnerAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        Buffer.from(name),
+        Buffer.from(symbol),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const value = new UpdateMetadataArgs({ uri });
+  const data = Buffer.from(serialize(SCHEMA, value));
+
+  const keys = [
+    {
+      pubkey: metadataAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: updateAuthority,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: metadataOwnerAccount,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data,
+    }),
+  );
+}
 
 export async function createMetadata(
   symbol: string,
@@ -289,7 +373,7 @@ export async function createMetadata(
   mintAuthorityKey: PublicKey,
   instructions: TransactionInstruction[],
   payer: PublicKey,
-  owner: PublicKey,
+  updateAuthority: PublicKey,
   signers: Account[],
 ) {
   const metadataProgramId = programIds().metadata;
@@ -347,7 +431,7 @@ export async function createMetadata(
       isWritable: false,
     },
     {
-      pubkey: payer,
+      pubkey: updateAuthority,
       isSigner: true,
       isWritable: false,
     },

@@ -1,2 +1,2 @@
 export * from './market';
-export * from './accounts';
+export * from './meta';
