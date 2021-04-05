@@ -28,6 +28,28 @@ const FAIL = 'fail';
 const SUCCESS = 'success';
 const LAMPORT_MULTIPLIER = 10 ** 9;
 const WINSTON_MULTIPLIER = 10 ** 12;
+const RESERVED_TXN_MANIFEST = 'manifest.json';
+
+function generateManifest(pathMap, indexPath) {
+  const manifest = {
+    manifest: 'arweave/paths',
+    version: '0.1.0',
+    paths: pathMap,
+  };
+
+  if (indexPath) {
+    if (!Object.keys(pathMap).includes(indexPath)) {
+      throw new Error(
+        `--index path not found in directory paths: ${indexPath}`,
+      );
+    }
+    manifest.index = {
+      path: indexPath,
+    };
+  }
+
+  return manifest;
+}
 
 const getKey = async function (name) {
   if (KEYHOLDER[name]) return KEYHOLDER[name];
@@ -198,8 +220,12 @@ exports.uploadFile = async (req, res) => {
 
   busboy.on('finish', async () => {
     console.log('Finish');
-    const filepaths = await Promise.all(fileWrites);
+    const filepaths = [
+      ...(await Promise.all(fileWrites)),
+      { filepath: RESERVED_TXN_MANIFEST, status: SUCCESS },
+    ];
     const fields = await Promise.all(fieldPromises);
+    const anchor = (await arweaveConnection.api.get('tx_anchor')).data;
 
     console.log('The one guy is ' + fields.map(f => f.name).join(','));
     const txn = fields.find(f => f.name === 'transaction');
@@ -225,6 +251,7 @@ exports.uploadFile = async (req, res) => {
     const arMultiplier =
       conversionRates.arweave.usd / conversionRates.solana.usd;
 
+    const paths = {};
     for (let i = 0; i < filepaths.length; i++) {
       const f = filepaths[i];
       if (f.status == FAIL) {
@@ -234,28 +261,35 @@ exports.uploadFile = async (req, res) => {
         const parts = filepath.split('/');
         const filename = parts[parts.length - 1];
         try {
-          const data = fs.readFileSync(filepath);
-          // Have to get separate Buffer since buffers are stateful
-          const hashSum = crypto.createHash('sha256');
-          hashSum.update(data.toString());
-          const hex = hashSum.digest('hex');
+          let data, fileSizeInBytes, mime;
+          if (filepath == RESERVED_TXN_MANIFEST) {
+            const manifest = await generateManifest(paths, 'metadata.json');
+            data = Buffer.from(JSON.stringify(manifest), 'utf8');
+            fileSizeInBytes = data.byteLength;
+            mime = 'application/x.arweave-manifest+json';
+          } else {
+            data = fs.readFileSync(filepath);
 
-          if (!txn.memoMessages.find(m => m === hex)) {
-            body.messages.push({
-              filename,
-              status: FAIL,
-              error: `Unable to find proof that you paid for this file, your hash is ${hex}, comparing to ${txn.memoMessages.join(
-                ',',
-              )}`,
-            });
-            continue;
+            // Have to get separate Buffer since buffers are stateful
+            const hashSum = crypto.createHash('sha256');
+            hashSum.update(data.toString());
+            const hex = hashSum.digest('hex');
+
+            if (!txn.memoMessages.find(m => m === hex)) {
+              body.messages.push({
+                filename,
+                status: FAIL,
+                error: `Unable to find proof that you paid for this file, your hash is ${hex}, comparing to ${txn.memoMessages.join(
+                  ',',
+                )}`,
+              });
+              continue;
+            }
+
+            const stats = fs.statSync(filepath);
+            fileSizeInBytes = stats.size;
+            mime = mimeType.lookup(filepath);
           }
-
-          const stats = fs.statSync(filepath);
-          const fileSizeInBytes = stats.size;
-          console.log(`File size ${fileSizeInBytes}`);
-
-          const mime = mimeType.lookup(filepath);
 
           const costSizeInWinstons = parseInt(
             await (
@@ -267,15 +301,11 @@ exports.uploadFile = async (req, res) => {
 
           const costToStoreInSolana =
             (costSizeInWinstons * arMultiplier) / WINSTON_MULTIPLIER;
-          console.log(
-            `With ar multiplier of ${arMultiplier} cost size ${costSizeInWinstons} cost to store is ${costToStoreInSolana} so in lamports is ${
-              costToStoreInSolana * LAMPORT_MULTIPLIER
-            } my amount was ${runningTotal}`,
-          );
+
           runningTotal -= costToStoreInSolana * LAMPORT_MULTIPLIER;
           if (runningTotal > 0) {
             const transaction = await arweaveConnection.createTransaction(
-              { data: data },
+              { data: data, last_tx: anchor },
               arweaveWallet,
             );
             transaction.addTag('Content-Type', mime);
@@ -289,14 +319,13 @@ exports.uploadFile = async (req, res) => {
               transaction,
               arweaveWallet,
             );
-            console.log('About to');
             await arweaveConnection.transactions.post(transaction);
-            console.log('Finished');
             body.messages.push({
               filename,
               status: SUCCESS,
               transactionId: transaction.id,
             });
+            paths[filename] = { id: transaction.id };
           } else {
             body.messages.push({
               filename,
@@ -310,7 +339,7 @@ exports.uploadFile = async (req, res) => {
         }
       }
     }
-    console.log('Returning');
+
     res.end(JSON.stringify(body));
   });
   busboy.end(req.rawBody);
