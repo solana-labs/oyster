@@ -19,7 +19,7 @@ import {
 import crypto from 'crypto';
 import { getAssetCostToStore } from '../utils/assets';
 import { AR_SOL_HOLDER_ID } from '../utils/ids';
-import { IMetadata } from '../views/artCreate';
+const RESERVED_TXN_MANIFEST = 'manifest.json';
 
 interface IArweaveResult {
   error?: string;
@@ -149,7 +149,7 @@ export const mintNFT = async (
           ).json();
 
           const metadataFile = result.messages?.find(
-            m => m.filename == 'metadata.json',
+            m => m.filename == RESERVED_TXN_MANIFEST,
           );
           if (metadataFile?.transactionId && wallet.publicKey) {
             const updateInstructions: TransactionInstruction[] = [];

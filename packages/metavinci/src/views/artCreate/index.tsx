@@ -206,6 +206,7 @@ const UploadStep = (props: {
             props.setAttributes({
               ...props.attributes,
               files: [info.file.originFileObj],
+              image: info.file.originFileObj.name,
             });
           }}
         >
