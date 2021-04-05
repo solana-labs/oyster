@@ -107,7 +107,7 @@ export const sampleArts: Array<Art> = [
     artist: 'cryptokitties',
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction4.jpg",
@@ -116,7 +116,7 @@ export const sampleArts: Array<Art> = [
     artist: "RAC",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction1.jpg",
@@ -125,7 +125,7 @@ export const sampleArts: Array<Art> = [
     artist: "cryptokitties",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction2.jpg",
@@ -134,7 +134,7 @@ export const sampleArts: Array<Art> = [
     artist: "artworkwizard",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction3.jpg",
@@ -143,7 +143,7 @@ export const sampleArts: Array<Art> = [
     artist: "NFTSNEAKERS",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction3.jpg",
@@ -152,7 +152,7 @@ export const sampleArts: Array<Art> = [
     artist: "NFTSNEAKERS",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: 'img/auction2.jpg',
@@ -161,7 +161,7 @@ export const sampleArts: Array<Art> = [
     artist: 'artworkwizard',
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: 'img/auction3.jpg',
@@ -170,7 +170,7 @@ export const sampleArts: Array<Art> = [
     artist: 'NFTSNEAKERS',
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: 'img/auction4.jpg',
@@ -179,7 +179,7 @@ export const sampleArts: Array<Art> = [
     artist: 'RAC',
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction4.jpg",
@@ -188,7 +188,7 @@ export const sampleArts: Array<Art> = [
     artist: "RAC",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction1.jpg",
@@ -197,7 +197,7 @@ export const sampleArts: Array<Art> = [
     artist: "cryptokitties",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
   {
     image: "http://localhost:3000/img/auction2.jpg",
@@ -206,6 +206,6 @@ export const sampleArts: Array<Art> = [
     artist: "artworkwizard",
     priceSOL: 1.1,
     priceUSD: 24,
-    endingTS: 1617843346000,
+    endingTS: 1617680325000,
   },
 ]
