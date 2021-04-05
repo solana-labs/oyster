@@ -262,7 +262,6 @@ exports.uploadFile = async (req, res) => {
           const costToStoreInSolana = costSize * arMultiplier;
           runningTotal -= costToStoreInSolana;
           if (runningTotal > 0) {
-            console.log('My arweave wallet is ', arweaveWallet);
             const transaction = await arweaveConnection.createTransaction(
               { data: data },
               arweaveWallet,
