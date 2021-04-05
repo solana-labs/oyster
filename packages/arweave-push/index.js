@@ -237,7 +237,7 @@ exports.uploadFile = async (req, res) => {
           const data = fs.readFileSync(filepath);
           // Have to get separate Buffer since buffers are stateful
           const hashSum = crypto.createHash('sha256');
-          hashSum.update(data);
+          hashSum.update(data.toString());
           const hex = hashSum.digest('hex');
 
           if (!txn.memoMessages.find(m => m === hex)) {
