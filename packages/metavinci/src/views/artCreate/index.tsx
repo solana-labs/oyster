@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Steps, Row, Button, Upload, Col, Input, Statistic } from 'antd';
+import { Steps, Row, Button, Upload, Col, Input } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
@@ -9,11 +9,16 @@ import { useConnection, useWallet } from '@oyster/common';
 const { Step } = Steps;
 const { Dragger } = Upload;
 
+interface IProps {
+  type: String;
+  files: File[];
+}
+
 export const ArtCreateView = () => {
   const connection = useConnection();
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
-  const [attributes, setAttributes] = useState({
+  const [attributes, setAttributes] = useState<IProps>({
     type: 'image',
     title: '',
     description: '',
@@ -44,17 +49,25 @@ export const ArtCreateView = () => {
           </Steps>
         </Col>
         <Col xl={16}>
-          {step === 0 && <CategoryStep confirm={(type) => {
-              setAttributes({
-                ...attributes,
-                type
-              })
-              setStep(1);
-            }} />}
-          {step === 1 && <UploadStep attributes setAttributes={setAttributes} confirm={() => setStep(2)} />}
-          {step === 2 && <InfoStep confirm={() =>  setStep(3)} />}
-          {step === 3 && <RoyaltiesStep confirm={() =>  setStep(4)} />}
-          {step === 4 && <LaunchStep confirm={() => mint()} />}
+          {step === 0 && (
+            <CategoryStep
+              confirm={type => {
+                setAttributes({
+                  ...attributes,
+                  type,
+                });
+                setStep(1);
+              }}
+            />
+          )}
+          {step === 1 && (
+            <UploadStep
+              attributes
+              setAttributes={setAttributes}
+              confirm={() => setStep(2)}
+            />
+          )}
+          {step === 2 && <MintStep confirm={() => mint()} attributes />}
         </Col>
       </Row>
     </>
@@ -66,38 +79,77 @@ const CategoryStep = (props: { confirm: (type: string) => void }) => {
     <>
       <Row className="call-to-action">
         <h2>Create your NFT artwork on Meta</h2>
-        <p>Creating NFT on Solana is not only low cost for artists but supports environment with 20% of the fees form the platform donated to charities.</p>
+        <p>
+          Creating NFT on Solana is not only low cost for artists but supports
+          environment with 20% of the fees form the platform donated to
+          charities.
+        </p>
       </Row>
       <Row>
-          <Button className="type-btn" size="large" onClick={() => props.confirm('image')}>Image</Button>
-          <Button className="type-btn" size="large" onClick={() => props.confirm('video')}>Video</Button>
-          <Button className="type-btn" size="large" onClick={() => props.confirm('audio')}>Audio</Button>
+        <Col xl={6}>
+          <Button
+            className="type-btn"
+            size="large"
+            onClick={() => props.confirm('image')}
+          >
+            Image
+          </Button>
+        </Col>
+        <Col xl={6}>
+          <Button
+            className="type-btn"
+            size="large"
+            onClick={() => props.confirm('video')}
+          >
+            Video
+          </Button>
+        </Col>
+        <Col xl={6}>
+          <Button
+            className="type-btn"
+            size="large"
+            onClick={() => props.confirm('audio')}
+          >
+            Audio
+          </Button>
+        </Col>
       </Row>
     </>
   );
 };
 
-const UploadStep = (props: { attributes: any, setAttributes: (attr: any) => void, confirm: () => void }) => {
+const UploadStep = (props: {
+  attributes: any;
+  setAttributes: (attr: any) => void;
+  confirm: () => void;
+}) => {
   return (
     <>
       <Row className="call-to-action">
         <h2>Now, let's upload your creation</h2>
-        <p>Your file will be uploaded to the decentralized web via Arweave. Depending on file type, can take up to 1 minute. Arweave is a new type of storage that backs data with sustainable and perpetual endowments, allowing users and developers to truly store data forever – for the very first time.</p>
+        <p>
+          Your file will be uploaded to the decentralized web via Arweave.
+          Depending on file type, can take up to 1 minute. Arweave is a new type
+          of storage that backs data with sustainable and perpetual endowments,
+          allowing users and developers to truly store data forever – for the
+          very first time.
+        </p>
       </Row>
-      <Row className="content-action content-action-stretch">
-        <Dragger multiple={false}
-          customRequest={(info) => {
+      <Row className="content-action">
+        <Dragger
+          multiple={false}
+          customRequest={info => {
             // dont upload files here, handled outside of the control
             info?.onSuccess?.({}, null as any);
           }}
-          style={{ padding: 20 }} onChange={(info) => {
-          props.setAttributes({
-            ...props.attributes,
-            files: [
-              info.file.originFileObj,
-            ],
-          });
-        }}>
+          style={{ padding: 20 }}
+          onChange={info => {
+            props.setAttributes({
+              ...props.attributes,
+              files: [info.file.originFileObj],
+            });
+          }}
+        >
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
@@ -107,7 +159,12 @@ const UploadStep = (props: { attributes: any, setAttributes: (attr: any) => void
         </Dragger>
       </Row>
       <Row>
-        <Button type="primary" size="large" onClick={props.confirm} className="action-btn">
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
           Continue to Mint
         </Button>
       </Row>
@@ -115,17 +172,19 @@ const UploadStep = (props: { attributes: any, setAttributes: (attr: any) => void
   );
 };
 
-const InfoStep = (props: { confirm: () => void }) => {
+const InfoStep = (props: { confirm: () => void; attributes: IProps }) => {
+  const file = props.attributes.files[0];
   return (
     <>
       <Row className="call-to-action">
         <h2>Describe your creation</h2>
-        <p>Provide detailed description of your creative process to engage with your audience.</p>
+        <p>
+          Provide detailed description of your creative process to engage with
+          your audience.
+        </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>
-          <ArtCard />
-        </Col>
+        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
         <Col className="section" xl={12}>
           <Input className="input" placeholder="Title" />
           <Input.TextArea
@@ -135,7 +194,12 @@ const InfoStep = (props: { confirm: () => void }) => {
         </Col>
       </Row>
       <Row>
-        <Button type="primary" size="large" onClick={props.confirm} className="action-btn">
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
           Continue to royalties
         </Button>
       </Row>
@@ -148,7 +212,10 @@ const RoyaltiesStep = (props: { confirm: () => void }) => {
     <>
       <Row className="call-to-action">
         <h2>Set royalties for the creation</h2>
-        <p>A royalty is a payment made by one the seller of this item to the creator. It is charged after every successful auction.</p>
+        <p>
+          A royalty is a payment made by one the seller of this item to the
+          creator. It is charged after every successful auction.
+        </p>
       </Row>
       <Row className="content-action">
         <Col xl={12}>
@@ -163,7 +230,12 @@ const RoyaltiesStep = (props: { confirm: () => void }) => {
         </Col>
       </Row>
       <Row>
-        <Button type="primary" size="large" onClick={props.confirm} className="action-btn">
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
           Continue to review
         </Button>
       </Row>
@@ -176,22 +248,45 @@ const LaunchStep = (props: { confirm: () => void }) => {
     <>
       <Row className="call-to-action">
         <h2>Launch your creation</h2>
-        <p>Provide detailed description of your creative process to engage with your audience.</p>
+        <p>
+          Provide detailed description of your creative process to engage with
+          your audience.
+        </p>
       </Row>
       <Row className="content-action">
         <Col xl={12}>
           <ArtCard />
         </Col>
         <Col className="section" xl={12}>
-          <Statistic className="create-statistic" title="Royalty Percentage" value={20} suffix="%" />
-          <Statistic className="create-statistic" title="Cost to Create" value={20} prefix="◎" />
+          <Statistic
+            className="create-statistic"
+            title="Royalty Percentage"
+            value={20}
+            suffix="%"
+          />
+          <Statistic
+            className="create-statistic"
+            title="Cost to Create"
+            value={20}
+            prefix="◎"
+          />
         </Col>
       </Row>
       <Row>
-        <Button type="primary" size="large" onClick={props.confirm} className="action-btn">
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
           Pay with SOL
         </Button>
-        <Button disabled={true} size="large" onClick={props.confirm} className="action-btn">
+        <Button
+          disabled={true}
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
           Pay with Credit Card
         </Button>
       </Row>
