@@ -56,7 +56,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "deploy:ar": "arweave deploy-dir build --key-file ",
+    "deploy:ar": "arweave deploy-dir  ../../build/metavinci --key-file ",
     "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
     "ethers": "typechain --target ethers-v4 --outDir src/contracts 'contracts/*.json'"
   },
