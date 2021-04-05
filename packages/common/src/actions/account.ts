@@ -12,11 +12,10 @@ import {
   TOKEN_PROGRAM_ID,
   WRAPPED_SOL_MINT,
 } from '../utils/ids';
+import { deserializeBorsh } from './../utils/borsh';
 import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
-// @ts-ignore
-import * as BufferLayout from 'buffer-layout';
-import { serialize, deserialize } from 'borsh';
+import { serialize, BinaryReader, Schema, BorshError } from 'borsh';
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -185,16 +184,73 @@ export function createAssociatedTokenAccountInstruction(
 class CreateMetadataArgs {
   instruction: number = 0;
   allow_duplicates: boolean = false;
-  name: string = '';
-  symbol: string = '';
-  uri: string = '';
+  name: string;
+  symbol: string;
+  uri: string;
 
-  constructor(name: string, symbol: string, uri: string) {
-    this.name = name;
-    this.symbol = symbol;
-    this.uri = uri;
+  constructor(args: { name: string; symbol: string; uri: string }) {
+    this.name = args.name;
+    this.symbol = args.symbol;
+    this.uri = args.uri;
   }
 }
+
+export class Metadata {
+  updateAuthority?: PublicKey;
+  mint: PublicKey;
+  name: string;
+  symbol: string;
+  uri: string;
+  extended?: any;
+
+  constructor(args: {
+    updateAuthority?: Buffer;
+    mint: Buffer;
+    name: string;
+    symbol: string;
+    uri: string;
+  }) {
+    this.updateAuthority =
+      args.updateAuthority && new PublicKey(args.updateAuthority);
+    this.mint = new PublicKey(args.mint);
+    this.name = args.name;
+    this.symbol = args.symbol;
+    this.uri = args.uri;
+  }
+}
+
+export const SCHEMA = new Map<any, any>([
+  [
+    CreateMetadataArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['allow_duplicates', 'u8'],
+        ['name', 'string'],
+        ['symbol', 'string'],
+        ['uri', 'string'],
+      ],
+    },
+  ],
+  [
+    Metadata,
+    {
+      kind: 'struct',
+      fields: [
+        ['allow_duplicates', { kind: 'option', type: 'u8' }],
+        ['mint', [32]],
+        ['name', 'string'],
+        ['symbol', 'string'],
+        ['uri', 'string'],
+      ],
+    },
+  ],
+]);
+
+export const decodeMetadata = (buffer: Buffer) => {
+  return deserializeBorsh(SCHEMA, Metadata, buffer) as Metadata;
+};
 
 export function createMint(
   instructions: TransactionInstruction[],
@@ -261,23 +317,8 @@ export async function createMetadata(
     )
   )[0];
 
-  const schema = new Map([
-    [
-      CreateMetadataArgs,
-      {
-        kind: 'struct',
-        fields: [
-          ['instruction', 'u8'],
-          ['allow_duplicates', 'u8'],
-          ['name', 'string'],
-          ['symbol', 'string'],
-          ['uri', 'string'],
-        ],
-      },
-    ],
-  ]);
-  const value = new CreateMetadataArgs(name, symbol, uri);
-  const data = Buffer.from(serialize(schema, value));
+  const value = new CreateMetadataArgs({ name, symbol, uri });
+  const data = Buffer.from(serialize(SCHEMA, value));
 
   const keys = [
     {
