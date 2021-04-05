@@ -16,6 +16,7 @@ import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
 // @ts-ignore
 import * as BufferLayout from 'buffer-layout';
+import borsh from 'borsh';
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -181,6 +182,20 @@ export function createAssociatedTokenAccountInstruction(
   );
 }
 
+class CreateMetadataArgs {
+  instruction: number = 0;
+  allow_duplicates: boolean = false;
+  name: string = '';
+  symbol: string = '';
+  uri: string = '';
+
+  constructor(name: string, symbol: string, uri: string) {
+    this.name = name;
+    this.symbol = symbol;
+    this.uri = uri;
+  }
+}
+
 export function createMint(
   instructions: TransactionInstruction[],
   payer: PublicKey,
@@ -246,26 +261,33 @@ export async function createMetadata(
     )
   )[0];
 
-  const dataLayout = BufferLayout.struct([
-    BufferLayout.u8('instruction'),
-    BufferLayout.u8('allow_duplicates'),
-    BufferLayout.blob(32, 'name'),
-    BufferLayout.blob(10, 'symbol'),
-    BufferLayout.blob(200, 'uri'),
+  const schema = new Map([
+    [
+      CreateMetadataArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['instruction', 'u8'],
+          ['allow_duplicates', 'u8'],
+          ['name', 'string'],
+          ['symbol', 'string'],
+          ['uri', 'string'],
+        ],
+      },
+    ],
   ]);
+  const value = new CreateMetadataArgs(name, symbol, uri);
 
-  const data = Buffer.alloc(dataLayout.span);
+  debugger;
 
-  dataLayout.encode(
-    {
-      instruction: 0,
-      allow_duplicates: false,
-      name: Buffer.from(name, 0, 32),
-      symbol: Buffer.from(symbol, 0, 10),
-      uri: Buffer.from(uri, 0, 200),
-    },
-    data,
+  const data = Buffer.from(borsh.serialize(schema, value));
+
+  const test = borsh.deserialize(
+    schema,
+    CreateMetadataArgs,
+    Buffer.alloc(1024),
   );
+  console.log(test);
 
   const keys = [
     {
