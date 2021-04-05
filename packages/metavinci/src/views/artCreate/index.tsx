@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Steps, Row, Button, Upload, Col, Input } from 'antd';
+import { Steps, Row, Button, Upload, Col, Input, } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
@@ -13,31 +13,33 @@ export const ArtCreateView = () => {
   const connection = useConnection();
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
-  const [attributes, setAttributes] = useState({});
+  const [attributes, setAttributes] = useState({
+    files: [],
+  });
 
   // store files
   const mint = () => {
-    mintNFT(connection, wallet, [], {});
+    mintNFT(connection, wallet, attributes.files, attributes);
   };
 
   return (
     <>
       <Row style={{ paddingTop: 50 }}>
-        <Col>
+        <Col xl={5}>
           <Steps
             progressDot
             direction="vertical"
             current={step}
-            style={{ width: 200, marginLeft: 20 }}
+            style={{ width: 200, marginLeft: 20, marginRight: 30 }}
           >
-            <Step title="Category" />
-            <Step title="Upload" />
-            <Step title="Mint" />
+            <Step title="Select category" />
+            <Step title="Upload creation" />
+            <Step title="Add metadata" />
           </Steps>
         </Col>
-        <Col>
+        <Col xl={19}>
           {step === 0 && <CategoryStep confirm={() => setStep(1)} />}
-          {step === 1 && <UploadStep confirm={() => setStep(2)} />}
+          {step === 1 && <UploadStep attributes setAttributes={setAttributes} confirm={() => setStep(2)} />}
           {step === 2 && <MintStep confirm={() => mint()} />}
         </Col>
       </Row>
@@ -65,14 +67,28 @@ const CategoryStep = (props: { confirm: () => void }) => {
   );
 };
 
-const UploadStep = (props: { confirm: () => void }) => {
+const UploadStep = (props: { attributes: any, setAttributes: (attr: any) => void, confirm: () => void }) => {
+
+
   return (
     <>
       <Row className="call-to-action">
-        <h2>Add an image or video loop to your NFT</h2>
+        <h2>Now, let's upload your creation</h2>
       </Row>
       <Row>
-        <Dragger {...props} style={{ padding: 20 }}>
+        <Dragger multiple={false}
+          customRequest={(info) => {
+            // dont upload files here, handled outside of the control
+            info?.onSuccess?.({}, null as any);
+          }}
+          style={{ padding: 20 }} onChange={(info) => {
+          props.setAttributes({
+            ...props.attributes,
+            files: [
+              info.file,
+            ],
+          });
+        }}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
