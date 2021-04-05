@@ -1,23 +1,32 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Card, Avatar } from 'antd';
+import React, { useLayoutEffect, useState } from 'react';
+import { Card } from 'antd';
 
 const { Meta } = Card;
 
-export const ArtCard = () => {
-  return <Card
-  className="custom-card"
-  cover={
-    <img
-      alt="example"
-      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-    />
-  }
->
-  <Meta
-    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-    title="Card title"
-    description="This is the description"
-  />
-</Card>;
-}
+export const ArtCard = ({
+  file,
+  name,
+  symbol,
+}: {
+  file?: File;
+  name?: String;
+  symbol?: String;
+}) => {
+  const [imgSrc, setImgSrc] = useState<string>();
+
+  useLayoutEffect(() => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        setImgSrc(event.target?.result as any);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, [file]);
+
+  return (
+    <Card className="custom-card" cover={<img src={imgSrc} />}>
+      <Meta title={`Title: ${name}`} description={`Symbol: ${symbol}`} />
+    </Card>
+  );
+};
