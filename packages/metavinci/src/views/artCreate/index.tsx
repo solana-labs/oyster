@@ -16,8 +16,20 @@ import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
 import { mintNFT } from '../../models';
-import { useConnection, useWallet } from '@oyster/common';
+import {
+  MAX_METADATA_LEN,
+  MAX_OWNER_LEN,
+  MAX_URI_LENGTH,
+  Metadata,
+  NameSymbolTuple,
+  SCHEMA,
+  useConnection,
+  useWallet,
+} from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
+import { Connection } from '@solana/web3.js';
+import { MintLayout } from '@solana/spl-token';
+import { serialize } from 'borsh';
 
 const { Step } = Steps;
 const { Dragger } = Upload;
@@ -131,7 +143,11 @@ export const ArtCreateView = () => {
             />
           )}
           {step === 4 && (
-            <LaunchStep attributes={attributes} confirm={() => mint()} />
+            <LaunchStep
+              attributes={attributes}
+              confirm={() => mint()}
+              connection={connection}
+            />
           )}
         </Col>
       </Row>
@@ -372,7 +388,11 @@ const RoyaltiesStep = (props: {
   );
 };
 
-const LaunchStep = (props: { confirm: () => void; attributes: IMetadata }) => {
+const LaunchStep = (props: {
+  confirm: () => void;
+  attributes: IMetadata;
+  connection: Connection;
+}) => {
   const file = props.attributes.files[0];
   const metadata = {
     ...(props.attributes as any),
@@ -383,9 +403,45 @@ const LaunchStep = (props: { confirm: () => void; attributes: IMetadata }) => {
     getAssetCostToStore([
       ...props.attributes.files,
       new File([JSON.stringify(metadata)], 'metadata.json'),
-    ]).then(lamports => {
+    ]).then(async lamports => {
       const sol = lamports / LAMPORT_MULTIPLIER;
-      setCost(sol);
+      const mintRent = await props.connection.getMinimumBalanceForRentExemption(
+        MintLayout.span,
+      );
+      const uriStr = 'x';
+      let uriBuilder = '';
+      for (let i = 0; i < MAX_URI_LENGTH; i++) {
+        uriBuilder += uriStr;
+      }
+      const defaultMeta = new Metadata({
+        //@ts-ignore
+        mint: Buffer.from('11111111111111111111111111111111').toString(),
+        name: props.attributes.name,
+        symbol: props.attributes.symbol,
+        uri: uriBuilder,
+      });
+
+      const defaultNameSymbol = new NameSymbolTuple({
+        //@ts-ignore
+        updateAuthority: Buffer.from(
+          '11111111111111111111111111111111',
+        ).toString(),
+        //@ts-ignore
+        metadata: Buffer.from('11111111111111111111111111111111').toString(),
+      });
+      //const serialized = serialize(SCHEMA, defaultMeta);
+      //const serializedName = serialize(SCHEMA, defaultNameSymbol);
+
+      const metadataRent = await props.connection.getMinimumBalanceForRentExemption(
+        MAX_METADATA_LEN,
+      );
+      const nameSymbolRent = await props.connection.getMinimumBalanceForRentExemption(
+        MAX_OWNER_LEN,
+      );
+      const additionalSol =
+        (metadataRent + nameSymbolRent + mintRent) / LAMPORT_MULTIPLIER;
+      // screw fees for now.
+      setCost(sol + additionalSol);
     });
   }, [file]);
   return (
@@ -418,7 +474,7 @@ const LaunchStep = (props: { confirm: () => void; attributes: IMetadata }) => {
             <Statistic
               className="create-statistic"
               title="Cost to Create"
-              value={cost}
+              value={cost.toPrecision(3)}
               prefix="◎"
             />
           ) : (

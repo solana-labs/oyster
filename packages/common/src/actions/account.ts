@@ -17,6 +17,17 @@ import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
 import { serialize, BinaryReader, Schema, BorshError } from 'borsh';
 
+export const MAX_NAME_LENGTH = 32;
+
+export const MAX_SYMBOL_LENGTH = 10;
+
+export const MAX_URI_LENGTH = 200;
+
+export const MAX_METADATA_LEN =
+  32 + MAX_NAME_LENGTH + MAX_SYMBOL_LENGTH + MAX_URI_LENGTH + 200;
+
+export const MAX_OWNER_LEN = 32 + 32;
+
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
   cleanupInstructions: TransactionInstruction[],
@@ -230,6 +241,16 @@ export class Metadata {
   }
 }
 
+export class NameSymbolTuple {
+  updateAuthority: PublicKey;
+  metadata: PublicKey;
+
+  constructor(args: { updateAuthority: Buffer; metadata: Buffer }) {
+    this.updateAuthority = new PublicKey(args.updateAuthority);
+    this.metadata = new PublicKey(args.metadata);
+  }
+}
+
 export const SCHEMA = new Map<any, any>([
   [
     CreateMetadataArgs,
@@ -265,6 +286,16 @@ export const SCHEMA = new Map<any, any>([
         ['name', 'string'],
         ['symbol', 'string'],
         ['uri', 'string'],
+      ],
+    },
+  ],
+  [
+    NameSymbolTuple,
+    {
+      kind: 'struct',
+      fields: [
+        ['update_authority', [32]],
+        ['metadata', [32]],
       ],
     },
   ],

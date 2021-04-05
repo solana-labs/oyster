@@ -39,7 +39,6 @@ export function VinciAccountsProvider({ children = null as any }) {
         try {
           const metadata = decodeMetadata(meta.account.data);
           if (isValidHttpUrl(metadata.uri)) {
-            console.log('Metadata uri', metadata.uri);
             mintToMetadata.set(metadata.mint.toBase58(), metadata);
           }
         } catch {
