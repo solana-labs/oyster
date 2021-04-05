@@ -4,15 +4,17 @@ import { Card, Avatar } from 'antd';
 
 const { Meta } = Card;
 
-export const ArtCard = (file: File) => {
+export const ArtCard = ({ file }: { file?: File }) => {
   const [imgSrc, setImgSrc] = useState<string>();
 
   useLayoutEffect(() => {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      setImgSrc(event.target?.result as any);
-    };
-    reader.readAsDataURL(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        setImgSrc(event.target?.result as any);
+      };
+      reader.readAsDataURL(file);
+    }
   }, [file]);
 
   return (

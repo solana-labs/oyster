@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Steps, Row, Button, Upload, Col, Input } from 'antd';
+import { Steps, Row, Button, Upload, Col, Input, Statistic } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
@@ -11,6 +11,8 @@ const { Dragger } = Upload;
 
 interface IProps {
   type: String;
+  title: String;
+  description: String;
   files: File[];
 }
 
@@ -67,7 +69,9 @@ export const ArtCreateView = () => {
               confirm={() => setStep(2)}
             />
           )}
-          {step === 2 && <MintStep confirm={() => mint()} attributes />}
+          {step === 2 && (
+            <InfoStep confirm={() => mint()} attributes={attributes} />
+          )}
         </Col>
       </Row>
     </>
@@ -207,7 +211,9 @@ const InfoStep = (props: { confirm: () => void; attributes: IProps }) => {
   );
 };
 
-const RoyaltiesStep = (props: { confirm: () => void }) => {
+const RoyaltiesStep = (props: { confirm: () => void; attributes: IProps }) => {
+  const file = props.attributes.files[0];
+
   return (
     <>
       <Row className="call-to-action">
@@ -218,9 +224,7 @@ const RoyaltiesStep = (props: { confirm: () => void }) => {
         </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>
-          <ArtCard />
-        </Col>
+        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
         <Col className="section" xl={12}>
           <Input className="input" placeholder="Title" />
           <Input.TextArea
@@ -243,7 +247,9 @@ const RoyaltiesStep = (props: { confirm: () => void }) => {
   );
 };
 
-const LaunchStep = (props: { confirm: () => void }) => {
+const LaunchStep = (props: { confirm: () => void; attributes: IProps }) => {
+  const file = props.attributes.files[0];
+
   return (
     <>
       <Row className="call-to-action">
@@ -254,9 +260,7 @@ const LaunchStep = (props: { confirm: () => void }) => {
         </p>
       </Row>
       <Row className="content-action">
-        <Col xl={12}>
-          <ArtCard />
-        </Col>
+        <Col xl={12}>{file && <ArtCard file={file} />}</Col>
         <Col className="section" xl={12}>
           <Statistic
             className="create-statistic"
