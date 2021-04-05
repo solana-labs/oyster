@@ -80,6 +80,7 @@ export const HomeView = () => {
   // TODO: fetch real auctions
   const auction = sampleAuction
   const auctions = sampleAuctions
+  const soldAuctions = sampleAuctions.slice(0, 3)
 
   return (
     <Layout style={{ margin: 0 }}>
@@ -92,6 +93,14 @@ export const HomeView = () => {
               {auctions.map((auction, idx) => (
                 <Col key={idx} className="gutter-row" style={{ marginBottom: 15 }}>
                   <AuctionCard auction={auction} />
+                </Col>
+              ))}
+            </Row>
+            <Row style={{ marginBottom: 10 }}>Recently Sold</Row>
+            <Row gutter={16} justify="space-around" style={{ marginRight: 0 }}>
+              {soldAuctions.map((auction, idx) => (
+                <Col key={idx} className="gutter-row" style={{ marginBottom: 15 }}>
+                  <AuctionCard auction={auction} sold={true} />
                 </Col>
               ))}
             </Row>

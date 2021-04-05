@@ -7,7 +7,7 @@ import { Auction } from '../../types'
 import './index.less'
 
 
-export const AuctionCard = ({ auction }: { auction: Auction }) => {
+export const AuctionCard = ({ auction, sold }: { auction: Auction, sold?: boolean }) => {
   const history = useHistory()
 
   const handleCoverClick = async () => {
@@ -22,7 +22,7 @@ export const AuctionCard = ({ auction }: { auction: Auction }) => {
     >
       <div>{auction.name}</div>
       <a href={auction.auctionerLink}>{auction.auctionerName}</a>
-      <div className="auction-bid">Highest Bid: ${auction.highestBid} / ◎{auction.solAmt}</div>
+      <div className="auction-bid">{sold ? 'SOLD' : 'Highest Bid:'} <span style={{color: '#13c2c2'}}>${auction.highestBid}</span> / ◎{auction.solAmt}</div>
     </Card>
   )
 }
