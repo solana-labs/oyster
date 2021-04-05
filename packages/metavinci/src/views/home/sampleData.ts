@@ -1,4 +1,4 @@
-import { Auction, Artist } from "../../types"
+import { Auction, Artist, Art } from "../../types"
 
 export const sampleAuction: Auction = {
   name: "Liquidity Pool",
@@ -22,7 +22,7 @@ export const sampleAuctions: Array<Auction> = [
   },
   {
     name: "Miko 4",
-    auctionerName: "Hello World",
+    auctionerName: "Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World ",
     auctionerLink: "/address/4321dcba",
     highestBid: 13000,
     solAmt: 75,
@@ -95,5 +95,44 @@ export const sampleArtists: Array<Artist> = [
     image: "http://localhost:3000/img/artist4.jpeg",
     itemsAvailable: 7,
     itemsSold: 215,
+  },
+]
+
+export const sampleArts: Array<Art> = [
+  {
+    image: "http://localhost:3000/img/auction1.jpg",
+    link: "/art/1234abcd",
+    title: "Cryptokitty #4823923",
+    artist: "cryptokitties",
+    priceSOL: 1.1,
+    priceUSD: 24,
+    endingTS: 1617843346000,
+  },
+  {
+    image: "http://localhost:3000/img/auction2.jpg",
+    link: "/art/1234abcd",
+    title: "Here Comes Trouble",
+    artist: "@artworkwizard",
+    priceSOL: 1.1,
+    priceUSD: 24,
+    endingTS: 1617843346000,
+  },
+  {
+    image: "http://localhost:3000/img/auction3.jpg",
+    link: "/art/1234abcd",
+    title: "“ALL-DEAD” CHUCK 70s",
+    artist: "NFTSNEAKERS",
+    priceSOL: 1.1,
+    priceUSD: 24,
+    endingTS: 1617843346000,
+  },
+  {
+    image: "http://localhost:3000/img/auction4.jpg",
+    link: "/art/1234abcd",
+    title: "ONE #1/1",
+    artist: "RAC",
+    priceSOL: 1.1,
+    priceUSD: 24,
+    endingTS: 1617843346000,
   },
 ]

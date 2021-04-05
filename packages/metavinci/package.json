@@ -41,6 +41,7 @@
     "react-dom": "16.13.1",
     "react-github-btn": "^1.2.0",
     "react-intl": "^5.10.2",
+    "react-masonry-css": "^1.0.16",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-three-fiber": "^5.3.18",
