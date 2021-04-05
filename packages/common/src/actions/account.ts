@@ -16,7 +16,7 @@ import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
 // @ts-ignore
 import * as BufferLayout from 'buffer-layout';
-import borsh from 'borsh';
+import { serialize, deserialize } from 'borsh';
 
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
@@ -277,17 +277,7 @@ export async function createMetadata(
     ],
   ]);
   const value = new CreateMetadataArgs(name, symbol, uri);
-
-  debugger;
-
-  const data = Buffer.from(borsh.serialize(schema, value));
-
-  const test = borsh.deserialize(
-    schema,
-    CreateMetadataArgs,
-    Buffer.alloc(1024),
-  );
-  console.log(test);
+  const data = Buffer.from(serialize(schema, value));
 
   const keys = [
     {
