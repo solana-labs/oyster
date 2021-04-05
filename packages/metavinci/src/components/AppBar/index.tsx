@@ -1,10 +1,8 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import './index.less';
 import { Link, useLocation } from 'react-router-dom';
-import { SearchBox } from './searchBox';
-import { Button, Popover } from 'antd';
-import { ConnectButton, CurrentUserBadge, useWallet,Settings } from '@oyster/common';
-import { SettingOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { ConnectButton, CurrentUserBadge, useWallet } from '@oyster/common';
 
 const UserActions = () => {
   return <>
