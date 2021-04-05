@@ -8,3 +8,11 @@ export interface Auction {
   link: string,
   image: string,
 }
+
+export interface Artist {
+  name: string,
+  link: string,
+  image: string,
+  itemsAvailable?: number,
+  itemsSold?: number,
+}

@@ -1,9 +1,10 @@
 import React from 'react'
 import { Layout, Row, Col } from 'antd'
 
-import { Auction } from '../../types'
+import { Artist, Auction } from '../../types'
 import { MainAuctionCard } from '../../components/MainAuctionCard'
 import { AuctionCard } from '../../components/AuctionCard'
+import { ArtistCard } from '../../components/ArtistCard'
 
 import './index.less'
 
@@ -76,11 +77,44 @@ const sampleAuctions: Array<Auction> = [
   },
 ]
 
+const sampleArtists: Array<Artist> = [
+  {
+    name: "Yuzu415",
+    link: "/artist/1234abcd",
+    image: "http://localhost:3000/img/artist1.jpeg",
+    itemsAvailable: 7,
+    itemsSold: 215,
+  },
+  {
+    name: "Mischa",
+    link: "/artist/1234abcd",
+    image: "http://localhost:3000/img/artist2.jpeg",
+    itemsAvailable: 2,
+    itemsSold: 215,
+  },
+  {
+    name: "Sammy",
+    link: "/artist/1234abcd",
+    image: "http://localhost:3000/img/artist3.jpeg",
+    itemsAvailable: 7,
+    itemsSold: 215,
+  },
+  {
+    name: "Wonderful",
+    link: "/artist/1234abcd",
+    image: "http://localhost:3000/img/artist4.jpeg",
+    itemsAvailable: 7,
+    itemsSold: 215,
+  },
+]
+
+
 export const HomeView = () => {
-  // TODO: fetch real auctions
-  const auction = sampleAuction
-  const auctions = sampleAuctions
-  const soldAuctions = sampleAuctions.slice(0, 3)
+  // TODO: fetch real data
+  const auction: Auction = sampleAuction
+  const auctions: Array<Auction> = sampleAuctions
+  const soldAuctions: Array<Auction> = sampleAuctions.slice(0, 3)
+  const artists: Array<Artist> = sampleArtists
 
   return (
     <Layout style={{ margin: 0 }}>
@@ -107,8 +141,14 @@ export const HomeView = () => {
           </Col>
         </Content>
         <Sider breakpoint="md" collapsedWidth="0">
-          <div>Trending Artists</div>
-          <div>artist 1</div>
+          <Col>
+            <Row style={{ marginBottom: 10 }}>Top Artists</Row>
+            {artists.map((artist, idx) => (
+              <Row key={idx} style={{ backgroundColor: "#222222" }}>
+                <ArtistCard artist={artist} />
+              </Row>
+            ))}
+          </Col>
         </Sider>
       </Layout>
     </Layout>
