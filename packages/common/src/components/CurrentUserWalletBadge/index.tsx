@@ -3,8 +3,10 @@ import React from 'react';
 import { useWallet, WALLET_PROVIDERS } from '../../contexts/wallet';
 import { shortenAddress } from '../../utils';
 
-export const CurrentUserWalletBadge = (props: {}) => {
-  const { wallet } = useWallet();
+export const CurrentUserWalletBadge = (props: {
+  showDisconnect?: boolean;
+}) => {
+  const { wallet, disconnect } = useWallet();
 
   if (!wallet || !wallet.publicKey) {
     return null;
@@ -21,6 +23,7 @@ export const CurrentUserWalletBadge = (props: {}) => {
           style={{ marginRight: 8 }}
         />
         {shortenAddress(`${wallet.publicKey}`)}
+        {props.showDisconnect && <span className={"disconnect"} onClick={() => disconnect()}>X</span>}
       </div>
     </div>
   );
