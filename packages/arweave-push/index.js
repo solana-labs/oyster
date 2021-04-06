@@ -21,6 +21,7 @@ const FOLDER_NAME = 'arweave';
 const ARWEAVE_KEYNAME = 'arweave.json';
 const SOLANA_KEYNAME = 'arweave-sol-container.json';
 const CLUSTER = 'https://devnet.solana.com';
+//const CLUSTER = 'https://api.mainnet-beta.solana.com';
 const SYSTEM = '11111111111111111111111111111111';
 const MEMO = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
 const KEYHOLDER = {};
