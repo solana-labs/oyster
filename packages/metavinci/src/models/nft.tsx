@@ -6,7 +6,9 @@ import {
   programIds,
   sendTransactions,
   sendTransaction,
+  notify,
 } from '@oyster/common';
+import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
 import { WalletAdapter } from '@solana/wallet-base';
 import {
@@ -155,10 +157,11 @@ export const mintNFT = async (
             const updateInstructions: TransactionInstruction[] = [];
             const updateSigners: Account[] = [];
 
+            const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
             await updateMetadata(
               metadata.symbol,
               metadata.name,
-              `https://arweave.net/${metadataFile.transactionId}`,
+              arweaveLink,
               mintKey,
               wallet.publicKey,
               updateInstructions,
@@ -173,6 +176,12 @@ export const mintNFT = async (
               true,
               'singleGossip',
             );
+
+            notify({
+              message: 'Art created on Solana',
+              description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
+              type: 'success',
+            });
           }
           console.log('Result', result);
           res(result);

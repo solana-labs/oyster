@@ -28,6 +28,9 @@ export const MAX_METADATA_LEN =
 
 export const MAX_OWNER_LEN = 32 + 32;
 
+export const METADATA_KEY = 0;
+export const NAME_SYMBOL_KEY = 1;
+
 export function ensureSplAccount(
   instructions: TransactionInstruction[],
   cleanupInstructions: TransactionInstruction[],
@@ -218,6 +221,7 @@ class UpdateMetadataArgs {
 }
 
 export class Metadata {
+  key: number;
   updateAuthority?: PublicKey;
   mint: PublicKey;
   name: string;
@@ -232,6 +236,7 @@ export class Metadata {
     symbol: string;
     uri: string;
   }) {
+    this.key = METADATA_KEY;
     this.updateAuthority =
       args.updateAuthority && new PublicKey(args.updateAuthority);
     this.mint = new PublicKey(args.mint);
@@ -242,10 +247,12 @@ export class Metadata {
 }
 
 export class NameSymbolTuple {
+  key: number;
   updateAuthority: PublicKey;
   metadata: PublicKey;
 
   constructor(args: { updateAuthority: Buffer; metadata: Buffer }) {
+    this.key = NAME_SYMBOL_KEY;
     this.updateAuthority = new PublicKey(args.updateAuthority);
     this.metadata = new PublicKey(args.metadata);
   }
@@ -281,6 +288,7 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
+        ['key', 'u8'],
         ['allow_duplicates', { kind: 'option', type: 'u8' }],
         ['mint', [32]],
         ['name', 'string'],
@@ -294,6 +302,7 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
+        ['key', 'u8'],
         ['update_authority', [32]],
         ['metadata', [32]],
       ],

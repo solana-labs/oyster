@@ -27,7 +27,7 @@ export function MetaProvider({ children = null as any }) {
       accounts.forEach(meta => {
         try{
           const metadata = decodeMetadata(meta.account.data);
-          if(isValidHttpUrl(metadata.uri)) {
+          if(isValidHttpUrl(metadata.uri) && metadata.uri.indexOf('arweave') >= 0) {
             const account: ParsedAccount<Metadata> = {
               pubkey: meta.pubkey,
               account: meta.account,
@@ -51,11 +51,19 @@ export function MetaProvider({ children = null as any }) {
         } else {
           const metadata = mintToMetadata.get(key);
           if(metadata && metadata.info.uri) {
-            extendedMetadataFetch.set(key, fetch(metadata.info.uri).catch(() => {
+            extendedMetadataFetch.set(key, fetch(metadata.info.uri).then(async _ => {
+              try {
+                metadata.info.extended = await _.json();
+                if(metadata.info.extended.image) {
+                  metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
+                }
+              } catch {
+                mintToMetadata.delete(key);
+                return undefined;
+              }
+            }).catch(() => {
               mintToMetadata.delete(key);
               return undefined;
-            }).then(_ => {
-              metadata.info.extended = _;
             }));
           }
         }
