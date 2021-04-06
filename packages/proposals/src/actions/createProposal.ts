@@ -15,6 +15,7 @@ import {
   TimelockStateLayout,
 } from '../models/timelock';
 
+const { cache } = contexts.Accounts;
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
@@ -39,6 +40,15 @@ export const createProposal = async (
     AccountLayout.span,
   );
 
+  const sourceMintDecimals = (
+    await cache.queryMint(
+      connection,
+      useGovernance
+        ? timelockConfig.info.governanceMint
+        : timelockConfig.info.councilMint,
+    )
+  ).decimals;
+
   const {
     sigMint,
     voteMint,
@@ -62,6 +72,7 @@ export const createProposal = async (
     mintRentExempt,
     timelockConfig,
     useGovernance,
+    sourceMintDecimals,
   );
 
   let createTimelockAccountsSigners: Account[] = [];
@@ -186,6 +197,7 @@ async function getAssociatedAccountsAndInstructions(
   mintRentExempt: number,
   timelockConfig: ParsedAccount<TimelockConfig>,
   useGovernance: boolean,
+  sourceMintDecimals: number,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
 
@@ -224,7 +236,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,
@@ -234,7 +246,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,
@@ -244,7 +256,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,
