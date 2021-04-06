@@ -130,6 +130,9 @@ export const HomeView = () => {
       <div className="flexColumn home-container wormhole-bg">
         <div className={'justify-bottom-container'}>
           <div>
+            <img src={'/home/main-logo.svg'} />
+          </div>
+          <div>
             A decentralized and bi-directional bridge for
             <br /> ERC-20 and SPL tokens
           </div>
