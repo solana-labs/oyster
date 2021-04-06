@@ -1,0 +1,58 @@
+@import "_colors";
+
+.ant-btn-group.ant-dropdown-button {
+  button {
+    text-transform: uppercase;
+    color: white;
+    background: #E67828;
+    //border-radius: 8px;
+    height: 40px;
+  }
+  button:first-child {
+    width: 134px;
+    border-bottom-left-radius: 8px !important;
+    border-top-left-radius: 8px !important;
+  }
+  button:last-child {
+    border-bottom-right-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+  }
+}
+
+.eth-connect {
+  display: flex;
+  justify-content: center;
+  & > button {
+    color: white;
+    background: #E67828;
+    border-radius: 8px;
+    height: 40px;
+    width: 166px;
+  }
+
+  .eth-address {
+    position: relative;
+    width: 183px;
+    height: 48px;
+    background: @tungsten-100;
+    border: 2px solid #193650;
+    box-sizing: border-box;
+    border-radius: 8px;
+
+    font-size: 16px;
+    line-height: 21px;
+    color: #03E1FF;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .disconnect {
+    cursor: pointer;
+    color: #193650;
+    font-size: 16px;
+    &:hover {
+      transform: scale(1.3);
+      transition: ease-out 0.5s;
+    }
+  }
+}

@@ -5,6 +5,7 @@ import React from 'react';
 import { useEthereum } from '../../contexts';
 import { ASSET_CHAIN } from '../../models/bridge/constants';
 import './style.less';
+import { TokenChain } from './tokenChain';
 
 export const TokenDisplay = ({
   asset,
@@ -20,15 +21,7 @@ export const TokenDisplay = ({
   return (
     <div className="token-chain-logo">
       <img className="token-logo" alt="" src={logo || token?.logoURI} />
-      <img
-        className="chain-logo"
-        alt=""
-        src={
-          chain === ASSET_CHAIN.Ethereum
-            ? '/blockchains/ETH.svg'
-            : '/blockchains/solana.webp'
-        }
-      />
+      {chain && <TokenChain chain={chain} className={'chain-logo'} />}
     </div>
   );
 };

@@ -30,6 +30,7 @@ import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { BigNumber } from 'ethers/utils';
+import { RecentTransactionsTable } from '../RecentTransactionsTable';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -52,7 +53,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
   const { provider, tokenMap } = useEthereum();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
@@ -95,7 +96,7 @@ export const Transfer = () => {
     <>
       <div className="exchange-card">
         <Input
-          title={`From ${chainToName(request.from)}`}
+          title={`From`}
           asset={request.asset}
           balance={displayBalance(A.info)}
           setAsset={asset => setAssetInformation(asset)}
@@ -110,6 +111,7 @@ export const Transfer = () => {
             setLastTypedAccount(A.chain);
             A.setAmount(amount || 0);
           }}
+          className={'left'}
         />
         <Button
           type="primary"
@@ -125,10 +127,10 @@ export const Transfer = () => {
             }
           }}
         >
-          ⇅
+          ⇆
         </Button>
         <Input
-          title={`To ${chainToName(request.to)}`}
+          title={`To`}
           asset={request.asset}
           balance={displayBalance(B.info)}
           setAsset={asset => setAssetInformation(asset)}
@@ -143,151 +145,154 @@ export const Transfer = () => {
             setLastTypedAccount(B.chain);
             B.setAmount(amount || 0);
           }}
+          className={'right'}
         />
-      </div>
-      <ConnectButton
-        type="primary"
-        size="large"
-        style={{ width: '100%' }}
-        disabled={!(A.amount && B.amount)}
-        onClick={async () => {
-          if (!wallet || !provider) {
-            return;
-          }
+        <Button
+          className={'transfer-button'}
+          type="primary"
+          size="large"
+          disabled={!(A.amount && B.amount) || !connected || !provider}
+          onClick={async () => {
+            if (!wallet || !provider) {
+              return;
+            }
 
-          const token = tokenMap.get(request.asset?.toLowerCase() || '');
-          const NotificationContent = () => {
-            const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
-              [],
-            );
-            useEffect(() => {
-              (async () => {
-                let steps: ProgressUpdate[] = [];
-                try {
-                  if (request.from === ASSET_CHAIN.Solana) {
-                    await fromSolana(
-                      connection,
-                      wallet,
-                      request,
-                      provider,
-                      update => {
-                        if (update.replace) {
-                          steps.pop();
-                          steps = [...steps, update];
-                        } else {
-                          steps = [...steps, update];
-                        }
+            const token = tokenMap.get(request.asset?.toLowerCase() || '');
+            const NotificationContent = () => {
+              const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
+                [],
+              );
+              useEffect(() => {
+                (async () => {
+                  let steps: ProgressUpdate[] = [];
+                  try {
+                    if (request.from === ASSET_CHAIN.Solana) {
+                      await fromSolana(
+                        connection,
+                        wallet,
+                        request,
+                        provider,
+                        update => {
+                          if (update.replace) {
+                            steps.pop();
+                            steps = [...steps, update];
+                          } else {
+                            steps = [...steps, update];
+                          }
 
-                        setActiveSteps(steps);
-                      },
-                    );
+                          setActiveSteps(steps);
+                        },
+                      );
+                    }
+
+                    if (request.to === ASSET_CHAIN.Solana) {
+                      await toSolana(
+                        connection,
+                        wallet,
+                        request,
+                        provider,
+                        update => {
+                          if (update.replace) {
+                            steps.pop();
+                            steps = [...steps, update];
+                          } else {
+                            steps = [...steps, update];
+                          }
+
+                          setActiveSteps(steps);
+                        },
+                      );
+                    }
+                  } catch (err) {
+                    // TODO...
+                    console.log(err);
                   }
+                })();
+              }, [setActiveSteps]);
 
-                  if (request.to === ASSET_CHAIN.Solana) {
-                    await toSolana(
-                      connection,
-                      wallet,
-                      request,
-                      provider,
-                      update => {
-                        if (update.replace) {
-                          steps.pop();
-                          steps = [...steps, update];
-                        } else {
-                          steps = [...steps, update];
-                        }
-
-                        setActiveSteps(steps);
-                      },
-                    );
-                  }
-                } catch {
-                  // TODO...
-                }
-              })();
-            }, [setActiveSteps]);
-
-            return (
-              <div>
-                <div style={{ display: 'flex' }}>
-                  <div>
-                    <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
-                      request.to,
-                    )} Mainnet`}</h5>
-                    <h2>
-                      {request.amount?.toString()} {request.info?.name}
-                    </h2>
+              return (
+                <div>
+                  <div style={{ display: 'flex' }}>
+                    <div>
+                      <h5>{`${chainToName(
+                        request.from,
+                      )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
+                      <h2>
+                        {request.amount?.toString()} {request.info?.name}
+                      </h2>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        marginLeft: 'auto',
+                        marginRight: 10,
+                      }}
+                    >
+                      <TokenDisplay
+                        asset={request.asset}
+                        chain={request.from}
+                        token={token}
+                      />
+                      <span style={{ margin: 15 }}>{'➔'}</span>
+                      <TokenDisplay
+                        asset={request.asset}
+                        chain={request.to}
+                        token={token}
+                      />
+                    </div>
                   </div>
                   <div
                     style={{
+                      textAlign: 'left',
                       display: 'flex',
-                      marginLeft: 'auto',
-                      marginRight: 10,
+                      flexDirection: 'column',
                     }}
                   >
-                    <TokenDisplay
-                      asset={request.asset}
-                      chain={request.from}
-                      token={token}
-                    />
-                    <span style={{ margin: 15 }}>{'➔'}</span>
-                    <TokenDisplay
-                      asset={request.asset}
-                      chain={request.to}
-                      token={token}
-                    />
+                    {(() => {
+                      let group = '';
+                      return activeSteps.map((step, i) => {
+                        let prevGroup = group;
+                        group = step.group;
+                        let newGroup = prevGroup !== group;
+                        return (
+                          <>
+                            {newGroup && <span>{group}</span>}
+                            <span style={{ marginLeft: 15 }}>
+                              {typeToIcon(
+                                step.type,
+                                activeSteps.length - 1 === i,
+                              )}{' '}
+                              {step.message}
+                            </span>
+                          </>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
-                <div
-                  style={{
-                    textAlign: 'left',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  {(() => {
-                    let group = '';
-                    return activeSteps.map((step, i) => {
-                      let prevGroup = group;
-                      group = step.group;
-                      let newGroup = prevGroup !== group;
-                      return (
-                        <>
-                          {newGroup && <span>{group}</span>}
-                          <span style={{ marginLeft: 15 }}>
-                            {typeToIcon(
-                              step.type,
-                              activeSteps.length - 1 === i,
-                            )}{' '}
-                            {step.message}
-                          </span>
-                        </>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-            );
-          };
+              );
+            };
 
-          notification.open({
-            message: '',
-            duration: 0,
-            placement: 'bottomLeft',
-            description: <NotificationContent />,
-            className: 'custom-class',
-            style: {
-              width: 500,
-            },
-          });
-        }}
-      >
-        {hasCorrespondingNetworks
-          ? !(A.amount && B.amount)
-            ? LABELS.ENTER_AMOUNT
-            : LABELS.TRANSFER
-          : LABELS.SET_CORRECT_WALLET_NETWORK}
-      </ConnectButton>
+            notification.open({
+              message: '',
+              duration: 0,
+              placement: 'bottomLeft',
+              description: <NotificationContent />,
+              className: 'custom-class',
+              style: {
+                width: 500,
+              },
+            });
+          }}
+        >
+          {hasCorrespondingNetworks
+            ? !(A.amount && B.amount)
+              ? LABELS.ENTER_AMOUNT
+              : LABELS.TRANSFER
+            : LABELS.SET_CORRECT_WALLET_NETWORK}
+        </Button>
+      </div>
+      <RecentTransactionsTable />
     </>
   );
 };
