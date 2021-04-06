@@ -10,7 +10,11 @@ import {
 import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
 import { contexts, hooks } from '@oyster/common';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  ExclamationCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 
 import './style.less';
 
@@ -44,17 +48,28 @@ export function Vote({
     userTokenAccount.info.amount.toNumber() > 0 &&
     state.info.status === TimelockStateStatus.Voting;
 
-  const btnLabel = yeahVote ? LABELS.VOTE_YEAH : LABELS.VOTE_NAY;
-  const title = yeahVote ? LABELS.VOTE_YEAH_QUESTION : LABELS.VOTE_NAY_QUESTION;
-  const msg = yeahVote ? LABELS.VOTE_YEAH_MSG : LABELS.VOTE_NAY_MSG;
+  const [btnLabel, title, msg, icon] = yeahVote
+    ? [
+        LABELS.VOTE_YEAH,
+        LABELS.VOTE_YEAH_QUESTION,
+        LABELS.VOTE_YEAH_MSG,
+        <CheckOutlined />,
+      ]
+    : [
+        LABELS.VOTE_NAY,
+        LABELS.VOTE_NAY_QUESTION,
+        LABELS.VOTE_NAY_MSG,
+        <CloseOutlined />,
+      ];
 
   return eligibleToView ? (
     <Button
       type="primary"
+      icon={icon}
       onClick={() =>
         confirm({
           title: title,
-          icon: <ExclamationCircleOutlined />,
+          icon: icon,
           content: (
             <Row>
               <Col span={24}>

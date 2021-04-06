@@ -40,11 +40,6 @@ export const LABELS = {
   REMOVE: 'Remove',
   ADDING_OR_REMOVING: 'Type',
 
-  VOTING_FOR_PROPOSAL: 'Voting for proposal.',
-  PROPOSAL_VOTED: 'Proposal voted.',
-  TOKENS_VOTED_FOR_THE_PROPOSAL: 'tokens voted for the proposal',
-  TOKENS_VOTED_AGAINST_THE_PROPOSAL: 'tokens voted against the proposal',
-
   ADDING_GOVERNANCE_TOKENS: 'Adding governance tokens',
   PLEASE_WAIT: 'Please wait...',
   GOVERNANCE_TOKENS_ADDED: 'Governance tokens added.',
@@ -67,11 +62,19 @@ export const LABELS = {
   ACTIONS: 'Actions',
 
   VOTE_YEAH: 'Yeah',
-  VOTE_NAY: 'Nay',
   VOTE_YEAH_QUESTION: 'Vote Yeah?',
   VOTE_YEAH_MSG: 'Vote in favour of the proposal.',
+  VOTING_YEAH: 'Voting for the proposal.',
+  VOTED_YEAH: 'Voted for the proposal.',
+
+  VOTE_NAY: 'Nay',
   VOTE_NAY_QUESTION: 'Vote Nay?',
   VOTE_NAY_MSG: 'Vote against the proposal.',
+  VOTING_NAY: 'Voting against the proposal.',
+  VOTED_NAY: 'Voted against the proposal.',
+
+  TOKENS_VOTED_FOR_THE_PROPOSAL: 'tokens voted for the proposal',
+  TOKENS_VOTED_AGAINST_THE_PROPOSAL: 'tokens voted against the proposal',
 
   EXECUTING: 'Executing...',
   EXECUTED: 'Executed.',

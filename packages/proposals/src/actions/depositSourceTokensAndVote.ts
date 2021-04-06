@@ -168,8 +168,21 @@ export const depositSourceTokensAndVote = async (
     ),
   );
 
+  const [votingMsg, votedMsg, voteTokensMsg] =
+    yesVotingTokenAmount > 0
+      ? [
+          LABELS.VOTING_YEAH,
+          LABELS.VOTED_YEAH,
+          `${yesVotingTokenAmount} ${LABELS.TOKENS_VOTED_FOR_THE_PROPOSAL}.`,
+        ]
+      : [
+          LABELS.VOTING_NAY,
+          LABELS.VOTED_NAY,
+          `${noVotingTokenAmount} ${LABELS.TOKENS_VOTED_AGAINST_THE_PROPOSAL}.`,
+        ];
+
   notify({
-    message: LABELS.VOTING_FOR_PROPOSAL,
+    message: votingMsg,
     description: LABELS.PLEASE_WAIT,
     type: 'warn',
   });
@@ -184,12 +197,9 @@ export const depositSourceTokensAndVote = async (
     );
 
     notify({
-      message: LABELS.PROPOSAL_VOTED,
+      message: votedMsg,
       type: 'success',
-      description:
-        yesVotingTokenAmount > 0
-          ? `${yesVotingTokenAmount} ${LABELS.TOKENS_VOTED_FOR_THE_PROPOSAL}.`
-          : `${noVotingTokenAmount} ${LABELS.TOKENS_VOTED_AGAINST_THE_PROPOSAL}.`,
+      description: voteTokensMsg,
     });
   } catch (ex) {
     console.error(ex);
