@@ -8,6 +8,7 @@ import {
   cache,
   MintParser,
   ParsedAccount,
+  METADATA_KEY,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import BN from 'bn.js';
@@ -36,14 +37,12 @@ export function VinciAccountsProvider({ children = null as any }) {
       const extendedMetadataFetch = new Map<string, Promise<any>>();
 
       metadataAccounts.forEach(meta => {
-        try {
+        if (meta.account.data[0] == METADATA_KEY) {
           const metadata = decodeMetadata(meta.account.data);
+          console.log('metadata', metadata);
           if (isValidHttpUrl(metadata.uri)) {
             mintToMetadata.set(metadata.mint.toBase58(), metadata);
           }
-        } catch {
-          // ignore errors
-          // add type as first byte for easier deserialization
         }
       });
 
