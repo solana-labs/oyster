@@ -10,11 +10,7 @@ import {
 import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
 import { contexts, hooks } from '@oyster/common';
-import {
-  ExclamationCircleOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './style.less';
 

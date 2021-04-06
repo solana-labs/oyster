@@ -64,31 +64,39 @@ export const LABELS = {
   VOTE_YEAH: 'Yeah',
   VOTE_YEAH_QUESTION: 'Vote Yeah?',
   VOTE_YEAH_MSG: 'Vote in favour of the proposal.',
-  VOTING_YEAH: 'Voting for the proposal.',
-  VOTED_YEAH: 'Voted for the proposal.',
+  VOTING_YEAH: 'Voting for the proposal',
+  VOTED_YEAH: 'Voted for the proposal',
 
   VOTE_NAY: 'Nay',
   VOTE_NAY_QUESTION: 'Vote Nay?',
   VOTE_NAY_MSG: 'Vote against the proposal.',
-  VOTING_NAY: 'Voting against the proposal.',
-  VOTED_NAY: 'Voted against the proposal.',
+  VOTING_NAY: 'Voting against the proposal',
+  VOTED_NAY: 'Voted against the proposal',
 
   TOKENS_VOTED_FOR_THE_PROPOSAL: 'tokens voted for the proposal',
   TOKENS_VOTED_AGAINST_THE_PROPOSAL: 'tokens voted against the proposal',
 
   EXECUTING: 'Executing...',
   EXECUTED: 'Executed.',
-  WITHDRAWING_VOTING_TOKENS: 'Refunding voting tokens as Source Tokens',
-  TOKENS_WITHDRAWN: 'Voting tokens refunded as Source Tokens',
+
   CONFIRM: 'Confirm',
   CANCEL: 'Cancel',
 
   WITHDRAW_VOTE: 'Withdraw My Vote',
-  WITHDRAW: 'Withdraw',
-
   WITHDRAW_YOUR_VOTE_QUESTION: 'Withdraw your vote?',
   WITHDRAW_YOUR_VOTE_MSG:
     'Once you withdraw your vote it won’t count towards the proposal voting outcome.',
+  WITHDRAW: 'Withdraw',
+  WITHDRAWING_YOUR_VOTE: 'Withdrawing your vote',
+  VOTE_WITHDRAWN: 'Your vote has been withdrawn',
+
+  REFUND_TOKENS: 'Refund My Tokens',
+  REFUND_YOUR_TOKENS_QUESTION: 'Refund your tokens?',
+  REFUND_YOUR_TOKENS_MSG:
+    'The proposal has been voted. Refunding your tokens won’t change the outcome.',
+  REFUND: 'Refund',
+  REFUNDING_YOUR_TOKENS: 'Refunding your tokens',
+  TOKENS_REFUNDED: 'Your voting tokens have been refunded',
 
   REGISTER_GOVERNANCE: 'Register',
   PROGRAM: 'Program ID',

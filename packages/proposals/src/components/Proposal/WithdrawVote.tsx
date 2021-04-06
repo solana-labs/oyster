@@ -40,23 +40,41 @@ export function WithdrawVote({
       ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
 
   const eligibleToView =
-    votingTokens > 0 && state.info.status === TimelockStateStatus.Voting;
+    votingTokens > 0 &&
+    (state.info.status === TimelockStateStatus.Voting ||
+      state.info.status === TimelockStateStatus.Completed ||
+      state.info.status === TimelockStateStatus.Defeated);
+
+  const [btnLabel, title, msg, action] =
+    state.info.status === TimelockStateStatus.Voting
+      ? [
+          LABELS.WITHDRAW_VOTE,
+          LABELS.WITHDRAW_YOUR_VOTE_QUESTION,
+          LABELS.WITHDRAW_YOUR_VOTE_MSG,
+          LABELS.WITHDRAW,
+        ]
+      : [
+          LABELS.REFUND_TOKENS,
+          LABELS.REFUND_YOUR_TOKENS_QUESTION,
+          LABELS.REFUND_YOUR_TOKENS_MSG,
+          LABELS.REFUND,
+        ];
 
   return eligibleToView ? (
     <Button
       type="primary"
       onClick={() =>
         confirm({
-          title: LABELS.WITHDRAW_YOUR_VOTE_QUESTION,
+          title: title,
           icon: <ExclamationCircleOutlined />,
           content: (
             <Row>
               <Col span={24}>
-                <p>{LABELS.WITHDRAW_YOUR_VOTE_MSG}</p>
+                <p>{msg}</p>
               </Col>
             </Row>
           ),
-          okText: LABELS.WITHDRAW,
+          okText: action,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (userAccount) {
@@ -76,7 +94,7 @@ export function WithdrawVote({
         })
       }
     >
-      {LABELS.WITHDRAW_VOTE}
+      {btnLabel}
     </Button>
   ) : null;
 }
