@@ -39,8 +39,7 @@ export const LABELS = {
   ADD: 'Add',
   REMOVE: 'Remove',
   ADDING_OR_REMOVING: 'Type',
-  ADDING_VOTES_TO_VOTER: 'Converting governance tokens to voting tokens',
-  VOTES_ADDED: 'Governance tokens converted.',
+
   ADDING_GOVERNANCE_TOKENS: 'Adding governance tokens',
   PLEASE_WAIT: 'Please wait...',
   GOVERNANCE_TOKENS_ADDED: 'Governance tokens added.',
@@ -61,18 +60,44 @@ export const LABELS = {
   ADD_GOVERNANCE_TOKENS: 'Add Governance Tokens',
   ADD_COUNCIL_TOKENS: 'Add Council Tokens',
   ACTIONS: 'Actions',
-  BURNING_VOTES: 'Burning your votes...',
-  VOTES_BURNED: 'Votes burned',
-  VOTE: 'Vote',
+
+  VOTE_YEAH: 'Yeah',
+  VOTE_YEAH_QUESTION: 'Vote Yeah?',
+  VOTE_YEAH_MSG: 'Vote in favour of the proposal.',
+  VOTING_YEAH: 'Voting for the proposal',
+  VOTED_YEAH: 'Voted for the proposal',
+
+  VOTE_NAY: 'Nay',
+  VOTE_NAY_QUESTION: 'Vote Nay?',
+  VOTE_NAY_MSG: 'Vote against the proposal.',
+  VOTING_NAY: 'Voting against the proposal',
+  VOTED_NAY: 'Voted against the proposal',
+
+  TOKENS_VOTED_FOR_THE_PROPOSAL: 'tokens voted for the proposal',
+  TOKENS_VOTED_AGAINST_THE_PROPOSAL: 'tokens voted against the proposal',
+
   EXECUTING: 'Executing...',
   EXECUTED: 'Executed.',
-  WITHDRAWING_VOTING_TOKENS: 'Refunding voting tokens as Source Tokens',
-  TOKENS_WITHDRAWN: 'Voting tokens refunded as Source Tokens',
-  REGISTER_TO_VOTE: 'Register to Vote',
+
   CONFIRM: 'Confirm',
   CANCEL: 'Cancel',
-  ADD_MORE_VOTES: 'Add More Votes',
+
+  WITHDRAW_VOTE: 'Withdraw My Vote',
+  WITHDRAW_YOUR_VOTE_QUESTION: 'Withdraw your vote?',
+  WITHDRAW_YOUR_VOTE_MSG:
+    'Once you withdraw your vote it won’t count towards the proposal voting outcome.',
+  WITHDRAW: 'Withdraw',
+  WITHDRAWING_YOUR_VOTE: 'Withdrawing your vote',
+  VOTE_WITHDRAWN: 'Your vote has been withdrawn',
+
   REFUND_TOKENS: 'Refund My Tokens',
+  REFUND_YOUR_TOKENS_QUESTION: 'Refund your tokens?',
+  REFUND_YOUR_TOKENS_MSG:
+    'The proposal has been voted. Refunding your tokens won’t change the outcome.',
+  REFUND: 'Refund',
+  REFUNDING_YOUR_TOKENS: 'Refunding your tokens',
+  TOKENS_REFUNDED: 'Your voting tokens have been refunded',
+
   REGISTER_GOVERNANCE: 'Register',
   PROGRAM: 'Program ID',
   GOVERNANCE: 'Governance Token Holders',

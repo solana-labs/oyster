@@ -24,8 +24,7 @@ import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
-import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
-import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
+import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
 import { getGovernanceVotingRecords } from '../../utils/lookups';
 import BN from 'bn.js';
@@ -296,20 +295,22 @@ function InnerProposalView({
                   timelockConfig.info.governanceMint.toBase58()
                 }
               />
-              <RegisterToVote
-                timelockConfig={timelockConfig}
-                proposal={proposal}
-                state={timelockState}
-              />
-              <WithdrawTokens
+              <WithdrawVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
               />
               <Vote
-                proposal={proposal}
                 timelockConfig={timelockConfig}
+                proposal={proposal}
                 state={timelockState}
+                yeahVote={true}
+              />
+              <Vote
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+                yeahVote={false}
               />
             </div>
           </Col>

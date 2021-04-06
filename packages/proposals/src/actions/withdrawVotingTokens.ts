@@ -12,7 +12,11 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockSet, TimelockState } from '../models/timelock';
+import {
+  TimelockSet,
+  TimelockState,
+  TimelockStateStatus,
+} from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
 import { LABELS } from '../constants';
@@ -141,8 +145,13 @@ export const withdrawVotingTokens = async (
     ),
   );
 
+  const [msg, completedMsg] =
+    state.info.status === TimelockStateStatus.Voting
+      ? [LABELS.WITHDRAWING_YOUR_VOTE, LABELS.VOTE_WITHDRAWN]
+      : [LABELS.REFUNDING_YOUR_TOKENS, LABELS.TOKENS_REFUNDED];
+
   notify({
-    message: LABELS.WITHDRAWING_VOTING_TOKENS,
+    message: msg,
     description: LABELS.PLEASE_WAIT,
     type: 'warn',
   });
@@ -157,7 +166,7 @@ export const withdrawVotingTokens = async (
     );
 
     notify({
-      message: LABELS.TOKENS_WITHDRAWN,
+      message: completedMsg,
       type: 'success',
       description: LABELS.TRANSACTION + ` ${tx}`,
     });
