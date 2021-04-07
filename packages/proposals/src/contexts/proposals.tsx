@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   Connection,
   KeyedAccountInfo,
+  PublicKey,
   PublicKeyAndAccount,
 } from '@solana/web3.js';
 import { useMemo } from 'react';
@@ -27,6 +28,9 @@ import {
   TimelockStateParser,
   TimelockStateLayout,
   CustomSingleSignerTimelockTransaction,
+  GovernanceVotingRecordLayout,
+  GovernanceVotingRecord,
+  GovernanceVotingRecordParser,
 } from '../models/timelock';
 
 export interface ProposalsContextState {
@@ -34,6 +38,7 @@ export interface ProposalsContextState {
   transactions: Record<string, ParsedAccount<TimelockTransaction>>;
   states: Record<string, ParsedAccount<TimelockState>>;
   configs: Record<string, ParsedAccount<TimelockConfig>>;
+  votingRecords: Record<string, ParsedAccount<GovernanceVotingRecord>>;
 }
 
 export const ProposalsContext = React.createContext<ProposalsContextState | null>(
@@ -50,6 +55,7 @@ export default function ProposalsProvider({ children = null as any }) {
   const [transactions, setTransactions] = useState({});
   const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
+  const [votingRecords, setVotingRecords] = useState({});
 
   useSetupProposalsCache({
     connection,
@@ -57,11 +63,18 @@ export default function ProposalsProvider({ children = null as any }) {
     setTransactions,
     setStates,
     setConfigs,
+    setVotingRecords,
   });
 
   return (
     <ProposalsContext.Provider
-      value={{ proposals, transactions, configs, states }}
+      value={{
+        proposals,
+        transactions,
+        configs,
+        states,
+        votingRecords,
+      }}
     >
       {children}
     </ProposalsContext.Provider>
@@ -74,12 +87,14 @@ function useSetupProposalsCache({
   setTransactions,
   setStates,
   setConfigs,
+  setVotingRecords,
 }: {
   connection: Connection;
   setProposals: React.Dispatch<React.SetStateAction<{}>>;
   setTransactions: React.Dispatch<React.SetStateAction<{}>>;
   setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
+  setVotingRecords: React.Dispatch<React.SetStateAction<{}>>;
 }) {
   const PROGRAM_IDS = utils.programIds();
 
@@ -96,8 +111,13 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<TimelockTransaction>
       > = {};
+
       const newStates: Record<string, ParsedAccount<TimelockState>> = {};
       const newConfigs: Record<string, ParsedAccount<TimelockConfig>> = {};
+      const newVotingRecords: Record<
+        string,
+        ParsedAccount<GovernanceVotingRecord>
+      > = {};
 
       all[0].forEach(a => {
         let cached;
@@ -126,6 +146,13 @@ function useSetupProposalsCache({
             cached = cache.get(a.pubkey) as ParsedAccount<TimelockState>;
             newStates[a.pubkey.toBase58()] = cached;
             break;
+          case GovernanceVotingRecordLayout.span:
+            cache.add(a.pubkey, a.account, GovernanceVotingRecordParser);
+            cached = cache.get(
+              a.pubkey,
+            ) as ParsedAccount<GovernanceVotingRecord>;
+            newVotingRecords[a.pubkey.toBase58()] = cached;
+            break;
         }
       });
 
@@ -133,6 +160,7 @@ function useSetupProposalsCache({
       setTransactions(newTransactions);
       setStates(newStates);
       setConfigs(newConfigs);
+      setVotingRecords(newVotingRecords);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.timelock.programId,
@@ -146,6 +174,11 @@ function useSetupProposalsCache({
           ],
           [TimelockStateLayout.span, TimelockStateParser, setStates],
           [TimelockConfigLayout.span, TimelockConfigParser, setConfigs],
+          [
+            GovernanceVotingRecordLayout.span,
+            GovernanceVotingRecordParser,
+            setVotingRecords,
+          ],
         ].forEach(arr => {
           const [span, parser, setter] = arr;
           if (info.accountInfo.data.length === span) {
@@ -171,6 +204,11 @@ function useSetupProposalsCache({
                 cached = cache.get(
                   info.accountId,
                 ) as ParsedAccount<TimelockState>;
+                break;
+              case GovernanceVotingRecordLayout.span:
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<GovernanceVotingRecord>;
                 break;
             }
             setter((obj: any) => ({
@@ -201,4 +239,26 @@ export const useConfig = (id: string) => {
   }
 
   return context.configs[id];
+};
+
+export const useVotingRecords = (proposal: PublicKey) => {
+  const context = useContext(ProposalsContext);
+
+  return useMemo(() => {
+    const votingRecords: Record<
+      string,
+      ParsedAccount<GovernanceVotingRecord>
+    > = {};
+
+    if (!proposal || !context?.votingRecords) {
+      return votingRecords;
+    }
+
+    return Object.values(context.votingRecords)
+      .filter(vr => vr.info.proposal.toBase58() === proposal?.toBase58())
+      .reduce((vrs, vr) => {
+        vrs[vr.pubkey.toBase58()] = vr;
+        return vrs;
+      }, votingRecords);
+  }, [proposal, context?.votingRecords]);
 };
