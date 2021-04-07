@@ -32,9 +32,10 @@ export const getAssetTokenSymbol = (
 
 export const getAssetAmountInUSD = (
   amount: number,
-  parsedAssetAddress: string,
-  assetChain: number,
+  // parsedAssetAddress: string,
+  // assetChain: number,
 ) => {
+  // TODO: make it work
   return amount;
 };
 
