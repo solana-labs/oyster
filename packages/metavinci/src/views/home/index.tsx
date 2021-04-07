@@ -5,11 +5,11 @@ import Masonry from 'react-masonry-css'
 import { Art } from '../../types'
 import { PreSaleBanner } from '../../components/PreSaleBanner'
 import { ItemCard } from '../../components/ItemCard'
-import { sampleArts } from './sampleData'
 import { useMeta } from '../../contexts/meta'
 
 import './index.less'
 import { ArtCard } from '../../components/ArtCard'
+import { Link } from 'react-router-dom'
 
 const { Content } = Layout
 
@@ -17,7 +17,6 @@ const { Content } = Layout
 export const HomeView = () => {
   // TODO: fetch real data
   const { metadata } = useMeta()
-  const arts: Array<Art> = sampleArts
 
   const breakpointColumnsObj = {
     default: 4,
@@ -38,7 +37,6 @@ export const HomeView = () => {
         <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col>
             <Row style={{ marginBottom: 30, marginTop: 20, fontSize: 20, fontWeight: 600 }}>Featured</Row>
-
             <Row>
               <Masonry
                 breakpointCols={breakpointColumnsObj}
@@ -46,15 +44,17 @@ export const HomeView = () => {
                 columnClassName="my-masonry-grid_column"
               >
               {metadata.map(m => {
-                return <ArtCard key={m.pubkey.toBase58()}
-                  image={m.info.extended?.image}
-                  name={m.info?.name}
-                  symbol={m.info.symbol}
-                  preview={false} />
+                const id = m.pubkey.toBase58();
+                return <Link to={`/art/${id}`}>
+                  <ArtCard key={id}
+                    image={m.info.extended?.image}
+                    name={m.info?.name}
+                    symbol={m.info.symbol}
+                    preview={false} />
+                  </Link>
               })}
               </Masonry>
             </Row>
-
           </Col>
         </Content>
       </Layout>

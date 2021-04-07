@@ -99,140 +99,17 @@ export const sampleArtists: Array<Artist> = [
   },
 ];
 
-export const sampleArts: Array<Art> = [
-  {
-    image: 'img/auction1.jpg',
-    link: '/art/1234abcd',
-    title: 'Cryptokitty #4823923',
-    artist: 'cryptokitties',
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction4.jpg",
-    link: "/art/1234abcd",
-    title: "ONE #1/1",
-    artist: "RAC",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction1.jpg",
-    link: "/art/1234abcd",
-    title: "Cryptokitty #4823923",
-    artist: "cryptokitties",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction2.jpg",
-    link: "/art/1234abcd",
-    title: "Here Comes Trouble",
-    artist: "artworkwizard",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction3.jpg",
-    link: "/art/1234abcd",
-    title: "“ALL-DEAD” CHUCK 70s",
-    artist: "NFTSNEAKERS",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction3.jpg",
-    link: "/art/1234abcd",
-    title: "“ALL-DEAD” CHUCK 70s",
-    artist: "NFTSNEAKERS",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: 'img/auction2.jpg',
-    link: '/art/1234abcd',
-    title: 'Here Comes Trouble',
-    artist: 'artworkwizard',
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: 'img/auction3.jpg',
-    link: '/art/1234abcd',
-    title: '“ALL-DEAD” CHUCK 70s',
-    artist: 'NFTSNEAKERS',
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: 'img/auction4.jpg',
-    link: '/art/1234abcd',
-    title: 'ONE #1/1',
-    artist: 'RAC',
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction4.jpg",
-    link: "/art/1234abcd",
-    title: "ONE #1/1",
-    artist: "RAC",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction1.jpg",
-    link: "/art/1234abcd",
-    title: "Cryptokitty #4823923",
-    artist: "cryptokitties",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-  {
-    image: "http://localhost:3000/img/auction2.jpg",
-    link: "/art/1234abcd",
-    title: "Here Comes Trouble",
-    artist: "artworkwizard",
-    priceSOL: 1.1,
-    priceUSD: 24,
-    endingTS: 1617680325000,
-  },
-]
-
-export const sampleArt: Art = {
-  image: 'img/auction3.jpg',
-  link: '/art/1234abcd',
-  title: 'nostalgic vibes',
-  artist: 'nftartist',
-  priceSOL: 1.1,
-  priceUSD: 24,
-  endingTS: 1617680325000,
-
-  royalties: 20,
-  about: "Series of three works by Mssingno & Natalia Stuyk 'Mirada' mp4, 30fps, 1080px x 1350px April 2021",
-}
-
 export const sampleArtist: Artist = {
   name: 'Yuzu415',
   link: '/artist/1234abcd',
   image: '/img/artist3.jpeg',
-  about: "NFTARTIST is an Artist & Director working in entertainment for the past 15 years. Experience in film, commercial and live events, his work serves as a means to visual and methodological study.",
-}
+  about:
+    'NFTARTIST is an Artist & Director working in entertainment for the past 15 years. Experience in film, commercial and live events, his work serves as a means to visual and methodological study.',
+};
 
 export const samplePresale: Presale = {
   endingTS: 1618447663000,
   targetPricePerShare: 5,
   pricePerShare: 4.39,
   marketCap: 328,
-}
+};

@@ -4,6 +4,7 @@ import { ArtCard } from '../../components/ArtCard';
 import { useMeta } from '../../contexts';
 import { Row, Col } from 'antd';
 import Masonry from 'react-masonry-css'
+import { Link } from 'react-router-dom';
 
 export const UserView = () => {
   const { metadata } = useMeta();
@@ -32,7 +33,14 @@ export const UserView = () => {
             columnClassName="my-masonry-grid_column"
           >
             {ownedMetadata.map(m => {
-              return <ArtCard image={m.info.extended?.image} name={m.info?.name} symbol={m.info.symbol} />
+              const id = m.pubkey.toBase58();
+              return <Link to={`/art/${id}`}>
+                <ArtCard key={id}
+                  image={m.info.extended?.image}
+                  name={m.info?.name}
+                  symbol={m.info.symbol}
+                  preview={false} />
+                </Link>
             })}
           </Masonry>
         </Row>
