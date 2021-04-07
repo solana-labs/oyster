@@ -34,7 +34,7 @@ export const PreSaleCard = ({ presale }: { presale: Presale }) => {
   }, [])
 
   return (
-    <div className="presale-container">
+    <div className="presale-card-container">
       <div style={{ fontWeight: 700, fontSize: '1.6rem' }}>Pre-Sale</div>
       <br />
       <div className="info-content" style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '1.2rem' }}>
