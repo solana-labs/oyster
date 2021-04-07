@@ -4,12 +4,16 @@ import { useParams } from 'react-router-dom';
 // import { useArt } from './../../hooks';
 
 import "./index.less"
+import { useMeta } from '../../contexts';
 
 const { Content } = Layout
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
-  // const art = useArt(id);
+  const { metadata } = useMeta();
+  let meta = metadata.find(m => m.pubkey.toBase58() === id);
+
+
 
   const art = {
     image: 'img/auction3.jpg',

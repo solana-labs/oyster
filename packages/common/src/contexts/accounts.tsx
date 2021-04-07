@@ -361,7 +361,7 @@ const precacheUserTokenAccounts = async (
   // used for filtering account updates over websocket
   PRECACHED_OWNERS.add(owner.toBase58());
 
-  // user accounts are update via ws subscription
+  // user accounts are updated via ws subscription
   const accounts = await connection.getTokenAccountsByOwner(owner, {
     programId: programIds().token,
   });

@@ -37,7 +37,7 @@ export function Routes() {
                         />
                         <Route
                           exact
-                          path="/user/:id"
+                          path="/user/:id?"
                           component={() => <UserView />}
                         />
                         <Route
