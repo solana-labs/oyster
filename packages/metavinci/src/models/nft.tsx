@@ -7,6 +7,7 @@ import {
   sendTransactions,
   sendTransaction,
   notify,
+  ENV,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
@@ -35,6 +36,7 @@ interface IArweaveResult {
 export const mintNFT = async (
   connection: Connection,
   wallet: WalletAdapter | undefined,
+  env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },
 ): Promise<IArweaveResult> => {
@@ -113,6 +115,10 @@ export const mintNFT = async (
     wallet.publicKey,
     signers,
   );
+
+  // TODO:
+  // store metadta against temporary account  that will pay for last transaction
+
   return new Promise(async res => {
     const txId = await sendTransactions(
       connection,
@@ -142,6 +148,9 @@ export const mintNFT = async (
 
           const result: IArweaveResult = await (
             await fetch(
+              // TODO: add CNAME
+              env === 'mainnet-beta' ?
+              'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd' :
               'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
               {
                 method: 'POST',
@@ -157,6 +166,7 @@ export const mintNFT = async (
             const updateInstructions: TransactionInstruction[] = [];
             const updateSigners: Account[] = [];
 
+            // TODO: connect to testnet arweave
             const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
             await updateMetadata(
               metadata.symbol,

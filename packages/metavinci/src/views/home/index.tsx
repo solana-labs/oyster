@@ -9,13 +9,14 @@ import { sampleArts } from './sampleData'
 import { useMeta } from '../../contexts/meta'
 
 import './index.less'
+import { ArtCard } from '../../components/ArtCard'
 
 const { Content } = Layout
 
 
 export const HomeView = () => {
   // TODO: fetch real data
-  const { accounts } = useMeta()
+  const { metadata } = useMeta()
   const arts: Array<Art> = sampleArts
 
   const breakpointColumnsObj = {
@@ -44,9 +45,13 @@ export const HomeView = () => {
                 className="my-masonry-grid"
                 columnClassName="my-masonry-grid_column"
               >
-                {arts.map((art, idx) => (
-                  <ItemCard key={idx} art={art}/>
-                ))}
+              {metadata.map(m => {
+                return <ArtCard key={m.pubkey.toBase58()}
+                  image={m.info.extended?.image}
+                  name={m.info?.name}
+                  symbol={m.info.symbol}
+                  preview={false} />
+              })}
               </Masonry>
             </Row>
 

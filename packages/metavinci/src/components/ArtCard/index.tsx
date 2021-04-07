@@ -1,31 +1,21 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Card } from 'antd';
+import { Card, Image } from 'antd';
 
 const { Meta } = Card;
 
 export const ArtCard = ({
-  file,
+  image,
   name,
   symbol,
+  preview,
 }: {
-  file?: File;
+  image?: string;
   name?: String;
   symbol?: String;
+  preview?: boolean;
 }) => {
-  const [imgSrc, setImgSrc] = useState<string>();
-
-  useLayoutEffect(() => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        setImgSrc(event.target?.result as any);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [file]);
-
   return (
-    <Card className="custom-card" cover={<img src={imgSrc} />}>
+    <Card className="custom-card" cover={<Image preview={preview} src={image} />}>
       <Meta title={`Title: ${name}`} description={`Symbol: ${symbol}`} />
     </Card>
   );

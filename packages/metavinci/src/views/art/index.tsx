@@ -7,15 +7,18 @@ import "./index.less"
 import { Art, Artist, Presale } from '../../types';
 import { sampleArt, sampleArtist, samplePresale } from '../home/sampleData';
 import { PreSaleCard } from '../../components/PresaleCard';
+import { useMeta } from '../../contexts';
 
 const { Content } = Layout
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
+  const { metadata } = useMeta();
+  let meta = metadata.find(m => m.pubkey.toBase58() === id);
+  
   // const art: Art = useArt(id);
   // const artist: Artist = getArtist(art.artist_id)
   // const presale: Presale = getPresale(art.presale_id)
-
   const art: Art = sampleArt
   const artist: Artist = sampleArtist
   const presale: Presale = samplePresale

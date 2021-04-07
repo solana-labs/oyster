@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Steps,
   Row,
@@ -22,42 +22,26 @@ import {
   MAX_URI_LENGTH,
   Metadata,
   NameSymbolTuple,
-  SCHEMA,
   useConnection,
   useWallet,
+  IMetadataExtension,
+  MetadataCategory,
+  useConnectionConfig,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 import { Connection } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
-import { serialize } from 'borsh';
 
 const { Step } = Steps;
 const { Dragger } = Upload;
 
-enum Category {
-  Audio = 'audio',
-  Video = 'video',
-  Image = 'image',
-}
-export interface IMetadata {
-  name: string;
-  symbol: string;
-  description: string;
-  // preview image
-  image: string;
-  // stores link to item on meta
-  externalUrl: string;
-  royalty: number;
-  files: File[];
-  category: Category;
-}
-
 export const ArtCreateView = () => {
   const connection = useConnection();
+  const { env } = useConnectionConfig();
   const { wallet, connected } = useWallet();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [attributes, setAttributes] = useState<IMetadata>({
+  const [attributes, setAttributes] = useState<IMetadataExtension>({
     name: '',
     symbol: '',
     description: '',
@@ -65,17 +49,18 @@ export const ArtCreateView = () => {
     image: '',
     royalty: 0,
     files: [],
-    category: Category.Image,
+    category: MetadataCategory.Image,
   });
 
   // store files
   const mint = async () => {
     const metadata = {
       ...(attributes as any),
-      files: attributes.files.map(f => f.name),
+      image: attributes.files && attributes.files?.[0] && attributes.files[0].name,
+      files: (attributes?.files || []).map(f => f.name),
     };
     setSaving(true);
-    await mintNFT(connection, wallet, attributes.files, metadata);
+    await mintNFT(connection, wallet, env, (attributes?.files || []), metadata);
     setSaving(false);
   };
 
@@ -111,7 +96,7 @@ export const ArtCreateView = () => {
         <Col xl={16}>
           {step === 0 && (
             <CategoryStep
-              confirm={(category: Category) => {
+              confirm={(category: MetadataCategory) => {
                 setAttributes({
                   ...attributes,
                   category,
@@ -155,7 +140,7 @@ export const ArtCreateView = () => {
   );
 };
 
-const CategoryStep = (props: { confirm: (category: Category) => void }) => {
+const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) => {
   return (
     <>
       <Row className="call-to-action">
@@ -170,21 +155,21 @@ const CategoryStep = (props: { confirm: (category: Category) => void }) => {
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm(Category.Image)}
+          onClick={() => props.confirm(MetadataCategory.Image)}
         >
           Image
         </Button>
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm(Category.Video)}
+          onClick={() => props.confirm(MetadataCategory.Video)}
         >
           Video
         </Button>
         <Button
           className="type-btn"
           size="large"
-          onClick={() => props.confirm(Category.Audio)}
+          onClick={() => props.confirm(MetadataCategory.Audio)}
         >
           Audio
         </Button>
@@ -194,8 +179,8 @@ const CategoryStep = (props: { confirm: (category: Category) => void }) => {
 };
 
 const UploadStep = (props: {
-  attributes: IMetadata;
-  setAttributes: (attr: IMetadata) => void;
+  attributes: IMetadataExtension;
+  setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
   return (
@@ -218,12 +203,17 @@ const UploadStep = (props: {
             info?.onSuccess?.({}, null as any);
           }}
           style={{ padding: 20 }}
-          onChange={info => {
-            props.setAttributes({
-              ...props.attributes,
-              files: [info.file.originFileObj],
-              image: info.file.originFileObj.name,
-            });
+          onChange={async info => {
+            const file = info.file.originFileObj;
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              props.setAttributes({
+                ...props.attributes,
+                files: [file],
+                image: (event.target?.result as string) || '',
+              });
+            };
+            reader.readAsDataURL(file);
           }}
         >
           <p className="ant-upload-drag-icon">
@@ -249,11 +239,10 @@ const UploadStep = (props: {
 };
 
 const InfoStep = (props: {
-  attributes: IMetadata;
-  setAttributes: (attr: IMetadata) => void;
+  attributes: IMetadataExtension;
+  setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const file = props.attributes.files[0];
   return (
     <>
       <Row className="call-to-action">
@@ -265,9 +254,9 @@ const InfoStep = (props: {
       </Row>
       <Row className="content-action">
         <Col xl={12}>
-          {file && (
+          {props.attributes.image && (
             <ArtCard
-              file={file}
+              image={props.attributes.image}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />
@@ -336,11 +325,11 @@ const InfoStep = (props: {
 };
 
 const RoyaltiesStep = (props: {
-  attributes: IMetadata;
-  setAttributes: (attr: IMetadata) => void;
+  attributes: IMetadataExtension;
+  setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const file = props.attributes.files[0];
+  const file = props.attributes.image;
 
   return (
     <>
@@ -355,7 +344,7 @@ const RoyaltiesStep = (props: {
         <Col xl={12}>
           {file && (
             <ArtCard
-              file={file}
+              image={props.attributes.image}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />
@@ -390,60 +379,51 @@ const RoyaltiesStep = (props: {
 
 const LaunchStep = (props: {
   confirm: () => void;
-  attributes: IMetadata;
+  attributes: IMetadataExtension;
   connection: Connection;
 }) => {
-  const file = props.attributes.files[0];
+  const files = props.attributes.files || [];
   const metadata = {
     ...(props.attributes as any),
-    files: props.attributes.files.map(f => f.name),
+    files: files.map(f => f.name),
   };
   const [cost, setCost] = useState(0);
   useEffect(() => {
+    const rentCall = Promise.all([
+      props.connection.getMinimumBalanceForRentExemption(
+        MintLayout.span,
+      ),
+      props.connection.getMinimumBalanceForRentExemption(
+        MAX_METADATA_LEN,
+      ),
+      props.connection.getMinimumBalanceForRentExemption(
+        MAX_OWNER_LEN,
+      )
+    ]);
+
     getAssetCostToStore([
-      ...props.attributes.files,
+      ...files,
       new File([JSON.stringify(metadata)], 'metadata.json'),
     ]).then(async lamports => {
       const sol = lamports / LAMPORT_MULTIPLIER;
-      const mintRent = await props.connection.getMinimumBalanceForRentExemption(
-        MintLayout.span,
-      );
+
+      // TODO: cache this and batch in one call
+      const [mintRent, metadataRent, nameSymbolRent] = await rentCall;
+
       const uriStr = 'x';
       let uriBuilder = '';
       for (let i = 0; i < MAX_URI_LENGTH; i++) {
         uriBuilder += uriStr;
       }
-      const defaultMeta = new Metadata({
-        //@ts-ignore
-        mint: Buffer.from('11111111111111111111111111111111').toString(),
-        name: props.attributes.name,
-        symbol: props.attributes.symbol,
-        uri: uriBuilder,
-      });
 
-      const defaultNameSymbol = new NameSymbolTuple({
-        //@ts-ignore
-        updateAuthority: Buffer.from(
-          '11111111111111111111111111111111',
-        ).toString(),
-        //@ts-ignore
-        metadata: Buffer.from('11111111111111111111111111111111').toString(),
-      });
-      //const serialized = serialize(SCHEMA, defaultMeta);
-      //const serializedName = serialize(SCHEMA, defaultNameSymbol);
-
-      const metadataRent = await props.connection.getMinimumBalanceForRentExemption(
-        MAX_METADATA_LEN,
-      );
-      const nameSymbolRent = await props.connection.getMinimumBalanceForRentExemption(
-        MAX_OWNER_LEN,
-      );
       const additionalSol =
         (metadataRent + nameSymbolRent + mintRent) / LAMPORT_MULTIPLIER;
-      // screw fees for now.
+
+      // TODO: add fees based on number of transactions and signers
       setCost(sol + additionalSol);
     });
-  }, [file]);
+  }, [...files, setCost]);
+
   return (
     <>
       <Row className="call-to-action">
@@ -455,9 +435,9 @@ const LaunchStep = (props: {
       </Row>
       <Row className="content-action">
         <Col xl={12}>
-          {file && (
+          {props.attributes.image && (
             <ArtCard
-              file={file}
+              image={props.attributes.image}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />
