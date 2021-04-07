@@ -7,8 +7,7 @@ import "./index.less"
 import { Art, Artist, Presale } from '../../types';
 import { sampleArtist, samplePresale } from '../home/sampleData';
 import { PreSaleCard } from '../../components/PresaleCard';
-import { useMeta } from '../../contexts';
-import { argv } from 'node:process';
+import { ArtContent } from '../../components/ArtContent';
 
 const { Content } = Layout
 
@@ -25,9 +24,7 @@ export const ArtView = () => {
     <Content>
       <Col>
         <Row>
-          {art.category === 'video' ?
-            <video src={art.image} className="artwork-image" playsInline={true} autoPlay={true} controlsList="nodownload" loop={true} /> :
-            <Image src={art.image} wrapperClassName="artwork-image" />}
+          <ArtContent category={art.category} content={art.image} className="artwork-image" />
         </Row>
         <Divider />
         <Row style={{ margin: '0 30px', textAlign: 'left', fontSize: '1.4rem' }}>

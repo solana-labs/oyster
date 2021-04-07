@@ -37,6 +37,7 @@ export const UserView = () => {
               return <Link to={`/art/${id}`}>
                 <ArtCard key={id}
                   image={m.info.extended?.image}
+                  category={m.info.extended?.category}
                   name={m.info?.name}
                   symbol={m.info.symbol}
                   preview={false} />
