@@ -15,6 +15,7 @@ export interface Artist {
   image: string,
   itemsAvailable?: number,
   itemsSold?: number,
+  about?: string,
 }
 
 export interface Art {
@@ -25,4 +26,13 @@ export interface Art {
   priceSOL: number,
   priceUSD?: number,
   endingTS?: number,
+  royalties?: number,
+  about?: string,
+}
+
+export interface Presale {
+  endingTS: number,
+  targetPricePerShare?: number,
+  pricePerShare?: number,
+  marketCap?: number,
 }

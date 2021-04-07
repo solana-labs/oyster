@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Col, Row } from 'antd'
 
 import './index.less'
+import { getCountdown } from '../../utils/utils'
 
 interface IPreSaleBanner {
   artistName: string,
@@ -18,17 +19,7 @@ export const PreSaleBanner = ({ artistName, productName, preSaleTS, image }: IPr
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = (new Date()).getTime()
-      let delta = Math.abs(preSaleTS - now) / 1000
-
-      const days = Math.floor(delta / 86400)
-      delta -= days * 86400
-
-      const hours = Math.floor(delta / 3600) % 24
-      delta -= hours * 3600
-
-      const minutes = Math.floor(delta / 60) % 60
-      delta -= minutes * 60
+      const {days, hours, minutes } = getCountdown(preSaleTS)
 
       setDays(days)
       setHours(hours)
