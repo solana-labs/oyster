@@ -257,6 +257,7 @@ const InfoStep = (props: {
           {props.attributes.image && (
             <ArtCard
               image={props.attributes.image}
+              category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />
@@ -345,6 +346,7 @@ const RoyaltiesStep = (props: {
           {file && (
             <ArtCard
               image={props.attributes.image}
+              category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />
@@ -438,6 +440,7 @@ const LaunchStep = (props: {
           {props.attributes.image && (
             <ArtCard
               image={props.attributes.image}
+              category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
             />

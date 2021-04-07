@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Divider, Layout } from 'antd';
+import { Row, Col, Divider, Layout, Image } from 'antd';
 import { useParams } from 'react-router-dom';
-// import { useArt } from './../../hooks';
+import { useArt } from './../../hooks';
 
 import "./index.less"
 import { Art, Artist, Presale } from '../../types';
-import { sampleArt, sampleArtist, samplePresale } from '../home/sampleData';
+import { sampleArtist, samplePresale } from '../home/sampleData';
 import { PreSaleCard } from '../../components/PresaleCard';
-import { useMeta } from '../../contexts';
+import { ArtContent } from '../../components/ArtContent';
 
 const { Content } = Layout
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
-  const { metadata } = useMeta();
-  let meta = metadata.find(m => m.pubkey.toBase58() === id);
-  
-  // const art: Art = useArt(id);
+
+  const art: Art = useArt(id);
   // const artist: Artist = getArtist(art.artist_id)
   // const presale: Presale = getPresale(art.presale_id)
-  const art: Art = sampleArt
   const artist: Artist = sampleArtist
   const presale: Presale = samplePresale
 
@@ -27,7 +24,7 @@ export const ArtView = () => {
     <Content>
       <Col>
         <Row>
-          <img src={art.image} className="artwork-image" />
+          <ArtContent category={art.category} content={art.image} className="artwork-image" />
         </Row>
         <Divider />
         <Row style={{ margin: '0 30px', textAlign: 'left', fontSize: '1.4rem' }}>
