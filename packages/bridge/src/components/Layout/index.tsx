@@ -37,7 +37,7 @@ export const AppLayout = React.memo((props: any) => {
             {!isRoot && (
               <div className="app-title app-left">
                 <Link to="/">
-                  <img src={'/appbar/logo.svg'} />
+                  <img alt="logo-bar" src={'/appbar/logo.svg'} />
                 </Link>
               </div>
             )}

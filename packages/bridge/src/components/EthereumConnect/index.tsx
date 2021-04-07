@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Dropdown, Menu } from 'antd';
+import './index.less';
 
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { shortenAddress } from '@oyster/common';
@@ -12,6 +13,7 @@ export const EthereumConnect = () => {
     connected,
     walletProvider,
     select,
+    disconnect,
   } = useEthereum();
   const { hasCorrespondingNetworks } = useCorrectNetwork();
 
@@ -24,10 +26,10 @@ export const EthereumConnect = () => {
   );
 
   return (
-    <div style={{ marginRight: 8 }}>
+    <div className={'eth-connect'}>
       {connected ? (
         hasCorrespondingNetworks ? (
-          <>
+          <div className={'eth-address'}>
             <img
               alt={'ethereum-icon'}
               width={20}
@@ -36,7 +38,10 @@ export const EthereumConnect = () => {
               src={walletProvider.icon}
             />
             {shortenAddress(accounts[0], 4)}
-          </>
+            <span className={'disconnect'} onClick={() => disconnect()}>
+              X
+            </span>
+          </div>
         ) : (
           <Button danger type={'primary'}>
             WRONG NETWORK
@@ -47,11 +52,11 @@ export const EthereumConnect = () => {
           onClick={() => onConnectEthereum && onConnectEthereum()}
           overlay={menu}
         >
-          Connect Ethereum
+          CONNECT
         </Dropdown.Button>
       ) : (
         <Button onClick={() => onConnectEthereum && onConnectEthereum()}>
-          Connect Ethereum
+          CONNECT WALLET
         </Button>
       )}
     </div>

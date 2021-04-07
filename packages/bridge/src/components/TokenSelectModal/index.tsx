@@ -15,6 +15,7 @@ export const TokenSelectModal = (props: {
   onChain: (chain: ASSET_CHAIN) => void;
   asset?: string;
   chain?: ASSET_CHAIN;
+  showIconChain?: boolean;
 }) => {
   const { tokens: ethTokens } = useEthereum();
   const { tokens: solTokens } = useConnectionConfig();
@@ -110,9 +111,11 @@ export const TokenSelectModal = (props: {
             <TokenDisplay
               asset={props.asset}
               token={firstToken}
-              chain={props.chain}
+              chain={props.showIconChain ? props.chain : undefined}
             />
           </div>
+          <div className={'multichain-option-symbol'}>{firstToken.symbol}</div>
+          <span className={'down-arrow'}></span>
         </div>
       ) : null}
       <Modal

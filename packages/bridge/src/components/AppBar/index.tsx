@@ -17,11 +17,15 @@ export const AppBar = () => {
       <div className={`app-bar-item ${isActiveClass('move')}`}>
         <Link to="/move">Bridge</Link>
       </div>
-      <div className={`app-bar-item ${isActiveClass('faq')}`}>FAQ</div>
-      <div className={`app-bar-item ${isActiveClass('poassets')}`}>
-        Proof-of-Assets
+      <div className={`app-bar-item ${isActiveClass('faq')}`}>
+        <Link to="/faq">FAQ</Link>
       </div>
-      <div className={`app-bar-item ${isActiveClass('help')}`}>Help</div>
+      <div className={`app-bar-item ${isActiveClass('proof-of-assets')}`}>
+        <Link to="/proof-of-assets">Proof-of-Assets</Link>
+      </div>
+      <div className={`app-bar-item ${isActiveClass('help')}`}>
+        <Link to="/help">Help</Link>
+      </div>
     </div>
   );
 };
