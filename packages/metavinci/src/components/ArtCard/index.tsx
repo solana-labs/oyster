@@ -20,7 +20,7 @@ export const ArtCard = ({
 }) => {
   return (
     <Card className="custom-card" cover={<ArtContent category={category} content={image} />}>
-      <Meta title={`Title: ${name}`} description={`Symbol: ${symbol}`} />
+      <Meta title={`Title: ${name}`} description={`Symbol: ${symbol}`} style={{ textAlign: 'left' }} />
     </Card>
   );
 };
