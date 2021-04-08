@@ -78,7 +78,7 @@ export const HomeView = () => {
             dataSource={listData}
             renderItem={item => (
               <List.Item
-                key={item.title}
+                key={item.configKey}
                 className="governance-item"
                 onClick={() => history.push(item.href)}
                 extra={
