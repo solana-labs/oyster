@@ -8,7 +8,6 @@ import {
 import { AccountInfo as TokenAccountInfo, Token } from '@solana/spl-token';
 import { TOKEN_PROGRAM_ID } from '../utils/ids';
 import BufferLayout from 'buffer-layout';
-import { createNamedExports } from 'typescript';
 
 export interface TokenAccount {
   pubkey: PublicKey;
@@ -73,8 +72,6 @@ export function approve(
     [],
     amount,
   );
-
-  console.log('CREATE APPROVE');
 
   // Temp. workaround for a bug in Token.createApproveInstruction which doesn't add the delegate account to signers
   instruction.keys = instruction.keys.map(k =>
