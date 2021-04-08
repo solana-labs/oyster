@@ -127,8 +127,16 @@ export const LABELS = {
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
   DELAY: 'Slot Delay',
+
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',
+  PROGRAM_ID_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
+    `Program ID: '${programId}' is not a valid public key`,
+  GOVERNANCE_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
+    `Governance Mint ID: '${programId}' is not a valid public key`,
+  COUNCIL_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
+    `Council Mint ID: '${programId}' is not a valid public key`,
+
   TIME_LIMIT: 'Voting Time Limit',
   THIS_CONFIG_LACKS_COUNCIL: 'This program does not have a council.',
   GIT_CONTENT_EXCEEDED:

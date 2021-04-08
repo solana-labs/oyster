@@ -10,9 +10,8 @@ import {
   VotingEntryRule,
   ZERO_KEY,
 } from '../../models/timelock';
-import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
-import { contexts, utils } from '@oyster/common';
+import { contexts, utils, tryParseKey } from '@oyster/common';
 import { registerProgramGovernance } from '../../actions/registerProgramGovernance';
 import { Redirect } from 'react-router';
 import BN from 'bn.js';
@@ -96,6 +95,32 @@ export function NewForm({
       });
       return;
     }
+    if (!tryParseKey(values.program)) {
+      notify({
+        message: LABELS.PROGRAM_ID_IS_NOT_A_VALID_PUBLIC_KEY(values.program),
+        type: 'error',
+      });
+      return;
+    }
+    if (values.governanceMint && !tryParseKey(values.governanceMint)) {
+      notify({
+        message: LABELS.GOVERNANCE_MINT_IS_NOT_A_VALID_PUBLIC_KEY(
+          values.governanceMint,
+        ),
+        type: 'error',
+      });
+      return;
+    }
+    if (values.councilMint && !tryParseKey(values.councilMint)) {
+      notify({
+        message: LABELS.COUNCIL_MINT_IS_NOT_A_VALID_PUBLIC_KEY(
+          values.councilMint,
+        ),
+        type: 'error',
+      });
+      return;
+    }
+
     const uninitializedConfig = {
       timelockType: values.timelockType,
       executionType: values.executionType,

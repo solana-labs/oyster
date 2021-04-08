@@ -163,6 +163,14 @@ export function fromLamports(
   return (amount / precision) * rate;
 }
 
+export const tryParseKey = (key: string): PublicKey | null => {
+  try {
+    return new PublicKey(key);
+  } catch (error) {
+    return null;
+  }
+};
+
 var SI_SYMBOL = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
 
 const abbreviateNumber = (number: number, precision: number) => {
