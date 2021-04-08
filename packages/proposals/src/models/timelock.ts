@@ -320,9 +320,8 @@ export const GovernanceVotingRecordParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
-  const buffer = Buffer.from(info.data);
-  const data = GovernanceVotingRecordLayout.decode(buffer);
-  console.log('Data', data);
+  const data = GovernanceVotingRecordLayout.decode(info.data);
+
   const details = {
     pubkey: pubKey,
     account: {
