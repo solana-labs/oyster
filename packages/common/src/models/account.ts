@@ -8,6 +8,7 @@ import {
 import { AccountInfo as TokenAccountInfo, Token } from '@solana/spl-token';
 import { TOKEN_PROGRAM_ID } from '../utils/ids';
 import BufferLayout from 'buffer-layout';
+import { createNamedExports } from 'typescript';
 
 export interface TokenAccount {
   pubkey: PublicKey;
@@ -60,18 +61,32 @@ export function approve(
   delegate?: PublicKey,
 ): Account {
   const tokenProgram = TOKEN_PROGRAM_ID;
-  const transferAuthority = new Account();
 
-  instructions.push(
-    Token.createApproveInstruction(
-      tokenProgram,
-      account,
-      delegate ?? transferAuthority.publicKey,
-      owner,
-      [],
-      amount,
-    ),
+  const transferAuthority = new Account();
+  const delegateKey = delegate ?? transferAuthority.publicKey;
+
+  const instruction = Token.createApproveInstruction(
+    tokenProgram,
+    account,
+    delegateKey,
+    owner,
+    [],
+    amount,
   );
+
+  console.log('CREATE APPROVE');
+
+  // Temp. workaround for a bug in Token.createApproveInstruction which doesn't add the delegate account to signers
+  instruction.keys = instruction.keys.map(k =>
+    k.pubkey.equals(delegateKey)
+      ? {
+          ...k,
+          isSigner: true,
+        }
+      : k,
+  );
+
+  instructions.push(instruction);
 
   if (autoRevoke) {
     cleanupInstructions.push(
