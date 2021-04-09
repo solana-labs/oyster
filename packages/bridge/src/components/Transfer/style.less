@@ -14,6 +14,10 @@
   font-size: 19px;
   top: 253px;
   color: black;
+  & > span:after {
+    content: '⇆';
+    padding-left: 0;
+  }
 }
 
 .exchange-card {
@@ -32,7 +36,7 @@
   width: 240px;
   height: 64px;
   left: calc(50% - 240px/2);
-  top: 335px;
+  top: 555px;
 
   border-radius: 12px;
   border: none;
@@ -57,5 +61,51 @@ div:not(.home-container) {
     width: 100%;
     max-width: calc(100% - 388px);
     margin: auto;
+  }
+}
+
+@media screen and (max-width: 1200px){
+  .exchange-card {
+    height: 770px;
+    width: 100%;
+    margin: 97px auto 0 auto;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+  }
+  .transfer-button {
+    display: flex;
+    position: relative;
+    width: 240px;
+    height: 64px;
+    left: calc(50% - 240px/2);
+    top: 30px;
+    margin-bottom: 100px;
+  }
+  .swap-button {
+    top: 0;
+  }
+  div:not(.home-container) > #recent-tx-container {
+    max-width: calc(100% - 100px);
+  }
+  .app-left {
+    position: absolute;
+    left: 20px;
+  }
+
+  .swap-button {
+    & > span:after {
+      content: "⇅";
+    }
+  }
+
+}
+@media screen and (max-width: 900px) {
+  .app-left {
+    display: none;
+  }
+  .app-right {
+    position: relative;
+    left: -10px;
   }
 }

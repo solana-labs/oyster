@@ -1,9 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './index.less';
 import { Link, useLocation } from 'react-router-dom';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+import { Button, Popover } from 'antd';
+import { LABELS } from '../../constants';
+import { Settings } from '@oyster/common';
 
-export const AppBar = () => {
+export const AppBar = (props: { isRoot?: boolean }) => {
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
   const location = useLocation();
 
@@ -17,7 +24,7 @@ export const AppBar = () => {
   useEffect(() => {
     const header = document.getElementById('app-header');
     if (header) {
-        header.style.width = showMobileMenu ?  "100%" : '0';
+      header.style.width = showMobileMenu ? '100%' : '0';
     }
   }, [showMobileMenu, document.body.offsetWidth]);
 
@@ -34,6 +41,11 @@ export const AppBar = () => {
         )}
       </span>
       <div className={`app-bar-inner ${showMobileMenu ? 'mobile-active' : ''}`}>
+        {!props.isRoot && (
+          <div className={`app-bar-item logo root-mobile`}>
+            <img alt="logo-bar" src={'/appbar/logo.svg'} />
+          </div>
+        )}
         <div className={`app-bar-item ${isActiveClass('move')}`}>
           <Link to="/move">Bridge</Link>
         </div>
@@ -46,6 +58,22 @@ export const AppBar = () => {
         <div className={`app-bar-item ${isActiveClass('help')}`}>
           <Link to="/help">Help</Link>
         </div>
+        {!props.isRoot && (
+          <Popover
+            placement="topRight"
+            title={LABELS.SETTINGS_TOOLTIP}
+            content={<Settings />}
+            trigger="click"
+          >
+            <Button
+              className={'app-right app-bar-item'}
+              shape="circle"
+              size="large"
+              type="text"
+              icon={<SettingOutlined />}
+            />
+          </Popover>
+        )}
       </div>
     </>
   );

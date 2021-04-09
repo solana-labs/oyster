@@ -16,7 +16,7 @@ header.ant-layout-header.App-Bar {
 
 }
 
-.app-left {
+.app-bar-item.logo {
   position: absolute;
   left: 10%;
 }
@@ -29,6 +29,7 @@ header.ant-layout-header.App-Bar {
   min-width: 50%;
   justify-content: center;
   height: auto;
+  align-items: center;
   .app-bar-item {
     cursor: pointer;
     padding: 0 30px;
@@ -48,8 +49,20 @@ header.ant-layout-header.App-Bar {
      width: 100% !important;
    }
 }
+@media screen and (max-width: 1200px) {
+
+  .app-bar-item.logo {
+    position: relative;
+    left: 0;
+  }
+  .app-bar-item.app-right{
+    position: relative;
+    left: 0;
+  }
+}
 @media screen and (max-width: 900px) {
   header.ant-layout-header.App-Bar  {
+    position: fixed;
     transition: ease-in-out 0.5s;
     width: 0;
     max-width: 240px;
@@ -66,13 +79,11 @@ header.ant-layout-header.App-Bar {
     }
     .app-bar-inner {
       //opacity: 0;
-      left: -70px;
+      left: -100px;
       position: relative;
       transition: ease-in-out 0.5s;
       flex-direction: column;
     }
-  }
-  header.ant-layout-header.App-Bar  {
     background: #06101a;
     & > .nav-burger.mobile-active {
       width: 30px;

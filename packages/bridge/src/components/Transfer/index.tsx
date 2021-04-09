@@ -127,7 +127,7 @@ export const Transfer = () => {
             }
           }}
         >
-          ⇆
+          <span></span>
         </Button>
         <Input
           title={`To`}
@@ -147,151 +147,152 @@ export const Transfer = () => {
           }}
           className={'right'}
         />
-        <Button
-          className={'transfer-button'}
-          type="primary"
-          size="large"
-          disabled={!(A.amount && B.amount) || !connected || !provider}
-          onClick={async () => {
-            if (!wallet || !provider) {
-              return;
-            }
+      </div>
 
-            const token = tokenMap.get(request.asset?.toLowerCase() || '');
-            const NotificationContent = () => {
-              const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
-                [],
-              );
-              useEffect(() => {
-                (async () => {
-                  let steps: ProgressUpdate[] = [];
-                  try {
-                    if (request.from === ASSET_CHAIN.Solana) {
-                      await fromSolana(
-                        connection,
-                        wallet,
-                        request,
-                        provider,
-                        update => {
-                          if (update.replace) {
-                            steps.pop();
-                            steps = [...steps, update];
-                          } else {
-                            steps = [...steps, update];
-                          }
+      <Button
+        className={'transfer-button'}
+        type="primary"
+        size="large"
+        disabled={!(A.amount && B.amount) || !connected || !provider}
+        onClick={async () => {
+          if (!wallet || !provider) {
+            return;
+          }
 
-                          setActiveSteps(steps);
-                        },
-                      );
-                    }
+          const token = tokenMap.get(request.asset?.toLowerCase() || '');
+          const NotificationContent = () => {
+            const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
+              [],
+            );
+            useEffect(() => {
+              (async () => {
+                let steps: ProgressUpdate[] = [];
+                try {
+                  if (request.from === ASSET_CHAIN.Solana) {
+                    await fromSolana(
+                      connection,
+                      wallet,
+                      request,
+                      provider,
+                      update => {
+                        if (update.replace) {
+                          steps.pop();
+                          steps = [...steps, update];
+                        } else {
+                          steps = [...steps, update];
+                        }
 
-                    if (request.to === ASSET_CHAIN.Solana) {
-                      await toSolana(
-                        connection,
-                        wallet,
-                        request,
-                        provider,
-                        update => {
-                          if (update.replace) {
-                            steps.pop();
-                            steps = [...steps, update];
-                          } else {
-                            steps = [...steps, update];
-                          }
-
-                          setActiveSteps(steps);
-                        },
-                      );
-                    }
-                  } catch (err) {
-                    // TODO...
-                    console.log(err);
+                        setActiveSteps(steps);
+                      },
+                    );
                   }
-                })();
-              }, [setActiveSteps]);
 
-              return (
-                <div>
-                  <div style={{ display: 'flex' }}>
-                    <div>
-                      <h5>{`${chainToName(
-                        request.from,
-                      )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
-                      <h2>
-                        {request.amount?.toString()} {request.info?.name}
-                      </h2>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        marginLeft: 'auto',
-                        marginRight: 10,
-                      }}
-                    >
-                      <TokenDisplay
-                        asset={request.asset}
-                        chain={request.from}
-                        token={token}
-                      />
-                      <span style={{ margin: 15 }}>{'➔'}</span>
-                      <TokenDisplay
-                        asset={request.asset}
-                        chain={request.to}
-                        token={token}
-                      />
-                    </div>
+                  if (request.to === ASSET_CHAIN.Solana) {
+                    await toSolana(
+                      connection,
+                      wallet,
+                      request,
+                      provider,
+                      update => {
+                        if (update.replace) {
+                          steps.pop();
+                          steps = [...steps, update];
+                        } else {
+                          steps = [...steps, update];
+                        }
+
+                        setActiveSteps(steps);
+                      },
+                    );
+                  }
+                } catch (err) {
+                  // TODO...
+                  console.log(err);
+                }
+              })();
+            }, [setActiveSteps]);
+
+            return (
+              <div>
+                <div style={{ display: 'flex' }}>
+                  <div>
+                    <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
+                      request.to,
+                    )} Mainnet`}</h5>
+                    <h2>
+                      {request.amount?.toString()} {request.info?.name}
+                    </h2>
                   </div>
                   <div
                     style={{
-                      textAlign: 'left',
                       display: 'flex',
-                      flexDirection: 'column',
+                      marginLeft: 'auto',
+                      marginRight: 10,
                     }}
                   >
-                    {(() => {
-                      let group = '';
-                      return activeSteps.map((step, i) => {
-                        let prevGroup = group;
-                        group = step.group;
-                        let newGroup = prevGroup !== group;
-                        return (
-                          <>
-                            {newGroup && <span>{group}</span>}
-                            <span style={{ marginLeft: 15 }}>
-                              {typeToIcon(
-                                step.type,
-                                activeSteps.length - 1 === i,
-                              )}{' '}
-                              {step.message}
-                            </span>
-                          </>
-                        );
-                      });
-                    })()}
+                    <TokenDisplay
+                      asset={request.asset}
+                      chain={request.from}
+                      token={token}
+                    />
+                    <span style={{ margin: 15 }}>{'➔'}</span>
+                    <TokenDisplay
+                      asset={request.asset}
+                      chain={request.to}
+                      token={token}
+                    />
                   </div>
                 </div>
-              );
-            };
+                <div
+                  style={{
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  {(() => {
+                    let group = '';
+                    return activeSteps.map((step, i) => {
+                      let prevGroup = group;
+                      group = step.group;
+                      let newGroup = prevGroup !== group;
+                      return (
+                        <>
+                          {newGroup && <span>{group}</span>}
+                          <span style={{ marginLeft: 15 }}>
+                            {typeToIcon(
+                              step.type,
+                              activeSteps.length - 1 === i,
+                            )}{' '}
+                            {step.message}
+                          </span>
+                        </>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            );
+          };
 
-            notification.open({
-              message: '',
-              duration: 0,
-              placement: 'bottomLeft',
-              description: <NotificationContent />,
-              className: 'custom-class',
-              style: {
-                width: 500,
-              },
-            });
-          }}
-        >
-          {hasCorrespondingNetworks
-            ? !(A.amount && B.amount)
-              ? LABELS.ENTER_AMOUNT
-              : LABELS.TRANSFER
-            : LABELS.SET_CORRECT_WALLET_NETWORK}
-        </Button>
-      </div>
+          notification.open({
+            message: '',
+            duration: 0,
+            placement: 'bottomLeft',
+            description: <NotificationContent />,
+            className: 'custom-class',
+            style: {
+              width: 500,
+            },
+          });
+        }}
+      >
+        {hasCorrespondingNetworks
+          ? !(A.amount && B.amount)
+            ? LABELS.ENTER_AMOUNT
+            : LABELS.TRANSFER
+          : LABELS.SET_CORRECT_WALLET_NETWORK}
+      </Button>
       <RecentTransactionsTable />
     </>
   );

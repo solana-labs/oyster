@@ -117,6 +117,7 @@ export const RecentTransactionsTable = () => {
       <Table
         scroll={{
           scrollToFirstRowOnChange: false,
+          x: 900,
         }}
         dataSource={externalAssets.filter(a => a.name)}
         columns={columns}

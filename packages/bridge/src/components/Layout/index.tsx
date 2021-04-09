@@ -34,30 +34,7 @@ export const AppLayout = React.memo((props: any) => {
       <div className={`App`}>
         <Layout title={LABELS.APP_TITLE}>
           <Header className="App-Bar" id={'app-header'}>
-            {!isRoot && (
-              <div className="app-title app-left">
-                <Link to="/">
-                  <img alt="logo-bar" src={'/appbar/logo.svg'} />
-                </Link>
-              </div>
-            )}
-            <AppBar />
-            {!isRoot && (
-              <Popover
-                placement="topRight"
-                title={LABELS.SETTINGS_TOOLTIP}
-                content={<Settings />}
-                trigger="click"
-              >
-                <Button
-                  className={'app-right'}
-                  shape="circle"
-                  size="large"
-                  type="text"
-                  icon={<SettingOutlined />}
-                />
-              </Popover>
-            )}
+            <AppBar isRoot={isRoot} />
           </Header>
           <Content style={{ flexDirection: 'column' }}>
             {props.children}
