@@ -17,9 +17,9 @@ export const AppBar = () => {
   useEffect(() => {
     const header = document.getElementById('app-header');
     if (header) {
-      header.style.width = showMobileMenu ? '240px' : '0';
+        header.style.width = showMobileMenu ?  "100%" : '0';
     }
-  }, [showMobileMenu]);
+  }, [showMobileMenu, document.body.offsetWidth]);
 
   return (
     <>

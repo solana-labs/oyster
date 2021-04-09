@@ -43,10 +43,16 @@ header.ant-layout-header.App-Bar {
   }
 }
 
+@media screen and (min-width: 901px) {
+   header.ant-layout-header.App-Bar  {
+     width: 100% !important;
+   }
+}
 @media screen and (max-width: 900px) {
   header.ant-layout-header.App-Bar  {
     transition: ease-in-out 0.5s;
     width: 0;
+    max-width: 240px;
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
