@@ -1,4 +1,21 @@
 @import "_colors";
+
+
+header.ant-layout-header.App-Bar {
+  position: absolute;
+  width: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  height: 80px;
+
+  .nav-burger {
+    cursor: pointer;
+    display: none;
+  }
+
+}
+
 .app-left {
   position: absolute;
   left: 10%;
@@ -22,6 +39,43 @@
     }
     &.active {
       color: white;
+    }
+  }
+}
+
+@media screen and (max-width: 900px) {
+  header.ant-layout-header.App-Bar  {
+    transition: ease-in-out 0.5s;
+    width: 0;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0;
+    .nav-burger {
+      display: inline-block;
+      left: 30px;
+      position: relative;
+      transition: ease-in-out 0.5s;
+      z-index: 10;
+    }
+    .app-bar-inner {
+      //opacity: 0;
+      left: -70px;
+      position: relative;
+      transition: ease-in-out 0.5s;
+      flex-direction: column;
+    }
+  }
+  header.ant-layout-header.App-Bar  {
+    background: #06101a;
+    & > .nav-burger.mobile-active {
+      width: 30px;
+      position: relative;
+      left: 0;
+    }
+
+    .app-bar-inner.mobile-active {
+      left: 0px;
     }
   }
 }

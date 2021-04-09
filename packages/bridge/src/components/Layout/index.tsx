@@ -33,7 +33,7 @@ export const AppLayout = React.memo((props: any) => {
     <>
       <div className={`App`}>
         <Layout title={LABELS.APP_TITLE}>
-          <Header className="App-Bar">
+          <Header className="App-Bar" id={'app-header'}>
             {!isRoot && (
               <div className="app-title app-left">
                 <Link to="/">

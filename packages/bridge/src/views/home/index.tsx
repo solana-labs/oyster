@@ -129,7 +129,7 @@ export const HomeView = () => {
     <>
       <div className="flexColumn home-container wormhole-bg">
         <div className={'justify-bottom-container'}>
-          <div>
+          <div className={'main-logo'}>
             <img src={'/home/main-logo.svg'} />
           </div>
           <div>
@@ -196,6 +196,7 @@ export const HomeView = () => {
           <Table
             scroll={{
               scrollToFirstRowOnChange: false,
+              x: 900,
             }}
             dataSource={externalAssets.filter(a => a.name)}
             columns={columns}
