@@ -2,9 +2,7 @@ import React from 'react'
 import { Layout, Row, Col } from 'antd'
 import Masonry from 'react-masonry-css'
 
-import { Art } from '../../types'
 import { PreSaleBanner } from '../../components/PreSaleBanner'
-import { ItemCard } from '../../components/ItemCard'
 import { useMeta } from '../../contexts/meta'
 
 import './index.less'
@@ -12,10 +10,7 @@ import { ArtCard } from '../../components/ArtCard'
 import { Link } from 'react-router-dom'
 
 const { Content } = Layout
-
-
 export const HomeView = () => {
-  // TODO: fetch real data
   const { metadata } = useMeta()
 
   const breakpointColumnsObj = {
@@ -35,7 +30,7 @@ export const HomeView = () => {
       />
       <Layout>
         <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <Col>
+          <Col style={{ width: '100%' }}>
             <Row style={{ marginBottom: 30, marginTop: 20, fontSize: 20, fontWeight: 600 }}>Featured</Row>
             <Row>
               <Masonry
@@ -51,6 +46,7 @@ export const HomeView = () => {
                     category={m.info.extended?.category}
                     name={m.info?.name}
                     symbol={m.info.symbol}
+                    description={m.info.extended?.description}
                     preview={false} />
                   </Link>
               })}

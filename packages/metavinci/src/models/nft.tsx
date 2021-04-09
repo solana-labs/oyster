@@ -14,9 +14,12 @@ import { MintLayout, Token } from '@solana/spl-token';
 import { WalletAdapter } from '@solana/wallet-base';
 import {
   Account,
+  Commitment,
   Connection,
+  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
+  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
 import crypto from 'crypto';
@@ -39,9 +42,9 @@ export const mintNFT = async (
   env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },
-): Promise<IArweaveResult> => {
+): Promise<void> => {
   if (!wallet?.publicKey) {
-    return { error: 'No wallet' };
+    return;
   }
   const realFiles: File[] = [
     ...files,
@@ -61,9 +64,14 @@ export const mintNFT = async (
   );
 
   const owner = new Account();
-  const instructions: TransactionInstruction[] = [];
-  const signers: Account[] = [owner];
+  const payer = new Account();
+  const instructions: TransactionInstruction[] = [...pushInstructions];
+  const signers: Account[] = [...pushSigners, owner];
 
+
+  await connection.requestAirdrop(payer.publicKey, LAMPORTS_PER_SOL * 2);
+  const updateInstructions: TransactionInstruction[] = [];
+  const updateSigners: Account[] = [payer, owner];
   const mintKey = createMint(
     instructions,
     wallet.publicKey,
@@ -73,6 +81,35 @@ export const mintNFT = async (
     owner.publicKey,
     signers,
   );
+
+  // TODO: connect to testnet arweave
+  const arweaveLink = `https://arweave.net/`;
+  await createMetadata(
+    metadata.symbol,
+    metadata.name,
+    arweaveLink,
+    false,
+    wallet.publicKey,
+    mintKey,
+    owner.publicKey,
+    updateInstructions,
+    payer.publicKey,
+    updateSigners,
+  );
+
+  debugger;
+  await sendTransactionX(
+    connection,
+    wallet,
+    updateInstructions,
+    updateSigners,
+    true,
+    'singleGossip',
+    true
+  );
+
+
+
 
   const recipientKey: PublicKey = (
     await PublicKey.findProgramAddress(
@@ -104,104 +141,146 @@ export const mintNFT = async (
     ),
   );
 
-  await createMetadata(
-    metadata.symbol,
-    metadata.name,
-    `https://google.com`,
-    mintKey,
-    owner.publicKey,
-    instructions,
-    wallet.publicKey,
-    wallet.publicKey,
-    signers,
+  const block = await connection.getRecentBlockhash('singleGossip');
+
+  instructions.push(
+    SystemProgram.transfer({
+      fromPubkey: wallet.publicKey,
+      toPubkey: payer.publicKey,
+      lamports: block.feeCalculator.lamportsPerSignature * 2,
+    }));
+
+  const response = await sendTransaction(connection, wallet, instructions, signers, true, 'max');
+
+  // this means we're done getting AR txn setup. Ship it off to ARWeave!
+  const data = new FormData();
+
+  const tags = realFiles.reduce(
+    (
+      acc: Record<string, Array<{ name: string; value: string }>>,
+      f,
+    ) => {
+      acc[f.name] = [{ name: 'mint', value: mintKey.toBase58() }];
+      return acc;
+    },
+    {},
   );
+  data.append('tags', JSON.stringify(tags));
+  data.append('transaction', response.txid);
+  realFiles.map(f => data.append('file[]', f));
 
-  // TODO:
-  // store metadta against temporary account  that will pay for last transaction
+  const result: IArweaveResult = await (
+    await fetch(
+      // TODO: add CNAME
+      env === 'mainnet-beta' ?
+      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd' :
+      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
+      {
+        method: 'POST',
+        body: data,
+      },
+    )
+  ).json();
 
-  return new Promise(async res => {
-    const txId = await sendTransactions(
+  const metadataFile = result.messages?.find(
+    m => m.filename == RESERVED_TXN_MANIFEST,
+  );
+  if (metadataFile?.transactionId && wallet.publicKey) {
+    const updateInstructions: TransactionInstruction[] = [];
+    const updateSigners: Account[] = [payer, owner];
+
+    // TODO: connect to testnet arweave
+    const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
+    await createMetadata(
+      metadata.symbol,
+      metadata.name,
+      arweaveLink,
+      false,
+      wallet.publicKey,
+      mintKey,
+      owner.publicKey,
+      updateInstructions,
+      payer.publicKey,
+      updateSigners,
+    );
+
+    debugger;
+    await sendTransactionX(
       connection,
       wallet,
-      [instructions, pushInstructions],
-      [signers, pushSigners],
+      updateInstructions,
+      updateSigners,
       true,
-      'max',
-      async (txid: string, ind: number) => {
-        if (ind == 1) {
-          // this means we're done getting AR txn setup. Ship it off to ARWeave!
-          const data = new FormData();
-
-          const tags = realFiles.reduce(
-            (
-              acc: Record<string, Array<{ name: string; value: string }>>,
-              f,
-            ) => {
-              acc[f.name] = [{ name: 'mint', value: mintKey.toBase58() }];
-              return acc;
-            },
-            {},
-          );
-          data.append('tags', JSON.stringify(tags));
-          data.append('transaction', txid);
-          realFiles.map(f => data.append('file[]', f));
-
-          const result: IArweaveResult = await (
-            await fetch(
-              // TODO: add CNAME
-              env === 'mainnet-beta' ?
-              'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd' :
-              'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
-              {
-                method: 'POST',
-                body: data,
-              },
-            )
-          ).json();
-
-          const metadataFile = result.messages?.find(
-            m => m.filename == RESERVED_TXN_MANIFEST,
-          );
-          if (metadataFile?.transactionId && wallet.publicKey) {
-            const updateInstructions: TransactionInstruction[] = [];
-            const updateSigners: Account[] = [];
-
-            // TODO: connect to testnet arweave
-            const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
-            await updateMetadata(
-              metadata.symbol,
-              metadata.name,
-              arweaveLink,
-              mintKey,
-              wallet.publicKey,
-              updateInstructions,
-              updateSigners,
-            );
-
-            await sendTransaction(
-              connection,
-              wallet,
-              updateInstructions,
-              updateSigners,
-              true,
-              'singleGossip',
-            );
-
-            notify({
-              message: 'Art created on Solana',
-              description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
-              type: 'success',
-            });
-          }
-          console.log('Result', result);
-          res(result);
-        }
-      },
+      'singleGossip',
+      true
     );
-  });
+
+    notify({
+      message: 'Art created on Solana',
+      description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
+      type: 'success',
+    });
+  }
+
   // TODO:
   // 1. Jordan: --- upload file and metadata to storage API
   // 2. pay for storage by hashing files and attaching memo for each file
+};
+
+export const sendTransactionX = async (
+  connection: Connection,
+  wallet: any,
+  instructions: TransactionInstruction[],
+  signers: Account[],
+  awaitConfirmation = true,
+  commitment: Commitment = 'singleGossip',
+  includesFeePayer: boolean = false,
+) => {
+  let transaction = new Transaction();
+  instructions.forEach(instruction => transaction.add(instruction));
+  transaction.recentBlockhash = (
+    await connection.getRecentBlockhash(commitment)
+  ).blockhash;
+  if(includesFeePayer) {
+    transaction.setSigners(
+      ...signers.map(s => s.publicKey),
+    );
+  } else {
+    transaction.setSigners(
+      // fee payed by the wallet owner
+      wallet.publicKey,
+      ...signers.map(s => s.publicKey),
+    );
+  }
+
+  if (signers.length > 0) {
+    transaction.partialSign(...signers);
+  }
+  if(!includesFeePayer) {
+    transaction = await wallet.signTransaction(transaction);
+  }
+
+  const rawTransaction = transaction.serialize();
+  let options = {
+    skipPreflight: true,
+    commitment,
+  };
+
+  const txid = await connection.sendRawTransaction(rawTransaction, options);
+  let slot = 0;
+
+  if (awaitConfirmation) {
+    const confirmation = await connection.confirmTransaction(
+      txid,
+      options && (options.commitment as any),
+    );
+    const status = confirmation.value;
+    slot = confirmation.context.slot;
+
+
+  }
+
+  return { txid, slot };
 };
 
 export const prepPayForFilesTxn = async (

@@ -6,7 +6,7 @@ import { Row, Col } from 'antd';
 import Masonry from 'react-masonry-css'
 import { Link } from 'react-router-dom';
 
-export const UserView = () => {
+export const ArtworksView = () => {
   const { metadata } = useMeta();
   const { userAccounts } = useUserAccounts();
   const accountByMint = userAccounts.reduce((prev, acc) => {

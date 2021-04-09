@@ -87,10 +87,16 @@ class CreateMetadataArgs {
   symbol: string;
   uri: string;
 
-  constructor(args: { name: string; symbol: string; uri: string }) {
+  constructor(args: {
+    name: string;
+    symbol: string;
+    uri: string;
+    allow_duplicates?: boolean;
+  }) {
     this.name = args.name;
     this.symbol = args.symbol;
     this.uri = args.uri;
+    this.allow_duplicates = !!args.allow_duplicates;
   }
 }
 class UpdateMetadataArgs {
@@ -226,11 +232,12 @@ export async function createMetadata(
   symbol: string,
   name: string,
   uri: string,
+  allow_duplicates: boolean,
+  updateAuthority: PublicKey,
   mintKey: PublicKey,
   mintAuthorityKey: PublicKey,
   instructions: TransactionInstruction[],
   payer: PublicKey,
-  updateAuthority: PublicKey,
   signers: Account[],
 ) {
   const metadataProgramId = programIds().metadata;
@@ -258,7 +265,7 @@ export async function createMetadata(
     )
   )[0];
 
-  const value = new CreateMetadataArgs({ name, symbol, uri });
+  const value = new CreateMetadataArgs({ name, symbol, uri, allow_duplicates });
   const data = Buffer.from(serialize(SCHEMA, value));
 
   const keys = [
