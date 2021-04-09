@@ -56,7 +56,7 @@ export const depositSourceTokensInstruction = (
     { pubkey: sourceHoldingAccount, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,

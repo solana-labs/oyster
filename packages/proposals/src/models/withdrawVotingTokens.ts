@@ -76,9 +76,9 @@ export const withdrawVotingTokensInstruction = (
     { pubkey: noVotingMint, isSigner: false, isWritable: true },
     { pubkey: timelockStateAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
-    { pubkey: yesTransferAuthority, isSigner: false, isWritable: false },
-    { pubkey: noTransferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
+    { pubkey: yesTransferAuthority, isSigner: true, isWritable: false },
+    { pubkey: noTransferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     {
       pubkey: PROGRAM_IDS.timelock.programAccountId,
