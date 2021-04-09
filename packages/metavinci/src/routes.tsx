@@ -1,5 +1,5 @@
-import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { contexts } from '@oyster/common';
 import {
   MarketProvider,
@@ -16,7 +16,7 @@ const { AccountsProvider } = contexts.Accounts;
 export function Routes() {
   return (
     <>
-      <HashRouter basename={'/'}>
+      <BrowserRouter basename={'/'}>
         <ConnectionProvider>
           <WalletProvider>
             <UseWalletProvider chainId={5}>
@@ -32,7 +32,7 @@ export function Routes() {
                         />
                         <Route
                           exact
-                          path="/art/create"
+                          path="/art/create/:step_param?"
                           component={() => <ArtCreateView />}
                         />
                         <Route
@@ -73,7 +73,7 @@ export function Routes() {
             </UseWalletProvider>
           </WalletProvider>
         </ConnectionProvider>
-      </HashRouter>
+      </BrowserRouter>
     </>
   );
 }
