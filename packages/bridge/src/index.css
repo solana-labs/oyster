@@ -31,10 +31,3 @@ code {
   height: auto;
   top: 0;
 }
-
-.wormhole-bg {
-  background-image: url('/home/background.svg');
-  background-size: 100% auto;
-  background-color: #06101a;
-  background-repeat: no-repeat;
-}
