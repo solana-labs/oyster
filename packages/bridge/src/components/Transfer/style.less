@@ -88,24 +88,10 @@ div:not(.home-container) {
   div:not(.home-container) > #recent-tx-container {
     max-width: calc(100% - 100px);
   }
-  .app-left {
-    position: absolute;
-    left: 20px;
-  }
 
   .swap-button {
     & > span:after {
       content: "⇅";
     }
-  }
-
-}
-@media screen and (max-width: 900px) {
-  .app-left {
-    display: none;
-  }
-  .app-right {
-    position: relative;
-    left: -10px;
   }
 }
