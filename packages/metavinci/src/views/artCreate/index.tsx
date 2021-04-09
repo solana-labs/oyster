@@ -31,7 +31,7 @@ import {
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 import { Connection } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
-import { ArtContent } from '../../components/ArtContent';
+import { useHistory, useParams } from 'react-router-dom';
 
 const { Step } = Steps;
 const { Dragger } = Upload;
@@ -40,6 +40,9 @@ export const ArtCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
   const { wallet, connected } = useWallet();
+  const { step_param }: { step_param: string } = useParams()
+  const history = useHistory()
+
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [attributes, setAttributes] = useState<IMetadataExtension>({
@@ -52,6 +55,15 @@ export const ArtCreateView = () => {
     files: [],
     category: MetadataCategory.Image,
   });
+
+  useEffect(() => {
+    if (step_param) setStep(parseInt(step_param))
+    else gotoStep(0)
+  }, [step_param])
+
+  const gotoStep = (_step: number) => {
+    history.push(`/art/create/${_step.toString()}`)
+  }
 
   // store files
   const mint = async () => {
@@ -102,7 +114,7 @@ export const ArtCreateView = () => {
                   ...attributes,
                   category,
                 });
-                setStep(1);
+                gotoStep(1);
               }}
             />
           )}
@@ -110,7 +122,7 @@ export const ArtCreateView = () => {
             <UploadStep
               attributes={attributes}
               setAttributes={setAttributes}
-              confirm={() => setStep(2)}
+              confirm={() => gotoStep(2)}
             />
           )}
 
@@ -118,13 +130,13 @@ export const ArtCreateView = () => {
             <InfoStep
               attributes={attributes}
               setAttributes={setAttributes}
-              confirm={() => setStep(3)}
+              confirm={() => gotoStep(3)}
             />
           )}
           {step === 3 && (
             <RoyaltiesStep
               attributes={attributes}
-              confirm={() => setStep(4)}
+              confirm={() => gotoStep(4)}
               setAttributes={setAttributes}
             />
           )}
@@ -135,7 +147,7 @@ export const ArtCreateView = () => {
               connection={connection}
             />
           )}
-          {step > 0 && <Button onClick={() => setStep(step - 1)}>Back</Button>}
+          {step > 0 && <Button onClick={() => gotoStep(step - 1)}>Back</Button>}
         </Col>
       </Row>
     </>
@@ -185,8 +197,7 @@ const UploadStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const [fileList, setFileList] = useState<any[]>([])
-  const [preview, setPreview] = useState<string>("")
+  const [fileList, setFileList] = useState<any[]>(props.attributes.files ?? [])
 
   return (
     <>
@@ -204,7 +215,6 @@ const UploadStep = (props: {
         <Dragger
           style={{ padding: 20 }}
           multiple={false}
-          showUploadList={false}
           customRequest={info => {
             // dont upload files here, handled outside of the control
             info?.onSuccess?.({}, null as any);
@@ -214,16 +224,14 @@ const UploadStep = (props: {
             const file = info.file.originFileObj;
             const reader = new FileReader();
             reader.onload = function (event) {
-              const image = (event.target?.result as string) || ''
               props.setAttributes({
                 ...props.attributes,
                 files: [file],
-                image,
+                image: (event.target?.result as string) || '',
               })
-              setPreview(image)
             };
-            reader.readAsDataURL(file);
-            setFileList(info.fileList.slice(-1)) // Keep only the last dropped file
+            if (file) reader.readAsDataURL(file);
+            setFileList(info.fileList?.slice(-1) ?? []) // Keep only the last dropped file
           }}
         >
           <p className="ant-upload-drag-icon">
@@ -233,9 +241,6 @@ const UploadStep = (props: {
             Click or drag file to this area to upload
           </p>
         </Dragger>
-        <div style={{ marginTop: 10 }}>
-          <ArtContent category={props.attributes.category} content={preview} className="art-content" />
-        </div>
       </Row>
       <Row>
         <Button
