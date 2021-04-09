@@ -330,12 +330,14 @@ export const sendTransaction = async (
   awaitConfirmation = true,
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
+  block?: BlockhashAndFeeCalculator
 ) => {
   let transaction = new Transaction();
   instructions.forEach(instruction => transaction.add(instruction));
-  transaction.recentBlockhash = (
+  transaction.recentBlockhash = (block || (
     await connection.getRecentBlockhash(commitment)
-  ).blockhash;
+  )).blockhash;
+
   if(includesFeePayer) {
     transaction.setSigners(
       ...signers.map(s => s.publicKey),

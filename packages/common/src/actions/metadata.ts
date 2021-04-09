@@ -45,10 +45,12 @@ export interface IMetadataExtension {
 export class Metadata {
   key: number;
   updateAuthority?: PublicKey;
+
   mint: PublicKey;
   name: string;
   symbol: string;
   uri: string;
+
   extended?: IMetadataExtension;
 
   constructor(args: {
@@ -166,6 +168,55 @@ export const SCHEMA = new Map<any, any>([
 export const decodeMetadata = (buffer: Buffer) => {
   return deserializeBorsh(SCHEMA, Metadata, buffer) as Metadata;
 };
+
+export async function transferMetadata(
+  symbol: string,
+  name: string,
+  currentUpdateAuthority: PublicKey,
+  newUpdateAuthority: PublicKey,
+  instructions: TransactionInstruction[],
+  signers: Account[],
+) {
+  const metadataProgramId = programIds().metadata;
+
+  const metadataOwnerAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        Buffer.from(name),
+        Buffer.from(symbol),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const keys = [
+    {
+      pubkey: metadataOwnerAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: currentUpdateAuthority,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: newUpdateAuthority,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data: Buffer.from([]),
+    }),
+  );
+}
+
 export async function updateMetadata(
   symbol: string,
   name: string,
@@ -228,6 +279,7 @@ export async function updateMetadata(
     }),
   );
 }
+
 export async function createMetadata(
   symbol: string,
   name: string,
@@ -296,7 +348,7 @@ export async function createMetadata(
     },
     {
       pubkey: updateAuthority,
-      isSigner: true,
+      isSigner: false,
       isWritable: false,
     },
     {

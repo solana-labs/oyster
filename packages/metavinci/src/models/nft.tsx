@@ -2,24 +2,21 @@ import {
   createAssociatedTokenAccountInstruction,
   createMint,
   createMetadata,
-  updateMetadata,
+  transferMetadata,
   programIds,
-  sendTransactions,
   sendTransaction,
   notify,
   ENV,
+  updateMetadata,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
 import { WalletAdapter } from '@solana/wallet-base';
 import {
   Account,
-  Commitment,
   Connection,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
-  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
 import crypto from 'crypto';
@@ -36,6 +33,7 @@ interface IArweaveResult {
     error?: string;
   }>;
 }
+
 export const mintNFT = async (
   connection: Connection,
   wallet: WalletAdapter | undefined,
@@ -68,10 +66,6 @@ export const mintNFT = async (
   const instructions: TransactionInstruction[] = [...pushInstructions];
   const signers: Account[] = [...pushSigners, owner];
 
-
-  await connection.requestAirdrop(payer.publicKey, LAMPORTS_PER_SOL * 2);
-  const updateInstructions: TransactionInstruction[] = [];
-  const updateSigners: Account[] = [payer, owner];
   const mintKey = createMint(
     instructions,
     wallet.publicKey,
@@ -81,35 +75,6 @@ export const mintNFT = async (
     owner.publicKey,
     signers,
   );
-
-  // TODO: connect to testnet arweave
-  const arweaveLink = `https://arweave.net/`;
-  await createMetadata(
-    metadata.symbol,
-    metadata.name,
-    arweaveLink,
-    false,
-    wallet.publicKey,
-    mintKey,
-    owner.publicKey,
-    updateInstructions,
-    payer.publicKey,
-    updateSigners,
-  );
-
-  debugger;
-  await sendTransactionX(
-    connection,
-    wallet,
-    updateInstructions,
-    updateSigners,
-    true,
-    'singleGossip',
-    true
-  );
-
-
-
 
   const recipientKey: PublicKey = (
     await PublicKey.findProgramAddress(
@@ -142,15 +107,37 @@ export const mintNFT = async (
   );
 
   const block = await connection.getRecentBlockhash('singleGossip');
+  const rentExempt = await connection.getMinimumBalanceForRentExemption(1000);
+
+  await createMetadata(
+    metadata.symbol,
+    metadata.name,
+    `https://arweave.net/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
+    false,
+    payer.publicKey,
+    mintKey,
+    owner.publicKey,
+    instructions,
+    wallet.publicKey,
+    signers,
+  );
 
   instructions.push(
     SystemProgram.transfer({
       fromPubkey: wallet.publicKey,
       toPubkey: payer.publicKey,
-      lamports: block.feeCalculator.lamportsPerSignature * 2,
+      lamports: block.feeCalculator.lamportsPerSignature * 3,
     }));
 
-  const response = await sendTransaction(connection, wallet, instructions, signers, true, 'max');
+  const response = await sendTransaction(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    true,
+    'max',
+    false,
+    block);
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
@@ -191,21 +178,27 @@ export const mintNFT = async (
 
     // TODO: connect to testnet arweave
     const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
-    await createMetadata(
+    await updateMetadata(
       metadata.symbol,
       metadata.name,
       arweaveLink,
-      false,
-      wallet.publicKey,
       mintKey,
-      owner.publicKey,
-      updateInstructions,
       payer.publicKey,
+      updateInstructions,
       updateSigners,
     );
 
+    await transferMetadata(
+      metadata.symbol,
+      metadata.name,
+      payer.publicKey,
+      wallet.publicKey,
+      updateInstructions,
+      updateSigners);
+
     debugger;
-    await sendTransactionX(
+
+    const txid = await sendTransaction(
       connection,
       wallet,
       updateInstructions,
@@ -215,72 +208,21 @@ export const mintNFT = async (
       true
     );
 
+    console.log("transaction id: ", txid);
+
     notify({
       message: 'Art created on Solana',
       description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
       type: 'success',
     });
-  }
 
+    // TODO: refund funds
+
+    // send transfer back to user
+  }
   // TODO:
   // 1. Jordan: --- upload file and metadata to storage API
   // 2. pay for storage by hashing files and attaching memo for each file
-};
-
-export const sendTransactionX = async (
-  connection: Connection,
-  wallet: any,
-  instructions: TransactionInstruction[],
-  signers: Account[],
-  awaitConfirmation = true,
-  commitment: Commitment = 'singleGossip',
-  includesFeePayer: boolean = false,
-) => {
-  let transaction = new Transaction();
-  instructions.forEach(instruction => transaction.add(instruction));
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash(commitment)
-  ).blockhash;
-  if(includesFeePayer) {
-    transaction.setSigners(
-      ...signers.map(s => s.publicKey),
-    );
-  } else {
-    transaction.setSigners(
-      // fee payed by the wallet owner
-      wallet.publicKey,
-      ...signers.map(s => s.publicKey),
-    );
-  }
-
-  if (signers.length > 0) {
-    transaction.partialSign(...signers);
-  }
-  if(!includesFeePayer) {
-    transaction = await wallet.signTransaction(transaction);
-  }
-
-  const rawTransaction = transaction.serialize();
-  let options = {
-    skipPreflight: true,
-    commitment,
-  };
-
-  const txid = await connection.sendRawTransaction(rawTransaction, options);
-  let slot = 0;
-
-  if (awaitConfirmation) {
-    const confirmation = await connection.confirmTransaction(
-      txid,
-      options && (options.commitment as any),
-    );
-    const status = confirmation.value;
-    slot = confirmation.context.slot;
-
-
-  }
-
-  return { txid, slot };
 };
 
 export const prepPayForFilesTxn = async (

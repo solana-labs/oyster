@@ -285,6 +285,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Title</span>
             <Input
+              autoFocus
               className="input"
               placeholder="Max 50 characters"
               allowClear
@@ -374,6 +375,7 @@ const RoyaltiesStep = (props: {
           <label className="action-field">
             <span className="field-title">Royalty Percentage</span>
             <InputNumber
+              autoFocus
               min={0}
               max={100}
               placeholder="Between 0 and 100"
