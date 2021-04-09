@@ -7,10 +7,10 @@ import {
   Col,
   Input,
   Statistic,
-  Slider,
   Modal,
   Progress,
   Spin,
+  InputNumber,
 } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
@@ -373,12 +373,14 @@ const RoyaltiesStep = (props: {
         <Col className="section" xl={12}>
           <label className="action-field">
             <span className="field-title">Royalty Percentage</span>
-            <Slider
+            <InputNumber
               min={0}
               max={100}
+              placeholder="Between 0 and 100"
               onChange={(val: number) => {
                 props.setAttributes({ ...props.attributes, royalty: val });
               }}
+              className="royalties-input"
             />
           </label>
         </Col>
