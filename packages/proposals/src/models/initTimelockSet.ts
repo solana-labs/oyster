@@ -28,9 +28,8 @@ import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
 ///   15. `[writable]` Initialized source holding account
 ///   16. `[]` Source mint
 ///   17. `[]` Timelock minting authority
-///   18. `[]` Timelock Program
-///   19. '[]` Token program id
-///   20. `[]` Rent sysvar
+///   18. '[]` Token program id
+///   19. `[]` Rent sysvar
 export const initTimelockSetInstruction = (
   timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
@@ -111,11 +110,6 @@ export const initTimelockSetInstruction = (
       isWritable: false,
     },
     { pubkey: authority, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
   ];

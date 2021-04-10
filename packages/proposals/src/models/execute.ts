@@ -14,8 +14,7 @@ import { TimelockInstruction } from './timelock';
 ///   2. `[]` Program being invoked account
 ///   3. `[]` Timelock set account.
 ///   4. `[]` Timelock config
-///   5. `[]` Timelock program account pub key.
-///   6. `[]` Clock sysvar.
+///   5. `[]` Clock sysvar.
 ///   7+ Any extra accounts that are part of the instruction, in order
 export const executeInstruction = (
   transactionAccount: PublicKey,
@@ -49,11 +48,6 @@ export const executeInstruction = (
     { pubkey: programBeingInvokedAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
     { pubkey: timelockConfig, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     ...accountInfos,
   ];
