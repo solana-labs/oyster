@@ -133,7 +133,7 @@ export const mintNFT = async (
     instructions,
     signers,
     true,
-    'single',
+    'max',
     false,
     block);
 
