@@ -106,13 +106,10 @@ export const mintNFT = async (
     ),
   );
 
-  const block = await connection.getRecentBlockhash('singleGossip');
-  const rentExempt = await connection.getMinimumBalanceForRentExemption(1000);
-
-  await createMetadata(
+  const [metadataAccount, metadataOwnerAccount] = await createMetadata(
     metadata.symbol,
     metadata.name,
-    `https://arweave.net/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
+    `https://-------.---/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
     false,
     payer.publicKey,
     mintKey,
@@ -122,11 +119,12 @@ export const mintNFT = async (
     signers,
   );
 
+  const block = await connection.getRecentBlockhash('singleGossip');
   instructions.push(
     SystemProgram.transfer({
       fromPubkey: wallet.publicKey,
       toPubkey: payer.publicKey,
-      lamports: block.feeCalculator.lamportsPerSignature * 3,
+      lamports: block.feeCalculator.lamportsPerSignature * 2,
     }));
 
   const response = await sendTransaction(
@@ -135,7 +133,7 @@ export const mintNFT = async (
     instructions,
     signers,
     true,
-    'max',
+    'single',
     false,
     block);
 
@@ -172,9 +170,10 @@ export const mintNFT = async (
   const metadataFile = result.messages?.find(
     m => m.filename == RESERVED_TXN_MANIFEST,
   );
-  if (metadataFile?.transactionId && wallet.publicKey) {
+  if (metadataFile?.transactionId && wallet.publicKey)
+  {
     const updateInstructions: TransactionInstruction[] = [];
-    const updateSigners: Account[] = [payer, owner];
+    const updateSigners: Account[] = [payer];
 
     // TODO: connect to testnet arweave
     const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
@@ -186,6 +185,8 @@ export const mintNFT = async (
       payer.publicKey,
       updateInstructions,
       updateSigners,
+      metadataAccount,
+      metadataOwnerAccount,
     );
 
     await transferMetadata(
@@ -194,9 +195,10 @@ export const mintNFT = async (
       payer.publicKey,
       wallet.publicKey,
       updateInstructions,
-      updateSigners);
-
-    debugger;
+      updateSigners,
+      metadataAccount,
+      metadataOwnerAccount,
+    );
 
     const txid = await sendTransaction(
       connection,
@@ -207,8 +209,6 @@ export const mintNFT = async (
       'singleGossip',
       true
     );
-
-    console.log("transaction id: ", txid);
 
     notify({
       message: 'Art created on Solana',
