@@ -14,6 +14,7 @@ export const ArtCard = ({
   description,
   artist,
   preview,
+  small,
 }: {
   image?: string;
   category?: MetadataCategory
@@ -22,11 +23,12 @@ export const ArtCard = ({
   description?: string;
   artist?: string;
   preview?: boolean;
+  small?: boolean
 }) => {
   return (
     <Card
       hoverable={true}
-      className="art-card"
+      className={`art-card ${small ? 'small' : ''}`}
       cover={<ArtContent category={category} content={image} />}
     >
       <Meta

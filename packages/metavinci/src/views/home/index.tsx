@@ -31,7 +31,7 @@ export const HomeView = () => {
       <Layout>
         <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col style={{ width: '100%' }}>
-            <Row style={{ marginBottom: 30, marginTop: 20, fontSize: 20, fontWeight: 600 }}>Featured</Row>
+            <Row style={{ marginTop: 20, fontSize: 20, fontWeight: 600 }}>Featured</Row>
             <Row>
               <Masonry
                 breakpointCols={breakpointColumnsObj}

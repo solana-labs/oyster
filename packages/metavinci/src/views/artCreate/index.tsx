@@ -278,6 +278,7 @@ const InfoStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>
@@ -368,6 +369,7 @@ const RoyaltiesStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>
@@ -465,6 +467,7 @@ const LaunchStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>
