@@ -69,7 +69,7 @@ export const PROGRAM_IDS = [
   {
     name: 'testnet',
     timelock: () => ({
-      programId: new PublicKey('8DevpkpN6CsdczP6rQ64CHraApXFrq96oGm4VjSNCs4q'),
+      programId: new PublicKey('DCVPuhaGNMLh73FRWFroH4o3ERUhBKMRWfBgJV94VqRk'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),

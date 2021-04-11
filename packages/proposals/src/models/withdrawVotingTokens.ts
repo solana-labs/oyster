@@ -20,10 +20,8 @@ import BN from 'bn.js';
 ///   11. `[]` Timelock state account.
 ///   12. `[]` Timelock set account.
 ///   13. `[]` Transfer authority
-///   14. `[]` Yes Transfer authority
-///   15. `[]` No Transfer authority
-///   16. `[]` Timelock program mint authority
-///   17. `[]` Token program account.
+///   14. `[]` Timelock program mint authority
+///   15. `[]` Token program account.
 export const withdrawVotingTokensInstruction = (
   governanceVotingRecord: PublicKey,
   votingAccount: PublicKey,
@@ -39,8 +37,6 @@ export const withdrawVotingTokensInstruction = (
   timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   transferAuthority: PublicKey,
-  yesTransferAuthority: PublicKey,
-  noTransferAuthority: PublicKey,
   mintAuthority: PublicKey,
   votingTokenAmount: number,
 ): TransactionInstruction => {
@@ -75,9 +71,7 @@ export const withdrawVotingTokensInstruction = (
     { pubkey: noVotingMint, isSigner: false, isWritable: true },
     { pubkey: timelockStateAccount, isSigner: false, isWritable: false },
     { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: transferAuthority, isSigner: false, isWritable: false },
-    { pubkey: yesTransferAuthority, isSigner: false, isWritable: false },
-    { pubkey: noTransferAuthority, isSigner: false, isWritable: false },
+    { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];

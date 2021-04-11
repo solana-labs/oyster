@@ -43,6 +43,7 @@ export function WithdrawVote({
     votingTokens > 0 &&
     (state.info.status === TimelockStateStatus.Voting ||
       state.info.status === TimelockStateStatus.Completed ||
+      state.info.status === TimelockStateStatus.Executing ||
       state.info.status === TimelockStateStatus.Defeated);
 
   const [btnLabel, title, msg, action] =

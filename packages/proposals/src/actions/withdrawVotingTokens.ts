@@ -93,20 +93,26 @@ export const withdrawVotingTokens = async (
     votingTokenAmount,
   );
 
-  const yesTransferAuthority = approve(
+  approve(
     instructions,
     [],
     existingYesVoteAccount,
     wallet.publicKey,
     votingTokenAmount,
+    undefined,
+    undefined,
+    transferAuthority,
   );
 
-  const noTransferAuthority = approve(
+  approve(
     instructions,
     [],
     existingNoVoteAccount,
     wallet.publicKey,
     votingTokenAmount,
+    undefined,
+    undefined,
+    transferAuthority,
   );
 
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
@@ -119,8 +125,6 @@ export const withdrawVotingTokens = async (
   );
 
   signers.push(transferAuthority);
-  signers.push(yesTransferAuthority);
-  signers.push(noTransferAuthority);
 
   instructions.push(
     withdrawVotingTokensInstruction(
@@ -138,8 +142,6 @@ export const withdrawVotingTokens = async (
       state.pubkey,
       proposal.pubkey,
       transferAuthority.publicKey,
-      yesTransferAuthority.publicKey,
-      noTransferAuthority.publicKey,
       mintAuthority,
       votingTokenAmount,
     ),
