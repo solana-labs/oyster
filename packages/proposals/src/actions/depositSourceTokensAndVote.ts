@@ -66,7 +66,7 @@ export const depositSourceTokensAndVote = async (
 
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
     [
-      PROGRAM_IDS.timelock.programAccountId.toBuffer(),
+      PROGRAM_IDS.timelock.programId.toBuffer(),
       proposal.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
     ],
@@ -107,7 +107,7 @@ export const depositSourceTokensAndVote = async (
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

@@ -14,8 +14,6 @@ import * as Layout from '../utils/layout';
 ///   1. `[]` Program account that this config uses
 ///   2. `[]` Governance mint that this config uses
 ///   3. `[]` Council mint that this config uses [Optional] [Pass in 0s otherwise]
-///   4. `[]` Timelock program account pub key.
-///   5. `[]` Token program account.
 export const initTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
@@ -72,12 +70,6 @@ export const initTimelockConfigInstruction = (
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
     { pubkey: councilMint, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
-    { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({
     keys,

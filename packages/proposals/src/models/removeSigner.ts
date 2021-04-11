@@ -12,8 +12,7 @@ import { TimelockInstruction } from './timelock';
 ///   3. `[writable]` Admin validation account.
 ///   4. `[]` Timelock set account.
 ///   5. `[]` Transfer authority
-///   5. `[]` Timelock program mint authority
-///   6. `[]` Timelock program account.
+///   6. `[]` Timelock program mint authority
 ///   7. '[]` Token program id.
 export const removeSignerInstruction = (
   signatoryAccount: PublicKey,
@@ -45,11 +44,6 @@ export const removeSignerInstruction = (
     { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({

@@ -49,6 +49,8 @@ export const createProposal = async (
     )
   ).decimals;
 
+  const timelockSetKey = new Account();
+
   const {
     sigMint,
     voteMint,
@@ -73,6 +75,7 @@ export const createProposal = async (
     timelockConfig,
     useGovernance,
     sourceMintDecimals,
+    timelockSetKey,
   );
 
   let createTimelockAccountsSigners: Account[] = [];
@@ -86,7 +89,6 @@ export const createProposal = async (
     TimelockStateLayout.span,
   );
 
-  const timelockSetKey = new Account();
   const timelockStateKey = new Account();
 
   const uninitializedTimelockStateInstruction = SystemProgram.createAccount({
@@ -112,7 +114,7 @@ export const createProposal = async (
   signers.push(timelockSetKey);
   createTimelockAccountsSigners.push(timelockSetKey);
   createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
-  console.log('useGov ernance is', useGovernance, timelockConfig);
+
   instructions.push(
     initTimelockSetInstruction(
       timelockStateKey.publicKey,
@@ -198,11 +200,12 @@ async function getAssociatedAccountsAndInstructions(
   timelockConfig: ParsedAccount<TimelockConfig>,
   useGovernance: boolean,
   sourceMintDecimals: number,
+  newProposalKey: Account,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
 
   const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [newProposalKey.publicKey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 
