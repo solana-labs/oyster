@@ -196,8 +196,16 @@ const UploadStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const [mainFile, setMainFile] = useState<any>(props.attributes.files?.slice(-1)[0])
-  const [coverFile, setCoverFile] = useState<any>(props.attributes.files?.slice(0, 1)[0])
+  const [mainFile, setMainFile] = useState<any>()
+  const [coverFile, setCoverFile] = useState<any>()
+  const [image, setImage] = useState<string>("")
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      files: []
+    })
+  }, [])
 
   const uploadMsg = (category: MetadataCategory) => {
     switch (category) {
@@ -236,16 +244,14 @@ const UploadStep = (props: {
           fileList={mainFile ? [mainFile] : []}
           onChange={async info => {
             const file = info.file.originFileObj;
-            const reader = new FileReader();
-            reader.onload = function (event) {
-              props.setAttributes({
-                ...props.attributes,
-                ...(props.attributes.category == MetadataCategory.Audio ? {} : {image: (event.target?.result as string) || ''}),
-                files: [(props.attributes.files as File[])[0], file],
-              })
-              setMainFile(file) // Keep only the last dropped file
+            if (file) setMainFile(file)
+            if (props.attributes.category != MetadataCategory.Audio) {
+              const reader = new FileReader();
+              reader.onload = function (event) {
+                setImage((event.target?.result as string) || '')
+              }
+              if (file) reader.readAsDataURL(file)
             }
-            if (file) reader.readAsDataURL(file)
           }}
         >
           <div className="ant-upload-drag-icon">
@@ -269,16 +275,14 @@ const UploadStep = (props: {
             fileList={coverFile ? [coverFile] : []}
             onChange={async info => {
               const file = info.file.originFileObj;
-              const reader = new FileReader();
-              reader.onload = function (event) {
-                props.setAttributes({
-                  ...props.attributes,
-                  files: [file, (props.attributes.files as File[])[1]],
-                  image: (event.target?.result as string) || '',
-                })
-                setCoverFile(file) // Keep only the last dropped file
+              if (file) setCoverFile(file)
+              if (props.attributes.category == MetadataCategory.Audio) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                  setImage((event.target?.result as string) || '')
+                }
+                if (file) reader.readAsDataURL(file)
               }
-              if (file) reader.readAsDataURL(file)
             }}
           >
             <div className="ant-upload-drag-icon">
@@ -294,7 +298,14 @@ const UploadStep = (props: {
         <Button
           type="primary"
           size="large"
-          onClick={props.confirm}
+          onClick={() => {
+            props.setAttributes({
+              ...props.attributes,
+              files: [mainFile, coverFile].filter(f => f),
+              image,
+            })
+            props.confirm()
+          }}
           className="action-btn"
         >
           Continue to Mint
@@ -459,7 +470,7 @@ const LaunchStep = (props: {
   const files = props.attributes.files || [];
   const metadata = {
     ...(props.attributes as any),
-    files: files.map(f => f.name),
+    files: files.map(f => f?.name),
   };
   const [cost, setCost] = useState(0);
   useEffect(() => {
