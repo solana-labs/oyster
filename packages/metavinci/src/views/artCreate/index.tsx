@@ -12,7 +12,6 @@ import {
   Spin,
   InputNumber,
 } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
 import { ArtCard } from './../../components/ArtCard';
 import './styles.less';
 import { mintNFT } from '../../models';
@@ -197,13 +196,27 @@ const UploadStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const [fileList, setFileList] = useState<any[]>(props.attributes.files ?? [])
+  const [mainFile, setMainFile] = useState<any>(props.attributes.files?.slice(-1)[0])
+  const [coverFile, setCoverFile] = useState<any>(props.attributes.files?.slice(0, 1)[0])
+
+  const uploadMsg = (category: MetadataCategory) => {
+    switch (category) {
+      case MetadataCategory.Audio:
+        return "Upload your audio creation (MP3, FLAC, WAV)"
+      case MetadataCategory.Image:
+        return "Upload your image creation (PNG, JPG, GIF)"
+      case MetadataCategory.Video:
+        return "Upload your video creation (MP4)"
+      default:
+        return "Please go back and choose a category"
+    }
+  }
 
   return (
     <>
       <Row className="call-to-action">
         <h2>Now, let's upload your creation</h2>
-        <p>
+        <p style={{ fontSize: '1.2rem' }}>
           Your file will be uploaded to the decentralized web via Arweave.
           Depending on file type, can take up to 1 minute. Arweave is a new type
           of storage that backs data with sustainable and perpetual endowments,
@@ -212,36 +225,71 @@ const UploadStep = (props: {
         </p>
       </Row>
       <Row className="content-action">
+        <h3>{uploadMsg(props.attributes.category)}</h3>
         <Dragger
           style={{ padding: 20 }}
           multiple={false}
           customRequest={info => {
             // dont upload files here, handled outside of the control
-            info?.onSuccess?.({}, null as any);
+            info?.onSuccess?.({}, null as any)
           }}
-          fileList={fileList}
+          fileList={mainFile ? [mainFile] : []}
           onChange={async info => {
             const file = info.file.originFileObj;
             const reader = new FileReader();
             reader.onload = function (event) {
               props.setAttributes({
                 ...props.attributes,
-                files: [file],
-                image: (event.target?.result as string) || '',
+                ...(props.attributes.category == MetadataCategory.Audio ? {} : {image: (event.target?.result as string) || ''}),
+                files: [(props.attributes.files as File[])[0], file],
               })
-            };
-            if (file) reader.readAsDataURL(file);
-            setFileList(info.fileList?.slice(-1) ?? []) // Keep only the last dropped file
+              setMainFile(file) // Keep only the last dropped file
+            }
+            if (file) reader.readAsDataURL(file)
           }}
         >
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
+          <div className="ant-upload-drag-icon">
+            <h3 style={{fontWeight: 700}}>Upload your creation</h3>
+          </div>
           <p className="ant-upload-text">
-            Click or drag file to this area to upload
+            Drag and drop, or click to browse
           </p>
         </Dragger>
       </Row>
+      {props.attributes.category == MetadataCategory.Audio &&
+        <Row className="content-action">
+          <h3>Optionally, you can upload a cover image or video (PNG, JPG, GIF, MP4)</h3>
+          <Dragger
+            style={{ padding: 20 }}
+            multiple={false}
+            customRequest={info => {
+              // dont upload files here, handled outside of the control
+              info?.onSuccess?.({}, null as any)
+            }}
+            fileList={coverFile ? [coverFile] : []}
+            onChange={async info => {
+              const file = info.file.originFileObj;
+              const reader = new FileReader();
+              reader.onload = function (event) {
+                props.setAttributes({
+                  ...props.attributes,
+                  files: [file, (props.attributes.files as File[])[1]],
+                  image: (event.target?.result as string) || '',
+                })
+                setCoverFile(file) // Keep only the last dropped file
+              }
+              if (file) reader.readAsDataURL(file)
+            }}
+          >
+            <div className="ant-upload-drag-icon">
+              <h3 style={{fontWeight: 700}}>Upload your cover image or video</h3>
+            </div>
+            <p className="ant-upload-text">
+              Drag and drop, or click to browse
+            </p>
+          </Dragger>
+        </Row>
+      }
       <Row>
         <Button
           type="primary"
