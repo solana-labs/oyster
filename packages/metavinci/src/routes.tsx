@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import { contexts } from '@oyster/common';
 import {
   MarketProvider,
@@ -16,7 +16,7 @@ const { AccountsProvider } = contexts.Accounts;
 export function Routes() {
   return (
     <>
-      <BrowserRouter basename={'/'}>
+      <HashRouter basename={'/'}>
         <ConnectionProvider>
           <WalletProvider>
             <UseWalletProvider chainId={5}>
@@ -73,7 +73,7 @@ export function Routes() {
             </UseWalletProvider>
           </WalletProvider>
         </ConnectionProvider>
-      </BrowserRouter>
+      </HashRouter>
     </>
   );
 }
