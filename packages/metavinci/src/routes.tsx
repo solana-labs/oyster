@@ -7,7 +7,7 @@ import {
 } from './contexts';
 import { AppLayout } from './components/Layout';
 
-import { ArtCreateView, ArtistsView, ArtistView, ArtView, AuctionCreateView, AuctionView, HomeView, UserView } from './views';
+import { ArtCreateView, ArtistsView, ArtistView, ArtView, AuctionCreateView, AuctionView, HomeView, ArtworksView } from './views';
 import { UseWalletProvider } from 'use-wallet';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -38,7 +38,7 @@ export function Routes() {
                         <Route
                           exact
                           path="/user/:id?"
-                          component={() => <UserView />}
+                          component={() => <ArtworksView />}
                         />
                         <Route
                           exact

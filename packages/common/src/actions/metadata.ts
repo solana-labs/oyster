@@ -45,10 +45,12 @@ export interface IMetadataExtension {
 export class Metadata {
   key: number;
   updateAuthority?: PublicKey;
+
   mint: PublicKey;
   name: string;
   symbol: string;
   uri: string;
+
   extended?: IMetadataExtension;
 
   constructor(args: {
@@ -87,10 +89,16 @@ class CreateMetadataArgs {
   symbol: string;
   uri: string;
 
-  constructor(args: { name: string; symbol: string; uri: string }) {
+  constructor(args: {
+    name: string;
+    symbol: string;
+    uri: string;
+    allow_duplicates?: boolean;
+  }) {
     this.name = args.name;
     this.symbol = args.symbol;
     this.uri = args.uri;
+    this.allow_duplicates = !!args.allow_duplicates;
   }
 }
 class UpdateMetadataArgs {
@@ -103,6 +111,11 @@ class UpdateMetadataArgs {
     this.uri = args.uri;
     this.non_unique_specific_update_authority = 0;
   }
+}
+
+class TransferMetadataArgs {
+  instruction: number = 2;
+  constructor() {}
 }
 
 export const SCHEMA = new Map<any, any>([
@@ -128,6 +141,13 @@ export const SCHEMA = new Map<any, any>([
         ['uri', 'string'],
         ['non_unique_specific_update_authority', 'u8'],
       ],
+    },
+  ],
+  [
+    TransferMetadataArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
     },
   ],
   [
@@ -160,6 +180,63 @@ export const SCHEMA = new Map<any, any>([
 export const decodeMetadata = (buffer: Buffer) => {
   return deserializeBorsh(SCHEMA, Metadata, buffer) as Metadata;
 };
+
+export async function transferMetadata(
+  symbol: string,
+  name: string,
+  currentUpdateAuthority: PublicKey,
+  newUpdateAuthority: PublicKey,
+  instructions: TransactionInstruction[],
+  signers: Account[],
+  metadataAccount?: PublicKey,
+  metadataOwnerAccount?: PublicKey,
+) {
+  const metadataProgramId = programIds().metadata;
+
+  metadataOwnerAccount =
+    metadataOwnerAccount ||
+    (
+      await PublicKey.findProgramAddress(
+        [
+          Buffer.from('metadata'),
+          metadataProgramId.toBuffer(),
+          Buffer.from(name),
+          Buffer.from(symbol),
+        ],
+        metadataProgramId,
+      )
+    )[0];
+
+  const data = Buffer.from(serialize(SCHEMA, new TransferMetadataArgs()));
+
+  const keys = [
+    {
+      pubkey: metadataOwnerAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: currentUpdateAuthority,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: newUpdateAuthority,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data: data,
+    }),
+  );
+
+  return [metadataAccount, metadataOwnerAccount];
+}
+
 export async function updateMetadata(
   symbol: string,
   name: string,
@@ -168,31 +245,37 @@ export async function updateMetadata(
   updateAuthority: PublicKey,
   instructions: TransactionInstruction[],
   signers: Account[],
+  metadataAccount?: PublicKey,
+  metadataOwnerAccount?: PublicKey,
 ) {
   const metadataProgramId = programIds().metadata;
 
-  const metadataAccount = (
-    await PublicKey.findProgramAddress(
-      [
-        Buffer.from('metadata'),
-        metadataProgramId.toBuffer(),
-        mintKey.toBuffer(),
-      ],
-      metadataProgramId,
-    )
-  )[0];
+  metadataAccount =
+    metadataAccount ||
+    (
+      await PublicKey.findProgramAddress(
+        [
+          Buffer.from('metadata'),
+          metadataProgramId.toBuffer(),
+          mintKey.toBuffer(),
+        ],
+        metadataProgramId,
+      )
+    )[0];
 
-  const metadataOwnerAccount = (
-    await PublicKey.findProgramAddress(
-      [
-        Buffer.from('metadata'),
-        metadataProgramId.toBuffer(),
-        Buffer.from(name),
-        Buffer.from(symbol),
-      ],
-      metadataProgramId,
-    )
-  )[0];
+  metadataOwnerAccount =
+    metadataOwnerAccount ||
+    (
+      await PublicKey.findProgramAddress(
+        [
+          Buffer.from('metadata'),
+          metadataProgramId.toBuffer(),
+          Buffer.from(name),
+          Buffer.from(symbol),
+        ],
+        metadataProgramId,
+      )
+    )[0];
 
   const value = new UpdateMetadataArgs({ uri });
   const data = Buffer.from(serialize(SCHEMA, value));
@@ -221,16 +304,20 @@ export async function updateMetadata(
       data,
     }),
   );
+
+  return [metadataAccount, metadataOwnerAccount];
 }
+
 export async function createMetadata(
   symbol: string,
   name: string,
   uri: string,
+  allow_duplicates: boolean,
+  updateAuthority: PublicKey,
   mintKey: PublicKey,
   mintAuthorityKey: PublicKey,
   instructions: TransactionInstruction[],
   payer: PublicKey,
-  updateAuthority: PublicKey,
   signers: Account[],
 ) {
   const metadataProgramId = programIds().metadata;
@@ -258,7 +345,7 @@ export async function createMetadata(
     )
   )[0];
 
-  const value = new CreateMetadataArgs({ name, symbol, uri });
+  const value = new CreateMetadataArgs({ name, symbol, uri, allow_duplicates });
   const data = Buffer.from(serialize(SCHEMA, value));
 
   const keys = [
@@ -289,7 +376,7 @@ export async function createMetadata(
     },
     {
       pubkey: updateAuthority,
-      isSigner: true,
+      isSigner: false,
       isWritable: false,
     },
     {
@@ -310,4 +397,6 @@ export async function createMetadata(
       data,
     }),
   );
+
+  return [metadataAccount, metadataOwnerAccount];
 }

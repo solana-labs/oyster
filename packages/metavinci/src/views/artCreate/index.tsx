@@ -278,6 +278,7 @@ const InfoStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>
@@ -285,6 +286,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Title</span>
             <Input
+              autoFocus
               className="input"
               placeholder="Max 50 characters"
               allowClear
@@ -367,6 +369,7 @@ const RoyaltiesStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>
@@ -374,6 +377,7 @@ const RoyaltiesStep = (props: {
           <label className="action-field">
             <span className="field-title">Royalty Percentage</span>
             <InputNumber
+              autoFocus
               min={0}
               max={100}
               placeholder="Between 0 and 100"
@@ -463,6 +467,7 @@ const LaunchStep = (props: {
               category={props.attributes.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
+              small={true}
             />
           )}
         </Col>

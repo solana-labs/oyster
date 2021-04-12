@@ -5,4 +5,4 @@ export { ArtistView } from './artist';
 export { ArtistsView } from './artists';
 export { AuctionView } from './auction';
 export { AuctionCreateView } from './auctionCreate';
-export { UserView } from './user';
+export { ArtworksView } from './artworks';

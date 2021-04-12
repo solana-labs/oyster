@@ -17,8 +17,6 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: b
     return null;
   }
 
-  // should use SOL ◎ ?
-
   const iconStyle: React.CSSProperties = props.showAddress ?
   {
     marginLeft: '0.5rem',
