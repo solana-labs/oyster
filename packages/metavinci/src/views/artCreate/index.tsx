@@ -601,7 +601,16 @@ const WaitingStep = (props: {
 }
 
 const Congrats = () => {
-  return <>
-    Congrats!
-  </>
+  return (
+    <div style={{ marginTop: 70 }}>
+      <div className="waiting-title">
+        Congratulations! Your creation is now live.
+      </div>
+      <div className="congrats-button-container">
+        <Button className="congrats-button"><span>Share it on Twitter</span><span>&gt;</span></Button>
+        <Button className="congrats-button"><span>See it in your collection</span><span>&gt;</span></Button>
+        <Button className="congrats-button"><span>Sell it via auction</span><span>&gt;</span></Button>
+      </div>
+    </div>
+  )
 }
