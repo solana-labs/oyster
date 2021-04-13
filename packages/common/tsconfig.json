@@ -18,6 +18,6 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["types", "../../types", "../../node_modules/@types"]
   },
-  "include": ["src/**/*", "src/config/tokens.json"],
+  "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts", "**/node_modules"]
 }
