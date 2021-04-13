@@ -8,7 +8,7 @@ import {
   createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
 import { ethers } from 'ethers';
-import { Erc20Factory } from '../../../contracts/Erc20Factory';
+import { ERC20Factory } from '../../../contracts/ERC20Factory';
 import { WormholeFactory } from '../../../contracts/WormholeFactory';
 import { AssetMeta, createWrappedAssetInstruction } from './../meta';
 import { bridgeAuthorityKey, wrappedAssetMintKey } from './../helpers';
@@ -168,7 +168,7 @@ export const toSolana = async (
       const group = 'Approve assets';
       try {
         if (request.info?.allowance.lt(amountBN)) {
-          let e = Erc20Factory.connect(request.asset, signer);
+          let e = ERC20Factory.connect(request.asset, signer);
           setProgress({
             message: `Waiting for ${walletName} approval`,
             type: 'user',
