@@ -42,8 +42,9 @@ export const ArtCreateView = () => {
   const { step_param }: { step_param: string } = useParams()
   const history = useHistory()
 
-  const [step, setStep] = useState(0);
-  const [saving, setSaving] = useState(false);
+  const [step, setStep] = useState<number>(0);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const [attributes, setAttributes] = useState<IMetadataExtension>({
     name: '',
     symbol: '',
@@ -70,28 +71,18 @@ export const ArtCreateView = () => {
       ...(attributes as any),
       image: attributes.files && attributes.files?.[0] && attributes.files[0].name,
       files: (attributes?.files || []).map(f => f.name),
-    };
-    setSaving(true);
-    await mintNFT(connection, wallet, env, (attributes?.files || []), metadata);
-    setSaving(false);
-  };
+    }
+    setSaving(true)
+    const inte = setInterval(() => setProgress(prog => prog + 1), 600)
+    // Update progress inside mintNFT
+    await mintNFT(connection, wallet, env, (attributes?.files || []), metadata)
+    clearInterval(inte)
+  }
 
   return (
     <>
-      <Modal title="Saving..." footer={null} closable={false} visible={saving}>
-        <Progress
-          percent={100}
-          strokeWidth={20}
-          status="active"
-          strokeColor={{
-            '0%': '#108ee9',
-            '100%': '#87d068',
-          }}
-          showInfo={false}
-        />
-      </Modal>
       <Row style={{ paddingTop: 50 }}>
-        <Col xl={5}>
+        {!saving && <Col xl={5}>
           <Steps
             progressDot
             direction="vertical"
@@ -104,8 +95,8 @@ export const ArtCreateView = () => {
             <Step title="Royalties" />
             <Step title="Launch" />
           </Steps>
-        </Col>
-        <Col xl={16}>
+        </Col>}
+        <Col {...(saving ? { xl: 24 } : { xl: 16 })}>
           {step === 0 && (
             <CategoryStep
               confirm={(category: MetadataCategory) => {
@@ -142,11 +133,21 @@ export const ArtCreateView = () => {
           {step === 4 && (
             <LaunchStep
               attributes={attributes}
-              confirm={() => mint()}
+              confirm={() => gotoStep(5)}
               connection={connection}
             />
           )}
-          {step > 0 && <Button onClick={() => gotoStep(step - 1)}>Back</Button>}
+          {step === 5 && (
+            <WaitingStep
+              mint={mint}
+              progress={progress}
+              confirm={() => gotoStep(6)}
+            />
+          )}
+          {step === 6 && (
+            <Congrats />
+          )}
+          {(0 < step && step < 5) && <Button onClick={() => gotoStep(step - 1)}>Back</Button>}
         </Col>
       </Row>
     </>
@@ -255,7 +256,7 @@ const UploadStep = (props: {
           }}
         >
           <div className="ant-upload-drag-icon">
-            <h3 style={{fontWeight: 700}}>Upload your creation</h3>
+            <h3 style={{ fontWeight: 700 }}>Upload your creation</h3>
           </div>
           <p className="ant-upload-text">
             Drag and drop, or click to browse
@@ -286,7 +287,7 @@ const UploadStep = (props: {
             }}
           >
             <div className="ant-upload-drag-icon">
-              <h3 style={{fontWeight: 700}}>Upload your cover image or video</h3>
+              <h3 style={{ fontWeight: 700 }}>Upload your cover image or video</h3>
             </div>
             <p className="ant-upload-text">
               Drag and drop, or click to browse
@@ -570,3 +571,37 @@ const LaunchStep = (props: {
     </>
   );
 };
+
+const WaitingStep = (props: {
+  mint: Function,
+  progress: number,
+  confirm: Function,
+}) => {
+
+  useEffect(() => {
+    const func = async () => {
+      await props.mint()
+      props.confirm()
+    }
+    func()
+  }, [])
+
+  return (
+    <div style={{ marginTop: 70 }}>
+      <Progress
+        type="circle"
+        percent={props.progress}
+      />
+      <div className="waiting-title">
+        Your creation is being uploaded to the decentralized web...
+      </div>
+      <div className="waiting-subtitle">This can take up to 1 minute.</div>
+    </div>
+  )
+}
+
+const Congrats = () => {
+  return <>
+    Congrats!
+  </>
+}
