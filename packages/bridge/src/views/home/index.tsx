@@ -127,8 +127,8 @@ export const HomeView = () => {
   };
   return (
     <>
-      <div className="flexColumn home-container wormhole-bg">
-        <div className={'justify-bottom-container'}>
+      <div className="flexColumn home-container">
+        <div className={'justify-bottom-container wormhole-bg'}>
           <div className={'main-logo'}>
             <img src={'/home/main-logo.svg'} />
           </div>
@@ -189,7 +189,7 @@ export const HomeView = () => {
           </div>
         </div>
         <div id={'recent-tx-container'}>
-          <div className={'home-subtitle'}>Recent Transactions</div>
+          <div className={'home-subtitle'}>Overview of Assets</div>
           <div className={'description-text'} style={{ marginBottom: '70px' }}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </div>

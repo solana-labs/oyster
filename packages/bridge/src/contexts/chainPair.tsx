@@ -249,7 +249,7 @@ export function TokenChainPairProvider({ children = null as any }) {
       return;
     }
     let { defaultChain, defaultToken } = getDefaultTokens(
-      ethTokens,
+      tokens,
       location.search,
     );
     if (!defaultToken || !defaultChain) {
@@ -269,15 +269,7 @@ export function TokenChainPairProvider({ children = null as any }) {
     );
     // mintAddressA and mintAddressB are not included here to prevent infinite loop
     // eslint-disable-next-line
-  }, [
-    location,
-    location.search,
-    location.pathname,
-    setMintAddress,
-    tokens,
-    setChainA,
-    setChainB,
-  ]);
+  }, [location, location.search, location.pathname, tokens]);
 
   const calculateDependent = useCallback(async () => {
     if (mintAddress) {
