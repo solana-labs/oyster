@@ -601,7 +601,7 @@ const WaitingStep = (props: {
 }
 
 const Congrats = () => {
-  return (
+  return <>
     <div style={{ marginTop: 70 }}>
       <div className="waiting-title">
         Congratulations! Your creation is now live.
@@ -612,5 +612,38 @@ const Congrats = () => {
         <Button className="congrats-button"><span>Sell it via auction</span><span>&gt;</span></Button>
       </div>
     </div>
-  )
+    <Conffeti />
+  </>
+}
+
+interface Particle {
+  top: number,
+  left: number,
+  speed: number,
+}
+
+const Conffeti = () => {
+  const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 20 }).map(_ => ({
+    top: -30,
+    left: Math.floor(Math.random() * 100),
+    speed: Math.random() * 2 + 0.5,
+  })))
+
+  useEffect(() => {
+    setInterval(() => {
+      setParticles(parts => parts.map(part => ({
+        ...part,
+        top: (part.top > 100 ? 0 : part.top + part.speed),
+      })))
+    }, 40)
+  }, [])
+
+  const getStyle = (particle: Particle) => ({
+    top: `${particle.top}%`,
+    left: `${particle.left}%`,
+  })
+
+  return <>
+    {particles.map((particle, idx) => <span key={idx} className="particle" style={getStyle(particle)}></span>)}
+  </>
 }
