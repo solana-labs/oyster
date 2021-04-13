@@ -12,9 +12,7 @@
   "ast": {
     "absolutePath": "@openzeppelin/contracts/token/ERC20/SafeERC20.sol",
     "exportedSymbols": {
-      "SafeERC20": [
-        3299
-      ]
+      "SafeERC20": [3299]
     },
     "id": 3300,
     "license": "MIT",
@@ -22,15 +20,7 @@
     "nodes": [
       {
         "id": 3088,
-        "literals": [
-          "solidity",
-          ">=",
-          "0.6",
-          ".0",
-          "<",
-          "0.8",
-          ".0"
-        ],
+        "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"],
         "nodeType": "PragmaDirective",
         "src": "33:31:7"
       },
@@ -80,9 +70,7 @@
         },
         "fullyImplemented": true,
         "id": 3299,
-        "linearizedBaseContracts": [
-          3299
-        ],
+        "linearizedBaseContracts": [3299],
         "name": "SafeERC20",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1127,10 +1115,7 @@
                       "id": 3155,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "1704:7:7",
                       "typeDescriptions": {
@@ -1476,9 +1461,7 @@
               "src": "2053:197:7",
               "statements": [
                 {
-                  "assignments": [
-                    3198
-                  ],
+                  "assignments": [3198],
                   "declarations": [
                     {
                       "constant": false,
@@ -2011,9 +1994,7 @@
               "src": "2342:242:7",
               "statements": [
                 {
-                  "assignments": [
-                    3234
-                  ],
+                  "assignments": [3234],
                   "declarations": [
                     {
                       "constant": false,
@@ -2568,9 +2549,7 @@
               "src": "3037:681:7",
               "statements": [
                 {
-                  "assignments": [
-                    3270
-                  ],
+                  "assignments": [3270],
                   "declarations": [
                     {
                       "constant": false,
@@ -2965,10 +2944,7 @@
                             "id": 3284,
                             "name": "require",
                             "nodeType": "Identifier",
-                            "overloadedDeclarations": [
-                              -18,
-                              -18
-                            ],
+                            "overloadedDeclarations": [-18, -18],
                             "referencedDeclaration": -18,
                             "src": "3616:7:7",
                             "typeDescriptions": {
@@ -3101,24 +3077,14 @@
     "attributes": {
       "absolutePath": "@openzeppelin/contracts/token/ERC20/SafeERC20.sol",
       "exportedSymbols": {
-        "SafeERC20": [
-          3299
-        ]
+        "SafeERC20": [3299]
       },
       "license": "MIT"
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            ">=",
-            "0.6",
-            ".0",
-            "<",
-            "0.8",
-            ".0"
-          ]
+          "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"]
         },
         "id": 3088,
         "name": "PragmaDirective",
@@ -3130,9 +3096,7 @@
           "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
           "file": "./IERC20.sol",
           "scope": 3300,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 3089,
@@ -3145,9 +3109,7 @@
           "absolutePath": "@openzeppelin/contracts/math/SafeMath.sol",
           "file": "../../math/SafeMath.sol",
           "scope": 3300,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 3090,
@@ -3160,9 +3122,7 @@
           "absolutePath": "@openzeppelin/contracts/utils/Address.sol",
           "file": "../../utils/Address.sol",
           "scope": 3300,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 3091,
@@ -3172,17 +3132,11 @@
       {
         "attributes": {
           "abstract": false,
-          "baseContracts": [
-            null
-          ],
-          "contractDependencies": [
-            null
-          ],
+          "baseContracts": [null],
+          "contractDependencies": [null],
           "contractKind": "library",
           "fullyImplemented": true,
-          "linearizedBaseContracts": [
-            3299
-          ],
+          "linearizedBaseContracts": [3299],
           "name": "SafeERC20",
           "scope": 3300
         },
@@ -3256,9 +3210,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "safeTransfer",
               "overrides": null,
               "scope": 3299,
@@ -3363,9 +3315,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3106,
@@ -3384,9 +3334,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -3404,9 +3352,7 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3298,
                               "type": "function (contract IERC20,bytes memory)",
                               "value": "_callOptionalReturn"
@@ -3418,9 +3364,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3100,
                               "type": "contract IERC20",
                               "value": "token"
@@ -3437,9 +3381,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "tryCall": false,
                               "type": "bytes memory",
                               "type_conversion": false
@@ -3473,9 +3415,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": -1,
                                       "type": "abi",
                                       "value": "abi"
@@ -3516,9 +3456,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3100,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -3540,9 +3478,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3102,
                                   "type": "address",
                                   "value": "to"
@@ -3554,9 +3490,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3104,
                                   "type": "uint256",
                                   "value": "value"
@@ -3596,9 +3530,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "safeTransferFrom",
               "overrides": null,
               "scope": 3299,
@@ -3732,9 +3664,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3130,
@@ -3753,9 +3683,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -3773,9 +3701,7 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3298,
                               "type": "function (contract IERC20,bytes memory)",
                               "value": "_callOptionalReturn"
@@ -3787,9 +3713,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3122,
                               "type": "contract IERC20",
                               "value": "token"
@@ -3806,9 +3730,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "tryCall": false,
                               "type": "bytes memory",
                               "type_conversion": false
@@ -3846,9 +3768,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": -1,
                                       "type": "abi",
                                       "value": "abi"
@@ -3889,9 +3809,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3122,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -3913,9 +3831,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3124,
                                   "type": "address",
                                   "value": "from"
@@ -3927,9 +3843,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3126,
                                   "type": "address",
                                   "value": "to"
@@ -3941,9 +3855,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3128,
                                   "type": "uint256",
                                   "value": "value"
@@ -3982,9 +3894,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "safeApprove",
               "overrides": null,
               "scope": 3299,
@@ -4097,9 +4007,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3154,
@@ -4118,9 +4026,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -4138,10 +4044,7 @@
                                   "typeString": "literal_string \"SafeERC20: approve from non-zero to non-zero allowance\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -4194,9 +4097,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3152,
                                           "type": "uint256",
                                           "value": "value"
@@ -4266,9 +4167,7 @@
                                           "isPure": false,
                                           "isStructConstructorCall": false,
                                           "lValueRequested": false,
-                                          "names": [
-                                            null
-                                          ],
+                                          "names": [null],
                                           "tryCall": false,
                                           "type": "uint256",
                                           "type_conversion": false
@@ -4322,9 +4221,7 @@
                                               "isPure": false,
                                               "isStructConstructorCall": false,
                                               "lValueRequested": false,
-                                              "names": [
-                                                null
-                                              ],
+                                              "names": [null],
                                               "tryCall": false,
                                               "type": "address",
                                               "type_conversion": true
@@ -4381,9 +4278,7 @@
                                           {
                                             "attributes": {
                                               "argumentTypes": null,
-                                              "overloadedDeclarations": [
-                                                null
-                                              ],
+                                              "overloadedDeclarations": [null],
                                               "referencedDeclaration": 3150,
                                               "type": "address",
                                               "value": "spender"
@@ -4466,9 +4361,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -4486,9 +4379,7 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3298,
                               "type": "function (contract IERC20,bytes memory)",
                               "value": "_callOptionalReturn"
@@ -4500,9 +4391,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3148,
                               "type": "contract IERC20",
                               "value": "token"
@@ -4519,9 +4408,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "tryCall": false,
                               "type": "bytes memory",
                               "type_conversion": false
@@ -4555,9 +4442,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": -1,
                                       "type": "abi",
                                       "value": "abi"
@@ -4598,9 +4483,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3148,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -4622,9 +4505,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3150,
                                   "type": "address",
                                   "value": "spender"
@@ -4636,9 +4517,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3152,
                                   "type": "uint256",
                                   "value": "value"
@@ -4678,9 +4557,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "safeIncreaseAllowance",
               "overrides": null,
               "scope": 3299,
@@ -4785,9 +4662,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3196,
@@ -4798,9 +4673,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        3198
-                      ]
+                      "assignments": [3198]
                     },
                     "children": [
                       {
@@ -4839,9 +4712,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "uint256",
                           "type_conversion": false
@@ -4872,9 +4743,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "tryCall": false,
                                   "type": "uint256",
                                   "type_conversion": false
@@ -4904,9 +4773,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3190,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -4928,9 +4795,7 @@
                                       "isPure": false,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "tryCall": false,
                                       "type": "address",
                                       "type_conversion": true
@@ -4968,9 +4833,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": -28,
                                           "type": "library SafeERC20",
                                           "value": "this"
@@ -4987,9 +4850,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 3192,
                                       "type": "address",
                                       "value": "spender"
@@ -5011,9 +4872,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3194,
                               "type": "uint256",
                               "value": "value"
@@ -5042,9 +4901,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -5062,9 +4919,7 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3298,
                               "type": "function (contract IERC20,bytes memory)",
                               "value": "_callOptionalReturn"
@@ -5076,9 +4931,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3190,
                               "type": "contract IERC20",
                               "value": "token"
@@ -5095,9 +4948,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "tryCall": false,
                               "type": "bytes memory",
                               "type_conversion": false
@@ -5131,9 +4982,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": -1,
                                       "type": "abi",
                                       "value": "abi"
@@ -5174,9 +5023,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3190,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -5198,9 +5045,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3192,
                                   "type": "address",
                                   "value": "spender"
@@ -5212,9 +5057,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3198,
                                   "type": "uint256",
                                   "value": "newAllowance"
@@ -5254,9 +5097,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "safeDecreaseAllowance",
               "overrides": null,
               "scope": 3299,
@@ -5361,9 +5202,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3232,
@@ -5374,9 +5213,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        3234
-                      ]
+                      "assignments": [3234]
                     },
                     "children": [
                       {
@@ -5415,9 +5252,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "uint256",
                           "type_conversion": false
@@ -5452,9 +5287,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "tryCall": false,
                                   "type": "uint256",
                                   "type_conversion": false
@@ -5484,9 +5317,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3226,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -5508,9 +5339,7 @@
                                       "isPure": false,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "tryCall": false,
                                       "type": "address",
                                       "type_conversion": true
@@ -5548,9 +5377,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": -28,
                                           "type": "library SafeERC20",
                                           "value": "this"
@@ -5567,9 +5394,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 3228,
                                       "type": "address",
                                       "value": "spender"
@@ -5591,9 +5416,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3230,
                               "type": "uint256",
                               "value": "value"
@@ -5639,9 +5462,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -5659,9 +5480,7 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3298,
                               "type": "function (contract IERC20,bytes memory)",
                               "value": "_callOptionalReturn"
@@ -5673,9 +5492,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3226,
                               "type": "contract IERC20",
                               "value": "token"
@@ -5692,9 +5509,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "tryCall": false,
                               "type": "bytes memory",
                               "type_conversion": false
@@ -5728,9 +5543,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": -1,
                                       "type": "abi",
                                       "value": "abi"
@@ -5771,9 +5584,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3226,
                                           "type": "contract IERC20",
                                           "value": "token"
@@ -5795,9 +5606,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3228,
                                   "type": "address",
                                   "value": "spender"
@@ -5809,9 +5618,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3234,
                                   "type": "uint256",
                                   "value": "newAllowance"
@@ -5850,9 +5657,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "_callOptionalReturn",
               "overrides": null,
               "scope": 3299,
@@ -5936,9 +5741,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3268,
@@ -5949,9 +5752,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        3270
-                      ]
+                      "assignments": [3270]
                     },
                     "children": [
                       {
@@ -5990,9 +5791,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "bytes memory",
                           "type_conversion": false
@@ -6027,9 +5826,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "tryCall": false,
                                   "type": "address",
                                   "type_conversion": true
@@ -6067,9 +5864,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 3264,
                                       "type": "contract IERC20",
                                       "value": "token"
@@ -6091,9 +5886,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3266,
                               "type": "bytes memory",
                               "value": "data"
@@ -6164,9 +5957,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3270,
                                   "type": "bytes memory",
                                   "value": "returndata"
@@ -6214,9 +6005,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "tryCall": false,
                                   "type": "tuple()",
                                   "type_conversion": false
@@ -6234,10 +6023,7 @@
                                           "typeString": "literal_string \"SafeERC20: ERC20 operation did not succeed\""
                                         }
                                       ],
-                                      "overloadedDeclarations": [
-                                        -18,
-                                        -18
-                                      ],
+                                      "overloadedDeclarations": [-18, -18],
                                       "referencedDeclaration": -18,
                                       "type": "function (bool,string memory) pure",
                                       "value": "require"
@@ -6254,9 +6040,7 @@
                                       "isPure": false,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "tryCall": false,
                                       "type": "bool",
                                       "type_conversion": false
@@ -6286,9 +6070,7 @@
                                           {
                                             "attributes": {
                                               "argumentTypes": null,
-                                              "overloadedDeclarations": [
-                                                null
-                                              ],
+                                              "overloadedDeclarations": [null],
                                               "referencedDeclaration": -1,
                                               "type": "abi",
                                               "value": "abi"
@@ -6305,9 +6087,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 3270,
                                           "type": "bytes memory",
                                           "value": "returndata"
