@@ -16,7 +16,7 @@
     "downlevelIteration": true,
     "noEmit": true,
     "jsx": "react",
-    "typeRoots": ["../../types"]
+    "typeRoots": ["types", "../../types", "../../node_modules/@types"]
   },
   "include": ["src"]
 }
