@@ -620,20 +620,27 @@ interface Particle {
   top: number,
   left: number,
   speed: number,
+  angle: number,
+  angle_speed: number,
+  size: number,
 }
 
 const Conffeti = () => {
-  const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 20 }).map(_ => ({
-    top: -30,
-    left: Math.floor(Math.random() * 100),
-    speed: Math.random() * 2 + 0.5,
+  const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 30 }).map(_ => ({
+    top: -Math.random() * 100,
+    left: Math.random() * 100,
+    speed: Math.random() * 1 + 3,
+    angle: 0,
+    angle_speed: Math.random() * 10 + 5,
+    size: Math.floor(Math.random() * 8 + 12),
   })))
 
   useEffect(() => {
     setInterval(() => {
       setParticles(parts => parts.map(part => ({
         ...part,
-        top: (part.top > 100 ? 0 : part.top + part.speed),
+        top: (part.top > 130 ? -30 : part.top + part.speed),
+        angle: (part.angle > 360 ? 0 : part.angle + part.angle_speed),
       })))
     }, 40)
   }, [])
@@ -641,9 +648,12 @@ const Conffeti = () => {
   const getStyle = (particle: Particle) => ({
     top: `${particle.top}%`,
     left: `${particle.left}%`,
+    transform: `rotate(${particle.angle}deg)`,
+    width: particle.size,
+    height: particle.size,
   })
 
-  return <>
+  return <div>
     {particles.map((particle, idx) => <span key={idx} className="particle" style={getStyle(particle)}></span>)}
-  </>
+  </div>
 }
