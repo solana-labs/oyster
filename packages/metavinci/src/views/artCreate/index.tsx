@@ -609,6 +609,58 @@ const WaitingStep = (props: {
 
 const Congrats = () => {
   return <>
-    Congrats!
+    <div style={{ marginTop: 70 }}>
+      <div className="waiting-title">
+        Congratulations! Your creation is now live.
+      </div>
+      <div className="congrats-button-container">
+        <Button className="congrats-button"><span>Share it on Twitter</span><span>&gt;</span></Button>
+        <Button className="congrats-button"><span>See it in your collection</span><span>&gt;</span></Button>
+        <Button className="congrats-button"><span>Sell it via auction</span><span>&gt;</span></Button>
+      </div>
+    </div>
+    <Conffeti />
   </>
+}
+
+interface Particle {
+  top: number,
+  left: number,
+  speed: number,
+  angle: number,
+  angle_speed: number,
+  size: number,
+}
+
+const Conffeti = () => {
+  const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 30 }).map(_ => ({
+    top: -Math.random() * 100,
+    left: Math.random() * 100,
+    speed: Math.random() * 1 + 3,
+    angle: 0,
+    angle_speed: Math.random() * 10 + 5,
+    size: Math.floor(Math.random() * 8 + 12),
+  })))
+
+  useEffect(() => {
+    setInterval(() => {
+      setParticles(parts => parts.map(part => ({
+        ...part,
+        top: (part.top > 130 ? -30 : part.top + part.speed),
+        angle: (part.angle > 360 ? 0 : part.angle + part.angle_speed),
+      })))
+    }, 40)
+  }, [])
+
+  const getStyle = (particle: Particle) => ({
+    top: `${particle.top}%`,
+    left: `${particle.left}%`,
+    transform: `rotate(${particle.angle}deg)`,
+    width: particle.size,
+    height: particle.size,
+  })
+
+  return <div>
+    {particles.map((particle, idx) => <span key={idx} className="particle" style={getStyle(particle)}></span>)}
+  </div>
 }
