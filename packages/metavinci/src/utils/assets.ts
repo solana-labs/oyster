@@ -4,6 +4,7 @@ import {
   KnownTokenMap,
 } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
+import { COINGECKO_COIN_PRICE_API } from '../contexts/coingecko';
 
 export const getAssetName = (
   parsedAssetAddress: string,
@@ -30,14 +31,11 @@ export const getAssetTokenSymbol = (
   else return getTokenName(ethTokens, `0x${parsedAssetAddress}`);
 };
 
-export const getAssetAmountInUSD = (
-  amount: number,
-  // parsedAssetAddress: string,
-  // assetChain: number,
-) => {
-  // TODO: make it work
-  return amount;
-};
+export const solanaToUSD = async (amount: number): Promise<number> => {
+  const url = `${COINGECKO_COIN_PRICE_API}?ids=solana&vs_currencies=usd`
+  const resp = await window.fetch(url).then(resp => resp.json())
+  return amount * resp.solana.usd
+}
 
 export enum ASSET_CHAIN {
   Solana = 1,

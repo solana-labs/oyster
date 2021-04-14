@@ -6,13 +6,19 @@ import { Presale } from '../../types'
 
 import './index.less'
 import { getCountdown } from '../../utils/utils'
-import { getAssetAmountInUSD } from '../../utils/assets'
+import { solanaToUSD } from '../../utils/assets'
 
 const Price = ({amt}: {amt: number}) => {
+  const [USDamt, setUSDamt] = useState<number>(0)
+
+  useEffect(() => {
+    solanaToUSD(amt).then(setUSDamt)
+  }, [amt])
+
   return (
     <div>
       <span className="cd-number">◎{amt}</span>&nbsp;&nbsp;
-      <span className="cd-label">${getAssetAmountInUSD(amt)}</span>
+      <span className="cd-label">${USDamt.toFixed(2)}</span>
     </div>
   )
 }

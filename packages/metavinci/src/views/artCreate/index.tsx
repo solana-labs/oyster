@@ -27,7 +27,7 @@ import {
   MetadataCategory,
   useConnectionConfig,
 } from '@oyster/common';
-import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
+import { getAssetCostToStore, LAMPORT_MULTIPLIER, solanaToUSD } from '../../utils/assets';
 import { Connection } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
@@ -474,6 +474,7 @@ const LaunchStep = (props: {
     files: files.map(f => f?.name),
   };
   const [cost, setCost] = useState(0);
+  const [USDcost, setUSDcost] = useState(0);
   useEffect(() => {
     const rentCall = Promise.all([
       props.connection.getMinimumBalanceForRentExemption(
@@ -510,6 +511,10 @@ const LaunchStep = (props: {
     });
   }, [...files, setCost]);
 
+  useEffect(() => {
+    cost && solanaToUSD(cost).then(setUSDcost)
+  }, [cost])
+
   return (
     <>
       <Row className="call-to-action">
@@ -538,14 +543,21 @@ const LaunchStep = (props: {
             value={props.attributes.royalty}
             suffix="%"
           />
-          {cost ? (
+          {cost ? <div style={{display: 'flex'}}>
             <Statistic
               className="create-statistic"
               title="Cost to Create"
               value={cost.toPrecision(3)}
               prefix="◎"
             />
-          ) : (
+            <div style={{
+              margin: "auto 0",
+              color: "rgba(255, 255, 255, 0.4)",
+              fontSize: "1.5rem",
+            }}>
+              ${USDcost.toPrecision(2)}
+            </div>
+          </div> : (
             <Spin />
           )}
         </Col>
