@@ -1,8 +1,7 @@
-import { Table, Col, Row, Statistic, Button } from 'antd';
+import { Table } from 'antd';
 import anime from 'animejs';
-import React, { useMemo } from 'react';
-import { GUTTER } from '../../constants';
-import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
+import React from 'react';
+import { formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
 import './index.less';
 import { Link } from 'react-router-dom';
@@ -14,7 +13,6 @@ export const HomeView = () => {
   const {
     loading: loadingLockedAccounts,
     externalAssets,
-    totalInUSD,
   } = useWormholeAccounts();
 
   const columns = [

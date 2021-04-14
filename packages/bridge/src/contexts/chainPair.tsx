@@ -110,7 +110,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
       // sol asset on eth chain
       // sol asset on sol chain
 
-      let ethAddress: string = '';
+      //let ethAddress: string = '';
       if (solToken) {
         // let signer = provider.getSigner();
         // let e = WrappedAssetFactory.connect(asset, provider);

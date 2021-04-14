@@ -1,35 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import {
-  contexts,
-  ConnectButton,
-  programIds,
-  notify,
-  cache,
-  useUserAccounts,
-} from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import {
-  bridgeAuthorityKey,
   displayBalance,
   fromSolana,
   ProgressUpdate,
   toSolana,
   TransferRequest,
-  wrappedAssetMintKey,
 } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
-import BN from 'bn.js';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import { BigNumber } from 'ethers/utils';
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
 
 const { useConnection } = contexts.Connection;

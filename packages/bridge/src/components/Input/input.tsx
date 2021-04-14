@@ -29,7 +29,7 @@ export function Input(props: {
   const [lastAmount, setLastAmount] = useState<string>('');
   const { userAccounts } = useUserAccounts();
   const [balance, setBalance] = useState<number>(0);
-  const mint = useMint(props.asset);
+  const mint = useMint(props.asset?.startsWith('0x') ? '' : props.asset);
 
   useEffect(() => {
     if (props.chain === ASSET_CHAIN.Solana) {
@@ -44,7 +44,7 @@ export function Input(props: {
         setBalance(0);
       }
     }
-  }, [props.asset, props.chain, userAccounts]);
+  }, [props.asset, props.chain, userAccounts, mint]);
 
   return (
     <div className={`dashed-input-container ${props.className}`}>

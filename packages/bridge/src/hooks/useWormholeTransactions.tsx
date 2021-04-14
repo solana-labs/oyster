@@ -1,15 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  useConnection,
-  useConnectionConfig,
-  // MintParser,
-  // cache,
-  // getMultipleAccounts,
-  // ParsedAccount,
-  // TokenAccountParser,
-  programIds,
-  // fromLamports,
-} from '@oyster/common';
+import { useConnection, useConnectionConfig, programIds } from '@oyster/common';
 import { WORMHOLE_PROGRAM_ID, POSTVAA_INSTRUCTION } from '../utils/ids';
 import { ASSET_CHAIN } from '../utils/assets';
 import { useEthereum } from '../contexts';
@@ -19,12 +9,9 @@ import {
   PartiallyDecodedInstruction,
   PublicKey,
 } from '@solana/web3.js';
-// import { models } from '@oyster/common';
-// import { /*AccountInfo,*/ MintInfo } from '@solana/spl-token';
 import {
   bridgeAuthorityKey,
   TransferOutProposalLayout,
-  // wrappedAssetMintKey,
 } from './../models/bridge';
 
 import bs58 from 'bs58';
@@ -34,7 +21,8 @@ import {
   useCoingecko,
 } from '../contexts/coingecko';
 import { BN } from 'bn.js';
-import { ClaimedVAA } from '../models/bridge/claim';
+import { WormholeFactory } from '../contracts/WormholeFactory';
+import { ethers } from 'ethers';
 
 interface ParsedData {
   info: any;
@@ -58,12 +46,14 @@ type WrappedTransferMeta = {
   txhash?: string;
   date: number; // timestamp
   status?: string;
+  vaa?: any;
 };
 
 const queryWrappedMetaTransactions = async (
   authorityKey: PublicKey,
   connection: Connection,
   setTransfers: (arr: WrappedTransferMeta[]) => void,
+  provider: ethers.providers.Web3Provider,
 ) => {
   const filters = [
     {
@@ -92,7 +82,6 @@ const queryWrappedMetaTransactions = async (
       },
     }))
     .map((acc: any) => {
-      console.log(acc.account.data.length, TransferOutProposalLayout.span);
       if (acc.account.data.length === TransferOutProposalLayout.span) {
         const metaTransfer = TransferOutProposalLayout.decode(acc.account.data);
 
@@ -144,14 +133,12 @@ const queryWrappedMetaTransactions = async (
           for (const ins of filteredInstructions) {
             const data = bs58.decode((ins as PartiallyDecodedInstruction).data);
 
-            //console.log(confirmedTx)
             if (
               data[0] == POSTVAA_INSTRUCTION &&
               confirmedTx.meta?.err == null
             ) {
               const innerInstructions = confirmedTx.meta?.innerInstructions;
               if (innerInstructions?.length) {
-                //console.log(innerInstructions, confirmedTx, transfer.publicKey.toBase58())
                 const parsedData: ParsedData = ((innerInstructions[0]
                   .instructions[0] as ParsedInstruction)
                   .parsed as unknown) as ParsedData;
@@ -161,20 +148,29 @@ const queryWrappedMetaTransactions = async (
                   connection.commitment,
                 );
                 const accData = resp?.data;
-                console.log(
-                  accData,
-                  ClaimedVAA.span,
-                  accData?.length,
-                  resp,
-                  parsedData.info.newAccount,
-                );
-                if (accData?.length === ClaimedVAA.span) {
-                  const metaTransfer = ClaimedVAA.decode(accData);
-                  console.log(metaTransfer);
-                  console.log(Buffer.from(metaTransfer.hash).toString('hex'));
+                try {
+                  const signer = provider?.getSigner();
+                  let wh = WormholeFactory.connect(
+                    programIds().wormhole.bridge,
+                    signer,
+                  );
+                  if (accData?.length) {
+                    const result = await wh.parseAndVerifyVAA(accData);
+                    transfer.status = 'Failed';
+                    transfer.vaa = accData;
+                    //TODO: handle vaa not posted
+                  } else {
+                    transfer.status = 'Failed';
+                    transfer.vaa = accData;
+                    //TODO: handle empty data
+                  }
+                } catch (e) {
+                  transfer.vaa = accData;
+                  transfer.status = 'Completed';
                 }
               } else {
-                //TODO: handle empty instructions
+                transfer.status = 'Failed';
+                //TODO: handle no inner instructions
               }
             }
           }
@@ -204,28 +200,13 @@ export const useWormholeTransactions = () => {
       // authority -> query for token accounts to get locked assets
       let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
 
-      // get all accounts that moved assets from solana to other chains
-      // const custodyAccounts = await queryCustodyAccounts(
-      //   authorityKey,
-      //   connection,
-      // );
-
       // query wrapped assets that were imported to solana from other chains
       queryWrappedMetaTransactions(
         authorityKey,
         connection,
         setTransfers,
+        new ethers.providers.Web3Provider((window as any).ethereum),
       ).then(() => setLoading(false));
-
-      // listen to solana accounts for updates
-      // wormholeSubId = connection.onProgramAccountChange(
-      //   WORMHOLE_PROGRAM_ID,
-      //   info => {
-      //     if (info.accountInfo.data.length === TransferOutProposalLayout.span) {
-      //       // TODO: check if new account and update external assets
-      //     }
-      //   },
-      // );
     })();
 
     return () => {
@@ -245,24 +226,21 @@ export const useWormholeTransactions = () => {
             if (knownToken) {
               transfer.logo = knownToken.logoURI;
               transfer.symbol = knownToken.symbol;
-              // transfer.name = knownToken.name;
             }
 
             let token = ethTokens.get(`0x${transfer.address || ''}`);
             if (token) {
               transfer.logo = token.logoURI;
               transfer.symbol = token.symbol;
-              // transfer.name = token.name;
             }
-
             if (transfer.symbol) {
               let coinInfo = coinList.get(transfer.symbol.toLowerCase());
-
               if (coinInfo) {
                 transfer.coinId = coinInfo.id;
                 return coinInfo.id;
               }
             }
+            return '';
           })
           .filter(a => a?.length),
       ),
@@ -272,10 +250,10 @@ export const useWormholeTransactions = () => {
 
     const parameters = `?ids=${ids.join(',')}&vs_currencies=usd`;
     const resp = await window.fetch(COINGECKO_COIN_PRICE_API + parameters);
-    const usdByCoidId = await resp.json();
+    const usdByCoinId = await resp.json();
 
     transfers.forEach(transfer => {
-      transfer.price = usdByCoidId[transfer.coinId as string]?.usd || 1;
+      transfer.price = usdByCoinId[transfer.coinId as string]?.usd || 1;
       transfer.value =
         Math.round(transfer.amount * (transfer.price || 1) * 100) / 100;
     });
