@@ -619,7 +619,7 @@ const Congrats = () => {
         <Button className="congrats-button"><span>Sell it via auction</span><span>&gt;</span></Button>
       </div>
     </div>
-    <Conffeti />
+    <Confetti />
   </>
 }
 
@@ -632,7 +632,7 @@ interface Particle {
   size: number,
 }
 
-const Conffeti = () => {
+const Confetti = () => {
   const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 30 }).map(_ => ({
     top: -Math.random() * 100,
     left: Math.random() * 100,
@@ -643,13 +643,23 @@ const Conffeti = () => {
   })))
 
   useEffect(() => {
-    setInterval(() => {
+    const interval = setInterval(() => {
       setParticles(parts => parts.map(part => ({
         ...part,
         top: (part.top > 130 ? -30 : part.top + part.speed),
         angle: (part.angle > 360 ? 0 : part.angle + part.angle_speed),
       })))
-    }, 40)
+    }, 70);
+
+    const timeout = setTimeout(() => {
+      setParticles([]);
+      clearInterval(interval);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [])
 
   const getStyle = (particle: Particle) => ({
