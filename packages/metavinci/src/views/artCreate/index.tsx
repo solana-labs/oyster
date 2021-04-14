@@ -11,8 +11,10 @@ import {
   Progress,
   Spin,
   InputNumber,
+  Select,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
+import { UserSearch } from './../../components/UserSearch';
 import './styles.less';
 import { mintNFT } from '../../models';
 import {
@@ -33,6 +35,7 @@ import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
 
 const { Step } = Steps;
+const { Option } = Select;
 const { Dragger } = Upload;
 
 export const ArtCreateView = () => {
@@ -158,11 +161,9 @@ const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) 
   return (
     <>
       <Row className="call-to-action">
-        <h2>Create your NFT artwork on Meta</h2>
+        <h2>Create a new item</h2>
         <p>
-          Creating NFT on Solana is not only low cost for artists but supports
-          environment with 20% of the fees form the platform donated to
-          charities.
+          First time creating on Metaplex? <a>Read our creators’ guide.</a>
         </p>
       </Row>
       <Row>
@@ -372,6 +373,12 @@ const InfoStep = (props: {
                   symbol: info.target.value,
                 })
               }
+            />
+          </label>
+          <label className="action-field">
+            <span className="field-title">Creators</span>
+            <UserSearch
+
             />
           </label>
           <label className="action-field">
