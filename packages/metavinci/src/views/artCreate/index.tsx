@@ -436,18 +436,34 @@ const RoyaltiesSplitter = (props: {
   royalties: Array<Royalty>,
   setRoyalties: Function,
 }) => {
-  // const { creators, royalties } = props
-  // console.log({ creators, royalties })
   return (
     <Col>
       {props.creators.map((creator, idx) => {
         const royalty = props.royalties.find(royalty => royalty.creator_key == creator.key)
-        const amt = royalty?.amount
-        return (amt &&
+        if (!royalty) return null
+
+        const amt = royalty.amount
+        const handleSlide = (newAmt: number) => {
+          const diff = newAmt - amt
+          let n = props.royalties.length - 1
+
+          props.setRoyalties(props.royalties.map(_royalty => {
+            let computed_amount = _royalty.amount - diff / n
+            if (computed_amount <= 0) {
+              computed_amount = 0
+              // n -= 1
+            }
+            return {
+              ..._royalty,
+              amount: _royalty.creator_key == royalty.creator_key ? newAmt : computed_amount,
+            }
+          }))
+        }
+        return (
           <Row key={idx} style={{ margin: '5px auto' }}>
             <Col span={11} className="slider-elem">{creator.label}</Col>
-            <Col span={8} className="slider-elem">{amt.toFixed(2)}%</Col>
-            <Col span={4}><Slider value={amt} /></Col>
+            <Col span={8} className="slider-elem">{amt.toFixed(0)}%</Col>
+            <Col span={4}><Slider value={amt} onChange={handleSlide} /></Col>
           </Row>
         )
       })}
