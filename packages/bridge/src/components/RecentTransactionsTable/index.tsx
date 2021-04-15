@@ -9,8 +9,17 @@ import en from 'javascript-time-ago/locale/en';
 import { Link } from 'react-router-dom';
 import { TokenDisplay } from '../../components/TokenDisplay';
 import { toChainSymbol } from '../../contexts/chainPair';
-import { formatUSD, shortenAddress } from '@oyster/common';
+import {
+  formatUSD,
+  shortenAddress,
+  EtherscanLink,
+  ExplorerLink,
+  Identicon,
+} from '@oyster/common';
 import { useWormholeTransactions } from '../../hooks/useWormholeTransactions';
+import { ASSET_CHAIN } from '../../utils/assets';
+import { TokenChain } from '../TokenDisplay/tokenChain';
+import bs58 from 'bs58';
 
 TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
@@ -26,7 +35,7 @@ export const RecentTransactionsTable = () => {
       render(text: string, record: any) {
         return {
           props: { style: {} },
-          children: (
+          children: record.logo ? (
             <Link
               to={`/move?from=${toChainSymbol(record.chain)}&token=${
                 record.symbol
@@ -38,6 +47,18 @@ export const RecentTransactionsTable = () => {
                 )}
               </span>
             </Link>
+          ) : (
+            <div className="token-chain-logo">
+              <Identicon
+                style={{ width: '50' }}
+                address={
+                  record.chain === ASSET_CHAIN.Solana
+                    ? record.address
+                    : bs58.encode(Buffer.from(record.address))
+                }
+              />
+              <TokenChain chain={record.chain} className={'chain-logo'} />
+            </div>
           ),
         };
       },
@@ -49,7 +70,7 @@ export const RecentTransactionsTable = () => {
       render(text: string, record: any) {
         return {
           props: { style: {} },
-          children: (
+          children: record.symbol ? (
             <Link
               to={`/move?from=${toChainSymbol(record.chain)}&token=${
                 record.symbol
@@ -59,6 +80,18 @@ export const RecentTransactionsTable = () => {
                 {record.symbol}
               </span>
             </Link>
+          ) : record.lockup.assetChain === ASSET_CHAIN.Solana ? (
+            <ExplorerLink
+              address={record.address}
+              length={5}
+              type={'address'}
+            />
+          ) : (
+            <EtherscanLink
+              address={record.address}
+              type={'address'}
+              length={5}
+            />
           ),
         };
       },
@@ -119,18 +152,15 @@ export const RecentTransactionsTable = () => {
   ];
   return (
     <div id={'recent-tx-container'}>
-      <div className={'home-subtitle'}>Recent Transactions</div>
-      <div className={'description-text'} style={{ marginBottom: '70px' }}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      <div className={'home-subtitle'} style={{ marginBottom: '70px' }}>
+        Recent Transactions
       </div>
       <Table
         scroll={{
           scrollToFirstRowOnChange: false,
           x: 900,
         }}
-        dataSource={transfers
-          .filter(a => a.symbol)
-          .sort((a, b) => b.date - a.date)}
+        dataSource={transfers.sort((a, b) => b.date - a.date)}
         columns={columns}
         loading={loadingTransfers}
       />

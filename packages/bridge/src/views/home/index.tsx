@@ -13,6 +13,7 @@ export const HomeView = () => {
   const {
     loading: loadingLockedAccounts,
     externalAssets,
+    totalInUSD,
   } = useWormholeAccounts();
 
   const columns = [
@@ -187,9 +188,12 @@ export const HomeView = () => {
           </div>
         </div>
         <div id={'recent-tx-container'}>
-          <div className={'home-subtitle'}>Overview of Assets</div>
-          <div className={'description-text'} style={{ marginBottom: '70px' }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          <div className={'home-subtitle'}>Total Value Locked</div>
+          <div
+            className={'assets-total description-text'}
+            style={{ marginBottom: '70px', fontSize: '40px' }}
+          >
+            {formatUSD.format(totalInUSD)}
           </div>
           <Table
             scroll={{

@@ -23,6 +23,8 @@ import {
 import { BN } from 'bn.js';
 import { WormholeFactory } from '../contracts/WormholeFactory';
 import { ethers } from 'ethers';
+import { useBridge } from '../contexts/bridge';
+import { SolanaBridge } from '../core';
 
 interface ParsedData {
   info: any;
@@ -37,7 +39,7 @@ type WrappedTransferMeta = {
 
   coinId?: string;
   price?: number;
-  explorer?: string;
+  explorer?: any;
 
   logo?: string;
   symbol?: string;
@@ -46,6 +48,7 @@ type WrappedTransferMeta = {
   txhash?: string;
   date: number; // timestamp
   status?: string;
+  lockup?: any;
   vaa?: any;
 };
 
@@ -54,6 +57,7 @@ const queryWrappedMetaTransactions = async (
   connection: Connection,
   setTransfers: (arr: WrappedTransferMeta[]) => void,
   provider: ethers.providers.Web3Provider,
+  bridge?: SolanaBridge,
 ) => {
   const filters = [
     {
@@ -84,7 +88,6 @@ const queryWrappedMetaTransactions = async (
     .map((acc: any) => {
       if (acc.account.data.length === TransferOutProposalLayout.span) {
         const metaTransfer = TransferOutProposalLayout.decode(acc.account.data);
-
         let assetAddress: string = '';
         if (metaTransfer.assetChain !== ASSET_CHAIN.Solana) {
           assetAddress = Buffer.from(
@@ -108,6 +111,7 @@ const queryWrappedMetaTransactions = async (
           decimals: 9,
           txhash,
           explorer: `https://explorer.solana.com/address/${txhash}`,
+          lockup: metaTransfer,
         });
       }
       return null;
@@ -134,43 +138,58 @@ const queryWrappedMetaTransactions = async (
             const data = bs58.decode((ins as PartiallyDecodedInstruction).data);
 
             if (
-              data[0] == POSTVAA_INSTRUCTION &&
-              confirmedTx.meta?.err == null
+              data[0] === POSTVAA_INSTRUCTION &&
+              confirmedTx.meta?.err == null &&
+              bridge
             ) {
-              const innerInstructions = confirmedTx.meta?.innerInstructions;
-              if (innerInstructions?.length) {
-                const parsedData: ParsedData = ((innerInstructions[0]
-                  .instructions[0] as ParsedInstruction)
-                  .parsed as unknown) as ParsedData;
-
-                const resp = await connection.getAccountInfo(
-                  new PublicKey(parsedData.info.newAccount),
-                  connection.commitment,
-                );
-                const accData = resp?.data;
-                try {
-                  const signer = provider?.getSigner();
-                  let wh = WormholeFactory.connect(
-                    programIds().wormhole.bridge,
-                    signer,
-                  );
-                  if (accData?.length) {
-                    const result = await wh.parseAndVerifyVAA(accData);
-                    transfer.status = 'Failed';
-                    transfer.vaa = accData;
-                    //TODO: handle vaa not posted
-                  } else {
-                    transfer.status = 'Failed';
-                    transfer.vaa = accData;
-                    //TODO: handle empty data
-                  }
-                } catch (e) {
-                  transfer.vaa = accData;
-                  transfer.status = 'Completed';
+              const lockup = transfer.lockup;
+              let vaa = lockup.vaa;
+              for (let i = vaa.length; i > 0; i--) {
+                if (vaa[i] == 0xff) {
+                  vaa = vaa.slice(0, i);
+                  break;
                 }
-              } else {
-                transfer.status = 'Failed';
-                //TODO: handle no inner instructions
+              }
+              let signatures = await bridge.fetchSignatureStatus(
+                lockup.signatureAccount,
+              );
+              let sigData = Buffer.of(
+                ...signatures.reduce((previousValue, currentValue) => {
+                  previousValue.push(currentValue.index);
+                  previousValue.push(...currentValue.signature);
+
+                  return previousValue;
+                }, new Array<number>()),
+              );
+
+              vaa = Buffer.concat([
+                vaa.slice(0, 5),
+                Buffer.of(signatures.length),
+                sigData,
+                vaa.slice(6),
+              ]);
+              try {
+                const signer = provider?.getSigner();
+                let wh = WormholeFactory.connect(
+                  programIds().wormhole.bridge,
+                  signer,
+                );
+                if (vaa?.length) {
+                  const result = await wh.parseAndVerifyVAA(vaa);
+                  console.log({ result });
+                  transfer.status = 'Failed';
+                  transfer.vaa = vaa;
+                  //TODO: handle vaa not posted
+                } else {
+                  console.log({ vaa });
+                  transfer.status = 'Error';
+                  transfer.vaa = vaa;
+                  //TODO: handle empty data
+                }
+              } catch (e) {
+                console.log({ error: e });
+                transfer.vaa = vaa;
+                transfer.status = 'Completed';
               }
             }
           }
@@ -187,6 +206,7 @@ export const useWormholeTransactions = () => {
   const { tokenMap: ethTokens } = useEthereum();
   const { tokenMap } = useConnectionConfig();
   const { coinList } = useCoingecko();
+  const bridge = useBridge();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [transfers, setTransfers] = useState<WrappedTransferMeta[]>([]);
@@ -206,6 +226,7 @@ export const useWormholeTransactions = () => {
         connection,
         setTransfers,
         new ethers.providers.Web3Provider((window as any).ethereum),
+        bridge,
       ).then(() => setLoading(false));
     })();
 
