@@ -7,14 +7,14 @@ import {
   Col,
   Input,
   Statistic,
-  Modal,
+  Slider,
   Progress,
   Spin,
   InputNumber,
   Select,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
-import { UserSearch } from './../../components/UserSearch';
+import { UserSearch, UserValue } from './../../components/UserSearch';
 import { Confetti } from './../../components/Confetti';
 import './../styles.less';
 import { mintNFT } from '../../models';
@@ -22,15 +22,13 @@ import {
   MAX_METADATA_LEN,
   MAX_OWNER_LEN,
   MAX_URI_LENGTH,
-  Metadata,
-  NameSymbolTuple,
   useConnection,
   useWallet,
   IMetadataExtension,
   MetadataCategory,
   useConnectionConfig,
 } from '@oyster/common';
-import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
+import { getAssetCostToStore, LAMPORT_MULTIPLIER, solanaToUSD } from '../../utils/assets';
 import { Connection } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
@@ -349,15 +347,30 @@ const UploadStep = (props: {
   );
 };
 
+interface Royalty {
+  creator_key: string,
+  amount: number
+}
+
 const InfoStep = (props: {
   attributes: IMetadataExtension;
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
+  const [creators, setCreators] = useState<Array<UserValue>>([])
+  const [royalties, setRoyalties] = useState<Array<Royalty>>([])
+
+  useEffect(() => {
+    setRoyalties(creators.map(creator => ({
+      creator_key: creator.key,
+      amount: 100 / creators.length,
+    })))
+  }, [creators])
+
   return (
     <>
       <Row className="call-to-action">
-        <h2>Describe your creation</h2>
+        <h2>Describe your item</h2>
         <p>
           Provide detailed description of your creative process to engage with
           your audience.
@@ -410,7 +423,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Creators</span>
             <UserSearch
-
+              setCreators={setCreators}
             />
           </label>
           <label className="action-field">
@@ -431,6 +444,12 @@ const InfoStep = (props: {
         </Col>
       </Row>
       <Row>
+        <label className="action-field" style={{ width: '100%' }}>
+          <span className="field-title">Royalties Split</span>
+          <RoyaltiesSplitter creators={creators} royalties={royalties} setRoyalties={setRoyalties} />
+        </label>
+      </Row>
+      <Row>
         <Button
           type="primary"
           size="large"
@@ -443,6 +462,46 @@ const InfoStep = (props: {
     </>
   );
 };
+
+const RoyaltiesSplitter = (props: {
+  creators: Array<UserValue>,
+  royalties: Array<Royalty>,
+  setRoyalties: Function,
+}) => {
+  return (
+    <Col>
+      {props.creators.map((creator, idx) => {
+        const royalty = props.royalties.find(royalty => royalty.creator_key == creator.key)
+        if (!royalty) return null
+
+        const amt = royalty.amount
+        const handleSlide = (newAmt: number) => {
+          const diff = newAmt - amt
+          let n = props.royalties.length - 1
+
+          props.setRoyalties(props.royalties.map(_royalty => {
+            let computed_amount = _royalty.amount - diff / n
+            if (computed_amount <= 0) {
+              computed_amount = 0
+              // n -= 1
+            }
+            return {
+              ..._royalty,
+              amount: _royalty.creator_key == royalty.creator_key ? newAmt : computed_amount,
+            }
+          }))
+        }
+        return (
+          <Row key={idx} style={{ margin: '5px auto' }}>
+            <Col span={11} className="slider-elem">{creator.label}</Col>
+            <Col span={8} className="slider-elem">{amt.toFixed(0)}%</Col>
+            <Col span={4}><Slider value={amt} onChange={handleSlide} /></Col>
+          </Row>
+        )
+      })}
+    </Col>
+  )
+}
 
 const RoyaltiesStep = (props: {
   attributes: IMetadataExtension;
@@ -513,6 +572,7 @@ const LaunchStep = (props: {
     files: files.map(f => f?.name),
   };
   const [cost, setCost] = useState(0);
+  const [USDcost, setUSDcost] = useState(0);
   useEffect(() => {
     const rentCall = Promise.all([
       props.connection.getMinimumBalanceForRentExemption(
@@ -549,6 +609,10 @@ const LaunchStep = (props: {
     });
   }, [...files, setCost]);
 
+  useEffect(() => {
+    cost && solanaToUSD(cost).then(setUSDcost)
+  }, [cost])
+
   return (
     <>
       <Row className="call-to-action">
@@ -577,14 +641,21 @@ const LaunchStep = (props: {
             value={props.attributes.royalty}
             suffix="%"
           />
-          {cost ? (
+          {cost ? <div style={{ display: 'flex' }}>
             <Statistic
               className="create-statistic"
               title="Cost to Create"
               value={cost.toPrecision(3)}
               prefix="◎"
             />
-          ) : (
+            <div style={{
+              margin: "auto 0",
+              color: "rgba(255, 255, 255, 0.4)",
+              fontSize: "1.5rem",
+            }}>
+              ${USDcost.toPrecision(2)}
+            </div>
+          </div> : (
             <Spin />
           )}
         </Col>
