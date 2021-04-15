@@ -65,6 +65,10 @@ const queryWrappedMetaTransactions = async (
     },
   ];
 
+  let wh = WormholeFactory.connect(
+    programIds().wormhole.bridge,
+    provider,
+  );
   const resp = await (connection as any)._rpcRequest('getProgramAccounts', [
     WORMHOLE_PROGRAM_ID.toBase58(),
     {
@@ -169,10 +173,6 @@ const queryWrappedMetaTransactions = async (
                 vaa.slice(6),
               ]);
               try {
-                let wh = WormholeFactory.connect(
-                  programIds().wormhole.bridge,
-                  provider,
-                );
                 if (vaa?.length) {
                   const _ = await wh.parseAndVerifyVAA(vaa);
                   transfer.status = 'Failed';
