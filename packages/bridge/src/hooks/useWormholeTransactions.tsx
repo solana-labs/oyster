@@ -176,15 +176,15 @@ const queryWrappedMetaTransactions = async (
                 );
                 if (vaa?.length) {
                   const result = await wh.parseAndVerifyVAA(vaa);
-                  console.log({ result });
                   transfer.status = 'Failed';
                   transfer.vaa = vaa;
                   //TODO: handle vaa not posted
+                  //console.log({ result });
                 } else {
-                  console.log({ vaa });
                   transfer.status = 'Error';
                   transfer.vaa = vaa;
                   //TODO: handle empty data
+                  //console.log({ vaa });
                 }
               } catch (e) {
                 console.log({ error: e });
@@ -215,7 +215,6 @@ export const useWormholeTransactions = () => {
   useEffect(() => {
     setLoading(true);
 
-    let wormholeSubId = 0;
     (async () => {
       // authority -> query for token accounts to get locked assets
       let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
@@ -230,9 +229,6 @@ export const useWormholeTransactions = () => {
       ).then(() => setLoading(false));
     })();
 
-    return () => {
-      connection.removeProgramAccountChangeListener(wormholeSubId);
-    };
   }, [connection, setTransfers]);
 
   const coingeckoTimer = useRef<number>(0);
