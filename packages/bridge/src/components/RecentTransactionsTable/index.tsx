@@ -145,7 +145,7 @@ export const RecentTransactionsTable = () => {
       render(text: string, record: any) {
         return {
           props: { style: {} },
-          children: <span className={`${text.toLowerCase()}`}>{text}</span>,
+          children: <span className={`${record.status?.toLowerCase()}`}>{record.status}</span>,
         };
       },
     },
