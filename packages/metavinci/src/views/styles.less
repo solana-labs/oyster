@@ -60,12 +60,34 @@
 }
 
 .type-btn {
-  height: 130px;
-  width: 240px;
+  height: 80px;
+  width: 280px;
   border-radius: 8px;
   background-color: #1d1d1d;
   border-width: 0px;
-  margin-right: 20px;
+  margin-bottom: 20px;
+  text-align: left;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+
+  background: linear-gradient(270deg, #616774 7.29%, #403F4C 100%);
+  border-radius: 8px;
+}
+
+.type-btn:hover {
+  background: linear-gradient(270deg, #616774 7.29%, #403F4C 100%) !important;
+}
+.type-btn:disabled {
+  pointer-events: none;
+}
+
+.type-btn-description {
+  color: #aaa;
+  font-size: 0.7rem;
 }
 
 .action-btn {

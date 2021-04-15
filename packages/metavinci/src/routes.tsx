@@ -57,13 +57,13 @@ export function Routes() {
                         />
                         <Route
                           exact
-                          path="/auction/:id"
-                          component={() => <AuctionView />}
+                          path="/auction/create/:step_param?"
+                          component={() => <AuctionCreateView />}
                         />
                         <Route
                           exact
-                          path="/auction/create"
-                          component={() => <AuctionCreateView />}
+                          path="/auction/:id"
+                          component={() => <AuctionView />}
                         />
                       </Switch>
                     </AppLayout>
