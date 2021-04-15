@@ -16,8 +16,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["../../types/", "../../node_modules/@types", "../../types"]
+    "typeRoots": ["types", "../../types", "../../node_modules/@types"]
   },
-  "include": ["src/**/*", "src/config/tokens.json"],
+  "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts", "**/node_modules"]
 }

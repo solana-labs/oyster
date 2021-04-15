@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { GUTTER, LABELS } from "../../constants";
 import { LiquidateItem } from "./item";
-import { useEnrichedLendingObligations } from "./../../hooks";
+import { useEnrichedLendingObligations } from "../../hooks";
 import "./style.less";
 import { Card, Col, Row, Statistic, Typography } from "antd";
 import { BarChartStatistic } from "../../components/BarChartStatistic";
