@@ -15,7 +15,8 @@ import {
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
 import { UserSearch } from './../../components/UserSearch';
-import './styles.less';
+import { Confetti } from './../../components/Confetti';
+import './../styles.less';
 import { mintNFT } from '../../models';
 import {
   MAX_METADATA_LEN,
@@ -167,27 +168,58 @@ const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) 
         </p>
       </Row>
       <Row>
-        <Button
-          className="type-btn"
-          size="large"
-          onClick={() => props.confirm(MetadataCategory.Image)}
-        >
-          Image
-        </Button>
-        <Button
-          className="type-btn"
-          size="large"
-          onClick={() => props.confirm(MetadataCategory.Video)}
-        >
-          Video
-        </Button>
-        <Button
-          className="type-btn"
-          size="large"
-          onClick={() => props.confirm(MetadataCategory.Audio)}
-        >
-          Audio
-        </Button>
+        <Col>
+          <Row>
+            <Button
+              className="type-btn"
+              size="large"
+              onClick={() => props.confirm(MetadataCategory.Image)}
+            >
+              <div>
+                <div>Image</div>
+                <div className="type-btn-description">JPG, PNG, GIF</div>
+              </div>
+            </Button>
+          </Row>
+          <Row>
+            <Button
+              className="type-btn"
+              size="large"
+              onClick={() => props.confirm(MetadataCategory.Video)}
+            >
+              <div>
+                <div>Video</div>
+                <div className="type-btn-description">MP3, WAV, FLAC</div>
+              </div>
+            </Button>
+
+          </Row>
+          <Row>
+            <Button
+              className="type-btn"
+              size="large"
+              onClick={() => props.confirm(MetadataCategory.Audio)}
+            >
+              <div>
+                <div>Audio</div>
+                <div className="type-btn-description">MP4</div>
+              </div>
+            </Button>
+          </Row>
+          <Row>
+            <Button
+              disabled={true}
+              className="type-btn"
+              size="large"
+              onClick={() => props.confirm(MetadataCategory.Audio)}
+            >
+              <div>
+                <div>AR/3D</div>
+                <div className="type-btn-description">Coming Soon</div>
+              </div>
+            </Button>
+          </Row>
+        </Col>
       </Row>
     </>
   );
@@ -623,54 +655,3 @@ const Congrats = () => {
   </>
 }
 
-interface Particle {
-  top: number,
-  left: number,
-  speed: number,
-  angle: number,
-  angle_speed: number,
-  size: number,
-}
-
-const Confetti = () => {
-  const [particles, setParticles] = useState<Array<Particle>>(Array.from({ length: 30 }).map(_ => ({
-    top: -Math.random() * 100,
-    left: Math.random() * 100,
-    speed: Math.random() * 1 + 3,
-    angle: 0,
-    angle_speed: Math.random() * 10 + 5,
-    size: Math.floor(Math.random() * 8 + 12),
-  })))
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setParticles(parts => parts.map(part => ({
-        ...part,
-        top: (part.top > 130 ? -30 : part.top + part.speed),
-        angle: (part.angle > 360 ? 0 : part.angle + part.angle_speed),
-      })))
-    }, 70);
-
-    const timeout = setTimeout(() => {
-      setParticles([]);
-      clearInterval(interval);
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [])
-
-  const getStyle = (particle: Particle) => ({
-    top: `${particle.top}%`,
-    left: `${particle.left}%`,
-    transform: `rotate(${particle.angle}deg)`,
-    width: particle.size,
-    height: particle.size,
-  })
-
-  return <div>
-    {particles.map((particle, idx) => <span key={idx} className="particle" style={getStyle(particle)}></span>)}
-  </div>
-}
