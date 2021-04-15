@@ -7,22 +7,20 @@ import {
   Col,
   Input,
   Statistic,
-  Modal,
+  Slider,
   Progress,
   Spin,
   InputNumber,
   Select,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
-import { UserSearch } from './../../components/UserSearch';
+import { UserSearch, UserValue } from './../../components/UserSearch';
 import './styles.less';
 import { mintNFT } from '../../models';
 import {
   MAX_METADATA_LEN,
   MAX_OWNER_LEN,
   MAX_URI_LENGTH,
-  Metadata,
-  NameSymbolTuple,
   useConnection,
   useWallet,
   IMetadataExtension,
@@ -317,15 +315,30 @@ const UploadStep = (props: {
   );
 };
 
+interface Royalty {
+  creator_key: string,
+  amount: number
+}
+
 const InfoStep = (props: {
   attributes: IMetadataExtension;
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
+  const [creators, setCreators] = useState<Array<UserValue>>([])
+  const [royalties, setRoyalties] = useState<Array<Royalty>>([])
+
+  useEffect(() => {
+    setRoyalties(creators.map(creator => ({
+      creator_key: creator.key,
+      amount: 100 / creators.length,
+    })))
+  }, [creators])
+
   return (
     <>
       <Row className="call-to-action">
-        <h2>Describe your creation</h2>
+        <h2>Describe your item</h2>
         <p>
           Provide detailed description of your creative process to engage with
           your audience.
@@ -378,7 +391,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Creators</span>
             <UserSearch
-
+              setCreators={setCreators}
             />
           </label>
           <label className="action-field">
@@ -399,6 +412,12 @@ const InfoStep = (props: {
         </Col>
       </Row>
       <Row>
+        <label className="action-field" style={{ width: '100%' }}>
+          <span className="field-title">Royalties Split</span>
+          <RoyaltiesSplitter creators={creators} royalties={royalties} setRoyalties={setRoyalties} />
+        </label>
+      </Row>
+      <Row>
         <Button
           type="primary"
           size="large"
@@ -411,6 +430,30 @@ const InfoStep = (props: {
     </>
   );
 };
+
+const RoyaltiesSplitter = (props: {
+  creators: Array<UserValue>,
+  royalties: Array<Royalty>,
+  setRoyalties: Function,
+}) => {
+  // const { creators, royalties } = props
+  // console.log({ creators, royalties })
+  return (
+    <Col>
+      {props.creators.map((creator, idx) => {
+        const royalty = props.royalties.find(royalty => royalty.creator_key == creator.key)
+        const amt = royalty?.amount
+        return (amt &&
+          <Row key={idx} style={{ margin: '5px auto' }}>
+            <Col span={11} className="slider-elem">{creator.label}</Col>
+            <Col span={8} className="slider-elem">{amt.toFixed(2)}%</Col>
+            <Col span={4}><Slider value={amt} /></Col>
+          </Row>
+        )
+      })}
+    </Col>
+  )
+}
 
 const RoyaltiesStep = (props: {
   attributes: IMetadataExtension;
@@ -550,7 +593,7 @@ const LaunchStep = (props: {
             value={props.attributes.royalty}
             suffix="%"
           />
-          {cost ? <div style={{display: 'flex'}}>
+          {cost ? <div style={{ display: 'flex' }}>
             <Statistic
               className="create-statistic"
               title="Cost to Create"

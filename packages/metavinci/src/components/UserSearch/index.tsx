@@ -51,7 +51,8 @@ function DebounceSelect<
 }
 
 // Usage of DebounceSelect
-interface UserValue {
+export interface UserValue {
+  key: string;
   label: string;
   value: string;
 }
@@ -71,7 +72,7 @@ async function fetchUserList(username: string): Promise<UserValue[]> {
     );
 }
 
-export const UserSearch = () => {
+export const UserSearch = (props: {setCreators: Function}) => {
   const [value, setValue] = React.useState<UserValue[]>([]);
 
   return (
@@ -83,6 +84,7 @@ export const UserSearch = () => {
       placeholder="Select creator"
       fetchOptions={fetchUserList}
       onChange={newValue => {
+        props.setCreators(newValue)
         setValue(newValue);
       }}
       style={{ width: '100%' }}
