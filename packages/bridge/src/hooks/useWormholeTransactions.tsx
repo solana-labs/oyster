@@ -65,6 +65,10 @@ const queryWrappedMetaTransactions = async (
     },
   ];
 
+  let wh = WormholeFactory.connect(
+    programIds().wormhole.bridge,
+    provider,
+  );
   const resp = await (connection as any)._rpcRequest('getProgramAccounts', [
     WORMHOLE_PROGRAM_ID.toBase58(),
     {
@@ -169,13 +173,8 @@ const queryWrappedMetaTransactions = async (
                 vaa.slice(6),
               ]);
               try {
-                const signer = provider?.getSigner();
-                let wh = WormholeFactory.connect(
-                  programIds().wormhole.bridge,
-                  signer,
-                );
                 if (vaa?.length) {
-                  const result = await wh.parseAndVerifyVAA(vaa);
+                  const _ = await wh.parseAndVerifyVAA(vaa);
                   transfer.status = 'Failed';
                   transfer.vaa = vaa;
                   //TODO: handle vaa not posted
@@ -187,7 +186,7 @@ const queryWrappedMetaTransactions = async (
                   //console.log({ vaa });
                 }
               } catch (e) {
-                console.log({ error: e });
+                //console.log({ error: e });
                 transfer.vaa = vaa;
                 transfer.status = 'Completed';
               }
