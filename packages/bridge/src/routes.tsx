@@ -1,11 +1,7 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
-import {
-  MarketProvider,
-  TokenPairProvider,
-  EthereumProvider,
-} from './contexts';
+import { MarketProvider, EthereumProvider } from './contexts';
 import { AppLayout } from './components/Layout';
 
 import {

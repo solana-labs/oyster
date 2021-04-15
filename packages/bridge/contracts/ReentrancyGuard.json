@@ -12,9 +12,7 @@
   "ast": {
     "absolutePath": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
     "exportedSymbols": {
-      "ReentrancyGuard": [
-        3658
-      ]
+      "ReentrancyGuard": [3658]
     },
     "id": 3659,
     "license": "MIT",
@@ -22,15 +20,7 @@
     "nodes": [
       {
         "id": 3620,
-        "literals": [
-          "solidity",
-          ">=",
-          "0.6",
-          ".0",
-          "<",
-          "0.8",
-          ".0"
-        ],
+        "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"],
         "nodeType": "PragmaDirective",
         "src": "33:31:10"
       },
@@ -47,9 +37,7 @@
         },
         "fullyImplemented": true,
         "id": 3658,
-        "linearizedBaseContracts": [
-          3658
-        ],
+        "linearizedBaseContracts": [3658],
         "name": "ReentrancyGuard",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -339,10 +327,7 @@
                       "id": 3640,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "2269:7:10",
                       "typeDescriptions": {
@@ -499,24 +484,14 @@
     "attributes": {
       "absolutePath": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
       "exportedSymbols": {
-        "ReentrancyGuard": [
-          3658
-        ]
+        "ReentrancyGuard": [3658]
       },
       "license": "MIT"
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            ">=",
-            "0.6",
-            ".0",
-            "<",
-            "0.8",
-            ".0"
-          ]
+          "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"]
         },
         "id": 3620,
         "name": "PragmaDirective",
@@ -525,17 +500,11 @@
       {
         "attributes": {
           "abstract": true,
-          "baseContracts": [
-            null
-          ],
-          "contractDependencies": [
-            null
-          ],
+          "baseContracts": [null],
+          "contractDependencies": [null],
           "contractKind": "contract",
           "fullyImplemented": true,
-          "linearizedBaseContracts": [
-            3658
-          ],
+          "linearizedBaseContracts": [3658],
           "name": "ReentrancyGuard",
           "scope": 3659
         },
@@ -670,9 +639,7 @@
               "implemented": true,
               "isConstructor": true,
               "kind": "constructor",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "",
               "overrides": null,
               "scope": 3658,
@@ -683,9 +650,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3630,
@@ -694,9 +659,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3631,
@@ -721,9 +684,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3629,
                               "type": "uint256",
                               "value": "_status"
@@ -735,9 +696,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3624,
                               "type": "uint256",
                               "value": "_NOT_ENTERED"
@@ -784,9 +743,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3639,
@@ -805,9 +762,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -825,10 +780,7 @@
                                   "typeString": "literal_string \"ReentrancyGuard: reentrant call\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -855,9 +807,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3629,
                                   "type": "uint256",
                                   "value": "_status"
@@ -869,9 +819,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 3627,
                                   "type": "uint256",
                                   "value": "_ENTERED"
@@ -928,9 +876,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3629,
                               "type": "uint256",
                               "value": "_status"
@@ -942,9 +888,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3627,
                               "type": "uint256",
                               "value": "_ENTERED"
@@ -984,9 +928,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3629,
                               "type": "uint256",
                               "value": "_status"
@@ -998,9 +940,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 3624,
                               "type": "uint256",
                               "value": "_NOT_ENTERED"

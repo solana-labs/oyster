@@ -1,8 +1,7 @@
-import { Table, Col, Row, Statistic, Button } from 'antd';
+import { Table } from 'antd';
 import anime from 'animejs';
-import React, { useMemo } from 'react';
-import { GUTTER } from '../../constants';
-import { formatNumber, formatUSD, shortenAddress } from '@oyster/common';
+import React from 'react';
+import { formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
 import './index.less';
 import { Link } from 'react-router-dom';
@@ -127,8 +126,8 @@ export const HomeView = () => {
   };
   return (
     <>
-      <div className="flexColumn home-container wormhole-bg">
-        <div className={'justify-bottom-container'}>
+      <div className="flexColumn home-container">
+        <div className={'justify-bottom-container wormhole-bg'}>
           <div className={'main-logo'}>
             <img src={'/home/main-logo.svg'} />
           </div>
@@ -189,9 +188,12 @@ export const HomeView = () => {
           </div>
         </div>
         <div id={'recent-tx-container'}>
-          <div className={'home-subtitle'}>Recent Transactions</div>
-          <div className={'description-text'} style={{ marginBottom: '70px' }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          <div className={'home-subtitle'}>Total Value Locked</div>
+          <div
+            className={'assets-total description-text'}
+            style={{ marginBottom: '70px', fontSize: '40px' }}
+          >
+            {formatUSD.format(totalInUSD)}
           </div>
           <Table
             scroll={{

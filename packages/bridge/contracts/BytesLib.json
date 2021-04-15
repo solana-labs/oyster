@@ -12,9 +12,7 @@
   "ast": {
     "absolutePath": "/Users/bartosz.lipinski/Workspace/wormhole/ethereum/contracts/BytesLib.sol",
     "exportedSymbols": {
-      "BytesLib": [
-        333
-      ]
+      "BytesLib": [333]
     },
     "id": 334,
     "license": "Unlicense",
@@ -22,15 +20,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          ">=",
-          "0.5",
-          ".0",
-          "<",
-          "0.7",
-          ".0"
-        ],
+        "literals": ["solidity", ">=", "0.5", ".0", "<", "0.7", ".0"],
         "nodeType": "PragmaDirective",
         "src": "336:31:0"
       },
@@ -42,9 +32,7 @@
         "documentation": null,
         "fullyImplemented": true,
         "id": 333,
-        "linearizedBaseContracts": [
-          333
-        ],
+        "linearizedBaseContracts": [333],
         "name": "BytesLib",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -55,9 +43,7 @@
               "src": "533:2695:0",
               "statements": [
                 {
-                  "assignments": [
-                    11
-                  ],
+                  "assignments": [11],
                   "declarations": [
                     {
                       "constant": false,
@@ -3469,10 +3455,7 @@
                       "id": 37,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "9027:7:0",
                       "typeDescriptions": {
@@ -3500,9 +3483,7 @@
                   "src": "9027:66:0"
                 },
                 {
-                  "assignments": [
-                    49
-                  ],
+                  "assignments": [49],
                   "declarations": [
                     {
                       "constant": false,
@@ -4587,10 +4568,7 @@
                       "id": 64,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "11449:7:0",
                       "typeDescriptions": {
@@ -4618,9 +4596,7 @@
                   "src": "11449:61:0"
                 },
                 {
-                  "assignments": [
-                    76
-                  ],
+                  "assignments": [76],
                   "declarations": [
                     {
                       "constant": false,
@@ -5063,10 +5039,7 @@
                       "id": 91,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "11804:7:0",
                       "typeDescriptions": {
@@ -5094,9 +5067,7 @@
                   "src": "11804:60:0"
                 },
                 {
-                  "assignments": [
-                    103
-                  ],
+                  "assignments": [103],
                   "declarations": [
                     {
                       "constant": false,
@@ -5519,10 +5490,7 @@
                       "id": 118,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "12114:7:0",
                       "typeDescriptions": {
@@ -5550,9 +5518,7 @@
                   "src": "12114:60:0"
                 },
                 {
-                  "assignments": [
-                    130
-                  ],
+                  "assignments": [130],
                   "declarations": [
                     {
                       "constant": false,
@@ -5975,10 +5941,7 @@
                       "id": 145,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "12425:7:0",
                       "typeDescriptions": {
@@ -6006,9 +5969,7 @@
                   "src": "12425:60:0"
                 },
                 {
-                  "assignments": [
-                    157
-                  ],
+                  "assignments": [157],
                   "declarations": [
                     {
                       "constant": false,
@@ -6431,10 +6392,7 @@
                       "id": 172,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "12736:7:0",
                       "typeDescriptions": {
@@ -6462,9 +6420,7 @@
                   "src": "12736:60:0"
                 },
                 {
-                  "assignments": [
-                    184
-                  ],
+                  "assignments": [184],
                   "declarations": [
                     {
                       "constant": false,
@@ -6887,10 +6843,7 @@
                       "id": 199,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "13047:7:0",
                       "typeDescriptions": {
@@ -6918,9 +6871,7 @@
                   "src": "13047:61:0"
                 },
                 {
-                  "assignments": [
-                    211
-                  ],
+                  "assignments": [211],
                   "declarations": [
                     {
                       "constant": false,
@@ -7343,10 +7294,7 @@
                       "id": 226,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "13361:7:0",
                       "typeDescriptions": {
@@ -7374,9 +7322,7 @@
                   "src": "13361:61:0"
                 },
                 {
-                  "assignments": [
-                    238
-                  ],
+                  "assignments": [238],
                   "declarations": [
                     {
                       "constant": false,
@@ -7799,10 +7745,7 @@
                       "id": 253,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "13677:7:0",
                       "typeDescriptions": {
@@ -7830,9 +7773,7 @@
                   "src": "13677:61:0"
                 },
                 {
-                  "assignments": [
-                    265
-                  ],
+                  "assignments": [265],
                   "declarations": [
                     {
                       "constant": false,
@@ -8255,10 +8196,7 @@
                       "id": 280,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        -18,
-                        -18
-                      ],
+                      "overloadedDeclarations": [-18, -18],
                       "referencedDeclaration": -18,
                       "src": "13993:7:0",
                       "typeDescriptions": {
@@ -8286,9 +8224,7 @@
                   "src": "13993:61:0"
                 },
                 {
-                  "assignments": [
-                    292
-                  ],
+                  "assignments": [292],
                   "declarations": [
                     {
                       "constant": false,
@@ -8560,9 +8496,7 @@
               "src": "14313:1291:0",
               "statements": [
                 {
-                  "assignments": [
-                    308
-                  ],
+                  "assignments": [308],
                   "declarations": [
                     {
                       "constant": false,
@@ -9290,9 +9224,7 @@
               "src": "15749:2491:0",
               "statements": [
                 {
-                  "assignments": [
-                    325
-                  ],
+                  "assignments": [325],
                   "declarations": [
                     {
                       "constant": false,
@@ -10434,24 +10366,14 @@
     "attributes": {
       "absolutePath": "/Users/bartosz.lipinski/Workspace/wormhole/ethereum/contracts/BytesLib.sol",
       "exportedSymbols": {
-        "BytesLib": [
-          333
-        ]
+        "BytesLib": [333]
       },
       "license": "Unlicense"
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            ">=",
-            "0.5",
-            ".0",
-            "<",
-            "0.7",
-            ".0"
-          ]
+          "literals": ["solidity", ">=", "0.5", ".0", "<", "0.7", ".0"]
         },
         "id": 1,
         "name": "PragmaDirective",
@@ -10460,18 +10382,12 @@
       {
         "attributes": {
           "abstract": false,
-          "baseContracts": [
-            null
-          ],
-          "contractDependencies": [
-            null
-          ],
+          "baseContracts": [null],
+          "contractDependencies": [null],
           "contractKind": "library",
           "documentation": null,
           "fullyImplemented": true,
-          "linearizedBaseContracts": [
-            333
-          ],
+          "linearizedBaseContracts": [333],
           "name": "BytesLib",
           "scope": 334
         },
@@ -10482,9 +10398,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "concat",
               "overrides": null,
               "scope": 333,
@@ -10595,9 +10509,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        11
-                      ],
+                      "assignments": [11],
                       "initialValue": null
                     },
                     "children": [
@@ -10724,9 +10636,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 11,
                           "type": "bytes memory",
                           "value": "tempBytes"
@@ -10756,9 +10666,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "concatStorage",
               "overrides": null,
               "scope": 333,
@@ -10832,9 +10740,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 23,
@@ -10955,9 +10861,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "slice",
               "overrides": null,
               "scope": 333,
@@ -11104,9 +11008,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -11124,10 +11026,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -11166,9 +11065,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 28,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -11211,9 +11108,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 30,
                                           "type": "uint256",
                                           "value": "_start"
@@ -11225,9 +11120,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 32,
                                           "type": "uint256",
                                           "value": "_length"
@@ -11280,9 +11173,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        49
-                      ],
+                      "assignments": [49],
                       "initialValue": null
                     },
                     "children": [
@@ -11416,9 +11307,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 49,
                           "type": "bytes memory",
                           "value": "tempBytes"
@@ -11448,9 +11337,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toAddress",
               "overrides": null,
               "scope": 333,
@@ -11570,9 +11457,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -11590,10 +11475,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -11632,9 +11514,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 57,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -11677,9 +11557,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 59,
                                           "type": "uint256",
                                           "value": "_start"
@@ -11749,9 +11627,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        76
-                      ],
+                      "assignments": [76],
                       "initialValue": null
                     },
                     "children": [
@@ -11830,9 +11706,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 76,
                           "type": "address",
                           "value": "tempAddress"
@@ -11862,9 +11736,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint8",
               "overrides": null,
               "scope": 333,
@@ -11983,9 +11855,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -12003,10 +11873,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -12045,9 +11912,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 84,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -12090,9 +11955,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 86,
                                           "type": "uint256",
                                           "value": "_start"
@@ -12162,9 +12025,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        103
-                      ],
+                      "assignments": [103],
                       "initialValue": null
                     },
                     "children": [
@@ -12242,9 +12103,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 103,
                           "type": "uint8",
                           "value": "tempUint"
@@ -12274,9 +12133,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint16",
               "overrides": null,
               "scope": 333,
@@ -12395,9 +12252,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -12415,10 +12270,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -12457,9 +12309,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 111,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -12502,9 +12352,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 113,
                                           "type": "uint256",
                                           "value": "_start"
@@ -12574,9 +12422,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        130
-                      ],
+                      "assignments": [130],
                       "initialValue": null
                     },
                     "children": [
@@ -12654,9 +12500,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 130,
                           "type": "uint16",
                           "value": "tempUint"
@@ -12686,9 +12530,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint32",
               "overrides": null,
               "scope": 333,
@@ -12807,9 +12649,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -12827,10 +12667,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -12869,9 +12706,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 138,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -12914,9 +12749,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 140,
                                           "type": "uint256",
                                           "value": "_start"
@@ -12986,9 +12819,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        157
-                      ],
+                      "assignments": [157],
                       "initialValue": null
                     },
                     "children": [
@@ -13066,9 +12897,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 157,
                           "type": "uint32",
                           "value": "tempUint"
@@ -13098,9 +12927,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint64",
               "overrides": null,
               "scope": 333,
@@ -13219,9 +13046,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -13239,10 +13064,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -13281,9 +13103,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 165,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -13326,9 +13146,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 167,
                                           "type": "uint256",
                                           "value": "_start"
@@ -13398,9 +13216,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        184
-                      ],
+                      "assignments": [184],
                       "initialValue": null
                     },
                     "children": [
@@ -13478,9 +13294,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 184,
                           "type": "uint64",
                           "value": "tempUint"
@@ -13510,9 +13324,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint96",
               "overrides": null,
               "scope": 333,
@@ -13631,9 +13443,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -13651,10 +13461,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -13693,9 +13500,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 192,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -13738,9 +13543,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 194,
                                           "type": "uint256",
                                           "value": "_start"
@@ -13810,9 +13613,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        211
-                      ],
+                      "assignments": [211],
                       "initialValue": null
                     },
                     "children": [
@@ -13890,9 +13691,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 211,
                           "type": "uint96",
                           "value": "tempUint"
@@ -13922,9 +13721,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint128",
               "overrides": null,
               "scope": 333,
@@ -14043,9 +13840,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -14063,10 +13858,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -14105,9 +13897,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 219,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -14150,9 +13940,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 221,
                                           "type": "uint256",
                                           "value": "_start"
@@ -14222,9 +14010,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        238
-                      ],
+                      "assignments": [238],
                       "initialValue": null
                     },
                     "children": [
@@ -14302,9 +14088,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 238,
                           "type": "uint128",
                           "value": "tempUint"
@@ -14334,9 +14118,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toUint256",
               "overrides": null,
               "scope": 333,
@@ -14455,9 +14237,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -14475,10 +14255,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -14517,9 +14294,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 246,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -14562,9 +14337,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 248,
                                           "type": "uint256",
                                           "value": "_start"
@@ -14634,9 +14407,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        265
-                      ],
+                      "assignments": [265],
                       "initialValue": null
                     },
                     "children": [
@@ -14714,9 +14485,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 265,
                           "type": "uint256",
                           "value": "tempUint"
@@ -14746,9 +14515,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "toBytes32",
               "overrides": null,
               "scope": 333,
@@ -14867,9 +14634,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "tryCall": false,
                           "type": "tuple()",
                           "type_conversion": false
@@ -14887,10 +14652,7 @@
                                   "typeString": "literal_string \"Read out of bounds\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                -18,
-                                -18
-                              ],
+                              "overloadedDeclarations": [-18, -18],
                               "referencedDeclaration": -18,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -14929,9 +14691,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 273,
                                       "type": "bytes memory",
                                       "value": "_bytes"
@@ -14974,9 +14734,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 275,
                                           "type": "uint256",
                                           "value": "_start"
@@ -15046,9 +14804,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        292
-                      ],
+                      "assignments": [292],
                       "initialValue": null
                     },
                     "children": [
@@ -15126,9 +14882,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 292,
                           "type": "bytes32",
                           "value": "tempBytes32"
@@ -15158,9 +14912,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "equal",
               "overrides": null,
               "scope": 333,
@@ -15271,9 +15023,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        308
-                      ]
+                      "assignments": [308]
                     },
                     "children": [
                       {
@@ -15388,9 +15138,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 308,
                           "type": "bool",
                           "value": "success"
@@ -15420,9 +15168,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "equalStorage",
               "overrides": null,
               "scope": 333,
@@ -15533,9 +15279,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        325
-                      ]
+                      "assignments": [325]
                     },
                     "children": [
                       {
@@ -15664,9 +15408,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 325,
                           "type": "bool",
                           "value": "success"

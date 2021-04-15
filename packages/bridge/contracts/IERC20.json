@@ -196,9 +196,7 @@
   "ast": {
     "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
     "exportedSymbols": {
-      "IERC20": [
-        3086
-      ]
+      "IERC20": [3086]
     },
     "id": 3087,
     "license": "MIT",
@@ -206,15 +204,7 @@
     "nodes": [
       {
         "id": 3010,
-        "literals": [
-          "solidity",
-          ">=",
-          "0.6",
-          ".0",
-          "<",
-          "0.8",
-          ".0"
-        ],
+        "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"],
         "nodeType": "PragmaDirective",
         "src": "33:31:6"
       },
@@ -231,9 +221,7 @@
         },
         "fullyImplemented": false,
         "id": 3086,
-        "linearizedBaseContracts": [
-          3086
-        ],
+        "linearizedBaseContracts": [3086],
         "name": "IERC20",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1136,24 +1124,14 @@
     "attributes": {
       "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "exportedSymbols": {
-        "IERC20": [
-          3086
-        ]
+        "IERC20": [3086]
       },
       "license": "MIT"
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            ">=",
-            "0.6",
-            ".0",
-            "<",
-            "0.8",
-            ".0"
-          ]
+          "literals": ["solidity", ">=", "0.6", ".0", "<", "0.8", ".0"]
         },
         "id": 3010,
         "name": "PragmaDirective",
@@ -1162,17 +1140,11 @@
       {
         "attributes": {
           "abstract": false,
-          "baseContracts": [
-            null
-          ],
-          "contractDependencies": [
-            null
-          ],
+          "baseContracts": [null],
+          "contractDependencies": [null],
           "contractKind": "interface",
           "fullyImplemented": false,
-          "linearizedBaseContracts": [
-            3086
-          ],
+          "linearizedBaseContracts": [3086],
           "name": "IERC20",
           "scope": 3087
         },
@@ -1192,9 +1164,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "totalSupply",
               "overrides": null,
               "scope": 3086,
@@ -1213,9 +1183,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 3013,
@@ -1269,9 +1237,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "balanceOf",
               "overrides": null,
               "scope": 3086,
@@ -1371,9 +1337,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "transfer",
               "overrides": null,
               "scope": 3086,
@@ -1501,9 +1465,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "allowance",
               "overrides": null,
               "scope": 3086,
@@ -1632,9 +1594,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "approve",
               "overrides": null,
               "scope": 3086,
@@ -1762,9 +1722,7 @@
               "implemented": false,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "transferFrom",
               "overrides": null,
               "scope": 3086,
