@@ -113,7 +113,7 @@ export const registerProgramGovernance = async (
     );
   }
 
-  const council_mint_seed = uninitializedTimelockConfig.councilMint
+  const councilMintSeed = uninitializedTimelockConfig.councilMint
     ? uninitializedTimelockConfig.councilMint.toBuffer()
     : Buffer.from('');
 
@@ -122,7 +122,7 @@ export const registerProgramGovernance = async (
       Buffer.from(AUTHORITY_SEED_GOVERNANCE),
       PROGRAM_IDS.timelock.programId.toBuffer(),
       uninitializedTimelockConfig.governanceMint.toBuffer(),
-      council_mint_seed,
+      councilMintSeed,
       uninitializedTimelockConfig.program.toBuffer(),
     ],
     PROGRAM_IDS.timelock.programId,
