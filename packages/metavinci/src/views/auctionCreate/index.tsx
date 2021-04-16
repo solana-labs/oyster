@@ -14,7 +14,7 @@ import {
   Select,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
-import { UserSearch } from './../../components/UserSearch';
+import { UserSearch, UserValue } from './../../components/UserSearch';
 import { Confetti } from './../../components/Confetti';
 import './../styles.less';
 import { mintNFT } from '../../models';
@@ -359,6 +359,8 @@ const InfoStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
+  const [creators, setCreators] = useState<Array<UserValue>>([]);
+
   return (
     <>
       <Row className="call-to-action">
@@ -415,7 +417,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Creators</span>
             <UserSearch
-
+              setCreators={setCreators}
             />
           </label>
           <label className="action-field">
