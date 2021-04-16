@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@solana/wallet-base": "0.0.1",
+    "@solana/wallet-ledger": "0.0.1",
     "@ant-design/icons": "^4.4.0",
     "@ant-design/pro-layout": "^6.7.0",
     "@babel/preset-typescript": "^7.12.13",

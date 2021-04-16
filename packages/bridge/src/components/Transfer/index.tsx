@@ -1,35 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import {
-  contexts,
-  ConnectButton,
-  programIds,
-  notify,
-  cache,
-  useUserAccounts,
-} from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import {
-  bridgeAuthorityKey,
   displayBalance,
   fromSolana,
   ProgressUpdate,
   toSolana,
   TransferRequest,
-  wrappedAssetMintKey,
 } from '../../models/bridge';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
-import BN from 'bn.js';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import { BigNumber } from 'ethers/utils';
+import { RecentTransactionsTable } from '../RecentTransactionsTable';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -52,7 +40,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
   const { provider, tokenMap } = useEthereum();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
@@ -95,7 +83,7 @@ export const Transfer = () => {
     <>
       <div className="exchange-card">
         <Input
-          title={`From ${chainToName(request.from)}`}
+          title={`From`}
           asset={request.asset}
           balance={displayBalance(A.info)}
           setAsset={asset => setAssetInformation(asset)}
@@ -110,6 +98,7 @@ export const Transfer = () => {
             setLastTypedAccount(A.chain);
             A.setAmount(amount || 0);
           }}
+          className={'left'}
         />
         <Button
           type="primary"
@@ -125,10 +114,10 @@ export const Transfer = () => {
             }
           }}
         >
-          ⇅
+          <span></span>
         </Button>
         <Input
-          title={`To ${chainToName(request.to)}`}
+          title={`To`}
           asset={request.asset}
           balance={displayBalance(B.info)}
           setAsset={asset => setAssetInformation(asset)}
@@ -143,13 +132,15 @@ export const Transfer = () => {
             setLastTypedAccount(B.chain);
             B.setAmount(amount || 0);
           }}
+          className={'right'}
         />
       </div>
-      <ConnectButton
+
+      <Button
+        className={'transfer-button'}
         type="primary"
         size="large"
-        style={{ width: '100%' }}
-        disabled={!(A.amount && B.amount)}
+        disabled={!(A.amount && B.amount) || !connected || !provider}
         onClick={async () => {
           if (!wallet || !provider) {
             return;
@@ -201,8 +192,9 @@ export const Transfer = () => {
                       },
                     );
                   }
-                } catch {
+                } catch (err) {
                   // TODO...
+                  console.log(err);
                 }
               })();
             }, [setActiveSteps]);
@@ -287,7 +279,8 @@ export const Transfer = () => {
             ? LABELS.ENTER_AMOUNT
             : LABELS.TRANSFER
           : LABELS.SET_CORRECT_WALLET_NETWORK}
-      </ConnectButton>
+      </Button>
+      <RecentTransactionsTable />
     </>
   );
 };

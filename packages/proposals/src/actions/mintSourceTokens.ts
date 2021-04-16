@@ -4,13 +4,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  contexts,
-  utils,
-  models,
-  ParsedAccount,
-  actions,
-} from '@oyster/common';
+import { contexts, utils, ParsedAccount, actions } from '@oyster/common';
 
 import { TimelockConfig } from '../models/timelock';
 import { AccountLayout, Token } from '@solana/spl-token';

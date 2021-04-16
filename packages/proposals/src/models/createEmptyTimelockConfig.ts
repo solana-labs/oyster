@@ -15,10 +15,8 @@ import * as Layout from '../utils/layout';
 ///   2. `[]` Governance mint to tie this config to
 ///   3. `[]` Council mint [optional] to tie this config to [Pass in 0s otherwise]
 ///   4. `[]` Payer
-///   5. `[]` Timelock program account pub key.
-///   6. `[]` Timelock program pub key. Different from program account - is the actual id of the executable.
-///   7. `[]` Token program account.
-///   8. `[]` System account.
+///   6. `[]` Timelock program pub key.
+///   7. `[]` System account.
 export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
@@ -47,16 +45,10 @@ export const createEmptyTimelockConfigInstruction = (
     { pubkey: payer, isSigner: true, isWritable: false },
 
     {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
       pubkey: PROGRAM_IDS.timelock.programId,
       isSigner: false,
       isWritable: false,
     },
-    { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({

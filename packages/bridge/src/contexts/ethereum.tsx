@@ -7,13 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-// @ts-ignore
-import { useWallet as useEthereumWallet } from 'use-wallet';
 
-// @ts-ignore
-import WalletConnectProvider from '@walletconnect/web3-provider';
-// @ts-ignore
-import Fortmatic from 'fortmatic';
 import { useWallet, useLocalStorageState } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { TokenList, TokenInfo } from '@uniswap/token-lists';

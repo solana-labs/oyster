@@ -29,9 +29,8 @@ import BN from 'bn.js';
 ///   10. `[]` Timelock config account.
 ///   12. `[]` Transfer authority
 ///   13. `[]` Timelock program mint authority
-///   14. `[]` Timelock program account pub key.
-///   15. `[]` Token program account.
-///   16. `[]` Clock sysvar.
+///   14. `[]` Token program account.
+///   15. `[]` Clock sysvar.
 export const voteInstruction = (
   governanceVotingRecord: PublicKey,
   timelockStateAccount: PublicKey,
@@ -82,11 +81,6 @@ export const voteInstruction = (
     { pubkey: timelockConfig, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
   ];

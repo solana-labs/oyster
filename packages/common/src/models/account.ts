@@ -58,20 +58,33 @@ export function approve(
 
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey,
+  existingTransferAuthority?: Account,
 ): Account {
   const tokenProgram = TOKEN_PROGRAM_ID;
-  const transferAuthority = new Account();
 
-  instructions.push(
-    Token.createApproveInstruction(
-      tokenProgram,
-      account,
-      delegate ?? transferAuthority.publicKey,
-      owner,
-      [],
-      amount,
-    ),
+  const transferAuthority = existingTransferAuthority || new Account();
+  const delegateKey = delegate ?? transferAuthority.publicKey;
+
+  const instruction = Token.createApproveInstruction(
+    tokenProgram,
+    account,
+    delegateKey,
+    owner,
+    [],
+    amount,
   );
+
+  // Temp. workaround for a bug in Token.createApproveInstruction which doesn't add the delegate account to signers
+  instruction.keys = instruction.keys.map(k =>
+    k.pubkey.equals(delegateKey)
+      ? {
+          ...k,
+          isSigner: true,
+        }
+      : k,
+  );
+
+  instructions.push(instruction);
 
   if (autoRevoke) {
     cleanupInstructions.push(

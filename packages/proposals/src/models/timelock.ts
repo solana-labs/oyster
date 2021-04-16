@@ -171,6 +171,7 @@ for (let i = 0; i < TRANSACTION_SLOTS; i++) {
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     Layout.publicKey('config'),
+    Layout.publicKey('tokenProgramId'),
     Layout.publicKey('state'),
     BufferLayout.u8('version'),
     Layout.publicKey('signatoryMint'),
@@ -212,6 +213,9 @@ export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.s
 export interface TimelockSet {
   /// configuration values
   config: PublicKey;
+
+  /// Token Program ID
+  tokenProgramId: PublicKey;
 
   /// state values
   state: PublicKey;
@@ -296,6 +300,7 @@ export const TimelockSetParser = (
     },
     info: {
       config: data.config,
+      tokenProgramId: data.tokenProgramId,
       state: data.state,
       version: data.version,
       signatoryMint: data.signatoryMint,
@@ -320,9 +325,8 @@ export const GovernanceVotingRecordParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
-  const buffer = Buffer.from(info.data);
-  const data = GovernanceVotingRecordLayout.decode(buffer);
-  console.log('Data', data);
+  const data = GovernanceVotingRecordLayout.decode(info.data);
+
   const details = {
     pubkey: pubKey,
     account: {

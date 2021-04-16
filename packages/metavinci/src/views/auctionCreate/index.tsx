@@ -14,7 +14,7 @@ import {
   Select,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
-import { UserSearch } from './../../components/UserSearch';
+import { UserSearch, UserValue } from './../../components/UserSearch';
 import { Confetti } from './../../components/Confetti';
 import './../styles.less';
 import { mintNFT } from '../../models';
@@ -119,7 +119,7 @@ export const AuctionCreateView = () => {
             />
           )}
           {step === 1 && (
-            <UploadStep
+            <SelectItemsStep
               attributes={attributes}
               setAttributes={setAttributes}
               confirm={() => gotoStep(2)}
@@ -230,7 +230,7 @@ const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) 
   );
 };
 
-const UploadStep = (props: {
+const SelectItemsStep = (props: {
   attributes: IMetadataExtension;
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
@@ -246,93 +246,17 @@ const UploadStep = (props: {
     })
   }, [])
 
-  const uploadMsg = (category: MetadataCategory) => {
-    switch (category) {
-      case MetadataCategory.Audio:
-        return "Upload your audio creation (MP3, FLAC, WAV)"
-      case MetadataCategory.Image:
-        return "Upload your image creation (PNG, JPG, GIF)"
-      case MetadataCategory.Video:
-        return "Upload your video creation (MP4)"
-      default:
-        return "Please go back and choose a category"
-    }
-  }
 
   return (
     <>
       <Row className="call-to-action">
-        <h2>Now, let's upload your creation</h2>
+        <h2>Select which item to sell</h2>
         <p style={{ fontSize: '1.2rem' }}>
-          Your file will be uploaded to the decentralized web via Arweave.
-          Depending on file type, can take up to 1 minute. Arweave is a new type
-          of storage that backs data with sustainable and perpetual endowments,
-          allowing users and developers to truly store data forever – for the
-          very first time.
+          Select the item(s) that you want to list.
         </p>
       </Row>
       <Row className="content-action">
-        <h3>{uploadMsg(props.attributes.category)}</h3>
-        <Dragger
-          style={{ padding: 20 }}
-          multiple={false}
-          customRequest={info => {
-            // dont upload files here, handled outside of the control
-            info?.onSuccess?.({}, null as any)
-          }}
-          fileList={mainFile ? [mainFile] : []}
-          onChange={async info => {
-            const file = info.file.originFileObj;
-            if (file) setMainFile(file)
-            if (props.attributes.category != MetadataCategory.Audio) {
-              const reader = new FileReader();
-              reader.onload = function (event) {
-                setImage((event.target?.result as string) || '')
-              }
-              if (file) reader.readAsDataURL(file)
-            }
-          }}
-        >
-          <div className="ant-upload-drag-icon">
-            <h3 style={{ fontWeight: 700 }}>Upload your creation</h3>
-          </div>
-          <p className="ant-upload-text">
-            Drag and drop, or click to browse
-          </p>
-        </Dragger>
       </Row>
-      {props.attributes.category == MetadataCategory.Audio &&
-        <Row className="content-action">
-          <h3>Optionally, you can upload a cover image or video (PNG, JPG, GIF, MP4)</h3>
-          <Dragger
-            style={{ padding: 20 }}
-            multiple={false}
-            customRequest={info => {
-              // dont upload files here, handled outside of the control
-              info?.onSuccess?.({}, null as any)
-            }}
-            fileList={coverFile ? [coverFile] : []}
-            onChange={async info => {
-              const file = info.file.originFileObj;
-              if (file) setCoverFile(file)
-              if (props.attributes.category == MetadataCategory.Audio) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                  setImage((event.target?.result as string) || '')
-                }
-                if (file) reader.readAsDataURL(file)
-              }
-            }}
-          >
-            <div className="ant-upload-drag-icon">
-              <h3 style={{ fontWeight: 700 }}>Upload your cover image or video</h3>
-            </div>
-            <p className="ant-upload-text">
-              Drag and drop, or click to browse
-            </p>
-          </Dragger>
-        </Row>
-      }
       <Row>
         <Button
           type="primary"
@@ -359,6 +283,8 @@ const InfoStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
+  const [creators, setCreators] = useState<Array<UserValue>>([]);
+
   return (
     <>
       <Row className="call-to-action">
@@ -415,7 +341,7 @@ const InfoStep = (props: {
           <label className="action-field">
             <span className="field-title">Creators</span>
             <UserSearch
-
+              setCreators={setCreators}
             />
           </label>
           <label className="action-field">

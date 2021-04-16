@@ -5,7 +5,7 @@ import { Button, Modal } from "antd";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { notify } from "./../utils/notifications";
 import { useConnectionConfig } from "./connection";
-import { useLocalStorageState } from "./../utils/utils";
+import { useLocalStorageState } from "../utils/utils";
 import { LedgerProvider } from "@solana/wallet-ledger";
 import { SolongWalletAdapter } from "../wallet-adapters/solong";
 import { PhantomWalletAdapter } from "../wallet-adapters/phantom";

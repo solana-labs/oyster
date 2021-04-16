@@ -8,15 +8,6 @@ section.ant-layout {
   margin: auto;
   position: relative;
 }
-header.ant-layout-header.App-Bar {
-  position: absolute;
-  width: 100%;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  height: 80px;
-
-}
 
 .get-started {
   background: url("/home/get-started.svg") center  center no-repeat;
@@ -48,6 +39,7 @@ header.ant-layout-header.App-Bar {
 .home-container {
   width: 100%;
 
+  background-color: #06101a;
   #how-it-works-container {
     display: flex;
     flex-direction: column;
@@ -64,9 +56,11 @@ header.ant-layout-header.App-Bar {
       display: flex;
       flex-direction: row;
       justify-content: space-evenly;
+      max-width: 90%;
+      margin: auto;
 
       .home-description-item {
-        padding: 0 100px 0 100px;
+        padding: 0 30px 0 30px;
         .description-title {
           font-size: 20px;
           line-height: 160%;
@@ -81,6 +75,8 @@ header.ant-layout-header.App-Bar {
   }
 
   #recent-tx-container {
+    max-width: 70%;
+    margin: auto;
     padding-bottom: 70px;
     .description-text {
       color: @tungsten-60
@@ -89,7 +85,6 @@ header.ant-layout-header.App-Bar {
       margin: 16px 100px;
     }
     .ant-table {
-      margin: 0 100px;
       thead {
         tr > th.ant-table-cell {
           background-color: @tungsten-100;
@@ -114,12 +109,19 @@ header.ant-layout-header.App-Bar {
   align-items: center;
   justify-content: flex-end;
   min-height: 802px;
-
+  .main-logo {
+    & > img {
+      max-width: 100%;
+    }
+  }
   & > div {
     font-size: 16px;
     line-height: 160%;
     width: auto;
-    margin: 3px 0 30px 0;
+    margin: 3px 20px 30px 20px;
+  }
+  & > div:first-child {
+    margin-bottom: 120px;
   }
 }
 
@@ -135,4 +137,36 @@ footer.ant-layout-footer {
   background-repeat: no-repeat;
   width: 100%;
   background-color: @tungsten-100;
+}
+
+.wormhole-bg {
+  background-image: url('/home/background.svg');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+}
+
+
+@media screen and (max-width: 900px) {
+  .justify-bottom-container {
+    min-height: 640px;
+  }
+  .home-container {
+    #recent-tx-container {
+      max-width: 100%;
+    }
+    #how-it-works-container {
+      .home-description {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+
+@media screen and (max-width: 1200px) {
+  .home-container {
+    #recent-tx-container {
+      max-width: 90%;
+    }
+  }
 }

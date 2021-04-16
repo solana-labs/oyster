@@ -8,9 +8,8 @@ import { TimelockInstruction } from './timelock';
 ///   1. `[]` Proposal key
 ///   2. `[]` Your voting account
 ///   3. `[]` Payer
-///   4. `[]` Timelock program account pub key.
-///   5. `[]` Timelock program pub key. Different from program account - is the actual id of the executable.
-///   6. `[]` System account.
+///   4. `[]` Timelock program pub key.
+///   5. `[]` System account.
 export const createEmptyGovernanceVotingRecordInstruction = (
   governanceRecordAccount: PublicKey,
   proposalAccount: PublicKey,
@@ -35,12 +34,6 @@ export const createEmptyGovernanceVotingRecordInstruction = (
     { pubkey: proposalAccount, isSigner: false, isWritable: false },
     { pubkey: votingAccount, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
-
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     {
       pubkey: PROGRAM_IDS.timelock.programId,
       isSigner: false,

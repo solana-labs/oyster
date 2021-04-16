@@ -1,4 +1,4 @@
-import { Button, Row, Spin } from 'antd';
+import { Row, Spin } from 'antd';
 import React from 'react';
 import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
@@ -6,7 +6,6 @@ import './style.less';
 import { useProposals } from '../../contexts/proposals';
 import { TimelockSet } from '../../models/timelock';
 import { Connection } from '@solana/web3.js';
-import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { WalletAdapter } from '@solana/wallet-base';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -36,8 +35,6 @@ export const DashboardView = () => {
 
 function InnerDummyView({
   proposal,
-  connection,
-  wallet,
 }: {
   connection: Connection;
   wallet: WalletAdapter;

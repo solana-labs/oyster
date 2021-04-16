@@ -50,5 +50,5 @@ export const chainToName = (chain?: ASSET_CHAIN) => {
 };
 
 export const filterModalSolTokens = (tokens: TokenInfo[]) => {
-  return tokens;
+  return tokens.filter(token => token.symbol !== 'SOL');
 };

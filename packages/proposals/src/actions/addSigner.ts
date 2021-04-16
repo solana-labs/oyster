@@ -47,7 +47,7 @@ export const addSigner = async (
   );
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 
