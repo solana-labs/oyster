@@ -13,6 +13,7 @@ import { TokenSelectModal } from '../TokenSelectModal';
 import { chainToName } from '../../utils/assets';
 import { TokenChain } from '../TokenDisplay/tokenChain';
 import { EthereumConnect } from '../EthereumConnect';
+import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';
 
 export function Input(props: {
   title: string;
@@ -106,7 +107,10 @@ export function Input(props: {
       </div>
       {props.chain === ASSET_CHAIN.Ethereum ? (
         <EthereumConnect />
-      ) : (<ConnectButton type="text" size="large" allowWalletChange={true} />
+      ) : connected ? (
+        <CurrentUserWalletBadge showDisconnect={true} />
+      ) : (
+        <ConnectButton type="text" size="large" allowWalletChange={true} />
       )}
     </div>
   );
