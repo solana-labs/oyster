@@ -12,7 +12,12 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockConfig, TimelockSet, TimelockState } from '../models/timelock';
+import {
+  GOVERNANCE_AUTHORITY_SEED,
+  TimelockConfig,
+  TimelockSet,
+  TimelockState,
+} from '../models/timelock';
 
 import { AccountLayout } from '@solana/spl-token';
 
@@ -66,6 +71,7 @@ export const depositSourceTokensAndVote = async (
 
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
     [
+      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
       PROGRAM_IDS.timelock.programId.toBuffer(),
       proposal.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
@@ -107,7 +113,7 @@ export const depositSourceTokensAndVote = async (
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

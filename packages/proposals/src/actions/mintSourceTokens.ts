@@ -45,7 +45,7 @@ export const mintSourceTokens = async (
         accountRentExempt,
         useGovernance
           ? timelockConfig.info.governanceMint
-          : timelockConfig.info.councilMint,
+          : timelockConfig.info.councilMint!,
         e.owner,
         signers,
       );
@@ -55,7 +55,7 @@ export const mintSourceTokens = async (
         PROGRAM_IDS.token,
         useGovernance
           ? timelockConfig.info.governanceMint
-          : timelockConfig.info.councilMint,
+          : timelockConfig.info.councilMint!,
         e.sourceAccount,
         wallet.publicKey,
         [],

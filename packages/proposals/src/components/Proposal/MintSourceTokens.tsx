@@ -33,7 +33,7 @@ export default function MintSourceTokens({
   const connection = useConnection();
   const mintKey = useGovernance
     ? timelockConfig.info.governanceMint
-    : timelockConfig.info.councilMint;
+    : timelockConfig.info.councilMint!;
   const mint = useMint(mintKey);
   const [saving, setSaving] = useState(false);
 
