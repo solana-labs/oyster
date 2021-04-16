@@ -26,6 +26,7 @@ export const registerProgramGovernance = async (
   connection: Connection,
   wallet: any,
   uninitializedTimelockConfig: Partial<TimelockConfig>,
+  useCouncil: boolean,
 ): Promise<PublicKey> => {
   const PROGRAM_IDS = utils.programIds();
   let signers: Account[] = [];
@@ -43,7 +44,7 @@ export const registerProgramGovernance = async (
   if (!uninitializedTimelockConfig.program)
     uninitializedTimelockConfig.program = new Account().publicKey; // Random generation if none given
 
-  if (!uninitializedTimelockConfig.councilMint) {
+  if (!uninitializedTimelockConfig.councilMint && useCouncil) {
     // Initialize the mint, an account for the admin, and give them one council token
     // to start their lives with.
     uninitializedTimelockConfig.councilMint = createMint(
@@ -111,11 +112,15 @@ export const registerProgramGovernance = async (
     );
   }
 
+  const council_mint_seed = uninitializedTimelockConfig.councilMint
+    ? uninitializedTimelockConfig.councilMint.toBuffer()
+    : Buffer.from('');
+
   const [timelockConfigKey] = await PublicKey.findProgramAddress(
     [
       PROGRAM_IDS.timelock.programId.toBuffer(),
       uninitializedTimelockConfig.governanceMint.toBuffer(),
-      uninitializedTimelockConfig.councilMint.toBuffer(),
+      council_mint_seed,
       uninitializedTimelockConfig.program.toBuffer(),
     ],
     PROGRAM_IDS.timelock.programId,
@@ -126,8 +131,8 @@ export const registerProgramGovernance = async (
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
-      uninitializedTimelockConfig.councilMint,
       wallet.publicKey,
+      uninitializedTimelockConfig.councilMint,
     ),
   );
   instructions.push(
@@ -135,7 +140,7 @@ export const registerProgramGovernance = async (
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
-      uninitializedTimelockConfig.councilMint,
+
       uninitializedTimelockConfig.consensusAlgorithm ||
         ConsensusAlgorithm.Majority,
       uninitializedTimelockConfig.executionType || ExecutionType.Independent,
@@ -145,6 +150,7 @@ export const registerProgramGovernance = async (
       uninitializedTimelockConfig.minimumSlotWaitingPeriod || new BN(0),
       uninitializedTimelockConfig.timeLimit || new BN(0),
       uninitializedTimelockConfig.name || '',
+      uninitializedTimelockConfig.councilMint,
     ),
   );
 

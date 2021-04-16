@@ -8,7 +8,6 @@ import {
   ExecutionType,
   TimelockType,
   VotingEntryRule,
-  ZERO_KEY,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { contexts, utils, tryParseKey } from '@oyster/common';
@@ -132,9 +131,8 @@ export function NewForm({
         : undefined,
       councilMint: values.councilMint
         ? new PublicKey(values.councilMint)
-        : councilVisible
-        ? undefined // if visible but empty, set undefined so we instantiate one
-        : new PublicKey(ZERO_KEY), // default empty case, just make it padding since user doesnt want one.
+        : undefined,
+
       program: new PublicKey(values.program),
       name: values.name,
       timeLimit: new BN(values.timeLimit),
@@ -144,6 +142,7 @@ export function NewForm({
       connection,
       wallet.wallet,
       uninitializedConfig,
+      councilVisible,
     );
     handleOk(newConfig);
   };

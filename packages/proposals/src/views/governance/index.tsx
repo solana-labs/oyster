@@ -16,7 +16,6 @@ import {
   TimelockConfig,
   TimelockType,
   VotingEntryRule,
-  ZERO_KEY,
 } from '../../models/timelock';
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
@@ -91,7 +90,7 @@ const columns = [
     render: (config: ParsedAccount<TimelockConfig>) => (
       <>
         <MintSourceTokens timelockConfig={config} useGovernance={true} />
-        {config.info.councilMint.toBase58() != ZERO_KEY && (
+        {config.info.councilMint && (
           <MintSourceTokens timelockConfig={config} useGovernance={false} />
         )}
       </>

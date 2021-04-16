@@ -45,7 +45,7 @@ export const createProposal = async (
       connection,
       useGovernance
         ? timelockConfig.info.governanceMint
-        : timelockConfig.info.councilMint,
+        : timelockConfig.info.councilMint!,
     )
   ).decimals;
 
@@ -135,7 +135,7 @@ export const createProposal = async (
       sourceHoldingAccount,
       useGovernance
         ? timelockConfig.info.governanceMint
-        : timelockConfig.info.councilMint,
+        : timelockConfig.info.councilMint!,
       authority,
       description,
       name,
@@ -342,7 +342,7 @@ async function getAssociatedAccountsAndInstructions(
     accountRentExempt,
     useGovernance
       ? timelockConfig.info.governanceMint
-      : timelockConfig.info.councilMint,
+      : timelockConfig.info.councilMint!,
     authority,
     holdingSigners,
   );

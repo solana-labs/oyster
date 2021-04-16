@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, ButtonProps, Modal, Radio } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { Account } from '@solana/web3.js';
-import { DESC_SIZE, NAME_SIZE, ZERO_KEY } from '../../models/timelock';
+import { DESC_SIZE, NAME_SIZE } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { contexts, utils } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
@@ -80,7 +80,7 @@ export function NewForm({
 
     if (
       values.proposalMintType === ProposalMintType.Council &&
-      config.info.councilMint.toBase58() === ZERO_KEY
+      !config.info.councilMint
     ) {
       notify({
         message: LABELS.THIS_CONFIG_LACKS_COUNCIL,

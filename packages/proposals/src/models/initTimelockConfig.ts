@@ -13,12 +13,11 @@ import * as Layout from '../utils/layout';
 ///           program account key, governance mint key, council mint key, timelock program account key.
 ///   1. `[]` Program account that this config uses
 ///   2. `[]` Governance mint that this config uses
-///   3. `[]` Council mint that this config uses [Optional] [Pass in 0s otherwise]
+///   3. `[]` Council mint that this config uses [Optional]
 export const initTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
-  councilMint: PublicKey,
   consensusAlgorithm: number,
   executionType: number,
   timelockType: number,
@@ -26,6 +25,7 @@ export const initTimelockConfigInstruction = (
   minimumSlotWaitingPeriod: BN,
   timeLimit: BN,
   name: string,
+  councilMint?: PublicKey,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -69,8 +69,12 @@ export const initTimelockConfigInstruction = (
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
-    { pubkey: councilMint, isSigner: false, isWritable: false },
   ];
+
+  if (councilMint) {
+    keys.push({ pubkey: councilMint, isSigner: false, isWritable: false });
+  }
+
   return new TransactionInstruction({
     keys,
     programId: PROGRAM_IDS.timelock.programId,

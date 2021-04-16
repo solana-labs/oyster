@@ -13,16 +13,16 @@ import * as Layout from '../utils/layout';
 ///           program account key, governance mint key, council mint key, and timelock program account key.
 ///   1. `[]` Program account to tie this config to.
 ///   2. `[]` Governance mint to tie this config to
-///   3. `[]` Council mint [optional] to tie this config to [Pass in 0s otherwise]
-///   4. `[]` Payer
-///   6. `[]` Timelock program pub key.
-///   7. `[]` System account.
+///   3. `[]` Payer
+///   4. `[]` Timelock program pub key.
+///   5. `[]` System account.
+///   6. `[]` Council mint [optional] to tie this config to [Optional]
 export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
-  councilMint: PublicKey,
   payer: PublicKey,
+  councilMint?: PublicKey,
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -41,7 +41,6 @@ export const createEmptyTimelockConfigInstruction = (
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
-    { pubkey: councilMint, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
 
     {
@@ -51,6 +50,11 @@ export const createEmptyTimelockConfigInstruction = (
     },
     { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
+
+  if (councilMint) {
+    keys.push({ pubkey: councilMint, isSigner: false, isWritable: false });
+  }
+
   return new TransactionInstruction({
     keys,
     programId: PROGRAM_IDS.timelock.programId,
