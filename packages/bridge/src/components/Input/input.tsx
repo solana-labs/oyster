@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ConnectButton,
-  CurrentUserWalletBadge,
+  CurrentUserBadge,
   NumericInput,
   useMint,
   useUserAccounts,
@@ -106,10 +106,7 @@ export function Input(props: {
       </div>
       {props.chain === ASSET_CHAIN.Ethereum ? (
         <EthereumConnect />
-      ) : connected ? (
-        <CurrentUserWalletBadge showDisconnect={true} />
-      ) : (
-        <ConnectButton type="text" size="large" allowWalletChange={true} />
+      ) : (<ConnectButton type="text" size="large" allowWalletChange={true} />
       )}
     </div>
   );
