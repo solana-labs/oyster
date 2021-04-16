@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { PublicKey } from "@solana/web3.js";
-import { notify } from "./../utils/notifications";
+import { notify } from "../utils/notifications";
 
 export class SolongAdapter extends EventEmitter {
   _publicKey: any;

@@ -1,6 +1,6 @@
 import { ParsedAccount } from '@oyster/common';
-import { Button, Col, Modal, Row, Slider } from 'antd';
-import React, { useState } from 'react';
+import { Button, Col, Modal, Row } from 'antd';
+import React from 'react';
 import {
   TimelockConfig,
   TimelockSet,
@@ -17,9 +17,8 @@ const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
-export function WithdrawTokens({
+export function WithdrawVote({
   proposal,
-  timelockConfig,
   state,
 }: {
   proposal: ParsedAccount<TimelockSet>;
@@ -33,45 +32,53 @@ export function WithdrawTokens({
   const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
 
   const userAccount = useAccountByMint(proposal.info.sourceMint);
+
   const votingTokens =
     (voteAccount && voteAccount.info.amount.toNumber()) ||
     0 +
       ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
       ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
-  let additionalMsg =
-    state.info.status !== TimelockStateStatus.Voting
-      ? ''
-      : LABELS.ADDITIONAL_VOTING_MSG;
 
-  const [_, setTokenAmount] = useState(1);
-  return votingTokens > 0 ? (
+  const eligibleToView =
+    votingTokens > 0 &&
+    (state.info.status === TimelockStateStatus.Voting ||
+      state.info.status === TimelockStateStatus.Completed ||
+      state.info.status === TimelockStateStatus.Executing ||
+      state.info.status === TimelockStateStatus.Defeated);
+
+  const [btnLabel, title, msg, action] =
+    state.info.status === TimelockStateStatus.Voting
+      ? [
+          LABELS.WITHDRAW_VOTE,
+          LABELS.WITHDRAW_YOUR_VOTE_QUESTION,
+          LABELS.WITHDRAW_YOUR_VOTE_MSG,
+          LABELS.WITHDRAW,
+        ]
+      : [
+          LABELS.REFUND_TOKENS,
+          LABELS.REFUND_YOUR_TOKENS_QUESTION,
+          LABELS.REFUND_YOUR_TOKENS_MSG,
+          LABELS.REFUND,
+        ];
+
+  return eligibleToView ? (
     <Button
       type="primary"
       onClick={() =>
         confirm({
-          title: 'Confirm',
+          title: title,
           icon: <ExclamationCircleOutlined />,
           content: (
             <Row>
               <Col span={24}>
-                <p>You can withdraw up to {votingTokens} voting tokens. </p>
-                {additionalMsg && <p>{additionalMsg}</p>}
-
-                <Slider min={1} max={votingTokens} onChange={setTokenAmount} />
+                <p>{msg}</p>
               </Col>
             </Row>
           ),
-          okText: LABELS.CONFIRM,
+          okText: action,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (userAccount) {
-              // tokenAmount is out of date in this scope, so we use a trick to get it here.
-              const valueHolder = { value: 0 };
-              await setTokenAmount(amount => {
-                valueHolder.value = amount;
-                return amount;
-              });
-
               await withdrawVotingTokens(
                 connection,
                 wallet.wallet,
@@ -81,16 +88,14 @@ export function WithdrawTokens({
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,
                 userAccount.pubkey,
-                valueHolder.value,
+                votingTokens,
               );
-              // reset
-              setTokenAmount(1);
             }
           },
         })
       }
     >
-      {LABELS.REFUND_TOKENS}
+      {btnLabel}
     </Button>
   ) : null;
 }

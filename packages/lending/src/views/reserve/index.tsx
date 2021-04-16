@@ -1,10 +1,10 @@
 import React from "react";
-import { useLendingReserve } from "./../../hooks";
+import { useLendingReserve } from "../../hooks";
 import { useParams } from "react-router-dom";
 import "./style.less";
 
-import { UserLendingCard } from "./../../components/UserLendingCard";
-import { ReserveStatus } from "./../../components/ReserveStatus";
+import { UserLendingCard } from "../../components/UserLendingCard";
+import { ReserveStatus } from "../../components/ReserveStatus";
 import { Col, Row } from "antd";
 import { GUTTER } from "../../constants";
 

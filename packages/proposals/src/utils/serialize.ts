@@ -1,4 +1,4 @@
-import { utils } from '@oyster/common';
+import { ParsedAccount, utils } from '@oyster/common';
 import {
   Connection,
   TransactionInstruction,
@@ -6,12 +6,15 @@ import {
   PublicKey,
   Message,
 } from '@solana/web3.js';
+import { TimelockSet } from '../models/timelock';
 export async function serializeInstruction({
   connection,
   instr,
+  proposal,
 }: {
   connection: Connection;
   instr: TransactionInstruction;
+  proposal: ParsedAccount<TimelockSet>;
 }): Promise<{ base64: string; byteArray: Uint8Array }> {
   const PROGRAM_IDS = utils.programIds();
   let instructionTransaction = new Transaction();
@@ -20,7 +23,7 @@ export async function serializeInstruction({
     await connection.getRecentBlockhash('max')
   ).blockhash;
   const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
   instructionTransaction.setSigners(authority);

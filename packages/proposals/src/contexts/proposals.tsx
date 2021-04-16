@@ -187,7 +187,7 @@ function useSetupProposalsCache({
     return () => {
       connection.removeProgramAccountChangeListener(subID);
     };
-  }, [connection, PROGRAM_IDS.timelock.programAccountId.toBase58()]);
+  }, [connection, PROGRAM_IDS.timelock.programId.toBase58()]);
 }
 export const useProposals = () => {
   const context = useContext(ProposalsContext);

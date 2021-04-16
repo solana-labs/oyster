@@ -50,7 +50,7 @@ export const addCustomSingleSignerTransaction = async (
   });
 
   const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 
@@ -71,6 +71,7 @@ export const addCustomSingleSignerTransaction = async (
     await serializeInstruction({
       connection,
       instr: pingInstruction(),
+      proposal
     })
   ).base64;
 
@@ -79,6 +80,7 @@ export const addCustomSingleSignerTransaction = async (
     await serializeInstruction({
       connection,
       instr: pingInstruction(),
+      proposal
     })
   ).byteArray;
 

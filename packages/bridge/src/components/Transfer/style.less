@@ -1,18 +1,97 @@
 @import "_colors";
+
 .input-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 10px;
 }
-.flexColumn:not(.home-container) {
-  background: @tungsten-100;
-}
+
 .swap-button {
   border-radius: 2em;
   width: 40px;
   height: 40px;
-  font-size: 20px;
+  font-size: 19px;
+  top: 253px;
+  color: black;
+  & > span:after {
+    content: '⇆';
+    padding-left: 0;
+  }
+}
+
+.exchange-card {
+  position: relative;
+  max-width: calc(100% - 460px);
+  width: 100%;
+  margin: 167px auto 150px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.transfer-button{
+  display: flex;
+
+  position: absolute;
+  width: 240px;
+  height: 64px;
+  left: calc(50% - 240px/2);
+  top: 555px;
+
+  border-radius: 12px;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  background: @surge-20;
+  color: white;
   font-weight: bold;
-  padding-left: 8px;
+  font-size: 18px;
+  line-height: 23px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-feature-settings: 'ss02' on;
+  &:disabled{
+    background: @tungsten-50;
+    color: #193650;
+  }
+}
+div:not(.home-container) {
+  & > #recent-tx-container{
+    width: 100%;
+    max-width: calc(100% - 388px);
+    margin: auto;
+  }
+}
+
+@media screen and (max-width: 1200px){
+  .exchange-card {
+    height: 770px;
+    width: 100%;
+    margin: 97px auto 0 auto;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+  }
+  .transfer-button {
+    display: flex;
+    position: relative;
+    width: 240px;
+    height: 64px;
+    left: calc(50% - 240px/2);
+    top: 30px;
+    margin-bottom: 100px;
+  }
+  .swap-button {
+    top: 0;
+  }
+  div:not(.home-container) > #recent-tx-container {
+    max-width: calc(100% - 100px);
+  }
+
+  .swap-button {
+    & > span:after {
+      content: "⇅";
+    }
+  }
 }

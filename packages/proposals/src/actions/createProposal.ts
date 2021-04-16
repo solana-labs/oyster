@@ -15,6 +15,7 @@ import {
   TimelockStateLayout,
 } from '../models/timelock';
 
+const { cache } = contexts.Accounts;
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
 const { notify } = utils;
@@ -39,6 +40,17 @@ export const createProposal = async (
     AccountLayout.span,
   );
 
+  const sourceMintDecimals = (
+    await cache.queryMint(
+      connection,
+      useGovernance
+        ? timelockConfig.info.governanceMint
+        : timelockConfig.info.councilMint,
+    )
+  ).decimals;
+
+  const timelockSetKey = new Account();
+
   const {
     sigMint,
     voteMint,
@@ -62,6 +74,8 @@ export const createProposal = async (
     mintRentExempt,
     timelockConfig,
     useGovernance,
+    sourceMintDecimals,
+    timelockSetKey,
   );
 
   let createTimelockAccountsSigners: Account[] = [];
@@ -75,7 +89,6 @@ export const createProposal = async (
     TimelockStateLayout.span,
   );
 
-  const timelockSetKey = new Account();
   const timelockStateKey = new Account();
 
   const uninitializedTimelockStateInstruction = SystemProgram.createAccount({
@@ -101,7 +114,7 @@ export const createProposal = async (
   signers.push(timelockSetKey);
   createTimelockAccountsSigners.push(timelockSetKey);
   createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
-  console.log('useGov ernance is', useGovernance, timelockConfig);
+
   instructions.push(
     initTimelockSetInstruction(
       timelockStateKey.publicKey,
@@ -186,11 +199,13 @@ async function getAssociatedAccountsAndInstructions(
   mintRentExempt: number,
   timelockConfig: ParsedAccount<TimelockConfig>,
   useGovernance: boolean,
+  sourceMintDecimals: number,
+  newProposalKey: Account,
 ): Promise<ValidationReturn> {
   const PROGRAM_IDS = utils.programIds();
 
   const [authority] = await PublicKey.findProgramAddress(
-    [PROGRAM_IDS.timelock.programAccountId.toBuffer()],
+    [newProposalKey.publicKey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 
@@ -224,7 +239,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,
@@ -234,7 +249,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,
@@ -244,7 +259,7 @@ async function getAssociatedAccountsAndInstructions(
     voteMintInstructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    sourceMintDecimals,
     authority,
     authority,
     voteMintSigners,

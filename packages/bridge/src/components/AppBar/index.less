@@ -1,5 +1,22 @@
 @import "_colors";
-.app-left {
+
+
+header.ant-layout-header.App-Bar {
+  position: absolute;
+  width: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  height: 80px;
+
+  .nav-burger {
+    cursor: pointer;
+    display: none;
+  }
+
+}
+
+.app-bar-item.logo {
   position: absolute;
   left: 10%;
 }
@@ -12,6 +29,7 @@
   min-width: 50%;
   justify-content: center;
   height: auto;
+  align-items: center;
   .app-bar-item {
     cursor: pointer;
     padding: 0 30px;
@@ -22,6 +40,60 @@
     }
     &.active {
       color: white;
+    }
+  }
+}
+
+@media screen and (min-width: 901px) {
+   header.ant-layout-header.App-Bar  {
+     width: 100% !important;
+   }
+}
+@media screen and (max-width: 1200px) {
+
+  .app-bar-item.logo {
+    position: relative;
+    left: 0;
+  }
+  .app-bar-item.app-right{
+    position: relative;
+    left: 0;
+    padding: 0;
+  }
+}
+@media screen and (max-width: 900px) {
+  header.ant-layout-header.App-Bar  {
+    position: fixed;
+    transition: ease-in-out 0.5s;
+    width: 0;
+    max-width: 240px;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0;
+    .nav-burger {
+      display: inline-block;
+      left: 30px;
+      position: relative;
+      transition: ease-in-out 0.5s;
+      z-index: 10;
+    }
+    .app-bar-inner {
+      //opacity: 0;
+      left: -100px;
+      position: relative;
+      transition: ease-in-out 0.5s;
+      flex-direction: column;
+    }
+    background: #06101a;
+    & > .nav-burger.mobile-active {
+      width: 30px;
+      position: relative;
+      left: 0;
+    }
+
+    .app-bar-inner.mobile-active {
+      left: 0px;
     }
   }
 }

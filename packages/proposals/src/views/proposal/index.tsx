@@ -1,10 +1,9 @@
 import { Card, Col, Grid, Row, Spin, Statistic, Tabs } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   ConsensusAlgorithm,
-  GovernanceVotingRecord,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
@@ -14,7 +13,7 @@ import {
 } from '../../models/timelock';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { useConfig, useProposals } from '../../contexts/proposals';
+import { useProposals } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -24,10 +23,9 @@ import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
 import { Vote } from '../../components/Proposal/Vote';
-import { RegisterToVote } from '../../components/Proposal/RegisterToVote';
-import { WithdrawTokens } from '../../components/Proposal/WithdrawTokens';
+import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
-import { getGovernanceVotingRecords } from '../../utils/lookups';
+import { useVotingRecords } from '../../hooks/useVotingRecords';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
@@ -59,12 +57,8 @@ export const ProposalView = () => {
   const yesVotingMint = useMint(proposal?.info.yesVotingMint);
   const noVotingMint = useMint(proposal?.info.noVotingMint);
 
-  const [votingDisplayData, setVotingDisplayData] = useState<any>({});
-  useEffect(() => {
-    getGovernanceVotingRecords(proposal?.pubkey, endpoint).then(records =>
-      setVotingDisplayData(voterDisplayData(records)),
-    );
-  }, [proposal]);
+  const votingRecords = useVotingRecords(proposal?.pubkey);
+
   return (
     <div className="flexColumn">
       {proposal &&
@@ -81,7 +75,7 @@ export const ProposalView = () => {
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
           noVotingMint={noVotingMint}
-          votingDisplayData={votingDisplayData}
+          votingDisplayData={voterDisplayData(votingRecords)}
           sigMint={sigMint}
           instructions={context.transactions}
           endpoint={endpoint}
@@ -296,20 +290,22 @@ function InnerProposalView({
                   timelockConfig.info.governanceMint.toBase58()
                 }
               />
-              <RegisterToVote
-                timelockConfig={timelockConfig}
-                proposal={proposal}
-                state={timelockState}
-              />
-              <WithdrawTokens
+              <WithdrawVote
                 timelockConfig={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
               />
               <Vote
-                proposal={proposal}
                 timelockConfig={timelockConfig}
+                proposal={proposal}
                 state={timelockState}
+                yeahVote={true}
+              />
+              <Vote
+                timelockConfig={timelockConfig}
+                proposal={proposal}
+                state={timelockState}
+                yeahVote={false}
               />
             </div>
           </Col>

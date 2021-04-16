@@ -23,8 +23,7 @@ import BN from 'bn.js';
 ///   5. `[]` Timelock Config account.
 ///   6. `[]` Transfer authority
 ///   7. `[]` Timelock mint authority
-///   8. `[]` Timelock program account.
-///   9. `[]` Token program account.
+///   8. `[]` Token program account.
 export const addCustomSingleSignerTransactionInstruction = (
   timelockTransactionAccount: PublicKey,
   timelockStateAccount: PublicKey,
@@ -94,11 +93,6 @@ export const addCustomSingleSignerTransactionInstruction = (
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.timelock.programAccountId,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
 
