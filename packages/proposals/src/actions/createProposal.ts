@@ -10,6 +10,7 @@ import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
 import {
+  AUTHORITY_SEED_PROPOSAL,
   TimelockConfig,
   TimelockSetLayout,
   TimelockStateLayout,
@@ -205,7 +206,7 @@ async function getAssociatedAccountsAndInstructions(
   const PROGRAM_IDS = utils.programIds();
 
   const [authority] = await PublicKey.findProgramAddress(
-    [newProposalKey.publicKey.toBuffer()],
+    [Buffer.from(AUTHORITY_SEED_PROPOSAL), newProposalKey.publicKey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

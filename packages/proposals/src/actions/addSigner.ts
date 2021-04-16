@@ -12,7 +12,11 @@ import {
   actions,
 } from '@oyster/common';
 
-import { TimelockSet, TimelockState } from '../models/timelock';
+import {
+  AUTHORITY_SEED_PROPOSAL,
+  TimelockSet,
+  TimelockState,
+} from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { addSignerInstruction } from '../models/addSigner';
 const { createTokenAccount } = actions;
@@ -47,7 +51,7 @@ export const addSigner = async (
   );
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [proposal.pubkey.toBuffer()],
+    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

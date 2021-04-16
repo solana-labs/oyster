@@ -6,7 +6,11 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import { TimelockSet, TimelockState } from '../models/timelock';
+import {
+  AUTHORITY_SEED_PROPOSAL,
+  TimelockSet,
+  TimelockState,
+} from '../models/timelock';
 import { signInstruction } from '../models/sign';
 
 const { sendTransaction } = contexts.Connection;
@@ -26,7 +30,7 @@ export const sign = async (
   let instructions: TransactionInstruction[] = [];
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [proposal.pubkey.toBuffer()],
+    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

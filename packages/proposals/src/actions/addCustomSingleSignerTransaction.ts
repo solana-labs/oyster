@@ -8,6 +8,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
+  AUTHORITY_SEED_PROPOSAL,
   CustomSingleSignerTimelockTransactionLayout,
   TimelockSet,
   TimelockState,
@@ -50,7 +51,7 @@ export const addCustomSingleSignerTransaction = async (
   });
 
   const [authority] = await PublicKey.findProgramAddress(
-    [proposal.pubkey.toBuffer()],
+    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

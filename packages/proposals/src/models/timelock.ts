@@ -11,6 +11,15 @@ export const INSTRUCTION_LIMIT = 450;
 export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
+/// Seed for proposal authority
+export const AUTHORITY_SEED_PROPOSAL = 'proposal';
+
+/// Seed for governance authority
+export const AUTHORITY_SEED_GOVERNANCE = 'governance';
+
+/// Seed for governance authority
+export const AUTHORITY_SEED_PROPOSAL_VOTE = 'proposal-vote';
+
 export enum TimelockInstruction {
   InitTimelockSet = 1,
   AddSigner = 2,
