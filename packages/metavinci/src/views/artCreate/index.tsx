@@ -363,7 +363,7 @@ const InfoStep = (props: {
   useEffect(() => {
     setRoyalties(creators.map(creator => ({
       creator_key: creator.key,
-      amount: 100 / creators.length,
+      amount: Math.trunc(100 / creators.length),
     })))
   }, [creators])
 
@@ -476,15 +476,29 @@ const RoyaltiesSplitter = (props: {
 
         const amt = royalty.amount
         const handleSlide = (newAmt: number) => {
-          const diff = newAmt - amt
-          let n = props.royalties.length - 1
+          const othersRoyalties = props.royalties.filter(_royalty => _royalty.creator_key != royalty.creator_key)
+          const others_n = props.royalties.length - 1
+          const sign = Math.sign(newAmt - amt)
+          let remaining = Math.abs(newAmt - amt)
+          let count = 0
+          while (remaining > 0 && count < 100) {
+            const idx = count % others_n
+            const _royalty = othersRoyalties[idx]
+            if (
+              (0 < _royalty.amount && _royalty.amount < 100) // Normal
+              || (_royalty.amount == 0 && sign < 0) // Low limit
+              || (_royalty.amount == 100 && sign > 0) // High limit
+            ) {
+              _royalty.amount -= sign
+              remaining -= 1
+            }
+            count += 1
+          }
 
           props.setRoyalties(props.royalties.map(_royalty => {
-            let computed_amount = _royalty.amount - diff / n
-            if (computed_amount <= 0) {
-              computed_amount = 0
-              // n -= 1
-            }
+            const computed_amount = othersRoyalties.find(newRoyalty =>
+              newRoyalty.creator_key == _royalty.creator_key
+            )?.amount
             return {
               ..._royalty,
               amount: _royalty.creator_key == royalty.creator_key ? newAmt : computed_amount,
@@ -494,7 +508,7 @@ const RoyaltiesSplitter = (props: {
         return (
           <Row key={idx} style={{ margin: '5px auto' }}>
             <Col span={11} className="slider-elem">{creator.label}</Col>
-            <Col span={8} className="slider-elem">{amt.toFixed(0)}%</Col>
+            <Col span={8} className="slider-elem">{amt}%</Col>
             <Col span={4}><Slider value={amt} onChange={handleSlide} /></Col>
           </Row>
         )
