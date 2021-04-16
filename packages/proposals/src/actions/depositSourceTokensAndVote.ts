@@ -13,8 +13,7 @@ import {
 } from '@oyster/common';
 
 import {
-  AUTHORITY_SEED_PROPOSAL,
-  AUTHORITY_SEED_PROPOSAL_VOTE,
+  GOVERNANCE_AUTHORITY_SEED,
   TimelockConfig,
   TimelockSet,
   TimelockState,
@@ -72,7 +71,7 @@ export const depositSourceTokensAndVote = async (
 
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
     [
-      Buffer.from(AUTHORITY_SEED_PROPOSAL_VOTE),
+      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
       PROGRAM_IDS.timelock.programId.toBuffer(),
       proposal.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
@@ -114,7 +113,7 @@ export const depositSourceTokensAndVote = async (
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

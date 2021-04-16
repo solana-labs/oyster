@@ -6,7 +6,7 @@ import {
   PublicKey,
   Message,
 } from '@solana/web3.js';
-import { AUTHORITY_SEED_PROPOSAL, TimelockSet } from '../models/timelock';
+import { GOVERNANCE_AUTHORITY_SEED, TimelockSet } from '../models/timelock';
 export async function serializeInstruction({
   connection,
   instr,
@@ -23,7 +23,7 @@ export async function serializeInstruction({
     await connection.getRecentBlockhash('max')
   ).blockhash;
   const [authority] = await PublicKey.findProgramAddress(
-    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
   instructionTransaction.setSigners(authority);

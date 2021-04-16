@@ -13,7 +13,7 @@ import {
 } from '@oyster/common';
 
 import {
-  AUTHORITY_SEED_PROPOSAL,
+  GOVERNANCE_AUTHORITY_SEED,
   TimelockSet,
   TimelockState,
 } from '../models/timelock';
@@ -51,7 +51,7 @@ export const addSigner = async (
   );
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(AUTHORITY_SEED_PROPOSAL), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.timelock.programId,
   );
 

@@ -8,7 +8,7 @@ import { contexts, utils, actions } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
-  AUTHORITY_SEED_GOVERNANCE,
+  GOVERNANCE_AUTHORITY_SEED,
   ConsensusAlgorithm,
   ExecutionType,
   TimelockConfig,
@@ -119,7 +119,7 @@ export const registerProgramGovernance = async (
 
   const [timelockConfigKey] = await PublicKey.findProgramAddress(
     [
-      Buffer.from(AUTHORITY_SEED_GOVERNANCE),
+      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
       PROGRAM_IDS.timelock.programId.toBuffer(),
       uninitializedTimelockConfig.governanceMint.toBuffer(),
       councilMintSeed,

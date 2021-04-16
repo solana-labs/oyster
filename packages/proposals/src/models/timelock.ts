@@ -12,13 +12,7 @@ export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
 /// Seed for proposal authority
-export const AUTHORITY_SEED_PROPOSAL = 'proposal';
-
-/// Seed for governance authority
-export const AUTHORITY_SEED_GOVERNANCE = 'governance';
-
-/// Seed for governance authority
-export const AUTHORITY_SEED_PROPOSAL_VOTE = 'proposal-vote';
+export const GOVERNANCE_AUTHORITY_SEED = 'governance';
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
