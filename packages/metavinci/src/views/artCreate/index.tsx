@@ -463,6 +463,10 @@ const InfoStep = (props: {
   );
 };
 
+const shuffle = (array: Array<any>) => {
+  array.sort(() => Math.random() - 0.5);
+}
+
 const RoyaltiesSplitter = (props: {
   creators: Array<UserValue>,
   royalties: Array<Royalty>,
@@ -477,6 +481,8 @@ const RoyaltiesSplitter = (props: {
         const amt = royalty.amount
         const handleSlide = (newAmt: number) => {
           const othersRoyalties = props.royalties.filter(_royalty => _royalty.creator_key != royalty.creator_key)
+          if (othersRoyalties.length < 1) return
+          shuffle(othersRoyalties)
           const others_n = props.royalties.length - 1
           const sign = Math.sign(newAmt - amt)
           let remaining = Math.abs(newAmt - amt)
