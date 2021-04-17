@@ -57,7 +57,7 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
   ],
 );
 export interface TimelockConfig {
-  ///version
+  /// Account type
   account_type: GovernanceAccountType;
   /// Consensus Algorithm
   consensusAlgorithm: ConsensusAlgorithm;
@@ -92,7 +92,7 @@ export enum GovernanceAccountType {
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('version'),
+    BufferLayout.u8('account_type'),
     BufferLayout.u8('consensusAlgorithm'),
     BufferLayout.u8('executionType'),
     BufferLayout.u8('timelockType'),
@@ -179,10 +179,10 @@ for (let i = 0; i < TRANSACTION_SLOTS; i++) {
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    BufferLayout.u8('account_type'),
     Layout.publicKey('config'),
     Layout.publicKey('tokenProgramId'),
     Layout.publicKey('state'),
-    BufferLayout.u8('version'),
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
     Layout.publicKey('votingMint'),
@@ -220,6 +220,9 @@ export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.s
 );
 
 export interface TimelockSet {
+  /// Account type
+  account_type: GovernanceAccountType;
+
   /// configuration values
   config: PublicKey;
 
@@ -228,9 +231,6 @@ export interface TimelockSet {
 
   /// state values
   state: PublicKey;
-
-  /// Version of the struct
-  version: number;
 
   /// Mint that creates signatory tokens of this instruction
   /// If there are outstanding signatory tokens, then cannot leave draft state. Signatories must burn tokens (ie agree
@@ -308,10 +308,10 @@ export const TimelockSetParser = (
       ...info,
     },
     info: {
+      account_type: data.account_type,
       config: data.config,
       tokenProgramId: data.tokenProgramId,
       state: data.state,
-      version: data.version,
       signatoryMint: data.signatoryMint,
       adminMint: data.adminMint,
       votingMint: data.votingMint,
@@ -430,7 +430,7 @@ export const TimelockConfigParser = (
       ...info,
     },
     info: {
-      version: data.version,
+      account_type: data.account_type,
       consensusAlgorithm: data.consensusAlgorithm,
       executionType: data.executionType,
       timelockType: data.timelockType,
