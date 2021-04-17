@@ -22,12 +22,12 @@ export enum TimelockInstruction {
   Sign = 8,
   Vote = 9,
   InitTimelockConfig = 10,
-  Ping = 11,
-  Execute = 12,
-  DepositGovernanceTokens = 13,
-  WithdrawVotingTokens = 14,
-  CreateEmptyTimelockConfig = 15,
-  CreateGovernanceVotingRecord = 16,
+
+  Execute = 11,
+  DepositGovernanceTokens = 12,
+  WithdrawVotingTokens = 13,
+  CreateEmptyTimelockConfig = 14,
+  CreateGovernanceVotingRecord = 15,
 }
 
 export interface GovernanceVotingRecord {
@@ -58,7 +58,7 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
 );
 export interface TimelockConfig {
   ///version
-  version: number;
+  account_type: GovernanceAccountType;
   /// Consensus Algorithm
   consensusAlgorithm: ConsensusAlgorithm;
   /// Execution type
@@ -81,6 +81,13 @@ export interface TimelockConfig {
   name: string;
   /// Running count of proposals
   count: number;
+}
+
+export enum GovernanceAccountType {
+  Uninitialized = 0,
+  Governance = 1,
+  Proposal = 2,
+  VoteRecord = 3,
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(

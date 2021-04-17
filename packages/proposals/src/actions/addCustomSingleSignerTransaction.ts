@@ -14,11 +14,9 @@ import {
   TimelockState,
 } from '../models/timelock';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
-import { pingInstruction } from '../models/ping';
-import { serializeInstruction } from '../utils/serialize';
 
 const { sendTransaction } = contexts.Connection;
-const { notify, shortvec, toUTF8Array, fromUTF8Array } = utils;
+const { notify, toUTF8Array, fromUTF8Array } = utils;
 const { approve } = models;
 
 export const addCustomSingleSignerTransaction = async (
