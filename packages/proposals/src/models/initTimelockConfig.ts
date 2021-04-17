@@ -18,7 +18,7 @@ export const initTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
-  consensusAlgorithm: number,
+  voteThreshold: number,
   executionType: number,
   timelockType: number,
   votingEntryRule: number,
@@ -35,7 +35,7 @@ export const initTimelockConfigInstruction = (
 
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
-    BufferLayout.u8('consensusAlgorithm'),
+    BufferLayout.u8('voteThreshold'),
     BufferLayout.u8('executionType'),
     BufferLayout.u8('timelockType'),
     BufferLayout.u8('votingEntryRule'),
@@ -54,7 +54,7 @@ export const initTimelockConfigInstruction = (
   dataLayout.encode(
     {
       instruction: TimelockInstruction.InitTimelockConfig,
-      consensusAlgorithm,
+      voteThreshold,
       executionType,
       timelockType,
       votingEntryRule,

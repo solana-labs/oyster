@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, Modal, Switch } from 'antd';
+import { Button, ButtonProps, InputNumber, Modal, Switch } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
   CONFIG_NAME_LENGTH,
-  ConsensusAlgorithm,
   ExecutionType,
   TimelockType,
   VotingEntryRule,
@@ -71,7 +70,7 @@ export function NewForm({
   const onFinish = async (values: {
     timelockType: TimelockType;
     executionType: ExecutionType;
-    consensusAlgorithm: ConsensusAlgorithm;
+    voteThreshold: number;
     votingEntryRule: VotingEntryRule;
     minimumSlotWaitingPeriod: string;
     timeLimit: string;
@@ -123,7 +122,7 @@ export function NewForm({
     const uninitializedConfig = {
       timelockType: values.timelockType,
       executionType: values.executionType,
-      consensusAlgorithm: values.consensusAlgorithm,
+      voteThreshold: values.voteThreshold,
       votingEntryRule: values.votingEntryRule,
       minimumSlotWaitingPeriod: new BN(values.minimumSlotWaitingPeriod),
       governanceMint: values.governanceMint
@@ -198,20 +197,12 @@ export function NewForm({
           <Input maxLength={64} />
         </Form.Item>
         <Form.Item
-          name="consensusAlgorithm"
-          label={LABELS.CONSENSUS_ALGORITHM}
+          name="voteThreshold"
+          label={LABELS.VOTE_PERCENT_THRESHOLD}
           rules={[{ required: true }]}
-          initialValue={ConsensusAlgorithm.Majority}
+          initialValue={60}
         >
-          <Select placeholder={LABELS.SELECT_CONSENSUS_ALGORITHM}>
-            <Option value={ConsensusAlgorithm.Majority}>Majority</Option>
-            <Option value={ConsensusAlgorithm.FullConsensus}>
-              Full Consensus
-            </Option>
-            <Option value={ConsensusAlgorithm.SuperMajority}>
-              Super Majority
-            </Option>
-          </Select>
+          <InputNumber maxLength={3} min={1} max={100} />
         </Form.Item>
         <Form.Item
           name="executionType"

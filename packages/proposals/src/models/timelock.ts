@@ -61,8 +61,8 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
 export interface TimelockConfig {
   /// Account type
   accountType: GovernanceAccountType;
-  /// Consensus Algorithm
-  consensusAlgorithm: ConsensusAlgorithm;
+  /// Vote threshold
+  voteThreshold: number;
   /// Execution type
   executionType: ExecutionType;
   /// Timelock Type
@@ -97,7 +97,7 @@ export enum GovernanceAccountType {
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
-    BufferLayout.u8('consensusAlgorithm'),
+    BufferLayout.u8('voteThreshold'),
     BufferLayout.u8('executionType'),
     BufferLayout.u8('timelockType'),
     BufferLayout.u8('votingEntryRule'),
@@ -115,12 +115,6 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
 
 export enum VotingEntryRule {
   Anytime = 0,
-}
-
-export enum ConsensusAlgorithm {
-  Majority = 0,
-  SuperMajority = 1,
-  FullConsensus = 2,
 }
 
 export enum ExecutionType {
@@ -314,7 +308,7 @@ export const TimelockSetParser = (
       ...info,
     },
     info: {
-      accountType: data.account_type,
+      accountType: data.accountType,
       config: data.config,
       tokenProgramId: data.tokenProgramId,
       state: data.state,
@@ -437,7 +431,7 @@ export const TimelockConfigParser = (
     },
     info: {
       accountType: data.accountType,
-      consensusAlgorithm: data.consensusAlgorithm,
+      voteThreshold: data.voteThreshold,
       executionType: data.executionType,
       timelockType: data.timelockType,
       votingEntryRule: data.votingEntryRule,
