@@ -32,7 +32,7 @@ export enum TimelockInstruction {
 
 export interface GovernanceVotingRecord {
   /// Account type
-  account_type: GovernanceAccountType;
+  accountType: GovernanceAccountType;
   /// proposal
   proposal: PublicKey;
   /// owner
@@ -48,7 +48,7 @@ export interface GovernanceVotingRecord {
 
 export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('account_type'),
+    BufferLayout.u8('accountType'),
     Layout.publicKey('proposal'),
     Layout.publicKey('owner'),
     Layout.uint64('undecidedCount'),
@@ -57,9 +57,10 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
     BufferLayout.seq(BufferLayout.u8(), 100, 'padding'),
   ],
 );
+
 export interface TimelockConfig {
   /// Account type
-  account_type: GovernanceAccountType;
+  accountType: GovernanceAccountType;
   /// Consensus Algorithm
   consensusAlgorithm: ConsensusAlgorithm;
   /// Execution type
@@ -94,7 +95,7 @@ export enum GovernanceAccountType {
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('account_type'),
+    BufferLayout.u8('accountType'),
     BufferLayout.u8('consensusAlgorithm'),
     BufferLayout.u8('executionType'),
     BufferLayout.u8('timelockType'),
@@ -159,9 +160,8 @@ export const STATE_COLOR: Record<string, string> = {
 
 export interface TimelockState {
   /// Account type
-  account_type: GovernanceAccountType;
+  accountType: GovernanceAccountType;
   timelockSet: PublicKey;
-
   status: TimelockStateStatus;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
@@ -183,7 +183,7 @@ for (let i = 0; i < TRANSACTION_SLOTS; i++) {
 
 export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('account_type'),
+    BufferLayout.u8('accountType'),
     Layout.publicKey('config'),
     Layout.publicKey('tokenProgramId'),
     Layout.publicKey('state'),
@@ -205,7 +205,7 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
 
 export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('account_type'),
+    BufferLayout.u8('accountType'),
     Layout.publicKey('timelockSet'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
@@ -225,7 +225,7 @@ export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.s
 
 export interface TimelockSet {
   /// Account type
-  account_type: GovernanceAccountType;
+  accountType: GovernanceAccountType;
 
   /// configuration values
   config: PublicKey;
@@ -277,7 +277,7 @@ export interface TimelockSet {
 
 export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
-    BufferLayout.u8('version'),
+    BufferLayout.u8('accountType'),
     Layout.uint64('slot'),
     BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
     BufferLayout.u8('executed'),
@@ -287,7 +287,8 @@ export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.St
 );
 
 export interface TimelockTransaction {
-  version: number;
+  /// Account type
+  accountType: GovernanceAccountType;
 
   slot: BN;
 
@@ -312,7 +313,7 @@ export const TimelockSetParser = (
       ...info,
     },
     info: {
-      account_type: data.account_type,
+      accountType: data.account_type,
       config: data.config,
       tokenProgramId: data.tokenProgramId,
       state: data.state,
@@ -346,7 +347,7 @@ export const GovernanceVotingRecordParser = (
       ...info,
     },
     info: {
-      account_type: data.account_type,
+      accountType: data.accountType,
       proposal: data.proposal,
       owner: data.owner,
       undecidedCount: data.undecidedCount,
@@ -376,7 +377,7 @@ export const TimelockStateParser = (
       ...info,
     },
     info: {
-      account_type: data.account_type,
+      accountType: data.accountType,
       timelockSet: data.timelockSet,
       status: data.timelockStateStatus,
       totalSigningTokensMinted: data.totalSigningTokensMinted,
@@ -409,7 +410,7 @@ export const CustomSingleSignerTimelockTransactionParser = (
       ...info,
     },
     info: {
-      version: data.version,
+      accountType: data.accountType,
       slot: data.slot,
       instruction: data.instruction.slice(0, data.instructionEndIndex + 1),
 
@@ -434,7 +435,7 @@ export const TimelockConfigParser = (
       ...info,
     },
     info: {
-      account_type: data.account_type,
+      accountType: data.accountType,
       consensusAlgorithm: data.consensusAlgorithm,
       executionType: data.executionType,
       timelockType: data.timelockType,
