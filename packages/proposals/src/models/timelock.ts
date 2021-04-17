@@ -31,12 +31,13 @@ export enum TimelockInstruction {
 }
 
 export interface GovernanceVotingRecord {
+  /// Account type
+  account_type: GovernanceAccountType;
   /// proposal
   proposal: PublicKey;
   /// owner
   owner: PublicKey;
-  ///version
-  version: number;
+
   /// How many votes were unspent
   undecidedCount: BN;
   /// How many votes were spent yes
@@ -47,9 +48,9 @@ export interface GovernanceVotingRecord {
 
 export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    BufferLayout.u8('account_type'),
     Layout.publicKey('proposal'),
     Layout.publicKey('owner'),
-    BufferLayout.u8('version'),
     Layout.uint64('undecidedCount'),
     Layout.uint64('yesCount'),
     Layout.uint64('noCount'),
@@ -345,9 +346,9 @@ export const GovernanceVotingRecordParser = (
       ...info,
     },
     info: {
+      account_type: data.account_type,
       proposal: data.proposal,
       owner: data.owner,
-      version: data.version,
       undecidedCount: data.undecidedCount,
       yesCount: data.yesCount,
       noCount: data.noCount,
