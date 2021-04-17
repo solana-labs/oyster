@@ -171,6 +171,7 @@ export const registerProgramGovernance = async (
         : [instructions],
       mintInstructions.length ? [mintSigners, signers] : [signers],
       true,
+      true,
     );
 
     notify({

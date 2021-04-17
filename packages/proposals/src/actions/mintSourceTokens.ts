@@ -80,6 +80,7 @@ export const mintSourceTokens = async (
       allInstructions,
       allSigners,
       true,
+      true,
       'singleGossip',
       (_txId: string, index: number) => {
         setSavePerc(Math.round(100 * ((index + 1) / allInstructions.length)));
