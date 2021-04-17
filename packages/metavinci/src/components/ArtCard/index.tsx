@@ -1,21 +1,12 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Card, Avatar } from 'antd';
+import { Card, Avatar, CardProps } from 'antd';
 import { MetadataCategory } from '@oyster/common';
 import { ArtContent } from './../ArtContent';
 import './index.less';
 
 const { Meta } = Card;
 
-export const ArtCard = ({
-  image,
-  category,
-  name,
-  symbol,
-  description,
-  artist,
-  preview,
-  small,
-}: {
+export interface ArtCardProps extends CardProps {
   image?: string;
   category?: MetadataCategory
   name?: string;
@@ -23,13 +14,17 @@ export const ArtCard = ({
   description?: string;
   artist?: string;
   preview?: boolean;
-  small?: boolean
-}) => {
+  small?: boolean;
+}
+
+export const ArtCard = (props: ArtCardProps) => {
+  const { className, small, category, image, name, preview, artist, ...rest } = props;
   return (
     <Card
       hoverable={true}
-      className={`art-card ${small ? 'small' : ''}`}
-      cover={<ArtContent category={category} content={image} />}
+      className={`art-card ${small ? 'small' : ''} ${className}`}
+      cover={<ArtContent category={category} content={image} preview={preview} />}
+      {...rest}
     >
       <Meta
         title={`${name}`}

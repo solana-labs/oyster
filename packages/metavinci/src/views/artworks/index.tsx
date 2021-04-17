@@ -1,20 +1,12 @@
-import { ParsedAccount, TokenAccount, useUserAccounts } from '@oyster/common';
 import React from 'react';
 import { ArtCard } from '../../components/ArtCard';
-import { useMeta } from '../../contexts';
 import { Row, Col } from 'antd';
 import Masonry from 'react-masonry-css'
 import { Link } from 'react-router-dom';
+import { useUserArts } from '../../hooks';
 
 export const ArtworksView = () => {
-  const { metadata } = useMeta();
-  const { userAccounts } = useUserAccounts();
-  const accountByMint = userAccounts.reduce((prev, acc) => {
-    prev.set(acc.info.mint.toBase58(), acc);
-    return prev;
-  }, new Map<string, TokenAccount>());
-
-  const ownedMetadata = metadata.filter(m => accountByMint.has(m.info.mint.toBase58()));
+  const ownedMetadata = useUserArts();
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
