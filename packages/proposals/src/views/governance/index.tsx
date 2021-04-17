@@ -11,7 +11,6 @@ import {
   ParsedAccount,
 } from '@oyster/common';
 import {
-  ConsensusAlgorithm,
   ExecutionType,
   TimelockConfig,
   TimelockType,
@@ -29,10 +28,10 @@ const columns = [
     key: 'name',
   },
   {
-    title: LABELS.CONSENSUS_ALGORITHM,
-    dataIndex: 'consensusAlgorithm',
-    key: 'consensusAlgorithm',
-    render: (number: number) => <span>{ConsensusAlgorithm[number]}</span>,
+    title: LABELS.VOTE_PERCENT_THRESHOLD,
+    dataIndex: 'voteThreshold',
+    key: 'voteThreshold',
+    render: (number: number) => <span>{number}</span>,
   },
   {
     title: LABELS.EXECUTION_TYPE,
@@ -74,7 +73,7 @@ const columns = [
     title: LABELS.COUNCIL_MINT,
     dataIndex: 'councilMint',
     key: 'councilMint',
-    render: (key: PublicKey) => <span>{key.toBase58()}</span>,
+    render: (key: PublicKey) => <span>{key?.toBase58()}</span>,
   },
   {
     title: LABELS.PROGRAM,

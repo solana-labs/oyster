@@ -9,7 +9,6 @@ import { contexts, utils, actions } from '@oyster/common';
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  ConsensusAlgorithm,
   ExecutionType,
   TimelockConfig,
   TimelockType,
@@ -143,8 +142,7 @@ export const registerProgramGovernance = async (
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,
 
-      uninitializedTimelockConfig.consensusAlgorithm ||
-        ConsensusAlgorithm.Majority,
+      uninitializedTimelockConfig.voteThreshold!,
       uninitializedTimelockConfig.executionType || ExecutionType.Independent,
       uninitializedTimelockConfig.timelockType ||
         TimelockType.CustomSingleSignerV1,
@@ -170,6 +168,7 @@ export const registerProgramGovernance = async (
         ? [mintInstructions, instructions]
         : [instructions],
       mintInstructions.length ? [mintSigners, signers] : [signers],
+      true,
       true,
     );
 

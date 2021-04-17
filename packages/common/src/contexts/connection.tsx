@@ -244,15 +244,16 @@ export const sendTransactions = async (
   instructionSet: TransactionInstruction[][],
   signersSet: Account[][],
   awaitConfirmation = true,
-  commitment = 'singleGossip',
+  sendInSequence = false,
+  commitment: Commitment = 'singleGossip',
   successCallback: (txid: string, ind: number) => void = (txid, ind) => {},
   failCallback: (txid: string, ind: number) => boolean = (txid, ind) => false,
   block?: BlockhashAndFeeCalculator,
 ) => {
   const unsignedTxns: Transaction[] = [];
 
-  if(!block) {
-    block = await connection.getRecentBlockhash('singleGossip');
+  if (!block) {
+    block = await connection.getRecentBlockhash(commitment);
   }
 
   for (let i = 0; i < instructionSet.length; i++) {
@@ -280,19 +281,22 @@ export const sendTransactions = async (
     commitment,
   };
 
-  const tasks: Promise<void>[] = [];
-  for (let i = 0; i < rawTransactions.length; i++) {
-    const rawTransaction = rawTransactions[i];
-    const task = connection.sendRawTransaction(rawTransaction, options).then(async (txid) => {
-      if (awaitConfirmation) {
-        const status = (
-          await connection.confirmTransaction(
-            txid,
-            options && (options.commitment as any),
-          )
-        ).value;
+  const pendingTxns: Promise<void>[] = [];
 
-        if (status?.err && !failCallback(txid, i)) {
+  for (let i = 0; i < rawTransactions.length; i++) {
+    const sendingTxId = connection.sendRawTransaction(
+      rawTransactions[i],
+      options,
+    );
+
+    if (sendInSequence || awaitConfirmation) {
+      const pendingTx = sendingTxId.then(async txid => {
+        const status = await connection.confirmTransaction(
+          txid,
+          options && (options.commitment as any),
+        );
+
+        if (status.value.err && !failCallback(txid, i)) {
           const errors = await getErrorForTransaction(connection, txid);
           notify({
             message: 'Transaction failed...',
@@ -308,18 +312,23 @@ export const sendTransactions = async (
           });
 
           throw new Error(
-            `Raw transaction ${txid} failed (${JSON.stringify(status)})`,
+            `Raw transaction ${txid} failed (${JSON.stringify(status.value)})`,
           );
         } else {
           successCallback(txid, i);
         }
+      });
+      if (sendInSequence) {
+        await pendingTx;
+      } else {
+        pendingTxns.push(pendingTx);
       }
-    });
-
-    tasks.push(task);
+    }
   }
 
-  return await Promise.all(tasks);
+  if (awaitConfirmation) {
+    await Promise.all(pendingTxns);
+  }
 };
 
 export const sendTransaction = async (
@@ -330,18 +339,16 @@ export const sendTransaction = async (
   awaitConfirmation = true,
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
-  block?: BlockhashAndFeeCalculator
+  block?: BlockhashAndFeeCalculator,
 ) => {
   let transaction = new Transaction();
   instructions.forEach(instruction => transaction.add(instruction));
-  transaction.recentBlockhash = (block || (
-    await connection.getRecentBlockhash(commitment)
-  )).blockhash;
+  transaction.recentBlockhash = (
+    block || (await connection.getRecentBlockhash(commitment))
+  ).blockhash;
 
-  if(includesFeePayer) {
-    transaction.setSigners(
-      ...signers.map(s => s.publicKey),
-    );
+  if (includesFeePayer) {
+    transaction.setSigners(...signers.map(s => s.publicKey));
   } else {
     transaction.setSigners(
       // fee payed by the wallet owner
@@ -353,7 +360,7 @@ export const sendTransaction = async (
   if (signers.length > 0) {
     transaction.partialSign(...signers);
   }
-  if(!includesFeePayer) {
+  if (!includesFeePayer) {
     transaction = await wallet.signTransaction(transaction);
   }
 
