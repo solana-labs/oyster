@@ -158,9 +158,7 @@ export const HomeView = () => {
               </div>
               <div className={'description-title'}>Bridge in any direction</div>
               <div className={'description-text'}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                nisi at praesent sed sollicitudin ullamcorper malesuada in.
-                Molestie sed morbi vitae in amet ultrices.
+
               </div>
             </div>
             <div className={'home-description-item'}>
@@ -169,9 +167,7 @@ export const HomeView = () => {
               </div>
               <div className={'description-title'}>Staking & Validation</div>
               <div className={'description-text'}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                nisi at praesent sed sollicitudin ullamcorper malesuada in.
-                Molestie sed morbi vitae in amet ultrices.
+
               </div>
             </div>
             <div className={'home-description-item'}>
@@ -180,9 +176,7 @@ export const HomeView = () => {
               </div>
               <div className={'description-title'}>Layers and Capabilities</div>
               <div className={'description-text'}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                nisi at praesent sed sollicitudin ullamcorper malesuada in.
-                Molestie sed morbi vitae in amet ultrices.
+
               </div>
             </div>
           </div>
