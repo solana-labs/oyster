@@ -10,6 +10,7 @@ import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
 import {
+  GOVERNANCE_AUTHORITY_SEED,
   TimelockConfig,
   TimelockSetLayout,
   TimelockStateLayout,
@@ -45,7 +46,7 @@ export const createProposal = async (
       connection,
       useGovernance
         ? timelockConfig.info.governanceMint
-        : timelockConfig.info.councilMint,
+        : timelockConfig.info.councilMint!,
     )
   ).decimals;
 
@@ -135,7 +136,7 @@ export const createProposal = async (
       sourceHoldingAccount,
       useGovernance
         ? timelockConfig.info.governanceMint
-        : timelockConfig.info.councilMint,
+        : timelockConfig.info.councilMint!,
       authority,
       description,
       name,
@@ -205,7 +206,10 @@ async function getAssociatedAccountsAndInstructions(
   const PROGRAM_IDS = utils.programIds();
 
   const [authority] = await PublicKey.findProgramAddress(
-    [newProposalKey.publicKey.toBuffer()],
+    [
+      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
+      newProposalKey.publicKey.toBuffer(),
+    ],
     PROGRAM_IDS.timelock.programId,
   );
 
@@ -342,7 +346,7 @@ async function getAssociatedAccountsAndInstructions(
     accountRentExempt,
     useGovernance
       ? timelockConfig.info.governanceMint
-      : timelockConfig.info.councilMint,
+      : timelockConfig.info.councilMint!,
     authority,
     holdingSigners,
   );

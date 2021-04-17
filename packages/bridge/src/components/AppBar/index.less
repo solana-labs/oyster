@@ -6,7 +6,7 @@ header.ant-layout-header.App-Bar {
   width: 100%;
   background: transparent;
   display: flex;
-  justify-content: center;
+  justify-content: center !important;
   height: 80px;
 
   .nav-burger {
@@ -30,6 +30,9 @@ header.ant-layout-header.App-Bar {
   justify-content: center;
   height: auto;
   align-items: center;
+  button.app-bar-item {
+    padding: 0;
+  }
   .app-bar-item {
     cursor: pointer;
     padding: 0 30px;

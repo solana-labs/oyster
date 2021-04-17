@@ -10,8 +10,9 @@ export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const TRANSACTION_SLOTS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
-// Key chosen to represent an unused key, a dummy empty. Points to system program.
-export const ZERO_KEY = '11111111111111111111111111111111';
+
+/// Seed for proposal authority
+export const GOVERNANCE_AUTHORITY_SEED = 'governance';
 
 export enum TimelockInstruction {
   InitTimelockSet = 1,
@@ -71,7 +72,7 @@ export interface TimelockConfig {
   /// Governance mint
   governanceMint: PublicKey;
   /// Council mint (Optional)
-  councilMint: PublicKey;
+  councilMint?: PublicKey;
   /// Program ID that is tied to this config (optional)
   program: PublicKey;
   /// Time limit in slots for proposal to be open to voting
@@ -91,12 +92,13 @@ export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.
     BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
+    BufferLayout.u8('councilMintOption'),
     Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
     BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
     BufferLayout.u32('count'),
-    BufferLayout.seq(BufferLayout.u8(), 296, 'padding'),
+    BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
   ],
 );
 
@@ -428,7 +430,7 @@ export const TimelockConfigParser = (
       votingEntryRule: data.votingEntryRule,
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
-      councilMint: data.councilMint,
+      councilMint: data.councilMintOption == 1 ? data.councilMint : null,
       program: data.program,
       timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),

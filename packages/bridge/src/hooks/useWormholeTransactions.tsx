@@ -65,10 +65,7 @@ const queryWrappedMetaTransactions = async (
     },
   ];
 
-  let wh = WormholeFactory.connect(
-    programIds().wormhole.bridge,
-    provider,
-  );
+  let wh = WormholeFactory.connect(programIds().wormhole.bridge, provider);
   const resp = await (connection as any)._rpcRequest('getProgramAccounts', [
     WORMHOLE_PROGRAM_ID.toBase58(),
     {
@@ -227,7 +224,6 @@ export const useWormholeTransactions = () => {
         bridge,
       ).then(() => setLoading(false));
     })();
-
   }, [connection, setTransfers]);
 
   const coingeckoTimer = useRef<number>(0);
