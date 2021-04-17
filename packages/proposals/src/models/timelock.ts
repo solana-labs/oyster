@@ -91,6 +91,7 @@ export enum GovernanceAccountType {
   Proposal = 2,
   ProposalState = 3,
   VoteRecord = 4,
+  CustomSingleSignerTransaction = 5,
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
