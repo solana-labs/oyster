@@ -87,7 +87,8 @@ export enum GovernanceAccountType {
   Uninitialized = 0,
   Governance = 1,
   Proposal = 2,
-  VoteRecord = 3,
+  ProposalState = 3,
+  VoteRecord = 4,
 }
 
 export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -156,8 +157,10 @@ export const STATE_COLOR: Record<string, string> = {
 };
 
 export interface TimelockState {
+  /// Account type
+  account_type: GovernanceAccountType;
   timelockSet: PublicKey;
-  version: number;
+
   status: TimelockStateStatus;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
@@ -201,8 +204,8 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
 
 export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
+    BufferLayout.u8('account_type'),
     Layout.publicKey('timelockSet'),
-    BufferLayout.u8('version'),
     BufferLayout.u8('timelockStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
@@ -372,7 +375,7 @@ export const TimelockStateParser = (
       ...info,
     },
     info: {
-      version: data.version,
+      account_type: data.account_type,
       timelockSet: data.timelockSet,
       status: data.timelockStateStatus,
       totalSigningTokensMinted: data.totalSigningTokensMinted,
