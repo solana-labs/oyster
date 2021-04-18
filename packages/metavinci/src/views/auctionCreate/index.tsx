@@ -41,10 +41,10 @@ const { Option } = Select;
 const { Dragger } = Upload;
 
 export enum AuctionCategory {
-  Single,
   Limited,
   Open,
-  Collection
+  Tiered,
+  Single,
 }
 
 export interface AuctionState {
@@ -180,23 +180,11 @@ const CategoryStep = (props: { confirm: (category: AuctionCategory) => void }) =
             <Button
               className="type-btn"
               size="large"
-              onClick={() => props.confirm(AuctionCategory.Single)}
-            >
-              <div>
-                <div>Single Artwork</div>
-                <div className="type-btn-description">Sell a one of a kind artwork</div>
-              </div>
-            </Button>
-          </Row>
-          <Row>
-            <Button
-              className="type-btn"
-              size="large"
               onClick={() => props.confirm(AuctionCategory.Limited)}
             >
               <div>
                 <div>Limited Edition</div>
-                <div className="type-btn-description">Sell one artwork multiple times</div>
+                <div className="type-btn-description">Sell a limited copy or copies of a single Master NFT</div>
               </div>
             </Button>
           </Row>
@@ -208,20 +196,31 @@ const CategoryStep = (props: { confirm: (category: AuctionCategory) => void }) =
             >
               <div>
                 <div>Open Edition</div>
-                <div className="type-btn-description">Sell one artwork with no limit on quantity</div>
+                <div className="type-btn-description">Sell unlimited copies of a single Master NFT</div>
               </div>
             </Button>
           </Row>
           <Row>
             <Button
-              disabled={true}
               className="type-btn"
               size="large"
-              onClick={() => props.confirm(AuctionCategory.Collection)}
+              onClick={() => props.confirm(AuctionCategory.Tiered)}
             >
               <div>
-                <div>Collection (Coming Soon)</div>
-                <div className="type-btn-description">Sell multiple artworks at once</div>
+                <div>Tiered Auction</div>
+                <div className="type-btn-description">Participants get unique rewards based on their leaderboard rank</div>
+              </div>
+            </Button>
+          </Row>
+          <Row>
+            <Button
+              className="type-btn"
+              size="large"
+              onClick={() => props.confirm(AuctionCategory.Single)}
+            >
+              <div>
+                <div>Sell an Existing Item</div>
+                <div className="type-btn-description">Sell an existing item in your NFT collection, including Master NFTs</div>
               </div>
             </Button>
           </Row>
@@ -256,7 +255,7 @@ const SelectItemsStep = (props: {
 
   return (
     <>
-      <Row className="call-to-action">
+      <Row className="call-to-action" style={{ marginBottom: 0 }}>
         <h2>Select which item to sell</h2>
         <p style={{ fontSize: '1.2rem' }}>
           Select the item(s) that you want to list.
@@ -274,7 +273,7 @@ const SelectItemsStep = (props: {
 
               const onSelect = () => {
                 let list = [...selectedItems.keys()];
-                if (props.attributes.category !== AuctionCategory.Collection) {
+                if (props.attributes.category !== AuctionCategory.Tiered) {
                   list = [];
                 }
 
@@ -290,7 +289,7 @@ const SelectItemsStep = (props: {
                     symbol={m.info.symbol}
                     preview={false}
                     onClick={onSelect}
-                    className={isSelected ? 'selected-card' : ''}
+                    className={isSelected ? 'selected-card' : 'not-selected-card'}
                     />;
             })}
           </Masonry>
