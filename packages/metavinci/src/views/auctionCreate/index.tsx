@@ -321,6 +321,8 @@ const TermsStep = (props: {
 }) => {
   const [creators, setCreators] = useState<Array<UserValue>>([]);
 
+
+
   return (
     <>
       <Row className="call-to-action">
@@ -331,6 +333,22 @@ const TermsStep = (props: {
       </Row>
       <Row className="content-action">
         <Col className="section" xl={24}>
+          <label className="action-field">
+            <span className="field-title">Number of copies</span>
+            <Input
+              autoFocus
+              className="input"
+              placeholder="Enter reservation price"
+              allowClear
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                })
+              }
+            />
+            <span className="field-info">= ◎ 4.84</span>
+          </label>
+
           <label className="action-field">
             <span className="field-title">Price Floor (USD)</span>
             <Input
