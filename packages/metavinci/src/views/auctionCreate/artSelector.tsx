@@ -25,6 +25,12 @@ export const ArtSelector = (props: ArtSelectorProps) => {
   const items = useUserArts();
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(props.selected.map(item => item.pubkey.toBase58())));
 
+  const [visible, setVisible] = useState(false);
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
   useEffect(() => {
     props.setSelected(items.filter(item => selectedItems.has(item.pubkey.toBase58())));
   }, [selectedItems]);
@@ -38,8 +44,8 @@ export const ArtSelector = (props: ArtSelectorProps) => {
 
   return (
     <>
-      <Button {...rest} />
-      <Modal>
+      <Button {...rest} onClick={() => showModal} />
+      <Modal visible={visible}>
         <Row className="call-to-action" style={{ marginBottom: 0 }}>
           <h2>Select the NFT you want to sell</h2>
           <p style={{ fontSize: '1.2rem' }}>

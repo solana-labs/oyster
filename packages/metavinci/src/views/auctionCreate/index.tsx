@@ -18,6 +18,7 @@ import {
 import { ArtCard } from './../../components/ArtCard';
 import { UserSearch, UserValue } from './../../components/UserSearch';
 import { Confetti } from './../../components/Confetti';
+import { ArtSelector } from './artSelector';
 import './../styles.less';
 import {
   MAX_METADATA_LEN,
@@ -328,37 +329,24 @@ const CopiesStep = (props: {
         </p>
       </Row>
       <Row className="content-action">
-        <Masonry
-            breakpointCols={breakpointColumnsObj}
-            className="my-masonry-grid"
-            columnClassName="my-masonry-grid_column"
-          >
-            {items.map(m => {
-              const id = m.pubkey.toBase58();
-              const isSelected = selectedItems.has(id);
-
-              const onSelect = () => {
-                let list = [...selectedItems.keys()];
-                if (props.attributes.category !== AuctionCategory.Tiered) {
-                  list = [];
+        <Col>
+          <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
+          <label className="action-field">
+              <span className="field-title">How many copies do you want to create?</span>
+              <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
+              <Input
+                autoFocus
+                className="input"
+                placeholder="Enter reservation price"
+                allowClear
+                onChange={info =>
+                  props.setAttributes({
+                    ...props.attributes,
+                  })
                 }
-
-                isSelected ?
-                  setSelectedItems(new Set(list.filter(item => item !== id))) :
-                  setSelectedItems(new Set([...list, id]));
-              };
-
-              return <ArtCard key={id}
-                    image={m.info.extended?.image}
-                    category={m.info.extended?.category}
-                    name={m.info?.name}
-                    symbol={m.info.symbol}
-                    preview={false}
-                    onClick={onSelect}
-                    className={isSelected ? 'selected-card' : 'not-selected-card'}
-                    />;
-            })}
-          </Masonry>
+              />
+            </label>
+          </Col>
       </Row>
       <Row>
         <Button
@@ -552,13 +540,14 @@ const ParticipationStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Participation NFT</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Provide NFT that will be awarded as an Open Edition NFT for auction participation.
       </p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+        <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
       </Col>
     </Row>
     <Row>
@@ -591,21 +580,6 @@ const TermsStep = (props: {
       </Row>
       <Row className="content-action">
         <Col className="section" xl={24}>
-          <label className="action-field">
-            <span className="field-title">Number of copies</span>
-            <Input
-              autoFocus
-              className="input"
-              placeholder="Enter reservation price"
-              allowClear
-              onChange={info =>
-                props.setAttributes({
-                  ...props.attributes,
-                })
-              }
-            />
-            <span className="field-info">= ◎ 4.84</span>
-          </label>
 
           <label className="action-field">
             <span className="field-title">Price Floor (USD)</span>

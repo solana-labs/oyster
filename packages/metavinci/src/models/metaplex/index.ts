@@ -9,22 +9,22 @@ export * from './startAuction';
 export * from './validateSafetyDepositBox';
 
 export class AuctionManager {
-  key: number;
-  authority: PublicKey;
-  auction: PublicKey;
-  vault: PublicKey;
-  auctionProgram: PublicKey;
-  tokenVaultProgram: PublicKey;
-  tokenMetadataProgram: PublicKey;
-  tokenProgram: PublicKey;
-  state: AuctionManagerState;
-  settings: AuctionManagerSettings;
+  key?: number;
+  authority?: PublicKey;
+  auction?: PublicKey;
+  vault?: PublicKey;
+  auctionProgram?: PublicKey;
+  tokenVaultProgram?: PublicKey;
+  tokenMetadataProgram?: PublicKey;
+  tokenProgram?: PublicKey;
+  state?: AuctionManagerState;
+  settings?: AuctionManagerSettings;
 }
 
 export class AuctionManagerSettings {
-  openEditionWinnerConstraint: WinningConstraint;
-  openEditionNonWinningConstraint: NonWinningConstraint;
-  winningConfigs: WinningConfig[];
+  openEditionWinnerConstraint?: WinningConstraint;
+  openEditionNonWinningConstraint?: NonWinningConstraint;
+  winningConfigs?: WinningConfig[];
   openEditionConfig?: number;
   openEditionFixedPrice?: number;
 }
@@ -50,33 +50,33 @@ export enum EditionType {
 }
 
 export class WinningConfig {
-  safetyDepositBoxIndex: number;
-  amount: number;
-  hasAuthority: boolean;
-  editionType: EditionType;
+  safetyDepositBoxIndex?: number;
+  amount?: number;
+  hasAuthority?: boolean;
+  editionType?: EditionType;
 }
 
 export class WinningConfigState {
   /// Used for cases of minting Limited Editions and keeping track of how many have been made so far.
-  amountMinted: number;
+  amountMinted?: number;
   /// Each safety deposit box needs to be validated via endpoint before auction manager will agree to let auction begin.
-  validated: boolean;
+  validated?: boolean;
   /// Ticked to true when a prize is claimed
-  claimed: boolean;
+  claimed?: boolean;
 }
 
 export class AuctionManagerState {
-  status: AuctionManagerStatus;
+  status?: AuctionManagerStatus;
   /// When all configs are validated the auction is started and auction manager moves to Running
-  winningConfigsValidated: number;
+  winningConfigsValidated?: number;
 
   /// Each master edition used as a template has to grant it's authority to the auction manager.
   /// This counter is incremented by one each time this is done. At the end of the auction; this is decremented
   /// each time authority is delegated back to the owner or the new owner and when it hits 0 another condition
   /// is met for going to Finished state.
-  masterEditionsWithAuthoritiesRemainingToReturn: number;
+  masterEditionsWithAuthoritiesRemainingToReturn?: number;
 
-  winningConfigStates: WinningConfigState[];
+  winningConfigStates?: WinningConfigState[];
 }
 
 export enum AuctionManagerStatus {
@@ -88,8 +88,8 @@ export enum AuctionManagerStatus {
 }
 
 export class BidRedemptionTicket {
-  openEditionRedeemed: boolean;
-  bidRedeemed: boolean;
+  openEditionRedeemed?: boolean;
+  bidRedeemed?: boolean;
 }
 
 export const SCHEMA = new Map<any, any>([
