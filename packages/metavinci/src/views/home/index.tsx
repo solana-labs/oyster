@@ -8,7 +8,6 @@ import { AuctionState, useAuctions } from '../../hooks'
 import './index.less'
 import { ArtCard } from '../../components/ArtCard'
 import { Link } from 'react-router-dom'
-import { useTorus } from '../../contexts/torus'
 
 const { TabPane } = Tabs;
 
@@ -16,8 +15,6 @@ const { Content } = Layout
 export const HomeView = () => {
   const [activeKey, setActiveKey] = useState(AuctionState.Live);
   const auctions = useAuctions(AuctionState.Live)
-  // const torus = useTorus()
-  // console.log({torus})
 
   const breakpointColumnsObj = {
     default: 4,
