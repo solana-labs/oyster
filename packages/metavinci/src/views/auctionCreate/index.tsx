@@ -87,16 +87,125 @@ export const AuctionCreateView = () => {
 
   useEffect(() => {
     if (step_param) setStep(parseInt(step_param))
-    else gotoStep(0)
+    else gotoNextStep(0)
   }, [step_param])
 
-  const gotoStep = (_step: number) => {
-    history.push(`/auction/create/${_step.toString()}`)
+  const gotoNextStep = (_step?: number) => {
+    const nextStep = _step === undefined ? (step + 1) : step;
+    history.push(`/auction/create/${nextStep.toString()}`)
   }
 
   const createAuction = async () => {
     // TODO: ....
   };
+
+  const categoryStep = <CategoryStep
+    confirm={(category: AuctionCategory) => {
+      setAttributes({
+        ...attributes,
+        category,
+      });
+      gotoNextStep();
+    }}
+  />;
+
+  const copiesStep = <CopiesStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const winnersStep = <NumberOfWinnersStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const tierStep = <TierStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const priceStep = <PriceStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const initialStep = <InitialPhaseStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const endingStep = <EndingPhaseStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const participationStep = <ParticipationStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+
+  const terms = <TermsStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const reviewStep = <ReviewStep
+    attributes={attributes}
+    confirm={() => gotoNextStep()}
+    connection={connection}
+  />;
+
+  const waitStep = <WaitingStep
+    createAuction={createAuction}
+    progress={progress}
+    confirm={() => gotoNextStep()}
+  />;
+
+  const congratsStep =  <Congrats />;
+
+  const stepsByCategory = {
+    [AuctionCategory.Limited]: [
+      ['Category', categoryStep],
+      ['Copies', copiesStep],
+      ['Price', priceStep],
+      ['Initial Phase', initialStep],
+      ['Ending Phase', endingStep],
+      ['Participation NFT', participationStep],
+      ['Review', reviewStep],
+      ['Publish', waitStep],
+      [undefined, congratsStep]
+    ],
+    [AuctionCategory.Open]: [
+      ['Category', categoryStep],
+      [undefined, congratsStep]
+    ],
+    [AuctionCategory.Single]: [
+      ['Category', categoryStep],
+      [undefined, congratsStep]
+    ],
+    [AuctionCategory.Tiered]: [
+      ['Category', categoryStep],
+      ['Number of Winners', winnersStep],
+      ['Tiers', tierStep],
+      ['Price', priceStep],
+      ['Initial Phase', initialStep],
+      ['Ending Phase', endingStep],
+      ['Participation NFT', participationStep],
+      ['Review', reviewStep],
+      ['Publish', waitStep],
+      [undefined, congratsStep]
+    ],
+
+  }
 
   return (
     <>
@@ -108,57 +217,14 @@ export const AuctionCreateView = () => {
             current={step}
             style={{ width: 200, marginLeft: 20, marginRight: 30 }}
           >
-            <Step title="List" />
-            <Step title="Select" />
-            <Step title="Terms" />
-            <Step title="Review" />
+            {stepsByCategory[attributes.category]
+              .filter(_ => !!_[0])
+              .map(step => <Step title={step[0]} />)}
           </Steps>
         </Col>}
         <Col {...(saving ? { xl: 24 } : { xl: 16 })}>
-          {step === 0 && (
-            <CategoryStep
-              confirm={(category: AuctionCategory) => {
-                setAttributes({
-                  ...attributes,
-                  category,
-                });
-                gotoStep(1);
-              }}
-            />
-          )}
-          {step === 1 && (
-            <SelectItemsStep
-              attributes={attributes}
-              setAttributes={setAttributes}
-              confirm={() => gotoStep(2)}
-            />
-          )}
-
-          {step === 2 && (
-            <TermsStep
-              attributes={attributes}
-              setAttributes={setAttributes}
-              confirm={() => gotoStep(3)}
-            />
-          )}
-          {step === 3 && (
-            <ReviewStep
-              attributes={attributes}
-              confirm={() => gotoStep(5)}
-              connection={connection}
-            />
-          )}
-          {step === 4 && (
-            <WaitingStep
-              createAuction={createAuction}
-              progress={progress}
-              confirm={() => gotoStep(6)}
-            />
-          )}
-          {step === 5 && (
-            <Congrats />
-          )}
-          {(0 < step && step < 5) && <Button onClick={() => gotoStep(step - 1)}>Back</Button>}
+          {stepsByCategory[attributes.category][step][1]}
+          {(0 < step && step < stepsByCategory[attributes.category].length) && <Button onClick={() => gotoNextStep(step - 1)}>Back</Button>}
         </Col>
       </Row>
     </>
@@ -230,7 +296,7 @@ const CategoryStep = (props: { confirm: (category: AuctionCategory) => void }) =
   );
 };
 
-const SelectItemsStep = (props: {
+const CopiesStep = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
@@ -314,14 +380,206 @@ const SelectItemsStep = (props: {
   );
 };
 
+const NumberOfWinnersStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+        <h2>Specify the terms of your auction</h2>
+        <p>
+          Provide detailed auction parameters such as price, start time, etc.
+        </p>
+      </Row>
+      <Row className="content-action">
+        <Col className="section" xl={24}>
+        </Col>
+      </Row>
+      <Row>
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >
+          Continue to Tiers
+        </Button>
+      </Row>
+  </>;
+};
+
+const TierStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Price
+      </Button>
+    </Row>
+  </>;
+};
+
+const PriceStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Initial Phase
+      </Button>
+    </Row>
+  </>;
+};
+
+const InitialPhaseStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">Preview Start Date</span>
+          <DatePicker className="field-date" size="large" />
+          <TimePicker className="field-date" size="large" />
+        </label>
+        <label className="action-field">
+          <span className="field-title">When do you want the auction to begin?</span>
+          <span>Immediately</span>
+          <span>At a specified data</span>
+        </label>
+        <label className="action-field">
+          <span className="field-title">Auction Start Date</span>
+          <DatePicker className="field-date" size="large" />
+          <TimePicker className="field-date" size="large" />
+        </label>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Ending Phase
+      </Button>
+    </Row>
+  </>;
+};
+
+const EndingPhaseStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+          <label className="action-field">
+            <span className="field-title">End Start Date</span>
+            <DatePicker className="field-date" size="large" />
+            <TimePicker className="field-date" size="large" />
+          </label>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Participation NFT
+      </Button>
+    </Row>
+  </>;
+};
+
+const ParticipationStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Review
+      </Button>
+    </Row>
+  </>;
+};
+
 const TermsStep = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
   const [creators, setCreators] = useState<Array<UserValue>>([]);
-
-
 
   return (
     <>
@@ -378,26 +636,8 @@ const TermsStep = (props: {
             />
             <span className="field-info">= ◎ 4.84</span>
           </label>
-          <label className="action-field">
-            <span className="field-title">Preview Start Date</span>
-            <DatePicker className="field-date" size="large" />
-            <TimePicker className="field-date" size="large" />
-          </label>
-          <label className="action-field">
-            <span className="field-title">When do you want the auction to begin?</span>
-            <span>Immediately</span>
-            <span>At a specified data</span>
-          </label>
-          <label className="action-field">
-            <span className="field-title">Auction Start Date</span>
-            <DatePicker className="field-date" size="large" />
-            <TimePicker className="field-date" size="large" />
-          </label>
-          <label className="action-field">
-            <span className="field-title">End Start Date</span>
-            <DatePicker className="field-date" size="large" />
-            <TimePicker className="field-date" size="large" />
-          </label>
+
+
         </Col>
       </Row>
       <Row>
