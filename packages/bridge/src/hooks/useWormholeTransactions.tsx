@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useConnection, useConnectionConfig, programIds } from '@oyster/common';
+import {
+  useConnection,
+  useConnectionConfig,
+  programIds,
+  notify,
+} from '@oyster/common';
 import { WORMHOLE_PROGRAM_ID, POSTVAA_INSTRUCTION } from '../utils/ids';
 import { ASSET_CHAIN } from '../utils/assets';
 import { useEthereum } from '../contexts';
@@ -214,15 +219,25 @@ export const useWormholeTransactions = () => {
     (async () => {
       // authority -> query for token accounts to get locked assets
       let authorityKey = await bridgeAuthorityKey(programIds().wormhole.pubkey);
-
-      // query wrapped assets that were imported to solana from other chains
-      queryWrappedMetaTransactions(
-        authorityKey,
-        connection,
-        setTransfers,
-        new ethers.providers.Web3Provider((window as any).ethereum),
-        bridge,
-      ).then(() => setLoading(false));
+      if ((window as any).ethereum === undefined) {
+        notify({
+          message: 'Metamask Error',
+          description: 'Please install metamask wallet extension',
+        });
+        setLoading(false);
+      } else {
+        const provider = new ethers.providers.Web3Provider(
+          (window as any).ethereum,
+        );
+        // query wrapped assets that were imported to solana from other chains
+        queryWrappedMetaTransactions(
+          authorityKey,
+          connection,
+          setTransfers,
+          provider,
+          bridge,
+        ).then(() => setLoading(false));
+      }
     })();
   }, [connection, setTransfers]);
 
