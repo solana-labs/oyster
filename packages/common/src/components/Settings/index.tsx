@@ -8,7 +8,7 @@ export const Settings = ({
 }: {
   additionalSettings?: JSX.Element;
 }) => {
-  const { connected, disconnect } = useWallet();
+  const { connected, disconnect, select } = useWallet();
   const { endpoint, setEndpoint } = useConnectionConfig();
 
   return (
@@ -27,9 +27,17 @@ export const Settings = ({
           ))}
         </Select>
         {connected && (
-          <Button type="primary" onClick={disconnect}>
-            Disconnect
-          </Button>
+          <>
+            <span>Wallet:</span>
+            <Button onClick={select}
+            style={{ marginBottom: 5 }}>
+              Change
+            </Button>
+            <Button type="primary" onClick={disconnect}
+            style={{ marginBottom: 5 }}>
+              Disconnect
+            </Button>
+          </>
         )}
         {additionalSettings}
       </div>

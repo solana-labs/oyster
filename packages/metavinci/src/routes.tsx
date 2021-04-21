@@ -27,11 +27,6 @@ export function Routes() {
                       <Switch>
                         <Route
                           exact
-                          path="/"
-                          component={() => <HomeView />}
-                        />
-                        <Route
-                          exact
                           path="/art/create/:step_param?"
                           component={() => <ArtCreateView />}
                         />
@@ -64,6 +59,10 @@ export function Routes() {
                           exact
                           path="/auction/:id"
                           component={() => <AuctionView />}
+                        />
+                        <Route
+                          path="/"
+                          component={() => <HomeView />}
                         />
                       </Switch>
                     </AppLayout>
