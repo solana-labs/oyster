@@ -10,7 +10,7 @@ const UserActions = () => {
     <Link to={`/art/create`}>
       <Button className="app-btn">Create</Button>
     </Link>
-    <Link to={`/auction/create`}>
+    <Link to={`/auction/create/0`}>
       <Button type="primary">Sell</Button>
     </Link>
   </>;
