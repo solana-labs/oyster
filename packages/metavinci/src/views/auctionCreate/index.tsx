@@ -43,9 +43,9 @@ const { Dragger } = Upload;
 
 export enum AuctionCategory {
   Limited,
+  Single,
   Open,
   Tiered,
-  Single,
 }
 
 export interface AuctionState {
@@ -68,6 +68,7 @@ export interface AuctionState {
   gapTime?: Date
 
   category: AuctionCategory;
+  price?: number;
 }
 
 export const AuctionCreateView = () => {
@@ -92,7 +93,7 @@ export const AuctionCreateView = () => {
   }, [step_param])
 
   const gotoNextStep = (_step?: number) => {
-    const nextStep = _step === undefined ? (step + 1) : step;
+    const nextStep = _step === undefined ? (step + 1) : _step;
     history.push(`/auction/create/${nextStep.toString()}`)
   }
 
@@ -185,9 +186,8 @@ export const AuctionCreateView = () => {
       ['Publish', waitStep],
       [undefined, congratsStep],
     ],
-    [AuctionCategory.Open]: [
+    [AuctionCategory.Single]: [
       ['Category', categoryStep],
-      ['Copies', copiesStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -196,8 +196,9 @@ export const AuctionCreateView = () => {
       ['Publish', waitStep],
       [undefined, congratsStep],
     ],
-    [AuctionCategory.Single]: [
+    [AuctionCategory.Open]: [
       ['Category', categoryStep],
+      ['Copies', copiesStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -344,7 +345,7 @@ const CopiesStep = (props: {
       <Row className="content-action">
         <Col>
           <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
-          <label className="action-field">
+            <label className="action-field">
               <span className="field-title">How many copies do you want to create?</span>
               <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
               <Input
@@ -446,14 +447,31 @@ const PriceStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Price</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the price for your auction.
       </p>
     </Row>
     <Row className="content-action">
-      <Col className="section" xl={24}>
-      </Col>
+      <label className="action-field">
+        <span className="field-title">Sale price</span>
+        <span className="field-info">This is the starting bid price for your auction.</span>
+        <Input
+          type="number"
+          min={0}
+          autoFocus
+          className="input"
+          placeholder="Price"
+          prefix="$"
+          suffix="USD"
+          onChange={info =>
+            props.setAttributes({
+              ...props.attributes,
+              price: parseFloat(info.target.value) || undefined
+            })
+          }
+        />
+      </label>
     </Row>
     <Row>
       <Button
