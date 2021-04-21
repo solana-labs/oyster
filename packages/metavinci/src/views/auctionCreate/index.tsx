@@ -14,6 +14,7 @@ import {
   Select,
   TimePicker,
   DatePicker,
+  Radio,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
 import { UserSearch, UserValue } from './../../components/UserSearch';
@@ -69,6 +70,8 @@ export interface AuctionState {
 
   category: AuctionCategory;
   price?: number;
+  startSaleTS?: number;
+  startListTS?: number;
 }
 
 export const AuctionCreateView = () => {
@@ -491,30 +494,56 @@ const InitialPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  const [saleNow, setSaleNow] = useState<boolean>(true)
+  const [listNow, setListNow] = useState<boolean>(true)
+
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Initial Phase</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the terms for your sale.
       </p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+
         <label className="action-field">
-          <span className="field-title">Preview Start Date</span>
-          <DatePicker className="field-date" size="large" />
-          <TimePicker className="field-date" size="large" />
+          <span className="field-title">When do you want the sale to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setSaleNow(info.target.value === "now")}>
+            <Radio className="radio-field" value="now">Immediately</Radio>
+            <div className="radio-subtitle">Participants can buy the NFT as soon as you finish setting up the auction.</div>
+            <Radio className="radio-field" value="later">At a specified date</Radio>
+            <div className="radio-subtitle">Participants can start buying the NFT at a specified date.</div>
+          </Radio.Group>
         </label>
-        <label className="action-field">
-          <span className="field-title">When do you want the auction to begin?</span>
-          <span>Immediately</span>
-          <span>At a specified data</span>
-        </label>
-        <label className="action-field">
-          <span className="field-title">Auction Start Date</span>
-          <DatePicker className="field-date" size="large" />
-          <TimePicker className="field-date" size="large" />
-        </label>
+
+        {!saleNow && <>
+
+          <label className="action-field">
+            <span className="field-title">Auction Start Date</span>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({dt, dtString})}/>
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({dt, dtString})}/>
+          </label>
+
+          <label className="action-field">
+            <span className="field-title">When do you want the listing to go live?</span>
+            <Radio.Group defaultValue="now" onChange={info => setListNow(info.target.value === "now")}>
+              <Radio className="radio-field" value="now" defaultChecked={true}>Immediately</Radio>
+              <div className="radio-subtitle">Participants will be able to view the listing with a countdown to the start date as soon as you finish setting up the sale.</div>
+              <Radio className="radio-field" value="later">At a specified date</Radio>
+              <div className="radio-subtitle">Participants will be able to view the listing with a countdown to the start date at the specified date.</div>
+            </Radio.Group>
+          </label>
+
+          {!listNow &&
+            <label className="action-field">
+              <span className="field-title">Preview Start Date</span>
+              <DatePicker className="field-date" size="large" />
+              <TimePicker className="field-date" size="large" />
+            </label>
+          }
+
+        </>}
       </Col>
     </Row>
     <Row>
