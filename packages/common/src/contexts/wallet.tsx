@@ -9,6 +9,7 @@ import { useLocalStorageState } from "../utils/utils";
 import { LedgerProvider } from "@solana/wallet-ledger";
 import { SolongWalletAdapter } from "../wallet-adapters/solong";
 import { PhantomWalletAdapter } from "../wallet-adapters/phantom";
+import { TorusWalletAdapter } from "../wallet-adapters/torus";
 
 const ASSETS_URL = 'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
 export const WALLET_PROVIDERS = [
@@ -37,6 +38,12 @@ export const WALLET_PROVIDERS = [
     icon: `https://www.phantom.app/img/logo.png`,
     adapter: PhantomWalletAdapter,
   },
+  {
+    name: 'Torus',
+    url: 'https://tor.us',
+    icon: `${ASSETS_URL}torus.svg`,
+    adapter: TorusWalletAdapter,
+  }
 ];
 
 const WalletContext = React.createContext<{
@@ -90,6 +97,7 @@ export function WalletProvider({ children = null as any }) {
 
       wallet.on("disconnect", () => {
         setConnected(false);
+        // setProviderUrl(null)
         notify({
           message: "Wallet update",
           description: "Disconnected from wallet",
@@ -99,6 +107,7 @@ export function WalletProvider({ children = null as any }) {
 
     return () => {
       setConnected(false);
+      // setProviderUrl(null)
       if (wallet) {
         wallet.disconnect();
       }
