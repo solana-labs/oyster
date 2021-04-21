@@ -20,6 +20,8 @@ import * as Layout from '../utils/layout';
 export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
+  programDataAccount: PublicKey,
+  programUpgradeAuthority: PublicKey,
   governanceMint: PublicKey,
   payer: PublicKey,
   councilMint?: PublicKey,
@@ -40,15 +42,16 @@ export const createEmptyTimelockConfigInstruction = (
   const keys = [
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
+    { pubkey: programDataAccount, isSigner: false, isWritable: true },
+    { pubkey: programUpgradeAuthority, isSigner: true, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
-
+    { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
     {
-      pubkey: PROGRAM_IDS.timelock.programId,
+      pubkey: PROGRAM_IDS.bpf_upgrade_loader,
       isSigner: false,
       isWritable: false,
     },
-    { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
 
   if (councilMint) {
