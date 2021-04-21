@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Divider,
   Steps,
   Row,
   Button,
@@ -72,6 +73,7 @@ export interface AuctionState {
   price?: number;
   startSaleTS?: number;
   startListTS?: number;
+  endTS?: number;
 }
 
 export const AuctionCreateView = () => {
@@ -175,7 +177,7 @@ export const AuctionCreateView = () => {
     confirm={() => gotoNextStep()}
   />;
 
-  const congratsStep =  <Congrats />;
+  const congratsStep = <Congrats />;
 
   const stepsByCategory = {
     [AuctionCategory.Limited]: [
@@ -347,23 +349,23 @@ const CopiesStep = (props: {
       </Row>
       <Row className="content-action">
         <Col>
-          <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
-            <label className="action-field">
-              <span className="field-title">How many copies do you want to create?</span>
-              <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
-              <Input
-                autoFocus
-                className="input"
-                placeholder="Enter number of copies sold"
-                allowClear
-                onChange={info =>
-                  props.setAttributes({
-                    ...props.attributes,
-                  })
-                }
-              />
-            </label>
-          </Col>
+          <ArtSelector selected={[]} setSelected={() => { }} allowMultiple={false}>Select NFT</ArtSelector>
+          <label className="action-field">
+            <span className="field-title">How many copies do you want to create?</span>
+            <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
+            <Input
+              autoFocus
+              className="input"
+              placeholder="Enter number of copies sold"
+              allowClear
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                })
+              }
+            />
+          </label>
+        </Col>
       </Row>
       <Row>
         <Button
@@ -392,25 +394,25 @@ const NumberOfWinnersStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-        <h2>Specify the terms of your auction</h2>
-        <p>
-          Provide detailed auction parameters such as price, start time, etc.
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
         </p>
-      </Row>
-      <Row className="content-action">
-        <Col className="section" xl={24}>
-        </Col>
-      </Row>
-      <Row>
-        <Button
-          type="primary"
-          size="large"
-          onClick={props.confirm}
-          className="action-btn"
-        >
-          Continue to Tiers
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Tiers
         </Button>
-      </Row>
+    </Row>
   </>;
 };
 
@@ -521,8 +523,8 @@ const InitialPhaseStep = (props: {
 
           <label className="action-field">
             <span className="field-title">Auction Start Date</span>
-            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({dt, dtString})}/>
-            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({dt, dtString})}/>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
           </label>
 
           <label className="action-field">
@@ -588,8 +590,8 @@ const EndingPhaseStep = (props: {
         {!untilSold &&
           <label className="action-field">
             <span className="field-title">End Date</span>
-            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())}/>
-            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())}/>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
           </label>
         }
       </Col>
@@ -621,7 +623,7 @@ const ParticipationStep = (props: {
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
-        <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
+        <ArtSelector selected={[]} setSelected={() => { }} allowMultiple={false}>Select NFT</ArtSelector>
       </Col>
     </Row>
     <Row>
@@ -750,7 +752,7 @@ const ReviewStep = (props: {
           <Statistic
             className="create-statistic"
             title="Copies"
-            value={props.attributes.editions === undefined ? 'Unique' : props.attributes.editions }
+            value={props.attributes.editions === undefined ? 'Unique' : props.attributes.editions}
           />
           {cost ? (
             <Statistic
@@ -763,6 +765,26 @@ const ReviewStep = (props: {
             <Spin />
           )}
         </Col>
+      </Row>
+      <Row style={{ display: 'block' }}>
+        <Divider />
+        {props.attributes.startSaleTS && <Statistic
+          className="create-statistic"
+          title="Start date"
+          value={props.attributes.startSaleTS}
+        />}
+        <br />
+        {props.attributes.startListTS && <Statistic
+          className="create-statistic"
+          title="Listing go live date"
+          value={props.attributes.startListTS}
+        />}
+        <Divider />
+        {props.attributes.endTS && <Statistic
+          className="create-statistic"
+          title="Sale ends"
+          value={props.attributes.endTS}
+        />}
       </Row>
       <Row>
         <Button
