@@ -564,20 +564,34 @@ const EndingPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  const [untilSold, setUntilSold] = useState<boolean>(true)
+
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Ending Phase</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the terms for your sale..
       </p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">When do you want the sale to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setUntilSold(info.target.value === "now")}>
+            <Radio className="radio-field" value="now">Until sols</Radio>
+            <div className="radio-subtitle">The sale will end once the supply goes to zero.</div>
+            <Radio className="radio-field" value="later">At a specified date</Radio>
+            <div className="radio-subtitle">The sale will end at this date, regardless if there is remaining supply.</div>
+          </Radio.Group>
+        </label>
+
+        {!untilSold &&
           <label className="action-field">
-            <span className="field-title">End Start Date</span>
-            <DatePicker className="field-date" size="large" />
-            <TimePicker className="field-date" size="large" />
+            <span className="field-title">End Date</span>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())}/>
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())}/>
           </label>
+        }
       </Col>
     </Row>
     <Row>
