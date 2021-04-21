@@ -183,15 +183,28 @@ export const AuctionCreateView = () => {
       ['Participation NFT', participationStep],
       ['Review', reviewStep],
       ['Publish', waitStep],
-      [undefined, congratsStep]
+      [undefined, congratsStep],
     ],
     [AuctionCategory.Open]: [
       ['Category', categoryStep],
-      [undefined, congratsStep]
+      ['Copies', copiesStep],
+      ['Price', priceStep],
+      ['Initial Phase', initialStep],
+      ['Ending Phase', endingStep],
+      ['Participation NFT', participationStep],
+      ['Review', reviewStep],
+      ['Publish', waitStep],
+      [undefined, congratsStep],
     ],
     [AuctionCategory.Single]: [
       ['Category', categoryStep],
-      [undefined, congratsStep]
+      ['Price', priceStep],
+      ['Initial Phase', initialStep],
+      ['Ending Phase', endingStep],
+      ['Participation NFT', participationStep],
+      ['Review', reviewStep],
+      ['Publish', waitStep],
+      [undefined, congratsStep],
     ],
     [AuctionCategory.Tiered]: [
       ['Category', categoryStep],
@@ -203,7 +216,7 @@ export const AuctionCreateView = () => {
       ['Participation NFT', participationStep],
       ['Review', reviewStep],
       ['Publish', waitStep],
-      [undefined, congratsStep]
+      [undefined, congratsStep],
     ],
 
   }
@@ -337,7 +350,7 @@ const CopiesStep = (props: {
               <Input
                 autoFocus
                 className="input"
-                placeholder="Enter reservation price"
+                placeholder="Enter number of copies sold"
                 allowClear
                 onChange={info =>
                   props.setAttributes({
