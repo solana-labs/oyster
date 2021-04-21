@@ -21,17 +21,35 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: b
   {
     marginLeft: '0.5rem',
     display: 'flex',
-    width: props.iconSize
+    width: props.iconSize,
+    borderRadius: 50,
+
   } :{
     display: 'flex',
     width: props.iconSize,
     paddingLeft: 0,
+    borderRadius: 50,
   };
 
   const baseWalletKey: React.CSSProperties = { height: props.iconSize, cursor: 'pointer', userSelect: 'none' };
   const walletKeyStyle: React.CSSProperties = props.showAddress ?
   baseWalletKey
   :{ ...baseWalletKey, paddingLeft: 0 };
+
+  let name = props.showAddress ? shortenAddress(`${wallet.publicKey}`) : '';
+  const unknownWallet = wallet as any;
+  if(unknownWallet.name) {
+    name = unknownWallet.name;
+  }
+
+  let image = <Identicon
+    address={wallet.publicKey?.toBase58()}
+    style={iconStyle}
+  />;
+
+  if(unknownWallet.image) {
+    image = <img src={unknownWallet.image} style={iconStyle} />;
+  }
 
   return (
     <div className="wallet-wrapper">
@@ -46,11 +64,8 @@ export const CurrentUserBadge = (props: { showBalance?: boolean, showAddress?: b
           trigger="click"
             >
         <div className="wallet-key" style={walletKeyStyle}>
-          {props.showAddress && shortenAddress(`${wallet.publicKey}`)}
-          <Identicon
-            address={wallet.publicKey?.toBase58()}
-            style={iconStyle}
-          />
+          {name && (<span style={{ marginRight: '0.5rem' }}>{name}</span>)}
+          {image}
         </div>
       </Popover>
     </div>
