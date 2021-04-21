@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Divider,
   Steps,
   Row,
   Button,
@@ -14,6 +15,7 @@ import {
   Select,
   TimePicker,
   DatePicker,
+  Radio,
 } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
 import { UserSearch, UserValue } from './../../components/UserSearch';
@@ -43,9 +45,9 @@ const { Dragger } = Upload;
 
 export enum AuctionCategory {
   Limited,
+  Single,
   Open,
   Tiered,
-  Single,
 }
 
 export interface AuctionState {
@@ -68,6 +70,10 @@ export interface AuctionState {
   gapTime?: Date
 
   category: AuctionCategory;
+  price?: number;
+  startSaleTS?: number;
+  startListTS?: number;
+  endTS?: number;
 }
 
 export const AuctionCreateView = () => {
@@ -92,7 +98,7 @@ export const AuctionCreateView = () => {
   }, [step_param])
 
   const gotoNextStep = (_step?: number) => {
-    const nextStep = _step === undefined ? (step + 1) : step;
+    const nextStep = _step === undefined ? (step + 1) : _step;
     history.push(`/auction/create/${nextStep.toString()}`)
   }
 
@@ -171,7 +177,7 @@ export const AuctionCreateView = () => {
     confirm={() => gotoNextStep()}
   />;
 
-  const congratsStep =  <Congrats />;
+  const congratsStep = <Congrats />;
 
   const stepsByCategory = {
     [AuctionCategory.Limited]: [
@@ -185,9 +191,8 @@ export const AuctionCreateView = () => {
       ['Publish', waitStep],
       [undefined, congratsStep],
     ],
-    [AuctionCategory.Open]: [
+    [AuctionCategory.Single]: [
       ['Category', categoryStep],
-      ['Copies', copiesStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -196,8 +201,9 @@ export const AuctionCreateView = () => {
       ['Publish', waitStep],
       [undefined, congratsStep],
     ],
-    [AuctionCategory.Single]: [
+    [AuctionCategory.Open]: [
       ['Category', categoryStep],
+      ['Copies', copiesStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -343,23 +349,23 @@ const CopiesStep = (props: {
       </Row>
       <Row className="content-action">
         <Col>
-          <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
+          <ArtSelector selected={[]} setSelected={() => { }} allowMultiple={false}>Select NFT</ArtSelector>
           <label className="action-field">
-              <span className="field-title">How many copies do you want to create?</span>
-              <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
-              <Input
-                autoFocus
-                className="input"
-                placeholder="Enter number of copies sold"
-                allowClear
-                onChange={info =>
-                  props.setAttributes({
-                    ...props.attributes,
-                  })
-                }
-              />
-            </label>
-          </Col>
+            <span className="field-title">How many copies do you want to create?</span>
+            <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>
+            <Input
+              autoFocus
+              className="input"
+              placeholder="Enter number of copies sold"
+              allowClear
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                })
+              }
+            />
+          </label>
+        </Col>
       </Row>
       <Row>
         <Button
@@ -388,25 +394,25 @@ const NumberOfWinnersStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-        <h2>Specify the terms of your auction</h2>
-        <p>
-          Provide detailed auction parameters such as price, start time, etc.
+      <h2>Specify the terms of your auction</h2>
+      <p>
+        Provide detailed auction parameters such as price, start time, etc.
         </p>
-      </Row>
-      <Row className="content-action">
-        <Col className="section" xl={24}>
-        </Col>
-      </Row>
-      <Row>
-        <Button
-          type="primary"
-          size="large"
-          onClick={props.confirm}
-          className="action-btn"
-        >
-          Continue to Tiers
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >
+        Continue to Tiers
         </Button>
-      </Row>
+    </Row>
   </>;
 };
 
@@ -446,14 +452,31 @@ const PriceStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Price</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the price for your auction.
       </p>
     </Row>
     <Row className="content-action">
-      <Col className="section" xl={24}>
-      </Col>
+      <label className="action-field">
+        <span className="field-title">Sale price</span>
+        <span className="field-info">This is the starting bid price for your auction.</span>
+        <Input
+          type="number"
+          min={0}
+          autoFocus
+          className="input"
+          placeholder="Price"
+          prefix="$"
+          suffix="USD"
+          onChange={info =>
+            props.setAttributes({
+              ...props.attributes,
+              price: parseFloat(info.target.value) || undefined
+            })
+          }
+        />
+      </label>
     </Row>
     <Row>
       <Button
@@ -473,30 +496,56 @@ const InitialPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  const [saleNow, setSaleNow] = useState<boolean>(true)
+  const [listNow, setListNow] = useState<boolean>(true)
+
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Initial Phase</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the terms for your sale.
       </p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+
         <label className="action-field">
-          <span className="field-title">Preview Start Date</span>
-          <DatePicker className="field-date" size="large" />
-          <TimePicker className="field-date" size="large" />
+          <span className="field-title">When do you want the sale to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setSaleNow(info.target.value === "now")}>
+            <Radio className="radio-field" value="now">Immediately</Radio>
+            <div className="radio-subtitle">Participants can buy the NFT as soon as you finish setting up the auction.</div>
+            <Radio className="radio-field" value="later">At a specified date</Radio>
+            <div className="radio-subtitle">Participants can start buying the NFT at a specified date.</div>
+          </Radio.Group>
         </label>
-        <label className="action-field">
-          <span className="field-title">When do you want the auction to begin?</span>
-          <span>Immediately</span>
-          <span>At a specified data</span>
-        </label>
-        <label className="action-field">
-          <span className="field-title">Auction Start Date</span>
-          <DatePicker className="field-date" size="large" />
-          <TimePicker className="field-date" size="large" />
-        </label>
+
+        {!saleNow && <>
+
+          <label className="action-field">
+            <span className="field-title">Auction Start Date</span>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
+          </label>
+
+          <label className="action-field">
+            <span className="field-title">When do you want the listing to go live?</span>
+            <Radio.Group defaultValue="now" onChange={info => setListNow(info.target.value === "now")}>
+              <Radio className="radio-field" value="now" defaultChecked={true}>Immediately</Radio>
+              <div className="radio-subtitle">Participants will be able to view the listing with a countdown to the start date as soon as you finish setting up the sale.</div>
+              <Radio className="radio-field" value="later">At a specified date</Radio>
+              <div className="radio-subtitle">Participants will be able to view the listing with a countdown to the start date at the specified date.</div>
+            </Radio.Group>
+          </label>
+
+          {!listNow &&
+            <label className="action-field">
+              <span className="field-title">Preview Start Date</span>
+              <DatePicker className="field-date" size="large" />
+              <TimePicker className="field-date" size="large" />
+            </label>
+          }
+
+        </>}
       </Col>
     </Row>
     <Row>
@@ -517,20 +566,34 @@ const EndingPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  const [untilSold, setUntilSold] = useState<boolean>(true)
+
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
+      <h2>Ending Phase</h2>
       <p>
-        Provide detailed auction parameters such as price, start time, etc.
+        Set the terms for your sale..
       </p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">When do you want the sale to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setUntilSold(info.target.value === "now")}>
+            <Radio className="radio-field" value="now">Until sols</Radio>
+            <div className="radio-subtitle">The sale will end once the supply goes to zero.</div>
+            <Radio className="radio-field" value="later">At a specified date</Radio>
+            <div className="radio-subtitle">The sale will end at this date, regardless if there is remaining supply.</div>
+          </Radio.Group>
+        </label>
+
+        {!untilSold &&
           <label className="action-field">
-            <span className="field-title">End Start Date</span>
-            <DatePicker className="field-date" size="large" />
-            <TimePicker className="field-date" size="large" />
+            <span className="field-title">End Date</span>
+            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
+            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
           </label>
+        }
       </Col>
     </Row>
     <Row>
@@ -560,7 +623,7 @@ const ParticipationStep = (props: {
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
-        <ArtSelector selected={[]} setSelected={() => {}} allowMultiple={false}>Select NFT</ArtSelector>
+        <ArtSelector selected={[]} setSelected={() => { }} allowMultiple={false}>Select NFT</ArtSelector>
       </Col>
     </Row>
     <Row>
@@ -689,7 +752,7 @@ const ReviewStep = (props: {
           <Statistic
             className="create-statistic"
             title="Copies"
-            value={props.attributes.editions === undefined ? 'Unique' : props.attributes.editions }
+            value={props.attributes.editions === undefined ? 'Unique' : props.attributes.editions}
           />
           {cost ? (
             <Statistic
@@ -702,6 +765,26 @@ const ReviewStep = (props: {
             <Spin />
           )}
         </Col>
+      </Row>
+      <Row style={{ display: 'block' }}>
+        <Divider />
+        {props.attributes.startSaleTS && <Statistic
+          className="create-statistic"
+          title="Start date"
+          value={props.attributes.startSaleTS}
+        />}
+        <br />
+        {props.attributes.startListTS && <Statistic
+          className="create-statistic"
+          title="Listing go live date"
+          value={props.attributes.startListTS}
+        />}
+        <Divider />
+        {props.attributes.endTS && <Statistic
+          className="create-statistic"
+          title="Sale ends"
+          value={props.attributes.endTS}
+        />}
       </Row>
       <Row>
         <Button
