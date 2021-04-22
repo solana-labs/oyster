@@ -107,11 +107,11 @@ export const LABELS = {
   COUNCIL_MINT: 'Council Mint ID',
   PROPOSAL_TYPE: 'Proposal Type',
   EXECUTION_TYPE: 'Execution Type',
-  CONSENSUS_ALGORITHM: 'Consensus Algorithm',
+  VOTE_PERCENT_THRESHOLD: 'Vote Threshold (%)',
   VOTING_ENTRY_RULES: 'Voting Entry Rules',
   SELECT_PROPOSAL_TYPE: 'Select the type of proposals this app will generate',
   SELECT_EXECUTION_TYPE: 'Select how transactions will be executed',
-  SELECT_CONSENSUS_ALGORITHM: 'Select the consensus algorithm',
+
   SELECT_VOTING_ENTRY_RULE:
     'Select the rules for registering to vote in proposals',
   MINIMUM_SLOT_WAITING_PERIOD: 'Minimum slots between proposal and vote',

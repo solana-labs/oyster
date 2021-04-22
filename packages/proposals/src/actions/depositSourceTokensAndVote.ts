@@ -200,6 +200,7 @@ export const depositSourceTokensAndVote = async (
       [depositInstructions, voteInstructions],
       [depositSigners, voteSigners],
       true,
+      true,
     );
 
     notify({

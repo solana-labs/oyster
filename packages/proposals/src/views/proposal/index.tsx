@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
-  ConsensusAlgorithm,
   INSTRUCTION_LIMIT,
   TimelockConfig,
   TimelockSet,
@@ -462,16 +461,10 @@ function getVotesRequired(
   timelockConfig: ParsedAccount<TimelockConfig>,
   sourceMint: MintInfo,
 ): number {
-  if (timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.Majority) {
-    return Math.ceil(sourceMint.supply.toNumber() * 0.5);
-  } else if (
-    timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.SuperMajority
-  ) {
-    return Math.ceil(sourceMint.supply.toNumber() * 0.66);
-  } else if (
-    timelockConfig.info.consensusAlgorithm === ConsensusAlgorithm.FullConsensus
-  ) {
-    return sourceMint.supply.toNumber();
-  }
-  return 0;
+  return timelockConfig.info.voteThreshold === 100
+    ? sourceMint.supply.toNumber()
+    : Math.ceil(
+        (timelockConfig.info.voteThreshold / 100) *
+          sourceMint.supply.toNumber(),
+      );
 }

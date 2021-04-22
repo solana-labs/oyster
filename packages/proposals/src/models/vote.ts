@@ -11,7 +11,7 @@ import { TimelockInstruction } from './timelock';
 import BN from 'bn.js';
 
 /// [Requires Voting tokens]
-/// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the consensus,
+/// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the vote threshold,
 /// then the transactions can begin to be run at their time slots when people click execute.
 ///
 ///   0. `[writable]` Governance voting record account.

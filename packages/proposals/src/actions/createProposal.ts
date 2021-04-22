@@ -160,6 +160,7 @@ export const createProposal = async (
       ],
       [...associatedSigners, createTimelockAccountsSigners, signers],
       true,
+      true,
     );
 
     notify({

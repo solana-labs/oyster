@@ -1,8 +1,6 @@
 import EventEmitter from "eventemitter3"
-import solanaWeb3 from "@solana/web3.js"
-import { Account, PublicKey, Transaction, Connection } from "@solana/web3.js"
+import { Account, PublicKey, Transaction } from "@solana/web3.js"
 import { WalletAdapter } from "@solana/wallet-base"
-import Torus from "@toruslabs/torus-embed"
 import OpenLogin from "@toruslabs/openlogin"
 import { getED25519Key } from "@toruslabs/openlogin-ed25519"
 
@@ -12,15 +10,12 @@ const getSolanaPrivateKey = (openloginKey: string)=>{
 }
 
 export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
-  // _provider: Torus | undefined;
   _provider: OpenLogin | undefined;
   endpoint: string;
   providerUrl: string;
   account: Account | undefined;
   image: string = '';
   name: string = '';
-
-  autoConnect = true;
 
   constructor(providerUrl: string, endpoint: string) {
     super()
@@ -73,15 +68,13 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
         const { privKey } = await this._provider.login();
         const secretKey = getSolanaPrivateKey(privKey);
         this.account = new Account(secretKey);
-      } catch {
-        //
+      } catch(ex) {
+        console.error('login failed', ex);
       }
     }
 
     this.name = this._provider?.state.store.get('name');;
     this.image = this._provider?.state.store.get('profileImage');;
-
-
 
     this.emit("connect");
   }

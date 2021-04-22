@@ -157,27 +157,21 @@ export const HomeView = () => {
                 <img src={'/home/icons/bridge-direction.svg'} />
               </div>
               <div className={'description-title'}>Bridge in any direction</div>
-              <div className={'description-text'}>
-
-              </div>
+              <div className={'description-text'}></div>
             </div>
             <div className={'home-description-item'}>
               <div className={'description-icon'}>
                 <img src={'/home/icons/sd-card.svg'} />
               </div>
               <div className={'description-title'}>Staking & Validation</div>
-              <div className={'description-text'}>
-
-              </div>
+              <div className={'description-text'}></div>
             </div>
             <div className={'home-description-item'}>
               <div className={'description-icon'}>
                 <img src={'/home/icons/layers.svg'} />
               </div>
               <div className={'description-title'}>Layers and Capabilities</div>
-              <div className={'description-text'}>
-
-              </div>
+              <div className={'description-text'}></div>
             </div>
           </div>
         </div>
