@@ -1,7 +1,6 @@
 import {
   Account,
   Connection,
-  Message,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
@@ -16,7 +15,7 @@ import {
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
 
 const { sendTransaction } = contexts.Connection;
-const { notify, toUTF8Array, fromUTF8Array } = utils;
+const { notify } = utils;
 const { approve } = models;
 
 export const addCustomSingleSignerTransaction = async (

@@ -22,8 +22,6 @@ export function useVotingRecords(proposal: PublicKey) {
   const { endpoint } = useConnectionConfig();
   const connection = useConnection();
 
-  const { timelock } = utils.programIds();
-
   useEffect(() => {
     if (!proposal) {
       return;
@@ -32,6 +30,8 @@ export function useVotingRecords(proposal: PublicKey) {
     const sub = (async () => {
       const records = await getGovernanceVotingRecords(proposal, endpoint);
       setVotingRecords(records);
+
+      const { timelock } = utils.programIds();
 
       return connection.onProgramAccountChange(timelock.programId, info => {
         if (
@@ -57,7 +57,7 @@ export function useVotingRecords(proposal: PublicKey) {
     return () => {
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
-  }, [proposal]);
+  }, [proposal, connection, endpoint]);
 
   return votingRecords;
 }

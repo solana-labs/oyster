@@ -1,13 +1,7 @@
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { CONFIG_NAME_LENGTH, TimelockInstruction } from './timelock';
-import BN from 'bn.js';
-import * as Layout from '../utils/layout';
+import { TimelockInstruction } from './timelock';
 
 ///   0. `[]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
 ///           program account key, governance mint key, council mint key, and timelock program account key.

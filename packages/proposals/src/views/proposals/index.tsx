@@ -13,7 +13,7 @@ export const ProposalsView = () => {
   const history = useHistory();
   const { proposals, states } = useProposals();
   const config = useConfig(id);
-  const [page, setPage] = useState(0);
+  const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
   const { connected } = useWallet();
   const token = tokenMap.get(
@@ -41,6 +41,7 @@ export const ProposalsView = () => {
         badge: <TokenIcon mintAddress={mint} size={30} />,
         status: state.info.status,
         state,
+        key,
       });
     });
     return newListData;
@@ -64,7 +65,11 @@ export const ProposalsView = () => {
           />
           <div>
             <h1>{config?.info.name}</h1>
-            <a href={tokenMap.get(mint)?.extensions?.website} target="_blank">
+            <a
+              href={tokenMap.get(mint)?.extensions?.website}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {tokenMap.get(mint)?.extensions?.website}
             </a>
           </div>
@@ -87,7 +92,7 @@ export const ProposalsView = () => {
           dataSource={listData}
           renderItem={item => (
             <List.Item
-              key={item.title}
+              key={item.key}
               className="proposal-item"
               onClick={() => history.push(item.href)}
             >

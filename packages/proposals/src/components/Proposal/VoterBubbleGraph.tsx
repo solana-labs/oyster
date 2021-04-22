@@ -30,7 +30,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
       '...' +
       d.name.slice(d.name.length - 3, d.name.length),
   }));
-  console.log('Data', limitedData);
+  //console.log('Data', limitedData);
   const format = d3.format(',d');
   const color = d3
     .scaleOrdinal()
@@ -51,7 +51,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
     if (ref) {
       ref.innerHTML = '';
       const root = pack(limitedData);
-      console.log('Re-rendered');
+      // console.log('Re-rendered');
       const newSvg = d3
         .select(ref)
         .append('svg')

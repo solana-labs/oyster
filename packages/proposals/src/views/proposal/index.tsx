@@ -113,7 +113,7 @@ function useLoadGist({
       }
       fetch(toFetch)
         .then(async resp => {
-          if (resp.status == 200) {
+          if (resp.status === 200) {
             if (isGist) {
               const jsonContent = await resp.json();
               const nextUrlFileName = Object.keys(jsonContent['files'])[0];
@@ -123,7 +123,7 @@ function useLoadGist({
               );
             } else setContent(await resp.text());
           } else {
-            if (resp.status == 403 && isGist)
+            if (resp.status === 403 && isGist)
               setMsg(LABELS.GIT_CONTENT_EXCEEDED);
             setFailed(true);
           }
@@ -408,7 +408,11 @@ function InnerProposalView({
                   failed ? (
                     <p>
                       {LABELS.DESCRIPTION}:{' '}
-                      <a href={timelockState.info.descLink} target="_blank">
+                      <a
+                        href={timelockState.info.descLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         {msg ? msg : LABELS.NO_LOAD}
                       </a>
                     </p>
