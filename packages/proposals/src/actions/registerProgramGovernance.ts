@@ -127,10 +127,17 @@ export const registerProgramGovernance = async (
     PROGRAM_IDS.timelock.programId,
   );
 
+  const [programDataAccount] = await PublicKey.findProgramAddress(
+    [uninitializedTimelockConfig.program.toBuffer()],
+    PROGRAM_IDS.bpf_upgrade_loader,
+  );
+
   instructions.push(
     createEmptyTimelockConfigInstruction(
       timelockConfigKey,
       uninitializedTimelockConfig.program,
+      programDataAccount,
+      wallet.publicKey,
       uninitializedTimelockConfig.governanceMint,
       wallet.publicKey,
       uninitializedTimelockConfig.councilMint,
