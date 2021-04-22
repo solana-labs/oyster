@@ -9,6 +9,7 @@ import { ProgressUpdate, TransferRequest } from './interface';
 import BN from 'bn.js';
 import { createLockAssetInstruction } from '../lock';
 import { TransferOutProposalLayout } from '../transferOutProposal';
+import { SolanaBridge } from '../../../core';
 
 export const fromSolana = async (
   connection: Connection,
@@ -16,27 +17,22 @@ export const fromSolana = async (
   request: TransferRequest,
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,
+  bridge?: SolanaBridge,
 ) => {
   if (
     !request.asset ||
     !request.amount ||
-    !request.recipient ||
     !request.to ||
-    !request.info
+    !request.info ||
+    !bridge
   ) {
     return;
   }
-  const walletName = 'MetaMask';
   const signer = provider?.getSigner();
   request.recipient = Buffer.from((await signer.getAddress()).slice(2), 'hex');
   const nonce = await provider.getTransactionCount(
     signer.getAddress(),
     'pending',
-  );
-
-  const amountBN = ethers.utils.parseUnits(
-    request.amount.toString(),
-    request.info.decimals,
   );
 
   let counter = 0;
@@ -66,7 +62,7 @@ export const fromSolana = async (
         return;
       }
 
-      let group = 'Lock assets';
+      let group = 'Initiate transfer';
       const programs = programIds();
       const bridgeId = programs.wormhole.pubkey;
       const authorityKey = await bridgeAuthorityKey(bridgeId);
@@ -79,7 +75,7 @@ export const fromSolana = async (
         wallet.publicKey,
         new PublicKey(request.info.address),
         new PublicKey(request.info.mint),
-        new BN(request.amount.toString()),
+        new BN(amount),
         request.to,
         request.recipient,
         {
@@ -100,6 +96,12 @@ export const fromSolana = async (
         amount,
       );
 
+      setProgress({
+        message: 'Waiting for Solana approval...',
+        type: 'user',
+        group,
+        step: counter++,
+      });
       let fee_ix = SystemProgram.transfer({
         fromPubkey: wallet.publicKey,
         toPubkey: authorityKey,
@@ -126,29 +128,28 @@ export const fromSolana = async (
         let startSlot = slot;
 
         let group = 'Lock assets';
-
+        const solConfirmationMessage = (current: number) =>
+          `Awaiting ETH confirmations: ${current} out of 32`;
         let slotUpdateListener = connection.onSlotChange(slot => {
           if (completed) return;
           const passedSlots = slot.slot - startSlot;
           const isLast = passedSlots - 1 === 31;
           if (passedSlots < 32) {
-            // setLoading({
-            //     loading: true,
-            //     message: "Awaiting confirmations",
-            //     progress: {
-            //         completion: (slot.slot - startSlot) / 32 * 100,
-            //         content: `${slot.slot - startSlot}/${32}`
-            //     }
-            // })
-            // setProgress({
-            //   message: ethConfirmationMessage(passedBlocks),
-            //   type: isLast ? 'done' : 'wait',
-            //   step: counter++,
-            //   group,
-            //   replace: passedBlocks > 0,
-            // });
-          } else {
-            //setLoading({loading: true, message: "Awaiting guardian confirmation"})
+            setProgress({
+              message: solConfirmationMessage(passedSlots),
+              type: isLast ? 'done' : 'wait',
+              step: counter++,
+              group,
+              replace: passedSlots > 0,
+            });
+            if (isLast) {
+              setProgress({
+                message: 'Awaiting guardian confirmation',
+                type: 'wait',
+                step: counter++,
+                group,
+              });
+            }
           }
         });
 
@@ -176,27 +177,27 @@ export const fromSolana = async (
             connection.removeAccountChangeListener(accountChangeListener);
             connection.removeSlotChangeListener(slotUpdateListener);
 
-            // let signatures = await bridge.fetchSignatureStatus(
-            //   lockup.signatureAccount,
-            // );
-            // let sigData = Buffer.of(
-            //   ...signatures.reduce((previousValue, currentValue) => {
-            //     previousValue.push(currentValue.index);
-            //     previousValue.push(...currentValue.signature);
+            let signatures = await bridge.fetchSignatureStatus(
+              lockup.signatureAccount,
+            );
+            let sigData = Buffer.of(
+              ...signatures.reduce((previousValue, currentValue) => {
+                previousValue.push(currentValue.index);
+                previousValue.push(...currentValue.signature);
 
-            //     return previousValue;
-            //   }, new Array<number>()),
-            // );
+                return previousValue;
+              }, new Array<number>()),
+            );
 
-            // vaa = Buffer.concat([
-            //   vaa.slice(0, 5),
-            //   Buffer.of(signatures.length),
-            //   sigData,
-            //   vaa.slice(6),
-            // ]);
-            // transferVAA = vaa
+            vaa = Buffer.concat([
+              vaa.slice(0, 5),
+              Buffer.of(signatures.length),
+              sigData,
+              vaa.slice(6),
+            ]);
+
             try {
-              await steps.postVAA(request);
+              await steps.postVAA(request, vaa);
               resolve();
             } catch {
               reject();
@@ -206,22 +207,30 @@ export const fromSolana = async (
         );
       });
     },
-    postVAA: async (request: TransferRequest) => {
+    postVAA: async (request: TransferRequest, vaa: any) => {
       let wh = WormholeFactory.connect(programIds().wormhole.bridge, signer);
-
-      // setLoading({
-      //     ...loading,
-      //     loading: true,
-      //     message: "Sign the claim...",
-      // })
-      // let tx = await wh.submitVAA(vaa);
-      // setLoading({
-      //     ...loading,
-      //     loading: true,
-      //     message: "Waiting for tokens unlock to be mined...",
-      // })
-      // await tx.wait(1);
-      // message.success({content: "Execution of VAA succeeded", key: "eth_tx"})
+      let group = 'Finalizing transfer';
+      setProgress({
+        message: 'Sign the claim...',
+        type: 'wait',
+        group,
+        step: counter++,
+      });
+      let tx = await wh.submitVAA(vaa);
+      setProgress({
+        message: 'Waiting for tokens unlock to be mined...',
+        type: 'wait',
+        group,
+        step: counter++,
+      });
+      await tx.wait(1);
+      setProgress({
+        message: 'Execution of VAA succeeded',
+        type: 'done',
+        group,
+        step: counter++,
+      });
+      //message.success({content: "", key: "eth_tx"})
     },
   };
 

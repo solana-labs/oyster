@@ -4,13 +4,17 @@ import {
   useConnectionConfig,
   programIds,
   notify,
+  useWallet,
 } from '@oyster/common';
-import { WORMHOLE_PROGRAM_ID, POSTVAA_INSTRUCTION } from '../utils/ids';
+import {
+  WORMHOLE_PROGRAM_ID,
+  POSTVAA_INSTRUCTION,
+  TRANSFER_ASSETS_OUT_INSTRUCTION,
+} from '../utils/ids';
 import { ASSET_CHAIN } from '../utils/assets';
 import { useEthereum } from '../contexts';
 import {
   Connection,
-  ParsedInstruction,
   PartiallyDecodedInstruction,
   PublicKey,
 } from '@solana/web3.js';
@@ -31,11 +35,6 @@ import { ethers } from 'ethers';
 import { useBridge } from '../contexts/bridge';
 import { SolanaBridge } from '../core';
 
-interface ParsedData {
-  info: any;
-  type: string;
-}
-
 type WrappedTransferMeta = {
   chain: number;
   decimals: number;
@@ -53,6 +52,7 @@ type WrappedTransferMeta = {
   txhash?: string;
   date: number; // timestamp
   status?: string;
+  owner?: string;
   lockup?: any;
   vaa?: any;
 };
@@ -105,7 +105,9 @@ const queryWrappedMetaTransactions = async (
 
         const dec = new BN(10).pow(new BN(metaTransfer.assetDecimals));
         const rawAmount = new BN(metaTransfer.amount, 2, 'le');
-        const amount = rawAmount.div(dec).toNumber();
+        const div = rawAmount.div(dec).toNumber();
+        const mod = rawAmount.mod(dec).toNumber();
+        const amount = parseFloat(div + '.' + mod.toString());
         const txhash = acc.publicKey.toBase58();
 
         transfers.set(assetAddress, {
@@ -142,6 +144,14 @@ const queryWrappedMetaTransactions = async (
         if (filteredInstructions && filteredInstructions?.length > 0) {
           for (const ins of filteredInstructions) {
             const data = bs58.decode((ins as PartiallyDecodedInstruction).data);
+            if (data[0] === TRANSFER_ASSETS_OUT_INSTRUCTION) {
+              try {
+                transfer.owner = (ins as PartiallyDecodedInstruction).accounts[10].toBase58();
+              } catch {
+                // Catch no owner
+                transfer.owner = '';
+              }
+            }
 
             if (
               data[0] === POSTVAA_INSTRUCTION &&
@@ -207,10 +217,12 @@ export const useWormholeTransactions = () => {
   const { tokenMap: ethTokens } = useEthereum();
   const { tokenMap } = useConnectionConfig();
   const { coinList } = useCoingecko();
+  const { wallet, connected: walletConnected } = useWallet();
   const bridge = useBridge();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [transfers, setTransfers] = useState<WrappedTransferMeta[]>([]);
+  const [userTransfers, setUserTransfers] = useState<WrappedTransferMeta[]>([]);
   const [amountInUSD, setAmountInUSD] = useState<number>(0);
 
   useEffect(() => {
@@ -240,6 +252,16 @@ export const useWormholeTransactions = () => {
       }
     })();
   }, [connection, setTransfers]);
+
+  useEffect(() => {
+    if (transfers && walletConnected && wallet?.publicKey) {
+      setUserTransfers(
+        transfers.filter(t => {
+          return t.owner === wallet?.publicKey?.toBase58();
+        }),
+      );
+    }
+  }, [wallet, walletConnected, transfers]);
 
   const coingeckoTimer = useRef<number>(0);
   const dataSourcePriceQuery = useCallback(async () => {
@@ -306,6 +328,7 @@ export const useWormholeTransactions = () => {
   return {
     loading,
     transfers,
+    userTransfers,
     totalInUSD: amountInUSD,
   };
 };

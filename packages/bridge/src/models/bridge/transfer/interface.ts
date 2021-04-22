@@ -37,11 +37,9 @@ export interface TransferRequest {
 
 export const displayBalance = (info?: TransferRequestInfo) => {
   try {
-    return (
-      new BN(info?.balance?.toString() || 0)
-        .div(new BN(10).pow(new BN(Math.min((info?.decimals || 0) - 2, 0))))
-        .toNumber() / 100
-    );
+    const balance = info?.balance.toNumber() || 0;
+    const precision = Math.pow(10, info?.decimals || 0);
+    return balance / precision;
   } catch {
     return 0;
   }
