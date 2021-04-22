@@ -66,18 +66,23 @@ export interface AuctionState {
   // suggested date time when auction should end UTC+0
   endDate?: Date;
 
-  // time interval between highest bid and end of the auction
-  gapTime?: Date
-
+  
+  // Jose's attributes
   category: AuctionCategory;
-  price?: number;
-  startSaleTS?: number;
-  startListTS?: number;
-  endTS?: number;
   saleType?: "auction" | "fixed";
+  
+  price?: number;
   priceFloor?: number;
   priceTick?: number;
-
+  
+  startSaleTS?: number; // Why do I prefer to work with unix ts?
+  startListTS?: number;
+  endTS?: number;
+  
+  auctionDuration?: number;
+  gapTime?: number;
+  tickSizeEndingPhase?: number;
+  
 }
 
 export const AuctionCreateView = () => {
@@ -489,7 +494,7 @@ const PriceStep = (props: {
   confirm: () => void;
 }) => {
   return <>
-    {props.attributes.saleType == "auction" ? <PriceAuction {...props} /> : <PriceFixed {...props}/>}
+    {props.attributes.saleType == "auction" ? <PriceAuction {...props} /> : <PriceFixed {...props} />}
   </>;
 };
 
@@ -681,14 +686,100 @@ const EndingPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  return <>
+    {props.attributes.saleType == "auction" ? <EndingPhaseAuction {...props} /> : <EndingPhaseFixed {...props} />}
+  </>;
+}
+
+const EndingPhaseAuction = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Ending Phase</h2>
+      <p>Set the terms for your auction.</p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">Auction Duration</span>
+          <span className="field-info">This is how long the auction will last for.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Duration in minutes"
+            suffix="minutes"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                auctionDuration: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+
+        <label className="action-field">
+          <span className="field-title">Gap Time</span>
+          <span className="field-info">The final phase of the auction will begin when there is this much time left on the countdown. Any bids placed during the final phase will extend the end time by this same duration.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Duration in minutes"
+            suffix="minutes"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                gapTime: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+
+        <label className="action-field">
+          <span className="field-title">Tick Size for Ending Phase</span>
+          <span className="field-info">In order for winners to move up in the auction, they must place a bid that’s at least this percentage higher than the next highest bid.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Percentage"
+            suffix="%"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                tickSizeEndingPhase: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >Continue</Button>
+    </Row>
+  </>;
+};
+
+const EndingPhaseFixed = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
   const [untilSold, setUntilSold] = useState<boolean>(true)
 
   return <>
     <Row className="call-to-action">
       <h2>Ending Phase</h2>
-      <p>
-        Set the terms for your sale..
-      </p>
+      <p>Set the terms for your sale.</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
@@ -717,9 +808,7 @@ const EndingPhaseStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Participation NFT
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
