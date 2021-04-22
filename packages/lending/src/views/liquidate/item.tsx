@@ -1,37 +1,42 @@
-import React, { useMemo } from 'react';
-
 import {
-  LendingReserve,
+  contexts,
+  formatNumber,
+  formatPct,
+  fromLamports,
+  ParsedAccount,
+  TokenIcon,
+  useTokenName,
+  wadToLamports,
+} from '@oyster/common';
+import { Button } from 'antd';
+import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { LABELS } from '../../constants';
+import { EnrichedLendingObligation } from '../../hooks';
+import {
   calculateBorrowAPY,
   collateralToLiquidity,
-} from '../../models/lending';
-import { EnrichedLendingObligation } from '../../hooks';
-import { Link } from 'react-router-dom';
-import { Button } from 'antd';
+  Reserve,
+} from '../../models';
 
-import { LABELS } from '../../constants';
-
-import { contexts, hooks, utils, ParsedAccount, TokenIcon } from '@oyster/common';
-const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { useMint, cache } = contexts.Accounts;
-const { useTokenName } = hooks;
 
 export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
   let obligation = props.item.info;
 
   const borrowReserve = cache.get(
-    obligation.borrowReserve,
-  ) as ParsedAccount<LendingReserve>;
+    obligation.borrows[0].borrowReserve,
+  ) as ParsedAccount<Reserve>;
 
-  const collateralReserve = cache.get(
-    obligation.collateralReserve,
-  ) as ParsedAccount<LendingReserve>;
+  const depositReserve = cache.get(
+    obligation.deposits[0].depositReserve,
+  ) as ParsedAccount<Reserve>;
 
-  const liquidityMint = useMint(borrowReserve.info.liquidityMint);
-  const collateralMint = useMint(collateralReserve.info.liquidityMint);
+  const liquidityMint = useMint(borrowReserve.info.liquidity.mint);
+  const collateralMint = useMint(depositReserve.info.liquidity.mint);
 
   const borrowAmount = fromLamports(
-    wadToLamports(obligation.borrowAmountWad),
+    wadToLamports(obligation.borrows[0].borrowedAmountWads),
     liquidityMint,
   );
 
@@ -40,13 +45,13 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
   ]);
 
   const collateralLamports = collateralToLiquidity(
-    obligation.depositedCollateral,
+    obligation.deposits[0].depositedAmount,
     borrowReserve.info,
   );
   const collateral = fromLamports(collateralLamports, collateralMint);
 
-  const borrowName = useTokenName(borrowReserve?.info.liquidityMint);
-  const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
+  const borrowName = useTokenName(borrowReserve?.info.liquidity.mint);
+  const collateralName = useTokenName(depositReserve?.info.liquidity.mint);
 
   return (
     <Link to={`/liquidate/${props.item.account.pubkey.toBase58()}`}>
@@ -54,10 +59,10 @@ export const LiquidateItem = (props: { item: EnrichedLendingObligation }) => {
         <span style={{ display: 'flex' }}>
           <div style={{ display: 'flex' }}>
             <TokenIcon
-              mintAddress={collateralReserve?.info.liquidityMint}
+              mintAddress={depositReserve?.info.liquidity.mint}
               style={{ marginRight: '-0.5rem' }}
             />
-            <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
+            <TokenIcon mintAddress={borrowReserve?.info.liquidity.mint} />
           </div>
           {collateralName}→{borrowName}
         </span>

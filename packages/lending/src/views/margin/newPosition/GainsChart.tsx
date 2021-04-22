@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import Chart, { ChartPluginsOptions } from "chart.js";
-import { Position } from "./interfaces";
+import Chart, { ChartPluginsOptions } from 'chart.js';
+import React, { useEffect, useRef } from 'react';
+import { Position } from './interfaces';
 
 // Special thanks to
 // https://github.com/bZxNetwork/fulcrum_ui/blob/development/packages/fulcrum-website/assets/js/trading.js

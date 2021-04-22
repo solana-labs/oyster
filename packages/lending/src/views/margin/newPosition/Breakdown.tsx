@@ -1,10 +1,10 @@
-import { Progress, Slider, Card, Statistic } from 'antd';
-import React, { useState } from 'react';
-import { Position } from './interfaces';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-import GainsChart from './GainsChart';
-import { usePoolAndTradeInfoFrom } from './utils';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useConnectionConfig } from '@oyster/common';
+import { Card, Progress, Slider, Statistic } from 'antd';
+import React, { useState } from 'react';
+import GainsChart from './GainsChart';
+import { Position } from './interfaces';
+import { usePoolAndTradeInfoFrom } from './utils';
 
 export default function Breakdown({ item }: { item: Position }) {
   const { tokens } = useConnectionConfig();
@@ -22,11 +22,10 @@ export default function Breakdown({ item }: { item: Position }) {
   const gains = 'green';
   const losses = 'red';
   const token = tokens.find(
-    t => t.address === item.asset.type?.info?.liquidityMint?.toBase58(),
+    t => t.address === item.asset.type?.info?.liquidity.mint?.toBase58(),
   );
   const collateralToken = tokens.find(
-    t =>
-      t.address === item.collateral.type?.info?.liquidityMint?.toBase58(),
+    t => t.address === item.collateral.type?.info?.liquidity.mint?.toBase58(),
   );
 
   const [myGain, setMyGain] = useState<number>(10);

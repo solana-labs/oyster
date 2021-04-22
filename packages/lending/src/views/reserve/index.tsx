@@ -1,12 +1,12 @@
-import React from "react";
-import { useLendingReserve } from "../../hooks";
-import { useParams } from "react-router-dom";
-import "./style.less";
+import { Col, Row } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { ReserveStatus } from '../../components/ReserveStatus';
 
-import { UserLendingCard } from "../../components/UserLendingCard";
-import { ReserveStatus } from "../../components/ReserveStatus";
-import { Col, Row } from "antd";
-import { GUTTER } from "../../constants";
+import { UserLendingCard } from '../../components/UserLendingCard';
+import { GUTTER } from '../../constants';
+import { useLendingReserve } from '../../hooks';
+import './style.less';
 
 export const ReserveView = () => {
   const { id } = useParams<{ id: string }>();

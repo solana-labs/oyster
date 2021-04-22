@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
-import { Card } from 'antd';
+import { ConnectButton, contexts, notify } from '@oyster/common';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Card } from 'antd';
+import React, { useCallback } from 'react';
 import { LABELS } from '../../constants';
-import { contexts, utils, ConnectButton } from '@oyster/common';
+
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
-const { notify } = utils;
 
 export const FaucetView = () => {
   const connection = useConnection();

@@ -1,8 +1,8 @@
-import { Card } from "antd";
-import React from "react";
-import { useLendingReserves } from "../../../hooks";
-import { ReserveItem } from "./item";
-import "./itemStyle.less";
+import { Card } from 'antd';
+import React from 'react';
+import { useLendingReserves } from '../../../hooks';
+import { ReserveItem } from './item';
+import './itemStyle.less';
 
 export const DepositView = () => {
   const { reserveAccounts } = useLendingReserves();
@@ -16,7 +16,7 @@ export const DepositView = () => {
           <div>APY</div>
           <div></div>
         </div>
-        {reserveAccounts.map((account) => (
+        {reserveAccounts.map(account => (
           <ReserveItem
             key={account.pubkey.toBase58()}
             reserve={account.info}

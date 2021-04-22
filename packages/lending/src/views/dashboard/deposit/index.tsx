@@ -1,8 +1,8 @@
+import { utils } from '@oyster/common';
 import { Card } from 'antd';
 import React from 'react';
 import { BarChartStatistic } from '../../../components/BarChartStatistic';
 import { LABELS } from '../../../constants';
-import { utils } from '@oyster/common';
 import { useUserDeposits } from './../../../hooks';
 import { DepositItem } from './item';
 

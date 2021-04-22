@@ -1,20 +1,20 @@
-import React from "react";
+import { Card, Col, Row, Statistic } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { BarChartStatistic } from '../../components/BarChartStatistic';
+
+import { BorrowInput } from '../../components/BorrowInput';
+import {
+  SideReserveOverview,
+  SideReserveOverviewMode,
+} from '../../components/SideReserveOverview';
+import { GUTTER, LABELS } from '../../constants';
 import {
   useBorrowingPower,
   useLendingReserve,
   useUserObligations,
-} from "../../hooks";
-import { useParams } from "react-router-dom";
-import "./style.less";
-
-import { BorrowInput } from "../../components/BorrowInput";
-import {
-  SideReserveOverview,
-  SideReserveOverviewMode,
-} from "../../components/SideReserveOverview";
-import { Card, Col, Row, Statistic } from "antd";
-import { BarChartStatistic } from "../../components/BarChartStatistic";
-import { GUTTER, LABELS } from "../../constants";
+} from '../../hooks';
+import './style.less';
 
 export const BorrowReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +55,7 @@ export const BorrowReserveView = () => {
             <Statistic
               title={LABELS.BORROWING_POWER_VALUE}
               value={borrowingPower}
-              valueStyle={{ color: "#3fBB00" }}
+              valueStyle={{ color: '#3fBB00' }}
               precision={2}
               prefix="$"
             />
@@ -66,10 +66,8 @@ export const BorrowReserveView = () => {
             <BarChartStatistic
               title="Your Loans"
               items={userObligations}
-              getPct={(item) =>
-                item.obligation.info.borrowedInQuote / loansValue
-              }
-              name={(item) => item.obligation.info.repayName}
+              getPct={item => item.obligation.info.borrowedInQuote / loansValue}
+              name={item => item.obligation.info.repayName}
             />
           </Card>
         </Col>

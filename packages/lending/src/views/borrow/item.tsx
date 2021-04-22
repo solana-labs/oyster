@@ -1,20 +1,21 @@
-import React from 'react';
-import { utils, hooks, TokenIcon } from '@oyster/common';
-import { useBorrowingPower } from '../../hooks';
-import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
+import {
+  formatNumber,
+  formatPct,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { Button } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import { useMidPriceInUSD } from '../../contexts/market';
-const { useTokenName } = hooks;
-const { formatNumber, formatPct } = utils;
-export const BorrowItem = (props: {
-  reserve: LendingReserve;
-  address: PublicKey;
-}) => {
-  const name = useTokenName(props.reserve.liquidityMint);
-  const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
+import { useBorrowingPower } from '../../hooks';
+import { calculateBorrowAPY, Reserve } from '../../models';
+
+export const BorrowItem = (props: { reserve: Reserve; address: PublicKey }) => {
+  const name = useTokenName(props.reserve.liquidity.mint);
+  const price = useMidPriceInUSD(props.reserve.liquidity.mint.toBase58()).price;
 
   const { borrowingPower, totalInQuote } = useBorrowingPower(props.address);
 
@@ -24,7 +25,7 @@ export const BorrowItem = (props: {
     <Link to={`/borrow/${props.address.toBase58()}`}>
       <div className="borrow-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
           {name}
         </span>
         <div>${formatNumber.format(price)}</div>

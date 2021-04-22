@@ -1,9 +1,9 @@
-import React from "react";
-import { LABELS } from "../../constants";
-import "./itemStyle.less";
-import { Card } from "antd";
-import { useLendingReserves } from "../../hooks/useLendingReserves";
-import { MarginTradeItem } from "./item";
+import { Card } from 'antd';
+import React from 'react';
+import { LABELS } from '../../constants';
+import { useLendingReserves } from '../../hooks/useLendingReserves';
+import { MarginTradeItem } from './item';
+import './itemStyle.less';
 
 export const MarginTrading = () => {
   const { reserveAccounts } = useLendingReserves();
@@ -17,7 +17,7 @@ export const MarginTrading = () => {
           <div>{LABELS.TABLE_TITLE_APY}</div>
           <div></div>
         </div>
-        {reserveAccounts.map((account) => (
+        {reserveAccounts.map(account => (
           <MarginTradeItem reserve={account.info} address={account.pubkey} />
         ))}
       </Card>

@@ -1,21 +1,24 @@
-import React from 'react';
-import { hooks, utils, TokenIcon } from '@oyster/common';
-import { useBorrowingPower } from '../../hooks';
-import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
+import {
+  formatNumber,
+  formatPct,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { Button } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
 import { useMidPriceInUSD } from '../../contexts/market';
-const { formatNumber, formatPct } = utils;
-const { useTokenName } = hooks;
+import { useBorrowingPower } from '../../hooks';
+import { calculateBorrowAPY, Reserve } from '../../models';
 
 export const MarginTradeItem = (props: {
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidityMint);
-  const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
+  const name = useTokenName(props.reserve.liquidity.mint);
+  const price = useMidPriceInUSD(props.reserve.liquidity.mint.toBase58()).price;
 
   const apr = calculateBorrowAPY(props.reserve);
 
@@ -30,7 +33,7 @@ export const MarginTradeItem = (props: {
     <Link to={`/margin/${props.address.toBase58()}`}>
       <div className="choose-margin-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
           {name}
         </span>
         <div>${formatNumber.format(price)}</div>

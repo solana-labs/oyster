@@ -1,12 +1,13 @@
+import { contexts } from '@oyster/common';
 import { Card, Col, Row } from 'antd';
 import React from 'react';
-import { GUTTER, LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
-import { useUserDeposits, useUserObligations } from './../../hooks';
-import { DashboardObligations } from './obligation';
-import { DashboardDeposits } from './deposit';
-import './style.less';
 import { NothingBorrowedPanel } from '../../components/NothingBorrowedPanel';
+import { GUTTER, LABELS } from '../../constants';
+import { useUserDeposits, useUserObligations } from './../../hooks';
+import { DashboardDeposits } from './deposit';
+import { DashboardObligations } from './obligation';
+import './style.less';
+
 const { useWallet } = contexts.Wallet;
 
 export const DashboardView = () => {

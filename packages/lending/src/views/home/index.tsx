@@ -1,16 +1,21 @@
+import {
+  contexts,
+  fromLamports,
+  getTokenName,
+  ParsedAccount,
+  wadToLamports,
+} from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Card, Col, Row, Statistic } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { contexts, ParsedAccount, utils } from '@oyster/common';
 import { useMarkets } from '../../contexts/market';
 import { useLendingReserves } from '../../hooks';
 import { reserveMarketCap, Totals } from '../../models';
-
-import { LendingReserveItem } from './item';
 import { BarChartStatistic } from './../../components/BarChartStatistic';
+import { LendingReserveItem } from './item';
 import './itemStyle.less';
-const { fromLamports, getTokenName, wadToLamports } = utils;
+
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
@@ -39,7 +44,7 @@ export const HomeView = () => {
 
         const localCache = cache;
         const liquidityMint = localCache.get(
-          item.info.liquidityMint.toBase58(),
+          item.info.liquidity.mint.toBase58(),
         ) as ParsedAccount<MintInfo>;
 
         if (!liquidityMint) {
@@ -54,10 +59,10 @@ export const HomeView = () => {
             fromLamports(marketCapLamports, liquidityMint?.info) * price,
           borrowed:
             fromLamports(
-              wadToLamports(item.info?.state.borrowedLiquidityWad).toNumber(),
+              wadToLamports(item.info?.liquidity.borrowedAmountWads).toNumber(),
               liquidityMint.info,
             ) * price,
-          name: getTokenName(tokenMap, item.info.liquidityMint.toBase58()),
+          name: getTokenName(tokenMap, item.info.liquidity.mint.toBase58()),
         };
 
         newTotals.items.push(leaf);

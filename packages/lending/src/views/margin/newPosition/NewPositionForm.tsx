@@ -1,24 +1,21 @@
+import { ArrowDownOutlined } from '@ant-design/icons';
+import { components, contexts, ParsedAccount } from '@oyster/common';
 import { Button, Card } from 'antd';
 import React, { useState } from 'react';
+import CollateralInput from '../../../components/CollateralInput';
 import { LABELS } from '../../../constants';
-import { contexts, ParsedAccount, components } from '@oyster/common';
-import {
-  LendingReserve,
-  LendingReserveParser,
-} from '../../../models/lending/reserve';
+import { UserDeposit } from '../../../hooks';
+import { Reserve, ReserveParser } from '../../../models';
 import { Position } from './interfaces';
 import { useLeverage } from './leverage';
-import CollateralInput from '../../../components/CollateralInput';
 import { usePoolAndTradeInfoFrom } from './utils';
-import { UserDeposit } from '../../../hooks';
-import { ArrowDownOutlined } from '@ant-design/icons';
 
 const { ActionConfirmation } = components;
 const { cache } = contexts.Accounts;
 const { useWallet } = contexts.Wallet;
 
 interface NewPositionFormProps {
-  lendingReserve: ParsedAccount<LendingReserve>;
+  lendingReserve: ParsedAccount<Reserve>;
   newPosition: Position;
   setNewPosition: (pos: Position) => void;
 }
@@ -144,9 +141,9 @@ export default function NewPositionForm({
               onCollateralReserve={key => {
                 const id: string =
                   cache
-                    .byParser(LendingReserveParser)
+                    .byParser(ReserveParser)
                     .find(acc => acc === key) || '';
-                const parser = cache.get(id) as ParsedAccount<LendingReserve>;
+                const parser = cache.get(id) as ParsedAccount<Reserve>;
                 const newPos = {
                   ...newPosition,
                   collateral: {

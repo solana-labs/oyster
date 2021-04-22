@@ -1,36 +1,42 @@
+import {
+  contexts,
+  formatNumber,
+  formatPct,
+  fromLamports,
+  TokenIcon,
+  useTokenName,
+  wadToLamports,
+} from '@oyster/common';
+import { PublicKey } from '@solana/web3.js';
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   calculateBorrowAPY,
   calculateDepositAPY,
-  LendingReserve,
-} from '../../models/lending';
+  Reserve,
+  TotalItem,
+} from '../../models';
 
-import { Link } from 'react-router-dom';
-import { PublicKey } from '@solana/web3.js';
-import { TotalItem } from '../../models';
-import { contexts, hooks, utils, TokenIcon } from '@oyster/common';
-const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { useMint } = contexts.Accounts;
-const { useTokenName } = hooks;
 
 export const LendingReserveItem = (props: {
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
   item?: TotalItem;
 }) => {
-  const name = useTokenName(props.reserve.liquidityMint);
+  const name = useTokenName(props.reserve.liquidity.mint);
 
-  const liquidityMint = useMint(props.reserve.liquidityMint);
+  const liquidityMint = useMint(props.reserve.liquidity.mint);
 
-  const availableLiquidity = fromLamports(
-    props.reserve.state.availableLiquidity,
+  const availableAmount = fromLamports(
+    props.reserve.liquidity.availableAmount,
     liquidityMint,
   );
 
   const totalBorrows = useMemo(
     () =>
       fromLamports(
-        wadToLamports(props.reserve.state.borrowedLiquidityWad),
+        wadToLamports(props.reserve.liquidity.borrowedAmountWads),
         liquidityMint,
       ),
     [props.reserve, liquidityMint],
@@ -44,13 +50,13 @@ export const LendingReserveItem = (props: {
     props.reserve,
   ]);
 
-  const marketSize = availableLiquidity + totalBorrows;
+  const marketSize = availableAmount + totalBorrows;
 
   return (
     <Link to={`/reserve/${props.address.toBase58()}`}>
       <div className="home-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
           {name}
         </span>
         <div title={marketSize.toString()}>

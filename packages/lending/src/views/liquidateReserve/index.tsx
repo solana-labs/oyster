@@ -1,18 +1,18 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import { useEnrichedLendingObligation, useLendingReserve } from "../../hooks";
+import { Col, Row } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+
+import { LiquidateInput } from '../../components/LiquidateInput';
+
+import { LoanInfoLine } from '../../components/LoanInfoLine';
 import {
   SideReserveOverview,
   SideReserveOverviewMode,
-} from "../../components/SideReserveOverview";
+} from '../../components/SideReserveOverview';
+import { GUTTER } from '../../constants';
+import { useEnrichedLendingObligation, useLendingReserve } from '../../hooks';
 
-import { LoanInfoLine } from "../../components/LoanInfoLine";
-
-import { LiquidateInput } from "../../components/LiquidateInput";
-
-import "./style.less";
-import { Col, Row } from "antd";
-import { GUTTER } from "../../constants";
+import './style.less';
 
 export const LiquidateReserveView = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ export const LiquidateReserveView = () => {
   const obligation = useEnrichedLendingObligation(id);
 
   const repayReserve = useLendingReserve(obligation?.info.borrowReserve);
-  const withdrawReserve = useLendingReserve(obligation?.info.collateralReserve);
+  const withdrawReserve = useLendingReserve(obligation?.info.depositReserve);
 
   if (!obligation || !repayReserve) {
     return null;

@@ -1,5 +1,5 @@
 import { ParsedAccount } from '@oyster/common';
-import { LendingReserve } from '../../../models/lending/reserve';
+import { Reserve } from '../../../models';
 
 export interface Token {
   mintAddress: string;
@@ -11,11 +11,11 @@ export interface Position {
   id?: number | null;
   leverage: number;
   collateral: {
-    type?: ParsedAccount<LendingReserve>;
+    type?: ParsedAccount<Reserve>;
     value?: number | null;
   };
   asset: {
-    type?: ParsedAccount<LendingReserve>;
+    type?: ParsedAccount<Reserve>;
     value?: number | null;
   };
   error?: string;

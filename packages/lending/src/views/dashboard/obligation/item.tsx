@@ -1,18 +1,24 @@
+import {
+  contexts,
+  formatNumber,
+  formatPct,
+  fromLamports,
+  ParsedAccount,
+  TokenIcon,
+  useTokenName,
+  wadToLamports,
+} from '@oyster/common';
+import { Button } from 'antd';
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { EnrichedLendingObligation } from '../../../hooks';
-import { hooks, utils, contexts, ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   calculateBorrowAPY,
   collateralToLiquidity,
   healthFactorToRiskColor,
-  LendingReserve,
-} from '../../../models/lending';
+  Reserve,
+} from '../../../models';
 
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
-const { useTokenName } = hooks;
-
-const { wadToLamports, formatNumber, fromLamports, formatPct } = utils;
 const { cache, useMint } = contexts.Accounts;
 
 export const ObligationItem = (props: {
@@ -21,18 +27,18 @@ export const ObligationItem = (props: {
   const { obligation } = props;
 
   const borrowReserve = cache.get(
-    obligation.info.borrowReserve,
-  ) as ParsedAccount<LendingReserve>;
+    obligation.info.borrows[0].borrowReserve,
+  ) as ParsedAccount<Reserve>;
 
-  const collateralReserve = cache.get(
-    obligation.info.collateralReserve,
-  ) as ParsedAccount<LendingReserve>;
+  const depositReserve = cache.get(
+    obligation.info.deposits[0].depositReserve,
+  ) as ParsedAccount<Reserve>;
 
-  const liquidityMint = useMint(borrowReserve.info.liquidityMint);
-  const collateralMint = useMint(collateralReserve.info.liquidityMint);
+  const liquidityMint = useMint(borrowReserve.info.liquidity.mint);
+  const collateralMint = useMint(depositReserve.info.liquidity.mint);
 
   const borrowAmount = fromLamports(
-    wadToLamports(obligation.info.borrowAmountWad),
+    wadToLamports(obligation.info.borrows[0].borrowedAmountWads),
     liquidityMint,
   );
 
@@ -41,13 +47,13 @@ export const ObligationItem = (props: {
   ]);
 
   const collateralLamports = collateralToLiquidity(
-    obligation.info.depositedCollateral,
+    obligation.info.deposits[0].depositedAmount,
     borrowReserve.info,
   );
   const collateral = fromLamports(collateralLamports, collateralMint);
 
-  const borrowName = useTokenName(borrowReserve?.info.liquidityMint);
-  const collateralName = useTokenName(collateralReserve?.info.liquidityMint);
+  const borrowName = useTokenName(borrowReserve?.info.liquidity.mint);
+  const collateralName = useTokenName(depositReserve?.info.liquidity.mint);
 
   return (
     <div className="dashboard-item">
@@ -57,10 +63,10 @@ export const ObligationItem = (props: {
           title={`${collateralName}→${borrowName}`}
         >
           <TokenIcon
-            mintAddress={collateralReserve?.info.liquidityMint}
+            mintAddress={depositReserve?.info.liquidity.mint}
             style={{ marginRight: '-0.5rem' }}
           />
-          <TokenIcon mintAddress={borrowReserve?.info.liquidityMint} />
+          <TokenIcon mintAddress={borrowReserve?.info.liquidity.mint} />
         </div>
       </span>
       <div>

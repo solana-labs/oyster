@@ -1,22 +1,22 @@
-import React, { useMemo } from "react";
-import { GUTTER, LABELS } from "../../constants";
-import { LiquidateItem } from "./item";
-import { useEnrichedLendingObligations } from "../../hooks";
-import "./style.less";
-import { Card, Col, Row, Statistic, Typography } from "antd";
-import { BarChartStatistic } from "../../components/BarChartStatistic";
+import { Card, Col, Row, Statistic, Typography } from 'antd';
+import React, { useMemo } from 'react';
+import { BarChartStatistic } from '../../components/BarChartStatistic';
+import { GUTTER, LABELS } from '../../constants';
+import { useEnrichedLendingObligations } from '../../hooks';
+import { LiquidateItem } from './item';
+import './style.less';
 
 export const LiquidateView = () => {
   const { obligations } = useEnrichedLendingObligations();
 
   const atRisk = useMemo(
-    () => obligations.filter((item) => item.info.health < 1.0),
-    [obligations]
+    () => obligations.filter(item => item.info.health < 1.0),
+    [obligations],
   );
 
   const valueAtRisk = useMemo(
     () => atRisk.reduce((acc, item) => acc + item.info.collateralInQuote, 0),
-    [atRisk]
+    [atRisk],
   );
   const loansAtRiskCount = useMemo(() => atRisk.length, [atRisk]);
   const pctAtRisk = useMemo(() => atRisk.length / obligations.length, [
@@ -28,7 +28,7 @@ export const LiquidateView = () => {
     return atRisk.reduce((acc, item) => {
       acc.set(
         item.info.repayName,
-        (acc.get(item.info.collateralName) || 0) + item.info.collateralInQuote
+        (acc.get(item.info.collateralName) || 0) + item.info.collateralInQuote,
       );
       return acc;
     }, new Map<string, number>());
@@ -56,7 +56,7 @@ export const LiquidateView = () => {
                   title="Value at risk"
                   value={valueAtRisk}
                   precision={2}
-                  valueStyle={{ color: "#3fBB00" }}
+                  valueStyle={{ color: '#3fBB00' }}
                   prefix="$"
                 />
               </Card>
@@ -84,8 +84,8 @@ export const LiquidateView = () => {
               <Card>
                 <BarChartStatistic
                   title="At risk loan composition"
-                  name={(item) => item}
-                  getPct={(item) => (groupedLoans.get(item) || 0) / valueAtRisk}
+                  name={item => item}
+                  getPct={item => (groupedLoans.get(item) || 0) / valueAtRisk}
                   items={keys}
                 />
               </Card>
@@ -103,7 +103,7 @@ export const LiquidateView = () => {
                   <div>{LABELS.TABLE_TITLE_HEALTH}</div>
                   <div>{LABELS.TABLE_TITLE_ACTION}</div>
                 </div>
-                {atRisk.map((item) => (
+                {atRisk.map(item => (
                   <LiquidateItem
                     key={item.account.pubkey.toBase58()}
                     item={item}

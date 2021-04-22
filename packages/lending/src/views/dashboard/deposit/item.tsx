@@ -1,16 +1,19 @@
-import React, { useMemo } from 'react';
-import { hooks, utils, TokenIcon } from '@oyster/common';
-import { UserDeposit } from '../../../hooks';
-import { calculateDepositAPY } from '../../../models/lending';
+import {
+  formatNumber,
+  formatPct,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
 import { Button } from 'antd';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../../constants';
-const { useTokenName } = hooks;
-const { formatNumber, formatPct } = utils;
+import { UserDeposit } from '../../../hooks';
+import { calculateDepositAPY } from '../../../models';
 
 export const DepositItem = (props: { userDeposit: UserDeposit }) => {
   const { reserve, info } = props.userDeposit;
-  const mintAddress = reserve.info.liquidityMint;
+  const mintAddress = reserve.info.liquidity.mint;
   const name = useTokenName(mintAddress);
 
   const depositAPY = useMemo(() => calculateDepositAPY(reserve.info), [

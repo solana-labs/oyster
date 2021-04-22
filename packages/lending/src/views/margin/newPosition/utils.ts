@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { useEnrichedPools } from '../../../contexts/market';
 import { UserDeposit, useUserDeposits } from '../../../hooks';
-import { LendingReserve, PoolInfo } from '../../../models';
+import { PoolInfo, Reserve } from '../../../models';
 import { usePoolForBasket } from '../../../utils/pools';
 import { Position } from './interfaces';
 
@@ -10,8 +10,8 @@ export function usePoolAndTradeInfoFrom(
 ): {
   enrichedPools: any[];
   collateralDeposit: UserDeposit | undefined;
-  collType: ParsedAccount<LendingReserve> | undefined;
-  desiredType: ParsedAccount<LendingReserve> | undefined;
+  collType: ParsedAccount<Reserve> | undefined;
+  desiredType: ParsedAccount<Reserve> | undefined;
   collValue: number;
   desiredValue: number;
   leverage: number;
@@ -23,15 +23,15 @@ export function usePoolAndTradeInfoFrom(
   const desiredValue = newPosition.asset.value || 0;
 
   const pool = usePoolForBasket([
-    collType?.info?.liquidityMint?.toBase58(),
-    desiredType?.info?.liquidityMint?.toBase58(),
+    collType?.info?.liquidity.mint?.toBase58(),
+    desiredType?.info?.liquidity.mint?.toBase58(),
   ]);
 
   const userDeposits = useUserDeposits();
   const collateralDeposit = userDeposits.userDeposits.find(
     u =>
-      u.reserve.info.liquidityMint.toBase58() ===
-      collType?.info?.liquidityMint?.toBase58(),
+      u.reserve.info.liquidity.mint.toBase58() ===
+      collType?.info?.liquidity.mint?.toBase58(),
   );
 
   const enrichedPools = useEnrichedPools(pool ? [pool] : []);

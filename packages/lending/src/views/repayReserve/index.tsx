@@ -1,22 +1,22 @@
-import React from "react";
+import { Card, Col, Row, Statistic } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { BarChartStatistic } from '../../components/BarChartStatistic';
+
+import { RepayInput } from '../../components/RepayInput';
+import {
+  SideReserveOverview,
+  SideReserveOverviewMode,
+} from '../../components/SideReserveOverview';
+import { GUTTER, LABELS } from '../../constants';
 import {
   useBorrowingPower,
   useEnrichedLendingObligation,
   useLendingReserve,
   useUserObligations,
-} from "../../hooks";
-import { useParams } from "react-router-dom";
+} from '../../hooks';
 
-import { RepayInput } from "../../components/RepayInput";
-import {
-  SideReserveOverview,
-  SideReserveOverviewMode,
-} from "../../components/SideReserveOverview";
-
-import "./style.less";
-import { Card, Col, Row, Statistic } from "antd";
-import { BarChartStatistic } from "../../components/BarChartStatistic";
-import { GUTTER, LABELS } from "../../constants";
+import './style.less';
 
 export const RepayReserveView = () => {
   const { reserve: reserveId, obligation: obligationId } = useParams<{
@@ -29,7 +29,7 @@ export const RepayReserveView = () => {
   const lendingReserve = useLendingReserve(id);
 
   const repayReserve = useLendingReserve(
-    obligationId ? lendingObligation?.info.collateralReserve : reserveId
+    obligationId ? lendingObligation?.info.depositReserve : reserveId,
   );
 
   const { userObligations, totalInQuote: loansValue } = useUserObligations();
@@ -69,7 +69,7 @@ export const RepayReserveView = () => {
             <Statistic
               title={LABELS.BORROWING_POWER_VALUE}
               value={borrowingPower}
-              valueStyle={{ color: "#3fBB00" }}
+              valueStyle={{ color: '#3fBB00' }}
               precision={2}
               prefix="$"
             />
@@ -80,10 +80,8 @@ export const RepayReserveView = () => {
             <BarChartStatistic
               title="Your Loans"
               items={userObligations}
-              getPct={(item) =>
-                item.obligation.info.borrowedInQuote / loansValue
-              }
-              name={(item) => item.obligation.info.repayName}
+              getPct={item => item.obligation.info.borrowedInQuote / loansValue}
+              name={item => item.obligation.info.repayName}
             />
           </Card>
         </Col>
@@ -93,7 +91,7 @@ export const RepayReserveView = () => {
           <RepayInput
             className="card-fill"
             borrowReserve={lendingReserve}
-            collateralReserve={repayReserve}
+            depositReserve={repayReserve}
             obligation={lendingObligation}
           />
         </Col>

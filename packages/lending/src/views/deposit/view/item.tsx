@@ -1,22 +1,26 @@
-import React from 'react';
-import { useUserCollateralBalance, useUserBalance } from '../../../hooks';
-import { hooks, utils, TokenIcon } from '@oyster/common';
-import { calculateDepositAPY, LendingReserve } from '../../../models/lending';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
+import {
+  formatNumber,
+  formatPct,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { Button } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { LABELS } from '../../../constants';
-const { formatNumber, formatPct } = utils;
-const { useTokenName } = hooks;
+import { useUserBalance, useUserCollateralBalance } from '../../../hooks';
+import { calculateDepositAPY, Reserve } from '../../../models';
+
 export const ReserveItem = (props: {
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidityMint);
+  const name = useTokenName(props.reserve.liquidity.mint);
   const {
     balance: tokenBalance,
     balanceInUSD: tokenBalanceInUSD,
-  } = useUserBalance(props.reserve.liquidityMint);
+  } = useUserBalance(props.reserve.liquidity.mint);
   const {
     balance: collateralBalance,
     balanceInUSD: collateralBalanceInUSD,
@@ -28,7 +32,7 @@ export const ReserveItem = (props: {
     <Link to={`/deposit/${props.address.toBase58()}`}>
       <div className="deposit-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
           {name}
         </span>
         <div>
