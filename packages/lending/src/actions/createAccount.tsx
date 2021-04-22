@@ -1,25 +1,26 @@
+import { LENDING_PROGRAM_ID } from '@oyster/common';
 import {
   Account,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { utils } from '@oyster/common';
-import { LendingObligationLayout } from '../models';
-const { LENDING_PROGRAM_ID } = utils;
-export function createUninitializedObligation(
+
+export function createAccount(
   instructions: TransactionInstruction[],
   payer: PublicKey,
   amount: number,
   signers: Account[],
+  space: number,
 ) {
   const account = new Account();
+
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
       newAccountPubkey: account.publicKey,
       lamports: amount,
-      space: LendingObligationLayout.span,
+      space,
       programId: LENDING_PROGRAM_ID,
     }),
   );

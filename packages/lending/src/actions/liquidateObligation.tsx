@@ -1,46 +1,42 @@
 import {
+  contexts,
+  createTempMemoryAccount,
+  ensureSplAccount,
+  findOrCreateAccountByMint,
+  LENDING_PROGRAM_ID,
+  models,
+  notify,
+  ParsedAccount,
+  TokenAccount,
+} from '@oyster/common';
+import { AccountLayout } from '@solana/spl-token';
+import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
-  contexts,
-  utils,
-  actions,
-  models,
-  ParsedAccount,
-  TokenAccount,
-} from '@oyster/common';
-import {
-  accrueInterestInstruction,
-  LendingReserve,
-} from './../models/lending/reserve';
-import { liquidateInstruction } from './../models/lending/liquidate';
-import { AccountLayout } from '@solana/spl-token';
-import { LendingMarket, LendingObligation } from '../models';
+  LendingMarket,
+  liquidateObligationInstruction,
+  Obligation,
+  refreshReserveInstruction,
+  Reserve,
+} from '../models';
+
 const { cache } = contexts.Accounts;
 const { approve } = models;
-const {
-  createTempMemoryAccount,
-  ensureSplAccount,
-  findOrCreateAccountByMint,
-} = actions;
 const { sendTransaction } = contexts.Connection;
-const { LENDING_PROGRAM_ID, notify } = utils;
 
-export const liquidate = async (
+// @FIXME
+export const liquidateObligation = async (
   connection: Connection,
   wallet: any,
-  from: TokenAccount, // liquidity account
-  amountLamports: number, // in liquidty token (lamports)
-
-  // which loan to repay
-  obligation: ParsedAccount<LendingObligation>,
-
-  repayReserve: ParsedAccount<LendingReserve>,
-
-  withdrawReserve: ParsedAccount<LendingReserve>,
+  liquidityAmount: number,
+  source: TokenAccount,
+  repayReserve: ParsedAccount<Reserve>,
+  withdrawReserve: ParsedAccount<Reserve>,
+  obligation: ParsedAccount<Obligation>,
 ) => {
   notify({
     message: 'Repaying funds...',
@@ -57,17 +53,17 @@ export const liquidate = async (
     AccountLayout.span,
   );
 
-  const [authority] = await PublicKey.findProgramAddress(
+  const [lendingMarketAuthority] = await PublicKey.findProgramAddress(
     [repayReserve.info.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID,
   );
 
-  const fromAccount = ensureSplAccount(
+  const sourceAccount = ensureSplAccount(
     instructions,
     cleanupInstructions,
-    from,
+    source,
     wallet.publicKey,
-    amountLamports + accountRentExempt,
+    liquidityAmount + accountRentExempt,
     signers,
   );
 
@@ -75,9 +71,9 @@ export const liquidate = async (
   const transferAuthority = approve(
     instructions,
     cleanupInstructions,
-    fromAccount,
+    sourceAccount,
     wallet.publicKey,
-    amountLamports,
+    liquidityAmount,
   );
   signers.push(transferAuthority);
 
@@ -88,16 +84,17 @@ export const liquidate = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    withdrawReserve.info.collateralMint,
+    withdrawReserve.info.collateral.mint,
     signers,
   );
 
-  const dexMarketAddress = repayReserve.info.dexMarketOption
-    ? repayReserve.info.dexMarket
-    : withdrawReserve.info.dexMarket;
-  const dexMarket = cache.get(dexMarketAddress);
+  // @FIXME: aggregator
+  const aggregatorAddress = repayReserve.info.liquidity.aggregatorOption
+    ? repayReserve.info.liquidity.aggregator
+    : withdrawReserve.info.liquidity.aggregator;
+  const aggregator = cache.get(aggregatorAddress);
 
-  if (!dexMarket) {
+  if (!aggregator) {
     throw new Error(`Dex market doesn't exist.`);
   }
 
@@ -105,11 +102,11 @@ export const liquidate = async (
     withdrawReserve.info.lendingMarket,
   ) as ParsedAccount<LendingMarket>;
 
-  const dexOrderBookSide = market.info.quoteMint.equals(
-    repayReserve.info.liquidityMint,
+  const dexOrderBookSide = market.info.quoteTokenMint.equals(
+    repayReserve.info.liquidity.mint,
   )
-    ? dexMarket?.info.asks
-    : dexMarket?.info.bids;
+    ? aggregator?.info.asks
+    : aggregator?.info.bids;
 
   const memory = createTempMemoryAccount(
     instructions,
@@ -119,25 +116,24 @@ export const liquidate = async (
   );
 
   instructions.push(
-    accrueInterestInstruction(repayReserve.pubkey, withdrawReserve.pubkey),
+    // @FIXME: aggregator needed
+    refreshReserveInstruction(repayReserve.pubkey),
+    refreshReserveInstruction(withdrawReserve.pubkey),
   );
 
   instructions.push(
-    liquidateInstruction(
-      amountLamports,
-      fromAccount,
+    liquidateObligationInstruction(
+      liquidityAmount,
+      sourceAccount,
       toAccount,
       repayReserve.pubkey,
-      repayReserve.info.liquiditySupply,
+      repayReserve.info.liquidity.supply,
       withdrawReserve.pubkey,
-      withdrawReserve.info.collateralSupply,
+      withdrawReserve.info.collateral.supply,
       obligation.pubkey,
       repayReserve.info.lendingMarket,
-      authority,
+      lendingMarketAuthority,
       transferAuthority.publicKey,
-      dexMarketAddress,
-      dexOrderBookSide,
-      memory,
     ),
   );
 

@@ -1,28 +1,35 @@
 import {
+  contexts,
+  findOrCreateAccountByMint,
+  LENDING_PROGRAM_ID,
+  models,
+  notify,
+  TokenAccount,
+} from '@oyster/common';
+import { AccountLayout } from '@solana/spl-token';
+import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, models, TokenAccount } from '@oyster/common';
 import {
-  accrueInterestInstruction,
-  LendingReserve,
-  withdrawInstruction,
-} from './../models/lending';
-import { AccountLayout } from '@solana/spl-token';
-const { approve } = models;
-const { findOrCreateAccountByMint } = actions;
-const { sendTransaction } = contexts.Connection;
-const { LENDING_PROGRAM_ID, notify } = utils;
+  redeemReserveCollateralInstruction,
+  refreshReserveInstruction,
+  Reserve,
+} from '../models';
 
-export const withdraw = async (
-  from: TokenAccount, // CollateralAccount
-  amountLamports: number, // in collateral token (lamports)
-  reserve: LendingReserve,
-  reserveAddress: PublicKey,
+const { approve } = models;
+const { sendTransaction } = contexts.Connection;
+
+// @FIXME
+export const redeemReserveCollateral = async (
   connection: Connection,
   wallet: any,
+  collateralAmount: number,
+  source: TokenAccount,
+  reserve: Reserve,
+  reserveAddress: PublicKey,
 ) => {
   notify({
     message: 'Withdrawing funds...',
@@ -39,53 +46,57 @@ export const withdraw = async (
     AccountLayout.span,
   );
 
-  const [authority] = await PublicKey.findProgramAddress(
+  const [lendingMarketAuthority] = await PublicKey.findProgramAddress(
     [reserve.lendingMarket.toBuffer()],
     LENDING_PROGRAM_ID,
   );
 
-  const fromAccount = from.pubkey;
+  const sourceCollateral = source.pubkey;
 
   // create approval for transfer transactions
   const transferAuthority = approve(
     instructions,
     cleanupInstructions,
-    fromAccount,
+    sourceCollateral,
     wallet.publicKey,
-    amountLamports,
+    collateralAmount,
   );
 
   signers.push(transferAuthority);
 
   // get destination account
-  const toAccount = await findOrCreateAccountByMint(
+  const destinationLiquidity = await findOrCreateAccountByMint(
     wallet.publicKey,
     wallet.publicKey,
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    reserve.liquidityMint,
+    reserve.liquidity.mint,
     signers,
   );
 
-  instructions.push(accrueInterestInstruction(reserveAddress));
-
   instructions.push(
-    withdrawInstruction(
-      amountLamports,
-      fromAccount,
-      toAccount,
+    refreshReserveInstruction(
       reserveAddress,
-      reserve.collateralMint,
-      reserve.liquiditySupply,
+      reserve.liquidity.aggregatorOption
+        ? reserve.liquidity.aggregator
+        : undefined,
+    ),
+    redeemReserveCollateralInstruction(
+      collateralAmount,
+      sourceCollateral,
+      destinationLiquidity,
+      reserveAddress,
+      reserve.collateral.mint,
+      reserve.liquidity.supply,
       reserve.lendingMarket,
-      authority,
+      lendingMarketAuthority,
       transferAuthority.publicKey,
     ),
   );
 
   try {
-    let { txid }  = await sendTransaction(
+    let { txid } = await sendTransaction(
       connection,
       wallet,
       instructions.concat(cleanupInstructions),
