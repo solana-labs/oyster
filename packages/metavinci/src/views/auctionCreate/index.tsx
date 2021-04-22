@@ -89,7 +89,7 @@ export const AuctionCreateView = () => {
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
-    category: AuctionCategory.Single,
+    category: AuctionCategory.Open,
   });
 
   useEffect(() => {
@@ -207,7 +207,6 @@ export const AuctionCreateView = () => {
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
-      ['Participation NFT', participationStep],
       ['Review', reviewStep],
       ['Publish', waitStep],
       [undefined, congratsStep],
