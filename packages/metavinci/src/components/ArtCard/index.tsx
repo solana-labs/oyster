@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Card, Avatar, CardProps } from 'antd';
+import { Card, Avatar, CardProps, Button } from 'antd';
 import { MetadataCategory } from '@oyster/common';
 import { ArtContent } from './../ArtContent';
 import './index.less';
@@ -15,15 +15,23 @@ export interface ArtCardProps extends CardProps {
   artist?: string;
   preview?: boolean;
   small?: boolean;
+  close?: () => void;
 }
 
 export const ArtCard = (props: ArtCardProps) => {
-  const { className, small, category, image, name, preview, artist, ...rest } = props;
+  const { className, small, category, image, name, preview, artist, close, ...rest } = props;
   return (
     <Card
       hoverable={true}
       className={`art-card ${small ? 'small' : ''} ${className}`}
-      cover={<ArtContent category={category} content={image} preview={preview} />}
+      cover={<>
+          {close && <Button className="card-close-button" shape="circle" onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            close();
+          }} >X</Button>}
+          <ArtContent category={category} content={image} preview={preview} />
+        </>}
       {...rest}
     >
       <Meta

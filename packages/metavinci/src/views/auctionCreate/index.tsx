@@ -242,9 +242,9 @@ export const AuctionCreateView = () => {
               .map(step => <Step title={step[0]} />)}
           </Steps>
         </Col>}
-        <Col {...(saving ? { xl: 24 } : { xl: 16 })}>
+        <Col {...(saving ? { xl: 24 } : { xl: 16, md: 17 })}>
           {stepsByCategory[attributes.category][step][1]}
-          {(0 < step && step < stepsByCategory[attributes.category].length) && <Button onClick={() => gotoNextStep(step - 1)}>Back</Button>}
+          {(0 < step && step < stepsByCategory[attributes.category].length) && <Button style={{ width: '100%' }} onClick={() => gotoNextStep(step - 1)}>Back</Button>}
         </Col>
       </Row>
     </>
@@ -327,17 +327,9 @@ const CopiesStep = (props: {
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      // TODO: add items
       items: items.filter(item => selectedItems.has(item.pubkey.toBase58()))
     })
   }, [selectedItems]);
-
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 3,
-    700: 2,
-    500: 1
-  };
 
   return (
     <>
@@ -348,8 +340,11 @@ const CopiesStep = (props: {
         </p>
       </Row>
       <Row className="content-action">
-        <Col>
-          <ArtSelector selected={[]} setSelected={() => { }} allowMultiple={false}>Select NFT</ArtSelector>
+        <Col xl={24}>
+          <ArtSelector
+            selected={items.filter(item => selectedItems.has(item.pubkey.toBase58()))}
+            setSelected={(items) => setSelectedItems(new Set(items.map(item => item.pubkey.toBase58())))}
+            allowMultiple={false}>Select NFT</ArtSelector>
           <label className="action-field">
             <span className="field-title">How many copies do you want to create?</span>
             <span className="field-info">Each copy will be given unique edition number e.g. 1 of 30</span>

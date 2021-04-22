@@ -416,11 +416,11 @@ export function AccountsProvider({ children = null as any }) {
     if (!connection || !publicKey) {
       setTokenAccounts([]);
     } else {
-      // precacheUserTokenAccounts(connection, LEND_HOST_FEE_ADDRESS);
+      precacheUserTokenAccounts(connection, LEND_HOST_FEE_ADDRESS);
 
-      // precacheUserTokenAccounts(connection, publicKey).then(() => {
-      //   setTokenAccounts(selectUserAccounts());
-      // });
+      precacheUserTokenAccounts(connection, publicKey).then(() => {
+        setTokenAccounts(selectUserAccounts());
+      });
 
       // This can return different types of accounts: token-account, mint, multisig
       // TODO: web3.js expose ability to filter.
