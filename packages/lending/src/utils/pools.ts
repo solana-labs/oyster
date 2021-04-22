@@ -1,9 +1,9 @@
+import { contexts, models, programIds } from '@oyster/common';
+import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { MintLayout, AccountLayout } from '@solana/spl-token';
-import { utils, models, contexts } from '@oyster/common';
 import { PoolInfo } from '../models';
-const { programIds } = utils;
+
 const {
   TokenSwapLayout,
   TokenSwapLayoutLegacyV0: TokenSwapLayoutV0,

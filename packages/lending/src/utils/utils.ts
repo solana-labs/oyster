@@ -1,4 +1,4 @@
-import { utils, KnownTokenMap } from '@oyster/common';
+import { KnownTokenMap, utils } from '@oyster/common';
 import { PoolInfo } from '../models';
 
 export function getPoolName(
