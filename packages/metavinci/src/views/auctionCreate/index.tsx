@@ -38,6 +38,7 @@ import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
 import { useUserArts } from '../../hooks';
 import Masonry from 'react-masonry-css';
+import { capitalize } from 'lodash';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -69,7 +70,7 @@ export interface AuctionState {
   
   // Jose's attributes
   category: AuctionCategory;
-  saleType?: "auction" | "fixed";
+  saleType?: "auction" | "sale";
   
   price?: number;
   priceFloor?: number;
@@ -471,7 +472,7 @@ const SaleTypeStep = (props: {
           })}>
             <Radio className="radio-field" value="auction">Auction</Radio>
             <div className="radio-subtitle">Allow bidding on your NFT(s).</div>
-            <Radio className="radio-field" value="fixed">Instant Sale</Radio>
+            <Radio className="radio-field" value="sale">Instant Sale</Radio>
             <div className="radio-subtitle">Allow buyers to purchase your NFT(s) at a fixed price.</div>
           </Radio.Group>
         </label>
@@ -494,11 +495,11 @@ const PriceStep = (props: {
   confirm: () => void;
 }) => {
   return <>
-    {props.attributes.saleType == "auction" ? <PriceAuction {...props} /> : <PriceFixed {...props} />}
+    {props.attributes.saleType == "auction" ? <PriceAuction {...props} /> : <PriceSale {...props} />}
   </>;
 };
 
-const PriceFixed = (props: {
+const PriceSale = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
@@ -616,22 +617,20 @@ const InitialPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
-  const [saleNow, setSaleNow] = useState<boolean>(true)
+  const [startNow, setStartNow] = useState<boolean>(true)
   const [listNow, setListNow] = useState<boolean>(true)
 
   return <>
     <Row className="call-to-action">
       <h2>Initial Phase</h2>
-      <p>
-        Set the terms for your sale.
-      </p>
+      <p>Set the terms for your {props.attributes.saleType}.</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
 
         <label className="action-field">
-          <span className="field-title">When do you want the sale to begin?</span>
-          <Radio.Group defaultValue="now" onChange={info => setSaleNow(info.target.value === "now")}>
+          <span className="field-title">When do you want the {props.attributes.saleType} to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setStartNow(info.target.value === "now")}>
             <Radio className="radio-field" value="now">Immediately</Radio>
             <div className="radio-subtitle">Participants can buy the NFT as soon as you finish setting up the auction.</div>
             <Radio className="radio-field" value="later">At a specified date</Radio>
@@ -639,10 +638,10 @@ const InitialPhaseStep = (props: {
           </Radio.Group>
         </label>
 
-        {!saleNow && <>
+        {!startNow && <>
 
           <label className="action-field">
-            <span className="field-title">Auction Start Date</span>
+            <span className="field-title">{capitalize(props.attributes.saleType)} Start Date</span>
             <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
             <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
           </label>
@@ -674,9 +673,7 @@ const InitialPhaseStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Ending Phase
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
@@ -687,7 +684,7 @@ const EndingPhaseStep = (props: {
   confirm: () => void;
 }) => {
   return <>
-    {props.attributes.saleType == "auction" ? <EndingPhaseAuction {...props} /> : <EndingPhaseFixed {...props} />}
+    {props.attributes.saleType == "auction" ? <EndingPhaseAuction {...props} /> : <EndingPhaseSale {...props} />}
   </>;
 }
 
@@ -769,7 +766,7 @@ const EndingPhaseAuction = (props: {
   </>;
 };
 
-const EndingPhaseFixed = (props: {
+const EndingPhaseSale = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
