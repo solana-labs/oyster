@@ -1,9 +1,9 @@
-import { HashRouter, Route, Switch } from 'react-router-dom';
-import React from 'react';
 import { contexts } from '@oyster/common';
-import { MarketProvider } from './contexts/market';
-import { LendingProvider } from './contexts/lending';
+import React from 'react';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import { AppLayout } from './components/Layout';
+import { LendingProvider } from './contexts/lending';
+import { MarketProvider } from './contexts/market';
 
 import {
   BorrowReserveView,
@@ -13,14 +13,15 @@ import {
   DepositView,
   FaucetView,
   HomeView,
+  LiquidateReserveView,
+  LiquidateView,
+  MarginTrading,
   RepayReserveView,
   ReserveView,
   WithdrawView,
-  LiquidateView,
-  LiquidateReserveView,
-  MarginTrading,
 } from './views';
 import { NewPosition } from './views/margin/newPosition';
+
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
