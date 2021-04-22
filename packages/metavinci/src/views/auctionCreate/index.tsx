@@ -38,6 +38,7 @@ import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
 import { useUserArts } from '../../hooks';
 import Masonry from 'react-masonry-css';
+import { capitalize } from 'lodash';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -66,14 +67,23 @@ export interface AuctionState {
   // suggested date time when auction should end UTC+0
   endDate?: Date;
 
-  // time interval between highest bid and end of the auction
-  gapTime?: Date
-
+  
+  // Jose's attributes
   category: AuctionCategory;
+  saleType?: "auction" | "sale";
+  
   price?: number;
-  startSaleTS?: number;
+  priceFloor?: number;
+  priceTick?: number;
+  
+  startSaleTS?: number; // Why do I prefer to work with unix ts?
   startListTS?: number;
   endTS?: number;
+  
+  auctionDuration?: number;
+  gapTime?: number;
+  tickSizeEndingPhase?: number;
+  
 }
 
 export const AuctionCreateView = () => {
@@ -90,6 +100,7 @@ export const AuctionCreateView = () => {
     reservationPrice: 0,
     items: [],
     category: AuctionCategory.Open,
+    saleType: "auction",
   });
 
   useEffect(() => {
@@ -134,6 +145,12 @@ export const AuctionCreateView = () => {
     confirm={() => gotoNextStep()}
   />;
 
+  const typeStep = <SaleTypeStep
+    attributes={attributes}
+    setAttributes={setAttributes}
+    confirm={() => gotoNextStep()}
+  />;
+
   const priceStep = <PriceStep
     attributes={attributes}
     setAttributes={setAttributes}
@@ -158,13 +175,6 @@ export const AuctionCreateView = () => {
     confirm={() => gotoNextStep()}
   />;
 
-
-  const terms = <TermsStep
-    attributes={attributes}
-    setAttributes={setAttributes}
-    confirm={() => gotoNextStep()}
-  />;
-
   const reviewStep = <ReviewStep
     attributes={attributes}
     confirm={() => gotoNextStep()}
@@ -183,6 +193,7 @@ export const AuctionCreateView = () => {
     [AuctionCategory.Limited]: [
       ['Category', categoryStep],
       ['Copies', copiesStep],
+      ['Sale Type', typeStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -439,7 +450,56 @@ const TierStep = (props: {
   </>;
 };
 
+const SaleTypeStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Sale Type</h2>
+      <p>
+        Sell a limited copy or copies of a single Master NFT.
+      </p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">How do you want to sell your NFT(s)?</span>
+          <Radio.Group defaultValue={props.attributes.saleType} onChange={info => props.setAttributes({
+            ...props.attributes,
+            saleType: info.target.value,
+          })}>
+            <Radio className="radio-field" value="auction">Auction</Radio>
+            <div className="radio-subtitle">Allow bidding on your NFT(s).</div>
+            <Radio className="radio-field" value="sale">Instant Sale</Radio>
+            <div className="radio-subtitle">Allow buyers to purchase your NFT(s) at a fixed price.</div>
+          </Radio.Group>
+        </label>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >Continue</Button>
+    </Row>
+  </>;
+};
+
 const PriceStep = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    {props.attributes.saleType == "auction" ? <PriceAuction {...props} /> : <PriceSale {...props} />}
+  </>;
+};
+
+const PriceSale = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
@@ -478,11 +538,78 @@ const PriceStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Initial Phase
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
+};
+
+const PriceAuction = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return (
+    <>
+      <Row className="call-to-action">
+        <h2>Price</h2>
+        <p>Set the price for your auction.</p>
+      </Row>
+      <Row className="content-action">
+        <Col className="section" xl={24}>
+
+          <label className="action-field">
+            <span className="field-title">Price Floor</span>
+            <span className="field-info">This is the starting bid price for your auction.</span>
+            <Input
+              type="number"
+              min={0}
+              autoFocus
+              className="input"
+              placeholder="Price"
+              prefix="$"
+              suffix="USD"
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                  priceFloor: parseFloat(info.target.value),
+                })
+              }
+            />
+            {/* <span className="field-info">= ◎ 4.84</span> */}
+          </label>
+          <label className="action-field">
+            <span className="field-title">Tick Size</span>
+            <span className="field-info">All bids must fall within this price increment.</span>
+            <Input
+              type="number"
+              min={0}
+              autoFocus
+              className="input"
+              placeholder="Tick size in USD"
+              prefix="$"
+              suffix="USD"
+              onChange={info =>
+                props.setAttributes({
+                  ...props.attributes,
+                  priceTick: parseFloat(info.target.value),
+                })
+              }
+            />
+            {/* <span className="field-info">= ◎ 4.84</span> */}
+          </label>
+
+        </Col>
+      </Row>
+      <Row>
+        <Button
+          type="primary"
+          size="large"
+          onClick={props.confirm}
+          className="action-btn"
+        >Continue</Button>
+      </Row>
+    </>
+  );
 };
 
 const InitialPhaseStep = (props: {
@@ -490,22 +617,20 @@ const InitialPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
-  const [saleNow, setSaleNow] = useState<boolean>(true)
+  const [startNow, setStartNow] = useState<boolean>(true)
   const [listNow, setListNow] = useState<boolean>(true)
 
   return <>
     <Row className="call-to-action">
       <h2>Initial Phase</h2>
-      <p>
-        Set the terms for your sale.
-      </p>
+      <p>Set the terms for your {props.attributes.saleType}.</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
 
         <label className="action-field">
-          <span className="field-title">When do you want the sale to begin?</span>
-          <Radio.Group defaultValue="now" onChange={info => setSaleNow(info.target.value === "now")}>
+          <span className="field-title">When do you want the {props.attributes.saleType} to begin?</span>
+          <Radio.Group defaultValue="now" onChange={info => setStartNow(info.target.value === "now")}>
             <Radio className="radio-field" value="now">Immediately</Radio>
             <div className="radio-subtitle">Participants can buy the NFT as soon as you finish setting up the auction.</div>
             <Radio className="radio-field" value="later">At a specified date</Radio>
@@ -513,10 +638,10 @@ const InitialPhaseStep = (props: {
           </Radio.Group>
         </label>
 
-        {!saleNow && <>
+        {!startNow && <>
 
           <label className="action-field">
-            <span className="field-title">Auction Start Date</span>
+            <span className="field-title">{capitalize(props.attributes.saleType)} Start Date</span>
             <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
             <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
           </label>
@@ -548,9 +673,7 @@ const InitialPhaseStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Ending Phase
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
@@ -560,14 +683,100 @@ const EndingPhaseStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+  return <>
+    {props.attributes.saleType == "auction" ? <EndingPhaseAuction {...props} /> : <EndingPhaseSale {...props} />}
+  </>;
+}
+
+const EndingPhaseAuction = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
+  return <>
+    <Row className="call-to-action">
+      <h2>Ending Phase</h2>
+      <p>Set the terms for your auction.</p>
+    </Row>
+    <Row className="content-action">
+      <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">Auction Duration</span>
+          <span className="field-info">This is how long the auction will last for.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Duration in minutes"
+            suffix="minutes"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                auctionDuration: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+
+        <label className="action-field">
+          <span className="field-title">Gap Time</span>
+          <span className="field-info">The final phase of the auction will begin when there is this much time left on the countdown. Any bids placed during the final phase will extend the end time by this same duration.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Duration in minutes"
+            suffix="minutes"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                gapTime: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+
+        <label className="action-field">
+          <span className="field-title">Tick Size for Ending Phase</span>
+          <span className="field-info">In order for winners to move up in the auction, they must place a bid that’s at least this percentage higher than the next highest bid.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Percentage"
+            suffix="%"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                tickSizeEndingPhase: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
+      </Col>
+    </Row>
+    <Row>
+      <Button
+        type="primary"
+        size="large"
+        onClick={props.confirm}
+        className="action-btn"
+      >Continue</Button>
+    </Row>
+  </>;
+};
+
+const EndingPhaseSale = (props: {
+  attributes: AuctionState;
+  setAttributes: (attr: AuctionState) => void;
+  confirm: () => void;
+}) => {
   const [untilSold, setUntilSold] = useState<boolean>(true)
 
   return <>
     <Row className="call-to-action">
       <h2>Ending Phase</h2>
-      <p>
-        Set the terms for your sale..
-      </p>
+      <p>Set the terms for your sale.</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
@@ -596,9 +805,7 @@ const EndingPhaseStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Participation NFT
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
@@ -631,71 +838,6 @@ const ParticipationStep = (props: {
       </Button>
     </Row>
   </>;
-};
-
-const TermsStep = (props: {
-  attributes: AuctionState;
-  setAttributes: (attr: AuctionState) => void;
-  confirm: () => void;
-}) => {
-  const [creators, setCreators] = useState<Array<UserValue>>([]);
-
-  return (
-    <>
-      <Row className="call-to-action">
-        <h2>Specify the terms of your auction</h2>
-        <p>
-          Provide detailed auction parameters such as price, start time, etc.
-        </p>
-      </Row>
-      <Row className="content-action">
-        <Col className="section" xl={24}>
-
-          <label className="action-field">
-            <span className="field-title">Price Floor (USD)</span>
-            <Input
-              autoFocus
-              className="input"
-              placeholder="Enter reservation price"
-              allowClear
-              onChange={info =>
-                props.setAttributes({
-                  ...props.attributes,
-                })
-              }
-            />
-            <span className="field-info">= ◎ 4.84</span>
-          </label>
-          <label className="action-field">
-            <span className="field-title">Tick Size (USD)</span>
-            <Input
-              className="input"
-              placeholder="Enter tick size"
-              allowClear
-              onChange={info =>
-                props.setAttributes({
-                  ...props.attributes,
-                })
-              }
-            />
-            <span className="field-info">= ◎ 4.84</span>
-          </label>
-
-
-        </Col>
-      </Row>
-      <Row>
-        <Button
-          type="primary"
-          size="large"
-          onClick={props.confirm}
-          className="action-btn"
-        >
-          Continue to Review
-        </Button>
-      </Row>
-    </>
-  );
 };
 
 const ReviewStep = (props: {
