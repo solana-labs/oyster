@@ -578,9 +578,9 @@ const EndingPhaseStep = (props: {
     <Row className="content-action">
       <Col className="section" xl={24}>
         <label className="action-field">
-          <span className="field-title">When do you want the sale to begin?</span>
+          <span className="field-title">When do you want the sale to end?</span>
           <Radio.Group defaultValue="now" onChange={info => setUntilSold(info.target.value === "now")}>
-            <Radio className="radio-field" value="now">Until sols</Radio>
+            <Radio className="radio-field" value="now">Until sold</Radio>
             <div className="radio-subtitle">The sale will end once the supply goes to zero.</div>
             <Radio className="radio-field" value="later">At a specified date</Radio>
             <div className="radio-subtitle">The sale will end at this date, regardless if there is remaining supply.</div>
