@@ -57,7 +57,7 @@ export default function MintSourceTokens({
     let failedSourcesHold: SourceEntryInterface[] = [];
     const zeroKey = PROGRAM_IDS.system;
     sourceHoldersAndCounts.forEach((value: string, index: number) => {
-      if (index % 2 == 0)
+      if (index % 2 === 0)
         sourceHolders.push({
           owner: value ? new PublicKey(value) : zeroKey,
           tokenAmount: 0,
@@ -75,7 +75,7 @@ export default function MintSourceTokens({
         sourceAccount: undefined,
       });
 
-    if (!sourceHolders.find(v => v.owner != zeroKey)) {
+    if (!sourceHolders.find(v => v.owner !== zeroKey)) {
       notify({
         message: LABELS.ENTER_AT_LEAST_ONE_PUB_KEY,
         type: 'error',

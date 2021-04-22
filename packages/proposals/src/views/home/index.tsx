@@ -23,7 +23,7 @@ export const HomeView = () => {
         (acc, proposalKey) => {
           let proposal = proposals[proposalKey];
           let state = states[proposal.info.state.toBase58()];
-          if (proposal.info.config.toBase58() == configKey) {
+          if (proposal.info.config.toBase58() === configKey) {
             acc.active =
               acc.active +
               (state.info.status === TimelockStateStatus.Voting ||
