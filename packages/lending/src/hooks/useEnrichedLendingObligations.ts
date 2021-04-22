@@ -1,33 +1,36 @@
-import { PublicKey } from '@solana/web3.js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLendingObligations } from './useLendingObligations';
 import {
-  collateralToLiquidity,
-  LendingObligation,
-  LendingReserve,
-} from '../models/lending';
+  contexts,
+  fromLamports,
+  getTokenName,
+  ParsedAccount,
+  wadToLamports,
+} from '@oyster/common';
+import { MintInfo } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
+import BN from 'bn.js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { simulateMarketOrderFill, useMarkets } from '../contexts/market';
+import { collateralToLiquidity, Obligation, Reserve } from '../models';
+import { useLendingObligations } from './useLendingObligations';
 import { useLendingReserves } from './useLendingReserves';
 
-import { MintInfo } from '@solana/spl-token';
-import { simulateMarketOrderFill, useMarkets } from '../contexts/market';
-
-import { contexts, utils, ParsedAccount } from '@oyster/common';
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
-const { fromLamports, wadToLamports, getTokenName } = utils;
 
-interface EnrichedLendingObligationInfo extends LendingObligation {
+// @FIXME: BigNumber
+interface EnrichedLendingObligationInfo extends Obligation {
   ltv: number;
   health: number;
   borrowedInQuote: number;
   collateralInQuote: number;
-  liquidationThreshold: number;
+  liquidationThreshold: BN;
   repayName: string;
   collateralName: string;
 }
 
+// @TODO: rework
 export interface EnrichedLendingObligation {
-  account: ParsedAccount<LendingObligation>;
+  account: ParsedAccount<Obligation>;
   info: EnrichedLendingObligationInfo;
 }
 
@@ -41,7 +44,7 @@ export function useEnrichedLendingObligations() {
     return reserveAccounts.reduce((map, reserve) => {
       map.set(reserve.pubkey.toBase58(), reserve);
       return map;
-    }, new Map<string, ParsedAccount<LendingReserve>>());
+    }, new Map<string, ParsedAccount<Reserve>>());
   }, [reserveAccounts]);
 
   const enrichedFactory = useCallback(() => {
@@ -54,25 +57,27 @@ export function useEnrichedLendingObligations() {
         .map(obligation => ({
           obligation,
           reserve: availableReserves.get(
-            obligation.info.borrowReserve.toBase58(),
-          ) as ParsedAccount<LendingReserve>,
-          collateralReserve: availableReserves.get(
-            obligation.info.collateralReserve.toBase58(),
-          ) as ParsedAccount<LendingReserve>,
+            obligation.info.borrows[0].borrowReserve.toBase58(),
+          ) as ParsedAccount<Reserve>,
+          depositReserve: availableReserves.get(
+            obligation.info.deposits[0].depositReserve.toBase58(),
+          ) as ParsedAccount<Reserve>,
         }))
         // use obligations with reserves available
         .filter(item => item.reserve)
         // use reserves with borrow amount greater than zero
         .filter(
           item =>
-            wadToLamports(item.obligation.info.borrowAmountWad).toNumber() > 0,
+            wadToLamports(
+              item.obligation.info.borrows[0].borrowedAmountWads,
+            ).toNumber() > 0,
         )
         .map(item => {
           const obligation = item.obligation;
           const reserve = item.reserve.info;
-          const collateralReserve = item.reserve.info;
+          const depositReserve = item.reserve.info;
           const liquidityMint = cache.get(
-            reserve.liquidityMint,
+            reserve.liquidity.mint,
           ) as ParsedAccount<MintInfo>;
           let ltv = 0;
           let health = 0;
@@ -81,31 +86,32 @@ export function useEnrichedLendingObligations() {
 
           if (liquidityMint) {
             const collateralMint = cache.get(
-              item.collateralReserve.info.liquidityMint,
+              item.depositReserve.info.liquidity.mint,
             );
 
             const collateral = fromLamports(
               collateralToLiquidity(
-                obligation.info.depositedCollateral,
+                obligation.info.deposits[0].depositedAmount,
                 item.reserve.info,
               ),
               collateralMint?.info,
             );
 
             const borrowed = wadToLamports(
-              obligation.info.borrowAmountWad,
+              obligation.info.borrows[0].borrowedAmountWads,
             ).toNumber();
 
             const borrowedAmount = simulateMarketOrderFill(
               borrowed,
               item.reserve.info,
-              item.reserve.info.dexMarketOption
-                ? item.reserve.info.dexMarket
-                : item.collateralReserve.info.dexMarket,
+              // @FIXME: aggregator
+              item.reserve.info.liquidity.aggregatorOption
+                ? item.reserve.info.liquidity.aggregator
+                : item.depositReserve.info.liquidity.aggregator,
               true,
             );
 
-            const liquidityMintAddress = item.reserve.info.liquidityMint.toBase58();
+            const liquidityMintAddress = item.reserve.info.liquidity.mint.toBase58();
             const liquidityMint = cache.get(
               liquidityMintAddress,
             ) as ParsedAccount<MintInfo>;
@@ -131,12 +137,13 @@ export function useEnrichedLendingObligations() {
               health,
               borrowedInQuote,
               collateralInQuote,
+              // @FIXME: BigNumber
               liquidationThreshold:
                 item.reserve.info.config.liquidationThreshold,
-              repayName: getTokenName(tokenMap, reserve.liquidityMint),
+              repayName: getTokenName(tokenMap, reserve.liquidity.mint),
               collateralName: getTokenName(
                 tokenMap,
-                collateralReserve.liquidityMint,
+                depositReserve.liquidity.mint,
               ),
             },
           } as EnrichedLendingObligation;

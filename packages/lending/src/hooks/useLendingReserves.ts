@@ -1,29 +1,27 @@
+import { contexts, getTokenByName, ParsedAccount } from '@oyster/common';
+import { TokenInfo } from '@solana/spl-token-registry';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { LendingReserve, LendingReserveParser } from '../models/lending';
-
-import { contexts, utils, ParsedAccount } from '@oyster/common';
-import { TokenInfo } from '@solana/spl-token-registry';
+import { Reserve, ReserveParser } from '../models';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
-const { getTokenByName } = utils;
 
 export const getLendingReserves = () => {
   return cache
-    .byParser(LendingReserveParser)
+    .byParser(ReserveParser)
     .map(id => cache.get(id))
-    .filter(acc => acc !== undefined) as ParsedAccount<LendingReserve>[];
+    .filter(acc => acc !== undefined) as ParsedAccount<Reserve>[];
 };
 
 export function useLendingReserves() {
   const [reserveAccounts, setReserveAccounts] = useState<
-    ParsedAccount<LendingReserve>[]
+    ParsedAccount<Reserve>[]
   >(getLendingReserves());
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
-      if (args.parser === LendingReserveParser) {
+      if (args.parser === ReserveParser) {
         setReserveAccounts(getLendingReserves());
       }
     });
@@ -46,7 +44,7 @@ export function useLendingReserve(address?: string | PublicKey) {
     const token: TokenInfo | null = getTokenByName(tokenMap, address);
     if (token) {
       const account = reserveAccounts.filter(
-        acc => acc.info.liquidityMint.toBase58() === token.address,
+        acc => acc.info.liquidity.mint.toBase58() === token.address,
       )[0];
       if (account) {
         addressName = account.pubkey;
@@ -59,14 +57,14 @@ export function useLendingReserve(address?: string | PublicKey) {
     [addressName],
   );
 
-  const [reserveAccount, setReserveAccount] = useState<
-    ParsedAccount<LendingReserve>
-  >(cache.get(id || '') as ParsedAccount<LendingReserve>);
+  const [reserveAccount, setReserveAccount] = useState<ParsedAccount<Reserve>>(
+    cache.get(id || '') as ParsedAccount<Reserve>,
+  );
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.id === id) {
-        setReserveAccount(cache.get(id) as ParsedAccount<LendingReserve>);
+        setReserveAccount(cache.get(id) as ParsedAccount<Reserve>);
       }
     });
 

@@ -1,20 +1,19 @@
+import { contexts, fromLamports } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useMarkets } from '../contexts/market';
-import { LendingReserve, reserveMarketCap } from '../models/lending';
+import { Reserve, reserveMarketCap } from '../models';
 import { useUserBalance } from './useUserBalance';
 
-import { contexts, utils } from '@oyster/common';
 const { useMint } = contexts.Accounts;
-const { fromLamports } = utils;
 
 export function useUserCollateralBalance(
-  reserve?: LendingReserve,
+  reserve?: Reserve,
   account?: PublicKey,
 ) {
-  const mint = useMint(reserve?.collateralMint);
+  const mint = useMint(reserve?.collateral.mint);
   const { balanceLamports: userBalance, accounts } = useUserBalance(
-    reserve?.collateralMint,
+    reserve?.collateral.mint,
     account,
   );
 
@@ -34,12 +33,12 @@ export function useUserCollateralBalance(
   useEffect(() => {
     const updateBalance = () => {
       setBalanceInUSD(
-        balance * midPriceInUSD(reserve?.liquidityMint?.toBase58() || ''),
+        balance * midPriceInUSD(reserve?.liquidity.mint?.toBase58() || ''),
       );
     };
 
     const dispose = marketEmitter.onMarket(args => {
-      if (args.ids.has(reserve?.dexMarket.toBase58() || '')) {
+      if (args.ids.has(reserve?.liquidity.aggregator.toBase58() || '')) {
         updateBalance();
       }
     });
@@ -55,17 +54,18 @@ export function useUserCollateralBalance(
     balance,
     balanceLamports,
     balanceInUSD,
-    mint: reserve?.collateralMint,
+    mint: reserve?.collateral.mint,
     accounts,
     hasBalance: accounts.length > 0 && balance > 0,
   };
 }
 export function calculateCollateralBalance(
-  reserve: LendingReserve,
+  reserve: Reserve,
   balanceLamports: number,
 ) {
+  // @FIXME: use BigNumber
   return (
     reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.state.collateralMintSupply.toNumber() || 1))
+    (balanceLamports / (reserve?.collateral.mintAmount.toNumber() || 1))
   );
 }

@@ -1,7 +1,8 @@
 import { contexts, ParsedAccount } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
-import { LendingMarketParser, LendingMarket } from '../models/lending';
+import { LendingMarket, LendingMarketParser } from '../models';
+
 const { cache } = contexts.Accounts;
 
 const getLendingMarkets = () => {

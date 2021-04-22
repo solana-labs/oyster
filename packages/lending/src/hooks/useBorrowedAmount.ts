@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
+import { contexts, fromLamports, wadToLamports } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { useEffect, useState } from 'react';
+import { useLendingReserve } from './useLendingReserves';
 import { useUserObligationByReserve } from './useUserObligationByReserve';
 
-import { MintInfo } from '@solana/spl-token';
-import { useLendingReserve } from './useLendingReserves';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
 const { cache, getMultipleAccounts, MintParser, useMint } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
-const { fromLamports, wadToLamports } = utils;
 
 export function useBorrowedAmount(address?: string | PublicKey) {
   const connection = useConnection();
@@ -20,7 +18,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     health: 0,
   });
   const reserve = useLendingReserve(address);
-  const liquidityMint = useMint(reserve?.info.liquidityMint);
+  const liquidityMint = useMint(reserve?.info.liquidity.mint);
 
   useEffect(() => {
     setBorrowedInfo({
@@ -35,6 +33,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
       // precache obligation mints
       const { keys, array } = await getMultipleAccounts(
         connection,
+        // @FIXME: obligation tokens
         userObligationsByReserve.map(item =>
           item.obligation.info.tokenMint.toBase58(),
         ),
@@ -58,21 +57,20 @@ export function useBorrowedAmount(address?: string | PublicKey) {
 
       userObligationsByReserve.forEach(item => {
         const borrowed = wadToLamports(
-          item.obligation.info.borrowAmountWad,
+          item.obligation.info.borrows[0].borrowedAmountWads,
         ).toNumber();
 
         const owned = item.userAccounts.reduce(
           (amount, acc) => (amount += acc.info.amount.toNumber()),
           0,
         );
-        const obligationMint = cache.get(
-          item.obligation.info.tokenMint,
-        ) as ParsedAccount<MintInfo>;
 
+        // @FIXME: obligation tokens
         result.borrowedLamports +=
           borrowed * (owned / obligationMint?.info.supply.toNumber());
         result.borrowedInUSD += item.obligation.info.borrowedInQuote;
         result.colateralInUSD += item.obligation.info.collateralInQuote;
+        // @FIXME: BigNumber
         liquidationThreshold = item.obligation.info.liquidationThreshold;
       }, 0);
 

@@ -1,6 +1,7 @@
+import { hooks, TokenAccount } from '@oyster/common';
 import { useMemo } from 'react';
 import { useEnrichedLendingObligations } from './useEnrichedLendingObligations';
-import { TokenAccount, hooks } from '@oyster/common';
+
 const { useUserAccounts } = hooks;
 
 export function useUserObligations() {
@@ -20,6 +21,7 @@ export function useUserObligations() {
       return [];
     }
 
+    // @FIXME: obligation tokens
     return obligations
       .filter(
         acc => accountsByMint.get(acc.info.tokenMint.toBase58()) !== undefined,

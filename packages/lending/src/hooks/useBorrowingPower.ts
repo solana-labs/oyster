@@ -23,24 +23,24 @@ export function useBorrowingPower(
 
   const reserve = useLendingReserve(key);
 
-  const liquidityMint = reserve?.info.liquidityMint;
+  const liquidityMint = reserve?.info.liquidity.mint;
   const liquidityMintAddress = liquidityMint?.toBase58();
   const market = useLendingMarket(reserve?.info.lendingMarket);
 
-  const quoteMintAddess = market?.info?.quoteMint?.toBase58();
+  const quoteTokenMintAddess = market?.info?.quoteTokenMint?.toBase58();
 
   // TODO: remove once cross-collateral is supported
-  const onlyQuoteAllowed = liquidityMintAddress !== quoteMintAddess;
+  const onlyQuoteAllowed = liquidityMintAddress !== quoteTokenMintAddess;
 
   const exclude = useMemo(() => new Set([key]), [key]);
   const inlcude = useMemo(() => {
     const quoteReserve = getLendingReserves().find(
-      r => r.info.liquidityMint.toBase58() === quoteMintAddess,
+      r => r.info.liquidity.mint.toBase58() === quoteTokenMintAddess,
     );
     return onlyQuoteAllowed && quoteReserve
       ? new Set([quoteReserve.pubkey.toBase58()])
       : undefined;
-  }, [onlyQuoteAllowed, quoteMintAddess]);
+  }, [onlyQuoteAllowed, quoteTokenMintAddess]);
 
   const { totalInQuote } = useUserDeposits(exclude, inlcude);
 
@@ -53,7 +53,7 @@ export function useBorrowingPower(
   const utilization = totalDeposits === 0 ? 0 : loansValue / totalDeposits;
 
   // amounts already expressed as quite mint
-  if (liquidityMintAddress === quoteMintAddess) {
+  if (liquidityMintAddress === quoteTokenMintAddess) {
     return {
       borrowingPower: totalInQuote,
       totalInQuote,

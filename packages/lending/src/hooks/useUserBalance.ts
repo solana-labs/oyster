@@ -1,11 +1,9 @@
+import { contexts, fromLamports, useUserAccounts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useMarkets } from '../contexts/market';
 
-import { contexts, utils, hooks } from '@oyster/common';
 const { useMint } = contexts.Accounts;
-const { useUserAccounts } = hooks;
-const { fromLamports } = utils;
 
 export function useUserBalance(
   mintAddress?: PublicKey | string,
