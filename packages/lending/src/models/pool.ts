@@ -1,5 +1,5 @@
-import { PublicKey } from '@solana/web3.js';
 import { TokenAccount } from '@oyster/common';
+import { PublicKey } from '@solana/web3.js';
 
 export const DEFAULT_DENOMINATOR = 10_000;
 

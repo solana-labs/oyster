@@ -1,3 +1,4 @@
+import { LENDING_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -5,36 +6,37 @@ import {
 } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
-import { calculateBorrowAPY } from './borrow';
-import { LendingInstruction } from './lending';
-import { calculateUtilizationRatio, LendingReserve } from './reserve';
-import { utils } from '@oyster/common';
 import * as Layout from '../../utils/layout';
+import { calculateUtilizationRatio, Reserve } from '../state/reserve';
+import { calculateBorrowAPY } from './borrowObligationLiquidity';
+import { LendingInstruction } from './instruction';
 
-const { TOKEN_PROGRAM_ID, LENDING_PROGRAM_ID } = utils;
-/// Deposit liquidity into a reserve. The output is a collateral token representing ownership
+/// Deposit liquidity into a reserve in exchange for collateral. Collateral represents a share
 /// of the reserve liquidity pool.
 ///
-///   0. `[writable]` Source liquidity token account. $authority can transfer $liquidity_amount
+/// Accounts expected by this instruction:
+///
+///   0. `[writable]` Source liquidity token account.
+///                     $authority can transfer $liquidity_amount.
 ///   1. `[writable]` Destination collateral token account.
 ///   2. `[writable]` Reserve account.
 ///   3. `[writable]` Reserve liquidity supply SPL Token account.
 ///   4. `[writable]` Reserve collateral SPL Token mint.
 ///   5. `[]` Lending market account.
 ///   6. `[]` Derived lending market authority.
-///   7. `[]` User transfer authority ($authority).
-///   8. `[]` Clock sysvar
-///   9. '[]` Token program id
-export const depositInstruction = (
+///   7. `[signer]` User transfer authority ($authority).
+///   8. `[]` Clock sysvar.
+///   9. `[]` Token program id.
+export const depositReserveLiquidityInstruction = (
   liquidityAmount: number | BN,
-  from: PublicKey, // Liquidity input SPL Token account. $authority can transfer $liquidity_amount
-  to: PublicKey, // Collateral output SPL Token account,
+  sourceLiquidity: PublicKey,
+  destinationCollateral: PublicKey,
+  reserve: PublicKey,
+  reserveLiquiditySupply: PublicKey,
+  reserveCollateralMint: PublicKey,
   lendingMarket: PublicKey,
-  reserveAuthority: PublicKey,
+  lendingMarketAuthority: PublicKey,
   transferAuthority: PublicKey,
-  reserveAccount: PublicKey,
-  reserveSupply: PublicKey,
-  collateralMint: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
@@ -51,17 +53,18 @@ export const depositInstruction = (
   );
 
   const keys = [
-    { pubkey: from, isSigner: false, isWritable: true },
-    { pubkey: to, isSigner: false, isWritable: true },
-    { pubkey: reserveAccount, isSigner: false, isWritable: true },
-    { pubkey: reserveSupply, isSigner: false, isWritable: true },
-    { pubkey: collateralMint, isSigner: false, isWritable: true },
+    { pubkey: sourceLiquidity, isSigner: false, isWritable: true },
+    { pubkey: destinationCollateral, isSigner: false, isWritable: true },
+    { pubkey: reserve, isSigner: false, isWritable: true },
+    { pubkey: reserveLiquiditySupply, isSigner: false, isWritable: true },
+    { pubkey: reserveCollateralMint, isSigner: false, isWritable: true },
     { pubkey: lendingMarket, isSigner: false, isWritable: false },
-    { pubkey: reserveAuthority, isSigner: false, isWritable: false },
+    { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
+
   return new TransactionInstruction({
     keys,
     programId: LENDING_PROGRAM_ID,
@@ -69,7 +72,7 @@ export const depositInstruction = (
   });
 };
 
-export const calculateDepositAPY = (reserve: LendingReserve) => {
+export const calculateDepositAPY = (reserve: Reserve) => {
   const currentUtilization = calculateUtilizationRatio(reserve);
 
   const borrowAPY = calculateBorrowAPY(reserve);

@@ -1,6 +1,7 @@
 import { contexts, ParsedAccountBase } from '@oyster/common';
 import { Market, MARKETS, Orderbook } from '@project-serum/serum';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
+
 const { MintParser, cache } = contexts.Accounts;
 
 export const OrderBookParser = (id: PublicKey, acc: AccountInfo<Buffer>) => {
@@ -39,7 +40,7 @@ export const DexMarketParser = (
   } as ParsedAccountBase;
 
   cache.registerParser(details.info.baseMint, MintParser);
-  cache.registerParser(details.info.quoteMint, MintParser);
+  cache.registerParser(details.info.quoteTokenMint, MintParser);
   cache.registerParser(details.info.bids, OrderBookParser);
   cache.registerParser(details.info.asks, OrderBookParser);
 

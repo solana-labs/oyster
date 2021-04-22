@@ -7,19 +7,17 @@ export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.s
     BufferLayout.u8('version'),
     BufferLayout.u8('bumpSeed'),
     Layout.publicKey('owner'),
-    Layout.publicKey('quoteMint'),
+    Layout.publicKey('quoteTokenMint'),
     Layout.publicKey('tokenProgramId'),
-
     // extra space for future contract changes
-    BufferLayout.blob(62, 'padding'),
+    BufferLayout.blob(128, 'padding'),
   ],
 );
 
 export interface LendingMarket {
   version: number;
-
   isInitialized: boolean;
-  quoteMint: PublicKey;
+  quoteTokenMint: PublicKey;
   tokenProgramId: PublicKey;
 }
 
@@ -28,22 +26,19 @@ export const isLendingMarket = (info: AccountInfo<Buffer>) => {
 };
 
 export const LendingMarketParser = (
-  pubKey: PublicKey,
+  pubkey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = LendingMarketLayout.decode(buffer);
+  const lendingMarket = LendingMarketLayout.decode(buffer) as LendingMarket;
 
   const details = {
-    pubkey: pubKey,
+    pubkey,
     account: {
       ...info,
     },
-    info: data,
+    info: lendingMarket,
   };
 
   return details;
 };
-
-// TODO:
-// create instructions for init
