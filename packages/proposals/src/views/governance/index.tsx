@@ -4,7 +4,6 @@ import { LABELS } from '../../constants';
 
 import {
   hooks,
-  contexts,
   useWallet,
   useConnection,
   deserializeMint,

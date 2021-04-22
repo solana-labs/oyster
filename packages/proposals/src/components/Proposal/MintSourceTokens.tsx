@@ -66,7 +66,7 @@ export default function MintSourceTokens({
       else
         sourceHolders[sourceHolders.length - 1].tokenAmount = parseInt(value);
     });
-    console.log(sourceHolders);
+    //console.log(sourceHolders);
 
     if (singleSourceHolder)
       sourceHolders.push({

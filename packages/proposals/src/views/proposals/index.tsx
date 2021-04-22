@@ -41,6 +41,7 @@ export const ProposalsView = () => {
         badge: <TokenIcon mintAddress={mint} size={30} />,
         status: state.info.status,
         state,
+        key,
       });
     });
     return newListData;
@@ -87,7 +88,7 @@ export const ProposalsView = () => {
           dataSource={listData}
           renderItem={item => (
             <List.Item
-              key={item.title}
+              key={item.key}
               className="proposal-item"
               onClick={() => history.push(item.href)}
             >

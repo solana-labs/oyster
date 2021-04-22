@@ -61,6 +61,7 @@ export const VoterTable = (props: IVoterTable) => {
         <a
           href={`https://explorer.solana.com/address/${key}?cluster=${subdomain}`}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {breakpoint.xxl && (
             <span>
