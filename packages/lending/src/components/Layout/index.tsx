@@ -1,24 +1,23 @@
-import React from 'react';
-import './../../App.less';
-import { Menu } from 'antd';
 import {
-  PieChartOutlined,
-  GithubOutlined,
   BankOutlined,
-  LogoutOutlined,
-  ShoppingOutlined,
-  HomeOutlined,
-  RocketOutlined,
   ForkOutlined,
-  // LineChartOutlined
+  GithubOutlined,
+  HomeOutlined,
+  LogoutOutlined,
+  PieChartOutlined,
+  RocketOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 
 import BasicLayout from '@ant-design/pro-layout';
+import { AppBar, contexts } from '@oyster/common';
+import { Menu } from 'antd';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
-import { contexts, AppBar } from '@oyster/common';
+import './../../App.less';
 
 const { useConnectionConfig } = contexts.Connection;
 

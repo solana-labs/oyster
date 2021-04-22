@@ -1,35 +1,36 @@
+import {
+  ActionConfirmation,
+  ConnectButton,
+  contexts,
+  fromLamports,
+  notify,
+  ParsedAccount,
+  wadToLamports,
+} from '@oyster/common';
 import { Slider } from 'antd';
 import Card from 'antd/lib/card';
-import React, { useCallback, useEffect } from 'react';
-import { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { liquidateObligation } from '../../actions';
 import { LABELS, marks } from '../../constants';
-import {
-  ParsedAccount,
-  contexts,
-  utils,
-  ConnectButton,
-  ActionConfirmation,
-} from '@oyster/common';
+import { useMidPriceInUSD } from '../../contexts/market';
 import {
   EnrichedLendingObligation,
   InputType,
   useSliderInput,
   useUserBalance,
 } from '../../hooks';
-import { LendingReserve } from '../../models';
-import { liquidate } from '../../actions';
-import './style.less';
+import { Reserve } from '../../models';
 import CollateralInput from '../CollateralInput';
-import { useMidPriceInUSD } from '../../contexts/market';
-const { notify, fromLamports, wadToLamports } = utils;
+import './style.less';
+
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 const { useMint } = contexts.Accounts;
 
 export const LiquidateInput = (props: {
   className?: string;
-  repayReserve: ParsedAccount<LendingReserve>;
-  withdrawReserve: ParsedAccount<LendingReserve>;
+  repayReserve: ParsedAccount<Reserve>;
+  withdrawReserve: ParsedAccount<Reserve>;
   obligation: EnrichedLendingObligation;
 }) => {
   const connection = useConnection();
@@ -40,12 +41,12 @@ export const LiquidateInput = (props: {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [collateralValue, setCollateralValue] = useState('');
 
-  const liquidityMint = useMint(repayReserve.info.liquidityMint);
-  const { accounts: fromAccounts, balance: tokenBalance } = useUserBalance(
-    repayReserve?.info.liquidityMint,
+  const liquidityMint = useMint(repayReserve.info.liquidity.mint);
+  const { accounts: sourceAccounts, balance: tokenBalance } = useUserBalance(
+    repayReserve?.info.liquidity.mint,
   );
   const borrowAmountLamports = wadToLamports(
-    obligation.info.borrowAmountWad,
+    obligation.info.borrows[0].borrowedAmountWads,
   ).toNumber();
 
   const borrowAmount = fromLamports(borrowAmountLamports, liquidityMint);
@@ -74,21 +75,22 @@ export const LiquidateInput = (props: {
 
     (async () => {
       try {
+        // @TODO: handle 100% -> u64::MAX
         const toLiquidateLamports =
           type === InputType.Percent && tokenBalance >= borrowAmount
             ? (pct * borrowAmountLamports) / 100
             : Math.ceil(
                 borrowAmountLamports * (parseFloat(value) / borrowAmount),
               );
-        await liquidate(
+        await liquidateObligation(
           connection,
           wallet,
-          fromAccounts[0],
           // TODO: ensure user has available amount
           toLiquidateLamports,
-          obligation.account,
+          sourceAccounts[0],
           repayReserve,
           withdrawReserve,
+          obligation.account,
         );
 
         setValue('');
@@ -107,7 +109,7 @@ export const LiquidateInput = (props: {
     })();
   }, [
     withdrawReserve,
-    fromAccounts,
+    sourceAccounts,
     obligation,
     repayReserve,
     wallet,
@@ -122,7 +124,7 @@ export const LiquidateInput = (props: {
   ]);
 
   const collateralPrice = useMidPriceInUSD(
-    withdrawReserve?.info.liquidityMint.toBase58(),
+    withdrawReserve?.info.liquidity.mint.toBase58(),
   )?.price;
 
   useEffect(() => {
@@ -238,7 +240,7 @@ export const LiquidateInput = (props: {
             size="large"
             onClick={onLiquidate}
             loading={pendingTx}
-            disabled={fromAccounts.length === 0}
+            disabled={sourceAccounts.length === 0}
           >
             {LABELS.LIQUIDATE_ACTION}
           </ConnectButton>

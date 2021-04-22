@@ -1,19 +1,24 @@
+import {
+  contexts,
+  formatNumber,
+  formatPct,
+  fromLamports,
+  ParsedAccount,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
+import { Card, Typography } from 'antd';
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { LABELS } from '../../constants';
 import {
   calculateBorrowAPY,
   calculateDepositAPY,
   calculateUtilizationRatio,
-  LendingReserve,
-} from '../../models/lending';
+  Reserve,
+} from '../../models';
 
-import { Card, Typography } from 'antd';
-import { ParsedAccount, utils, contexts, hooks, TokenIcon } from '@oyster/common';
-import { Link } from 'react-router-dom';
-import { LABELS } from '../../constants';
-const { formatNumber, formatPct, fromLamports } = utils;
 const { useMint } = contexts.Accounts;
-const { useTokenName } = hooks;
-
 const { Text } = Typography;
 
 export enum SideReserveOverviewMode {
@@ -23,16 +28,16 @@ export enum SideReserveOverviewMode {
 
 export const SideReserveOverview = (props: {
   className?: string;
-  reserve: ParsedAccount<LendingReserve>;
+  reserve: ParsedAccount<Reserve>;
   mode: SideReserveOverviewMode;
 }) => {
   const reserve = props.reserve.info;
   const mode = props.mode;
-  const name = useTokenName(reserve?.liquidityMint);
-  const liquidityMint = useMint(reserve.liquidityMint);
+  const name = useTokenName(reserve?.liquidity.mint);
+  const liquidityMint = useMint(reserve.liquidity.mint);
 
-  const availableLiquidity = fromLamports(
-    reserve.state.availableLiquidity,
+  const availableAmount = fromLamports(
+    reserve.liquidity.availableAmount,
     liquidityMint,
   );
 
@@ -108,7 +113,7 @@ export const SideReserveOverview = (props: {
         >
           <Link to={`/reserve/${props.reserve.pubkey}`}>
             <TokenIcon
-              mintAddress={reserve?.liquidityMint}
+              mintAddress={reserve?.liquidity.mint}
               style={{ width: 30, height: 30 }}
             />{' '}
             {name} Reserve Overview
@@ -128,7 +133,7 @@ export const SideReserveOverview = (props: {
           Available liquidity:
         </Text>
         <div className="card-cell ">
-          {formatNumber.format(availableLiquidity)} {name}
+          {formatNumber.format(availableAmount)} {name}
         </div>
       </div>
 

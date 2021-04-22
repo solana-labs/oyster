@@ -1,20 +1,23 @@
-import React from 'react';
-import { calculateDepositAPY, LendingReserve } from '../../models/lending';
-import { Card, Col, Row, Statistic } from 'antd';
+import {
+  contexts,
+  formatNumber,
+  fromLamports,
+  TokenIcon,
+  wadToLamports,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
-import './style.less';
+import { Card, Col, Row, Statistic } from 'antd';
+import React, { useMemo } from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
-import { useMemo } from 'react';
-
-import { utils, contexts, TokenIcon } from '@oyster/common';
 import { useMidPriceInUSD } from '../../contexts/market';
+import { calculateDepositAPY, Reserve } from '../../models';
+import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
+import './style.less';
 
-const { formatNumber, fromLamports, wadToLamports } = utils;
 const { useMint } = contexts.Accounts;
 export const ReserveStatus = (props: {
   className?: string;
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
   const bodyStyle: React.CSSProperties = {
@@ -23,20 +26,20 @@ export const ReserveStatus = (props: {
     alignItems: 'center',
   };
 
-  const mintAddress = props.reserve.liquidityMint?.toBase58();
+  const mintAddress = props.reserve.liquidity.mint?.toBase58();
   const liquidityMint = useMint(mintAddress);
   const { price } = useMidPriceInUSD(mintAddress);
-  const availableLiquidity = fromLamports(
-    props.reserve.state.availableLiquidity,
+  const availableAmount = fromLamports(
+    props.reserve.liquidity.availableAmount,
     liquidityMint,
   );
 
-  const availableLiquidityInUSD = price * availableLiquidity;
+  const availableAmountInUSD = price * availableAmount;
 
   const totalBorrows = useMemo(
     () =>
       fromLamports(
-        wadToLamports(props.reserve.state.borrowedLiquidityWad),
+        wadToLamports(props.reserve.liquidity.borrowedAmountWads),
         liquidityMint,
       ),
     [props.reserve, liquidityMint],
@@ -77,12 +80,12 @@ export const ReserveStatus = (props: {
           <Col span={12}>
             <Statistic
               title="Available Liquidity"
-              value={availableLiquidity}
+              value={availableAmount}
               valueRender={node => (
                 <div>
                   {node}
                   <div className="dashboard-amount-quote-stat">
-                    ${formatNumber.format(availableLiquidityInUSD)}
+                    ${formatNumber.format(availableAmountInUSD)}
                   </div>
                 </div>
               )}

@@ -1,36 +1,34 @@
+import { formatNumber, useTokenName } from '@oyster/common';
+import { PublicKey } from '@solana/web3.js';
+import { Button, Card, Typography } from 'antd';
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { LABELS } from '../../constants';
+import { Reserve } from '../../models';
 import {
-  useUserCollateralBalance,
-  useUserBalance,
   useBorrowedAmount,
   useBorrowingPower,
+  useUserBalance,
+  useUserCollateralBalance,
   useUserObligationByReserve,
 } from './../../hooks';
-import { LendingReserve } from '../../models/lending';
-import { Button, Card, Typography } from 'antd';
-import { Link } from 'react-router-dom';
-import { PublicKey } from '@solana/web3.js';
-import { LABELS } from '../../constants';
-import { hooks, utils } from '@oyster/common';
-const { useTokenName } = hooks;
-const { formatNumber } = utils;
 
 const { Text } = Typography;
 
 export const UserLendingCard = (props: {
   className?: string;
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
   const reserve = props.reserve;
   const address = props.address;
 
-  const name = useTokenName(reserve?.liquidityMint);
+  const name = useTokenName(reserve?.liquidity.mint);
 
   const {
     balance: tokenBalance,
     balanceInUSD: tokenBalanceInUSD,
-  } = useUserBalance(props.reserve.liquidityMint);
+  } = useUserBalance(props.reserve.liquidity.mint);
   const {
     balance: collateralBalance,
     balanceInUSD: collateralBalanceInUSD,
@@ -73,7 +71,8 @@ export const UserLendingCard = (props: {
         <div className="card-cell ">
           <div>
             <div>
-              <em>{formatNumber.format(totalBorrowed)}</em> {name}
+              <em>{formatNumber.format(totalBorrowed)}</em>
+              {name}
             </div>
             <div className="dashboard-amount-quote">
               ${formatNumber.format(borrowedInUSD)}
@@ -103,7 +102,8 @@ export const UserLendingCard = (props: {
         <div className="card-cell ">
           <div>
             <div>
-              <em>{formatNumber.format(borrowingPower)}</em> {name}
+              <em>{formatNumber.format(borrowingPower)}</em>
+              {name}
             </div>
             <div className="dashboard-amount-quote">
               ${formatNumber.format(borrowingPowerInUSD)}
@@ -121,7 +121,8 @@ export const UserLendingCard = (props: {
         <div className="card-cell ">
           <div>
             <div>
-              <em>{formatNumber.format(tokenBalance)}</em> {name}
+              <em>{formatNumber.format(tokenBalance)}</em>
+              {name}
             </div>
             <div className="dashboard-amount-quote">
               ${formatNumber.format(tokenBalanceInUSD)}
@@ -137,7 +138,8 @@ export const UserLendingCard = (props: {
         <div className="card-cell ">
           <div>
             <div>
-              <em>{formatNumber.format(collateralBalance)}</em> {name}
+              <em>{formatNumber.format(collateralBalance)}</em>
+              {name}
             </div>
             <div className="dashboard-amount-quote">
               ${formatNumber.format(collateralBalanceInUSD)}

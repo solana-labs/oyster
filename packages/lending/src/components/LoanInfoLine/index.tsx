@@ -1,27 +1,31 @@
+import {
+  contexts,
+  formatNumber,
+  formatPct,
+  fromLamports,
+  useTokenName,
+  wadToLamports,
+} from '@oyster/common';
 import { Card, Col, Row, Statistic } from 'antd';
-
 import React, { useMemo } from 'react';
-import { EnrichedLendingObligation, useLendingReserve } from '../../hooks';
-
-import { calculateBorrowAPY, collateralToLiquidity } from '../../models';
 import { GUTTER } from '../../constants';
-import { hooks, contexts, utils } from '@oyster/common';
-const { useTokenName } = hooks;
+import { EnrichedLendingObligation, useLendingReserve } from '../../hooks';
+import { calculateBorrowAPY, collateralToLiquidity } from '../../models';
+
 const { useMint } = contexts.Accounts;
-const { formatNumber, formatPct, fromLamports, wadToLamports } = utils;
 export const LoanInfoLine = (props: {
   className?: string;
   obligation: EnrichedLendingObligation;
 }) => {
   const obligation = props.obligation;
 
-  const repayReserve = useLendingReserve(obligation?.info.borrowReserve);
-  const withdrawReserve = useLendingReserve(obligation?.info.collateralReserve);
+  const repayReserve = useLendingReserve(obligation?.info.borrows[0].borrowReserve);
+  const withdrawReserve = useLendingReserve(obligation?.info.deposits[0].depositReserve);
 
-  const liquidityMint = useMint(repayReserve?.info.liquidityMint);
-  const collateralMint = useMint(withdrawReserve?.info.liquidityMint);
-  const repayName = useTokenName(repayReserve?.info.liquidityMint);
-  const withdrawName = useTokenName(withdrawReserve?.info.liquidityMint);
+  const liquidityMint = useMint(repayReserve?.info.liquidity.mint);
+  const collateralMint = useMint(withdrawReserve?.info.liquidity.mint);
+  const repayName = useTokenName(repayReserve?.info.liquidity.mint);
+  const withdrawName = useTokenName(withdrawReserve?.info.liquidity.mint);
 
   const borrowAPY = useMemo(
     () => (repayReserve ? calculateBorrowAPY(repayReserve?.info) : 0),
@@ -31,11 +35,11 @@ export const LoanInfoLine = (props: {
     return null;
   }
   const borrowAmount = fromLamports(
-    wadToLamports(obligation?.info.borrowAmountWad),
+    wadToLamports(obligation?.info.borrows[0].borrowedAmountWads),
     liquidityMint,
   );
   const collateralLamports = collateralToLiquidity(
-    obligation?.info.depositedCollateral,
+    obligation?.info.deposits[0].depositedAmount,
     repayReserve.info,
   );
   const collateral = fromLamports(collateralLamports, collateralMint);

@@ -1,24 +1,25 @@
+import { ActionConfirmation, ConnectButton, contexts } from '@oyster/common';
+import { PublicKey } from '@solana/web3.js';
+import { Card, Slider } from 'antd';
 import React, { useCallback, useState } from 'react';
+import { redeemReserveCollateral } from '../../actions';
+import { LABELS, marks } from '../../constants';
 import {
   InputType,
-  useUserCollateralBalance,
   useSliderInput,
   useUserBalance,
+  useUserCollateralBalance,
 } from '../../hooks';
-import { LendingReserve } from '../../models/lending';
-import { Card, Slider } from 'antd';
-import { withdraw } from '../../actions';
-import { PublicKey } from '@solana/web3.js';
-import './style.less';
-import { LABELS, marks } from '../../constants';
+import { Reserve } from '../../models';
 import CollateralInput from '../CollateralInput';
-import { contexts, ConnectButton, ActionConfirmation } from '@oyster/common';
+import './style.less';
+
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
 
 export const WithdrawInput = (props: {
   className?: string;
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
   const connection = useConnection();
@@ -31,8 +32,8 @@ export const WithdrawInput = (props: {
 
   const {
     balanceLamports: collateralBalanceLamports,
-    accounts: fromAccounts,
-  } = useUserBalance(reserve?.collateralMint);
+    accounts: sourceAccounts,
+  } = useUserBalance(reserve?.collateral.mint);
   const { balance: collateralBalanceInLiquidity } = useUserCollateralBalance(
     reserve,
   );
@@ -55,7 +56,7 @@ export const WithdrawInput = (props: {
 
     (async () => {
       try {
-        const withdrawAmount = Math.min(
+        const collateralAmount = Math.min(
           type === InputType.Percent
             ? (pct * collateralBalanceLamports) / 100
             : Math.ceil(
@@ -64,13 +65,13 @@ export const WithdrawInput = (props: {
               ),
           collateralBalanceLamports,
         );
-        await withdraw(
-          fromAccounts[0],
-          withdrawAmount,
-          reserve,
-          address,
+        await redeemReserveCollateral(
           connection,
           wallet,
+          collateralAmount,
+          sourceAccounts[0],
+          reserve,
+          address,
         );
 
         setValue('');
@@ -86,7 +87,7 @@ export const WithdrawInput = (props: {
     collateralBalanceInLiquidity,
     collateralBalanceLamports,
     connection,
-    fromAccounts,
+    sourceAccounts,
     pct,
     reserve,
     setValue,
@@ -143,9 +144,9 @@ export const WithdrawInput = (props: {
             type="primary"
             onClick={onWithdraw}
             loading={pendingTx}
-            disabled={fromAccounts.length === 0}
+            disabled={sourceAccounts.length === 0}
           >
-            {fromAccounts.length === 0
+            {sourceAccounts.length === 0
               ? LABELS.NO_COLLATERAL
               : LABELS.WITHDRAW_ACTION}
           </ConnectButton>

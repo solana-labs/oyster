@@ -1,30 +1,29 @@
-import React, { useMemo } from 'react';
-import { LendingReserve } from '../../models/lending';
-import { contexts, utils } from '@oyster/common';
-import { WaterWave } from './../WaterWave';
+import { contexts, fromLamports, wadToLamports } from '@oyster/common';
 import { Statistic } from 'antd';
+import React, { useMemo } from 'react';
+import { Reserve } from '../../models';
+import { WaterWave } from './../WaterWave';
 
-const { fromLamports, wadToLamports } = utils;
 const { useMint } = contexts.Accounts;
 
-export const ReserveUtilizationChart = (props: { reserve: LendingReserve }) => {
-  const mintAddress = props.reserve.liquidityMint?.toBase58();
+export const ReserveUtilizationChart = (props: { reserve: Reserve }) => {
+  const mintAddress = props.reserve.liquidity.mint?.toBase58();
   const liquidityMint = useMint(mintAddress);
-  const availableLiquidity = fromLamports(
-    props.reserve.state.availableLiquidity,
+  const availableAmount = fromLamports(
+    props.reserve.liquidity.availableAmount,
     liquidityMint,
   );
 
   const totalBorrows = useMemo(
     () =>
       fromLamports(
-        wadToLamports(props.reserve.state.borrowedLiquidityWad),
+        wadToLamports(props.reserve.liquidity.borrowedAmountWads),
         liquidityMint,
       ),
     [props.reserve, liquidityMint],
   );
 
-  const totalSupply = availableLiquidity + totalBorrows;
+  const totalSupply = availableAmount + totalBorrows;
   const percent = (100 * totalBorrows) / totalSupply;
 
   return (

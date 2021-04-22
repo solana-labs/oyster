@@ -1,21 +1,21 @@
-import React, { useMemo } from 'react';
-import { useUserBalance, useUserCollateralBalance } from './../../hooks';
-import { calculateDepositAPY, LendingReserve } from '../../models/lending';
-import { Card, Col, Row, Statistic } from 'antd';
-import './style.less';
+import { formatNumber, formatPct, useTokenName } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { Card, Col, Row, Statistic } from 'antd';
+import React, { useMemo } from 'react';
 import { GUTTER } from '../../constants';
-import { utils, hooks } from '@oyster/common';
-const { formatNumber, formatPct } = utils;
-const { useTokenName } = hooks;
+import { calculateDepositAPY, Reserve } from '../../models';
+import { useUserBalance, useUserCollateralBalance } from './../../hooks';
+import './style.less';
 
 export const DepositInfoLine = (props: {
   className?: string;
-  reserve: LendingReserve;
+  reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidityMint);
-  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
+  const name = useTokenName(props.reserve.liquidity.mint);
+  const { balance: tokenBalance } = useUserBalance(
+    props.reserve.liquidity.mint,
+  );
   const { balance: collateralBalance } = useUserCollateralBalance(
     props.reserve,
   );
