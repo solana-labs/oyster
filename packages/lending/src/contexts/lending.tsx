@@ -1,22 +1,20 @@
+import { contexts, LENDING_PROGRAM_ID, ParsedAccount } from '@oyster/common';
+import { AccountInfo, PublicKey } from '@solana/web3.js';
 import React, { useCallback, useEffect, useState } from 'react';
-
+import { useLendingReserves } from '../hooks';
 import {
-  LendingMarketParser,
-  isLendingReserve,
   isLendingMarket,
-  LendingReserveParser,
-  LendingReserve,
-  isLendingObligation,
-  LendingObligationParser,
-} from './../models/lending';
-
-import { PublicKey, AccountInfo } from '@solana/web3.js';
+  isObligation,
+  isReserve,
+  LendingMarketParser,
+  ObligationParser,
+  Reserve,
+  ReserveParser,
+} from '../models';
 import { DexMarketParser } from '../models/dex';
 import { usePrecacheMarket } from './market';
-import { useLendingReserves } from '../hooks';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+
 const { useConnection } = contexts.Connection;
-const { LENDING_PROGRAM_ID } = utils;
 const { cache, getMultipleAccounts, MintParser } = contexts.Accounts;
 
 export interface LendingContextState {}
@@ -46,11 +44,11 @@ export const useLending = () => {
 
   const processAccount = useCallback(
     (item: { pubkey: PublicKey; account: AccountInfo<Buffer> }) => {
-      if (isLendingReserve(item.account)) {
+      if (isReserve(item.account)) {
         const reserve = cache.add(
           item.pubkey.toBase58(),
           item.account,
-          LendingReserveParser,
+          ReserveParser,
         );
 
         return reserve;
@@ -60,11 +58,11 @@ export const useLending = () => {
           item.account,
           LendingMarketParser,
         );
-      } else if (isLendingObligation(item.account)) {
+      } else if (isObligation(item.account)) {
         return cache.add(
           item.pubkey.toBase58(),
           item.account,
-          LendingObligationParser,
+          ObligationParser,
         );
       }
     },
@@ -74,7 +72,7 @@ export const useLending = () => {
   useEffect(() => {
     if (reserveAccounts.length > 0) {
       precacheMarkets(
-        reserveAccounts.map(reserve => reserve.info.liquidityMint.toBase58()),
+        reserveAccounts.map(reserve => reserve.info.liquidity.mint.toBase58()),
       );
     }
   }, [reserveAccounts, precacheMarkets]);
@@ -94,24 +92,24 @@ export const useLending = () => {
 
       const lendingReserves = accounts
         .filter(
-          acc => (acc?.info as LendingReserve).lendingMarket !== undefined,
+          acc => (acc?.info as Reserve).lendingMarket !== undefined,
         )
-        .map(acc => acc as ParsedAccount<LendingReserve>);
+        .map(acc => acc as ParsedAccount<Reserve>);
 
       const toQuery = [
         ...lendingReserves.map(acc => {
           const result = [
             cache.registerParser(
-              acc?.info.collateralMint.toBase58(),
+              acc?.info.collateral.mint.toBase58(),
               MintParser,
             ),
             cache.registerParser(
-              acc?.info.liquidityMint.toBase58(),
+              acc?.info.liquidity.mint.toBase58(),
               MintParser,
             ),
             // ignore dex if its not set
             cache.registerParser(
-              acc?.info.dexMarketOption ? acc?.info.dexMarket.toBase58() : '',
+              acc?.info.liquidity.aggregatorOption ? acc?.info.liquidity.aggregator.toBase58() : '',
               DexMarketParser,
             ),
           ].filter(_ => _);

@@ -1,26 +1,30 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { MINT_TO_MARKET } from './../models/marketOverrides';
-import { POOLS_WITH_AIRDROP } from './../models/airdrops';
-
-import { getPoolName } from '../utils/utils';
-
-import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
-import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
-
 import {
   contexts,
-  utils,
-  ParsedAccount,
-  KnownTokenMap,
+  convert,
   EventEmitter,
+  fromLamports,
+  getTokenName,
+  KnownTokenMap,
+  ParsedAccount,
+  STABLE_COINS,
 } from '@oyster/common';
-
-import { DexMarketParser } from './../models/dex';
-import { LendingMarket, LendingReserve, PoolInfo } from '../models';
+import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { LendingMarket, PoolInfo, Reserve } from '../models';
 import { LIQUIDITY_PROVIDER_FEE, SERUM_FEE } from '../utils/pools';
+import { getPoolName } from '../utils/utils';
+import { POOLS_WITH_AIRDROP } from './../models/airdrops';
+import { DexMarketParser } from './../models/dex';
+import { MINT_TO_MARKET } from './../models/marketOverrides';
+
 const { useConnectionConfig } = contexts.Connection;
-const { convert, fromLamports, getTokenName, STABLE_COINS } = utils;
 const { cache, getMultipleAccounts } = contexts.Accounts;
 
 const INITAL_LIQUIDITY_DATE = new Date('2020-10-27');
@@ -146,7 +150,7 @@ export function MarketProvider({ children = null as any }) {
         }
 
         if (!cache.get(decoded.info.baseMint)) {
-          toQuery.add(decoded.info.quoteMint.toBase58());
+          toQuery.add(decoded.info.quoteTokenMint.toBase58());
         }
 
         toQuery.add(decoded.info.bids.toBase58());
@@ -509,12 +513,12 @@ export const usePrecacheMarket = () => {
 
 export const simulateMarketOrderFill = (
   amount: number,
-  reserve: LendingReserve,
+  reserve: Reserve,
   dex: PublicKey,
   useBBO = false,
 ) => {
-  const liquidityMint = cache.get(reserve.liquidityMint);
-  const collateralMint = cache.get(reserve.collateralMint);
+  const liquidityMint = cache.get(reserve.liquidity.mint);
+  const collateralMint = cache.get(reserve.collateral.mint);
   if (!liquidityMint || !collateralMint) {
     return 0.0;
   }
@@ -527,17 +531,17 @@ export const simulateMarketOrderFill = (
 
   const baseMintDecimals =
     cache.get(decodedMarket.baseMint)?.info.decimals || 0;
-  const quoteMintDecimals =
-    cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
+  const quoteTokenMintDecimals =
+    cache.get(decodedMarket.quoteTokenMint)?.info.decimals || 0;
 
   const lendingMarket = cache.get(
     reserve.lendingMarket,
   ) as ParsedAccount<LendingMarket>;
 
-  const dexMarket = new Market(
+  const aggregator = new Market(
     decodedMarket,
     baseMintDecimals,
-    quoteMintDecimals,
+    quoteTokenMintDecimals,
     undefined,
     decodedMarket.programId,
   );
@@ -548,10 +552,10 @@ export const simulateMarketOrderFill = (
     return 0;
   }
 
-  const bids = new Orderbook(dexMarket, bidInfo.accountFlags, bidInfo.slab);
-  const asks = new Orderbook(dexMarket, askInfo.accountFlags, askInfo.slab);
+  const bids = new Orderbook(aggregator, bidInfo.accountFlags, bidInfo.slab);
+  const asks = new Orderbook(aggregator, askInfo.accountFlags, askInfo.slab);
 
-  const book = lendingMarket.info.quoteMint.equals(reserve.liquidityMint)
+  const book = lendingMarket.info.quoteTokenMint.equals(reserve.liquidity.mint)
     ? bids
     : asks;
 
@@ -617,13 +621,13 @@ const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
 
   const baseMintDecimals =
     cache.get(decodedMarket.baseMint)?.info.decimals || 0;
-  const quoteMintDecimals =
-    cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
+  const quoteTokenMintDecimals =
+    cache.get(decodedMarket.quoteTokenMint)?.info.decimals || 0;
 
   const market = new Market(
     decodedMarket,
     baseMintDecimals,
-    quoteMintDecimals,
+    quoteTokenMintDecimals,
     undefined,
     decodedMarket.programId,
   );
