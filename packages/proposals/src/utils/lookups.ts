@@ -33,7 +33,7 @@ export async function getGovernanceVotingRecords(
             {
               memcmp: {
                 // Proposal key is first thing in the account data
-                offset: 0,
+                offset: 1,
                 bytes: proposal.toString(),
               },
             },
