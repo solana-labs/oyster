@@ -95,7 +95,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const from = A.chain;
             A.setChain(chain);
-            B.setChain(from);
+            if (B.chain === chain) {
+              B.setChain(from);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(A.chain);
@@ -129,7 +131,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const to = B.chain;
             B.setChain(chain);
-            A.setChain(to);
+            if (A.chain === chain) {
+              A.setChain(to);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(B.chain);
