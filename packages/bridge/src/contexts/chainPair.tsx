@@ -125,7 +125,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
       // sol asset on sol chain
 
       //let ethAddress: string = '';
-      console.log({ chain, solToken, ethToken });
+      // console.log({ chain, solToken, ethToken });
       if (chain === ASSET_CHAIN.Solana) {
         if (!solToken) {
           setInfo(defaultCoinInfo);
@@ -207,7 +207,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
           });
         }
 
-        console.log({ info });
+        // console.log({ info });
         setInfo(info);
       }
     })();
