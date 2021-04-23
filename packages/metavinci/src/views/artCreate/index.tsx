@@ -20,7 +20,7 @@ import './../styles.less';
 import { mintNFT } from '../../actions';
 import {
   MAX_METADATA_LEN,
-  MAX_OWNER_LEN,
+  MAX_NAME_SYMBOL_LEN,
   MAX_URI_LENGTH,
   useConnection,
   useWallet,
@@ -28,7 +28,11 @@ import {
   MetadataCategory,
   useConnectionConfig,
 } from '@oyster/common';
-import { getAssetCostToStore, LAMPORT_MULTIPLIER, solanaToUSD } from '../../utils/assets';
+import {
+  getAssetCostToStore,
+  LAMPORT_MULTIPLIER,
+  solanaToUSD,
+} from '../../utils/assets';
 import { Connection } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
@@ -41,8 +45,8 @@ export const ArtCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
   const { wallet, connected } = useWallet();
-  const { step_param }: { step_param: string } = useParams()
-  const history = useHistory()
+  const { step_param }: { step_param: string } = useParams();
+  const history = useHistory();
 
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
@@ -59,45 +63,48 @@ export const ArtCreateView = () => {
   });
 
   useEffect(() => {
-    if (step_param) setStep(parseInt(step_param))
-    else gotoStep(0)
-  }, [step_param])
+    if (step_param) setStep(parseInt(step_param));
+    else gotoStep(0);
+  }, [step_param]);
 
   const gotoStep = (_step: number) => {
-    history.push(`/art/create/${_step.toString()}`)
-  }
+    history.push(`/art/create/${_step.toString()}`);
+  };
 
   // store files
   const mint = async () => {
     const metadata = {
       ...(attributes as any),
-      image: attributes.files && attributes.files?.[0] && attributes.files[0].name,
+      image:
+        attributes.files && attributes.files?.[0] && attributes.files[0].name,
       files: (attributes?.files || []).map(f => f.name),
-    }
-    setSaving(true)
-    const inte = setInterval(() => setProgress(prog => prog + 1), 600)
+    };
+    setSaving(true);
+    const inte = setInterval(() => setProgress(prog => prog + 1), 600);
     // Update progress inside mintNFT
-    await mintNFT(connection, wallet, env, (attributes?.files || []), metadata)
-    clearInterval(inte)
-  }
+    await mintNFT(connection, wallet, env, attributes?.files || [], metadata);
+    clearInterval(inte);
+  };
 
   return (
     <>
       <Row style={{ paddingTop: 50 }}>
-        {!saving && <Col xl={5}>
-          <Steps
-            progressDot
-            direction="vertical"
-            current={step}
-            style={{ width: 200, marginLeft: 20, marginRight: 30 }}
-          >
-            <Step title="Category" />
-            <Step title="Upload" />
-            <Step title="Info" />
-            <Step title="Royalties" />
-            <Step title="Launch" />
-          </Steps>
-        </Col>}
+        {!saving && (
+          <Col xl={5}>
+            <Steps
+              progressDot
+              direction="vertical"
+              current={step}
+              style={{ width: 200, marginLeft: 20, marginRight: 30 }}
+            >
+              <Step title="Category" />
+              <Step title="Upload" />
+              <Step title="Info" />
+              <Step title="Royalties" />
+              <Step title="Launch" />
+            </Steps>
+          </Col>
+        )}
         <Col {...(saving ? { xl: 24 } : { xl: 16 })}>
           {step === 0 && (
             <CategoryStep
@@ -146,17 +153,19 @@ export const ArtCreateView = () => {
               confirm={() => gotoStep(6)}
             />
           )}
-          {step === 6 && (
-            <Congrats />
+          {step === 6 && <Congrats />}
+          {0 < step && step < 5 && (
+            <Button onClick={() => gotoStep(step - 1)}>Back</Button>
           )}
-          {(0 < step && step < 5) && <Button onClick={() => gotoStep(step - 1)}>Back</Button>}
         </Col>
       </Row>
     </>
   );
 };
 
-const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) => {
+const CategoryStep = (props: {
+  confirm: (category: MetadataCategory) => void;
+}) => {
   return (
     <>
       <Row className="call-to-action">
@@ -190,7 +199,6 @@ const CategoryStep = (props: { confirm: (category: MetadataCategory) => void }) 
                 <div className="type-btn-description">MP3, WAV, FLAC</div>
               </div>
             </Button>
-
           </Row>
           <Row>
             <Button
@@ -228,29 +236,29 @@ const UploadStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const [mainFile, setMainFile] = useState<any>()
-  const [coverFile, setCoverFile] = useState<any>()
-  const [image, setImage] = useState<string>("")
+  const [mainFile, setMainFile] = useState<any>();
+  const [coverFile, setCoverFile] = useState<any>();
+  const [image, setImage] = useState<string>('');
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      files: []
-    })
-  }, [])
+      files: [],
+    });
+  }, []);
 
   const uploadMsg = (category: MetadataCategory) => {
     switch (category) {
       case MetadataCategory.Audio:
-        return "Upload your audio creation (MP3, FLAC, WAV)"
+        return 'Upload your audio creation (MP3, FLAC, WAV)';
       case MetadataCategory.Image:
-        return "Upload your image creation (PNG, JPG, GIF)"
+        return 'Upload your image creation (PNG, JPG, GIF)';
       case MetadataCategory.Video:
-        return "Upload your video creation (MP4)"
+        return 'Upload your video creation (MP4)';
       default:
-        return "Please go back and choose a category"
+        return 'Please go back and choose a category';
     }
-  }
+  };
 
   return (
     <>
@@ -271,61 +279,62 @@ const UploadStep = (props: {
           multiple={false}
           customRequest={info => {
             // dont upload files here, handled outside of the control
-            info?.onSuccess?.({}, null as any)
+            info?.onSuccess?.({}, null as any);
           }}
           fileList={mainFile ? [mainFile] : []}
           onChange={async info => {
             const file = info.file.originFileObj;
-            if (file) setMainFile(file)
+            if (file) setMainFile(file);
             if (props.attributes.category != MetadataCategory.Audio) {
               const reader = new FileReader();
               reader.onload = function (event) {
-                setImage((event.target?.result as string) || '')
-              }
-              if (file) reader.readAsDataURL(file)
+                setImage((event.target?.result as string) || '');
+              };
+              if (file) reader.readAsDataURL(file);
             }
           }}
         >
           <div className="ant-upload-drag-icon">
             <h3 style={{ fontWeight: 700 }}>Upload your creation</h3>
           </div>
-          <p className="ant-upload-text">
-            Drag and drop, or click to browse
-          </p>
+          <p className="ant-upload-text">Drag and drop, or click to browse</p>
         </Dragger>
       </Row>
-      {props.attributes.category == MetadataCategory.Audio &&
+      {props.attributes.category == MetadataCategory.Audio && (
         <Row className="content-action">
-          <h3>Optionally, you can upload a cover image or video (PNG, JPG, GIF, MP4)</h3>
+          <h3>
+            Optionally, you can upload a cover image or video (PNG, JPG, GIF,
+            MP4)
+          </h3>
           <Dragger
             style={{ padding: 20 }}
             multiple={false}
             customRequest={info => {
               // dont upload files here, handled outside of the control
-              info?.onSuccess?.({}, null as any)
+              info?.onSuccess?.({}, null as any);
             }}
             fileList={coverFile ? [coverFile] : []}
             onChange={async info => {
               const file = info.file.originFileObj;
-              if (file) setCoverFile(file)
+              if (file) setCoverFile(file);
               if (props.attributes.category == MetadataCategory.Audio) {
                 const reader = new FileReader();
                 reader.onload = function (event) {
-                  setImage((event.target?.result as string) || '')
-                }
-                if (file) reader.readAsDataURL(file)
+                  setImage((event.target?.result as string) || '');
+                };
+                if (file) reader.readAsDataURL(file);
               }
             }}
           >
             <div className="ant-upload-drag-icon">
-              <h3 style={{ fontWeight: 700 }}>Upload your cover image or video</h3>
+              <h3 style={{ fontWeight: 700 }}>
+                Upload your cover image or video
+              </h3>
             </div>
-            <p className="ant-upload-text">
-              Drag and drop, or click to browse
-            </p>
+            <p className="ant-upload-text">Drag and drop, or click to browse</p>
           </Dragger>
         </Row>
-      }
+      )}
       <Row>
         <Button
           type="primary"
@@ -335,8 +344,8 @@ const UploadStep = (props: {
               ...props.attributes,
               files: [mainFile, coverFile].filter(f => f),
               image,
-            })
-            props.confirm()
+            });
+            props.confirm();
           }}
           className="action-btn"
         >
@@ -348,8 +357,8 @@ const UploadStep = (props: {
 };
 
 interface Royalty {
-  creator_key: string,
-  amount: number
+  creator_key: string;
+  amount: number;
 }
 
 const InfoStep = (props: {
@@ -357,15 +366,17 @@ const InfoStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const [creators, setCreators] = useState<Array<UserValue>>([])
-  const [royalties, setRoyalties] = useState<Array<Royalty>>([])
+  const [creators, setCreators] = useState<Array<UserValue>>([]);
+  const [royalties, setRoyalties] = useState<Array<Royalty>>([]);
 
   useEffect(() => {
-    setRoyalties(creators.map(creator => ({
-      creator_key: creator.key,
-      amount: Math.trunc(100 / creators.length),
-    })))
-  }, [creators])
+    setRoyalties(
+      creators.map(creator => ({
+        creator_key: creator.key,
+        amount: Math.trunc(100 / creators.length),
+      })),
+    );
+  }, [creators]);
 
   return (
     <>
@@ -422,9 +433,7 @@ const InfoStep = (props: {
           </label>
           <label className="action-field">
             <span className="field-title">Creators</span>
-            <UserSearch
-              setCreators={setCreators}
-            />
+            <UserSearch setCreators={setCreators} />
           </label>
           <label className="action-field">
             <span className="field-title">Description</span>
@@ -446,7 +455,11 @@ const InfoStep = (props: {
       <Row>
         <label className="action-field" style={{ width: '100%' }}>
           <span className="field-title">Royalties Split</span>
-          <RoyaltiesSplitter creators={creators} royalties={royalties} setRoyalties={setRoyalties} />
+          <RoyaltiesSplitter
+            creators={creators}
+            royalties={royalties}
+            setRoyalties={setRoyalties}
+          />
         </label>
       </Row>
       <Row>
@@ -465,63 +478,78 @@ const InfoStep = (props: {
 
 const shuffle = (array: Array<any>) => {
   array.sort(() => Math.random() - 0.5);
-}
+};
 
 const RoyaltiesSplitter = (props: {
-  creators: Array<UserValue>,
-  royalties: Array<Royalty>,
-  setRoyalties: Function,
+  creators: Array<UserValue>;
+  royalties: Array<Royalty>;
+  setRoyalties: Function;
 }) => {
   return (
     <Col>
       {props.creators.map((creator, idx) => {
-        const royalty = props.royalties.find(royalty => royalty.creator_key == creator.key)
-        if (!royalty) return null
+        const royalty = props.royalties.find(
+          royalty => royalty.creator_key == creator.key,
+        );
+        if (!royalty) return null;
 
-        const amt = royalty.amount
+        const amt = royalty.amount;
         const handleSlide = (newAmt: number) => {
-          const othersRoyalties = props.royalties.filter(_royalty => _royalty.creator_key != royalty.creator_key)
-          if (othersRoyalties.length < 1) return
-          shuffle(othersRoyalties)
-          const others_n = props.royalties.length - 1
-          const sign = Math.sign(newAmt - amt)
-          let remaining = Math.abs(newAmt - amt)
-          let count = 0
+          const othersRoyalties = props.royalties.filter(
+            _royalty => _royalty.creator_key != royalty.creator_key,
+          );
+          if (othersRoyalties.length < 1) return;
+          shuffle(othersRoyalties);
+          const others_n = props.royalties.length - 1;
+          const sign = Math.sign(newAmt - amt);
+          let remaining = Math.abs(newAmt - amt);
+          let count = 0;
           while (remaining > 0 && count < 100) {
-            const idx = count % others_n
-            const _royalty = othersRoyalties[idx]
+            const idx = count % others_n;
+            const _royalty = othersRoyalties[idx];
             if (
-              (0 < _royalty.amount && _royalty.amount < 100) // Normal
-              || (_royalty.amount == 0 && sign < 0) // Low limit
-              || (_royalty.amount == 100 && sign > 0) // High limit
+              (0 < _royalty.amount && _royalty.amount < 100) || // Normal
+              (_royalty.amount == 0 && sign < 0) || // Low limit
+              (_royalty.amount == 100 && sign > 0) // High limit
             ) {
-              _royalty.amount -= sign
-              remaining -= 1
+              _royalty.amount -= sign;
+              remaining -= 1;
             }
-            count += 1
+            count += 1;
           }
 
-          props.setRoyalties(props.royalties.map(_royalty => {
-            const computed_amount = othersRoyalties.find(newRoyalty =>
-              newRoyalty.creator_key == _royalty.creator_key
-            )?.amount
-            return {
-              ..._royalty,
-              amount: _royalty.creator_key == royalty.creator_key ? newAmt : computed_amount,
-            }
-          }))
-        }
+          props.setRoyalties(
+            props.royalties.map(_royalty => {
+              const computed_amount = othersRoyalties.find(
+                newRoyalty => newRoyalty.creator_key == _royalty.creator_key,
+              )?.amount;
+              return {
+                ..._royalty,
+                amount:
+                  _royalty.creator_key == royalty.creator_key
+                    ? newAmt
+                    : computed_amount,
+              };
+            }),
+          );
+        };
         return (
           <Row key={idx} style={{ margin: '5px auto' }}>
-            <Col span={11} className="slider-elem">{creator.label}</Col>
-            <Col span={8} className="slider-elem">{amt}%</Col>
-            <Col span={4}><Slider value={amt} onChange={handleSlide} /></Col>
+            <Col span={11} className="slider-elem">
+              {creator.label}
+            </Col>
+            <Col span={8} className="slider-elem">
+              {amt}%
+            </Col>
+            <Col span={4}>
+              <Slider value={amt} onChange={handleSlide} />
+            </Col>
           </Row>
-        )
+        );
       })}
     </Col>
-  )
-}
+  );
+};
 
 const RoyaltiesStep = (props: {
   attributes: IMetadataExtension;
@@ -595,15 +623,9 @@ const LaunchStep = (props: {
   const [USDcost, setUSDcost] = useState(0);
   useEffect(() => {
     const rentCall = Promise.all([
-      props.connection.getMinimumBalanceForRentExemption(
-        MintLayout.span,
-      ),
-      props.connection.getMinimumBalanceForRentExemption(
-        MAX_METADATA_LEN,
-      ),
-      props.connection.getMinimumBalanceForRentExemption(
-        MAX_OWNER_LEN,
-      )
+      props.connection.getMinimumBalanceForRentExemption(MintLayout.span),
+      props.connection.getMinimumBalanceForRentExemption(MAX_METADATA_LEN),
+      props.connection.getMinimumBalanceForRentExemption(MAX_NAME_SYMBOL_LEN),
     ]);
 
     getAssetCostToStore([
@@ -630,8 +652,8 @@ const LaunchStep = (props: {
   }, [...files, setCost]);
 
   useEffect(() => {
-    cost && solanaToUSD(cost).then(setUSDcost)
-  }, [cost])
+    cost && solanaToUSD(cost).then(setUSDcost);
+  }, [cost]);
 
   return (
     <>
@@ -661,21 +683,25 @@ const LaunchStep = (props: {
             value={props.attributes.royalty}
             suffix="%"
           />
-          {cost ? <div style={{ display: 'flex' }}>
-            <Statistic
-              className="create-statistic"
-              title="Cost to Create"
-              value={cost.toPrecision(3)}
-              prefix="◎"
-            />
-            <div style={{
-              margin: "auto 0",
-              color: "rgba(255, 255, 255, 0.4)",
-              fontSize: "1.5rem",
-            }}>
-              ${USDcost.toPrecision(2)}
+          {cost ? (
+            <div style={{ display: 'flex' }}>
+              <Statistic
+                className="create-statistic"
+                title="Cost to Create"
+                value={cost.toPrecision(3)}
+                prefix="◎"
+              />
+              <div
+                style={{
+                  margin: 'auto 0',
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  fontSize: '1.5rem',
+                }}
+              >
+                ${USDcost.toPrecision(2)}
+              </div>
             </div>
-          </div> : (
+          ) : (
             <Spin />
           )}
         </Col>
@@ -703,46 +729,52 @@ const LaunchStep = (props: {
 };
 
 const WaitingStep = (props: {
-  mint: Function,
-  progress: number,
-  confirm: Function,
+  mint: Function;
+  progress: number;
+  confirm: Function;
 }) => {
-
   useEffect(() => {
     const func = async () => {
-      await props.mint()
-      props.confirm()
-    }
-    func()
-  }, [])
+      await props.mint();
+      props.confirm();
+    };
+    func();
+  }, []);
 
   return (
     <div style={{ marginTop: 70 }}>
-      <Progress
-        type="circle"
-        percent={props.progress}
-      />
+      <Progress type="circle" percent={props.progress} />
       <div className="waiting-title">
         Your creation is being uploaded to the decentralized web...
       </div>
       <div className="waiting-subtitle">This can take up to 1 minute.</div>
     </div>
-  )
-}
+  );
+};
 
 const Congrats = () => {
-  return <>
-    <div style={{ marginTop: 70 }}>
-      <div className="waiting-title">
-        Congratulations, you created an NFT!
+  return (
+    <>
+      <div style={{ marginTop: 70 }}>
+        <div className="waiting-title">
+          Congratulations, you created an NFT!
+        </div>
+        <div className="congrats-button-container">
+          <Button className="congrats-button">
+            <span>Share it on Twitter</span>
+            <span>&gt;</span>
+          </Button>
+          <Button className="congrats-button">
+            <span>See it in your collection</span>
+            <span>&gt;</span>
+          </Button>
+          <Button className="congrats-button">
+            <span>Sell it via auction</span>
+            <span>&gt;</span>
+          </Button>
+        </div>
       </div>
-      <div className="congrats-button-container">
-        <Button className="congrats-button"><span>Share it on Twitter</span><span>&gt;</span></Button>
-        <Button className="congrats-button"><span>See it in your collection</span><span>&gt;</span></Button>
-        <Button className="congrats-button"><span>Sell it via auction</span><span>&gt;</span></Button>
-      </div>
-    </div>
-    <Confetti />
-  </>
-}
-
+      <Confetti />
+    </>
+  );
+};
