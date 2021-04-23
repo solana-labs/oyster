@@ -30,11 +30,12 @@ export const AppLayout = React.memo((props: any) => {
       </Breadcrumb.Item>
     );
   });
-  const breadcrumbItems = [
-    <Breadcrumb.Item key="home">
-      <Link to="/">Home</Link>
-    </Breadcrumb.Item>,
-  ].concat(extraBreadcrumbItems);
+
+  // const breadcrumbItems = [
+  //   <Breadcrumb.Item key="home">
+  //     <Link to="/">Home</Link>
+  //   </Breadcrumb.Item>,
+  // ].concat(extraBreadcrumbItems);
 
   // TODO: add breadcrumb
 
