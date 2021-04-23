@@ -122,15 +122,15 @@ export const AuctionCreateView = () => {
   }, [step_param])
 
   const gotoNextStep = (_step?: number) => {
-    debugger;
+    // debugger;
 
-    const test = new AuctionManager();
-    test.auction = TOKEN_PROGRAM_ID;
-    const buffer = serialize(SCHEMA, test);
+    // const test = new AuctionManager();
+    // test.auction = TOKEN_PROGRAM_ID;
+    // const buffer = serialize(SCHEMA, test);
 
-    const test2 = deserializeBorsh(SCHEMA, AuctionManager, Buffer.from(buffer));
+    // const test2 = deserializeBorsh(SCHEMA, AuctionManager, Buffer.from(buffer));
 
-    debugger;
+    // debugger;
 
     const nextStep = _step === undefined ? (step + 1) : _step;
     history.push(`/auction/create/${nextStep.toString()}`)
