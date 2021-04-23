@@ -119,9 +119,6 @@ export const registerProgramGovernance = async (
   const [timelockConfigKey] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_AUTHORITY_SEED),
-      PROGRAM_IDS.timelock.programId.toBuffer(),
-      uninitializedTimelockConfig.governanceMint.toBuffer(),
-      councilMintSeed,
       uninitializedTimelockConfig.program.toBuffer(),
     ],
     PROGRAM_IDS.timelock.programId,
