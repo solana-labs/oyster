@@ -2,12 +2,14 @@ import {
   createAssociatedTokenAccountInstruction,
   createMint,
   createMetadata,
-  transferMetadata,
+  transferUpdateAuthority,
   programIds,
   sendTransaction,
+  sendTransactions,
   notify,
   ENV,
   updateMetadata,
+  createMasterEdition,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
@@ -61,18 +63,23 @@ export const mintNFT = async (
     MintLayout.span,
   );
 
+  // This owner is a temporary signer and owner of metadata we use to circumvent requesting signing
+  // twice post Arweave. We store in an account (payer) and use it post-Arweave to update MD with new link
+  // then give control back to the user.
   const owner = new Account();
   const payer = new Account();
   const instructions: TransactionInstruction[] = [...pushInstructions];
   const signers: Account[] = [...pushSigners, owner];
 
+  // This is only temporarily owned by wallet...transferred to program by createMasterEdition below
   const mintKey = createMint(
     instructions,
     wallet.publicKey,
     mintRent,
     0,
-    owner.publicKey,
-    owner.publicKey,
+    // Some weird bug with phantom where it's public key doesnt mesh with data encode well
+    wallet.publicKey,
+    wallet.publicKey,
     signers,
   );
 
@@ -100,23 +107,23 @@ export const mintNFT = async (
       TOKEN_PROGRAM_ID,
       mintKey,
       recipientKey,
-      owner.publicKey,
+      // Some weird bug with phantom where it's public key doesnt mesh with data encode well
+      new PublicKey(wallet.publicKey.toBase58()),
       [],
       1,
     ),
   );
 
-  const [metadataAccount, metadataOwnerAccount] = await createMetadata(
+  const [metadataAccount, nameSymbolAccount] = await createMetadata(
     metadata.symbol,
     metadata.name,
     `https://-------.---/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
-    false,
+    true,
     payer.publicKey,
     mintKey,
     owner.publicKey,
     instructions,
     wallet.publicKey,
-    signers,
   );
 
   const block = await connection.getRecentBlockhash('singleGossip');
@@ -125,41 +132,74 @@ export const mintNFT = async (
       fromPubkey: wallet.publicKey,
       toPubkey: payer.publicKey,
       lamports: block.feeCalculator.lamportsPerSignature * 2,
-    }));
+    }),
+  );
 
-  const response = await sendTransaction(
+  let masterEdInstruction: TransactionInstruction[] = [];
+  let masterEdSigner: Account[] = [payer];
+
+  // This mint, which allows limited editions to be made, stays with user's wallet.
+  const masterMint = createMint(
+    masterEdInstruction,
+    wallet.publicKey,
+    mintRent,
+    0,
+    // Some weird bug with phantom where it's public key doesnt mesh with data encode well
+    wallet.publicKey,
+    wallet.publicKey,
+    masterEdSigner,
+  );
+
+  // In this instruction, mint authority will be removed from the main mint, while
+  // minting authority will be maintained for the master mint (which we want.)
+  await createMasterEdition(
+    metadata.symbol,
+    metadata.name,
+    undefined,
+    mintKey,
+    masterMint,
+    payer.publicKey,
+    wallet.publicKey,
+    instructions,
+    wallet.publicKey,
+  );
+
+  const txIds: string[] = [];
+  const response = await sendTransactions(
     connection,
     wallet,
-    instructions,
-    signers,
+    [instructions, masterEdInstruction],
+    [signers, masterEdSigner],
+    true,
     true,
     'max',
-    false,
-    block);
+    txId => {
+      txIds.push(txId);
+    },
+    undefined,
+    block,
+  );
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
 
   const tags = realFiles.reduce(
-    (
-      acc: Record<string, Array<{ name: string; value: string }>>,
-      f,
-    ) => {
+    (acc: Record<string, Array<{ name: string; value: string }>>, f) => {
       acc[f.name] = [{ name: 'mint', value: mintKey.toBase58() }];
       return acc;
     },
     {},
   );
   data.append('tags', JSON.stringify(tags));
-  data.append('transaction', response.txid);
+  data.append('transaction', txIds[0]);
   realFiles.map(f => data.append('file[]', f));
 
   const result: IArweaveResult = await (
     await fetch(
       // TODO: add CNAME
-      env === 'mainnet-beta' ?
-      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd' :
-      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
+      env === 'mainnet-beta'
+        ? 'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd'
+        : 'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
       {
         method: 'POST',
         body: data,
@@ -170,8 +210,7 @@ export const mintNFT = async (
   const metadataFile = result.messages?.find(
     m => m.filename == RESERVED_TXN_MANIFEST,
   );
-  if (metadataFile?.transactionId && wallet.publicKey)
-  {
+  if (metadataFile?.transactionId && wallet.publicKey) {
     const updateInstructions: TransactionInstruction[] = [];
     const updateSigners: Account[] = [payer];
 
@@ -181,23 +220,19 @@ export const mintNFT = async (
       metadata.symbol,
       metadata.name,
       arweaveLink,
+      undefined,
       mintKey,
       payer.publicKey,
       updateInstructions,
-      updateSigners,
       metadataAccount,
-      metadataOwnerAccount,
+      nameSymbolAccount,
     );
 
-    await transferMetadata(
-      metadata.symbol,
-      metadata.name,
+    await transferUpdateAuthority(
+      metadataAccount,
       payer.publicKey,
       wallet.publicKey,
       updateInstructions,
-      updateSigners,
-      metadataAccount,
-      metadataOwnerAccount,
     );
 
     const txid = await sendTransaction(
@@ -207,12 +242,16 @@ export const mintNFT = async (
       updateSigners,
       true,
       'singleGossip',
-      true
+      true,
     );
 
     notify({
       message: 'Art created on Solana',
-      description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
+      description: (
+        <a href={arweaveLink} target="_blank">
+          Arweave Link
+        </a>
+      ),
       type: 'success',
     });
 

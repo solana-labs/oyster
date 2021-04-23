@@ -392,7 +392,7 @@ export async function sendSignedTransaction({
   sentMessage?: string;
   successMessage?: string;
   timeout?: number;
-}): Promise<{ txid: string, slot: number }> {
+}): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
   let slot = 0;
@@ -415,7 +415,11 @@ export async function sendSignedTransaction({
     }
   })();
   try {
-    slot = await awaitTransactionSignatureConfirmation(txid, timeout, connection);
+    slot = await awaitTransactionSignatureConfirmation(
+      txid,
+      timeout,
+      connection,
+    );
   } catch (err) {
     if (err.timeout) {
       throw new Error('Timed out awaiting confirmation on transaction');
@@ -495,7 +499,7 @@ async function awaitTransactionSignatureConfirmation(
       try {
         subId = connection.onSignature(
           txid,
-          (result) => {
+          result => {
             console.log('WS confirmed', txid, result);
             done = true;
             if (result.err) {
@@ -544,11 +548,17 @@ async function awaitTransactionSignatureConfirmation(
         await sleep(500);
       }
     })();
-  }).catch(_ => {
-    connection.removeSignatureListener(subId);
-  }).then(_ => {
-    connection.removeSignatureListener(subId);
-  });
+  })
+    .catch(_ => {
+      //@ts-ignore
+      if (connection._signatureSubscriptions[subId])
+        connection.removeSignatureListener(subId);
+    })
+    .then(_ => {
+      //@ts-ignore
+      if (connection._signatureSubscriptions[subId])
+        connection.removeSignatureListener(subId);
+    });
   done = true;
   return slot;
 }
