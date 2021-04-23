@@ -734,7 +734,7 @@ const Congrats = () => {
   return <>
     <div style={{ marginTop: 70 }}>
       <div className="waiting-title">
-        Congratulations! Your creation is now live.
+        Congratulations, you created an NFT!
       </div>
       <div className="congrats-button-container">
         <Button className="congrats-button"><span>Share it on Twitter</span><span>&gt;</span></Button>

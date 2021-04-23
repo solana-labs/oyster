@@ -31,14 +31,17 @@ import {
   useConnectionConfig,
   Metadata,
   ParsedAccount,
+  deserializeBorsh,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js';
-import { MintLayout } from '@solana/spl-token';
+import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
 import { useUserArts } from '../../hooks';
 import Masonry from 'react-masonry-css';
 import { capitalize } from 'lodash';
+import { AuctionManager, SCHEMA } from '../../models/metaplex';
+import { serialize } from 'borsh';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -67,23 +70,23 @@ export interface AuctionState {
   // suggested date time when auction should end UTC+0
   endDate?: Date;
 
-  
+
   // Jose's attributes
   category: AuctionCategory;
   saleType?: "auction" | "sale";
-  
+
   price?: number;
   priceFloor?: number;
   priceTick?: number;
-  
+
   startSaleTS?: number; // Why do I prefer to work with unix ts?
   startListTS?: number;
   endTS?: number;
-  
+
   auctionDuration?: number;
   gapTime?: number;
   tickSizeEndingPhase?: number;
-  
+
 }
 
 export const AuctionCreateView = () => {
@@ -109,6 +112,16 @@ export const AuctionCreateView = () => {
   }, [step_param])
 
   const gotoNextStep = (_step?: number) => {
+    debugger;
+
+    const test = new AuctionManager();
+    test.auction = TOKEN_PROGRAM_ID;
+    const buffer = serialize(SCHEMA, test);
+
+    const test2 = deserializeBorsh(SCHEMA, AuctionManager, Buffer.from(buffer));
+
+    debugger;
+
     const nextStep = _step === undefined ? (step + 1) : _step;
     history.push(`/auction/create/${nextStep.toString()}`)
   }

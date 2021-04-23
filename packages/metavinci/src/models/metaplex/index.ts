@@ -1,4 +1,6 @@
+import { deserializeBorsh } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import { serialize, BinaryReader, BinaryWriter } from 'borsh';
 
 export * from './initAuctionManager';
 export * from './redeemBid';
@@ -7,6 +9,19 @@ export * from './redeemMasterEditionBid';
 export * from './redeemOpenEditionBid';
 export * from './startAuction';
 export * from './validateSafetyDepositBox';
+
+(BinaryReader.prototype as any).readPubkey = function () {
+  debugger;
+  const reader = (this as unknown) as BinaryReader;
+  const array = reader.readFixedArray(32);
+  return new PublicKey(array);
+};
+
+(BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {
+  debugger;
+  const writer = (this as unknown) as BinaryWriter;
+  writer.writeFixedArray(value.toBuffer());
+};
 
 export class AuctionManager {
   key?: number;
@@ -19,6 +34,34 @@ export class AuctionManager {
   tokenProgram?: PublicKey;
   state?: AuctionManagerState;
   settings?: AuctionManagerSettings;
+}
+
+export class InitAuctionManagerArgs {
+  instruction = 0;
+}
+
+export class ValidateSafetyDepositBoxArgs {
+  instruction = 1;
+}
+
+export class RedeemBidArgs {
+  instruction = 2;
+}
+
+export class RedeemMasterEditionBidArgs {
+  instruction = 3;
+}
+
+export class RedeemLimitedEditionBidArgs {
+  instruction = 4;
+}
+
+export class RedeemOpenEditionBidArgs {
+  instruction = 5;
+}
+
+export class StartAuctionArgs {
+  instruction = 6;
 }
 
 export class AuctionManagerSettings {
@@ -99,13 +142,13 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['key', 'u8'],
-        ['authority', 'u32'],
-        ['auction', 'u32'],
-        ['vault', 'u32'],
-        ['auctionProgram', 'u32'],
-        ['tokenVaultProgram', 'u32'],
-        ['tokenMetadataProgram', 'u32'],
-        ['tokenProgram', 'u32'],
+        ['authority', 'pubkey'],
+        ['auction', 'pubkey'],
+        ['vault', 'pubkey'],
+        ['auctionProgram', 'pubkey'],
+        ['tokenVaultProgram', 'pubkey'],
+        ['tokenMetadataProgram', 'pubkey'],
+        ['tokenProgram', 'pubkey'],
         ['state', AuctionManagerState],
         ['settings', AuctionManagerSettings],
       ],
@@ -116,8 +159,11 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        ['openEditionWinnerConstraint', { kind: 'enum' }], // TODO:
-        ['openEditionNonWinningConstraint', { kind: 'enum' }], // TODO:
+        ['openEditionWinnerConstraint', { kind: 'enum', values: [0, 1, 2] }], // TODO:
+        [
+          'openEditionNonWinningConstraint',
+          { kind: 'enum', values: [0, 1, 2] },
+        ], // TODO:
         ['winningConfigs', [WinningConfig]], // TODO: check
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
         ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
@@ -132,7 +178,7 @@ export const SCHEMA = new Map<any, any>([
         ['safetyDepositBoxIndex', 'u8'],
         ['amount', 'u8'],
         ['hasAuthority', 'u8'], // bool
-        ['editionType', { kind: 'enum' }], // TODO:
+        ['editionType', { kind: 'enum', values: [0, 1, 2] }], // TODO:
       ],
     },
   ],
@@ -153,7 +199,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         // TODO: fix enum
-        ['status', { kind: 'enum' }],
+        ['status', { kind: 'enum', values: [0, 1, 2] }],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
         ['winningConfigStates', [WinningConfigState]],
@@ -168,6 +214,55 @@ export const SCHEMA = new Map<any, any>([
         ['openEditionRedeemed', 'u8'], // bool
         ['bidRedeemed', 'u8'], // bool
       ],
+    },
+  ],
+  [
+    InitAuctionManagerArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    ValidateSafetyDepositBoxArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    RedeemBidArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    RedeemMasterEditionBidArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    RedeemLimitedEditionBidArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    RedeemOpenEditionBidArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    StartAuctionArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
     },
   ],
 ]);
