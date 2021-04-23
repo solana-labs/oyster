@@ -476,30 +476,37 @@ const TierWinners = (props: {
   tier: Tier;
   setTier: Function;
   previousTo?: number;
+  lastTier?: Tier;
 }) => {
+  const from = (props.previousTo || 0) + 1
   return <>
     <Divider />
     <label className="action-field">
       <span className="field-title">Winners</span>
       <div>
-        <Input
-          disabled={props.idx === 0}
-          defaultValue={(props.previousTo || 0) + 1}
+        <InputNumber
+          disabled={true}
+          value={from}
           type="number"
           className="input"
           style={{ width: '30%' }}
-          onChange={info =>
+          onChange={value =>
             null
           }
         />
         &nbsp;to&nbsp;
-        <Input
+        <InputNumber
+          min={from + 1}
+          disabled={props.lastTier?.to == props.tier.to}
           defaultValue={props.tier.to}
           type="number"
           className="input"
           style={{ width: '30%' }}
-          onChange={info =>
-            null
+          onChange={value =>
+            props.setTier(props.idx, {
+              ...props.tier,
+              to: value || props.tier.to,
+            })
           }
         />
       </div>
@@ -588,6 +595,7 @@ const TierStep = (props: {
           tier={tier}
           setTier={setTier}
           previousTo={tiers[idx - 1]?.to}
+          lastTier={tiers.slice(-1)[0]}
         />)}
       </Col>
     </Row>
@@ -735,7 +743,6 @@ const PriceAuction = (props: {
             <Input
               type="number"
               min={0}
-              autoFocus
               className="input"
               placeholder="Tick size in USD"
               prefix="$"
@@ -875,7 +882,6 @@ const EndingPhaseAuction = (props: {
           <span className="field-info">The final phase of the auction will begin when there is this much time left on the countdown. Any bids placed during the final phase will extend the end time by this same duration.</span>
           <Input
             type="number"
-            autoFocus
             className="input"
             placeholder="Duration in minutes"
             suffix="minutes"
@@ -893,7 +899,6 @@ const EndingPhaseAuction = (props: {
           <span className="field-info">In order for winners to move up in the auction, they must place a bid that’s at least this percentage higher than the next highest bid.</span>
           <Input
             type="number"
-            autoFocus
             className="input"
             placeholder="Percentage"
             suffix="%"
