@@ -1,5 +1,4 @@
 import {
-  Account,
   PublicKey,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
@@ -8,6 +7,7 @@ import {
 import { programIds } from '../utils/ids';
 import { deserializeBorsh } from './../utils/borsh';
 import { serialize } from 'borsh';
+import BN from 'bn.js';
 
 export const MAX_NAME_LENGTH = 32;
 
@@ -16,12 +16,17 @@ export const MAX_SYMBOL_LENGTH = 10;
 export const MAX_URI_LENGTH = 200;
 
 export const MAX_METADATA_LEN =
-  32 + MAX_NAME_LENGTH + MAX_SYMBOL_LENGTH + MAX_URI_LENGTH + 200;
+  1 + 32 + MAX_NAME_LENGTH + MAX_SYMBOL_LENGTH + MAX_URI_LENGTH + 200;
 
-export const MAX_OWNER_LEN = 32 + 32;
+export const MAX_NAME_SYMBOL_LEN = 1 + 32 + 8;
+export const MAX_MASTER_EDITION_KEN = 1 + 9 + 8 + 32;
 
-export const METADATA_KEY = 0;
-export const NAME_SYMBOL_KEY = 1;
+export enum Key {
+  MetadataV1 = 0,
+  NameSymbolTupleV1 = 1,
+  EditionV1 = 2,
+  MasterEditionV1 = 3,
+}
 
 export enum MetadataCategory {
   Audio = 'audio',
@@ -42,9 +47,29 @@ export interface IMetadataExtension {
   category: MetadataCategory;
 }
 
+export class MasterEdition {
+  key: Key;
+  supply: BN;
+  maxSupply?: BN;
+  /// Can be used to mint tokens that give one-time permission to mint a single limited edition.
+  masterMint: PublicKey;
+
+  constructor(args: {
+    key: Key;
+    supply: BN;
+    maxSupply?: BN;
+    /// Can be used to mint tokens that give one-time permission to mint a single limited edition.
+    masterMint: PublicKey;
+  }) {
+    this.key = Key.MasterEditionV1;
+    this.supply = args.supply;
+    this.maxSupply = args.maxSupply;
+    this.masterMint = args.masterMint;
+  }
+}
 export class Metadata {
-  key: number;
-  updateAuthority?: PublicKey;
+  key: Key;
+  nonUniqueSpecificUpdateAuthority?: PublicKey;
 
   mint: PublicKey;
   name: string;
@@ -54,16 +79,16 @@ export class Metadata {
   extended?: IMetadataExtension;
 
   constructor(args: {
-    updateAuthority?: Buffer;
-    mint: Buffer;
+    nonUniqueSpecificUpdateAuthority?: PublicKey;
+    mint: PublicKey;
     name: string;
     symbol: string;
     uri: string;
   }) {
-    this.key = METADATA_KEY;
-    this.updateAuthority =
-      args.updateAuthority && new PublicKey(args.updateAuthority);
-    this.mint = new PublicKey(args.mint);
+    this.key = Key.MetadataV1;
+    this.nonUniqueSpecificUpdateAuthority =
+      args.nonUniqueSpecificUpdateAuthority;
+    this.mint = args.mint;
     this.name = args.name;
     this.symbol = args.symbol;
     this.uri = args.uri;
@@ -71,12 +96,12 @@ export class Metadata {
 }
 
 export class NameSymbolTuple {
-  key: number;
+  key: Key;
   updateAuthority: PublicKey;
   metadata: PublicKey;
 
   constructor(args: { updateAuthority: Buffer; metadata: Buffer }) {
-    this.key = NAME_SYMBOL_KEY;
+    this.key = Key.NameSymbolTupleV1;
     this.updateAuthority = new PublicKey(args.updateAuthority);
     this.metadata = new PublicKey(args.metadata);
   }
@@ -84,7 +109,7 @@ export class NameSymbolTuple {
 
 class CreateMetadataArgs {
   instruction: number = 0;
-  allow_duplicates: boolean = false;
+  allowDuplicates: boolean = false;
   name: string;
   symbol: string;
   uri: string;
@@ -93,29 +118,42 @@ class CreateMetadataArgs {
     name: string;
     symbol: string;
     uri: string;
-    allow_duplicates?: boolean;
+    allowDuplicates?: boolean;
   }) {
     this.name = args.name;
     this.symbol = args.symbol;
     this.uri = args.uri;
-    this.allow_duplicates = !!args.allow_duplicates;
+    this.allowDuplicates = !!args.allowDuplicates;
   }
 }
 class UpdateMetadataArgs {
   instruction: number = 1;
   uri: string;
   // Not used by this app, just required for instruction
-  non_unique_specific_update_authority: number;
+  nonUniqueSpecificUpdateAuthority?: PublicKey;
 
-  constructor(args: { uri: string }) {
+  constructor(args: {
+    uri: string;
+    nonUniqueSpecificUpdateAuthority?: string;
+  }) {
     this.uri = args.uri;
-    this.non_unique_specific_update_authority = 0;
+    this.nonUniqueSpecificUpdateAuthority = args.nonUniqueSpecificUpdateAuthority
+      ? new PublicKey(args.nonUniqueSpecificUpdateAuthority)
+      : undefined;
   }
 }
 
-class TransferMetadataArgs {
+class TransferUpdateAuthorityArgs {
   instruction: number = 2;
   constructor() {}
+}
+
+class CreateMasterEditionArgs {
+  instruction: number = 3;
+  maxSupply?: BN;
+  constructor(args: { maxSupply?: BN }) {
+    this.maxSupply = args.maxSupply;
+  }
 }
 
 export const SCHEMA = new Map<any, any>([
@@ -125,7 +163,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['allow_duplicates', 'u8'],
+        ['allowDuplicates', 'u8'],
         ['name', 'string'],
         ['symbol', 'string'],
         ['uri', 'string'],
@@ -139,15 +177,40 @@ export const SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['uri', 'string'],
-        ['non_unique_specific_update_authority', 'u8'],
+        [
+          'nonUniqueSpecificUpdateAuthority',
+          { kind: 'option', type: 'pubkey' },
+        ],
       ],
     },
   ],
   [
-    TransferMetadataArgs,
+    TransferUpdateAuthorityArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    CreateMasterEditionArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['maxSupply', { kind: 'option', type: 'u64' }],
+      ],
+    },
+  ],
+  [
+    MasterEdition,
+    {
+      kind: 'struct',
+      fields: [
+        ['key', 'u8'],
+        ['supply', 'u64'],
+        ['maxSupply', { kind: 'option', type: 'u64' }],
+        ['masterMint', 'publicKey'],
+      ],
     },
   ],
   [
@@ -156,8 +219,11 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['key', 'u8'],
-        ['allow_duplicates', { kind: 'option', type: 'u8' }],
-        ['mint', [32]],
+        [
+          'nonUniqueSpecificUpdateAuthority',
+          { kind: 'option', type: 'pubkey' },
+        ],
+        ['mint', 'pubkey'],
         ['name', 'string'],
         ['symbol', 'string'],
         ['uri', 'string'],
@@ -170,8 +236,8 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['key', 'u8'],
-        ['update_authority', [32]],
-        ['metadata', [32]],
+        ['updateAuthority', 'pubkey'],
+        ['metadata', 'pubkey'],
       ],
     },
   ],
@@ -181,37 +247,21 @@ export const decodeMetadata = (buffer: Buffer) => {
   return deserializeBorsh(SCHEMA, Metadata, buffer) as Metadata;
 };
 
-export async function transferMetadata(
-  symbol: string,
-  name: string,
+export async function transferUpdateAuthority(
+  account: PublicKey,
   currentUpdateAuthority: PublicKey,
   newUpdateAuthority: PublicKey,
   instructions: TransactionInstruction[],
-  signers: Account[],
-  metadataAccount?: PublicKey,
-  metadataOwnerAccount?: PublicKey,
 ) {
   const metadataProgramId = programIds().metadata;
 
-  metadataOwnerAccount =
-    metadataOwnerAccount ||
-    (
-      await PublicKey.findProgramAddress(
-        [
-          Buffer.from('metadata'),
-          metadataProgramId.toBuffer(),
-          Buffer.from(name),
-          Buffer.from(symbol),
-        ],
-        metadataProgramId,
-      )
-    )[0];
-
-  const data = Buffer.from(serialize(SCHEMA, new TransferMetadataArgs()));
+  const data = Buffer.from(
+    serialize(SCHEMA, new TransferUpdateAuthorityArgs()),
+  );
 
   const keys = [
     {
-      pubkey: metadataOwnerAccount,
+      pubkey: account,
       isSigner: false,
       isWritable: true,
     },
@@ -233,20 +283,18 @@ export async function transferMetadata(
       data: data,
     }),
   );
-
-  return [metadataAccount, metadataOwnerAccount];
 }
 
 export async function updateMetadata(
   symbol: string,
   name: string,
   uri: string,
+  newNonUniqueSpecificUpdateAuthority: string | undefined,
   mintKey: PublicKey,
   updateAuthority: PublicKey,
   instructions: TransactionInstruction[],
-  signers: Account[],
   metadataAccount?: PublicKey,
-  metadataOwnerAccount?: PublicKey,
+  nameSymbolAccount?: PublicKey,
 ) {
   const metadataProgramId = programIds().metadata;
 
@@ -263,8 +311,8 @@ export async function updateMetadata(
       )
     )[0];
 
-  metadataOwnerAccount =
-    metadataOwnerAccount ||
+  nameSymbolAccount =
+    nameSymbolAccount ||
     (
       await PublicKey.findProgramAddress(
         [
@@ -277,9 +325,13 @@ export async function updateMetadata(
       )
     )[0];
 
-  const value = new UpdateMetadataArgs({ uri });
+  const value = new UpdateMetadataArgs({
+    uri,
+    nonUniqueSpecificUpdateAuthority: !newNonUniqueSpecificUpdateAuthority
+      ? undefined
+      : newNonUniqueSpecificUpdateAuthority,
+  });
   const data = Buffer.from(serialize(SCHEMA, value));
-
   const keys = [
     {
       pubkey: metadataAccount,
@@ -292,7 +344,7 @@ export async function updateMetadata(
       isWritable: false,
     },
     {
-      pubkey: metadataOwnerAccount,
+      pubkey: nameSymbolAccount,
       isSigner: false,
       isWritable: false,
     },
@@ -305,20 +357,19 @@ export async function updateMetadata(
     }),
   );
 
-  return [metadataAccount, metadataOwnerAccount];
+  return [metadataAccount, nameSymbolAccount];
 }
 
 export async function createMetadata(
   symbol: string,
   name: string,
   uri: string,
-  allow_duplicates: boolean,
+  allowDuplicates: boolean,
   updateAuthority: PublicKey,
   mintKey: PublicKey,
   mintAuthorityKey: PublicKey,
   instructions: TransactionInstruction[],
   payer: PublicKey,
-  signers: Account[],
 ) {
   const metadataProgramId = programIds().metadata;
 
@@ -333,7 +384,7 @@ export async function createMetadata(
     )
   )[0];
 
-  const metadataOwnerAccount = (
+  const nameSymbolAccount = (
     await PublicKey.findProgramAddress(
       [
         Buffer.from('metadata'),
@@ -345,12 +396,12 @@ export async function createMetadata(
     )
   )[0];
 
-  const value = new CreateMetadataArgs({ name, symbol, uri, allow_duplicates });
+  const value = new CreateMetadataArgs({ name, symbol, uri, allowDuplicates });
   const data = Buffer.from(serialize(SCHEMA, value));
 
   const keys = [
     {
-      pubkey: metadataOwnerAccount,
+      pubkey: nameSymbolAccount,
       isSigner: false,
       isWritable: true,
     },
@@ -398,5 +449,122 @@ export async function createMetadata(
     }),
   );
 
-  return [metadataAccount, metadataOwnerAccount];
+  return [metadataAccount, nameSymbolAccount];
+}
+
+export async function createMasterEdition(
+  name: string,
+  symbol: string,
+  maxSupply: BN | undefined,
+  mintKey: PublicKey,
+  masterMintKey: PublicKey,
+  updateAuthorityKey: PublicKey,
+  mintAuthorityKey: PublicKey,
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+) {
+  const metadataProgramId = programIds().metadata;
+
+  const metadataAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        mintKey.toBuffer(),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const nameSymbolAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        Buffer.from(name),
+        Buffer.from(symbol),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const editionAccount = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from('metadata'),
+        metadataProgramId.toBuffer(),
+        mintKey.toBuffer(),
+        Buffer.from('edition'),
+      ],
+      metadataProgramId,
+    )
+  )[0];
+
+  const value = new CreateMasterEditionArgs({ maxSupply });
+  const data = Buffer.from(serialize(SCHEMA, value));
+
+  const keys = [
+    {
+      pubkey: editionAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: mintKey,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: masterMintKey,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: updateAuthorityKey,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: mintAuthorityKey,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: metadataAccount,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: nameSymbolAccount,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: payer,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: programIds().token,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SystemProgram.programId,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SYSVAR_RENT_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data,
+    }),
+  );
 }
