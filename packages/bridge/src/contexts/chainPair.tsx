@@ -24,6 +24,9 @@ import {
   TransferRequestInfo,
   wrappedAssetMintKey,
 } from '../models/bridge';
+import { useBridge } from './bridge';
+import { PublicKey } from '@solana/web3.js';
+
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
 
@@ -91,11 +94,22 @@ export const useCurrencyLeg = (mintAddress: string) => {
   const [chain, setChain] = useState(ASSET_CHAIN.Ethereum);
   const [info, setInfo] = useState<TransferRequestInfo>();
   const { userAccounts } = useUserAccounts();
+  const bridge = useBridge();
 
   const { provider, tokens: ethTokens } = useEthereum();
   const { tokens: solTokens } = useConnectionConfig();
   const connection = useConnection();
-
+  const defaultCoinInfo = {
+    address: '',
+    name: '',
+    balance: new BigNumber(0),
+    decimals: 0,
+    allowance: new BigNumber(0),
+    isWrapped: false,
+    chainID: 0,
+    assetAddress: new Buffer(0),
+    mint: '',
+  };
   useEffect(() => {
     if (!provider || !connection) {
       return;
@@ -111,23 +125,44 @@ export const useCurrencyLeg = (mintAddress: string) => {
       // sol asset on sol chain
 
       //let ethAddress: string = '';
-      if (solToken) {
-        // let signer = provider.getSigner();
-        // let e = WrappedAssetFactory.connect(asset, provider);
-        // let addr = await signer.getAddress();
-        // let decimals = await e.decimals();
-        // let symbol = await e.symbol();
-
+      // console.log({ chain, solToken, ethToken });
+      if (chain === ASSET_CHAIN.Solana) {
+        if (!solToken) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
         // TODO: checked if mint is wrapped mint from eth...
+        const currentAccount = userAccounts?.find(
+          a => a.info.mint.toBase58() === solToken.address,
+        );
+        const assetMeta = await bridge?.fetchAssetMeta(
+          new PublicKey(solToken.address),
+        );
 
-        const accounts = userAccounts
-          .filter(a => a.info.mint.toBase58() === solToken.address)
-          .sort((a, b) => a.info.amount.toNumber() - b.info.amount.toNumber());
+        if (!assetMeta || !currentAccount) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
 
-        console.log(accounts);
+        let info = {
+          address: currentAccount.pubkey.toBase58(),
+          name: solToken.symbol,
+          balance: new BigNumber(currentAccount?.info.amount.toNumber() || 0),
+          allowance: new BigNumber(0),
+          decimals: solToken.decimals,
+          isWrapped: assetMeta.chain != ASSET_CHAIN.Solana,
+          chainID: assetMeta.chain,
+          assetAddress: assetMeta.address,
+          mint: solToken.address,
+        };
+        setInfo(info);
       }
 
-      if (ethToken) {
+      if (chain === ASSET_CHAIN.Ethereum) {
+        if (!ethToken) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
         let signer = provider.getSigner();
         let e = WrappedAssetFactory.connect(mintAddress, provider);
         let addr = await signer.getAddress();
@@ -170,12 +205,9 @@ export const useCurrencyLeg = (mintAddress: string) => {
             address: info.assetAddress,
             chain: info.chainID,
           });
-
-          console.log(mint.toBase58());
         }
 
-        console.log(info);
-
+        // console.log({ info });
         setInfo(info);
       }
     })();
@@ -190,16 +222,13 @@ export const useCurrencyLeg = (mintAddress: string) => {
     userAccounts,
   ]);
 
-  return useMemo(
-    () => ({
-      amount: amount,
-      setAmount: setAmount,
-      chain: chain,
-      setChain: setChain,
-      info,
-    }),
-    [amount, setAmount, chain, setChain],
-  );
+  return {
+    amount: amount,
+    setAmount: setAmount,
+    chain: chain,
+    setChain: setChain,
+    info,
+  };
 };
 
 export function TokenChainPairProvider({ children = null as any }) {

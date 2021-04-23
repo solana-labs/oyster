@@ -28,24 +28,6 @@ export function Input(props: {
 }) {
   const { connected } = useWallet();
   const [lastAmount, setLastAmount] = useState<string>('');
-  const { userAccounts } = useUserAccounts();
-  const [balance, setBalance] = useState<number>(0);
-  const mint = useMint(props.asset?.startsWith('0x') ? '' : props.asset);
-
-  useEffect(() => {
-    if (props.chain === ASSET_CHAIN.Solana) {
-      const currentAccount = userAccounts?.find(
-        a => a.info.mint.toBase58() === props.asset,
-      );
-      if (currentAccount && mint) {
-        setBalance(
-          currentAccount.info.amount.toNumber() / Math.pow(10, mint.decimals),
-        );
-      } else {
-        setBalance(0);
-      }
-    }
-  }, [props.asset, props.chain, userAccounts, mint]);
 
   return (
     <div className={`dashed-input-container ${props.className}`}>
@@ -53,25 +35,14 @@ export function Input(props: {
       <div className="input-chain">
         <TokenChain chain={props.chain} className={'input-icon'} />
         {chainToName(props.chain)}
-        {props.chain !== ASSET_CHAIN.Solana ? (
-          typeof props.balance === 'number' && (
-            <div
-              className="balance"
-              onClick={() =>
-                props.onInputChange && props.onInputChange(props.balance)
-              }
-            >
-              {props.balance.toFixed(10)}
-            </div>
-          )
-        ) : (
-          <div
-            className="balance"
-            onClick={() => props.onInputChange && props.onInputChange(balance)}
-          >
-            {balance.toFixed(10)}
-          </div>
-        )}
+        <div
+          className="balance"
+          onClick={() =>
+            props.onInputChange && props.onInputChange(props.balance)
+          }
+        >
+          {props.balance}
+        </div>
       </div>
       <div className="input-container">
         <NumericInput
