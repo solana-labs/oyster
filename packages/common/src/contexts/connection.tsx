@@ -1,12 +1,15 @@
-import { useLocalStorageState } from '../utils/utils';
+import { sleep, useLocalStorageState } from '../utils/utils';
 import {
   Account,
   BlockhashAndFeeCalculator,
   clusterApiUrl,
   Commitment,
   Connection,
+  RpcResponseAndContext,
+  SimulatedTransactionResponse,
   Transaction,
   TransactionInstruction,
+  TransactionSignature,
 } from '@solana/web3.js';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { notify } from '../utils/notifications';
@@ -364,43 +367,188 @@ export const sendTransaction = async (
     transaction = await wallet.signTransaction(transaction);
   }
 
-  const rawTransaction = transaction.serialize();
-  let options = {
-    skipPreflight: true,
-    commitment,
-  };
-
-  const txid = await connection.sendRawTransaction(rawTransaction, options);
-  let slot = 0;
-
-  if (awaitConfirmation) {
-    const confirmation = await connection.confirmTransaction(
-      txid,
-      options && (options.commitment as any),
-    );
-    const status = confirmation.value;
-    slot = confirmation.context.slot;
-
-    if (status?.err) {
-      const errors = await getErrorForTransaction(connection, txid);
-      notify({
-        message: 'Transaction failed...',
-        description: (
-          <>
-            {errors.map(err => (
-              <div>{err}</div>
-            ))}
-            <ExplorerLink address={txid} type="transaction" />
-          </>
-        ),
-        type: 'error',
-      });
-
-      throw new Error(
-        `Raw transaction ${txid} failed (${JSON.stringify(status)})`,
-      );
-    }
-  }
+  const { txid, slot } = await sendSignedTransaction({
+    connection,
+    signedTransaction: transaction,
+  });
 
   return { txid, slot };
 };
+
+export const getUnixTs = () => {
+  return new Date().getTime() / 1000;
+};
+
+const DEFAULT_TIMEOUT = 15000;
+
+export async function sendSignedTransaction({
+  signedTransaction,
+  connection,
+  timeout = DEFAULT_TIMEOUT,
+}: {
+  signedTransaction: Transaction;
+  connection: Connection;
+  sendingMessage?: string;
+  sentMessage?: string;
+  successMessage?: string;
+  timeout?: number;
+}): Promise<{ txid: string, slot: number }> {
+  const rawTransaction = signedTransaction.serialize();
+  const startTime = getUnixTs();
+  let slot = 0;
+  const txid: TransactionSignature = await connection.sendRawTransaction(
+    rawTransaction,
+    {
+      skipPreflight: true,
+    },
+  );
+
+  console.log('Started awaiting confirmation for', txid);
+
+  let done = false;
+  (async () => {
+    while (!done && getUnixTs() - startTime < timeout) {
+      connection.sendRawTransaction(rawTransaction, {
+        skipPreflight: true,
+      });
+      await sleep(300);
+    }
+  })();
+  try {
+    slot = await awaitTransactionSignatureConfirmation(txid, timeout, connection);
+  } catch (err) {
+    if (err.timeout) {
+      throw new Error('Timed out awaiting confirmation on transaction');
+    }
+    let simulateResult: SimulatedTransactionResponse | null = null;
+    try {
+      simulateResult = (
+        await simulateTransaction(connection, signedTransaction, 'single')
+      ).value;
+    } catch (e) {}
+    if (simulateResult && simulateResult.err) {
+      if (simulateResult.logs) {
+        for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
+          const line = simulateResult.logs[i];
+          if (line.startsWith('Program log: ')) {
+            throw new Error(
+              'Transaction failed: ' + line.slice('Program log: '.length),
+            );
+          }
+        }
+      }
+      throw new Error(JSON.stringify(simulateResult.err));
+    }
+    throw new Error('Transaction failed');
+  } finally {
+    done = true;
+  }
+
+  console.log('Latency', txid, getUnixTs() - startTime);
+  return { txid, slot };
+}
+
+async function simulateTransaction(
+  connection: Connection,
+  transaction: Transaction,
+  commitment: Commitment,
+): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
+  // @ts-ignore
+  transaction.recentBlockhash = await connection._recentBlockhash(
+    // @ts-ignore
+    connection._disableBlockhashCaching,
+  );
+
+  const signData = transaction.serializeMessage();
+  // @ts-ignore
+  const wireTransaction = transaction._serialize(signData);
+  const encodedTransaction = wireTransaction.toString('base64');
+  const config: any = { encoding: 'base64', commitment };
+  const args = [encodedTransaction, config];
+
+  // @ts-ignore
+  const res = await connection._rpcRequest('simulateTransaction', args);
+  if (res.error) {
+    throw new Error('failed to simulate transaction: ' + res.error.message);
+  }
+  return res.result;
+}
+
+async function awaitTransactionSignatureConfirmation(
+  txid: TransactionSignature,
+  timeout: number,
+  connection: Connection,
+) {
+  let done = false;
+  let slot = 0;
+  let subId = 0;
+  await new Promise((resolve, reject) => {
+    (async () => {
+      setTimeout(() => {
+        if (done) {
+          return;
+        }
+        done = true;
+        console.log('Timed out for txid', txid);
+        reject({ timeout: true });
+      }, timeout);
+      try {
+        subId = connection.onSignature(
+          txid,
+          (result) => {
+            console.log('WS confirmed', txid, result);
+            done = true;
+            if (result.err) {
+              reject(result.err);
+            } else {
+              resolve(result);
+            }
+          },
+          'recent',
+        );
+        console.log('Set up WS connection', txid);
+      } catch (e) {
+        done = true;
+        console.log('WS error in setup', txid, e);
+      }
+      while (!done) {
+        // eslint-disable-next-line no-loop-func
+        (async () => {
+          try {
+            const signatureStatuses = await connection.getSignatureStatuses([
+              txid,
+            ]);
+            slot = signatureStatuses && signatureStatuses.context.slot;
+            const result = signatureStatuses && signatureStatuses.value[0];
+            if (!done) {
+              if (!result) {
+                console.log('REST null result for', txid, result);
+              } else if (result.err) {
+                console.log('REST error for', txid, result);
+                done = true;
+                reject(result.err);
+              } else if (!result.confirmations) {
+                console.log('REST no confirmations for', txid, result);
+              } else {
+                console.log('REST confirmation for', txid, result);
+                done = true;
+                resolve(result);
+              }
+            }
+          } catch (e) {
+            if (!done) {
+              console.log('REST connection error: txid', txid, e);
+            }
+          }
+        })();
+        await sleep(500);
+      }
+    })();
+  }).catch(_ => {
+    connection.removeSignatureListener(subId);
+  }).then(_ => {
+    connection.removeSignatureListener(subId);
+  });
+  done = true;
+  return slot;
+}
