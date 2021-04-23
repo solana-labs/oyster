@@ -28,6 +28,7 @@ export class AuctionManager {
 
 export class InitAuctionManagerArgs {
   instruction = 0;
+  manager?: AuctionManager;
 }
 
 export class ValidateSafetyDepositBoxArgs {
@@ -178,7 +179,7 @@ export const SCHEMA = new Map<any, any>([
         ['safetyDepositBoxIndex', 'u8'],
         ['amount', 'u8'],
         ['hasAuthority', 'u8'], // bool
-        ['editionType', 'u8'], // TODO:
+        ['editionType', 'u8'],
       ],
     },
   ],
@@ -198,7 +199,6 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        // TODO: fix enum
         ['status', 'u8'],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
@@ -220,7 +220,10 @@ export const SCHEMA = new Map<any, any>([
     InitAuctionManagerArgs,
     {
       kind: 'struct',
-      fields: [['instruction', 'u8']],
+      fields: [
+        ['instruction', 'u8'],
+        ['manager', AuctionManagerSettings],
+      ],
     },
   ],
   [

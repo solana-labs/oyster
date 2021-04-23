@@ -127,29 +127,28 @@ export const AuctionCreateView = () => {
   }, [step_param]);
 
   const gotoNextStep = (_step?: number) => {
-    const test = new AuctionManager();
-    test.key = 0;
-    test.authority = TOKEN_PROGRAM_ID;
-    test.auction = TOKEN_PROGRAM_ID;
-    test.vault = TOKEN_PROGRAM_ID;
-    test.auctionProgram = TOKEN_PROGRAM_ID;
-    test.tokenVaultProgram = TOKEN_PROGRAM_ID;
-    test.tokenMetadataProgram = TOKEN_PROGRAM_ID;
-    test.tokenProgram = TOKEN_PROGRAM_ID;
-    test.state = new AuctionManagerState();
-    test.state.status = AuctionManagerStatus.Finished;
-    test.settings = new AuctionManagerSettings();
-    test.settings.openEditionConfig = 0;
-    test.settings.openEditionFixedPrice = 0;
-    test.settings.openEditionNonWinningConstraint =
-      NonWinningConstraint.GivenForFixedPrice;
-    const buffer = serialize(SCHEMA, test);
+    // const test = new AuctionManager();
+    // test.key = 0;
+    // test.authority = TOKEN_PROGRAM_ID;
+    // test.auction = TOKEN_PROGRAM_ID;
+    // test.vault = TOKEN_PROGRAM_ID;
+    // test.auctionProgram = TOKEN_PROGRAM_ID;
+    // test.tokenVaultProgram = TOKEN_PROGRAM_ID;
+    // test.tokenMetadataProgram = TOKEN_PROGRAM_ID;
+    // test.tokenProgram = TOKEN_PROGRAM_ID;
+    // test.state = new AuctionManagerState();
+    // test.state.status = AuctionManagerStatus.Finished;
+    // test.settings = new AuctionManagerSettings();
+    // test.settings.openEditionConfig = 0;
+    // test.settings.openEditionFixedPrice = 0;
+    // test.settings.openEditionNonWinningConstraint = NonWinningConstraint.GivenForFixedPrice;
+    // const buffer = serialize(SCHEMA, test);
 
-    debugger;
+    // debugger;
 
-    const test2 = deserializeBorsh(SCHEMA, AuctionManager, Buffer.from(buffer));
+    // const test2 = deserializeBorsh(SCHEMA, AuctionManager, Buffer.from(buffer));
 
-    console.log(test2);
+    // console.log(test2);
 
     const nextStep = _step === undefined ? step + 1 : _step;
     history.push(`/auction/create/${nextStep.toString()}`);
