@@ -155,6 +155,7 @@ function voterDisplayData(
     title: key,
     group: label,
     value: amount,
+    key: key,
   });
 
   const undecidedData = [
@@ -198,6 +199,7 @@ function voterDisplayData(
   const data = [...undecidedData, ...yesData, ...noData].sort(
     (a, b) => b.value - a.value,
   );
+
   return data;
 }
 

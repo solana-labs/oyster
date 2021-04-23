@@ -14,10 +14,6 @@ const MAX_BUBBLE_AMOUNT = 50;
 
 export function VoterBubbleGraph(props: IVoterBubbleGraph) {
   const { data, width, height, endpoint } = props;
-  const subdomain = endpoint
-    .replace('http://', '')
-    .replace('https://', '')
-    .split('.')[0];
 
   // For some reason giving this a type causes an issue where setRef
   // cant be used with ref={} prop...not sure why. SetStateAction nonsense.
@@ -31,24 +27,30 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
       d.name.slice(d.name.length - 3, d.name.length),
   }));
   //console.log('Data', limitedData);
-  const format = d3.format(',d');
-  const color = d3
-    .scaleOrdinal()
-    .domain([VoteType.Undecided, VoteType.Yes, VoteType.No])
-    .range(['grey', 'green', 'red']);
-
-  const pack = (data: Array<VoterDisplayData>) => {
-    return d3
-      .pack()
-      .size([width - 2, height - 2])
-      .padding(3)(
-      //@ts-ignore
-      d3.hierarchy({ children: data }).sum(d => (d.value ? d.value : 0)),
-    );
-  };
 
   useEffect(() => {
     if (ref) {
+      const subdomain = endpoint
+        .replace('http://', '')
+        .replace('https://', '')
+        .split('.')[0];
+
+      const format = d3.format(',d');
+      const color = d3
+        .scaleOrdinal()
+        .domain([VoteType.Undecided, VoteType.Yes, VoteType.No])
+        .range(['grey', 'green', 'red']);
+
+      const pack = (data: Array<VoterDisplayData>) => {
+        return d3
+          .pack()
+          .size([width - 2, height - 2])
+          .padding(3)(
+          //@ts-ignore
+          d3.hierarchy({ children: data }).sum(d => (d.value ? d.value : 0)),
+        );
+      };
+
       ref.innerHTML = '';
       const root = pack(limitedData);
       // console.log('Re-rendered');
@@ -127,7 +129,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
           }${format(d.value)}`,
       );
     }
-  }, [ref, limitedData, height, width]);
+  }, [ref, limitedData, height, width, endpoint]);
 
   return (
     <div
