@@ -7,7 +7,7 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { ParsedAccount, contexts } from '@oyster/common';
-import { Card } from 'antd';
+import { Card, Button } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useState } from 'react';
 import { execute } from '../../actions/execute';
@@ -139,17 +139,17 @@ function PlayStatusButton({
 
   if (playing === Playstate.Unplayed)
     return (
-      <a onClick={run}>
+      <Button onClick={run}>
         <PlayCircleOutlined style={{ color: 'green' }} key="play" />
-      </a>
+      </Button>
     );
   else if (playing === Playstate.Playing)
     return <LoadingOutlined style={{ color: 'orange' }} key="loading" />;
   else if (playing === Playstate.Error)
     return (
-      <a onClick={run}>
+      <Button onClick={run}>
         <RedoOutlined style={{ color: 'orange' }} key="play" />
-      </a>
+      </Button>
     );
   else return <CheckCircleOutlined style={{ color: 'green' }} key="played" />;
 }
