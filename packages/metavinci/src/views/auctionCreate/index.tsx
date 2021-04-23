@@ -46,12 +46,20 @@ import { serialize } from 'borsh';
 const { Step } = Steps;
 const { Option } = Select;
 const { Dragger } = Upload;
+const { TextArea } = Input
 
 export enum AuctionCategory {
   Limited,
   Single,
   Open,
   Tiered,
+}
+
+interface Tier {
+  to: number;
+  name: string;
+  description?: string;
+  items: ParsedAccount<Metadata>[];
 }
 
 export interface AuctionState {
@@ -87,6 +95,8 @@ export interface AuctionState {
   gapTime?: number;
   tickSizeEndingPhase?: number;
 
+  spots?: number;
+  tiers?: Array<Tier>;
 }
 
 export const AuctionCreateView = () => {
@@ -412,13 +422,27 @@ const NumberOfWinnersStep = (props: {
 }) => {
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
-      <p>
-        Provide detailed auction parameters such as price, start time, etc.
-        </p>
+      <h2>Tiered Auction</h2>
+      <p>Create a Tiered Auction</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">How many participants can win the auction?</span>
+          <span className="field-info">This is the number of spots in the leaderboard.</span>
+          <Input
+            type="number"
+            autoFocus
+            className="input"
+            placeholder="Number of spots in the leaderboard"
+            onChange={info =>
+              props.setAttributes({
+                ...props.attributes,
+                spots: parseInt(info.target.value),
+              })
+            }
+          />
+        </label>
       </Col>
     </Row>
     <Row>
@@ -427,27 +451,129 @@ const NumberOfWinnersStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Tiers
-        </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
+
+const TierWinners = (props: {
+  idx: number;
+  tier: Tier;
+  setTier: Function;
+  previousTo?: number;
+}) => {
+  return <>
+    <Divider />
+    <label className="action-field">
+      <span className="field-title">Winners</span>
+      <div>
+        <Input
+          disabled={props.idx === 0}
+          defaultValue={(props.previousTo || 0) + 1}
+          type="number"
+          className="input"
+          style={{ width: '30%' }}
+          onChange={info =>
+            null
+          }
+        />
+        &nbsp;to&nbsp;
+        <Input
+          defaultValue={props.tier.to}
+          type="number"
+          className="input"
+          style={{ width: '30%' }}
+          onChange={info =>
+            null
+          }
+        />
+      </div>
+    </label>
+
+    <label className="action-field">
+      <span className="field-title">Tier Name</span>
+      <Input
+        className="input"
+        placeholder="Max 50 characters"
+        onChange={info =>
+          props.setTier(props.idx, {
+            ...props.tier,
+            name: info.target.value || "",
+          })
+        }
+      />
+    </label>
+
+    <label className="action-field">
+      <span className="field-title">Tier Description</span>
+      <TextArea
+        className="input"
+        style={{ height: 150 }}
+        placeholder="Max 500 characters"
+        onChange={info =>
+          props.setTier(props.idx, {
+            ...props.tier,
+            description: info.target.value || "",
+          })
+        }
+      />
+    </label>
+
+    <ArtSelector selected={[]} setSelected={_ => { }} allowMultiple={true} />
+  </>
+}
 
 const TierStep = (props: {
   attributes: AuctionState;
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
+
+  const setTier = (idx: number, tier: Tier) => {
+    let tiers = props.attributes.tiers as Array<Tier>
+    tiers[idx] = tier
+    props.setAttributes({
+      ...props.attributes,
+      tiers,
+    })
+  }
+
+  const tiers = props.attributes.tiers || []
+
   return <>
     <Row className="call-to-action">
-      <h2>Specify the terms of your auction</h2>
-      <p>
-        Provide detailed auction parameters such as price, start time, etc.
-      </p>
+      <h2>Tiers</h2>
+      <p>Winners in the same tier will receive the next lowest edition number based on their leaderboard standing.</p>
     </Row>
     <Row className="content-action">
       <Col className="section" xl={24}>
+        <label className="action-field">
+          <span className="field-title">Number of Tiers</span>
+          <span className="field-info">Each winner in a given tier will receive the same reward.</span>
+          <Input
+            type="number"
+            min={1}
+            autoFocus
+            className="input"
+            onChange={info => props.setAttributes({
+              ...props.attributes,
+              tiers: [...Array(parseInt(info.target.value) || 0)].map((_, idx) => ({
+                to: Math.trunc((idx + 1) * (props.attributes.spots as number) / parseInt(info.target.value)),
+                name: "",
+                description: "",
+                items: [],
+              }))
+            })}
+          />
+        </label>
+
+        {tiers.map((tier, idx) => <TierWinners
+          key={idx}
+          idx={idx}
+          tier={tier}
+          setTier={setTier}
+          previousTo={tiers[idx - 1]?.to}
+        />)}
       </Col>
     </Row>
     <Row>
@@ -456,9 +582,7 @@ const TierStep = (props: {
         size="large"
         onClick={props.confirm}
         className="action-btn"
-      >
-        Continue to Price
-      </Button>
+      >Continue</Button>
     </Row>
   </>;
 };
