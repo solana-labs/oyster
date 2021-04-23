@@ -1,4 +1,22 @@
-import { serialize, BinaryReader, Schema, BorshError } from 'borsh';
+import { PublicKey } from '@solana/web3.js';
+import {
+  serialize,
+  BinaryReader,
+  Schema,
+  BorshError,
+  BinaryWriter,
+} from 'borsh';
+
+(BinaryReader.prototype as any).readPubkey = function () {
+  const reader = (this as unknown) as BinaryReader;
+  const array = reader.readFixedArray(32);
+  return new PublicKey(array);
+};
+
+(BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {
+  const writer = (this as unknown) as BinaryWriter;
+  writer.writeFixedArray(value.toBuffer());
+};
 
 function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);

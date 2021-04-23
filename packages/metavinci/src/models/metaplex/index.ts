@@ -9,20 +9,6 @@ export * from './redeemMasterEditionBid';
 export * from './redeemOpenEditionBid';
 export * from './startAuction';
 export * from './validateSafetyDepositBox';
-
-(BinaryReader.prototype as any).readPubkey = function () {
-  debugger;
-  const reader = (this as unknown) as BinaryReader;
-  const array = reader.readFixedArray(32);
-  return new PublicKey(array);
-};
-
-(BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {
-  debugger;
-  const writer = (this as unknown) as BinaryWriter;
-  writer.writeFixedArray(value.toBuffer());
-};
-
 export class AuctionManager {
   key?: number;
   authority?: PublicKey;
@@ -65,11 +51,13 @@ export class StartAuctionArgs {
 }
 
 export class AuctionManagerSettings {
-  openEditionWinnerConstraint?: WinningConstraint;
-  openEditionNonWinningConstraint?: NonWinningConstraint;
+  openEditionWinnerConstraint: WinningConstraint =
+    WinningConstraint.NoOpenEdition;
+  openEditionNonWinningConstraint: NonWinningConstraint =
+    NonWinningConstraint.GivenForFixedPrice;
   winningConfigs?: WinningConfig[];
   openEditionConfig?: number;
-  openEditionFixedPrice?: number;
+  openEditionFixedPrice: number = 0;
 }
 
 export enum WinningConstraint {
@@ -109,7 +97,7 @@ export class WinningConfigState {
 }
 
 export class AuctionManagerState {
-  status?: AuctionManagerStatus;
+  status: AuctionManagerStatus = AuctionManagerStatus.Initialized;
   /// When all configs are validated the auction is started and auction manager moves to Running
   winningConfigsValidated?: number;
 
@@ -159,7 +147,7 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        ['openEditionWinnerConstraint', { kind: 'enum', values: [0, 1, 2] }], // TODO:
+        ['openEditionWinnerConstraint', { kind: 'enum', values: [0, 1] }], // TODO:
         [
           'openEditionNonWinningConstraint',
           { kind: 'enum', values: [0, 1, 2] },
@@ -199,7 +187,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         // TODO: fix enum
-        ['status', { kind: 'enum', values: [0, 1, 2] }],
+        ['status', { kind: 'enum', values: [0, 1, 2, 3, 4] }],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
         ['winningConfigStates', [WinningConfigState]],
