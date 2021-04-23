@@ -4,11 +4,12 @@ export const WORMHOLE_PROGRAM_ID = new PublicKey(
   'WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC',
 );
 
+export const TRANSFER_ASSETS_OUT_INSTRUCTION: number = 1;
 export const POSTVAA_INSTRUCTION: number = 2;
 
 const INSTRUCTION_LOOKUP: { [key: number]: string } = {
   0: 'Initialize Bridge',
-  1: 'Transfer Assets Out',
+  [TRANSFER_ASSETS_OUT_INSTRUCTION]: 'Transfer Assets Out',
   [POSTVAA_INSTRUCTION]: 'Post VAA',
   3: 'Evict Transfer Proposal',
   4: 'Evict Claimed VAA',

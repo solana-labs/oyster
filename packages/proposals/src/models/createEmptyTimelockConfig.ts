@@ -1,13 +1,7 @@
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { CONFIG_NAME_LENGTH, TimelockInstruction } from './timelock';
-import BN from 'bn.js';
-import * as Layout from '../utils/layout';
+import { TimelockInstruction } from './timelock';
 
 ///   0. `[]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
 ///           program account key, governance mint key, council mint key, and timelock program account key.
@@ -20,6 +14,8 @@ import * as Layout from '../utils/layout';
 export const createEmptyTimelockConfigInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
+  programDataAccount: PublicKey,
+  programUpgradeAuthority: PublicKey,
   governanceMint: PublicKey,
   payer: PublicKey,
   councilMint?: PublicKey,
@@ -40,15 +36,16 @@ export const createEmptyTimelockConfigInstruction = (
   const keys = [
     { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
+    { pubkey: programDataAccount, isSigner: false, isWritable: true },
+    { pubkey: programUpgradeAuthority, isSigner: true, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
-
+    { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
     {
-      pubkey: PROGRAM_IDS.timelock.programId,
+      pubkey: PROGRAM_IDS.bpf_upgrade_loader,
       isSigner: false,
       isWritable: false,
     },
-    { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
 
   if (councilMint) {

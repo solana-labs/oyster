@@ -108,9 +108,13 @@ function PlayStatusButton({
 
   useEffect(() => {
     if (ineligibleToSee) {
-      const id = setTimeout(() => {
+      const timer = setTimeout(() => {
         connection.getSlot().then(setCurrSlot);
       }, 5000);
+
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [ineligibleToSee, connection, currSlot]);
 
@@ -127,8 +131,8 @@ function PlayStatusButton({
   };
 
   if (
-    state.info.status != TimelockStateStatus.Executing &&
-    state.info.status != TimelockStateStatus.Completed
+    state.info.status !== TimelockStateStatus.Executing &&
+    state.info.status !== TimelockStateStatus.Completed
   )
     return null;
   if (ineligibleToSee) return null;

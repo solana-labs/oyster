@@ -32,8 +32,8 @@ export async function getGovernanceVotingRecords(
             { dataSize: GovernanceVotingRecordLayout.span },
             {
               memcmp: {
-                // Proposal key is first thing in the account data
-                offset: 0,
+                // Proposal key is second thing in the account data
+                offset: 1,
                 bytes: proposal.toString(),
               },
             },

@@ -5,6 +5,7 @@ import assert from 'assert';
 // @ts-ignore
 import * as BufferLayout from 'buffer-layout';
 import * as bs58 from 'bs58';
+import { AssetMeta } from '../models/bridge';
 
 export interface Lockup {
   lockupAddress: PublicKey;
@@ -71,7 +72,40 @@ class SolanaBridge {
       data,
     });
   }
+  // fetchAssetMeta fetches the AssetMeta for an SPL token
+  async fetchAssetMeta(mint: PublicKey): Promise<AssetMeta> {
+    // @ts-ignore
+    let configKey = await this.getConfigKey();
+    let seeds: Array<Buffer> = [
+      Buffer.from('meta'),
+      configKey.toBuffer(),
+      mint.toBuffer(),
+    ];
+    // @ts-ignore
+    let metaKey = (
+      await solanaWeb3.PublicKey.findProgramAddress(seeds, this.programID)
+    )[0];
+    let metaInfo = await this.connection.getAccountInfo(metaKey);
+    if (metaInfo == null || metaInfo.lamports == 0) {
+      return {
+        address: mint.toBuffer(),
+        chain: CHAIN_ID_SOLANA,
+        decimals: 0,
+      };
+    } else {
+      const dataLayout = BufferLayout.struct([
+        BufferLayout.u8('assetChain'),
+        BufferLayout.blob(32, 'assetAddress'),
+      ]);
+      let wrappedMeta = dataLayout.decode(metaInfo?.data);
 
+      return {
+        address: wrappedMeta.assetAddress,
+        chain: wrappedMeta.assetChain,
+        decimals: 0,
+      };
+    }
+  }
   // fetchSignatureStatus fetches the signatures for a VAA
   async fetchSignatureStatus(signatureStatus: PublicKey): Promise<Signature[]> {
     let signatureInfo = await this.connection.getAccountInfo(

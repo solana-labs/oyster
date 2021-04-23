@@ -18,6 +18,7 @@ import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
+import { useBridge } from '../../contexts/bridge';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -40,6 +41,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
+  const bridge = useBridge();
   const { wallet, connected } = useWallet();
   const { provider, tokenMap } = useEthereum();
   const hasCorrespondingNetworks = useCorrectNetwork();
@@ -50,6 +52,7 @@ export const Transfer = () => {
     setMintAddress,
     setLastTypedAccount,
   } = useTokenChainPairState();
+
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
     to: ASSET_CHAIN.Solana,
@@ -77,7 +80,7 @@ export const Transfer = () => {
       to: B.chain,
       info: A.info,
     });
-  }, [A, B, mintAddress]);
+  }, [A, B, mintAddress, A.info]);
 
   return (
     <>
@@ -92,7 +95,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const from = A.chain;
             A.setChain(chain);
-            B.setChain(from);
+            if (B.chain === chain) {
+              B.setChain(from);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(A.chain);
@@ -126,7 +131,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const to = B.chain;
             B.setChain(chain);
-            A.setChain(to);
+            if (A.chain === chain) {
+              A.setChain(to);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(B.chain);
@@ -171,6 +178,7 @@ export const Transfer = () => {
 
                         setActiveSteps(steps);
                       },
+                      bridge,
                     );
                   }
 

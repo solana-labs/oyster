@@ -437,7 +437,7 @@ export const TimelockConfigParser = (
       votingEntryRule: data.votingEntryRule,
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
-      councilMint: data.councilMintOption == 1 ? data.councilMint : null,
+      councilMint: data.councilMintOption === 1 ? data.councilMint : null,
       program: data.program,
       timeLimit: data.timeLimit,
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),

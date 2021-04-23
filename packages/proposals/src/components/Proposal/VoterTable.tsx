@@ -61,6 +61,7 @@ export const VoterTable = (props: IVoterTable) => {
         <a
           href={`https://explorer.solana.com/address/${key}?cluster=${subdomain}`}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {breakpoint.xxl && (
             <span>
@@ -89,7 +90,7 @@ export const VoterTable = (props: IVoterTable) => {
       render: (count: number, record: VoterDisplayData) => (
         <span
           style={
-            record.group == VoteType.Undecided
+            record.group === VoteType.Undecided
               ? { color: 'grey' }
               : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
@@ -101,12 +102,12 @@ export const VoterTable = (props: IVoterTable) => {
     {
       title: LABELS.PERCENTAGE,
       dataIndex: 'value',
-      key: 'value',
+      key: 'percentage',
       align: 'center',
       render: (count: number, record: VoterDisplayData) => (
         <span
           style={
-            record.group == VoteType.Undecided
+            record.group === VoteType.Undecided
               ? { color: 'grey' }
               : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }

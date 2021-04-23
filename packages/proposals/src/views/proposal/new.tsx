@@ -138,7 +138,9 @@ export function NewForm({
         >
           <Select placeholder={LABELS.SELECT_CONFIG}>
             {configs.map(c => (
-              <Option value={c.pubkey.toBase58()}>{c.info.name}</Option>
+              <Option value={c.pubkey.toBase58()} key={c.pubkey.toBase58()}>
+                {c.info.name}
+              </Option>
             ))}
           </Select>
         </Form.Item>
