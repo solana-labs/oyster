@@ -27,7 +27,6 @@ function deserializeField(
   fieldName: string,
   fieldType: any,
   reader: BinaryReader,
-  optional: boolean,
 ): any {
   try {
     if (typeof fieldType === 'string') {
@@ -40,20 +39,14 @@ function deserializeField(
       }
 
       return reader.readArray(() =>
-        deserializeField(schema, fieldName, fieldType[0], reader, false),
+        deserializeField(schema, fieldName, fieldType[0], reader),
       );
     }
 
     if (fieldType.kind === 'option') {
       const option = reader.readU8();
       if (option) {
-        return deserializeField(
-          schema,
-          fieldName,
-          fieldType.type,
-          reader,
-          false,
-        );
+        return deserializeField(schema, fieldName, fieldType.type, reader);
       }
 
       return undefined;
@@ -86,7 +79,6 @@ function deserializeStruct(
         fieldName,
         fieldType,
         reader,
-        false,
       );
     }
     return new classType(result);
@@ -98,13 +90,7 @@ function deserializeStruct(
       throw new BorshError(`Enum index: ${idx} is out of range`);
     }
     const [fieldName, fieldType] = structSchema.values[idx];
-    const fieldValue = deserializeField(
-      schema,
-      fieldName,
-      fieldType,
-      reader,
-      false,
-    );
+    const fieldValue = deserializeField(schema, fieldName, fieldType, reader);
     return new classType({ [fieldName]: fieldValue });
   }
 

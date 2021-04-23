@@ -10,7 +10,7 @@ export * from './redeemOpenEditionBid';
 export * from './startAuction';
 export * from './validateSafetyDepositBox';
 export class AuctionManager {
-  key?: number;
+  key: number = 0;
   authority?: PublicKey;
   auction?: PublicKey;
   vault?: PublicKey;
@@ -20,6 +20,10 @@ export class AuctionManager {
   tokenProgram?: PublicKey;
   state?: AuctionManagerState;
   settings?: AuctionManagerSettings;
+
+  constructor(args?: AuctionManager) {
+    Object.assign(this, args);
+  }
 }
 
 export class InitAuctionManagerArgs {
@@ -55,9 +59,13 @@ export class AuctionManagerSettings {
     WinningConstraint.NoOpenEdition;
   openEditionNonWinningConstraint: NonWinningConstraint =
     NonWinningConstraint.GivenForFixedPrice;
-  winningConfigs?: WinningConfig[];
-  openEditionConfig?: number;
+  winningConfigs: WinningConfig[] = [];
+  openEditionConfig: number = 0;
   openEditionFixedPrice: number = 0;
+
+  constructor(args?: AuctionManagerSettings) {
+    Object.assign(this, args);
+  }
 }
 
 export enum WinningConstraint {
@@ -81,33 +89,36 @@ export enum EditionType {
 }
 
 export class WinningConfig {
-  safetyDepositBoxIndex?: number;
-  amount?: number;
-  hasAuthority?: boolean;
-  editionType?: EditionType;
+  safetyDepositBoxIndex: number = 0;
+  amount: number = 0;
+  hasAuthority: boolean = false;
+  editionType: EditionType = EditionType.NA;
+
+  constructor(args?: WinningConfig) {
+    Object.assign(this, args);
+  }
 }
 
 export class WinningConfigState {
-  /// Used for cases of minting Limited Editions and keeping track of how many have been made so far.
-  amountMinted?: number;
-  /// Each safety deposit box needs to be validated via endpoint before auction manager will agree to let auction begin.
-  validated?: boolean;
-  /// Ticked to true when a prize is claimed
-  claimed?: boolean;
+  amountMinted: number = 0;
+  validated: boolean = false;
+  claimed: boolean = false;
+
+  constructor(args?: WinningConfigState) {
+    Object.assign(this, args);
+  }
 }
 
 export class AuctionManagerState {
   status: AuctionManagerStatus = AuctionManagerStatus.Initialized;
-  /// When all configs are validated the auction is started and auction manager moves to Running
-  winningConfigsValidated?: number;
+  winningConfigsValidated: number = 0;
+  masterEditionsWithAuthoritiesRemainingToReturn: number = 0;
 
-  /// Each master edition used as a template has to grant it's authority to the auction manager.
-  /// This counter is incremented by one each time this is done. At the end of the auction; this is decremented
-  /// each time authority is delegated back to the owner or the new owner and when it hits 0 another condition
-  /// is met for going to Finished state.
-  masterEditionsWithAuthoritiesRemainingToReturn?: number;
+  winningConfigStates: WinningConfigState[] = [];
 
-  winningConfigStates?: WinningConfigState[];
+  constructor(args?: AuctionManagerState) {
+    Object.assign(this, args);
+  }
 }
 
 export enum AuctionManagerStatus {
@@ -119,8 +130,12 @@ export enum AuctionManagerStatus {
 }
 
 export class BidRedemptionTicket {
-  openEditionRedeemed?: boolean;
-  bidRedeemed?: boolean;
+  openEditionRedeemed: boolean = false;
+  bidRedeemed: boolean = false;
+
+  constructor(args?: BidRedemptionTicket) {
+    Object.assign(this, args);
+  }
 }
 
 export const SCHEMA = new Map<any, any>([
@@ -147,11 +162,8 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        ['openEditionWinnerConstraint', { kind: 'enum', values: [0, 1] }], // TODO:
-        [
-          'openEditionNonWinningConstraint',
-          { kind: 'enum', values: [0, 1, 2] },
-        ], // TODO:
+        ['openEditionWinnerConstraint', 'u8'], // enum
+        ['openEditionNonWinningConstraint', 'u8'], // TODO:
         ['winningConfigs', [WinningConfig]], // TODO: check
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
         ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
@@ -166,7 +178,7 @@ export const SCHEMA = new Map<any, any>([
         ['safetyDepositBoxIndex', 'u8'],
         ['amount', 'u8'],
         ['hasAuthority', 'u8'], // bool
-        ['editionType', { kind: 'enum', values: [0, 1, 2] }], // TODO:
+        ['editionType', 'u8'], // TODO:
       ],
     },
   ],
@@ -187,7 +199,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         // TODO: fix enum
-        ['status', { kind: 'enum', values: [0, 1, 2, 3, 4] }],
+        ['status', 'u8'],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
         ['winningConfigStates', [WinningConfigState]],
