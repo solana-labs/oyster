@@ -40,8 +40,8 @@ const columns = [
   },
   {
     title: LABELS.PROPOSAL_TYPE,
-    dataIndex: 'timelockType',
-    key: 'timelockType',
+    dataIndex: 'governanceType',
+    key: 'governanceType',
     render: (number: number) => <span>{GovernanceType[number]}</span>,
   },
   {

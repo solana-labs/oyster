@@ -120,7 +120,7 @@ export function NewForm({
     }
 
     const uninitializedGovernance = {
-      timelockType: values.governanceType,
+      governanceType: values.governanceType,
       executionType: values.executionType,
       voteThreshold: values.voteThreshold,
       votingEntryRule: values.votingEntryRule,
@@ -215,7 +215,7 @@ export function NewForm({
           </Select>
         </Form.Item>
         <Form.Item
-          name="timelockType"
+          name="governanceType"
           label={LABELS.PROPOSAL_TYPE}
           rules={[{ required: true }]}
           initialValue={GovernanceType.Governance}

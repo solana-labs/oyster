@@ -132,7 +132,7 @@ export function NewForm({
           <Input maxLength={DESC_SIZE} placeholder={LABELS.GIST_PLACEHOLDER} />
         </Form.Item>
         <Form.Item
-          name="timelockConfigKey"
+          name="governanceKey"
           label={LABELS.CONFIG}
           rules={[{ required: true }]}
         >

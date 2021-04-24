@@ -144,7 +144,7 @@ export const registerProgramGovernance = async (
 
       uninitializedGovernance.voteThreshold!,
       uninitializedGovernance.executionType || ExecutionType.Independent,
-      uninitializedGovernance.timelockType || GovernanceType.Governance,
+      uninitializedGovernance.governanceType || GovernanceType.Governance,
       uninitializedGovernance.votingEntryRule || VotingEntryRule.Anytime,
       uninitializedGovernance.minimumSlotWaitingPeriod || new BN(0),
       uninitializedGovernance.timeLimit || new BN(0),

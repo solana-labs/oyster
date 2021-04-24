@@ -66,7 +66,7 @@ export interface Governance {
   /// Execution type
   executionType: ExecutionType;
   /// Governance Type
-  timelockType: GovernanceType;
+  governanceType: GovernanceType;
   /// Voting entry rule
   votingEntryRule: VotingEntryRule;
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
@@ -99,7 +99,7 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
     BufferLayout.u8('accountType'),
     BufferLayout.u8('voteThreshold'),
     BufferLayout.u8('executionType'),
-    BufferLayout.u8('timelockType'),
+    BufferLayout.u8('governanceType'),
     BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
@@ -432,7 +432,7 @@ export const GovernanceParser = (
       accountType: data.accountType,
       voteThreshold: data.voteThreshold,
       executionType: data.executionType,
-      timelockType: data.timelockType,
+      governanceType: data.governanceType,
       votingEntryRule: data.votingEntryRule,
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
