@@ -10,7 +10,7 @@ module.exports = {
   webpack: {
     configure: (webpackConfig, { env, paths }) => {
       paths.appBuild = webpackConfig.output.path = path.resolve(
-        './../../build/proposals',
+        './../../build/governance',
       );
       return webpackConfig;
     },

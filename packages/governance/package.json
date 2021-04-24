@@ -1,5 +1,5 @@
 {
-  "name": "proposals",
+  "name": "governance",
   "version": "0.0.1",
   "dependencies": {
     "@ant-design/icons": "^4.4.0",
@@ -60,8 +60,8 @@
     "localnet:down": "solana-localnet down",
     "localnet:logs": "solana-localnet logs -f",
     "predeploy": "git pull --ff-only && yarn && yarn build",
-    "deploy": "gh-pages -d ../../build/proposals --repo https://github.com/solana-labs/oyster-gov",
-    "deploy:ar": "arweave deploy-dir ../../build/proposals --key-file ",
+    "deploy": "gh-pages -d ../../build/governance --repo https://github.com/solana-labs/oyster-gov",
+    "deploy:ar": "arweave deploy-dir ../../build/governance --key-file ",
     "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\""
   },
   "eslintConfig": {

@@ -1,6 +1,6 @@
 {
-  "name": "Oyster Proposals",
-  "short_name": "Oyster Proposals",
+  "name": "Oyster Governance",
+  "short_name": "Oyster Governance",
   "display": "standalone",
   "start_url": "./",
   "theme_color": "#002140",
