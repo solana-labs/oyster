@@ -26,6 +26,10 @@ export const MEMO_ID = new PublicKey(
   'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
 );
 
+export const VAULT_ID = new PublicKey(
+  '94wRaYAQdC2gYF76AUTYSugNJ3rAC4EimjAMPwM7uYry',
+);
+
 export let SYSTEM = new PublicKey('11111111111111111111111111111111');
 
 let WORMHOLE_BRIDGE: {
@@ -166,5 +170,6 @@ export const programIds = () => {
     system: SYSTEM,
     metadata: METADATA_PROGRAM_ID,
     memo: MEMO_ID,
+    vault: VAULT_ID,
   };
 };

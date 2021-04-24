@@ -209,7 +209,7 @@ export const SCHEMA = new Map<any, any>([
         ['key', 'u8'],
         ['supply', 'u64'],
         ['maxSupply', { kind: 'option', type: 'u64' }],
-        ['masterMint', 'publicKey'],
+        ['masterMint', 'pubkey'],
       ],
     },
   ],
