@@ -7,9 +7,10 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { ParsedAccount, contexts } from '@oyster/common';
+import { Message } from '@solana/web3.js';
 import { Card, Button } from 'antd';
 import Meta from 'antd/lib/card/Meta';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
@@ -18,6 +19,7 @@ import {
   TimelockStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
+
 import './style.less';
 
 const { useWallet } = contexts.Wallet;
@@ -44,13 +46,24 @@ export function InstructionCard({
   const [playing, setPlaying] = useState(
     instruction.info.executed === 1 ? Playstate.Played : Playstate.Unplayed,
   );
+
+  const instructionDetails = useMemo(() => {
+    const message = Message.from(instruction.info.instruction);
+
+    return {
+      instructionProgramID:
+        message.accountKeys[message.instructions[0].programIdIndex],
+      instructionData: message.instructions[0].data,
+    };
+  }, [instruction]);
+
   const contentList: Record<string, JSX.Element> = {
     info: (
       <Meta
-        title={'Program: TODO'}
+        title={`${LABELS.PROGRAM_ID}: ${instructionDetails.instructionProgramID}`}
         description={
           <>
-            <p>Instruction: TODO</p>
+            <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.instructionData}`}</p>
             <p>
               {LABELS.DELAY}: {instruction.info.slot.toNumber()}
             </p>

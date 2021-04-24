@@ -75,7 +75,7 @@ const columns = [
     render: (key: PublicKey) => <span>{key?.toBase58()}</span>,
   },
   {
-    title: LABELS.PROGRAM,
+    title: LABELS.PROGRAM_ID,
     dataIndex: 'program',
     key: 'program',
     render: (key: PublicKey) => <span>{key.toBase58()}</span>,
