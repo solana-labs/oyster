@@ -1,4 +1,4 @@
-import { Card, Col, Grid, Row, Spin, Statistic, Tabs } from 'antd';
+import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
@@ -30,11 +30,12 @@ import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
 const { TabPane } = Tabs;
 
+// eslint-disable-next-line
 export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 const { useAccountByMint } = hooks;
-const { useBreakpoint } = Grid;
+//const { useBreakpoint } = Grid;
 
 export enum VoteType {
   Undecided = 'Undecided',
@@ -134,7 +135,7 @@ function useLoadGist({
           setLoading(false);
         });
     }
-  }, [loading]);
+  }, [loading]); //eslint-disable-line
 }
 interface PartialGovernanceRecord {
   info: { yesCount: BN; noCount: BN; undecidedCount: BN };
@@ -244,7 +245,7 @@ function InnerProposalView({
   const [msg, setMsg] = useState('');
   const [width, setWidth] = useState<number>();
   const [height, setHeight] = useState<number>();
-  const breakpoint = useBreakpoint();
+  //  const breakpoint = useBreakpoint();
 
   useLoadGist({
     loading,

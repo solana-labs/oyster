@@ -81,9 +81,9 @@ function useSetupProposalsCache({
   setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
 }) {
-  const PROGRAM_IDS = utils.programIds();
-
   useEffect(() => {
+    const PROGRAM_IDS = utils.programIds();
+
     const query = async () => {
       const programAccounts = await connection.getProgramAccounts(
         PROGRAM_IDS.timelock.programId,
@@ -187,7 +187,7 @@ function useSetupProposalsCache({
     return () => {
       connection.removeProgramAccountChangeListener(subID);
     };
-  }, [connection, PROGRAM_IDS.timelock.programId.toBase58()]);
+  }, [connection]); //eslint-disable-line
 }
 export const useProposals = () => {
   const context = useContext(ProposalsContext);

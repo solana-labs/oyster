@@ -133,7 +133,7 @@ export const GovernanceDashboard = () => {
         })),
       );
     });
-  }, [configs.length, myTokenAccts.join(',')]);
+  }, [configs.length, myTokenAccts.join(',')]); //eslint-disable-line
 
   return <Table columns={columns} dataSource={data} />;
 };
