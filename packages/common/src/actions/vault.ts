@@ -9,8 +9,8 @@ import { deserializeBorsh } from './../utils/borsh';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
 
-const PREFIX = 'vault';
-export enum Key {
+export const VAULT_PREFIX = 'vault';
+export enum VaultKey {
   VaultV1 = 0,
   SafetyDepositBoxV1 = 1,
   ExternalPriceAccountV1 = 2,
@@ -23,8 +23,12 @@ export enum VaultState {
   Deactivated = 3,
 }
 
+export const MAX_VAULT_SIZE =
+  1 + 32 + 32 + 32 + 32 + 1 + 32 + 1 + 32 + 1 + 1 + 8;
+
+export const MAX_EXTERNAL_ACCOUNT_SIZE = 1 + 8 + 32 + 1;
 export class Vault {
-  key: Key;
+  key: VaultKey;
   /// Store token program used
   tokenProgram: PublicKey;
   /// Mint that produces the fractional shares
@@ -65,7 +69,7 @@ export class Vault {
     state: VaultState;
     lockedPricePerShare: BN;
   }) {
-    this.key = Key.VaultV1;
+    this.key = VaultKey.VaultV1;
     this.tokenProgram = args.tokenProgram;
     this.fractionMint = args.fractionMint;
     this.authority = args.authority;
@@ -80,8 +84,8 @@ export class Vault {
 }
 export class SafetyDepositBox {
   /// Each token type in a vault has it's own box that contains it's mint and a look-back
-  key: Key;
-  /// Key pointing to the parent vault
+  key: VaultKey;
+  /// VaultKey pointing to the parent vault
   vault: PublicKey;
   /// This particular token's mint
   tokenMint: PublicKey;
@@ -96,7 +100,7 @@ export class SafetyDepositBox {
     store: PublicKey;
     order: number;
   }) {
-    this.key = Key.SafetyDepositBoxV1;
+    this.key = VaultKey.SafetyDepositBoxV1;
     this.vault = args.vault;
     this.tokenMint = args.tokenMint;
     this.store = args.store;
@@ -105,7 +109,7 @@ export class SafetyDepositBox {
 }
 
 export class ExternalPriceAccount {
-  key: Key;
+  key: VaultKey;
   pricePerShare: BN;
   /// Mint of the currency we are pricing the shares against, should be same as redeem_treasury.
   /// Most likely will be USDC mint most of the time.
@@ -118,7 +122,7 @@ export class ExternalPriceAccount {
     priceMint: PublicKey;
     allowedToCombine: boolean;
   }) {
-    this.key = Key.ExternalPriceAccountV1;
+    this.key = VaultKey.ExternalPriceAccountV1;
     this.pricePerShare = args.pricePerShare;
     this.priceMint = args.priceMint;
     this.allowedToCombine = args.allowedToCombine;
@@ -163,7 +167,7 @@ class UpdateExternalPriceAccountArgs {
   }
 }
 
-export const SCHEMA = new Map<any, any>([
+export const VAULT_SCHEMA = new Map<any, any>([
   [
     InitVaultArgs,
     {
@@ -254,7 +258,7 @@ export const SCHEMA = new Map<any, any>([
 ]);
 
 export const decodeVault = (buffer: Buffer) => {
-  return deserializeBorsh(SCHEMA, Vault, buffer) as Vault;
+  return deserializeBorsh(VAULT_SCHEMA, Vault, buffer) as Vault;
 };
 
 export async function initVault(
@@ -270,7 +274,7 @@ export async function initVault(
   const vaultProgramId = programIds().vault;
 
   const data = Buffer.from(
-    serialize(SCHEMA, new InitVaultArgs({ allowFurtherShareCreation })),
+    serialize(VAULT_SCHEMA, new InitVaultArgs({ allowFurtherShareCreation })),
   );
 
   const keys = [
@@ -340,7 +344,7 @@ export async function addTokenToInactiveVault(
 
   const safetyDepositBox: PublicKey = (
     await PublicKey.findProgramAddress(
-      [Buffer.from(PREFIX), vault.toBuffer(), tokenMint.toBuffer()],
+      [Buffer.from(VAULT_PREFIX), vault.toBuffer(), tokenMint.toBuffer()],
       vaultProgramId,
     )
   )[0];
@@ -350,7 +354,7 @@ export async function addTokenToInactiveVault(
     amount,
   });
 
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
   const keys = [
     {
       pubkey: safetyDepositBox,
@@ -424,13 +428,13 @@ export async function activateVault(
 
   const fractionMintAuthority = (
     await PublicKey.findProgramAddress(
-      [Buffer.from(PREFIX), vaultProgramId.toBuffer()],
+      [Buffer.from(VAULT_PREFIX), vaultProgramId.toBuffer()],
       vaultProgramId,
     )
   )[0];
 
   const value = new NumberOfShareArgs({ instruction: 2, numberOfShares });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
 
   const keys = [
     {
@@ -490,7 +494,7 @@ export async function combineVault(
 
   const burnAuthority = (
     await PublicKey.findProgramAddress(
-      [Buffer.from(PREFIX), vaultProgramId.toBuffer()],
+      [Buffer.from(VAULT_PREFIX), vaultProgramId.toBuffer()],
       vaultProgramId,
     )
   )[0];
@@ -582,13 +586,13 @@ export async function withdrawTokenFromSafetyDepositBox(
 
   const transferAuthority = (
     await PublicKey.findProgramAddress(
-      [Buffer.from(PREFIX), vaultProgramId.toBuffer()],
+      [Buffer.from(VAULT_PREFIX), vaultProgramId.toBuffer()],
       vaultProgramId,
     )
   )[0];
 
   const value = new AmountArgs({ instruction: 5, amount });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
 
   const keys = [
     {
@@ -654,7 +658,7 @@ export async function updateExternalPriceAccount(
   const vaultProgramId = programIds().vault;
 
   const value = new UpdateExternalPriceAccountArgs({ externalPriceAccount });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
 
   const keys = [
     {

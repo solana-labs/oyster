@@ -21,7 +21,7 @@ export const MAX_METADATA_LEN =
 export const MAX_NAME_SYMBOL_LEN = 1 + 32 + 8;
 export const MAX_MASTER_EDITION_KEN = 1 + 9 + 8 + 32;
 
-export enum Key {
+export enum MetadataKey {
   MetadataV1 = 0,
   NameSymbolTupleV1 = 1,
   EditionV1 = 2,
@@ -48,27 +48,27 @@ export interface IMetadataExtension {
 }
 
 export class MasterEdition {
-  key: Key;
+  key: MetadataKey;
   supply: BN;
   maxSupply?: BN;
   /// Can be used to mint tokens that give one-time permission to mint a single limited edition.
   masterMint: PublicKey;
 
   constructor(args: {
-    key: Key;
+    key: MetadataKey;
     supply: BN;
     maxSupply?: BN;
     /// Can be used to mint tokens that give one-time permission to mint a single limited edition.
     masterMint: PublicKey;
   }) {
-    this.key = Key.MasterEditionV1;
+    this.key = MetadataKey.MasterEditionV1;
     this.supply = args.supply;
     this.maxSupply = args.maxSupply;
     this.masterMint = args.masterMint;
   }
 }
 export class Metadata {
-  key: Key;
+  key: MetadataKey;
   nonUniqueSpecificUpdateAuthority?: PublicKey;
 
   mint: PublicKey;
@@ -85,7 +85,7 @@ export class Metadata {
     symbol: string;
     uri: string;
   }) {
-    this.key = Key.MetadataV1;
+    this.key = MetadataKey.MetadataV1;
     this.nonUniqueSpecificUpdateAuthority =
       args.nonUniqueSpecificUpdateAuthority;
     this.mint = args.mint;
@@ -96,12 +96,12 @@ export class Metadata {
 }
 
 export class NameSymbolTuple {
-  key: Key;
+  key: MetadataKey;
   updateAuthority: PublicKey;
   metadata: PublicKey;
 
   constructor(args: { updateAuthority: Buffer; metadata: Buffer }) {
-    this.key = Key.NameSymbolTupleV1;
+    this.key = MetadataKey.NameSymbolTupleV1;
     this.updateAuthority = new PublicKey(args.updateAuthority);
     this.metadata = new PublicKey(args.metadata);
   }
@@ -156,7 +156,7 @@ class CreateMasterEditionArgs {
   }
 }
 
-export const SCHEMA = new Map<any, any>([
+export const METADATA_SCHEMA = new Map<any, any>([
   [
     CreateMetadataArgs,
     {
@@ -244,7 +244,7 @@ export const SCHEMA = new Map<any, any>([
 ]);
 
 export const decodeMetadata = (buffer: Buffer) => {
-  return deserializeBorsh(SCHEMA, Metadata, buffer) as Metadata;
+  return deserializeBorsh(METADATA_SCHEMA, Metadata, buffer) as Metadata;
 };
 
 export async function transferUpdateAuthority(
@@ -256,7 +256,7 @@ export async function transferUpdateAuthority(
   const metadataProgramId = programIds().metadata;
 
   const data = Buffer.from(
-    serialize(SCHEMA, new TransferUpdateAuthorityArgs()),
+    serialize(METADATA_SCHEMA, new TransferUpdateAuthorityArgs()),
   );
 
   const keys = [
@@ -331,7 +331,7 @@ export async function updateMetadata(
       ? undefined
       : newNonUniqueSpecificUpdateAuthority,
   });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(METADATA_SCHEMA, value));
   const keys = [
     {
       pubkey: metadataAccount,
@@ -397,7 +397,7 @@ export async function createMetadata(
   )[0];
 
   const value = new CreateMetadataArgs({ name, symbol, uri, allowDuplicates });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(METADATA_SCHEMA, value));
 
   const keys = [
     {
@@ -501,7 +501,7 @@ export async function createMasterEdition(
   )[0];
 
   const value = new CreateMasterEditionArgs({ maxSupply });
-  const data = Buffer.from(serialize(SCHEMA, value));
+  const data = Buffer.from(serialize(METADATA_SCHEMA, value));
 
   const keys = [
     {
