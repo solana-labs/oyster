@@ -3,9 +3,9 @@ import { Card } from 'antd';
 import { Form, Input } from 'antd';
 import {
   INSTRUCTION_LIMIT,
-  TimelockConfig,
-  TimelockSet,
-  TimelockState,
+  Governance,
+  Proposal,
+  ProposalState,
 } from '../../models/timelock';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
@@ -28,9 +28,9 @@ export function NewInstructionCard({
   position,
   config,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
-  config: ParsedAccount<TimelockConfig>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
+  config: ParsedAccount<Governance>;
   position: number;
 }) {
   const [form] = Form.useForm();

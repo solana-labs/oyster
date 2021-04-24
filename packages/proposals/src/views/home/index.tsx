@@ -6,7 +6,7 @@ import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from './../../components/Background';
 import { useHistory } from 'react-router-dom';
 import { RegisterGovernanceMenuItem } from '../governance/register';
-import { TimelockStateStatus } from '../../models/timelock';
+import { ProposalStateStatus } from '../../models/timelock';
 
 export const HomeView = () => {
   const history = useHistory();
@@ -26,8 +26,8 @@ export const HomeView = () => {
           if (proposal.info.config.toBase58() === configKey) {
             acc.active =
               acc.active +
-              (state.info.status === TimelockStateStatus.Voting ||
-              state.info.status === TimelockStateStatus.Draft
+              (state.info.status === ProposalStateStatus.Voting ||
+              state.info.status === ProposalStateStatus.Draft
                 ? 1
                 : 0);
 

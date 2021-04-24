@@ -2,10 +2,10 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
-  TimelockConfig,
-  TimelockSet,
-  TimelockState,
-  TimelockStateStatus,
+  Governance,
+  Proposal,
+  ProposalState,
+  ProposalStateStatus,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
@@ -25,9 +25,9 @@ export function Vote({
   timelockConfig,
   yeahVote,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
-  timelockConfig: ParsedAccount<TimelockConfig>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
+  timelockConfig: ParsedAccount<Governance>;
   yeahVote: boolean;
 }) {
   const wallet = useWallet();
@@ -42,7 +42,7 @@ export function Vote({
   const eligibleToView =
     userTokenAccount &&
     userTokenAccount.info.amount.toNumber() > 0 &&
-    state.info.status === TimelockStateStatus.Voting;
+    state.info.status === ProposalStateStatus.Voting;
 
   const [btnLabel, title, msg, icon] = yeahVote
     ? [

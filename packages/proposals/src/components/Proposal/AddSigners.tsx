@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
-import { TimelockSet, TimelockState } from '../../models/timelock';
+import { Proposal, ProposalState } from '../../models/timelock';
 import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
@@ -22,8 +22,8 @@ export default function AddSigners({
   proposal,
   state,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();

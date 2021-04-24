@@ -6,7 +6,7 @@ import {
   PublicKey,
   Message,
 } from '@solana/web3.js';
-import { GOVERNANCE_AUTHORITY_SEED, TimelockSet } from '../models/timelock';
+import { GOVERNANCE_AUTHORITY_SEED, Proposal } from '../models/timelock';
 export async function serializeInstruction({
   connection,
   instr,
@@ -14,7 +14,7 @@ export async function serializeInstruction({
 }: {
   connection: Connection;
   instr: TransactionInstruction;
-  proposal: ParsedAccount<TimelockSet>;
+  proposal: ParsedAccount<Proposal>;
 }): Promise<{ base64: string; byteArray: Uint8Array }> {
   const PROGRAM_IDS = utils.programIds();
   let instructionTransaction = new Transaction();

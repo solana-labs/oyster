@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, ParsedAccount, actions } from '@oyster/common';
 
-import { TimelockConfig } from '../models/timelock';
+import { Governance } from '../models/timelock';
 import { AccountLayout, Token } from '@solana/spl-token';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;
@@ -20,7 +20,7 @@ export interface SourceEntryInterface {
 export const mintSourceTokens = async (
   connection: Connection,
   wallet: any,
-  timelockConfig: ParsedAccount<TimelockConfig>,
+  timelockConfig: ParsedAccount<Governance>,
   useGovernance: boolean,
   entries: SourceEntryInterface[],
   setSavePerc: (num: number) => void,

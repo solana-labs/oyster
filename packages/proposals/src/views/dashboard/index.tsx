@@ -4,7 +4,7 @@ import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
 import './style.less';
 import { useProposals } from '../../contexts/proposals';
-import { TimelockSet } from '../../models/timelock';
+import { Proposal } from '../../models/timelock';
 import { Connection } from '@solana/web3.js';
 import { WalletAdapter } from '@solana/wallet-base';
 const { useWallet } = contexts.Wallet;
@@ -38,7 +38,7 @@ function InnerDummyView({
 }: {
   connection: Connection;
   wallet: WalletAdapter;
-  proposal: ParsedAccount<TimelockSet>;
+  proposal: ParsedAccount<Proposal>;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   if (!sigAccount) return <Spin />;

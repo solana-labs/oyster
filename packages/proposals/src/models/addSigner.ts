@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 /// [Requires Admin token]
 /// Adds a signatory to the Timelock which means that this timelock can't leave Draft state until yet another signatory burns
@@ -35,7 +35,7 @@ export const addSignerInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.AddSigner,
+      instruction: GovernanceInstruction.AddSigner,
     },
     data,
   );

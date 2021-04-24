@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { DESC_SIZE, NAME_SIZE, TimelockInstruction } from './timelock';
+import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './timelock';
 
 /// Initializes a new empty Timelocked set of Instructions that will be executed at various slots in the future in draft mode.
 /// Grants Admin token to caller.
@@ -80,7 +80,7 @@ export const initTimelockSetInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.InitTimelockSet,
+      instruction: GovernanceInstruction.InitProposal,
       descLink: descAsBytes,
       name: nameAsBytes,
     },

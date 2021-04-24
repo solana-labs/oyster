@@ -7,8 +7,8 @@ import {
 import { contexts, utils, ParsedAccount } from '@oyster/common';
 
 import {
-  TimelockSet,
-  TimelockState,
+  Proposal,
+  ProposalState,
   TimelockTransaction,
 } from '../models/timelock';
 import { executeInstruction } from '../models/execute';
@@ -20,8 +20,8 @@ const { notify } = utils;
 export const execute = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
-  state: ParsedAccount<TimelockState>,
+  proposal: ParsedAccount<Proposal>,
+  state: ParsedAccount<ProposalState>,
   transaction: ParsedAccount<TimelockTransaction>,
 ) => {
   let signers: Account[] = [];

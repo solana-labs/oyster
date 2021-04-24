@@ -14,26 +14,26 @@ import {
   cache,
 } from '@oyster/common';
 import {
-  CustomSingleSignerTimelockTransactionLayout,
-  CustomSingleSignerTimelockTransactionParser,
-  TimelockConfig,
-  TimelockConfigLayout,
-  TimelockConfigParser,
-  TimelockSet,
-  TimelockState,
-  TimelockSetLayout,
+  CustomSingleSignerTransactionLayout,
+  CustomSingleSignerTransactionParser,
+  Governance,
+  GovernanceLayout,
+  GovernanceParser,
+  Proposal,
+  ProposalState,
+  ProposalLayout,
   TimelockSetParser,
   TimelockTransaction,
-  TimelockStateParser,
-  TimelockStateLayout,
-  CustomSingleSignerTimelockTransaction,
+  ProposalStateParser,
+  ProposalStateLayout,
+  CustomSingleSignerTransaction,
 } from '../models/timelock';
 
 export interface ProposalsContextState {
-  proposals: Record<string, ParsedAccount<TimelockSet>>;
+  proposals: Record<string, ParsedAccount<Proposal>>;
   transactions: Record<string, ParsedAccount<TimelockTransaction>>;
-  states: Record<string, ParsedAccount<TimelockState>>;
-  configs: Record<string, ParsedAccount<TimelockConfig>>;
+  states: Record<string, ParsedAccount<ProposalState>>;
+  configs: Record<string, ParsedAccount<Governance>>;
 }
 
 export const ProposalsContext = React.createContext<ProposalsContextState | null>(
@@ -91,39 +91,35 @@ function useSetupProposalsCache({
       return programAccounts;
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      const newProposals: Record<string, ParsedAccount<TimelockSet>> = {};
+      const newProposals: Record<string, ParsedAccount<Proposal>> = {};
       const newTransactions: Record<
         string,
         ParsedAccount<TimelockTransaction>
       > = {};
-      const newStates: Record<string, ParsedAccount<TimelockState>> = {};
-      const newConfigs: Record<string, ParsedAccount<TimelockConfig>> = {};
+      const newStates: Record<string, ParsedAccount<ProposalState>> = {};
+      const newConfigs: Record<string, ParsedAccount<Governance>> = {};
 
       all[0].forEach(a => {
         let cached;
         switch (a.account.data.length) {
-          case TimelockSetLayout.span:
+          case ProposalLayout.span:
             cache.add(a.pubkey, a.account, TimelockSetParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<TimelockSet>;
+            cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
             newProposals[a.pubkey.toBase58()] = cached;
             break;
-          case CustomSingleSignerTimelockTransactionLayout.span:
-            cache.add(
-              a.pubkey,
-              a.account,
-              CustomSingleSignerTimelockTransactionParser,
-            );
+          case CustomSingleSignerTransactionLayout.span:
+            cache.add(a.pubkey, a.account, CustomSingleSignerTransactionParser);
             cached = cache.get(a.pubkey) as ParsedAccount<TimelockTransaction>;
             newTransactions[a.pubkey.toBase58()] = cached;
             break;
-          case TimelockConfigLayout.span:
-            cache.add(a.pubkey, a.account, TimelockConfigParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<TimelockConfig>;
+          case GovernanceLayout.span:
+            cache.add(a.pubkey, a.account, GovernanceParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
             newConfigs[a.pubkey.toBase58()] = cached;
             break;
-          case TimelockStateLayout.span:
-            cache.add(a.pubkey, a.account, TimelockStateParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<TimelockState>;
+          case ProposalStateLayout.span:
+            cache.add(a.pubkey, a.account, ProposalStateParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<ProposalState>;
             newStates[a.pubkey.toBase58()] = cached;
             break;
         }
@@ -138,39 +134,35 @@ function useSetupProposalsCache({
       PROGRAM_IDS.timelock.programId,
       async (info: KeyedAccountInfo) => {
         [
-          [TimelockSetLayout.span, TimelockSetParser, setProposals],
+          [ProposalLayout.span, TimelockSetParser, setProposals],
           [
-            CustomSingleSignerTimelockTransactionLayout.span,
-            CustomSingleSignerTimelockTransactionParser,
+            CustomSingleSignerTransactionLayout.span,
+            CustomSingleSignerTransactionParser,
             setTransactions,
           ],
-          [TimelockStateLayout.span, TimelockStateParser, setStates],
-          [TimelockConfigLayout.span, TimelockConfigParser, setConfigs],
+          [ProposalStateLayout.span, ProposalStateParser, setStates],
+          [GovernanceLayout.span, GovernanceParser, setConfigs],
         ].forEach(arr => {
           const [span, parser, setter] = arr;
           if (info.accountInfo.data.length === span) {
             cache.add(info.accountId, info.accountInfo, parser);
             let cached: any;
             switch (info.accountInfo.data.length) {
-              case TimelockSetLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<TimelockSet>;
+              case ProposalLayout.span:
+                cached = cache.get(info.accountId) as ParsedAccount<Proposal>;
                 break;
-              case CustomSingleSignerTimelockTransactionLayout.span:
+              case CustomSingleSignerTransactionLayout.span:
                 cached = cache.get(
                   info.accountId,
-                ) as ParsedAccount<CustomSingleSignerTimelockTransaction>;
+                ) as ParsedAccount<CustomSingleSignerTransaction>;
                 break;
-              case TimelockConfigLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<TimelockConfig>;
+              case GovernanceLayout.span:
+                cached = cache.get(info.accountId) as ParsedAccount<Governance>;
                 break;
-              case TimelockStateLayout.span:
+              case ProposalStateLayout.span:
                 cached = cache.get(
                   info.accountId,
-                ) as ParsedAccount<TimelockState>;
+                ) as ParsedAccount<ProposalState>;
                 break;
             }
             setter((obj: any) => ({

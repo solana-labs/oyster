@@ -2,10 +2,10 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
-  TimelockConfig,
-  TimelockSet,
-  TimelockState,
-  TimelockStateStatus,
+  Governance,
+  Proposal,
+  ProposalState,
+  ProposalStateStatus,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
 import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
@@ -21,9 +21,9 @@ export function WithdrawVote({
   proposal,
   state,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
-  timelockConfig: ParsedAccount<TimelockConfig>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
+  timelockConfig: ParsedAccount<Governance>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
@@ -41,13 +41,13 @@ export function WithdrawVote({
 
   const eligibleToView =
     votingTokens > 0 &&
-    (state.info.status === TimelockStateStatus.Voting ||
-      state.info.status === TimelockStateStatus.Completed ||
-      state.info.status === TimelockStateStatus.Executing ||
-      state.info.status === TimelockStateStatus.Defeated);
+    (state.info.status === ProposalStateStatus.Voting ||
+      state.info.status === ProposalStateStatus.Completed ||
+      state.info.status === ProposalStateStatus.Executing ||
+      state.info.status === ProposalStateStatus.Defeated);
 
   const [btnLabel, title, msg, action] =
-    state.info.status === TimelockStateStatus.Voting
+    state.info.status === ProposalStateStatus.Voting
       ? [
           LABELS.WITHDRAW_VOTE,
           LABELS.WITHDRAW_YOUR_VOTE_QUESTION,

@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import {
   CONFIG_NAME_LENGTH,
   ExecutionType,
-  TimelockType,
+  GovernanceType,
   VotingEntryRule,
 } from '../../models/timelock';
 import { LABELS } from '../../constants';
@@ -68,7 +68,7 @@ export function NewForm({
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
-    timelockType: TimelockType;
+    timelockType: GovernanceType;
     executionType: ExecutionType;
     voteThreshold: number;
     votingEntryRule: VotingEntryRule;
@@ -218,12 +218,10 @@ export function NewForm({
           name="timelockType"
           label={LABELS.PROPOSAL_TYPE}
           rules={[{ required: true }]}
-          initialValue={TimelockType.CustomSingleSignerV1}
+          initialValue={GovernanceType.Governance}
         >
           <Select placeholder={LABELS.SELECT_PROPOSAL_TYPE}>
-            <Option value={TimelockType.CustomSingleSignerV1}>
-              Single Signer
-            </Option>
+            <Option value={GovernanceType.Governance}>Single Signer</Option>
           </Select>
         </Form.Item>
         <Form.Item

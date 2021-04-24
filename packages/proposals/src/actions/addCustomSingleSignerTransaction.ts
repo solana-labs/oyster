@@ -8,9 +8,9 @@ import {
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  CustomSingleSignerTimelockTransactionLayout,
-  TimelockSet,
-  TimelockState,
+  CustomSingleSignerTransactionLayout,
+  Proposal,
+  ProposalState,
 } from '../models/timelock';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
 
@@ -21,8 +21,8 @@ const { approve } = models;
 export const addCustomSingleSignerTransaction = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
-  state: ParsedAccount<TimelockState>,
+  proposal: ParsedAccount<Proposal>,
+  state: ParsedAccount<ProposalState>,
   sigAccount: PublicKey,
   slot: string,
   instruction: string,
@@ -34,7 +34,7 @@ export const addCustomSingleSignerTransaction = async (
   let instructions: TransactionInstruction[] = [];
 
   const rentExempt = await connection.getMinimumBalanceForRentExemption(
-    CustomSingleSignerTimelockTransactionLayout.span,
+    CustomSingleSignerTransactionLayout.span,
   );
 
   const txnKey = new Account();
@@ -43,7 +43,7 @@ export const addCustomSingleSignerTransaction = async (
     fromPubkey: wallet.publicKey,
     newAccountPubkey: txnKey.publicKey,
     lamports: rentExempt,
-    space: CustomSingleSignerTimelockTransactionLayout.span,
+    space: CustomSingleSignerTransactionLayout.span,
     programId: PROGRAM_IDS.timelock.programId,
   });
 

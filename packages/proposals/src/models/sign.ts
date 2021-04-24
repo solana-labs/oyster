@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 /// [Requires Signatory token]
 /// Burns signatory token, indicating you approve of moving this Timelock set from Draft state to Voting state.
@@ -35,7 +35,7 @@ export const signInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.Sign,
+      instruction: GovernanceInstruction.Sign,
     },
     data,
   );

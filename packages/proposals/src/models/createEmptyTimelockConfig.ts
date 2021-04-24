@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 ///   0. `[]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
 ///           program account key, governance mint key, council mint key, and timelock program account key.
@@ -28,7 +28,7 @@ export const createEmptyTimelockConfigInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.CreateEmptyTimelockConfig,
+      instruction: GovernanceInstruction.CreateEmptyGovernance,
     },
     data,
   );

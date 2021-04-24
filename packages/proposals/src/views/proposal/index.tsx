@@ -4,10 +4,10 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   INSTRUCTION_LIMIT,
-  TimelockConfig,
-  TimelockSet,
-  TimelockState,
-  TimelockStateStatus,
+  Governance,
+  Proposal,
+  ProposalState,
+  ProposalStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
 import { useParams } from 'react-router-dom';
@@ -102,7 +102,7 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  timelockState: ParsedAccount<TimelockState>;
+  timelockState: ParsedAccount<ProposalState>;
 }) {
   useMemo(() => {
     if (loading) {
@@ -217,9 +217,9 @@ function InnerProposalView({
   votingDisplayData,
   endpoint,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  timelockConfig: ParsedAccount<TimelockConfig>;
-  timelockState: ParsedAccount<TimelockState>;
+  proposal: ParsedAccount<Proposal>;
+  timelockConfig: ParsedAccount<Governance>;
+  timelockState: ParsedAccount<ProposalState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
@@ -277,12 +277,12 @@ function InnerProposalView({
             <div className="proposal-actions">
               {adminAccount &&
                 adminAccount.info.amount.toNumber() === 1 &&
-                timelockState.info.status === TimelockStateStatus.Draft && (
+                timelockState.info.status === ProposalStateStatus.Draft && (
                   <AddSigners proposal={proposal} state={timelockState} />
                 )}
               {sigAccount &&
                 sigAccount.info.amount.toNumber() === 1 &&
-                timelockState.info.status === TimelockStateStatus.Draft && (
+                timelockState.info.status === ProposalStateStatus.Draft && (
                   <SignButton proposal={proposal} state={timelockState} />
                 )}
               <MintSourceTokens
@@ -444,7 +444,7 @@ function InnerProposalView({
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    timelockState.info.status === TimelockStateStatus.Draft && (
+                    timelockState.info.status === ProposalStateStatus.Draft && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
@@ -465,7 +465,7 @@ function InnerProposalView({
 }
 
 function getVotesRequired(
-  timelockConfig: ParsedAccount<TimelockConfig>,
+  timelockConfig: ParsedAccount<Governance>,
   sourceMint: MintInfo,
 ): number {
   return timelockConfig.info.voteThreshold === 100

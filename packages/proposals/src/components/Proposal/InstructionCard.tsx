@@ -14,9 +14,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
-  TimelockSet,
-  TimelockState,
-  TimelockStateStatus,
+  Proposal,
+  ProposalState,
+  ProposalStateStatus,
   TimelockTransaction,
 } from '../../models/timelock';
 
@@ -38,8 +38,8 @@ export function InstructionCard({
   position,
 }: {
   instruction: ParsedAccount<TimelockTransaction>;
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
@@ -106,8 +106,8 @@ function PlayStatusButton({
   setPlaying,
   instruction,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
   instruction: ParsedAccount<TimelockTransaction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
@@ -144,8 +144,8 @@ function PlayStatusButton({
   };
 
   if (
-    state.info.status !== TimelockStateStatus.Executing &&
-    state.info.status !== TimelockStateStatus.Completed
+    state.info.status !== ProposalStateStatus.Executing &&
+    state.info.status !== ProposalStateStatus.Completed
   )
     return null;
   if (ineligibleToSee) return null;

@@ -8,8 +8,8 @@ import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  TimelockSet,
-  TimelockState,
+  Proposal,
+  ProposalState,
 } from '../models/timelock';
 import { signInstruction } from '../models/sign';
 
@@ -20,8 +20,8 @@ const { approve } = models;
 export const sign = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
-  state: ParsedAccount<TimelockState>,
+  proposal: ParsedAccount<Proposal>,
+  state: ParsedAccount<ProposalState>,
   sigAccount: PublicKey,
 ) => {
   const PROGRAM_IDS = utils.programIds();

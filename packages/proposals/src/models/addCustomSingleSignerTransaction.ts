@@ -5,8 +5,8 @@ import * as Layout from '../utils/layout';
 import * as BufferLayout from 'buffer-layout';
 import {
   INSTRUCTION_LIMIT,
-  TimelockInstruction,
-  TRANSACTION_SLOTS,
+  GovernanceInstruction,
+  MAX_TRANSACTIONS,
 } from './timelock';
 import BN from 'bn.js';
 
@@ -53,9 +53,9 @@ export const addCustomSingleSignerTransactionInstruction = (
     );
   }
 
-  if (position > TRANSACTION_SLOTS) {
+  if (position > MAX_TRANSACTIONS) {
     throw new Error(
-      'Position is more than ' + TRANSACTION_SLOTS + ' which is not allowed.',
+      'Position is more than ' + MAX_TRANSACTIONS + ' which is not allowed.',
     );
   }
 
@@ -75,7 +75,7 @@ export const addCustomSingleSignerTransactionInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.AddCustomSingleSignerTransaction,
+      instruction: GovernanceInstruction.AddCustomSingleSignerTransaction,
       slot: new BN(slot),
       instructions: instructionAsBytes,
       position: position,

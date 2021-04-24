@@ -14,9 +14,9 @@ import {
 
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  TimelockSet,
-  TimelockState,
-  TimelockStateStatus,
+  Proposal,
+  ProposalState,
+  ProposalStateStatus,
 } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
@@ -29,8 +29,8 @@ const { approve } = models;
 export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
-  state: ParsedAccount<TimelockState>,
+  proposal: ParsedAccount<Proposal>,
+  state: ParsedAccount<ProposalState>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
@@ -150,7 +150,7 @@ export const withdrawVotingTokens = async (
   );
 
   const [msg, completedMsg] =
-    state.info.status === TimelockStateStatus.Voting
+    state.info.status === ProposalStateStatus.Voting
       ? [LABELS.WITHDRAWING_YOUR_VOTE, LABELS.VOTE_WITHDRAWN]
       : [LABELS.REFUNDING_YOUR_TOKENS, LABELS.TOKENS_REFUNDED];
 

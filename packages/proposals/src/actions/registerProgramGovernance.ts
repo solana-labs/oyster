@@ -10,8 +10,8 @@ import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
   GOVERNANCE_AUTHORITY_SEED,
   ExecutionType,
-  TimelockConfig,
-  TimelockType,
+  Governance,
+  GovernanceType,
   VotingEntryRule,
 } from '../models/timelock';
 import { initTimelockConfigInstruction } from '../models/initTimelockConfig';
@@ -25,7 +25,7 @@ const { notify } = utils;
 export const registerProgramGovernance = async (
   connection: Connection,
   wallet: any,
-  uninitializedTimelockConfig: Partial<TimelockConfig>,
+  uninitializedTimelockConfig: Partial<Governance>,
   useCouncil: boolean,
 ): Promise<PublicKey> => {
   const PROGRAM_IDS = utils.programIds();
@@ -144,8 +144,7 @@ export const registerProgramGovernance = async (
 
       uninitializedTimelockConfig.voteThreshold!,
       uninitializedTimelockConfig.executionType || ExecutionType.Independent,
-      uninitializedTimelockConfig.timelockType ||
-        TimelockType.CustomSingleSignerV1,
+      uninitializedTimelockConfig.timelockType || GovernanceType.Governance,
       uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,
       uninitializedTimelockConfig.minimumSlotWaitingPeriod || new BN(0),
       uninitializedTimelockConfig.timeLimit || new BN(0),

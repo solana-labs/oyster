@@ -14,8 +14,8 @@ import {
 
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  TimelockSet,
-  TimelockState,
+  Proposal,
+  ProposalState,
 } from '../models/timelock';
 import { AccountLayout } from '@solana/spl-token';
 import { addSignerInstruction } from '../models/addSigner';
@@ -27,8 +27,8 @@ const { approve } = models;
 export const addSigner = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
-  state: ParsedAccount<TimelockState>,
+  proposal: ParsedAccount<Proposal>,
+  state: ParsedAccount<ProposalState>,
   adminAccount: PublicKey,
   newSignatoryAccountOwner: PublicKey,
 ) => {

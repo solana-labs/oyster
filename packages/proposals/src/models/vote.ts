@@ -7,7 +7,7 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 import BN from 'bn.js';
 
 /// [Requires Voting tokens]
@@ -60,7 +60,7 @@ export const voteInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.Vote,
+      instruction: GovernanceInstruction.Vote,
       yesVotingTokenAmount: new BN(yesVotingTokenAmount),
       noVotingTokenAmount: new BN(noVotingTokenAmount),
     },

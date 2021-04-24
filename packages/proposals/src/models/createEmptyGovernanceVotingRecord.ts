@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 ///   0. `[]` Governance voting record key. Needs to be set with pubkey set to PDA with seeds of the
 ///           program account key, proposal key, your voting account key.
@@ -24,7 +24,7 @@ export const createEmptyGovernanceVotingRecordInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.CreateGovernanceVotingRecord,
+      instruction: GovernanceInstruction.CreateGovernanceVotingRecord,
     },
     data,
   );

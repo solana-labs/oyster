@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 /// Executes a command in the timelock set.
 ///
@@ -35,7 +35,7 @@ export const executeInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.Execute,
+      instruction: GovernanceInstruction.Execute,
       numberOfExtraAccounts: accountInfos.length,
     },
     data,

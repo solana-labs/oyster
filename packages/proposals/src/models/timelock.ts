@@ -8,25 +8,25 @@ export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const CONFIG_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
-export const TRANSACTION_SLOTS = 5;
+export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
 /// Seed for proposal authority
 export const GOVERNANCE_AUTHORITY_SEED = 'governance';
 
-export enum TimelockInstruction {
-  InitTimelockSet = 1,
+export enum GovernanceInstruction {
+  InitProposal = 1,
   AddSigner = 2,
   RemoveSigner = 3,
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
   Vote = 9,
-  InitTimelockConfig = 10,
+  InitGovernance = 10,
 
   Execute = 11,
   DepositGovernanceTokens = 12,
   WithdrawVotingTokens = 13,
-  CreateEmptyTimelockConfig = 14,
+  CreateEmptyGovernance = 14,
   CreateGovernanceVotingRecord = 15,
 }
 
@@ -58,7 +58,7 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
   ],
 );
 
-export interface TimelockConfig {
+export interface Governance {
   /// Account type
   accountType: GovernanceAccountType;
   /// Vote threshold
@@ -66,7 +66,7 @@ export interface TimelockConfig {
   /// Execution type
   executionType: ExecutionType;
   /// Timelock Type
-  timelockType: TimelockType;
+  timelockType: GovernanceType;
   /// Voting entry rule
   votingEntryRule: VotingEntryRule;
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
@@ -94,7 +94,7 @@ export enum GovernanceAccountType {
   CustomSingleSignerTransaction = 5,
 }
 
-export const TimelockConfigLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
     BufferLayout.u8('voteThreshold'),
@@ -121,11 +121,11 @@ export enum ExecutionType {
   Independent = 0,
 }
 
-export enum TimelockType {
-  CustomSingleSignerV1 = 0,
+export enum GovernanceType {
+  Governance = 0,
 }
 
-export enum TimelockStateStatus {
+export enum ProposalStateStatus {
   /// Draft
   Draft = 0,
   /// Taking votes
@@ -145,19 +145,19 @@ export enum TimelockStateStatus {
 }
 
 export const STATE_COLOR: Record<string, string> = {
-  [TimelockStateStatus.Draft]: 'orange',
-  [TimelockStateStatus.Voting]: 'blue',
-  [TimelockStateStatus.Executing]: 'green',
-  [TimelockStateStatus.Completed]: 'purple',
-  [TimelockStateStatus.Deleted]: 'gray',
-  [TimelockStateStatus.Defeated]: 'red',
+  [ProposalStateStatus.Draft]: 'orange',
+  [ProposalStateStatus.Voting]: 'blue',
+  [ProposalStateStatus.Executing]: 'green',
+  [ProposalStateStatus.Completed]: 'purple',
+  [ProposalStateStatus.Deleted]: 'gray',
+  [ProposalStateStatus.Defeated]: 'red',
 };
 
-export interface TimelockState {
+export interface ProposalState {
   /// Account type
   accountType: GovernanceAccountType;
   timelockSet: PublicKey;
-  status: TimelockStateStatus;
+  status: ProposalStateStatus;
   totalSigningTokensMinted: BN;
   timelockTransactions: PublicKey[];
   name: string;
@@ -171,12 +171,12 @@ export interface TimelockState {
   usedTxnSlots: number;
 }
 
-const timelockTxns = [];
-for (let i = 0; i < TRANSACTION_SLOTS; i++) {
-  timelockTxns.push(Layout.publicKey('timelockTxn' + i.toString()));
+const proposalTxns = [];
+for (let i = 0; i < MAX_TRANSACTIONS; i++) {
+  proposalTxns.push(Layout.publicKey('timelockTxn' + i.toString()));
 }
 
-export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
     Layout.publicKey('config'),
@@ -198,7 +198,7 @@ export const TimelockSetLayout: typeof BufferLayout.Structure = BufferLayout.str
   ],
 );
 
-export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const ProposalStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
     Layout.publicKey('timelockSet'),
@@ -213,12 +213,12 @@ export const TimelockStateLayout: typeof BufferLayout.Structure = BufferLayout.s
     Layout.uint64('deletedAt'),
     BufferLayout.u8('executions'),
     BufferLayout.u8('usedTxnSlots'),
-    ...timelockTxns,
+    ...proposalTxns,
     BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
 
-export interface TimelockSet {
+export interface Proposal {
   /// Account type
   accountType: GovernanceAccountType;
 
@@ -270,7 +270,7 @@ export interface TimelockSet {
   noVotingDump: PublicKey;
 }
 
-export const CustomSingleSignerTimelockTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const CustomSingleSignerTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
     Layout.uint64('slot'),
@@ -293,15 +293,14 @@ export interface TimelockTransaction {
 
   instructionEndIndex: number;
 }
-export interface CustomSingleSignerTimelockTransaction
-  extends TimelockTransaction {}
+export interface CustomSingleSignerTransaction extends TimelockTransaction {}
 
 export const TimelockSetParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = TimelockSetLayout.decode(buffer);
+  const data = ProposalLayout.decode(buffer);
   const details = {
     pubkey: pubKey,
     account: {
@@ -354,15 +353,15 @@ export const GovernanceVotingRecordParser = (
   return details;
 };
 
-export const TimelockStateParser = (
+export const ProposalStateParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = TimelockStateLayout.decode(buffer);
+  const data = ProposalStateLayout.decode(buffer);
 
   const timelockTxns = [];
-  for (let i = 0; i < TRANSACTION_SLOTS; i++) {
+  for (let i = 0; i < MAX_TRANSACTIONS; i++) {
     timelockTxns.push(data['timelockTxn' + i.toString()]);
   }
 
@@ -392,12 +391,12 @@ export const TimelockStateParser = (
   return details;
 };
 
-export const CustomSingleSignerTimelockTransactionParser = (
+export const CustomSingleSignerTransactionParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = CustomSingleSignerTimelockTransactionLayout.decode(buffer);
+  const data = CustomSingleSignerTransactionLayout.decode(buffer);
 
   const details = {
     pubkey: pubKey,
@@ -417,12 +416,12 @@ export const CustomSingleSignerTimelockTransactionParser = (
   return details;
 };
 
-export const TimelockConfigParser = (
+export const GovernanceParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const data = TimelockConfigLayout.decode(buffer);
+  const data = GovernanceLayout.decode(buffer);
 
   const details = {
     pubkey: pubKey,

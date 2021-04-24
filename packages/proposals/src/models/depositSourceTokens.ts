@@ -3,7 +3,7 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 import BN from 'bn.js';
 
 /// [Requires tokens of the Governance mint or Council mint depending on type of TimelockSet]
@@ -42,7 +42,7 @@ export const depositSourceTokensInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.DepositGovernanceTokens,
+      instruction: GovernanceInstruction.DepositGovernanceTokens,
       votingTokenAmount: new BN(votingTokenAmount),
     },
     data,

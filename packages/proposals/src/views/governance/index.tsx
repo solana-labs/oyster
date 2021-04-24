@@ -11,8 +11,8 @@ import {
 } from '@oyster/common';
 import {
   ExecutionType,
-  TimelockConfig,
-  TimelockType,
+  Governance,
+  GovernanceType,
   VotingEntryRule,
 } from '../../models/timelock';
 import { PublicKey } from '@solana/web3.js';
@@ -42,7 +42,7 @@ const columns = [
     title: LABELS.PROPOSAL_TYPE,
     dataIndex: 'timelockType',
     key: 'timelockType',
-    render: (number: number) => <span>{TimelockType[number]}</span>,
+    render: (number: number) => <span>{GovernanceType[number]}</span>,
   },
   {
     title: LABELS.VOTING_ENTRY_RULES,
@@ -85,7 +85,7 @@ const columns = [
     title: LABELS.ACTIONS,
     dataIndex: 'config',
     key: 'config',
-    render: (config: ParsedAccount<TimelockConfig>) => (
+    render: (config: ParsedAccount<Governance>) => (
       <>
         <MintSourceTokens timelockConfig={config} useGovernance={true} />
         {config.info.councilMint && (

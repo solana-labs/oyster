@@ -11,9 +11,9 @@ import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  TimelockConfig,
-  TimelockSetLayout,
-  TimelockStateLayout,
+  Governance,
+  ProposalLayout,
+  ProposalStateLayout,
 } from '../models/timelock';
 
 const { cache } = contexts.Accounts;
@@ -27,7 +27,7 @@ export const createProposal = async (
   name: string,
   description: string,
   useGovernance: boolean,
-  timelockConfig: ParsedAccount<TimelockConfig>,
+  timelockConfig: ParsedAccount<Governance>,
 ): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -83,11 +83,11 @@ export const createProposal = async (
   let createTimelockAccountsInstructions: TransactionInstruction[] = [];
 
   const timelockRentExempt = await connection.getMinimumBalanceForRentExemption(
-    TimelockSetLayout.span,
+    ProposalLayout.span,
   );
 
   const timelockStateRentExempt = await connection.getMinimumBalanceForRentExemption(
-    TimelockStateLayout.span,
+    ProposalStateLayout.span,
   );
 
   const timelockStateKey = new Account();
@@ -96,7 +96,7 @@ export const createProposal = async (
     fromPubkey: wallet.publicKey,
     newAccountPubkey: timelockStateKey.publicKey,
     lamports: timelockStateRentExempt,
-    space: TimelockStateLayout.span,
+    space: ProposalStateLayout.span,
     programId: PROGRAM_IDS.timelock.programId,
   });
   signers.push(timelockStateKey);
@@ -109,7 +109,7 @@ export const createProposal = async (
     fromPubkey: wallet.publicKey,
     newAccountPubkey: timelockSetKey.publicKey,
     lamports: timelockRentExempt,
-    space: TimelockSetLayout.span,
+    space: ProposalLayout.span,
     programId: PROGRAM_IDS.timelock.programId,
   });
   signers.push(timelockSetKey);
@@ -199,7 +199,7 @@ async function getAssociatedAccountsAndInstructions(
   wallet: any,
   accountRentExempt: number,
   mintRentExempt: number,
-  timelockConfig: ParsedAccount<TimelockConfig>,
+  timelockConfig: ParsedAccount<Governance>,
   useGovernance: boolean,
   sourceMintDecimals: number,
   newProposalKey: Account,

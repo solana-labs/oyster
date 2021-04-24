@@ -14,9 +14,9 @@ import {
 
 import {
   GOVERNANCE_AUTHORITY_SEED,
-  TimelockConfig,
-  TimelockSet,
-  TimelockState,
+  Governance,
+  Proposal,
+  ProposalState,
 } from '../models/timelock';
 
 import { AccountLayout } from '@solana/spl-token';
@@ -35,13 +35,13 @@ const { approve } = models;
 export const depositSourceTokensAndVote = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
+  proposal: ParsedAccount<Proposal>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
   sourceAccount: PublicKey,
-  timelockConfig: ParsedAccount<TimelockConfig>,
-  state: ParsedAccount<TimelockState>,
+  timelockConfig: ParsedAccount<Governance>,
+  state: ParsedAccount<ProposalState>,
   yesVotingTokenAmount: number,
   noVotingTokenAmount: number,
 ) => {

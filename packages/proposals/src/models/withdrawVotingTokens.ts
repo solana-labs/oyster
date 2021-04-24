@@ -3,7 +3,7 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 import BN from 'bn.js';
 
 ///   0. `[writable]` Governance voting record account. See Vote docs for more detail.
@@ -51,7 +51,7 @@ export const withdrawVotingTokensInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.WithdrawVotingTokens,
+      instruction: GovernanceInstruction.WithdrawVotingTokens,
       votingTokenAmount: new BN(votingTokenAmount),
     },
     data,

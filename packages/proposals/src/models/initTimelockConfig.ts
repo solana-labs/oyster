@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { CONFIG_NAME_LENGTH, TimelockInstruction } from './timelock';
+import { CONFIG_NAME_LENGTH, GovernanceInstruction } from './timelock';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
@@ -49,7 +49,7 @@ export const initTimelockConfigInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.InitTimelockConfig,
+      instruction: GovernanceInstruction.InitGovernance,
       voteThreshold,
       executionType,
       timelockType,

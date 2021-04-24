@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { TimelockInstruction } from './timelock';
+import { GovernanceInstruction } from './timelock';
 
 /// [Requires Admin token]
 /// Removes a signer from the set.
@@ -31,7 +31,7 @@ export const removeSignerInstruction = (
 
   dataLayout.encode(
     {
-      instruction: TimelockInstruction.RemoveSigner,
+      instruction: GovernanceInstruction.RemoveSigner,
     },
     data,
   );

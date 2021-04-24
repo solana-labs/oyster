@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import { GOVERNANCE_AUTHORITY_SEED, TimelockSet } from '../models/timelock';
+import { GOVERNANCE_AUTHORITY_SEED, Proposal } from '../models/timelock';
 import { removeSignerInstruction } from '../models/removeSigner';
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -15,7 +15,7 @@ const { approve } = models;
 export const removeSigner = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<TimelockSet>,
+  proposal: ParsedAccount<Proposal>,
   adminAccount: PublicKey,
   sigAccount: PublicKey,
 ) => {

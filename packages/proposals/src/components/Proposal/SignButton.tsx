@@ -3,7 +3,7 @@ import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { sign } from '../../actions/sign';
-import { TimelockSet, TimelockState } from '../../models/timelock';
+import { Proposal, ProposalState } from '../../models/timelock';
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
@@ -15,8 +15,8 @@ export default function SignButton({
   proposal,
   state,
 }: {
-  proposal: ParsedAccount<TimelockSet>;
-  state: ParsedAccount<TimelockState>;
+  proposal: ParsedAccount<Proposal>;
+  state: ParsedAccount<ProposalState>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
