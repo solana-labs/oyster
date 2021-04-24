@@ -40,7 +40,7 @@ export const depositSourceTokensAndVote = async (
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
   sourceAccount: PublicKey,
-  timelockConfig: ParsedAccount<Governance>,
+  governance: ParsedAccount<Governance>,
   state: ParsedAccount<ProposalState>,
   yesVotingTokenAmount: number,
   noVotingTokenAmount: number,
@@ -72,11 +72,11 @@ export const depositSourceTokensAndVote = async (
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_AUTHORITY_SEED),
-      PROGRAM_IDS.timelock.programId.toBuffer(),
+      PROGRAM_IDS.governance.programId.toBuffer(),
       proposal.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
     ],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   if (needToCreateGovAccountToo) {
@@ -114,7 +114,7 @@ export const depositSourceTokensAndVote = async (
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   const depositAuthority = approve(
@@ -166,7 +166,7 @@ export const depositSourceTokensAndVote = async (
       proposal.info.noVotingMint,
       proposal.info.sourceMint,
       proposal.pubkey,
-      timelockConfig.pubkey,
+      governance.pubkey,
       voteAuthority.publicKey,
       mintAuthority,
       yesVotingTokenAmount,

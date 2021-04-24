@@ -2,7 +2,6 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
-  Governance,
   Proposal,
   ProposalState,
   ProposalStateStatus,
@@ -23,7 +22,6 @@ export function WithdrawVote({
 }: {
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
-  timelockConfig: ParsedAccount<Governance>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();

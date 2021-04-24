@@ -11,13 +11,13 @@ import { GovernanceInstruction } from './governance';
 import BN from 'bn.js';
 
 /// [Requires Voting tokens]
-/// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the vote threshold,
-/// then the transactions can begin to be run at their time slots when people click execute.
+/// Burns voting tokens, indicating you approve and/or disapprove of running this set of transactions. If you tip the consensus,
+/// then the transactions can begin to be run at their time slots when people click execute. You are then given yes and/or no tokens.
 ///
 ///   0. `[writable]` Governance voting record account.
 ///                   Can be uninitialized or initialized(if already used once in this proposal)
-///                   Must have address with PDA having seed tuple [timelock acct key, proposal key, your voting account key]
-///   1. `[writable]` Timelock state account.
+///                   Must have address with PDA having seed tuple [Governance acct key, proposal key, your voting account key]
+///   1. `[writable]` Proposal state account.
 ///   2. `[writable]` Your Voting account.
 ///   3. `[writable]` Your Yes-Voting account.
 ///   4. `[writable]` Your No-Voting account.
@@ -25,15 +25,15 @@ import BN from 'bn.js';
 ///   6. `[writable]` Yes Voting mint account.
 ///   7. `[writable]` No Voting mint account.
 ///   8. `[]` Source mint account
-///   9. `[]` Timelock set account.
-///   10. `[]` Timelock config account.
+///   9. `[]` Proposal account.
+///   10. `[]` Governance account.
 ///   12. `[]` Transfer authority
-///   13. `[]` Timelock program mint authority
+///   13. `[]` Governance program mint authority (pda of seed Proposal key)
 ///   14. `[]` Token program account.
 ///   15. `[]` Clock sysvar.
 export const voteInstruction = (
   governanceVotingRecord: PublicKey,
-  timelockStateAccount: PublicKey,
+  proposalStateAccount: PublicKey,
   votingAccount: PublicKey,
   yesVotingAccount: PublicKey,
   noVotingAccount: PublicKey,
@@ -41,8 +41,8 @@ export const voteInstruction = (
   yesVotingMint: PublicKey,
   noVotingMint: PublicKey,
   sourceMint: PublicKey,
-  timelockSetAccount: PublicKey,
-  timelockConfig: PublicKey,
+  proposalAccount: PublicKey,
+  governance: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
   yesVotingTokenAmount: number,
@@ -69,7 +69,7 @@ export const voteInstruction = (
 
   const keys = [
     { pubkey: governanceVotingRecord, isSigner: false, isWritable: true },
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalStateAccount, isSigner: false, isWritable: true },
     { pubkey: votingAccount, isSigner: false, isWritable: true },
     { pubkey: yesVotingAccount, isSigner: false, isWritable: true },
     { pubkey: noVotingAccount, isSigner: false, isWritable: true },
@@ -77,8 +77,8 @@ export const voteInstruction = (
     { pubkey: yesVotingMint, isSigner: false, isWritable: true },
     { pubkey: noVotingMint, isSigner: false, isWritable: true },
     { pubkey: sourceMint, isSigner: false, isWritable: false },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: timelockConfig, isSigner: false, isWritable: false },
+    { pubkey: proposalAccount, isSigner: false, isWritable: false },
+    { pubkey: governance, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
@@ -87,7 +87,7 @@ export const voteInstruction = (
 
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

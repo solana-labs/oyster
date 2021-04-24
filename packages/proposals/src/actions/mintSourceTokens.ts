@@ -20,7 +20,7 @@ export interface SourceEntryInterface {
 export const mintSourceTokens = async (
   connection: Connection,
   wallet: any,
-  timelockConfig: ParsedAccount<Governance>,
+  governance: ParsedAccount<Governance>,
   useGovernance: boolean,
   entries: SourceEntryInterface[],
   setSavePerc: (num: number) => void,
@@ -44,8 +44,8 @@ export const mintSourceTokens = async (
         wallet.publicKey,
         accountRentExempt,
         useGovernance
-          ? timelockConfig.info.governanceMint
-          : timelockConfig.info.councilMint!,
+          ? governance.info.governanceMint
+          : governance.info.councilMint!,
         e.owner,
         signers,
       );
@@ -54,8 +54,8 @@ export const mintSourceTokens = async (
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
         useGovernance
-          ? timelockConfig.info.governanceMint
-          : timelockConfig.info.councilMint!,
+          ? governance.info.governanceMint
+          : governance.info.councilMint!,
         e.sourceAccount,
         wallet.publicKey,
         [],

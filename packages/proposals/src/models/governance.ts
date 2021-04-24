@@ -65,7 +65,7 @@ export interface Governance {
   voteThreshold: number;
   /// Execution type
   executionType: ExecutionType;
-  /// Timelock Type
+  /// Governance Type
   timelockType: GovernanceType;
   /// Voting entry rule
   votingEntryRule: VotingEntryRule;
@@ -281,7 +281,7 @@ export const CustomSingleSignerTransactionLayout: typeof BufferLayout.Structure 
   ],
 );
 
-export interface TimelockTransaction {
+export interface GovernanceTransaction {
   /// Account type
   accountType: GovernanceAccountType;
 
@@ -293,9 +293,9 @@ export interface TimelockTransaction {
 
   instructionEndIndex: number;
 }
-export interface CustomSingleSignerTransaction extends TimelockTransaction {}
+export interface CustomSingleSignerTransaction extends GovernanceTransaction {}
 
-export const TimelockSetParser = (
+export const ProposalParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {

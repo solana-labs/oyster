@@ -25,7 +25,7 @@ export async function getGovernanceVotingRecords(
       id: 1,
       method: 'getProgramAccounts',
       params: [
-        PROGRAM_IDS.timelock.programId.toBase58(),
+        PROGRAM_IDS.governance.programId.toBase58(),
         {
           commitment: 'single',
           filters: [

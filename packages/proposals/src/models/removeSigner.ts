@@ -10,16 +10,17 @@ import { GovernanceInstruction } from './governance';
 ///   1. `[writable]` Signatory mint account.
 ///   2. `[writable]` Admin account.
 ///   3. `[writable]` Admin validation account.
-///   4. `[]` Timelock set account.
-///   5. `[]` Transfer authority
-///   6. `[]` Timelock program mint authority
-///   7. '[]` Token program id.
+///   4. `[writable]` Proposal state account.
+///   5. `[]` Proposal account.
+///   6. `[]` Transfer authority
+///   7. `[]` Governance program mint authority (pda of seed with Proposal key)
+///   8. '[]` Token program id.
 export const removeSignerInstruction = (
   signatoryAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminAccount: PublicKey,
   adminValidationAccount: PublicKey,
-  timelockSetAccount: PublicKey,
+  proposalAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
 ): TransactionInstruction => {
@@ -41,14 +42,14 @@ export const removeSignerInstruction = (
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminAccount, isSigner: false, isWritable: true },
     { pubkey: adminValidationAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalAccount, isSigner: false, isWritable: true },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

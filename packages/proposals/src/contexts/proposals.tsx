@@ -22,8 +22,8 @@ import {
   Proposal,
   ProposalState,
   ProposalLayout,
-  TimelockSetParser,
-  TimelockTransaction,
+  ProposalParser,
+  GovernanceTransaction,
   ProposalStateParser,
   ProposalStateLayout,
   CustomSingleSignerTransaction,
@@ -31,7 +31,7 @@ import {
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<Proposal>>;
-  transactions: Record<string, ParsedAccount<TimelockTransaction>>;
+  transactions: Record<string, ParsedAccount<GovernanceTransaction>>;
   states: Record<string, ParsedAccount<ProposalState>>;
   configs: Record<string, ParsedAccount<Governance>>;
 }
@@ -86,7 +86,7 @@ function useSetupProposalsCache({
 
     const query = async () => {
       const programAccounts = await connection.getProgramAccounts(
-        PROGRAM_IDS.timelock.programId,
+        PROGRAM_IDS.governance.programId,
       );
       return programAccounts;
     };
@@ -94,7 +94,7 @@ function useSetupProposalsCache({
       const newProposals: Record<string, ParsedAccount<Proposal>> = {};
       const newTransactions: Record<
         string,
-        ParsedAccount<TimelockTransaction>
+        ParsedAccount<GovernanceTransaction>
       > = {};
       const newStates: Record<string, ParsedAccount<ProposalState>> = {};
       const newConfigs: Record<string, ParsedAccount<Governance>> = {};
@@ -103,13 +103,15 @@ function useSetupProposalsCache({
         let cached;
         switch (a.account.data.length) {
           case ProposalLayout.span:
-            cache.add(a.pubkey, a.account, TimelockSetParser);
+            cache.add(a.pubkey, a.account, ProposalParser);
             cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
             newProposals[a.pubkey.toBase58()] = cached;
             break;
           case CustomSingleSignerTransactionLayout.span:
             cache.add(a.pubkey, a.account, CustomSingleSignerTransactionParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<TimelockTransaction>;
+            cached = cache.get(
+              a.pubkey,
+            ) as ParsedAccount<GovernanceTransaction>;
             newTransactions[a.pubkey.toBase58()] = cached;
             break;
           case GovernanceLayout.span:
@@ -131,10 +133,10 @@ function useSetupProposalsCache({
       setConfigs(newConfigs);
     });
     const subID = connection.onProgramAccountChange(
-      PROGRAM_IDS.timelock.programId,
+      PROGRAM_IDS.governance.programId,
       async (info: KeyedAccountInfo) => {
         [
-          [ProposalLayout.span, TimelockSetParser, setProposals],
+          [ProposalLayout.span, ProposalParser, setProposals],
           [
             CustomSingleSignerTransactionLayout.span,
             CustomSingleSignerTransactionParser,

@@ -22,12 +22,12 @@ const { confirm } = Modal;
 export function Vote({
   proposal,
   state,
-  timelockConfig,
+  governance,
   yeahVote,
 }: {
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
-  timelockConfig: ParsedAccount<Governance>;
+  governance: ParsedAccount<Governance>;
   yeahVote: boolean;
 }) {
   const wallet = useWallet();
@@ -90,7 +90,7 @@ export function Vote({
                 yesVoteAccount?.pubkey,
                 noVoteAccount?.pubkey,
                 userTokenAccount.pubkey,
-                timelockConfig,
+                governance,
                 state,
                 yesTokenAmount,
                 noTokenAmount,

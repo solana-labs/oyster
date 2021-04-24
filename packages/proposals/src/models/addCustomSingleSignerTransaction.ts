@@ -11,26 +11,26 @@ import {
 import BN from 'bn.js';
 
 /// [Requires Signatory token]
-/// Adds a Transaction to the Timelock Set. Max of 10 of any Transaction type. More than 10 will throw error.
+/// Adds a Transaction to the Proposal. Max of 10 of any Transaction type. More than 10 will throw error.
 /// Creates a PDA using your authority to be used to later execute the instruction.
 /// This transaction needs to contain authority to execute the program.
 ///
-///   0. `[writable]` Uninitialized Timelock Transaction account.
-///   1. `[writable]` Timelock set account.
+///   0. `[writable]` Uninitialized Proposal Transaction account.
+///   1. `[writable]` Proposal account.
 ///   2. `[writable]` Signatory account
 ///   3. `[writable]` Signatory validation account.
-///   4. `[]` Timelock Set account.
-///   5. `[]` Timelock Config account.
+///   4. `[]` Proposal account.
+///   5. `[]` Governance account.
 ///   6. `[]` Transfer authority
-///   7. `[]` Timelock mint authority
+///   7. `[]` Governance mint authority
 ///   8. `[]` Token program account.
 export const addCustomSingleSignerTransactionInstruction = (
-  timelockTransactionAccount: PublicKey,
-  timelockStateAccount: PublicKey,
+  proposalTransactionAccount: PublicKey,
+  proposalStateAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryValidationAccount: PublicKey,
-  timelockSetAccount: PublicKey,
-  timelockConfigAccount: PublicKey,
+  proposalAccount: PublicKey,
+  governanceAccount: PublicKey,
   transferAuthority: PublicKey,
   authority: PublicKey,
   slot: string,
@@ -85,12 +85,12 @@ export const addCustomSingleSignerTransactionInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockTransactionAccount, isSigner: true, isWritable: true },
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalTransactionAccount, isSigner: true, isWritable: true },
+    { pubkey: proposalStateAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryValidationAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
+    { pubkey: proposalAccount, isSigner: false, isWritable: false },
+    { pubkey: governanceAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: authority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
@@ -98,7 +98,7 @@ export const addCustomSingleSignerTransactionInstruction = (
 
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

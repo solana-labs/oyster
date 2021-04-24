@@ -26,7 +26,7 @@ export const removeSigner = async (
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   const transferAuthority = approve(

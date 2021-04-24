@@ -4,7 +4,7 @@ import * as BufferLayout from 'buffer-layout';
 import { GovernanceInstruction } from './governance';
 
 /// [Requires Admin token]
-/// Adds a signatory to the Timelock which means that this timelock can't leave Draft state until yet another signatory burns
+/// Adds a signatory to the Proposal which means that this Proposal can't leave Draft state until yet another signatory burns
 /// their signatory token indicating they are satisfied with the instruction queue. They'll receive an signatory token
 /// as a result of this call that they can burn later.
 ///
@@ -12,18 +12,18 @@ import { GovernanceInstruction } from './governance';
 ///   1. `[writable]` Initialized Signatory mint account.
 ///   2. `[writable]` Admin account.
 ///   3. `[writable]` Admin validation account.
-///   4. `[writable]` Timelock set account.
-///   5. `[]` Timelock set account.
+///   4. `[writable]` Proposal account.
+///   5. `[]` Proposal account.
 ///   6. `[]` Transfer authority
-///   7. `[]` Timelock program mint authority
+///   7. `[]` Governance program mint authority
 ///   8. '[]` Token program id.
 export const addSignerInstruction = (
   signatoryAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminAccount: PublicKey,
   adminValidationAccount: PublicKey,
-  timelockStateAccount: PublicKey,
-  timelockSetAccount: PublicKey,
+  proposalStateAccount: PublicKey,
+  proposalAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
 ): TransactionInstruction => {
@@ -45,15 +45,15 @@ export const addSignerInstruction = (
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminAccount, isSigner: false, isWritable: true },
     { pubkey: adminValidationAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
+    { pubkey: proposalStateAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

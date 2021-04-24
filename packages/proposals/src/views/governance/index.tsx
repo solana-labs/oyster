@@ -87,9 +87,9 @@ const columns = [
     key: 'config',
     render: (config: ParsedAccount<Governance>) => (
       <>
-        <MintSourceTokens timelockConfig={config} useGovernance={true} />
+        <MintSourceTokens governance={config} useGovernance={true} />
         {config.info.councilMint && (
-          <MintSourceTokens timelockConfig={config} useGovernance={false} />
+          <MintSourceTokens governance={config} useGovernance={false} />
         )}
       </>
     ),

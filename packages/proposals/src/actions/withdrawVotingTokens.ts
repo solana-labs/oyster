@@ -81,7 +81,7 @@ export const withdrawVotingTokens = async (
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   // We dont know in this scope how much is in each account so we just ask for all in each.
@@ -119,11 +119,11 @@ export const withdrawVotingTokens = async (
   const [governanceVotingRecord] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_AUTHORITY_SEED),
-      PROGRAM_IDS.timelock.programId.toBuffer(),
+      PROGRAM_IDS.governance.programId.toBuffer(),
       proposal.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
     ],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   signers.push(transferAuthority);

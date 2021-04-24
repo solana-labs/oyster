@@ -7,21 +7,22 @@ import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
 import { GovernanceInstruction } from './governance';
 
-/// Executes a command in the timelock set.
+/// Executes a command in the Proposal
 ///
 ///   0. `[writable]` Transaction account you wish to execute.
-///   1. `[writable]` Timelock state account.
+///   1. `[writable]` Proposal state account.
 ///   2. `[]` Program being invoked account
-///   3. `[]` Timelock set account.
-///   4. `[]` Timelock config
-///   5. `[]` Clock sysvar.
+///   3. `[]` Proposal account.
+///   4. `[]` Governance account
+///   5. `[]` Governance program account pub key.
+///   6. `[]` Clock sysvar.
 ///   7+ Any extra accounts that are part of the instruction, in order
 export const executeInstruction = (
   transactionAccount: PublicKey,
-  timelockStateAccount: PublicKey,
-  timelockSetAccount: PublicKey,
+  proposalStateAccount: PublicKey,
+  proposalAccount: PublicKey,
   programBeingInvokedAccount: PublicKey,
-  timelockConfig: PublicKey,
+  governance: PublicKey,
   accountInfos: { pubkey: PublicKey; isWritable: boolean; isSigner: boolean }[],
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
@@ -44,16 +45,16 @@ export const executeInstruction = (
   const keys = [
     // just a note this were all set to writable true...come back and check on this
     { pubkey: transactionAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalStateAccount, isSigner: false, isWritable: true },
     { pubkey: programBeingInvokedAccount, isSigner: false, isWritable: false },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
-    { pubkey: timelockConfig, isSigner: false, isWritable: false },
+    { pubkey: proposalAccount, isSigner: false, isWritable: false },
+    { pubkey: governance, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     ...accountInfos,
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

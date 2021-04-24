@@ -5,18 +5,18 @@ import { CONFIG_NAME_LENGTH, GovernanceInstruction } from './governance';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
-///   0. `[writable]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
-///           program account key, governance mint key, council mint key, timelock program account key.
-///   1. `[]` Program account that this config uses
-///   2. `[]` Governance mint that this config uses
-///   3. `[]` Council mint that this config uses [Optional]
+///   0. `[writable]` Governance account. The account pubkey needs to be set to PDA with the following seeds:
+///           1) 'governance' const prefix, 2) Governed Program account key
+///   1. `[]` Account of the Program governed by this Governance account
+///   2. `[]` Governance mint that this Governance uses
+///   3. `[]` Council mint that this Governance uses [Optional]
 export const initGovernanceInstruction = (
-  timelockConfigAccount: PublicKey,
+  governanceAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,
   voteThreshold: number,
   executionType: number,
-  timelockType: number,
+  governanceType: number,
   votingEntryRule: number,
   minimumSlotWaitingPeriod: BN,
   timeLimit: BN,
@@ -52,7 +52,7 @@ export const initGovernanceInstruction = (
       instruction: GovernanceInstruction.InitGovernance,
       voteThreshold,
       executionType,
-      timelockType,
+      timelockType: governanceType,
       votingEntryRule,
       minimumSlotWaitingPeriod,
       timeLimit,
@@ -62,7 +62,7 @@ export const initGovernanceInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
+    { pubkey: governanceAccount, isSigner: false, isWritable: true },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: governanceMint, isSigner: false, isWritable: false },
   ];
@@ -73,7 +73,7 @@ export const initGovernanceInstruction = (
 
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

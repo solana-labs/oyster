@@ -25,7 +25,7 @@ const { notify } = utils;
 export const registerProgramGovernance = async (
   connection: Connection,
   wallet: any,
-  uninitializedTimelockConfig: Partial<Governance>,
+  uninitializedGovernance: Partial<Governance>,
   useCouncil: boolean,
 ): Promise<PublicKey> => {
   const PROGRAM_IDS = utils.programIds();
@@ -41,13 +41,13 @@ export const registerProgramGovernance = async (
     AccountLayout.span,
   );
 
-  if (!uninitializedTimelockConfig.program)
-    uninitializedTimelockConfig.program = new Account().publicKey; // Random generation if none given
+  if (!uninitializedGovernance.program)
+    uninitializedGovernance.program = new Account().publicKey; // Random generation if none given
 
-  if (!uninitializedTimelockConfig.councilMint && useCouncil) {
+  if (!uninitializedGovernance.councilMint && useCouncil) {
     // Initialize the mint, an account for the admin, and give them one council token
     // to start their lives with.
-    uninitializedTimelockConfig.councilMint = createMint(
+    uninitializedGovernance.councilMint = createMint(
       mintInstructions,
       wallet.publicKey,
       mintRentExempt,
@@ -61,7 +61,7 @@ export const registerProgramGovernance = async (
       mintInstructions,
       wallet.publicKey,
       accountRentExempt,
-      uninitializedTimelockConfig.councilMint,
+      uninitializedGovernance.councilMint,
       wallet.publicKey,
       mintSigners,
     );
@@ -69,7 +69,7 @@ export const registerProgramGovernance = async (
     mintInstructions.push(
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
-        uninitializedTimelockConfig.councilMint,
+        uninitializedGovernance.councilMint,
         adminsCouncilToken,
         wallet.publicKey,
         [],
@@ -78,10 +78,10 @@ export const registerProgramGovernance = async (
     );
   }
 
-  if (!uninitializedTimelockConfig.governanceMint) {
+  if (!uninitializedGovernance.governanceMint) {
     // Initialize the mint, an account for the admin, and give them one governance token
     // to start their lives with.
-    uninitializedTimelockConfig.governanceMint = createMint(
+    uninitializedGovernance.governanceMint = createMint(
       mintInstructions,
       wallet.publicKey,
       mintRentExempt,
@@ -95,7 +95,7 @@ export const registerProgramGovernance = async (
       mintInstructions,
       wallet.publicKey,
       accountRentExempt,
-      uninitializedTimelockConfig.governanceMint,
+      uninitializedGovernance.governanceMint,
       wallet.publicKey,
       mintSigners,
     );
@@ -103,7 +103,7 @@ export const registerProgramGovernance = async (
     mintInstructions.push(
       Token.createMintToInstruction(
         PROGRAM_IDS.token,
-        uninitializedTimelockConfig.governanceMint,
+        uninitializedGovernance.governanceMint,
         adminsGovernanceToken,
         wallet.publicKey,
         [],
@@ -112,44 +112,44 @@ export const registerProgramGovernance = async (
     );
   }
 
-  const [timelockConfigKey] = await PublicKey.findProgramAddress(
+  const [governanceKey] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_AUTHORITY_SEED),
-      uninitializedTimelockConfig.program.toBuffer(),
+      uninitializedGovernance.program.toBuffer(),
     ],
-    PROGRAM_IDS.timelock.programId,
+    PROGRAM_IDS.governance.programId,
   );
 
   const [programDataAccount] = await PublicKey.findProgramAddress(
-    [uninitializedTimelockConfig.program.toBuffer()],
+    [uninitializedGovernance.program.toBuffer()],
     PROGRAM_IDS.bpf_upgrade_loader,
   );
 
   instructions.push(
     createEmptyGovernanceInstruction(
-      timelockConfigKey,
-      uninitializedTimelockConfig.program,
+      governanceKey,
+      uninitializedGovernance.program,
       programDataAccount,
       wallet.publicKey,
-      uninitializedTimelockConfig.governanceMint,
+      uninitializedGovernance.governanceMint,
       wallet.publicKey,
-      uninitializedTimelockConfig.councilMint,
+      uninitializedGovernance.councilMint,
     ),
   );
   instructions.push(
     initGovernanceInstruction(
-      timelockConfigKey,
-      uninitializedTimelockConfig.program,
-      uninitializedTimelockConfig.governanceMint,
+      governanceKey,
+      uninitializedGovernance.program,
+      uninitializedGovernance.governanceMint,
 
-      uninitializedTimelockConfig.voteThreshold!,
-      uninitializedTimelockConfig.executionType || ExecutionType.Independent,
-      uninitializedTimelockConfig.timelockType || GovernanceType.Governance,
-      uninitializedTimelockConfig.votingEntryRule || VotingEntryRule.Anytime,
-      uninitializedTimelockConfig.minimumSlotWaitingPeriod || new BN(0),
-      uninitializedTimelockConfig.timeLimit || new BN(0),
-      uninitializedTimelockConfig.name || '',
-      uninitializedTimelockConfig.councilMint,
+      uninitializedGovernance.voteThreshold!,
+      uninitializedGovernance.executionType || ExecutionType.Independent,
+      uninitializedGovernance.timelockType || GovernanceType.Governance,
+      uninitializedGovernance.votingEntryRule || VotingEntryRule.Anytime,
+      uninitializedGovernance.minimumSlotWaitingPeriod || new BN(0),
+      uninitializedGovernance.timeLimit || new BN(0),
+      uninitializedGovernance.name || '',
+      uninitializedGovernance.councilMint,
     ),
   );
 
@@ -177,7 +177,7 @@ export const registerProgramGovernance = async (
       description: `Transaction - ${tx}`,
     });
 
-    return timelockConfigKey;
+    return governanceKey;
   } catch (ex) {
     console.error(ex);
     throw new Error();

@@ -8,22 +8,22 @@ import * as BufferLayout from 'buffer-layout';
 import { GovernanceInstruction } from './governance';
 
 /// [Requires Signatory token]
-/// Burns signatory token, indicating you approve of moving this Timelock set from Draft state to Voting state.
+/// Burns signatory token, indicating you approve of moving this Proposal from Draft state to Voting state.
 /// The last Signatory token to be burned moves the state to Voting.
 ///
-///   0. `[writable]` Timelock state account pub key.
+///   0. `[writable]` Proposal state account pub key.
 ///   1. `[writable]` Signatory account
 ///   2. `[writable]` Signatory mint account.
-///   3. `[]` Timelock set account pub key.
+///   3. `[]` Proposal account pub key.
 ///   4. `[]` Transfer authority
-///   5. `[]` Timelock mint authority
-///   6. `[]` Token program account.
-///   7. `[]` Clock sysvar.
+///   5. `[]` Governance mint authority (pda of seed Proposal key)
+///   7. `[]` Token program account.
+///   8. `[]` Clock sysvar.
 export const signInstruction = (
-  timelockStateAccount: PublicKey,
+  proposalStateAccount: PublicKey,
   signatoryAccount: PublicKey,
   signatoryMintAccount: PublicKey,
-  timelockSetAccount: PublicKey,
+  proposalAccount: PublicKey,
   transferAuthority: PublicKey,
   mintAuthority: PublicKey,
 ): TransactionInstruction => {
@@ -41,10 +41,10 @@ export const signInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockStateAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalStateAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: false, isWritable: false },
+    { pubkey: proposalAccount, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: mintAuthority, isSigner: false, isWritable: false },
     { pubkey: PROGRAM_IDS.token, isSigner: false, isWritable: false },
@@ -52,7 +52,7 @@ export const signInstruction = (
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

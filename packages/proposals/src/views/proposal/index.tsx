@@ -8,7 +8,7 @@ import {
   Proposal,
   ProposalState,
   ProposalStateStatus,
-  TimelockTransaction,
+  GovernanceTransaction,
 } from '../../models/governance';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -225,14 +225,14 @@ function InnerProposalView({
   yesVotingMint: MintInfo;
   noVotingMint: MintInfo;
   sourceMint: MintInfo;
-  instructions: Record<string, ParsedAccount<TimelockTransaction>>;
+  instructions: Record<string, ParsedAccount<GovernanceTransaction>>;
   votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
 
-  const instructionsForProposal: ParsedAccount<TimelockTransaction>[] = timelockState.info.timelockTransactions
+  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = timelockState.info.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
   const isUrl = !!timelockState.info.descLink.match(urlRegex);
@@ -286,25 +286,21 @@ function InnerProposalView({
                   <SignButton proposal={proposal} state={timelockState} />
                 )}
               <MintSourceTokens
-                timelockConfig={timelockConfig}
+                governance={timelockConfig}
                 useGovernance={
                   proposal.info.sourceMint.toBase58() ===
                   timelockConfig.info.governanceMint.toBase58()
                 }
               />
-              <WithdrawVote
-                timelockConfig={timelockConfig}
-                proposal={proposal}
-                state={timelockState}
-              />
+              <WithdrawVote proposal={proposal} state={timelockState} />
               <Vote
-                timelockConfig={timelockConfig}
+                governance={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
                 yeahVote={true}
               />
               <Vote
-                timelockConfig={timelockConfig}
+                governance={timelockConfig}
                 proposal={proposal}
                 state={timelockState}
                 yeahVote={false}

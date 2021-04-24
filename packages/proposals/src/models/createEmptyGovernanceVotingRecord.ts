@@ -8,7 +8,7 @@ import { GovernanceInstruction } from './governance';
 ///   1. `[]` Proposal key
 ///   2. `[]` Your voting account
 ///   3. `[]` Payer
-///   4. `[]` Timelock program pub key.
+///   4. `[]` Governance program pub key
 ///   5. `[]` System account.
 export const createEmptyGovernanceVotingRecordInstruction = (
   governanceRecordAccount: PublicKey,
@@ -35,7 +35,7 @@ export const createEmptyGovernanceVotingRecordInstruction = (
     { pubkey: votingAccount, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
     {
-      pubkey: PROGRAM_IDS.timelock.programId,
+      pubkey: PROGRAM_IDS.governance.programId,
       isSigner: false,
       isWritable: false,
     },
@@ -43,7 +43,7 @@ export const createEmptyGovernanceVotingRecordInstruction = (
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

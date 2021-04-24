@@ -9,7 +9,7 @@ import { contexts, utils, ParsedAccount } from '@oyster/common';
 import {
   Proposal,
   ProposalState,
-  TimelockTransaction,
+  GovernanceTransaction,
 } from '../models/governance';
 import { executeInstruction } from '../models/execute';
 import { LABELS } from '../constants';
@@ -22,7 +22,7 @@ export const execute = async (
   wallet: any,
   proposal: ParsedAccount<Proposal>,
   state: ParsedAccount<ProposalState>,
-  transaction: ParsedAccount<TimelockTransaction>,
+  transaction: ParsedAccount<GovernanceTransaction>,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];

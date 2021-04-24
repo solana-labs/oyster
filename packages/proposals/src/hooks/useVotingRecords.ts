@@ -31,9 +31,9 @@ export function useVotingRecords(proposal: PublicKey) {
       const records = await getGovernanceVotingRecords(proposal, endpoint);
       setVotingRecords(records);
 
-      const { timelock } = utils.programIds();
+      const { governance } = utils.programIds();
 
-      return connection.onProgramAccountChange(timelock.programId, info => {
+      return connection.onProgramAccountChange(governance.programId, info => {
         if (
           info.accountInfo.data.length === GovernanceVotingRecordLayout.span
         ) {

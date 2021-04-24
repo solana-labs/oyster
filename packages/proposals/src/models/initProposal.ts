@@ -7,12 +7,12 @@ import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
 import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './governance';
 
-/// Initializes a new empty Timelocked set of Instructions that will be executed at various slots in the future in draft mode.
+/// Initializes a new empty Proposal for Instructions that will be executed at various slots in the future in draft mode.
 /// Grants Admin token to caller.
 ///
-///   0. `[writable]` Uninitialized Timelock state account .
-///   1. `[writable]` Uninitialized Timelock set account .
-///   2. `[writable]` Initialized Timelock config account.
+///   0. `[writable]` Uninitialized Proposal state account .
+///   1. `[writable]` Uninitialized Proposal account .
+///   2. `[writable]` Initialized Governance account.
 ///   3. `[writable]` Initialized Signatory Mint account
 ///   4. `[writable]` Initialized Admin Mint account
 ///   5. `[writable]` Initialized Voting Mint account
@@ -27,13 +27,13 @@ import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './governance';
 ///   14. `[writable]` Initialized No voting dump account
 ///   15. `[writable]` Initialized source holding account
 ///   16. `[]` Source mint
-///   17. `[]` Timelock minting authority
+///   17. `[]` Governance minting authority (pda with seed of Proposal  key)
 ///   18. '[]` Token program id
 ///   19. `[]` Rent sysvar
 export const initProposalInstruction = (
-  timelockStateAccount: PublicKey,
-  timelockSetAccount: PublicKey,
-  timelockConfigAccount: PublicKey,
+  proposalStateAccount: PublicKey,
+  proposalAccount: PublicKey,
+  governanceAccount: PublicKey,
   signatoryMintAccount: PublicKey,
   adminMintAccount: PublicKey,
   votingMintAccount: PublicKey,
@@ -88,9 +88,9 @@ export const initProposalInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockStateAccount, isSigner: true, isWritable: true },
-    { pubkey: timelockSetAccount, isSigner: true, isWritable: true },
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: true },
+    { pubkey: proposalStateAccount, isSigner: true, isWritable: true },
+    { pubkey: proposalAccount, isSigner: true, isWritable: true },
+    { pubkey: governanceAccount, isSigner: false, isWritable: true },
     { pubkey: signatoryMintAccount, isSigner: false, isWritable: true },
     { pubkey: adminMintAccount, isSigner: false, isWritable: true },
     { pubkey: votingMintAccount, isSigner: false, isWritable: true },
@@ -115,7 +115,7 @@ export const initProposalInstruction = (
   ];
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

@@ -22,18 +22,18 @@ const layout = {
 };
 
 export default function MintSourceTokens({
-  timelockConfig,
+  governance,
   useGovernance,
 }: {
-  timelockConfig: ParsedAccount<Governance>;
+  governance: ParsedAccount<Governance>;
   useGovernance: boolean;
 }) {
   const PROGRAM_IDS = utils.programIds();
   const wallet = useWallet();
   const connection = useConnection();
   const mintKey = useGovernance
-    ? timelockConfig.info.governanceMint
-    : timelockConfig.info.councilMint!;
+    ? governance.info.governanceMint
+    : governance.info.councilMint!;
   const mint = useMint(mintKey);
   const [saving, setSaving] = useState(false);
 
@@ -108,7 +108,7 @@ export default function MintSourceTokens({
       try {
         if (sourceHolders[i].owner) {
           const tokenAccounts = await connection.getTokenAccountsByOwner(
-            sourceHolders[i].owner || PROGRAM_IDS.timelock,
+            sourceHolders[i].owner || PROGRAM_IDS.governance,
             {
               programId: PROGRAM_IDS.token,
             },
@@ -130,7 +130,7 @@ export default function MintSourceTokens({
       await mintSourceTokens(
         connection,
         wallet.wallet,
-        timelockConfig,
+        governance,
         useGovernance,
         sourceHoldersToRun,
         setSavePerc,

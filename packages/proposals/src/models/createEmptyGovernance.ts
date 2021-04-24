@@ -3,16 +3,16 @@ import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
 import { GovernanceInstruction } from './governance';
 
-///   0. `[]` Timelock config key. Needs to be set with pubkey set to PDA with seeds of the
-///           program account key, governance mint key, council mint key, and timelock program account key.
-///   1. `[]` Program account to tie this config to.
-///   2. `[]` Governance mint to tie this config to
-///   3. `[]` Payer
-///   4. `[]` Timelock program pub key.
+///   0. `[]` Governance account. The account pubkey needs to be set to PDA with the following seeds:
+///           1) 'governance' const prefix, 2) Governed Program account key
+///   1. `[]` Account of the Program governed by this Governance account
+///   2. `[writable]` Program Data account of the Program governed by this Governance account
+///   3. `[signer]` Current Upgrade Authority account of the Program governed by this Governance account
+///   4. `[signer]` Payer
 ///   5. `[]` System account.
-///   6. `[]` Council mint [optional] to tie this config to [Optional]
+///   6. `[]` bpf_upgrade_loader account.
 export const createEmptyGovernanceInstruction = (
-  timelockConfigAccount: PublicKey,
+  governanceAccount: PublicKey,
   programAccount: PublicKey,
   programDataAccount: PublicKey,
   programUpgradeAuthority: PublicKey,
@@ -34,7 +34,7 @@ export const createEmptyGovernanceInstruction = (
   );
 
   const keys = [
-    { pubkey: timelockConfigAccount, isSigner: false, isWritable: false },
+    { pubkey: governanceAccount, isSigner: false, isWritable: false },
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: programDataAccount, isSigner: false, isWritable: true },
     { pubkey: programUpgradeAuthority, isSigner: true, isWritable: false },
@@ -50,7 +50,7 @@ export const createEmptyGovernanceInstruction = (
 
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.timelock.programId,
+    programId: PROGRAM_IDS.governance.programId,
     data,
   });
 };

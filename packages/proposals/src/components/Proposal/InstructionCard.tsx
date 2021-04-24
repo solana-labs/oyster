@@ -17,7 +17,7 @@ import {
   Proposal,
   ProposalState,
   ProposalStateStatus,
-  TimelockTransaction,
+  GovernanceTransaction,
 } from '../../models/governance';
 
 import './style.less';
@@ -37,7 +37,7 @@ export function InstructionCard({
   state,
   position,
 }: {
-  instruction: ParsedAccount<TimelockTransaction>;
+  instruction: ParsedAccount<GovernanceTransaction>;
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
   position: number;
@@ -108,7 +108,7 @@ function PlayStatusButton({
 }: {
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
-  instruction: ParsedAccount<TimelockTransaction>;
+  instruction: ParsedAccount<GovernanceTransaction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
 }) {
