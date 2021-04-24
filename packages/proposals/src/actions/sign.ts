@@ -10,7 +10,7 @@ import {
   GOVERNANCE_AUTHORITY_SEED,
   Proposal,
   ProposalState,
-} from '../models/timelock';
+} from '../models/governance';
 import { signInstruction } from '../models/sign';
 
 const { sendTransaction } = contexts.Connection;

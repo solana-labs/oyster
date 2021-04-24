@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { CONFIG_NAME_LENGTH, GovernanceInstruction } from './timelock';
+import { CONFIG_NAME_LENGTH, GovernanceInstruction } from './governance';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
@@ -10,7 +10,7 @@ import * as Layout from '../utils/layout';
 ///   1. `[]` Program account that this config uses
 ///   2. `[]` Governance mint that this config uses
 ///   3. `[]` Council mint that this config uses [Optional]
-export const initTimelockConfigInstruction = (
+export const initGovernanceInstruction = (
   timelockConfigAccount: PublicKey,
   programAccount: PublicKey,
   governanceMint: PublicKey,

@@ -18,7 +18,7 @@ import {
   ProposalState,
   ProposalStateStatus,
   TimelockTransaction,
-} from '../../models/timelock';
+} from '../../models/governance';
 
 import './style.less';
 

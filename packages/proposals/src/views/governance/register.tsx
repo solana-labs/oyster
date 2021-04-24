@@ -7,7 +7,7 @@ import {
   ExecutionType,
   GovernanceType,
   VotingEntryRule,
-} from '../../models/timelock';
+} from '../../models/governance';
 import { LABELS } from '../../constants';
 import { contexts, utils, tryParseKey } from '@oyster/common';
 import { registerProgramGovernance } from '../../actions/registerProgramGovernance';

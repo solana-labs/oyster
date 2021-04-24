@@ -17,7 +17,7 @@ import {
   Proposal,
   ProposalState,
   ProposalStateStatus,
-} from '../models/timelock';
+} from '../models/governance';
 import { AccountLayout } from '@solana/spl-token';
 import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
 import { LABELS } from '../constants';

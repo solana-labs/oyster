@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { GovernanceInstruction } from './timelock';
+import { GovernanceInstruction } from './governance';
 
 /// [Requires Signatory token]
 /// Burns signatory token, indicating you approve of moving this Timelock set from Draft state to Voting state.

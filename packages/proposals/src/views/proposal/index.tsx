@@ -9,7 +9,7 @@ import {
   ProposalState,
   ProposalStateStatus,
   TimelockTransaction,
-} from '../../models/timelock';
+} from '../../models/governance';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useProposals } from '../../contexts/proposals';

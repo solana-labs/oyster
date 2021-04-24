@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './timelock';
+import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './governance';
 
 /// Initializes a new empty Timelocked set of Instructions that will be executed at various slots in the future in draft mode.
 /// Grants Admin token to caller.
@@ -30,7 +30,7 @@ import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './timelock';
 ///   17. `[]` Timelock minting authority
 ///   18. '[]` Token program id
 ///   19. `[]` Rent sysvar
-export const initTimelockSetInstruction = (
+export const initProposalInstruction = (
   timelockStateAccount: PublicKey,
   timelockSetAccount: PublicKey,
   timelockConfigAccount: PublicKey,

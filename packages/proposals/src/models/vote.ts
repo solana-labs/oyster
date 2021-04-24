@@ -7,7 +7,7 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import { GovernanceInstruction } from './timelock';
+import { GovernanceInstruction } from './governance';
 import BN from 'bn.js';
 
 /// [Requires Voting tokens]

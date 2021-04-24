@@ -27,7 +27,7 @@ import {
   ProposalStateParser,
   ProposalStateLayout,
   CustomSingleSignerTransaction,
-} from '../models/timelock';
+} from '../models/governance';
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<Proposal>>;

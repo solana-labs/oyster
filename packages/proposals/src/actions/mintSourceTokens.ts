@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, ParsedAccount, actions } from '@oyster/common';
 
-import { Governance } from '../models/timelock';
+import { Governance } from '../models/governance';
 import { AccountLayout, Token } from '@solana/spl-token';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;

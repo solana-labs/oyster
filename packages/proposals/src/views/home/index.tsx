@@ -6,7 +6,7 @@ import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from './../../components/Background';
 import { useHistory } from 'react-router-dom';
 import { RegisterGovernanceMenuItem } from '../governance/register';
-import { ProposalStateStatus } from '../../models/timelock';
+import { ProposalStateStatus } from '../../models/governance';
 
 export const HomeView = () => {
   const history = useHistory();

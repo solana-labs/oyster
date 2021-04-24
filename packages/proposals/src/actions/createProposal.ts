@@ -8,13 +8,13 @@ import {
 import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
-import { initTimelockSetInstruction } from '../models/initTimelockSet';
+import { initProposalInstruction } from '../models/initProposal';
 import {
   GOVERNANCE_AUTHORITY_SEED,
   Governance,
   ProposalLayout,
   ProposalStateLayout,
-} from '../models/timelock';
+} from '../models/governance';
 
 const { cache } = contexts.Accounts;
 const { sendTransactions } = contexts.Connection;
@@ -117,7 +117,7 @@ export const createProposal = async (
   createTimelockAccountsInstructions.push(uninitializedTimelockSetInstruction);
 
   instructions.push(
-    initTimelockSetInstruction(
+    initProposalInstruction(
       timelockStateKey.publicKey,
       timelockSetKey.publicKey,
       timelockConfig.pubkey,

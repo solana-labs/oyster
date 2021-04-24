@@ -5,7 +5,7 @@ import {
   GovernanceVotingRecord,
   GovernanceVotingRecordLayout,
   GovernanceVotingRecordParser,
-} from '../models/timelock';
+} from '../models/governance';
 
 const MAX_LOOKUPS = 5000;
 export async function getGovernanceVotingRecords(

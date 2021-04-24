@@ -5,7 +5,7 @@ import {
   STATE_COLOR,
   ProposalState,
   ProposalStateStatus,
-} from '../../models/timelock';
+} from '../../models/governance';
 
 export function StateBadgeRibbon({
   state,

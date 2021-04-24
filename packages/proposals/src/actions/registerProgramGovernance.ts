@@ -13,10 +13,10 @@ import {
   Governance,
   GovernanceType,
   VotingEntryRule,
-} from '../models/timelock';
-import { initTimelockConfigInstruction } from '../models/initTimelockConfig';
+} from '../models/governance';
+import { initGovernanceInstruction } from '../models/initGovernance';
 import BN from 'bn.js';
-import { createEmptyTimelockConfigInstruction } from '../models/createEmptyTimelockConfig';
+import { createEmptyGovernanceInstruction } from '../models/createEmptyGovernance';
 
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -126,7 +126,7 @@ export const registerProgramGovernance = async (
   );
 
   instructions.push(
-    createEmptyTimelockConfigInstruction(
+    createEmptyGovernanceInstruction(
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       programDataAccount,
@@ -137,7 +137,7 @@ export const registerProgramGovernance = async (
     ),
   );
   instructions.push(
-    initTimelockConfigInstruction(
+    initGovernanceInstruction(
       timelockConfigKey,
       uninitializedTimelockConfig.program,
       uninitializedTimelockConfig.governanceMint,

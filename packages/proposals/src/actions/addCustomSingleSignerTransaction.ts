@@ -11,7 +11,7 @@ import {
   CustomSingleSignerTransactionLayout,
   Proposal,
   ProposalState,
-} from '../models/timelock';
+} from '../models/governance';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
 
 const { sendTransaction } = contexts.Connection;

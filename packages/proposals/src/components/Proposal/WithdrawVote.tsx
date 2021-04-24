@@ -6,7 +6,7 @@ import {
   Proposal,
   ProposalState,
   ProposalStateStatus,
-} from '../../models/timelock';
+} from '../../models/governance';
 import { LABELS } from '../../constants';
 import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
 import { contexts, hooks } from '@oyster/common';

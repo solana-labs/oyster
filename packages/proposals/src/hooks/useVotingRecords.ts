@@ -11,7 +11,7 @@ import {
   GovernanceVotingRecord,
   GovernanceVotingRecordLayout,
   GovernanceVotingRecordParser,
-} from '../models/timelock';
+} from '../models/governance';
 import { getGovernanceVotingRecords } from '../utils/lookups';
 
 export function useVotingRecords(proposal: PublicKey) {

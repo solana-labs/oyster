@@ -6,7 +6,7 @@ import {
   Governance,
   Proposal,
   ProposalState,
-} from '../../models/timelock';
+} from '../../models/governance';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';

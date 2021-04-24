@@ -7,7 +7,7 @@ import {
   INSTRUCTION_LIMIT,
   GovernanceInstruction,
   MAX_TRANSACTIONS,
-} from './timelock';
+} from './governance';
 import BN from 'bn.js';
 
 /// [Requires Signatory token]

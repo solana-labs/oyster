@@ -17,7 +17,7 @@ import {
   Governance,
   Proposal,
   ProposalState,
-} from '../models/timelock';
+} from '../models/governance';
 
 import { AccountLayout } from '@solana/spl-token';
 

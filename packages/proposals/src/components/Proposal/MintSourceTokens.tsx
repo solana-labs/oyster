@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress, InputNumber, Radio } from 'antd';
 import React, { useState } from 'react';
-import { Governance } from '../../models/timelock';
+import { Governance } from '../../models/governance';
 import { utils, contexts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
