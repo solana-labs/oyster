@@ -34,7 +34,7 @@ let WORMHOLE_BRIDGE: {
   wrappedMaster: string;
 };
 
-let TIMELOCK: {
+let GOVERNANCE: {
   programId: PublicKey;
 };
 
@@ -112,7 +112,7 @@ export const PROGRAM_IDS = [
   {
     name: 'localnet',
     timelock: () => ({
-      programId: new PublicKey('3KEiR9eX7isb8xeFzTzbLZij8tKH6YFYUbMyjBp8ygDK'),
+      programId: new PublicKey('2uWrXQ3tMurqTLe3Dmue6DzasUGV9UPqK7AK7HzS7v3D'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -143,7 +143,7 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LAYOUT = swap.current.layout;
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
-  TIMELOCK = instance.timelock();
+  GOVERNANCE = instance.timelock();
 
   if (envName === 'mainnet-beta') {
     LENDING_PROGRAM_ID = new PublicKey(
@@ -160,7 +160,7 @@ export const programIds = () => {
     swapLayout: SWAP_PROGRAM_LAYOUT,
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,
-    timelock: TIMELOCK,
+    governance: GOVERNANCE,
     associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
     system: SYSTEM,
