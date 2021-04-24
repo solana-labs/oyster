@@ -156,10 +156,10 @@ export const STATE_COLOR: Record<string, string> = {
 export interface ProposalState {
   /// Account type
   accountType: GovernanceAccountType;
-  timelockSet: PublicKey;
+  proposal: PublicKey;
   status: ProposalStateStatus;
   totalSigningTokensMinted: BN;
-  timelockTransactions: PublicKey[];
+  proposalTransactions: PublicKey[];
   name: string;
   descLink: string;
   votingEndedAt: BN;
@@ -173,7 +173,7 @@ export interface ProposalState {
 
 const proposalTxns = [];
 for (let i = 0; i < MAX_TRANSACTIONS; i++) {
-  proposalTxns.push(Layout.publicKey('timelockTxn' + i.toString()));
+  proposalTxns.push(Layout.publicKey('proposalTxn' + i.toString()));
 }
 
 export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -201,8 +201,8 @@ export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct
 export const ProposalStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
-    Layout.publicKey('timelockSet'),
-    BufferLayout.u8('timelockStateStatus'),
+    Layout.publicKey('proposal'),
+    BufferLayout.u8('proposalStateStatus'),
     Layout.uint64('totalSigningTokensMinted'),
     BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
     BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
@@ -360,9 +360,9 @@ export const ProposalStateParser = (
   const buffer = Buffer.from(info.data);
   const data = ProposalStateLayout.decode(buffer);
 
-  const timelockTxns = [];
+  const proposalTxns = [];
   for (let i = 0; i < MAX_TRANSACTIONS; i++) {
-    timelockTxns.push(data['timelockTxn' + i.toString()]);
+    proposalTxns.push(data['proposalTxn' + i.toString()]);
   }
 
   const details = {
@@ -372,12 +372,12 @@ export const ProposalStateParser = (
     },
     info: {
       accountType: data.accountType,
-      timelockSet: data.timelockSet,
-      status: data.timelockStateStatus,
+      proposal: data.proposal,
+      status: data.proposalStateStatus,
       totalSigningTokensMinted: data.totalSigningTokensMinted,
       descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
       name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-      timelockTransactions: timelockTxns,
+      proposalTransactions: proposalTxns,
       votingEndedAt: data.votingEndedAt,
       votingBeganAt: data.votingBeganAt,
       createdAt: data.createdAt,

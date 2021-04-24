@@ -232,7 +232,7 @@ function InnerProposalView({
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
 
-  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = proposalState.info.timelockTransactions
+  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = proposalState.info.proposalTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
   const isUrl = !!proposalState.info.descLink.match(urlRegex);
