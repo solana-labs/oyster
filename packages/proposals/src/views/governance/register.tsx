@@ -158,7 +158,7 @@ export function NewForm({
         </Form.Item>
         <Form.Item
           name="program"
-          label={LABELS.PROGRAM}
+          label={LABELS.PROGRAM_ID}
           rules={[{ required: true }]}
         >
           <Input />

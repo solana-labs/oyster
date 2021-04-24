@@ -99,7 +99,10 @@ export const LABELS = {
   TOKENS_REFUNDED: 'Your voting tokens have been refunded',
 
   REGISTER_GOVERNANCE: 'Register',
-  PROGRAM: 'Program ID',
+
+  PROGRAM_ID: 'Program ID',
+  INSTRUCTION: 'Instruction',
+
   GOVERNANCE: 'Governance Token Holders',
   COUNCIL: 'The Council',
   GOVERNANCE_MINT: 'Governance Mint ID',

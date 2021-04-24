@@ -45,7 +45,7 @@ export const ProposalsView = () => {
       });
     });
     return newListData;
-  }, [proposals]);
+  }, [proposals, id, mint, states]);
 
   return (
     <Row

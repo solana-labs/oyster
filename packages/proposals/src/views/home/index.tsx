@@ -56,7 +56,7 @@ export const HomeView = () => {
       });
     });
     return newListData;
-  }, [configs, proposals]);
+  }, [configs, proposals, states]);
 
   return (
     <>

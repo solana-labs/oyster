@@ -38,7 +38,7 @@ export const createEmptyTimelockConfigInstruction = (
     { pubkey: programAccount, isSigner: false, isWritable: false },
     { pubkey: programDataAccount, isSigner: false, isWritable: true },
     { pubkey: programUpgradeAuthority, isSigner: true, isWritable: false },
-    { pubkey: governanceMint, isSigner: false, isWritable: false },
+
     { pubkey: payer, isSigner: true, isWritable: false },
     { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
     {
@@ -47,10 +47,6 @@ export const createEmptyTimelockConfigInstruction = (
       isWritable: false,
     },
   ];
-
-  if (councilMint) {
-    keys.push({ pubkey: councilMint, isSigner: false, isWritable: false });
-  }
 
   return new TransactionInstruction({
     keys,
