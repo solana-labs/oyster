@@ -74,9 +74,9 @@ export function NewForm({
     name: string;
     proposalMintType: string;
     description: string;
-    timelockConfigKey: string;
+    governanceKey: string;
   }) => {
-    const config = context.configs[values.timelockConfigKey];
+    const config = context.configs[values.governanceKey];
 
     if (
       values.proposalMintType === ProposalMintType.Council &&

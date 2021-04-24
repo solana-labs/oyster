@@ -47,8 +47,8 @@ export const ProposalView = () => {
   const context = useProposals();
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
-  const timelockConfig = context.configs[proposal?.info.config.toBase58()];
-  const timelockState = context.states[proposal?.info.state.toBase58()];
+  const governance = context.configs[proposal?.info.config.toBase58()];
+  const proposalState = context.states[proposal?.info.state.toBase58()];
   const { endpoint } = useConnectionConfig();
   const sigMint = useMint(proposal?.info.signatoryMint);
   const votingMint = useMint(proposal?.info.votingMint);
@@ -69,8 +69,8 @@ export const ProposalView = () => {
       noVotingMint ? (
         <InnerProposalView
           proposal={proposal}
-          timelockState={timelockState}
-          timelockConfig={timelockConfig}
+          proposalState={proposalState}
+          governance={governance}
           sourceMint={sourceMint}
           votingMint={votingMint}
           yesVotingMint={yesVotingMint}
@@ -94,7 +94,7 @@ function useLoadGist({
   setMsg,
   setContent,
   isGist,
-  timelockState,
+  proposalState,
 }: {
   loading: boolean;
   setLoading: (b: boolean) => void;
@@ -102,11 +102,11 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  timelockState: ParsedAccount<ProposalState>;
+  proposalState: ParsedAccount<ProposalState>;
 }) {
   useMemo(() => {
     if (loading) {
-      let toFetch = timelockState.info.descLink;
+      let toFetch = proposalState.info.descLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -206,20 +206,20 @@ function voterDisplayData(
 
 function InnerProposalView({
   proposal,
-  timelockState,
+  proposalState,
   sigMint,
   votingMint,
   yesVotingMint,
   noVotingMint,
   instructions,
-  timelockConfig,
+  governance,
   sourceMint,
   votingDisplayData,
   endpoint,
 }: {
   proposal: ParsedAccount<Proposal>;
-  timelockConfig: ParsedAccount<Governance>;
-  timelockState: ParsedAccount<ProposalState>;
+  governance: ParsedAccount<Governance>;
+  proposalState: ParsedAccount<ProposalState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
@@ -232,14 +232,14 @@ function InnerProposalView({
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
 
-  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = timelockState.info.timelockTransactions
+  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = proposalState.info.timelockTransactions
     .map(k => instructions[k.toBase58()])
     .filter(k => k);
-  const isUrl = !!timelockState.info.descLink.match(urlRegex);
+  const isUrl = !!proposalState.info.descLink.match(urlRegex);
   const isGist =
-    !!timelockState.info.descLink.match(/gist/i) &&
-    !!timelockState.info.descLink.match(/github/i);
-  const [content, setContent] = useState(timelockState.info.descLink);
+    !!proposalState.info.descLink.match(/gist/i) &&
+    !!proposalState.info.descLink.match(/github/i);
+  const [content, setContent] = useState(proposalState.info.descLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -254,7 +254,7 @@ function InnerProposalView({
     setMsg,
     setContent,
     isGist,
-    timelockState,
+    proposalState: proposalState,
   });
 
   return (
@@ -268,8 +268,8 @@ function InnerProposalView({
                 size={60}
               />
               <Col>
-                <h1>{timelockState.info.name}</h1>
-                <StateBadge state={timelockState} />
+                <h1>{proposalState.info.name}</h1>
+                <StateBadge state={proposalState} />
               </Col>
             </Row>
           </Col>
@@ -277,32 +277,32 @@ function InnerProposalView({
             <div className="proposal-actions">
               {adminAccount &&
                 adminAccount.info.amount.toNumber() === 1 &&
-                timelockState.info.status === ProposalStateStatus.Draft && (
-                  <AddSigners proposal={proposal} state={timelockState} />
+                proposalState.info.status === ProposalStateStatus.Draft && (
+                  <AddSigners proposal={proposal} state={proposalState} />
                 )}
               {sigAccount &&
                 sigAccount.info.amount.toNumber() === 1 &&
-                timelockState.info.status === ProposalStateStatus.Draft && (
-                  <SignButton proposal={proposal} state={timelockState} />
+                proposalState.info.status === ProposalStateStatus.Draft && (
+                  <SignButton proposal={proposal} state={proposalState} />
                 )}
               <MintSourceTokens
-                governance={timelockConfig}
+                governance={governance}
                 useGovernance={
                   proposal.info.sourceMint.toBase58() ===
-                  timelockConfig.info.governanceMint.toBase58()
+                  governance.info.governanceMint.toBase58()
                 }
               />
-              <WithdrawVote proposal={proposal} state={timelockState} />
+              <WithdrawVote proposal={proposal} state={proposalState} />
               <Vote
-                governance={timelockConfig}
+                governance={governance}
                 proposal={proposal}
-                state={timelockState}
+                state={proposalState}
                 yeahVote={true}
               />
               <Vote
-                governance={timelockConfig}
+                governance={governance}
                 proposal={proposal}
-                state={timelockState}
+                state={proposalState}
                 yeahVote={false}
               />
             </div>
@@ -366,10 +366,10 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.SIG_GIVEN}
                 value={
-                  timelockState.info.totalSigningTokensMinted.toNumber() -
+                  proposalState.info.totalSigningTokensMinted.toNumber() -
                   sigMint.supply.toNumber()
                 }
-                suffix={`/ ${timelockState.info.totalSigningTokensMinted.toNumber()}`}
+                suffix={`/ ${proposalState.info.totalSigningTokensMinted.toNumber()}`}
               />
             </Card>
           </Col>
@@ -387,7 +387,7 @@ function InnerProposalView({
               <Statistic
                 valueStyle={{ color: 'green' }}
                 title={LABELS.VOTES_REQUIRED}
-                value={getVotesRequired(timelockConfig, sourceMint)}
+                value={getVotesRequired(governance, sourceMint)}
               />
             </Card>
           </Col>
@@ -408,7 +408,7 @@ function InnerProposalView({
                     <p>
                       {LABELS.DESCRIPTION}:{' '}
                       <a
-                        href={timelockState.info.descLink}
+                        href={proposalState.info.descLink}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -435,17 +435,17 @@ function InnerProposalView({
                         proposal={proposal}
                         position={position + 1}
                         instruction={instruction}
-                        state={timelockState}
+                        state={proposalState}
                       />
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    timelockState.info.status === ProposalStateStatus.Draft && (
+                    proposalState.info.status === ProposalStateStatus.Draft && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
-                          state={timelockState}
-                          config={timelockConfig}
+                          state={proposalState}
+                          config={governance}
                           position={instructionsForProposal.length}
                         />
                       </Col>
@@ -461,13 +461,12 @@ function InnerProposalView({
 }
 
 function getVotesRequired(
-  timelockConfig: ParsedAccount<Governance>,
+  governance: ParsedAccount<Governance>,
   sourceMint: MintInfo,
 ): number {
-  return timelockConfig.info.voteThreshold === 100
+  return governance.info.voteThreshold === 100
     ? sourceMint.supply.toNumber()
     : Math.ceil(
-        (timelockConfig.info.voteThreshold / 100) *
-          sourceMint.supply.toNumber(),
+        (governance.info.voteThreshold / 100) * sourceMint.supply.toNumber(),
       );
 }

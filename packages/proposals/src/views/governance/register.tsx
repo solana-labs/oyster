@@ -68,7 +68,7 @@ export function NewForm({
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
-    timelockType: GovernanceType;
+    governanceType: GovernanceType;
     executionType: ExecutionType;
     voteThreshold: number;
     votingEntryRule: VotingEntryRule;
@@ -119,8 +119,8 @@ export function NewForm({
       return;
     }
 
-    const uninitializedConfig = {
-      timelockType: values.timelockType,
+    const uninitializedGovernance = {
+      timelockType: values.governanceType,
       executionType: values.executionType,
       voteThreshold: values.voteThreshold,
       votingEntryRule: values.votingEntryRule,
@@ -140,7 +140,7 @@ export function NewForm({
     const newConfig = await registerProgramGovernance(
       connection,
       wallet.wallet,
-      uninitializedConfig,
+      uninitializedGovernance,
       councilVisible,
     );
     handleOk(newConfig);
