@@ -1,4 +1,11 @@
-import { deserializeBorsh } from '@oyster/common';
+import {
+  AUCTION_PREFIX,
+  deserializeBorsh,
+  programIds,
+  METADATA,
+  METADATA_PREFIX,
+  EDITION,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { serialize, BinaryReader, BinaryWriter } from 'borsh';
 
@@ -305,3 +312,110 @@ export const SCHEMA = new Map<any, any>([
     },
   ],
 ]);
+
+export async function getAuctionKeys(
+  vault: PublicKey,
+): Promise<{ auctionKey: PublicKey; auctionManagerKey: PublicKey }> {
+  const PROGRAM_IDS = programIds();
+
+  const auctionKey: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(AUCTION_PREFIX),
+        PROGRAM_IDS.auction.toBuffer(),
+        vault.toBuffer(),
+      ],
+      PROGRAM_IDS.auction,
+    )
+  )[0];
+
+  const auctionManagerKey: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [Buffer.from(METAPLEX_PREFIX), auctionKey.toBuffer()],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+
+  return { auctionKey, auctionManagerKey };
+}
+
+export async function getBidderKeys(
+  auctionKey: PublicKey,
+  bidder: PublicKey,
+): Promise<{ bidMetadata: PublicKey; bidRedemption: PublicKey }> {
+  const PROGRAM_IDS = programIds();
+
+  const bidMetadata: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(AUCTION_PREFIX),
+        auctionKey.toBuffer(),
+        bidder.toBuffer(),
+        Buffer.from(METADATA),
+      ],
+      PROGRAM_IDS.auction,
+    )
+  )[0];
+
+  const bidRedemption: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METAPLEX_PREFIX),
+        auctionKey.toBuffer(),
+        bidMetadata.toBuffer(),
+      ],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+
+  return { bidMetadata, bidRedemption };
+}
+
+export async function getOriginalAuthority(
+  auctionKey: PublicKey,
+  metadata: PublicKey,
+): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METAPLEX_PREFIX),
+        auctionKey.toBuffer(),
+        metadata.toBuffer(),
+      ],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+}
+
+export async function getMetadata(tokenMint: PublicKey): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METADATA_PREFIX),
+        PROGRAM_IDS.metadata.toBuffer(),
+        tokenMint.toBuffer(),
+      ],
+      PROGRAM_IDS.metadata,
+    )
+  )[0];
+}
+
+export async function getEdition(tokenMint: PublicKey): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METADATA_PREFIX),
+        PROGRAM_IDS.metadata.toBuffer(),
+        tokenMint.toBuffer(),
+        Buffer.from(EDITION),
+      ],
+      PROGRAM_IDS.metadata,
+    )
+  )[0];
+}

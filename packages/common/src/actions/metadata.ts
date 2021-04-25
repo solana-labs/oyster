@@ -9,6 +9,9 @@ import { deserializeBorsh } from './../utils/borsh';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
 
+export const METADATA_PREFIX = 'metadata';
+export const EDITION = 'edition';
+
 export const MAX_NAME_LENGTH = 32;
 
 export const MAX_SYMBOL_LENGTH = 10;
@@ -139,7 +142,7 @@ class UpdateMetadataArgs {
     this.uri = args.uri;
     this.nonUniqueSpecificUpdateAuthority = args.nonUniqueSpecificUpdateAuthority
       ? new PublicKey(args.nonUniqueSpecificUpdateAuthority)
-      : null;
+      : undefined;
   }
 }
 

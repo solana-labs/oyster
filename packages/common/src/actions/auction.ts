@@ -11,6 +11,7 @@ import { serialize } from 'borsh';
 import BN from 'bn.js';
 
 export const AUCTION_PREFIX = 'auction';
+export const METADATA = 'metadata';
 
 export enum AuctionState {
   Created = 0,
