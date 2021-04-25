@@ -1,7 +1,7 @@
 import {
   programIds,
   getMultipleAccounts,
-  sendTransaction,
+  sendTransactionWithRetry,
   cache,
   TokenAccountParser,
   ParsedAccount,
@@ -139,12 +139,11 @@ export const toSolana = async (
             step: counter++,
           });
 
-          await sendTransaction(
+          await sendTransactionWithRetry(
             connection,
             wallet,
             instructions,
             signers,
-            true,
           );
         }
       } catch (err) {

@@ -10,6 +10,7 @@ import {
   ENV,
   updateMetadata,
   createMasterEdition,
+  sendTransactionWithRetry,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
@@ -66,10 +67,10 @@ export const mintNFT = async (
   // This owner is a temporary signer and owner of metadata we use to circumvent requesting signing
   // twice post Arweave. We store in an account (payer) and use it post-Arweave to update MD with new link
   // then give control back to the user.
-  const owner = new Account();
-  const payer = new Account();
+  // const payer = new Account();
+  const payerPublicKey = wallet.publicKey;
   const instructions: TransactionInstruction[] = [...pushInstructions];
-  const signers: Account[] = [...pushSigners, owner];
+  const signers: Account[] = [...pushSigners];
 
   // This is only temporarily owned by wallet...transferred to program by createMasterEdition below
   const mintKey = createMint(
@@ -78,8 +79,8 @@ export const mintNFT = async (
     mintRent,
     0,
     // Some weird bug with phantom where it's public key doesnt mesh with data encode well
-    wallet.publicKey,
-    wallet.publicKey,
+    payerPublicKey,
+    payerPublicKey,
     signers,
   );
 
@@ -107,7 +108,7 @@ export const mintNFT = async (
       TOKEN_PROGRAM_ID,
       mintKey,
       recipientKey,
-      wallet.publicKey,
+      payerPublicKey,
       [],
       1,
     ),
@@ -118,65 +119,30 @@ export const mintNFT = async (
     metadata.name,
     `https://-------.---/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
     true,
-    payer.publicKey,
+    payerPublicKey,
     mintKey,
-    owner.publicKey,
+    payerPublicKey,
     instructions,
     wallet.publicKey,
   );
 
-  const block = await connection.getRecentBlockhash('singleGossip');
-  instructions.push(
-    SystemProgram.transfer({
-      fromPubkey: wallet.publicKey,
-      toPubkey: payer.publicKey,
-      lamports: block.feeCalculator.lamportsPerSignature * 2,
-    }),
-  );
+  // TODO: enable when using payer account to avoid 2nd popup
+  // const block = await connection.getRecentBlockhash('singleGossip');
+  // instructions.push(
+  //   SystemProgram.transfer({
+  //     fromPubkey: wallet.publicKey,
+  //     toPubkey: payerPublicKey,
+  //     lamports: 0.5 * LAMPORTS_PER_SOL // block.feeCalculator.lamportsPerSignature * 3 + mintRent, // TODO
+  //   }),
+  // );
 
-  let masterEdInstruction: TransactionInstruction[] = [];
-  let masterEdSigner: Account[] = [payer];
-
-  // This mint, which allows limited editions to be made, stays with user's wallet.
-  const masterMint = createMint(
-    masterEdInstruction,
-    wallet.publicKey,
-    mintRent,
-    0,
-    // Some weird bug with phantom where it's public key doesnt mesh with data encode well
-    wallet.publicKey,
-    wallet.publicKey,
-    masterEdSigner,
-  );
-
-  // In this instruction, mint authority will be removed from the main mint, while
-  // minting authority will be maintained for the master mint (which we want.)
-  await createMasterEdition(
-    metadata.symbol,
-    metadata.name,
-    undefined,
-    mintKey,
-    masterMint,
-    payer.publicKey,
-    wallet.publicKey,
-    instructions,
-    wallet.publicKey,
-  );
-
-  const txIds: string[] = [];
-  const response = await sendTransactions(
+  const { txid } = await sendTransaction(
     connection,
     wallet,
-    [instructions, masterEdInstruction],
-    [signers, masterEdSigner],
+    instructions,
+    signers,
     true,
-    true,
-    'max',
-    txId => {
-      txIds.push(txId);
-    },
-    undefined,
-    block,
+    'max'
   );
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
@@ -190,7 +156,7 @@ export const mintNFT = async (
     {},
   );
   data.append('tags', JSON.stringify(tags));
-  data.append('transaction', txIds[0]);
+  data.append('transaction', txid);
   realFiles.map(f => data.append('file[]', f));
 
   const result: IArweaveResult = await (
@@ -209,9 +175,10 @@ export const mintNFT = async (
   const metadataFile = result.messages?.find(
     m => m.filename == RESERVED_TXN_MANIFEST,
   );
-  if (metadataFile?.transactionId && wallet.publicKey) {
+  if (metadataFile?.transactionId && wallet.publicKey)
+  {
     const updateInstructions: TransactionInstruction[] = [];
-    const updateSigners: Account[] = [payer];
+    const updateSigners: Account[] = [];
 
     // TODO: connect to testnet arweave
     const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
@@ -221,27 +188,50 @@ export const mintNFT = async (
       arweaveLink,
       undefined,
       mintKey,
-      payer.publicKey,
+      payerPublicKey,
       updateInstructions,
       metadataAccount,
       nameSymbolAccount,
     );
 
-    await transferUpdateAuthority(
-      metadataAccount,
-      payer.publicKey,
-      wallet.publicKey,
+    // // This mint, which allows limited editions to be made, stays with user's wallet.
+    const masterMint = createMint(
       updateInstructions,
+      payerPublicKey,
+      mintRent,
+      0,
+      payerPublicKey,
+      payerPublicKey,
+      updateSigners,
     );
 
-    const txid = await sendTransaction(
+    // // In this instruction, mint authority will be removed from the main mint, while
+    // // minting authority will be maintained for the master mint (which we want.)
+    await createMasterEdition(
+      metadata.symbol,
+      metadata.name,
+      undefined,
+      mintKey,
+      masterMint,
+      payerPublicKey,
+      payerPublicKey,
+      updateInstructions,
+      payerPublicKey,
+    );
+
+    // TODO: enable when using payer account to avoid 2nd popup
+    // await transferUpdateAuthority(
+    //   metadataAccount,
+    //   payerPublicKey,
+    //   wallet.publicKey,
+    //   updateInstructions,
+    // );
+
+    const txid = await sendTransactionWithRetry(
       connection,
       wallet,
       updateInstructions,
       updateSigners,
-      true,
-      'singleGossip',
-      true,
     );
 
     notify({

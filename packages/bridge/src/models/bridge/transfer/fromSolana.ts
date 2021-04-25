@@ -1,4 +1,4 @@
-import { programIds, sendTransaction } from '@oyster/common';
+import { programIds, sendTransactionWithRetry } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
 import { WormholeFactory } from '../../../contracts/WormholeFactory';
@@ -108,12 +108,11 @@ export const fromSolana = async (
         lamports: await getTransferFee(connection),
       });
 
-      const { slot } = await sendTransaction(
+      const { slot } = await sendTransactionWithRetry(
         connection,
         wallet,
         [ix, fee_ix, lock_ix],
         [],
-        true,
       );
 
       return steps.wait(request, transferKey, slot);

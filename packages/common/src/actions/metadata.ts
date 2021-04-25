@@ -139,7 +139,7 @@ class UpdateMetadataArgs {
     this.uri = args.uri;
     this.nonUniqueSpecificUpdateAuthority = args.nonUniqueSpecificUpdateAuthority
       ? new PublicKey(args.nonUniqueSpecificUpdateAuthority)
-      : undefined;
+      : null;
   }
 }
 
