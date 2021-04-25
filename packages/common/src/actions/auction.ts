@@ -251,7 +251,7 @@ export const AUCTION_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['type', 'u8'],
-        ['bids', { kind: 'option', type: { kind: 'vec', type: 'Bid' } }],
+        ['bids', { kind: 'option', type: [Bid] }],
         ['max', { kind: 'option', type: 'u64' }],
       ],
     },

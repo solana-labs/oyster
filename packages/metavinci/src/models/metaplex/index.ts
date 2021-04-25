@@ -200,8 +200,8 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['openEditionWinnerConstraint', 'u8'], // enum
-        ['openEditionNonWinningConstraint', 'u8'], // TODO:
-        ['winningConfigs', { kind: 'vec', type: 'WinningConfig' }], // TODO: check
+        ['openEditionNonWinningConstraint', 'u8'],
+        ['winningConfigs', [WinningConfig]],
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
         ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
       ],
@@ -238,7 +238,7 @@ export const SCHEMA = new Map<any, any>([
         ['status', 'u8'],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
-        ['winningConfigStates', { kind: 'vec', type: 'WinningConfigState' }],
+        ['winningConfigStates', [WinningConfigState]],
       ],
     },
   ],
