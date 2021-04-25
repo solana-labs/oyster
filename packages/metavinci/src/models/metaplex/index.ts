@@ -9,6 +9,8 @@ export * from './redeemMasterEditionBid';
 export * from './redeemOpenEditionBid';
 export * from './startAuction';
 export * from './validateSafetyDepositBox';
+
+export const METAPLEX_PREFIX = 'metaplex';
 export class AuctionManager {
   key: number = 0;
   authority?: PublicKey;
