@@ -11,26 +11,58 @@ export * from './startAuction';
 export * from './validateSafetyDepositBox';
 
 export const METAPLEX_PREFIX = 'metaplex';
-export class AuctionManager {
-  key: number = 0;
-  authority?: PublicKey;
-  auction?: PublicKey;
-  vault?: PublicKey;
-  auctionProgram?: PublicKey;
-  tokenVaultProgram?: PublicKey;
-  tokenMetadataProgram?: PublicKey;
-  tokenProgram?: PublicKey;
-  state?: AuctionManagerState;
-  settings?: AuctionManagerSettings;
 
-  constructor(args?: AuctionManager) {
-    Object.assign(this, args);
+export enum MetaplexKey {
+  AuctionManagerV1 = 0,
+  OriginalAuthorityLookupV1 = 1,
+  BidRedemptionTicketV1 = 2,
+}
+export class AuctionManager {
+  key: MetaplexKey;
+  authority: PublicKey;
+  auction: PublicKey;
+  vault: PublicKey;
+  auctionProgram: PublicKey;
+  tokenVaultProgram: PublicKey;
+  tokenMetadataProgram: PublicKey;
+  tokenProgram: PublicKey;
+  acceptPayment: PublicKey;
+  state: AuctionManagerState;
+  settings: AuctionManagerSettings;
+
+  constructor(args: {
+    authority: PublicKey;
+    auction: PublicKey;
+    vault: PublicKey;
+    auctionProgram: PublicKey;
+    tokenVaultProgram: PublicKey;
+    tokenMetadataProgram: PublicKey;
+    tokenProgram: PublicKey;
+    acceptPayment: PublicKey;
+    state: AuctionManagerState;
+    settings: AuctionManagerSettings;
+  }) {
+    this.key = MetaplexKey.AuctionManagerV1;
+    this.authority = args.authority;
+    this.auction = args.auction;
+    this.vault = args.vault;
+    this.auctionProgram = args.auctionProgram;
+    this.tokenVaultProgram = args.tokenVaultProgram;
+    this.tokenMetadataProgram = args.tokenMetadataProgram;
+    this.tokenProgram = args.tokenProgram;
+    this.acceptPayment = args.acceptPayment;
+    this.state = args.state;
+    this.settings = args.settings;
   }
 }
 
 export class InitAuctionManagerArgs {
   instruction = 0;
-  manager?: AuctionManager;
+  settings?: AuctionManagerSettings;
+
+  constructor(args: { settings: AuctionManagerSettings }) {
+    this.settings = args.settings;
+  }
 }
 
 export class ValidateSafetyDepositBoxArgs {
@@ -63,8 +95,8 @@ export class AuctionManagerSettings {
   openEditionNonWinningConstraint: NonWinningConstraint =
     NonWinningConstraint.GivenForFixedPrice;
   winningConfigs: WinningConfig[] = [];
-  openEditionConfig: number = 0;
-  openEditionFixedPrice: number = 0;
+  openEditionConfig?: number = 0;
+  openEditionFixedPrice?: number = 0;
 
   constructor(args?: AuctionManagerSettings) {
     Object.assign(this, args);
@@ -133,6 +165,7 @@ export enum AuctionManagerStatus {
 }
 
 export class BidRedemptionTicket {
+  key: MetaplexKey = MetaplexKey.BidRedemptionTicketV1;
   openEditionRedeemed: boolean = false;
   bidRedeemed: boolean = false;
 
@@ -155,8 +188,9 @@ export const SCHEMA = new Map<any, any>([
         ['tokenVaultProgram', 'pubkey'],
         ['tokenMetadataProgram', 'pubkey'],
         ['tokenProgram', 'pubkey'],
-        ['state', AuctionManagerState],
-        ['settings', AuctionManagerSettings],
+        ['acceptPayment', 'pubkey'],
+        ['state', 'AuctionManagerState'],
+        ['settings', 'AuctionManagerSettings'],
       ],
     },
   ],
@@ -167,7 +201,7 @@ export const SCHEMA = new Map<any, any>([
       fields: [
         ['openEditionWinnerConstraint', 'u8'], // enum
         ['openEditionNonWinningConstraint', 'u8'], // TODO:
-        ['winningConfigs', [WinningConfig]], // TODO: check
+        ['winningConfigs', { kind: 'vec', type: 'WinningConfig' }], // TODO: check
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
         ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
       ],
@@ -204,7 +238,7 @@ export const SCHEMA = new Map<any, any>([
         ['status', 'u8'],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
-        ['winningConfigStates', [WinningConfigState]],
+        ['winningConfigStates', { kind: 'vec', type: 'WinningConfigState' }],
       ],
     },
   ],
@@ -224,7 +258,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['manager', AuctionManagerSettings],
+        ['manager', 'AuctionManagerSettings'],
       ],
     },
   ],

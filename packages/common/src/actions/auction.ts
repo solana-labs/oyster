@@ -491,7 +491,6 @@ export async function placeBid(
       isSigner: false,
       isWritable: true,
     },
-
     {
       pubkey: tokenMintPubkey,
       isSigner: false,
