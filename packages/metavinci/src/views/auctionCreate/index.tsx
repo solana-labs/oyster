@@ -46,6 +46,7 @@ import {
   AuctionManagerStatus,
   NonWinningConstraint,
   SCHEMA,
+  WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
 import { SafetyDepositDraft } from '../../actions/createAuctionManager';
@@ -66,7 +67,7 @@ interface Tier {
   to: number;
   name: string;
   description?: string;
-  items: ParsedAccount<Metadata>[];
+  items: SafetyDepositDraft[];
 }
 
 export interface AuctionState {
@@ -75,6 +76,8 @@ export interface AuctionState {
 
   // listed NFTs
   items: SafetyDepositDraft[];
+
+  settings: AuctionManagerSettings;
 
   // number of editions for this auction (only applicable to limited edition)
   editions?: number;
@@ -120,6 +123,13 @@ export const AuctionCreateView = () => {
     items: [],
     category: AuctionCategory.Open,
     saleType: 'auction',
+    settings: {
+      openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
+      openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
+      winningConfigs: [],
+      openEditionConfig: undefined,
+      openEditionFixedPrice: undefined,
+    },
   });
 
   useEffect(() => {
@@ -395,14 +405,35 @@ const CopiesStep = (props: {
   confirm: () => void;
 }) => {
   const items = useUserArts();
+  let eligibleItems: SafetyDepositDraft[] = [];
+  if (props.attributes.category == AuctionCategory.Limited) {
+    eligibleItems = items.filter(i => i.masterEdition);
+  } else if (
+    props.attributes.category == AuctionCategory.Single ||
+    props.attributes.category == AuctionCategory.Tiered
+  ) {
+    eligibleItems = items;
+  } else if (props.attributes.category == AuctionCategory.Open) {
+    eligibleItems = items.filter(
+      i =>
+        i.masterEdition &&
+        (i.masterEdition.info.maxSupply == undefined ||
+          i.masterEdition.info.maxSupply == null),
+    );
+  }
+
   const [selectedItems, setSelectedItems] = useState<Set<string>>(
-    new Set(props.attributes.items.map(item => item.pubkey.toBase58())),
+    new Set(
+      props.attributes.items.map(item => item.metadata.pubkey.toBase58()),
+    ),
   );
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      items: items.filter(item => selectedItems.has(item.pubkey.toBase58())),
+      items: eligibleItems.filter((item: SafetyDepositDraft) =>
+        selectedItems.has(item.metadata.pubkey.toBase58()),
+      ),
     });
   }, [selectedItems]);
 
@@ -417,12 +448,12 @@ const CopiesStep = (props: {
       <Row className="content-action">
         <Col xl={24}>
           <ArtSelector
-            selected={items.filter(item =>
-              selectedItems.has(item.pubkey.toBase58()),
+            selected={eligibleItems.filter(item =>
+              selectedItems.has(item.metadata.pubkey.toBase58()),
             )}
             setSelected={items =>
               setSelectedItems(
-                new Set(items.map(item => item.pubkey.toBase58())),
+                new Set(items.map(item => item.metadata.pubkey.toBase58())),
               )
             }
             allowMultiple={false}
@@ -457,6 +488,16 @@ const CopiesStep = (props: {
           onClick={() => {
             props.setAttributes({
               ...props.attributes,
+              tiers:
+                !props.attributes.tiers || props.attributes.tiers?.length == 0
+                  ? [
+                      {
+                        to: 0,
+                        name: 'Default Tier',
+                        items: props.attributes.items,
+                      },
+                    ]
+                  : props.attributes.tiers,
             });
             props.confirm();
           }}
@@ -1213,12 +1254,12 @@ const ReviewStep = (props: {
       </Row>
       <Row className="content-action">
         <Col xl={12}>
-          {item?.info && (
+          {item?.metadata.info && (
             <ArtCard
-              image={item.info.extended?.image}
-              category={item.info.extended?.category}
-              name={item.info.name}
-              symbol={item.info.symbol}
+              image={item.metadata.info.extended?.image}
+              category={item.metadata.info.extended?.category}
+              name={item.metadata.info.name}
+              symbol={item.metadata.info.symbol}
               small={true}
             />
           )}
