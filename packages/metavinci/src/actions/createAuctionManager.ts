@@ -166,7 +166,16 @@ export async function createAuctionManager(
       signers: auctionManagerSigners,
     },
     startAuction: await setupStartAuction(wallet, vault),
-    validateBoxes: await validateBoxes(wallet, vault, safetyDeposits, stores),
+    validateBoxes: await validateBoxes(
+      wallet,
+      vault,
+      // No need to validate open edition, it's already been during init
+      safetyDeposits.filter(
+        (_, i) =>
+          settings.openEditionConfig != null && i != settings.openEditionConfig,
+      ),
+      stores,
+    ),
   };
 
   let signers: Account[][] = [
