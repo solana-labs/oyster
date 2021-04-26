@@ -13,6 +13,7 @@ import {
   NameSymbolTuple,
   SequenceType,
   sendTransactions,
+  getSafetyDepositBox,
 } from '@oyster/common';
 
 import { AccountLayout } from '@solana/spl-token';
@@ -20,7 +21,10 @@ import BN from 'bn.js';
 import {
   AuctionManagerSettings,
   getAuctionKeys,
+  getMetadata,
   initAuctionManager,
+  startAuction,
+  validateSafetyDepositBox,
 } from '../models/metaplex';
 import { createVault } from './createVault';
 import { closeVault } from './closeVault';
@@ -37,10 +41,15 @@ interface byType {
     instructions: Array<TransactionInstruction[]>;
     signers: Array<Account[]>;
   };
+  validateBoxes: {
+    instructions: Array<TransactionInstruction[]>;
+    signers: Array<Account[]>;
+  };
   createVault: normalPattern;
   closeVault: normalPattern;
   makeAuction: normalPattern;
   initAuctionManager: normalPattern;
+  startAuction: normalPattern;
 }
 
 export interface SafetyDepositDraft {
@@ -83,10 +92,13 @@ export async function createAuctionManager(
     auction,
   } = await makeAuction(wallet, winnerLimit, vault, duration, gap, paymentMint);
 
-  let nftConfigs = settings.winningConfigs.map(w => ({
-    tokenAccount: safetyDeposits[w.safetyDepositBoxIndex].holding,
-    tokenMint: safetyDeposits[w.safetyDepositBoxIndex].metadata.info.mint,
-    amount: new BN(w.amount),
+  let nftConfigs = safetyDeposits.map((w, i) => ({
+    tokenAccount: w.holding,
+    tokenMint: w.metadata.info.mint,
+    amount: new BN(
+      settings.winningConfigs.find(w => w.safetyDepositBoxIndex == i)?.amount ||
+        1,
+    ),
   }));
 
   let openEditionSafetyDeposit = undefined;
@@ -94,11 +106,6 @@ export async function createAuctionManager(
     settings.openEditionConfig != null &&
     settings.openEditionConfig != undefined
   ) {
-    nftConfigs.push({
-      tokenAccount: safetyDeposits[settings.openEditionConfig].holding,
-      tokenMint: safetyDeposits[settings.openEditionConfig].metadata.info.mint,
-      amount: new BN(1),
-    });
     openEditionSafetyDeposit = safetyDeposits[settings.openEditionConfig];
   }
 
@@ -115,6 +122,12 @@ export async function createAuctionManager(
     openEditionSafetyDeposit,
   );
 
+  const {
+    instructions: addTokenInstructions,
+    signers: addTokenSigners,
+    stores,
+  } = await addTokensToVault(connection, wallet, vault, nftConfigs);
+
   let lookup: byType = {
     createVault: {
       instructions: createVaultInstructions,
@@ -130,7 +143,7 @@ export async function createAuctionManager(
       priceMint,
       externalPriceAccount,
     ),
-    addTokens: await addTokensToVault(connection, wallet, vault, nftConfigs),
+    addTokens: { instructions: addTokenInstructions, signers: addTokenSigners },
     makeAuction: {
       instructions: makeAuctionInstructions,
       signers: makeAuctionSigners,
@@ -139,6 +152,8 @@ export async function createAuctionManager(
       instructions: auctionManagerInstructions,
       signers: auctionManagerSigners,
     },
+    startAuction: await setupStartAuction(wallet, vault),
+    validateBoxes: await validateBoxes(wallet, vault, safetyDeposits, stores),
   };
 
   let signers: Account[][] = [
@@ -147,6 +162,8 @@ export async function createAuctionManager(
     lookup.closeVault.signers,
     lookup.makeAuction.signers,
     lookup.initAuctionManager.signers,
+    ...lookup.validateBoxes.signers,
+    lookup.startAuction.signers,
   ];
   let instructions: TransactionInstruction[][] = [
     lookup.createVault.instructions,
@@ -154,6 +171,8 @@ export async function createAuctionManager(
     lookup.closeVault.instructions,
     lookup.makeAuction.instructions,
     lookup.initAuctionManager.instructions,
+    ...lookup.validateBoxes.instructions,
+    lookup.startAuction.instructions,
   ];
 
   let stopPoint = 0;
@@ -217,4 +236,60 @@ async function setupAuctionManagerInstructions(
   );
 
   return { instructions, signers, auctionManager: auctionManagerKey };
+}
+
+async function setupStartAuction(
+  wallet: any,
+  vault: PublicKey,
+): Promise<{
+  instructions: TransactionInstruction[];
+  signers: Account[];
+}> {
+  let signers: Account[] = [];
+  let instructions: TransactionInstruction[] = [];
+
+  await startAuction(vault, wallet.publicKey, instructions);
+
+  return { instructions, signers };
+}
+
+async function validateBoxes(
+  wallet: any,
+  vault: PublicKey,
+  safetyDeposits: SafetyDepositDraft[],
+  stores: PublicKey[],
+): Promise<{
+  instructions: TransactionInstruction[][];
+  signers: Account[][];
+}> {
+  let signers: Account[][] = [];
+  let instructions: TransactionInstruction[][] = [];
+
+  for (let i = 0; i < safetyDeposits.length; i++) {
+    let tokenSigners: Account[] = [];
+    let tokenInstructions: TransactionInstruction[] = [];
+    const safetyDepositBox: PublicKey = await getSafetyDepositBox(
+      vault,
+      safetyDeposits[i].metadata.info.mint,
+    );
+
+    await validateSafetyDepositBox(
+      vault,
+      safetyDeposits[i].metadata.pubkey,
+      safetyDeposits[i].nameSymbol.pubkey,
+      safetyDepositBox,
+      stores[i],
+      safetyDeposits[i].metadata.info.mint,
+      wallet.pubkey,
+      wallet.pubkey,
+      wallet.pubkey,
+      tokenInstructions,
+      safetyDeposits[i].masterEdition?.info.masterMint,
+      safetyDeposits[i].masterEdition ? wallet.pubkey : undefined,
+    );
+
+    signers.push(tokenSigners);
+    instructions.push(tokenInstructions);
+  }
+  return { instructions, signers };
 }

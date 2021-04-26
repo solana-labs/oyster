@@ -329,6 +329,20 @@ export async function initVault(
   );
 }
 
+export async function getSafetyDepositBox(
+  vault: PublicKey,
+  tokenMint: PublicKey,
+): Promise<PublicKey> {
+  const vaultProgramId = programIds().vault;
+
+  return (
+    await PublicKey.findProgramAddress(
+      [Buffer.from(VAULT_PREFIX), vault.toBuffer(), tokenMint.toBuffer()],
+      vaultProgramId,
+    )
+  )[0];
+}
+
 export async function addTokenToInactiveVault(
   amount: BN,
   tokenMint: PublicKey,
@@ -342,12 +356,10 @@ export async function addTokenToInactiveVault(
 ) {
   const vaultProgramId = programIds().vault;
 
-  const safetyDepositBox: PublicKey = (
-    await PublicKey.findProgramAddress(
-      [Buffer.from(VAULT_PREFIX), vault.toBuffer(), tokenMint.toBuffer()],
-      vaultProgramId,
-    )
-  )[0];
+  const safetyDepositBox: PublicKey = await getSafetyDepositBox(
+    vault,
+    tokenMint,
+  );
 
   const value = new AmountArgs({
     instruction: 1,

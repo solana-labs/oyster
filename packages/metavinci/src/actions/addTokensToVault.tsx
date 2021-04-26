@@ -22,6 +22,7 @@ export async function addTokensToVault(
 ): Promise<{
   instructions: Array<TransactionInstruction[]>;
   signers: Array<Account[]>;
+  stores: PublicKey[];
 }> {
   const PROGRAM_IDS = utils.programIds();
 
@@ -40,6 +41,7 @@ export async function addTokensToVault(
 
   let signers: Array<Account[]> = [];
   let instructions: Array<TransactionInstruction[]> = [];
+  let newStores: PublicKey[] = [];
 
   let currSigners: Account[] = [];
   let currInstructions: TransactionInstruction[] = [];
@@ -53,6 +55,7 @@ export async function addTokensToVault(
       vaultAuthority,
       currSigners,
     );
+    newStores.push(newStoreAccount);
 
     const transferAuthority = approve(
       currInstructions,
@@ -88,5 +91,5 @@ export async function addTokensToVault(
   signers.push(currSigners);
   instructions.push(currInstructions);
 
-  return { signers, instructions };
+  return { signers, instructions, stores: newStores };
 }
