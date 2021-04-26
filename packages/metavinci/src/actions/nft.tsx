@@ -136,14 +136,22 @@ export const mintNFT = async (
   //   }),
   // );
 
-  const { txid } = await sendTransaction(
+  const { txid } = await sendTransactionWithRetry(
     connection,
     wallet,
     instructions,
     signers,
-    true,
-    'max'
   );
+
+  try {
+    await connection.confirmTransaction(txid, 'max');
+  } catch {
+    // ignore
+  }
+
+  // Force wait for max confirmations
+  // await connection.confirmTransaction(txid, 'max');
+  await connection.getParsedConfirmedTransaction(txid, 'confirmed');
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
@@ -233,6 +241,8 @@ export const mintNFT = async (
       updateInstructions,
       updateSigners,
     );
+
+    debugger;
 
     notify({
       message: 'Art created on Solana',
