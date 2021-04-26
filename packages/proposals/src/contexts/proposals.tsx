@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   Connection,
   KeyedAccountInfo,
+  PublicKey,
   PublicKeyAndAccount,
 } from '@solana/web3.js';
 import { useMemo } from 'react';
@@ -137,6 +138,10 @@ function useSetupProposalsCache({
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.timelock.programId,
       async (info: KeyedAccountInfo) => {
+        const pubkey = typeof info.accountId === 'string' ?
+            new PublicKey((info.accountId as unknown) as string) :
+            info.accountId;
+
         [
           [TimelockSetLayout.span, TimelockSetParser, setProposals],
           [
@@ -154,30 +159,28 @@ function useSetupProposalsCache({
             switch (info.accountInfo.data.length) {
               case TimelockSetLayout.span:
                 cached = cache.get(
-                  info.accountId,
+                  pubkey,
                 ) as ParsedAccount<TimelockSet>;
                 break;
               case CustomSingleSignerTimelockTransactionLayout.span:
                 cached = cache.get(
-                  info.accountId,
+                  pubkey,
                 ) as ParsedAccount<CustomSingleSignerTimelockTransaction>;
                 break;
               case TimelockConfigLayout.span:
                 cached = cache.get(
-                  info.accountId,
+                  pubkey,
                 ) as ParsedAccount<TimelockConfig>;
                 break;
               case TimelockStateLayout.span:
                 cached = cache.get(
-                  info.accountId,
+                  pubkey,
                 ) as ParsedAccount<TimelockState>;
                 break;
             }
             setter((obj: any) => ({
               ...obj,
-              [typeof info.accountId === 'string'
-                ? info.accountId
-                : info.accountId.toBase58()]: cached,
+              [pubkey.toBase58()]: cached,
             }));
           }
         });
