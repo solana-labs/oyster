@@ -7,7 +7,7 @@ import {
   InputNumber
 } from 'antd'
 
-import { Auction } from '../../types'
+import { Auction, Presale } from '../../types'
 
 import './index.less'
 import { getCountdown } from '../../utils/utils'
