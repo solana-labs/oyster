@@ -3,6 +3,7 @@ import {
   VAULT_SCHEMA,
   METADATA_PREFIX,
   EDITION,
+  getEdition,
 } from '@oyster/common';
 import {
   PublicKey,
@@ -14,7 +15,6 @@ import { serialize } from 'borsh';
 
 import {
   getAuctionKeys,
-  getEdition,
   getOriginalAuthority,
   METAPLEX_PREFIX,
   ValidateSafetyDepositBoxArgs,
@@ -23,7 +23,7 @@ import {
 export async function validateSafetyDepositBox(
   vault: PublicKey,
   metadata: PublicKey,
-  nameSymbol: PublicKey,
+  nameSymbol: PublicKey | undefined,
   safetyDepositBox: PublicKey,
   store: PublicKey,
   tokenMint: PublicKey,
@@ -59,7 +59,7 @@ export async function validateSafetyDepositBox(
       isWritable: true,
     },
     {
-      pubkey: nameSymbol,
+      pubkey: nameSymbol || SystemProgram.programId,
       isSigner: false,
       isWritable: true,
     },

@@ -403,19 +403,3 @@ export async function getMetadata(tokenMint: PublicKey): Promise<PublicKey> {
     )
   )[0];
 }
-
-export async function getEdition(tokenMint: PublicKey): Promise<PublicKey> {
-  const PROGRAM_IDS = programIds();
-
-  return (
-    await PublicKey.findProgramAddress(
-      [
-        Buffer.from(METADATA_PREFIX),
-        PROGRAM_IDS.metadata.toBuffer(),
-        tokenMint.toBuffer(),
-        Buffer.from(EDITION),
-      ],
-      PROGRAM_IDS.metadata,
-    )
-  )[0];
-}

@@ -14,6 +14,7 @@ import {
   SequenceType,
   sendTransactions,
   getSafetyDepositBox,
+  Edition,
 } from '@oyster/common';
 
 import { AccountLayout } from '@solana/spl-token';
@@ -54,8 +55,9 @@ interface byType {
 
 export interface SafetyDepositDraft {
   metadata: ParsedAccount<Metadata>;
-  nameSymbol: ParsedAccount<NameSymbolTuple>;
-  masterEdition: ParsedAccount<MasterEdition>;
+  nameSymbol?: ParsedAccount<NameSymbolTuple>;
+  masterEdition?: ParsedAccount<MasterEdition>;
+  edition?: ParsedAccount<Edition>;
   holding: PublicKey;
 }
 
@@ -222,11 +224,11 @@ async function setupAuctionManagerInstructions(
   await initAuctionManager(
     vault,
     openEditionSafetyDeposit?.metadata.pubkey,
-    openEditionSafetyDeposit?.nameSymbol.pubkey,
+    openEditionSafetyDeposit?.nameSymbol?.pubkey,
     wallet.pubkey,
-    openEditionSafetyDeposit?.masterEdition.pubkey,
+    openEditionSafetyDeposit?.masterEdition?.pubkey,
     openEditionSafetyDeposit?.metadata.info.mint,
-    openEditionSafetyDeposit?.masterEdition.info.masterMint,
+    openEditionSafetyDeposit?.masterEdition?.info.masterMint,
     wallet.pubkey,
     wallet.pubkey,
     wallet.pubkey,
@@ -276,7 +278,7 @@ async function validateBoxes(
     await validateSafetyDepositBox(
       vault,
       safetyDeposits[i].metadata.pubkey,
-      safetyDeposits[i].nameSymbol.pubkey,
+      safetyDeposits[i].nameSymbol?.pubkey,
       safetyDepositBox,
       stores[i],
       safetyDeposits[i].metadata.info.mint,

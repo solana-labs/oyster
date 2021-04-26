@@ -8,6 +8,8 @@ import { programIds } from '../utils/ids';
 import { deserializeBorsh } from './../utils/borsh';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
+import { PublicKeyInput } from 'node:crypto';
+import { ParsedAccount } from '..';
 
 export const METADATA_PREFIX = 'metadata';
 export const EDITION = 'edition';
@@ -70,6 +72,20 @@ export class MasterEdition {
     this.masterMint = args.masterMint;
   }
 }
+
+export class Edition {
+  key: MetadataKey;
+  /// Points at MasterEdition struct
+  parent: PublicKey;
+  /// Starting at 0 for master record, this is incremented for each edition minted.
+  edition: BN;
+
+  constructor(args: { key: MetadataKey; parent: PublicKey; edition: BN }) {
+    this.key = MetadataKey.EditionV1;
+    this.parent = args.parent;
+    this.edition = args.edition;
+  }
+}
 export class Metadata {
   key: MetadataKey;
   nonUniqueSpecificUpdateAuthority?: PublicKey;
@@ -80,6 +96,9 @@ export class Metadata {
   uri: string;
 
   extended?: IMetadataExtension;
+  masterEdition?: PublicKey;
+  edition?: PublicKey;
+  nameSymbolTuple?: PublicKey;
 
   constructor(args: {
     nonUniqueSpecificUpdateAuthority?: PublicKey;
@@ -217,6 +236,17 @@ export const METADATA_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    Edition,
+    {
+      kind: 'struct',
+      fields: [
+        ['key', 'u8'],
+        ['parent', 'pubkey'],
+        ['edition', 'u64'],
+      ],
+    },
+  ],
+  [
     Metadata,
     {
       kind: 'struct',
@@ -246,8 +276,36 @@ export const METADATA_SCHEMA = new Map<any, any>([
   ],
 ]);
 
-export const decodeMetadata = (buffer: Buffer) => {
-  return deserializeBorsh(METADATA_SCHEMA, Metadata, buffer) as Metadata;
+export const decodeMetadata = async (buffer: Buffer): Promise<Metadata> => {
+  const metadata = deserializeBorsh(
+    METADATA_SCHEMA,
+    Metadata,
+    buffer,
+  ) as Metadata;
+  metadata.nameSymbolTuple = await getNameSymbol(metadata);
+  metadata.edition = await getEdition(metadata.mint);
+  metadata.masterEdition = await getEdition(metadata.mint);
+  return metadata;
+};
+
+export const decodeEdition = (buffer: Buffer) => {
+  return deserializeBorsh(METADATA_SCHEMA, Edition, buffer) as Edition;
+};
+
+export const decodeMasterEdition = (buffer: Buffer) => {
+  return deserializeBorsh(
+    METADATA_SCHEMA,
+    MasterEdition,
+    buffer,
+  ) as MasterEdition;
+};
+
+export const decodeNameSymbolTuple = (buffer: Buffer) => {
+  return deserializeBorsh(
+    METADATA_SCHEMA,
+    NameSymbolTuple,
+    buffer,
+  ) as NameSymbolTuple;
 };
 
 export async function transferUpdateAuthority(
@@ -570,4 +628,37 @@ export async function createMasterEdition(
       data,
     }),
   );
+}
+
+export async function getNameSymbol(metadata: Metadata): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METADATA_PREFIX),
+        PROGRAM_IDS.metadata.toBuffer(),
+        metadata.mint.toBuffer(),
+        Buffer.from(metadata.name),
+        Buffer.from(metadata.symbol),
+      ],
+      PROGRAM_IDS.metadata,
+    )
+  )[0];
+}
+
+export async function getEdition(tokenMint: PublicKey): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METADATA_PREFIX),
+        PROGRAM_IDS.metadata.toBuffer(),
+        tokenMint.toBuffer(),
+        Buffer.from(EDITION),
+      ],
+      PROGRAM_IDS.metadata,
+    )
+  )[0];
 }

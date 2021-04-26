@@ -1,39 +1,104 @@
-import { EventEmitter, programIds, useConnection, decodeMetadata, Metadata, getMultipleAccounts, cache, MintParser, ParsedAccount } from '@oyster/common';
+import {
+  EventEmitter,
+  programIds,
+  useConnection,
+  decodeMetadata,
+  decodeNameSymbolTuple,
+  decodeEdition,
+  decodeMasterEdition,
+  Metadata,
+  getMultipleAccounts,
+  cache,
+  MintParser,
+  ParsedAccount,
+  actions,
+  Edition,
+  MasterEdition,
+  NameSymbolTuple,
+} from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
 import BN from 'bn.js';
 import React, { useContext, useEffect, useState } from 'react';
 
+const { MetadataKey } = actions;
 export interface MetaContextState {
   metadata: ParsedAccount<Metadata>[];
+  nameSymbolTuples: Record<string, ParsedAccount<NameSymbolTuple>>;
+  editions: Record<string, ParsedAccount<Edition>>;
+  masterEditions: Record<string, ParsedAccount<MasterEdition>>;
 }
 
-const MetaContext = React.createContext<MetaContextState>(
-  {
-    metadata: []
-  },
-);
+const MetaContext = React.createContext<MetaContextState>({
+  metadata: [],
+  nameSymbolTuples: {},
+  masterEditions: {},
+  editions: {},
+});
 
 export function MetaProvider({ children = null as any }) {
   const connection = useConnection();
   const [metadata, setMetadata] = useState<ParsedAccount<Metadata>[]>([]);
+  const [nameSymbolTuples, setNameSymbolTuples] = useState<
+    Record<string, ParsedAccount<NameSymbolTuple>>
+  >({});
+  const [masterEditions, setMasterEditions] = useState<
+    Record<string, ParsedAccount<MasterEdition>>
+  >({});
+  const [editions, setEditions] = useState<
+    Record<string, ParsedAccount<Edition>>
+  >({});
 
   useEffect(() => {
     let dispose = () => {};
     (async () => {
-
       const mintToMetadata = new Map<string, ParsedAccount<Metadata>>();
 
-      const processMetaData = (meta: PublicKeyAndAccount<Buffer>) => {
-        try{
-          const metadata = decodeMetadata(meta.account.data);
-          if(isValidHttpUrl(metadata.uri) && metadata.uri.indexOf('arweave') >= 0) {
-            const account: ParsedAccount<Metadata> = {
+      const processMetaData = async (meta: PublicKeyAndAccount<Buffer>) => {
+        try {
+          if (meta.account.data[0] == MetadataKey.MetadataV1) {
+            const metadata = await decodeMetadata(meta.account.data);
+            if (
+              isValidHttpUrl(metadata.uri) &&
+              metadata.uri.indexOf('arweave') >= 0
+            ) {
+              const account: ParsedAccount<Metadata> = {
+                pubkey: meta.pubkey,
+                account: meta.account,
+                info: metadata,
+              };
+              mintToMetadata.set(metadata.mint.toBase58(), account);
+            }
+          } else if (meta.account.data[0] == MetadataKey.EditionV1) {
+            const edition = decodeEdition(meta.account.data);
+            const account: ParsedAccount<Edition> = {
               pubkey: meta.pubkey,
               account: meta.account,
-              info: metadata,
+              info: edition,
             };
-            mintToMetadata.set(metadata.mint.toBase58(), account);
+            setEditions(e => ({ ...e, [meta.pubkey.toBase58()]: account }));
+          } else if (meta.account.data[0] == MetadataKey.MasterEditionV1) {
+            const masterEdition = decodeMasterEdition(meta.account.data);
+            const account: ParsedAccount<MasterEdition> = {
+              pubkey: meta.pubkey,
+              account: meta.account,
+              info: masterEdition,
+            };
+            setMasterEditions(e => ({
+              ...e,
+              [meta.pubkey.toBase58()]: account,
+            }));
+          } else if (meta.account.data[0] == MetadataKey.NameSymbolTupleV1) {
+            const nameSymbolTuple = decodeNameSymbolTuple(meta.account.data);
+            const account: ParsedAccount<NameSymbolTuple> = {
+              pubkey: meta.pubkey,
+              account: meta.account,
+              info: nameSymbolTuple,
+            };
+            setNameSymbolTuples(e => ({
+              ...e,
+              [meta.pubkey.toBase58()]: account,
+            }));
           }
         } catch {
           // ignore errors
@@ -41,22 +106,27 @@ export function MetaProvider({ children = null as any }) {
         }
       };
 
-      const accounts = await connection.getProgramAccounts(programIds().metadata);
-      accounts.forEach(meta => {
-        processMetaData(meta);
-      });
+      const accounts = await connection.getProgramAccounts(
+        programIds().metadata,
+      );
+      for (let i = 0; i < accounts.length; i++) {
+        await processMetaData(accounts[i]);
+      }
 
       await queryExtendedMetadata(connection, setMetadata, mintToMetadata);
 
-      let subId = connection.onProgramAccountChange(programIds().metadata, (info) => {
+      let subId = connection.onProgramAccountChange(
+        programIds().metadata,
+        async info => {
           const id = (info.accountId as unknown) as string;
-          processMetaData({
+          await processMetaData({
             pubkey: new PublicKey(id),
             account: info.accountInfo,
           });
 
           queryExtendedMetadata(connection, setMetadata, mintToMetadata);
-      });
+        },
+      );
       dispose = () => {
         connection.removeProgramAccountChangeListener(subId);
       };
@@ -64,11 +134,19 @@ export function MetaProvider({ children = null as any }) {
 
     return () => {
       dispose();
-    }
-  }, [connection, setMetadata])
+    };
+  }, [
+    connection,
+    setMetadata,
+    setMasterEditions,
+    setNameSymbolTuples,
+    setEditions,
+  ]);
 
   return (
-    <MetaContext.Provider value={{ metadata }}>
+    <MetaContext.Provider
+      value={{ metadata, editions, masterEditions, nameSymbolTuples }}
+    >
       {children}
     </MetaContext.Provider>
   );
@@ -77,39 +155,55 @@ export function MetaProvider({ children = null as any }) {
 const queryExtendedMetadata = async (
   connection: Connection,
   setMetadata: (metadata: ParsedAccount<Metadata>[]) => void,
-  mintToMeta: Map<string, ParsedAccount<Metadata>>) => {
-
+  mintToMeta: Map<string, ParsedAccount<Metadata>>,
+) => {
   const mintToMetadata = new Map<string, ParsedAccount<Metadata>>(mintToMeta);
   const extendedMetadataFetch = new Map<string, Promise<any>>();
 
-  const mints = await getMultipleAccounts(connection, [...mintToMetadata.keys()].filter(k => !cache.get(k)), 'single');
+  const mints = await getMultipleAccounts(
+    connection,
+    [...mintToMetadata.keys()].filter(k => !cache.get(k)),
+    'single',
+  );
   mints.keys.forEach((key, index) => {
     const mintAccount = mints.array[index];
-    const mint = cache.add(key, mintAccount, MintParser) as ParsedAccount<MintInfo>;
-    if(mint.info.supply.gt(new BN(1)) || mint.info.decimals !== 0) {
+    const mint = cache.add(
+      key,
+      mintAccount,
+      MintParser,
+    ) as ParsedAccount<MintInfo>;
+    if (mint.info.supply.gt(new BN(1)) || mint.info.decimals !== 0) {
       // naive not NFT check
       mintToMetadata.delete(key);
     } else {
       const metadata = mintToMetadata.get(key);
-      if(metadata && metadata.info.uri) {
-        extendedMetadataFetch.set(key, fetch(metadata.info.uri).then(async _ => {
-          try {
-            metadata.info.extended = await _.json();
-            if (!metadata.info.extended || metadata.info.extended?.files?.length === 0) {
-              mintToMetadata.delete(key);
-            } else {
-              if(metadata.info.extended?.image) {
-                metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
+      if (metadata && metadata.info.uri) {
+        extendedMetadataFetch.set(
+          key,
+          fetch(metadata.info.uri)
+            .then(async _ => {
+              try {
+                metadata.info.extended = await _.json();
+                if (
+                  !metadata.info.extended ||
+                  metadata.info.extended?.files?.length === 0
+                ) {
+                  mintToMetadata.delete(key);
+                } else {
+                  if (metadata.info.extended?.image) {
+                    metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
+                  }
+                }
+              } catch {
+                mintToMetadata.delete(key);
+                return undefined;
               }
-            }
-          } catch {
-            mintToMetadata.delete(key);
-            return undefined;
-          }
-        }).catch(() => {
-          mintToMetadata.delete(key);
-          return undefined;
-        }));
+            })
+            .catch(() => {
+              mintToMetadata.delete(key);
+              return undefined;
+            }),
+        );
       }
     }
   });
@@ -133,5 +227,5 @@ function isValidHttpUrl(text: string) {
     return false;
   }
 
-  return url.protocol === "http:" || url.protocol === "https:";
+  return url.protocol === 'http:' || url.protocol === 'https:';
 }

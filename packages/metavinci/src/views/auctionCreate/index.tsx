@@ -48,6 +48,7 @@ import {
   SCHEMA,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
+import { SafetyDepositDraft } from '../../actions/createAuctionManager';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -73,7 +74,7 @@ export interface AuctionState {
   reservationPrice: number;
 
   // listed NFTs
-  items: ParsedAccount<Metadata>[];
+  items: SafetyDepositDraft[];
 
   // number of editions for this auction (only applicable to limited edition)
   editions?: number;
