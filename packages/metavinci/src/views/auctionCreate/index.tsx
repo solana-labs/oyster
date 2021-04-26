@@ -46,6 +46,7 @@ import {
   AuctionManagerSettings,
   AuctionManagerState,
   AuctionManagerStatus,
+  EditionType,
   NonWinningConstraint,
   SCHEMA,
   WinningConstraint,
@@ -140,6 +141,7 @@ export const AuctionCreateView = () => {
 
   const createAuction = async () => {
     let settings: AuctionManagerSettings;
+    let winnerLimit: WinnerLimit;
     if (attributes.category == AuctionCategory.Open) {
       settings = {
         openEditionWinnerConstraint: WinningConstraint.OpenEditionGiven,
@@ -149,21 +151,42 @@ export const AuctionCreateView = () => {
         openEditionFixedPrice: undefined,
       };
 
-      const winnerLimit = new WinnerLimit({ type: WinnerLimitType.Unlimited });
-
-      await createAuctionManager(
-        connection,
-        wallet,
-        settings,
-        winnerLimit,
-        new BN((attributes.auctionDuration || 1) * 60),
-        new BN((attributes.gapTime || 1) * 60),
-        [attributes.items[0]],
-        new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
-      );
+      winnerLimit = new WinnerLimit({ type: WinnerLimitType.Unlimited });
+    } else if (attributes.category == AuctionCategory.Single) {
+      settings = {
+        openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
+        openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
+        winningConfigs: [
+          {
+            safetyDepositBoxIndex: 0,
+            amount: 1,
+            hasAuthority: false,
+            editionType: attributes.items[0].masterEdition
+              ? EditionType.MasterEdition
+              : EditionType.NA,
+          },
+        ],
+        openEditionConfig: undefined,
+        openEditionFixedPrice: undefined,
+      };
+      winnerLimit = new WinnerLimit({
+        type: WinnerLimitType.Capped,
+        usize: new BN(1),
+      });
     } else {
       throw new Error('Not supported');
     }
+
+    await createAuctionManager(
+      connection,
+      wallet,
+      settings,
+      winnerLimit,
+      new BN((attributes.auctionDuration || 1) * 60),
+      new BN((attributes.gapTime || 1) * 60),
+      [attributes.items[0]],
+      new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+    );
   };
 
   const categoryStep = (

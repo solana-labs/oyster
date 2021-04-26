@@ -529,7 +529,7 @@ export async function createMasterEdition(
   const metadataAccount = (
     await PublicKey.findProgramAddress(
       [
-        Buffer.from('metadata'),
+        Buffer.from(METADATA_PREFIX),
         metadataProgramId.toBuffer(),
         mintKey.toBuffer(),
       ],
@@ -540,7 +540,7 @@ export async function createMasterEdition(
   const nameSymbolAccount = (
     await PublicKey.findProgramAddress(
       [
-        Buffer.from('metadata'),
+        Buffer.from(METADATA_PREFIX),
         metadataProgramId.toBuffer(),
         Buffer.from(name),
         Buffer.from(symbol),
@@ -552,10 +552,10 @@ export async function createMasterEdition(
   const editionAccount = (
     await PublicKey.findProgramAddress(
       [
-        Buffer.from('metadata'),
+        Buffer.from(METADATA_PREFIX),
         metadataProgramId.toBuffer(),
         mintKey.toBuffer(),
-        Buffer.from('edition'),
+        Buffer.from(EDITION),
       ],
       metadataProgramId,
     )
