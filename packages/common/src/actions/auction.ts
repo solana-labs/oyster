@@ -142,27 +142,30 @@ export class WinnerLimit {
 class CreateAuctionArgs {
   instruction: number = 0;
   /// How many winners are allowed for this auction. See AuctionData.
-  winners: WinnerLimit;
+  winnerType: number;
+  winnerAmount: BN | null;
   /// The resource being auctioned. See AuctionData.
   resource: PublicKey;
   /// End time is the cut-off point that the auction is forced to end by. See AuctionData.
-  endAuctionAt?: BN;
+  endAuctionAt: BN | null;
   /// Gap time is how much time after the previous bid where the auction ends. See AuctionData.
-  endAuctionGap?: BN;
+  endAuctionGap: BN | null;
   /// Token mint for the SPL token used for bidding.
   tokenMint: PublicKey;
   /// Authority
   authority: PublicKey;
 
   constructor(args: {
-    winners: WinnerLimit;
+    winnerType: number;
+    winnerAmount: BN | null;
     resource: PublicKey;
-    endAuctionAt?: BN;
-    endAuctionGap?: BN;
+    endAuctionAt: BN | null;
+    endAuctionGap: BN | null;
     tokenMint: PublicKey;
     authority: PublicKey;
   }) {
-    this.winners = args.winners;
+    this.winnerType = args.winnerType;
+    this.winnerAmount = args.winnerAmount;
     this.resource = args.resource;
     this.endAuctionAt = args.endAuctionAt;
     this.endAuctionGap = args.endAuctionGap;
@@ -198,8 +201,8 @@ export const AUCTION_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['winnerLimitType', 'u8'],
-        ['usize', { kind: 'option', type: 'u64' }],
+        ['winnerType', 'u8'],
+        ['winnerAmount', { kind: 'option', type: 'u64' }],
         ['resource', 'pubkey'],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
         ['endAuctionGap', { kind: 'option', type: 'u64' }],
@@ -296,8 +299,8 @@ export const decodeAuctionData = (buffer: Buffer) => {
 export async function createAuction(
   winners: WinnerLimit,
   resource: PublicKey,
-  endAuctionAt: BN | undefined,
-  endAuctionGap: BN | undefined,
+  endAuctionAt: BN | null,
+  endAuctionGap: BN | null,
   tokenMint: PublicKey,
   authority: PublicKey,
   creator: PublicKey,
@@ -309,7 +312,8 @@ export async function createAuction(
     serialize(
       AUCTION_SCHEMA,
       new CreateAuctionArgs({
-        winners,
+        winnerType: winners.type,
+        winnerAmount: winners.usize == undefined ? null : winners.usize,
         resource,
         endAuctionAt,
         endAuctionGap,
@@ -318,6 +322,10 @@ export async function createAuction(
       }),
     ),
   );
+
+  console.log('Winner', winners);
+
+  console.log('Data', data);
 
   const auctionKey: PublicKey = (
     await PublicKey.findProgramAddress(

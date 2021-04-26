@@ -1,4 +1,4 @@
-import { getEdition, programIds, VAULT_SCHEMA } from '@oyster/common';
+import { getEdition, programIds } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -13,6 +13,7 @@ import {
   getBidderKeys,
   getMetadata,
   RedeemOpenEditionBidArgs,
+  SCHEMA,
 } from '.';
 
 export async function redeemOpenEditionBid(
@@ -43,7 +44,7 @@ export async function redeemOpenEditionBid(
   const masterEdition: PublicKey = await getEdition(tokenMint);
 
   const value = new RedeemOpenEditionBidArgs();
-  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  const data = Buffer.from(serialize(SCHEMA, value));
   const keys = [
     {
       pubkey: auctionManagerKey,

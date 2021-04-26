@@ -1,4 +1,4 @@
-import { programIds, VAULT_SCHEMA } from '@oyster/common';
+import { programIds } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -11,6 +11,7 @@ import {
   AuctionManagerSettings,
   getAuctionKeys,
   InitAuctionManagerArgs,
+  SCHEMA,
 } from '.';
 
 export async function initAuctionManager(
@@ -35,7 +36,16 @@ export async function initAuctionManager(
     settings,
   });
 
-  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  const data = Buffer.from(serialize(SCHEMA, value));
+  console.log(
+    'Auction',
+    auctionManagerKey,
+    vault,
+    auctionKey,
+    auctionManagerAuthority,
+    payer,
+    acceptPaymentAccount,
+  );
   const keys = [
     {
       pubkey: auctionManagerKey,

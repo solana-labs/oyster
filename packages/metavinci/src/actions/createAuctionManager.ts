@@ -31,6 +31,7 @@ import { createVault } from './createVault';
 import { closeVault } from './closeVault';
 import { addTokensToVault } from './addTokensToVault';
 import { makeAuction } from './makeAuction';
+import { createExternalPriceAccount } from './createExternalPriceAccount';
 const { createTokenAccount } = actions;
 
 interface normalPattern {
@@ -51,6 +52,7 @@ interface byType {
   makeAuction: normalPattern;
   initAuctionManager: normalPattern;
   startAuction: normalPattern;
+  externalPriceAccount: normalPattern;
 }
 
 export interface SafetyDepositDraft {
@@ -78,15 +80,20 @@ export async function createAuctionManager(
   auctionManager: PublicKey;
 }> {
   const {
+    externalPriceAccount,
+    priceMint,
+    instructions: epaInstructions,
+    signers: epaSigners,
+  } = await createExternalPriceAccount(connection, wallet);
+
+  const {
     instructions: createVaultInstructions,
     signers: createVaultSigners,
     vault,
-    externalPriceAccount,
     fractionalMint,
     redeemTreasury,
     fractionTreasury,
-    priceMint,
-  } = await createVault(connection, wallet);
+  } = await createVault(connection, wallet, priceMint, externalPriceAccount);
 
   const {
     instructions: makeAuctionInstructions,
@@ -131,6 +138,10 @@ export async function createAuctionManager(
   } = await addTokensToVault(connection, wallet, vault, nftConfigs);
 
   let lookup: byType = {
+    externalPriceAccount: {
+      instructions: epaInstructions,
+      signers: epaSigners,
+    },
     createVault: {
       instructions: createVaultInstructions,
       signers: createVaultSigners,
@@ -159,6 +170,7 @@ export async function createAuctionManager(
   };
 
   let signers: Account[][] = [
+    lookup.externalPriceAccount.signers,
     lookup.createVault.signers,
     ...lookup.addTokens.signers,
     lookup.closeVault.signers,
@@ -168,6 +180,7 @@ export async function createAuctionManager(
     lookup.startAuction.signers,
   ];
   let instructions: TransactionInstruction[][] = [
+    lookup.externalPriceAccount.instructions,
     lookup.createVault.instructions,
     ...lookup.addTokens.instructions,
     lookup.closeVault.instructions,
@@ -225,13 +238,13 @@ async function setupAuctionManagerInstructions(
     vault,
     openEditionSafetyDeposit?.metadata.pubkey,
     openEditionSafetyDeposit?.nameSymbol?.pubkey,
-    wallet.pubkey,
+    wallet.publicKey,
     openEditionSafetyDeposit?.masterEdition?.pubkey,
     openEditionSafetyDeposit?.metadata.info.mint,
     openEditionSafetyDeposit?.masterEdition?.info.masterMint,
-    wallet.pubkey,
-    wallet.pubkey,
-    wallet.pubkey,
+    wallet.publicKey,
+    wallet.publicKey,
+    wallet.publicKey,
     acceptPayment,
     settings,
     instructions,
@@ -282,12 +295,12 @@ async function validateBoxes(
       safetyDepositBox,
       stores[i],
       safetyDeposits[i].metadata.info.mint,
-      wallet.pubkey,
-      wallet.pubkey,
-      wallet.pubkey,
+      wallet.publicKey,
+      wallet.publicKey,
+      wallet.publicKey,
       tokenInstructions,
       safetyDeposits[i].masterEdition?.info.masterMint,
-      safetyDeposits[i].masterEdition ? wallet.pubkey : undefined,
+      safetyDeposits[i].masterEdition ? wallet.publicKey : undefined,
     );
 
     signers.push(tokenSigners);

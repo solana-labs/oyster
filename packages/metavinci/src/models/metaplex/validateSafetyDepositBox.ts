@@ -1,10 +1,4 @@
-import {
-  programIds,
-  VAULT_SCHEMA,
-  METADATA_PREFIX,
-  EDITION,
-  getEdition,
-} from '@oyster/common';
+import { programIds, getEdition } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -16,7 +10,7 @@ import { serialize } from 'borsh';
 import {
   getAuctionKeys,
   getOriginalAuthority,
-  METAPLEX_PREFIX,
+  SCHEMA,
   ValidateSafetyDepositBoxArgs,
 } from '.';
 
@@ -46,7 +40,7 @@ export async function validateSafetyDepositBox(
   const edition: PublicKey = await getEdition(tokenMint);
   const value = new ValidateSafetyDepositBoxArgs();
 
-  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  const data = Buffer.from(serialize(SCHEMA, value));
   const keys = [
     {
       pubkey: auctionManagerKey,
