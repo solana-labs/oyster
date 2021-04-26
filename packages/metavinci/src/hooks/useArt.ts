@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useMeta } from './../contexts';
+import { useMeta } from '../contexts';
 import { Art } from '../types';
 
 export const useArt = (id: PublicKey | string) => {

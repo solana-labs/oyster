@@ -140,6 +140,9 @@ export class WinningConfig {
     Object.assign(this, args);
   }
 }
+export const decodeAuctionManager = (buffer: Buffer) => {
+  return deserializeBorsh(SCHEMA, AuctionManager, buffer) as AuctionManager;
+};
 
 export class WinningConfigState {
   amountMinted: number = 0;
@@ -313,6 +316,20 @@ export const SCHEMA = new Map<any, any>([
   ],
 ]);
 
+export async function getAuctionManagerKey(
+  vault: PublicKey,
+  auctionKey: PublicKey,
+): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [Buffer.from(METAPLEX_PREFIX), auctionKey.toBuffer()],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+}
+
 export async function getAuctionKeys(
   vault: PublicKey,
 ): Promise<{ auctionKey: PublicKey; auctionManagerKey: PublicKey }> {
@@ -329,12 +346,7 @@ export async function getAuctionKeys(
     )
   )[0];
 
-  const auctionManagerKey: PublicKey = (
-    await PublicKey.findProgramAddress(
-      [Buffer.from(METAPLEX_PREFIX), auctionKey.toBuffer()],
-      PROGRAM_IDS.metaplex,
-    )
-  )[0];
+  const auctionManagerKey = await getAuctionManagerKey(vault, auctionKey);
 
   return { auctionKey, auctionManagerKey };
 }

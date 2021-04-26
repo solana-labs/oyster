@@ -4,6 +4,7 @@ import {
   useConnection,
   decodeMetadata,
   decodeNameSymbolTuple,
+  decodeAuction,
   decodeEdition,
   decodeMasterEdition,
   Metadata,
@@ -15,30 +16,55 @@ import {
   Edition,
   MasterEdition,
   NameSymbolTuple,
+  AuctionData,
+  SafetyDepositBox,
+  VaultKey,
+  decodeSafetyDeposit,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
 import BN from 'bn.js';
 import React, { useContext, useEffect, useState } from 'react';
+import {
+  AuctionManager,
+  AuctionManagerStatus,
+  decodeAuctionManager,
+  getAuctionManagerKey,
+  MetaplexKey,
+} from '../models/metaplex';
 
 const { MetadataKey } = actions;
 export interface MetaContextState {
   metadata: ParsedAccount<Metadata>[];
+  metadataByMint: Record<string, ParsedAccount<Metadata>>;
   nameSymbolTuples: Record<string, ParsedAccount<NameSymbolTuple>>;
   editions: Record<string, ParsedAccount<Edition>>;
   masterEditions: Record<string, ParsedAccount<MasterEdition>>;
+  auctionManagers: Record<string, ParsedAccount<AuctionManager>>;
+  auctions: Record<string, ParsedAccount<AuctionData>>;
+  safetyDepositBoxesByVaultAndIndex: Record<
+    string,
+    ParsedAccount<SafetyDepositBox>
+  >;
 }
 
 const MetaContext = React.createContext<MetaContextState>({
   metadata: [],
+  metadataByMint: {},
   nameSymbolTuples: {},
   masterEditions: {},
   editions: {},
+  auctionManagers: {},
+  auctions: {},
+  safetyDepositBoxesByVaultAndIndex: {},
 });
 
 export function MetaProvider({ children = null as any }) {
   const connection = useConnection();
   const [metadata, setMetadata] = useState<ParsedAccount<Metadata>[]>([]);
+  const [metadataByMint, setMetadataByMint] = useState<
+    Record<string, ParsedAccount<Metadata>>
+  >({});
   const [nameSymbolTuples, setNameSymbolTuples] = useState<
     Record<string, ParsedAccount<NameSymbolTuple>>
   >({});
@@ -48,12 +74,181 @@ export function MetaProvider({ children = null as any }) {
   const [editions, setEditions] = useState<
     Record<string, ParsedAccount<Edition>>
   >({});
+  const [auctionManagers, setAuctionManagers] = useState<
+    Record<string, ParsedAccount<AuctionManager>>
+  >({});
+  const [auctions, setAuctions] = useState<
+    Record<string, ParsedAccount<AuctionData>>
+  >({});
+  const [
+    safetyDepositBoxesByVaultAndIndex,
+    setSafetyDepositBoxesByVaultAndIndex,
+  ] = useState<Record<string, ParsedAccount<SafetyDepositBox>>>({});
 
   useEffect(() => {
     let dispose = () => {};
     (async () => {
-      const mintToMetadata = new Map<string, ParsedAccount<Metadata>>();
+      const processAuctions = async (a: PublicKeyAndAccount<Buffer>) => {
+        try {
+          const auction = await decodeAuction(a.account.data);
+          auction.auctionManagerKey = await getAuctionManagerKey(
+            auction.resource,
+            a.pubkey,
+          );
+          const account: ParsedAccount<AuctionData> = {
+            pubkey: a.pubkey,
+            account: a.account,
+            info: auction,
+          };
+          setAuctions(e => ({
+            ...e,
+            [a.pubkey.toBase58()]: account,
+          }));
+        } catch {
+          // ignore errors
+          // add type as first byte for easier deserialization
+        }
+      };
 
+      const accounts = await connection.getProgramAccounts(
+        programIds().auction,
+      );
+      for (let i = 0; i < accounts.length; i++) {
+        await processAuctions(accounts[i]);
+      }
+
+      let subId = connection.onProgramAccountChange(
+        programIds().auction,
+        async info => {
+          const pubkey =
+            typeof info.accountId === 'string'
+              ? new PublicKey((info.accountId as unknown) as string)
+              : info.accountId;
+          await processAuctions({
+            pubkey,
+            account: info.accountInfo,
+          });
+        },
+      );
+      dispose = () => {
+        connection.removeProgramAccountChangeListener(subId);
+      };
+    })();
+
+    return () => {
+      dispose();
+    };
+  }, [connection, setAuctions]);
+
+  useEffect(() => {
+    let dispose = () => {};
+    (async () => {
+      const processSafetyDeposits = async (a: PublicKeyAndAccount<Buffer>) => {
+        try {
+          if (a.account.data[0] == VaultKey.SafetyDepositBoxV1) {
+            const safetyDeposit = await decodeSafetyDeposit(a.account.data);
+            const account: ParsedAccount<SafetyDepositBox> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: safetyDeposit,
+            };
+            setSafetyDepositBoxesByVaultAndIndex(e => ({
+              ...e,
+              [safetyDeposit.vault.toBase58() +
+              '-' +
+              safetyDeposit.order]: account,
+            }));
+          }
+        } catch {
+          // ignore errors
+          // add type as first byte for easier deserialization
+        }
+      };
+
+      const accounts = await connection.getProgramAccounts(programIds().vault);
+      for (let i = 0; i < accounts.length; i++) {
+        await processSafetyDeposits(accounts[i]);
+      }
+
+      let subId = connection.onProgramAccountChange(
+        programIds().vault,
+        async info => {
+          const pubkey =
+            typeof info.accountId === 'string'
+              ? new PublicKey((info.accountId as unknown) as string)
+              : info.accountId;
+          await processSafetyDeposits({
+            pubkey,
+            account: info.accountInfo,
+          });
+        },
+      );
+      dispose = () => {
+        connection.removeProgramAccountChangeListener(subId);
+      };
+    })();
+
+    return () => {
+      dispose();
+    };
+  }, [connection, setSafetyDepositBoxesByVaultAndIndex]);
+
+  useEffect(() => {
+    let dispose = () => {};
+    (async () => {
+      const processAuctionManagers = async (a: PublicKeyAndAccount<Buffer>) => {
+        try {
+          if (a.account.data[0] == MetaplexKey.AuctionManagerV1) {
+            const auctionManager = await decodeAuctionManager(a.account.data);
+            const account: ParsedAccount<AuctionManager> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: auctionManager,
+            };
+            setAuctionManagers(e => ({
+              ...e,
+              [a.pubkey.toBase58()]: account,
+            }));
+          }
+        } catch {
+          // ignore errors
+          // add type as first byte for easier deserialization
+        }
+      };
+
+      const accounts = await connection.getProgramAccounts(
+        programIds().metaplex,
+      );
+      for (let i = 0; i < accounts.length; i++) {
+        await processAuctionManagers(accounts[i]);
+      }
+
+      let subId = connection.onProgramAccountChange(
+        programIds().metaplex,
+        async info => {
+          const pubkey =
+            typeof info.accountId === 'string'
+              ? new PublicKey((info.accountId as unknown) as string)
+              : info.accountId;
+          await processAuctionManagers({
+            pubkey,
+            account: info.accountInfo,
+          });
+        },
+      );
+      dispose = () => {
+        connection.removeProgramAccountChangeListener(subId);
+      };
+    })();
+
+    return () => {
+      dispose();
+    };
+  }, [connection, setAuctionManagers]);
+
+  useEffect(() => {
+    let dispose = () => {};
+    (async () => {
       const processMetaData = async (meta: PublicKeyAndAccount<Buffer>) => {
         try {
           if (meta.account.data[0] == MetadataKey.MetadataV1) {
@@ -67,7 +262,10 @@ export function MetaProvider({ children = null as any }) {
                 account: meta.account,
                 info: metadata,
               };
-              mintToMetadata.set(metadata.mint.toBase58(), account);
+              setMetadataByMint(e => ({
+                ...e,
+                [metadata.mint.toBase58()]: account,
+              }));
             }
           } else if (meta.account.data[0] == MetadataKey.EditionV1) {
             const edition = decodeEdition(meta.account.data);
@@ -113,20 +311,21 @@ export function MetaProvider({ children = null as any }) {
         await processMetaData(accounts[i]);
       }
 
-      await queryExtendedMetadata(connection, setMetadata, mintToMetadata);
+      await queryExtendedMetadata(connection, setMetadata, metadataByMint);
 
       let subId = connection.onProgramAccountChange(
         programIds().metadata,
         async info => {
-          const pubkey = typeof info.accountId === 'string' ?
-            new PublicKey((info.accountId as unknown) as string) :
-            info.accountId;
+          const pubkey =
+            typeof info.accountId === 'string'
+              ? new PublicKey((info.accountId as unknown) as string)
+              : info.accountId;
           await processMetaData({
             pubkey,
             account: info.accountInfo,
           });
 
-          queryExtendedMetadata(connection, setMetadata, mintToMetadata);
+          queryExtendedMetadata(connection, setMetadata, metadataByMint);
         },
       );
       dispose = () => {
@@ -147,7 +346,16 @@ export function MetaProvider({ children = null as any }) {
 
   return (
     <MetaContext.Provider
-      value={{ metadata, editions, masterEditions, nameSymbolTuples }}
+      value={{
+        metadata,
+        editions,
+        masterEditions,
+        nameSymbolTuples,
+        auctionManagers,
+        auctions,
+        metadataByMint,
+        safetyDepositBoxesByVaultAndIndex,
+      }}
     >
       {children}
     </MetaContext.Provider>
@@ -157,14 +365,14 @@ export function MetaProvider({ children = null as any }) {
 const queryExtendedMetadata = async (
   connection: Connection,
   setMetadata: (metadata: ParsedAccount<Metadata>[]) => void,
-  mintToMeta: Map<string, ParsedAccount<Metadata>>,
+  mintToMeta: Record<string, ParsedAccount<Metadata>>,
 ) => {
-  const mintToMetadata = new Map<string, ParsedAccount<Metadata>>(mintToMeta);
+  const mintToMetadata = { ...mintToMeta };
   const extendedMetadataFetch = new Map<string, Promise<any>>();
 
   const mints = await getMultipleAccounts(
     connection,
-    [...mintToMetadata.keys()].filter(k => !cache.get(k)),
+    [...Object.keys(mintToMetadata)].filter(k => !cache.get(k)),
     'single',
   );
   mints.keys.forEach((key, index) => {
@@ -176,9 +384,9 @@ const queryExtendedMetadata = async (
     ) as ParsedAccount<MintInfo>;
     if (mint.info.supply.gt(new BN(1)) || mint.info.decimals !== 0) {
       // naive not NFT check
-      mintToMetadata.delete(key);
+      delete mintToMetadata[key];
     } else {
-      const metadata = mintToMetadata.get(key);
+      const metadata = mintToMetadata[key];
       if (metadata && metadata.info.uri) {
         extendedMetadataFetch.set(
           key,
@@ -190,19 +398,19 @@ const queryExtendedMetadata = async (
                   !metadata.info.extended ||
                   metadata.info.extended?.files?.length === 0
                 ) {
-                  mintToMetadata.delete(key);
+                  delete mintToMetadata[key];
                 } else {
                   if (metadata.info.extended?.image) {
                     metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
                   }
                 }
               } catch {
-                mintToMetadata.delete(key);
+                delete mintToMetadata[key];
                 return undefined;
               }
             })
             .catch(() => {
-              mintToMetadata.delete(key);
+              delete mintToMetadata[key];
               return undefined;
             }),
         );
@@ -212,7 +420,7 @@ const queryExtendedMetadata = async (
 
   await Promise.all([...extendedMetadataFetch.values()]);
 
-  setMetadata([...mintToMetadata.values()]);
+  setMetadata([...Object.values(mintToMetadata)]);
 };
 
 export const useMeta = () => {
