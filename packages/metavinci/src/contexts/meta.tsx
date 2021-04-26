@@ -118,9 +118,11 @@ export function MetaProvider({ children = null as any }) {
       let subId = connection.onProgramAccountChange(
         programIds().metadata,
         async info => {
-          const id = (info.accountId as unknown) as string;
+          const pubkey = typeof info.accountId === 'string' ?
+            new PublicKey((info.accountId as unknown) as string) :
+            info.accountId;
           await processMetaData({
-            pubkey: new PublicKey(id),
+            pubkey,
             account: info.accountInfo,
           });
 
