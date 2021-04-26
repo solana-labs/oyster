@@ -1,16 +1,7 @@
-import {
-  ParsedAccount,
-  Metadata,
-  SafetyDepositBox,
-  AuctionData,
-  useConnection,
-  AuctionState,
-} from '@oyster/common';
+import { useConnection } from '@oyster/common';
 import { useEffect, useState } from 'react';
 import { AuctionView, processAccountsIntoAuctionView } from '.';
 import { useMeta } from '../contexts';
-import { AuctionManager } from '../models/metaplex';
-import { sampleAuction } from '../views/home/sampleData';
 
 export const useAuction = (id: string) => {
   const connection = useConnection();
@@ -40,6 +31,12 @@ export const useAuction = (id: string) => {
       );
       if (auctionView) setAuctionView(auctionView);
     }
-  }, [clock]);
+  }, [
+    clock,
+    auctions,
+    auctionManagers,
+    safetyDepositBoxesByVaultAndIndex,
+    metadataByMint,
+  ]);
   return auctionView;
 };

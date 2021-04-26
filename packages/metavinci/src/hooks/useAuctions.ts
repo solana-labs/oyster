@@ -62,7 +62,14 @@ export const useAuctions = (state: AuctionViewState) => {
       if (auctionView) newAuctionViews.push(auctionView);
     });
     setAuctionViews(newAuctionViews);
-  }, [clock, state, auctions]);
+  }, [
+    clock,
+    state,
+    auctions,
+    auctionManagers,
+    safetyDepositBoxesByVaultAndIndex,
+    metadataByMint,
+  ]);
 
   return auctionViews;
 };
