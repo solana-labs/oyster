@@ -46,11 +46,13 @@ export const ArtSelector = (props: ArtSelectorProps) => {
   };
 
   const confirm = () => {
-    let list = items.filter(item =>
-      selectedItems.has(item.metadata.pubkey.toBase58()),
-    );
-    setSelected(list);
-    close();
+    setTimeout(() => {
+      let list = items.filter(item =>
+        selectedItems.has(item.metadata.pubkey.toBase58()),
+      );
+      setSelected(list);
+      close();
+    }, 200);
   };
 
   const breakpointColumnsObj = {
@@ -131,9 +133,11 @@ export const ArtSelector = (props: ArtSelectorProps) => {
                   list = [];
                 }
 
-                isSelected
-                  ? setSelectedItems(new Set(list.filter(item => item !== id)))
-                  : setSelectedItems(new Set([...list, id]));
+                const newSet = isSelected
+                  ? new Set(list.filter(item => item !== id))
+                  : new Set([...list, id]);
+
+                setSelectedItems(newSet);
 
                 if (!allowMultiple) {
                   confirm();

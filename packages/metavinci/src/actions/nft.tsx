@@ -242,8 +242,6 @@ export const mintNFT = async (
       updateSigners,
     );
 
-    debugger;
-
     notify({
       message: 'Art created on Solana',
       description: (
