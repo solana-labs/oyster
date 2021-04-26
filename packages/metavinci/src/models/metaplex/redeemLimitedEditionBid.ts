@@ -1,4 +1,4 @@
-import { programIds, VAULT_SCHEMA } from '@oyster/common';
+import { getEdition, programIds, VAULT_SCHEMA } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -11,7 +11,6 @@ import { serialize } from 'borsh';
 import {
   getAuctionKeys,
   getBidderKeys,
-  getEdition,
   getMetadata,
   getOriginalAuthority,
   RedeemLimitedEditionBidArgs,
