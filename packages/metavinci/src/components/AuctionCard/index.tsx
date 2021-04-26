@@ -11,6 +11,7 @@ import { Auction, Presale } from '../../types'
 
 import './index.less'
 import { getCountdown } from '../../utils/utils'
+import { shortenAddress } from '@oyster/common';
 
 export const AuctionCard = ({ auction }: { auction: Auction }) => {
   const [hours, setHours] = useState<number>(23)
@@ -82,18 +83,16 @@ export const AuctionCard = ({ auction }: { auction: Auction }) => {
           PLACE BID
       </Button>
 
-      {/* <div className="info-header">TARGET PRICE PER SHARE (NVA)</div>
-      <div><Price amt={auction.targetPricePerShare as number}/></div>
-      <Divider />
-      <div className="info-header">PRICE PER SHARE (NVA)</div>
-      <div><Price amt={auction.pricePerShare as number}/></div>
-      <br />
-      <div className="info-header">MARKET CAP</div>
-      <div><Price amt={auction.marketCap as number}/></div> */}
-      {/* <Row>
-        <Col span={12}><Button className="primary-button">BUY SHARES</Button></Col>
-        <Col span={12}><Button className="gradients-metal">SELL SHARES</Button></Col>
-      </Row> */}
+
     </div>
   )
 }
+
+export const AuctionBidders = (auctionID: string) => {
+  const bids = [];
+  return <Col>
+    {bids.map((bid, index) => {
+      return <Row>{index+1}. {shortenAddress(bid.address)} {bi}</Row>
+    })}
+  </Col>
+};
