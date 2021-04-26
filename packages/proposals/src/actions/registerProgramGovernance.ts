@@ -4,7 +4,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions } from '@oyster/common';
+import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
@@ -175,8 +175,7 @@ export const registerProgramGovernance = async (
         ? [mintInstructions, instructions]
         : [instructions],
       mintInstructions.length ? [mintSigners, signers] : [signers],
-      true,
-      true,
+      SequenceType.Sequential,
     );
 
     notify({

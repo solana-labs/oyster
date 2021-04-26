@@ -242,18 +242,23 @@ export const getErrorForTransaction = async (
   return errors;
 };
 
+export enum SequenceType {
+  Sequential,
+  Parallel,
+  StopOnFailure,
+}
+
 export const sendTransactions = async (
   connection: Connection,
   wallet: any,
   instructionSet: TransactionInstruction[][],
   signersSet: Account[][],
-  awaitConfirmation = true,
-  sendInSequence = false,
+  sequenceType: SequenceType = SequenceType.Parallel,
   commitment: Commitment = 'singleGossip',
   successCallback: (txid: string, ind: number) => void = (txid, ind) => {},
-  failCallback: (txid: string, ind: number) => boolean = (txid, ind) => false,
+  failCallback: (reason: string, ind: number) => boolean = (txid, ind) => false,
   block?: BlockhashAndFeeCalculator,
-) => {
+): Promise<number> => {
   const unsignedTxns: Transaction[] = [];
 
   if (!block) {
@@ -280,63 +285,43 @@ export const sendTransactions = async (
   }
 
   const signedTxns = await wallet.signAllTransactions(unsignedTxns);
-  const rawTransactions = signedTxns.map((t: Transaction) => t.serialize());
-  let options = {
-    skipPreflight: true,
-    commitment,
-  };
 
-  const pendingTxns: Promise<void>[] = [];
+  const pendingTxns: Promise<{ txid: string; slot: number }>[] = [];
 
-  for (let i = 0; i < rawTransactions.length; i++) {
-    const sendingTxId = connection.sendRawTransaction(
-      rawTransactions[i],
-      options,
-    );
+  let breakEarlyObject = { breakEarly: false };
+  for (let i = 0; i < signedTxns.length; i++) {
+    const signedTxnPromise = sendSignedTransaction({
+      connection,
+      signedTransaction: signedTxns[i],
+    });
 
-    if (sendInSequence || awaitConfirmation) {
-      const pendingTx = sendingTxId.then(async txid => {
-        const confirmation = await awaitTransactionSignatureConfirmation(
-          txid,
-          DEFAULT_TIMEOUT,
-          connection,
-          commitment);
-
-        if (confirmation?.err && !failCallback(txid, i)) {
-          const errors = await getErrorForTransaction(connection, txid);
-          notify({
-            message: 'Transaction failed...',
-            description: (
-              <>
-                {errors.map(err => (
-                  <div>{err}</div>
-                ))}
-                <ExplorerLink address={txid} type="transaction" />
-              </>
-            ),
-            type: 'error',
-          });
-
-          throw new Error(
-            `Raw transaction ${txid} failed (${JSON.stringify(confirmation.slot)})`,
-          );
-        } else {
-          successCallback(txid, i);
+    signedTxnPromise
+      .then(({ txid, slot }) => {
+        successCallback(txid, i);
+      })
+      .catch(reason => {
+        failCallback(signedTxns[i], i);
+        if (sequenceType == SequenceType.StopOnFailure) {
+          breakEarlyObject.breakEarly = true;
         }
       });
-      if (sendInSequence) {
-        await pendingTx;
-      } else {
-        pendingTxns.push(pendingTx);
+
+    if (sequenceType != SequenceType.Parallel) {
+      await signedTxnPromise;
+      if (breakEarlyObject.breakEarly) {
+        return i; // REturn the txn we failed on by index
       }
+    } else {
+      pendingTxns.push(signedTxnPromise);
     }
   }
 
-  if (awaitConfirmation) {
+  if (sequenceType != SequenceType.Parallel) {
     await Promise.all(pendingTxns);
   }
-};
 
+  return signedTxns.length;
+};
 
 export const sendTransaction = async (
   connection: Connection,
@@ -385,8 +370,8 @@ export const sendTransaction = async (
       txid,
       DEFAULT_TIMEOUT,
       connection,
-      commitment);
-
+      commitment,
+    );
 
     slot = confirmation?.slot || 0;
 
@@ -593,7 +578,7 @@ async function awaitTransactionSignatureConfirmation(
               err: result.err,
               slot: context.slot,
               confirmations: 0,
-            }
+            };
             if (result.err) {
               reject(result.err);
             } else {
