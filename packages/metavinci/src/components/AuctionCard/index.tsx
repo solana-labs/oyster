@@ -98,7 +98,8 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
         className="info-content"
         style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}
       >
-        Your Balance: ${myPayingAccount ? myPayingAccount.info.amount : 0.0}
+        Your Balance: $
+        {myPayingAccount ? myPayingAccount.info.amount.toNumber() : 0.0}
       </div>
 
       <Button
