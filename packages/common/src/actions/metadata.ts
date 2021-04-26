@@ -152,7 +152,7 @@ class UpdateMetadataArgs {
   instruction: number = 1;
   uri: string;
   // Not used by this app, just required for instruction
-  nonUniqueSpecificUpdateAuthority?: PublicKey;
+  nonUniqueSpecificUpdateAuthority: PublicKey | null;
 
   constructor(args: {
     uri: string;
@@ -161,7 +161,7 @@ class UpdateMetadataArgs {
     this.uri = args.uri;
     this.nonUniqueSpecificUpdateAuthority = args.nonUniqueSpecificUpdateAuthority
       ? new PublicKey(args.nonUniqueSpecificUpdateAuthority)
-      : undefined;
+      : null;
   }
 }
 
