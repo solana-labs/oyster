@@ -1,4 +1,4 @@
-import { programIds, VAULT_SCHEMA } from '@oyster/common';
+import { programIds } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { serialize } from 'borsh';
 
-import { getAuctionKeys, StartAuctionArgs } from '.';
+import { getAuctionKeys, SCHEMA, StartAuctionArgs } from '.';
 
 export async function startAuction(
   vault: PublicKey,
@@ -18,7 +18,7 @@ export async function startAuction(
   const { auctionKey, auctionManagerKey } = await getAuctionKeys(vault);
 
   const value = new StartAuctionArgs();
-  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  const data = Buffer.from(serialize(SCHEMA, value));
 
   const keys = [
     {

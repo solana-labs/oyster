@@ -1,4 +1,4 @@
-import { programIds, VAULT_SCHEMA, VAULT_PREFIX } from '@oyster/common';
+import { programIds, VAULT_PREFIX } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -8,7 +8,7 @@ import {
 } from '@solana/web3.js';
 import { serialize } from 'borsh';
 
-import { getAuctionKeys, getBidderKeys, RedeemBidArgs } from '.';
+import { getAuctionKeys, getBidderKeys, RedeemBidArgs, SCHEMA } from '.';
 
 export async function redeemBid(
   vault: PublicKey,
@@ -37,7 +37,7 @@ export async function redeemBid(
   )[0];
 
   const value = new RedeemBidArgs();
-  const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  const data = Buffer.from(serialize(SCHEMA, value));
   const keys = [
     {
       pubkey: auctionManagerKey,

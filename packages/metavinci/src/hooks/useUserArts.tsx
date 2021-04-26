@@ -10,8 +10,11 @@ export const useUserArts = (): SafetyDepositDraft[] => {
     return prev;
   }, new Map<string, TokenAccount>());
 
-  const ownedMetadata = metadata.filter(m =>
-    accountByMint.has(m.info.mint.toBase58()),
+  const ownedMetadata = metadata.filter(
+    m =>
+      accountByMint.has(m.info.mint.toBase58()) &&
+      (accountByMint?.get(m.info.mint.toBase58())?.info?.amount?.toNumber() ||
+        0) > 0,
   );
 
   const possibleNameSymbols = ownedMetadata.map(m =>

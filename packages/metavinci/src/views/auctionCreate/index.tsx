@@ -115,6 +115,7 @@ export interface AuctionState {
 export const AuctionCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
+  const items = useUserArts();
   const { wallet, connected } = useWallet();
   const { step_param }: { step_param: string } = useParams();
   const history = useHistory();
@@ -143,17 +144,17 @@ export const AuctionCreateView = () => {
     let settings: AuctionManagerSettings;
     let winnerLimit: WinnerLimit;
     if (attributes.category == AuctionCategory.Open) {
-      settings = {
+      settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.OpenEditionGiven,
         openEditionNonWinningConstraint: NonWinningConstraint.GivenForBidPrice,
         winningConfigs: [],
         openEditionConfig: 0,
-        openEditionFixedPrice: undefined,
-      };
+        openEditionFixedPrice: null,
+      });
 
       winnerLimit = new WinnerLimit({ type: WinnerLimitType.Unlimited });
     } else if (attributes.category == AuctionCategory.Single) {
-      settings = {
+      settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
         winningConfigs: [
@@ -161,14 +162,14 @@ export const AuctionCreateView = () => {
             safetyDepositBoxIndex: 0,
             amount: 1,
             hasAuthority: false,
-            editionType: attributes.items[0].masterEdition
+            editionType: items[0].masterEdition
               ? EditionType.MasterEdition
               : EditionType.NA,
           },
         ],
-        openEditionConfig: undefined,
-        openEditionFixedPrice: undefined,
-      };
+        openEditionConfig: null,
+        openEditionFixedPrice: null,
+      });
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Capped,
         usize: new BN(1),
@@ -184,7 +185,7 @@ export const AuctionCreateView = () => {
       winnerLimit,
       new BN((attributes.auctionDuration || 1) * 60),
       new BN((attributes.gapTime || 1) * 60),
-      [attributes.items[0]],
+      [items[0]],
       new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
     );
   };
@@ -298,6 +299,7 @@ export const AuctionCreateView = () => {
     ],
     [AuctionCategory.Single]: [
       ['Category', categoryStep],
+      ['Copies', copiesStep],
       ['Price', priceStep],
       ['Initial Phase', initialStep],
       ['Ending Phase', endingStep],
@@ -465,21 +467,6 @@ const CopiesStep = (props: {
     );
   }
 
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(
-    new Set(
-      props.attributes.items.map(item => item.metadata.pubkey.toBase58()),
-    ),
-  );
-
-  useEffect(() => {
-    props.setAttributes({
-      ...props.attributes,
-      items: eligibleItems.filter((item: SafetyDepositDraft) =>
-        selectedItems.has(item.metadata.pubkey.toBase58()),
-      ),
-    });
-  }, [selectedItems]);
-
   return (
     <>
       <Row className="call-to-action" style={{ marginBottom: 0 }}>
@@ -491,14 +478,10 @@ const CopiesStep = (props: {
       <Row className="content-action">
         <Col xl={24}>
           <ArtSelector
-            selected={eligibleItems.filter(item =>
-              selectedItems.has(item.metadata.pubkey.toBase58()),
-            )}
-            setSelected={items =>
-              setSelectedItems(
-                new Set(items.map(item => item.metadata.pubkey.toBase58())),
-              )
-            }
+            selected={props.attributes.items}
+            setSelected={items => {
+              props.setAttributes({ ...props.attributes, items });
+            }}
             allowMultiple={false}
           >
             Select NFT

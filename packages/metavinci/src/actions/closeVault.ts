@@ -40,12 +40,6 @@ export async function closeVault(
   );
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
-  const vaultAuthority = (
-    await PublicKey.findProgramAddress(
-      [Buffer.from(VAULT_PREFIX), PROGRAM_IDS.vault.toBuffer()],
-      PROGRAM_IDS.vault,
-    )
-  )[0];
 
   const auctionKey: PublicKey = (
     await PublicKey.findProgramAddress(
@@ -70,7 +64,7 @@ export async function closeVault(
     vault,
     fractionMint,
     fractionTreasury,
-    vaultAuthority,
+    wallet.publicKey,
     instructions,
   );
 
@@ -92,14 +86,30 @@ export async function closeVault(
     signers,
   );
 
+  let transferAuthority = new Account();
+
   // Shouldn't need to pay anything since we activated vault with 0 shares, but we still
   // need this setup anyway.
-  const transferAuthority = approve(
+  approve(
     instructions,
     [],
     payingTokenAccount,
     wallet.publicKey,
     0,
+    false,
+    undefined,
+    transferAuthority,
+  );
+
+  approve(
+    instructions,
+    [],
+    outstandingShareAccount,
+    wallet.publicKey,
+    0,
+    false,
+    undefined,
+    transferAuthority,
   );
 
   signers.push(transferAuthority);

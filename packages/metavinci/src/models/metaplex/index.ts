@@ -65,7 +65,7 @@ export class AuctionManager {
 
 export class InitAuctionManagerArgs {
   instruction = 0;
-  settings?: AuctionManagerSettings;
+  settings: AuctionManagerSettings;
 
   constructor(args: { settings: AuctionManagerSettings }) {
     this.settings = args.settings;
@@ -102,8 +102,8 @@ export class AuctionManagerSettings {
   openEditionNonWinningConstraint: NonWinningConstraint =
     NonWinningConstraint.GivenForFixedPrice;
   winningConfigs: WinningConfig[] = [];
-  openEditionConfig?: number = 0;
-  openEditionFixedPrice?: number = 0;
+  openEditionConfig: number | null = 0;
+  openEditionFixedPrice: number | null = 0;
 
   constructor(args?: AuctionManagerSettings) {
     Object.assign(this, args);
@@ -196,8 +196,8 @@ export const SCHEMA = new Map<any, any>([
         ['tokenMetadataProgram', 'pubkey'],
         ['tokenProgram', 'pubkey'],
         ['acceptPayment', 'pubkey'],
-        ['state', 'AuctionManagerState'],
-        ['settings', 'AuctionManagerSettings'],
+        ['state', AuctionManagerState],
+        ['settings', AuctionManagerSettings],
       ],
     },
   ],
@@ -265,7 +265,7 @@ export const SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['manager', 'AuctionManagerSettings'],
+        ['settings', AuctionManagerSettings],
       ],
     },
   ],

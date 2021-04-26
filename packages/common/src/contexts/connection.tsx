@@ -487,6 +487,11 @@ export async function sendSignedTransaction({
       true,
     );
 
+    if (confirmation.err) {
+      console.error(confirmation.err);
+      throw new Error('Transaction failed: Custom instruction error');
+    }
+
     slot = confirmation?.slot || 0;
   } catch (err) {
     if (err.timeout) {
@@ -580,8 +585,10 @@ async function awaitTransactionSignatureConfirmation(
               confirmations: 0,
             };
             if (result.err) {
+              console.log('Rejected via websocket', result.err);
               reject(result.err);
             } else {
+              console.log('Resolved via websocket', result);
               resolve(result);
             }
           },
@@ -624,7 +631,7 @@ async function awaitTransactionSignatureConfirmation(
       }
     })();
   })
-    .catch(_ => {
+    .catch(err => {
       //@ts-ignore
       if (connection._signatureSubscriptions[subId])
         connection.removeSignatureListener(subId);

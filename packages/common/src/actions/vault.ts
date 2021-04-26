@@ -204,10 +204,7 @@ export const VAULT_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['key', 'u8'],
-        ['pricePerShare', 'u64'],
-        ['priceMint', 'pubkey'],
-        ['allowToCombine', 'u8'],
+        ['externalPriceAccount', ExternalPriceAccount],
       ],
     },
   ],
@@ -251,7 +248,7 @@ export const VAULT_SCHEMA = new Map<any, any>([
         ['key', 'u8'],
         ['pricePerShare', 'u64'],
         ['priceMint', 'pubkey'],
-        ['allowToCombine', 'u8'],
+        ['allowedToCombine', 'u8'],
       ],
     },
   ],
@@ -671,6 +668,7 @@ export async function updateExternalPriceAccount(
 
   const value = new UpdateExternalPriceAccountArgs({ externalPriceAccount });
   const data = Buffer.from(serialize(VAULT_SCHEMA, value));
+  console.log('Data', data);
 
   const keys = [
     {
