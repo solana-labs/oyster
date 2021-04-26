@@ -31,6 +31,8 @@ import {
   Metadata,
   ParsedAccount,
   deserializeBorsh,
+  WinnerLimit,
+  WinnerLimitType,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js';
@@ -49,7 +51,11 @@ import {
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
-import { SafetyDepositDraft } from '../../actions/createAuctionManager';
+import {
+  createAuctionManager,
+  SafetyDepositDraft,
+} from '../../actions/createAuctionManager';
+import BN from 'bn.js';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -76,9 +82,6 @@ export interface AuctionState {
 
   // listed NFTs
   items: SafetyDepositDraft[];
-
-  settings: AuctionManagerSettings;
-
   // number of editions for this auction (only applicable to limited edition)
   editions?: number;
 
@@ -123,13 +126,6 @@ export const AuctionCreateView = () => {
     items: [],
     category: AuctionCategory.Open,
     saleType: 'auction',
-    settings: {
-      openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
-      openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
-      winningConfigs: [],
-      openEditionConfig: undefined,
-      openEditionFixedPrice: undefined,
-    },
   });
 
   useEffect(() => {
@@ -143,7 +139,31 @@ export const AuctionCreateView = () => {
   };
 
   const createAuction = async () => {
-    // TODO: ....
+    let settings: AuctionManagerSettings;
+    if (attributes.category == AuctionCategory.Open) {
+      settings = {
+        openEditionWinnerConstraint: WinningConstraint.OpenEditionGiven,
+        openEditionNonWinningConstraint: NonWinningConstraint.GivenForBidPrice,
+        winningConfigs: [],
+        openEditionConfig: 0,
+        openEditionFixedPrice: undefined,
+      };
+
+      const winnerLimit = new WinnerLimit({ type: WinnerLimitType.Unlimited });
+
+      await createAuctionManager(
+        connection,
+        wallet,
+        settings,
+        winnerLimit,
+        new BN((attributes.auctionDuration || 1) * 60),
+        new BN((attributes.gapTime || 1) * 60),
+        [attributes.items[0]],
+        new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+      );
+    } else {
+      throw new Error('Not supported');
+    }
   };
 
   const categoryStep = (
