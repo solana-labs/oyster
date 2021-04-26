@@ -42,6 +42,7 @@ import Masonry from 'react-masonry-css';
 import { capitalize } from 'lodash';
 import { AuctionManager, AuctionManagerSettings, AuctionManagerState, AuctionManagerStatus, NonWinningConstraint, SCHEMA } from '../../models/metaplex';
 import { serialize } from 'borsh';
+import moment from 'moment'
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -79,7 +80,7 @@ export interface AuctionState {
   endDate?: Date;
 
 
-  // Jose's attributes
+  //////////////////
   category: AuctionCategory;
   saleType?: "auction" | "sale";
 
@@ -779,6 +780,31 @@ const InitialPhaseStep = (props: {
   const [startNow, setStartNow] = useState<boolean>(true)
   const [listNow, setListNow] = useState<boolean>(true)
 
+  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(props.attributes.startSaleTS ? moment.unix(props.attributes.startSaleTS) : undefined)
+  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(props.attributes.startListTS ? moment.unix(props.attributes.startListTS) : undefined)
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      startSaleTS: saleMoment && saleMoment.unix() * 1000
+    })
+  }, [saleMoment])
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      startListTS: listMoment && listMoment.unix() * 1000
+    })
+  }, [listMoment])
+
+  useEffect(() => {
+    if (startNow) setSaleMoment(moment())
+  }, [startNow])
+
+  useEffect(() => {
+    if (listNow) setListMoment(moment())
+  }, [listNow])
+
   return <>
     <Row className="call-to-action">
       <h2>Initial Phase</h2>
@@ -801,8 +827,37 @@ const InitialPhaseStep = (props: {
 
           <label className="action-field">
             <span className="field-title">{capitalize(props.attributes.saleType)} Start Date</span>
-            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
-            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log({ dt, dtString })} />
+            <DatePicker
+              className="field-date"
+              size="large"
+              disabledDate={current => current && current < moment().endOf('day')}
+              value={saleMoment}
+              onChange={value => {
+                if (!value) return
+                if (!saleMoment) return setSaleMoment(value)
+
+                const currentMoment = saleMoment.clone()
+                currentMoment.year(value.year())
+                currentMoment.month(value.month())
+                currentMoment.day(value.day())
+                setSaleMoment(currentMoment)
+              }}
+            />
+            <TimePicker
+              className="field-date"
+              size="large"
+              value={saleMoment}
+              onChange={value => {
+                if (!value) return
+                if (!saleMoment) return setSaleMoment(value)
+
+                const currentMoment = saleMoment.clone()
+                currentMoment.hour(value.hour())
+                currentMoment.minute(value.minute())
+                currentMoment.second(value.second())
+                setSaleMoment(currentMoment)
+              }}
+            />
           </label>
 
           <label className="action-field">
@@ -818,8 +873,38 @@ const InitialPhaseStep = (props: {
           {!listNow &&
             <label className="action-field">
               <span className="field-title">Preview Start Date</span>
-              <DatePicker className="field-date" size="large" />
-              <TimePicker className="field-date" size="large" />
+              <DatePicker
+                allowClear={false}
+                className="field-date"
+                size="large"
+                disabledDate={current => current < moment().startOf('day') || current > (saleMoment as moment.Moment)}
+                value={listMoment}
+                onChange={value => {
+                  if (!value) return
+                  if (!listMoment) return setListMoment(value)
+
+                  const currentMoment = listMoment.clone()
+                  currentMoment.year(value.year())
+                  currentMoment.month(value.month())
+                  currentMoment.day(value.day())
+                  setListMoment(currentMoment)
+                }}
+              />
+              <TimePicker
+                className="field-date"
+                size="large"
+                value={listMoment}
+                onChange={value => {
+                  if (!value) return
+                  if (!listMoment) return setListMoment(value)
+
+                  const currentMoment = listMoment.clone()
+                  currentMoment.hour(value.hour())
+                  currentMoment.minute(value.minute())
+                  currentMoment.second(value.second())
+                  setListMoment(currentMoment)
+                }}
+              />
             </label>
           }
 
@@ -929,6 +1014,18 @@ const EndingPhaseSale = (props: {
   confirm: () => void;
 }) => {
   const [untilSold, setUntilSold] = useState<boolean>(true)
+  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined)
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      endTS: endMoment && endMoment.unix() * 1000
+    })
+  }, [endMoment])
+
+  useEffect(() => {
+    if (untilSold) setEndMoment(undefined)
+  }, [untilSold])
 
   return <>
     <Row className="call-to-action">
@@ -950,8 +1047,37 @@ const EndingPhaseSale = (props: {
         {!untilSold &&
           <label className="action-field">
             <span className="field-title">End Date</span>
-            <DatePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
-            <TimePicker className="field-date" size="large" onChange={(dt, dtString) => console.log(dt?.unix())} />
+            <DatePicker
+              className="field-date"
+              size="large"
+              disabledDate={current => current && current < moment().endOf('day')}
+              value={endMoment}
+              onChange={value => {
+                if (!value) return
+                if (!endMoment) return setEndMoment(value)
+
+                const currentMoment = endMoment.clone()
+                currentMoment.hour(value.hour())
+                currentMoment.minute(value.minute())
+                currentMoment.second(value.second())
+                setEndMoment(currentMoment)
+              }}
+            />
+            <TimePicker
+              className="field-date"
+              size="large"
+              value={endMoment}
+              onChange={value => {
+                if (!value) return
+                if (!endMoment) return setEndMoment(value)
+
+                const currentMoment = endMoment.clone()
+                currentMoment.hour(value.hour())
+                currentMoment.minute(value.minute())
+                currentMoment.second(value.second())
+                setEndMoment(currentMoment)
+              }}
+            />
           </label>
         }
       </Col>
