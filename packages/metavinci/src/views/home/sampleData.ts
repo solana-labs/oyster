@@ -8,6 +8,7 @@ export const sampleAuction: Auction = {
   solAmt: 200,
   link: '/auction/1234abcd',
   image: 'img/auction1.jpg',
+  endingTS: 1618447663000,
 };
 
 export const sampleAuctions: Array<Auction> = [
@@ -19,6 +20,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 115,
     link: '/auction/1234abcd',
     image: 'img/auction2.jpg',
+    endingTS: 1618447663000,
   },
   {
     name: 'Miko 4',
@@ -29,6 +31,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 75,
     link: '/auction/1234abcd',
     image: 'img/auction3.jpg',
+    endingTS: 1618447663000,
   },
   {
     name: 'Tell Me',
@@ -38,6 +41,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 120,
     link: '/auction/1234abcd',
     image: 'img/auction4.jpg',
+    endingTS: 1618447663000,
   },
   {
     name: 'Saucy',
@@ -47,6 +51,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 200,
     link: '/auction/1234abcd',
     image: 'img/auction5.jpg',
+    endingTS: 1618447663000,
   },
   {
     name: 'Haze',
@@ -56,6 +61,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 200,
     link: '/auction/1234abcd',
     image: 'img/auction6.jpg',
+    endingTS: 1618447663000,
   },
   {
     name: 'Wounderground',
@@ -65,6 +71,7 @@ export const sampleAuctions: Array<Auction> = [
     solAmt: 200,
     link: '/auction/1234abcd',
     image: 'img/auction7.jpg',
+    endingTS: 1618447663000,
   },
 ];
 
