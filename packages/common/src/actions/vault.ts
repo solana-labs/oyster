@@ -258,6 +258,14 @@ export const decodeVault = (buffer: Buffer) => {
   return deserializeBorsh(VAULT_SCHEMA, Vault, buffer) as Vault;
 };
 
+export const decodeSafetyDeposit = (buffer: Buffer) => {
+  return deserializeBorsh(
+    VAULT_SCHEMA,
+    SafetyDepositBox,
+    buffer,
+  ) as SafetyDepositBox;
+};
+
 export async function initVault(
   allowFurtherShareCreation: boolean,
   fractionalMint: PublicKey,

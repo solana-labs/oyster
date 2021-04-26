@@ -129,7 +129,7 @@ export const AuctionCreateView = () => {
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
-    category: AuctionCategory.Open,
+    category: AuctionCategory.Single,
     saleType: 'auction',
     winnersCount: 1,
   });
@@ -161,6 +161,7 @@ export const AuctionCreateView = () => {
         usize: ZERO,
       });
     } else if (attributes.category == AuctionCategory.Single) {
+      console.log('Using single');
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,

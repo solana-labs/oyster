@@ -45,6 +45,10 @@ export class BidState {
   }
 }
 
+export const decodeAuction = (buffer: Buffer) => {
+  return deserializeBorsh(AUCTION_SCHEMA, AuctionData, buffer) as AuctionData;
+};
+
 export const BASE_AUCTION_DATA_SIZE = 32 + 32 + 32 + 8 + 8 + 1 + 9 + 9 + 9 + 9;
 
 export class AuctionData {
@@ -66,6 +70,9 @@ export class AuctionData {
   endAuctionAt?: BN;
   /// Gap time is the amount of time in slots after the previous bid at which the auction ends.
   endAuctionGap?: BN;
+
+  /// Used for precalculation on the front end, not a backend key
+  auctionManagerKey?: PublicKey;
 
   constructor(args: {
     authority: PublicKey;
@@ -247,7 +254,7 @@ export const AUCTION_SCHEMA = new Map<any, any>([
         ['resource', 'pubkey'],
         ['tokenMint', 'pubkey'],
         ['state', 'u8'],
-        ['bidState', 'BidState'],
+        ['bidState', BidState],
         ['lastBid', { kind: 'option', type: 'u64' }],
         ['endedAt', { kind: 'option', type: 'u64' }],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
