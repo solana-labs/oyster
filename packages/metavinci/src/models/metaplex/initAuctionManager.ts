@@ -91,7 +91,7 @@ export async function initAuctionManager(
     {
       pubkey: openEditionMasterMint || SystemProgram.programId, // Won't actually be used if openEditionConfig is null
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     {
       pubkey: openEditionMasterMintAuthority || SystemProgram.programId, // Won't actually be used if openEditionConfig is null

@@ -132,8 +132,8 @@ export enum WinnerLimitType {
 
 export class WinnerLimit {
   type: WinnerLimitType;
-  usize?: BN;
-  constructor(args: { type: WinnerLimitType; usize?: BN }) {
+  usize: BN;
+  constructor(args: { type: WinnerLimitType; usize: BN }) {
     this.type = args.type;
     this.usize = args.usize;
   }
@@ -142,10 +142,7 @@ export class WinnerLimit {
 class CreateAuctionArgs {
   instruction: number = 0;
   /// How many winners are allowed for this auction. See AuctionData.
-  winnerType: number;
-  winnerAmount: BN | null;
-  /// The resource being auctioned. See AuctionData.
-  resource: PublicKey;
+  winners: WinnerLimit;
   /// End time is the cut-off point that the auction is forced to end by. See AuctionData.
   endAuctionAt: BN | null;
   /// Gap time is how much time after the previous bid where the auction ends. See AuctionData.
@@ -154,23 +151,23 @@ class CreateAuctionArgs {
   tokenMint: PublicKey;
   /// Authority
   authority: PublicKey;
+  /// The resource being auctioned. See AuctionData.
+  resource: PublicKey;
 
   constructor(args: {
-    winnerType: number;
-    winnerAmount: BN | null;
-    resource: PublicKey;
+    winners: WinnerLimit;
     endAuctionAt: BN | null;
     endAuctionGap: BN | null;
     tokenMint: PublicKey;
     authority: PublicKey;
+    resource: PublicKey;
   }) {
-    this.winnerType = args.winnerType;
-    this.winnerAmount = args.winnerAmount;
-    this.resource = args.resource;
+    this.winners = args.winners;
     this.endAuctionAt = args.endAuctionAt;
     this.endAuctionGap = args.endAuctionGap;
     this.tokenMint = args.tokenMint;
     this.authority = args.authority;
+    this.resource = args.resource;
   }
 }
 
@@ -201,13 +198,22 @@ export const AUCTION_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['winnerType', 'u8'],
-        ['winnerAmount', { kind: 'option', type: 'u64' }],
-        ['resource', 'pubkey'],
+        ['winners', WinnerLimit],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
         ['endAuctionGap', { kind: 'option', type: 'u64' }],
         ['tokenMint', 'pubkey'],
         ['authority', 'pubkey'],
+        ['resource', 'pubkey'],
+      ],
+    },
+  ],
+  [
+    WinnerLimit,
+    {
+      kind: 'struct',
+      fields: [
+        ['type', 'u8'],
+        ['usize', 'u64'],
       ],
     },
   ],
@@ -312,8 +318,7 @@ export async function createAuction(
     serialize(
       AUCTION_SCHEMA,
       new CreateAuctionArgs({
-        winnerType: winners.type,
-        winnerAmount: winners.usize == undefined ? null : winners.usize,
+        winners,
         resource,
         endAuctionAt,
         endAuctionGap,
@@ -322,10 +327,6 @@ export async function createAuction(
       }),
     ),
   );
-
-  console.log('Winner', winners);
-
-  console.log('Data', data);
 
   const auctionKey: PublicKey = (
     await PublicKey.findProgramAddress(
@@ -351,6 +352,11 @@ export async function createAuction(
     },
     {
       pubkey: SYSVAR_RENT_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SystemProgram.programId,
       isSigner: false,
       isWritable: false,
     },

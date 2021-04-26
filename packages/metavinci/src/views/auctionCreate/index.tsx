@@ -152,7 +152,10 @@ export const AuctionCreateView = () => {
         openEditionFixedPrice: null,
       });
 
-      winnerLimit = new WinnerLimit({ type: WinnerLimitType.Unlimited });
+      winnerLimit = new WinnerLimit({
+        type: WinnerLimitType.Unlimited,
+        usize: new BN(0),
+      });
     } else if (attributes.category == AuctionCategory.Single) {
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
@@ -186,7 +189,7 @@ export const AuctionCreateView = () => {
       new BN((attributes.auctionDuration || 1) * 60),
       new BN((attributes.gapTime || 1) * 60),
       [items[0]],
-      new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+      new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
     );
   };
 
