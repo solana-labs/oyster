@@ -89,10 +89,10 @@ export const AuctionCard = ({ auction }: { auction: Auction }) => {
 }
 
 export const AuctionBidders = (auctionID: string) => {
-  const bids = [];
+  const bids: any[] = [];
   return <Col>
     {bids.map((bid, index) => {
-      return <Row>{index+1}. {shortenAddress(bid.address)} {bi}</Row>
+      return <Row>{index+1}. {shortenAddress(bid.address)} {bid.amount}</Row>
     })}
   </Col>
 };
