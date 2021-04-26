@@ -5,7 +5,12 @@ import { Auction, Presale } from '../../types';
 
 import './index.less';
 import { getCountdown } from '../../utils/utils';
-import { shortenAddress, useConnection } from '@oyster/common';
+import {
+  shortenAddress,
+  TokenAccount,
+  useConnection,
+  useUserAccounts,
+} from '@oyster/common';
 import { AuctionView } from '../../hooks';
 
 export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
@@ -14,7 +19,15 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   const [seconds, setSeconds] = useState<number>(59);
   const [clock, setClock] = useState<number>(0);
   const connection = useConnection();
+  const { userAccounts } = useUserAccounts();
+  const accountByMint = userAccounts.reduce((prev, acc) => {
+    prev.set(acc.info.mint.toBase58(), acc);
+    return prev;
+  }, new Map<string, TokenAccount>());
 
+  const myPayingAccount = accountByMint.get(
+    auctionView.auction.info.tokenMint.toBase58(),
+  );
   useEffect(() => {
     connection.getSlot().then(setClock);
   }, [connection]);
@@ -85,7 +98,7 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
         className="info-content"
         style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}
       >
-        Your Balance: ◎ {0.0} (${0.0})
+        Your Balance: ${myPayingAccount ? myPayingAccount.info.amount : 0.0}
       </div>
 
       <Button

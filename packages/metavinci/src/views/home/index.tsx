@@ -32,7 +32,7 @@ export const HomeView = () => {
       {auctions.map(m => {
         const id = m.auction.pubkey.toBase58();
         return (
-          <Link to={`/art/${id}`}>
+          <Link to={`/auction/${id}`}>
             <ArtCard
               key={id}
               image={m.thumbnail.metadata.info.extended?.image}

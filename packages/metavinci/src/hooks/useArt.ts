@@ -5,7 +5,6 @@ import { Art } from '../types';
 
 export const useArt = (id: PublicKey | string) => {
   const { metadata } = useMeta();
-  console.log(metadata);
 
   const key = typeof id === 'string' ? id : id?.toBase58() || '';
   const account = useMemo(
