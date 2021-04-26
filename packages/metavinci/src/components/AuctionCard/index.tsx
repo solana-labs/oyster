@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-// import { useHistory } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
 import {
   Row,
   Col,
@@ -8,26 +7,10 @@ import {
   InputNumber
 } from 'antd'
 
-import { Auction, Presale } from '../../types'
+import { Auction } from '../../types'
 
 import './index.less'
 import { getCountdown } from '../../utils/utils'
-import { solanaToUSD } from '../../utils/assets'
-
-const Price = ({amt}: {amt: number}) => {
-  const [USDamt, setUSDamt] = useState<number>(0)
-
-  useEffect(() => {
-    solanaToUSD(amt).then(setUSDamt)
-  }, [amt])
-
-  return (
-    <div>
-      <span className="cd-number">◎{amt}</span>&nbsp;&nbsp;
-      <span className="cd-label">${USDamt.toFixed(2)}</span>
-    </div>
-  )
-}
 
 export const AuctionCard = ({ auction }: { auction: Auction }) => {
   const [hours, setHours] = useState<number>(23)
