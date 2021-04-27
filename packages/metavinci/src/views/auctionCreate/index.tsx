@@ -49,6 +49,7 @@ import {
   EditionType,
   NonWinningConstraint,
   SCHEMA,
+  WinningConfig,
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
@@ -57,6 +58,7 @@ import {
   SafetyDepositDraft,
 } from '../../actions/createAuctionManager';
 import BN from 'bn.js';
+import { ZERO } from '@oyster/common/dist/lib/constants';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -110,6 +112,8 @@ export interface AuctionState {
 
   spots?: number;
   tiers?: Array<Tier>;
+
+  winnersCount: number;
 }
 
 export const AuctionCreateView = () => {
@@ -128,6 +132,7 @@ export const AuctionCreateView = () => {
     items: [],
     category: AuctionCategory.Open,
     saleType: 'auction',
+    winnersCount: 1,
   });
 
   useEffect(() => {
@@ -154,29 +159,28 @@ export const AuctionCreateView = () => {
 
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Unlimited,
-        usize: new BN(0),
+        usize: ZERO,
       });
     } else if (attributes.category == AuctionCategory.Single) {
       console.log('Using single');
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
-        winningConfigs: [
-          {
-            safetyDepositBoxIndex: 0,
-            amount: 1,
-            hasAuthority: false,
-            editionType: items[0].masterEdition
-              ? EditionType.MasterEdition
-              : EditionType.NA,
-          },
-        ],
+        winningConfigs: attributes.items.map((item, index) => (new WinningConfig({
+          // TODO: check index
+          safetyDepositBoxIndex: index,
+          amount: 1,
+          hasAuthority: false,
+          editionType: item.masterEdition
+            ? EditionType.MasterEdition
+            : EditionType.NA,
+        }))),
         openEditionConfig: null,
         openEditionFixedPrice: null,
       });
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Capped,
-        usize: new BN(1),
+        usize: new BN(attributes.winnersCount),
       });
     } else {
       throw new Error('Not supported');
@@ -189,7 +193,8 @@ export const AuctionCreateView = () => {
       winnerLimit,
       new BN((attributes.auctionDuration || 1) * 60 * 60 * 24),
       new BN((attributes.gapTime || 1) * 60),
-      [items[0]],
+      attributes.items,
+      // TODO: move to config
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
     );
   };
@@ -357,7 +362,7 @@ export const AuctionCreateView = () => {
         )}
         <Col {...(saving ? { xl: 24 } : { xl: 16, md: 17 })}>
           {stepsByCategory[attributes.category][step][1]}
-          {0 < step && step < stepsByCategory[attributes.category].length && (
+          {0 < step && step < (stepsByCategory[attributes.category].length -1) && (
             <Button
               style={{ width: '100%' }}
               onClick={() => gotoNextStep(step - 1)}
@@ -490,7 +495,7 @@ const CopiesStep = (props: {
           >
             Select NFT
           </ArtSelector>
-          <label className="action-field">
+          {props.attributes.category !== AuctionCategory.Open && <label className="action-field">
             <span className="field-title">
               How many copies do you want to create?
             </span>
@@ -508,7 +513,7 @@ const CopiesStep = (props: {
                 })
               }
             />
-          </label>
+          </label>}
         </Col>
       </Row>
       <Row>

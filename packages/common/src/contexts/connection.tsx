@@ -268,6 +268,11 @@ export const sendTransactions = async (
   for (let i = 0; i < instructionSet.length; i++) {
     const instructions = instructionSet[i];
     const signers = signersSet[i];
+
+    if(instructions.length === 0) {
+      continue;
+    }
+
     let transaction = new Transaction();
     instructions.forEach(instruction => transaction.add(instruction));
     transaction.recentBlockhash = block.blockhash;
