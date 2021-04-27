@@ -150,17 +150,7 @@ export function processAccountsIntoAuctionView(
       bidderPotsByAuctionAndBidder[
         auction.pubkey.toBase58() + '-' + myPayingAccount?.pubkey.toBase58()
       ];
-    if (
-      auction.pubkey.toBase58() ==
-      'CLxhAeuhz8KX3y8yEWHADtmTzE26ofAnd6j8zwMXjW9P'
-    ) {
-      console.log(
-        'I found',
 
-        bidderMetadata,
-        myPayingAccount?.pubkey.toBase58(),
-      );
-    }
     if (existingAuctionView && existingAuctionView.totallyComplete) {
       // If totally complete, we know we arent updating anythign else, let's speed things up
       // and only update the two things that could possibly change
