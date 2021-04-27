@@ -366,7 +366,15 @@ export function MetaProvider({ children = null as any }) {
         await processMetaData(accounts[i]);
       }
 
-      await queryExtendedMetadata(connection, setMetadata, metadataByMint);
+      setMetadataByMint(latest => {
+        queryExtendedMetadata(
+          connection,
+          setMetadata,
+          setMetadataByMint,
+          latest,
+        );
+        return latest;
+      });
 
       let subId = connection.onProgramAccountChange(
         programIds().metadata,
@@ -379,8 +387,15 @@ export function MetaProvider({ children = null as any }) {
             pubkey,
             account: info.accountInfo,
           });
-
-          queryExtendedMetadata(connection, setMetadata, metadataByMint);
+          setMetadataByMint(latest => {
+            queryExtendedMetadata(
+              connection,
+              setMetadata,
+              setMetadataByMint,
+              latest,
+            );
+            return latest;
+          });
         },
       );
       dispose = () => {
@@ -422,6 +437,9 @@ export function MetaProvider({ children = null as any }) {
 const queryExtendedMetadata = async (
   connection: Connection,
   setMetadata: (metadata: ParsedAccount<Metadata>[]) => void,
+  setMetadataByMint: (
+    metadata: Record<string, ParsedAccount<Metadata>>,
+  ) => void,
   mintToMeta: Record<string, ParsedAccount<Metadata>>,
 ) => {
   const mintToMetadata = { ...mintToMeta };
@@ -444,6 +462,7 @@ const queryExtendedMetadata = async (
       delete mintToMetadata[key];
     } else {
       const metadata = mintToMetadata[key];
+
       if (metadata && metadata.info.uri) {
         extendedMetadataFetch.set(
           key,
@@ -478,6 +497,7 @@ const queryExtendedMetadata = async (
   await Promise.all([...extendedMetadataFetch.values()]);
 
   setMetadata([...Object.values(mintToMetadata)]);
+  setMetadataByMint(mintToMetadata);
 };
 
 export const useMeta = () => {
