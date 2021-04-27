@@ -126,7 +126,7 @@ export const AuctionCreateView = () => {
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
-    category: AuctionCategory.Single,
+    category: AuctionCategory.Open,
     saleType: 'auction',
   });
 
@@ -187,7 +187,7 @@ export const AuctionCreateView = () => {
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60),
+      new BN((attributes.auctionDuration || 1) * 60 * 60 * 24),
       new BN((attributes.gapTime || 1) * 60),
       [items[0]],
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),

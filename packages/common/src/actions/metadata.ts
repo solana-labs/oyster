@@ -172,8 +172,8 @@ class TransferUpdateAuthorityArgs {
 
 class CreateMasterEditionArgs {
   instruction: number = 3;
-  maxSupply?: BN;
-  constructor(args: { maxSupply?: BN }) {
+  maxSupply: BN | null;
+  constructor(args: { maxSupply: BN | null }) {
     this.maxSupply = args.maxSupply;
   }
 }
@@ -561,7 +561,7 @@ export async function createMasterEdition(
     )
   )[0];
 
-  const value = new CreateMasterEditionArgs({ maxSupply });
+  const value = new CreateMasterEditionArgs({ maxSupply: maxSupply || null });
   const data = Buffer.from(serialize(METADATA_SCHEMA, value));
 
   const keys = [
