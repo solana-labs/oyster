@@ -53,6 +53,7 @@ import {
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
+import moment from 'moment'
 import {
   createAuctionManager,
   SafetyDepositDraft,
@@ -94,7 +95,8 @@ export interface AuctionState {
   // suggested date time when auction should end UTC+0
   endDate?: Date;
 
-  // Jose's attributes
+
+  //////////////////
   category: AuctionCategory;
   saleType?: 'auction' | 'sale';
 
@@ -362,7 +364,7 @@ export const AuctionCreateView = () => {
         )}
         <Col {...(saving ? { xl: 24 } : { xl: 16, md: 17 })}>
           {stepsByCategory[attributes.category][step][1]}
-          {0 < step && step < (stepsByCategory[attributes.category].length -1) && (
+          {0 < step && step < (stepsByCategory[attributes.category].length - 1) && (
             <Button
               style={{ width: '100%' }}
               onClick={() => gotoNextStep(step - 1)}
@@ -526,12 +528,12 @@ const CopiesStep = (props: {
               tiers:
                 !props.attributes.tiers || props.attributes.tiers?.length == 0
                   ? [
-                      {
-                        to: 0,
-                        name: 'Default Tier',
-                        items: props.attributes.items,
-                      },
-                    ]
+                    {
+                      to: 0,
+                      name: 'Default Tier',
+                      items: props.attributes.items,
+                    },
+                  ]
                   : props.attributes.tiers,
             });
             props.confirm();
@@ -599,28 +601,39 @@ const TierWinners = (props: {
   tier: Tier;
   setTier: Function;
   previousTo?: number;
+  lastTier?: Tier;
 }) => {
+  const from = (props.previousTo || 0) + 1
   return (
     <>
       <Divider />
       <label className="action-field">
         <span className="field-title">Winners</span>
         <div>
-          <Input
-            disabled={props.idx === 0}
-            defaultValue={(props.previousTo || 0) + 1}
+          <InputNumber
+            disabled={true}
+            value={from}
             type="number"
             className="input"
             style={{ width: '30%' }}
-            onChange={info => null}
+            onChange={value =>
+              null
+            }
           />
           &nbsp;to&nbsp;
-          <Input
+          <InputNumber
+            min={from + 1}
+            disabled={props.lastTier?.to == props.tier.to}
             defaultValue={props.tier.to}
             type="number"
             className="input"
             style={{ width: '30%' }}
-            onChange={info => null}
+            onChange={value =>
+              props.setTier(props.idx, {
+                ...props.tier,
+                to: value || props.tier.to,
+              })
+            }
           />
         </div>
       </label>
@@ -654,7 +667,7 @@ const TierWinners = (props: {
         />
       </label>
 
-      <ArtSelector selected={[]} setSelected={_ => {}} allowMultiple={true} />
+      <ArtSelector selected={[]} setSelected={_ => { }} allowMultiple={true} />
     </>
   );
 };
@@ -703,7 +716,7 @@ const TierStep = (props: {
                     (_, idx) => ({
                       to: Math.trunc(
                         ((idx + 1) * (props.attributes.spots as number)) /
-                          parseInt(info.target.value),
+                        parseInt(info.target.value),
                       ),
                       name: '',
                       description: '',
@@ -722,8 +735,10 @@ const TierStep = (props: {
               tier={tier}
               setTier={setTier}
               previousTo={tiers[idx - 1]?.to}
+              lastTier={tiers.slice(-1)[0]}
             />
           ))}
+
         </Col>
       </Row>
       <Row>
@@ -903,7 +918,6 @@ const PriceAuction = (props: {
             <Input
               type="number"
               min={0}
-              autoFocus
               className="input"
               placeholder="Tick size in USD"
               prefix="$"
@@ -940,6 +954,31 @@ const InitialPhaseStep = (props: {
 }) => {
   const [startNow, setStartNow] = useState<boolean>(true);
   const [listNow, setListNow] = useState<boolean>(true);
+
+  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(props.attributes.startSaleTS ? moment.unix(props.attributes.startSaleTS) : undefined)
+  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(props.attributes.startListTS ? moment.unix(props.attributes.startListTS) : undefined)
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      startSaleTS: saleMoment && saleMoment.unix() * 1000
+    })
+  }, [saleMoment])
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      startListTS: listMoment && listMoment.unix() * 1000
+    })
+  }, [listMoment])
+
+  useEffect(() => {
+    if (startNow) setSaleMoment(moment())
+  }, [startNow])
+
+  useEffect(() => {
+    if (listNow) setListMoment(moment())
+  }, [listNow])
 
   return (
     <>
@@ -1104,7 +1143,6 @@ const EndingPhaseAuction = (props: {
             </span>
             <Input
               type="number"
-              autoFocus
               className="input"
               placeholder="Duration in minutes"
               suffix="minutes"
@@ -1126,7 +1164,6 @@ const EndingPhaseAuction = (props: {
             </span>
             <Input
               type="number"
-              autoFocus
               className="input"
               placeholder="Percentage"
               suffix="%"
@@ -1160,6 +1197,18 @@ const EndingPhaseSale = (props: {
   confirm: () => void;
 }) => {
   const [untilSold, setUntilSold] = useState<boolean>(true);
+  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined)
+
+  useEffect(() => {
+    props.setAttributes({
+      ...props.attributes,
+      endTS: endMoment && endMoment.unix() * 1000
+    })
+  }, [endMoment])
+
+  useEffect(() => {
+    if (untilSold) setEndMoment(undefined)
+  }, [untilSold])
 
   return (
     <>
@@ -1199,12 +1248,33 @@ const EndingPhaseSale = (props: {
               <DatePicker
                 className="field-date"
                 size="large"
-                onChange={(dt, dtString) => console.log(dt?.unix())}
+                disabledDate={current => current && current < moment().endOf('day')}
+                value={endMoment}
+                onChange={value => {
+                  if (!value) return
+                  if (!endMoment) return setEndMoment(value)
+
+                  const currentMoment = endMoment.clone()
+                  currentMoment.hour(value.hour())
+                  currentMoment.minute(value.minute())
+                  currentMoment.second(value.second())
+                  setEndMoment(currentMoment)
+                }}
               />
               <TimePicker
                 className="field-date"
                 size="large"
-                onChange={(dt, dtString) => console.log(dt?.unix())}
+                value={endMoment}
+                onChange={value => {
+                  if (!value) return
+                  if (!endMoment) return setEndMoment(value)
+
+                  const currentMoment = endMoment.clone()
+                  currentMoment.hour(value.hour())
+                  currentMoment.minute(value.minute())
+                  currentMoment.second(value.second())
+                  setEndMoment(currentMoment)
+                }}
               />
             </label>
           )}
@@ -1242,7 +1312,7 @@ const ParticipationStep = (props: {
         <Col className="section" xl={24}>
           <ArtSelector
             selected={[]}
-            setSelected={() => {}}
+            setSelected={() => { }}
             allowMultiple={false}
           >
             Select NFT
