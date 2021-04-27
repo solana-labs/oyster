@@ -26,6 +26,8 @@ import {
   decodeBidderPot,
   BIDDER_METADATA_LEN,
   BIDDER_POT_LEN,
+  decodeVault,
+  Vault,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
@@ -48,6 +50,7 @@ export interface MetaContextState {
   masterEditions: Record<string, ParsedAccount<MasterEdition>>;
   auctionManagers: Record<string, ParsedAccount<AuctionManager>>;
   auctions: Record<string, ParsedAccount<AuctionData>>;
+  vaults: Record<string, ParsedAccount<Vault>>;
   bidderMetadataByAuctionAndBidder: Record<
     string,
     ParsedAccount<BidderMetadata>
@@ -67,6 +70,7 @@ const MetaContext = React.createContext<MetaContextState>({
   editions: {},
   auctionManagers: {},
   auctions: {},
+  vaults: {},
   bidderMetadataByAuctionAndBidder: {},
   safetyDepositBoxesByVaultAndIndex: {},
   bidderPotsByAuctionAndBidder: {},
@@ -93,6 +97,9 @@ export function MetaProvider({ children = null as any }) {
   const [auctions, setAuctions] = useState<
     Record<string, ParsedAccount<AuctionData>>
   >({});
+  const [vaults, setVaults] = useState<Record<string, ParsedAccount<Vault>>>(
+    {},
+  );
   const [
     bidderMetadataByAuctionAndBidder,
     setBidderMetadataByAuctionAndBidder,
@@ -204,7 +211,7 @@ export function MetaProvider({ children = null as any }) {
   useEffect(() => {
     let dispose = () => {};
     (async () => {
-      const processSafetyDeposits = async (a: PublicKeyAndAccount<Buffer>) => {
+      const processVaultData = async (a: PublicKeyAndAccount<Buffer>) => {
         try {
           if (a.account.data[0] == VaultKey.SafetyDepositBoxV1) {
             const safetyDeposit = await decodeSafetyDeposit(a.account.data);
@@ -219,6 +226,17 @@ export function MetaProvider({ children = null as any }) {
               '-' +
               safetyDeposit.order]: account,
             }));
+          } else if (a.account.data[0] == VaultKey.VaultV1) {
+            const vault = await decodeVault(a.account.data);
+            const account: ParsedAccount<Vault> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: vault,
+            };
+            setVaults(e => ({
+              ...e,
+              [a.pubkey.toBase58()]: account,
+            }));
           }
         } catch {
           // ignore errors
@@ -228,7 +246,7 @@ export function MetaProvider({ children = null as any }) {
 
       const accounts = await connection.getProgramAccounts(programIds().vault);
       for (let i = 0; i < accounts.length; i++) {
-        await processSafetyDeposits(accounts[i]);
+        await processVaultData(accounts[i]);
       }
 
       let subId = connection.onProgramAccountChange(
@@ -238,7 +256,7 @@ export function MetaProvider({ children = null as any }) {
             typeof info.accountId === 'string'
               ? new PublicKey((info.accountId as unknown) as string)
               : info.accountId;
-          await processSafetyDeposits({
+          await processVaultData({
             pubkey,
             account: info.accountInfo,
           });
@@ -433,6 +451,7 @@ export function MetaProvider({ children = null as any }) {
         safetyDepositBoxesByVaultAndIndex,
         bidderMetadataByAuctionAndBidder,
         bidderPotsByAuctionAndBidder,
+        vaults,
       }}
     >
       {children}

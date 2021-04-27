@@ -18,6 +18,7 @@ export * from './startAuction';
 export * from './validateSafetyDepositBox';
 
 export const METAPLEX_PREFIX = 'metaplex';
+export const ORIGINAL_AUTHORITY_LOOKUP_SIZE = 33;
 
 export enum MetaplexKey {
   AuctionManagerV1 = 0,
@@ -111,14 +112,14 @@ export class AuctionManagerSettings {
 }
 
 export enum WinningConstraint {
-  NoOpenEdition,
-  OpenEditionGiven,
+  NoOpenEdition = 0,
+  OpenEditionGiven = 1,
 }
 
 export enum NonWinningConstraint {
-  NoOpenEdition,
-  GivenForFixedPrice,
-  GivenForBidPrice,
+  NoOpenEdition = 0,
+  GivenForFixedPrice = 1,
+  GivenForBidPrice = 2,
 }
 
 export enum EditionType {
@@ -397,21 +398,6 @@ export async function getOriginalAuthority(
         metadata.toBuffer(),
       ],
       PROGRAM_IDS.metaplex,
-    )
-  )[0];
-}
-
-export async function getMetadata(tokenMint: PublicKey): Promise<PublicKey> {
-  const PROGRAM_IDS = programIds();
-
-  return (
-    await PublicKey.findProgramAddress(
-      [
-        Buffer.from(METADATA_PREFIX),
-        PROGRAM_IDS.metadata.toBuffer(),
-        tokenMint.toBuffer(),
-      ],
-      PROGRAM_IDS.metadata,
     )
   )[0];
 }

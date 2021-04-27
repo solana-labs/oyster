@@ -630,6 +630,107 @@ export async function createMasterEdition(
   );
 }
 
+export async function mintNewEditionFromMasterEditionViaToken(
+  newMint: PublicKey,
+  tokenMint: PublicKey,
+  newMintAuthority: PublicKey,
+  masterMint: PublicKey,
+  authorizationTokenHoldingAccount: PublicKey,
+  burnAuthority: PublicKey,
+  updateAuthorityOfMaster: PublicKey,
+  instructions: TransactionInstruction[],
+  payer: PublicKey,
+) {
+  const metadataProgramId = programIds().metadata;
+
+  const newMetadataKey = await getMetadata(newMint);
+  const masterMetadataKey = await getMetadata(tokenMint);
+  const newEdition = await getEdition(newMint);
+  const masterEdition = await getEdition(tokenMint);
+
+  const data = Buffer.from('5');
+
+  const keys = [
+    {
+      pubkey: newMetadataKey,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: newEdition,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: masterEdition,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: newMint,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: newMintAuthority,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: masterMint,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: authorizationTokenHoldingAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: burnAuthority,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: payer,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: updateAuthorityOfMaster,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: masterMetadataKey,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: programIds().token,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SystemProgram.programId,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: SYSVAR_RENT_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  instructions.push(
+    new TransactionInstruction({
+      keys,
+      programId: metadataProgramId,
+      data,
+    }),
+  );
+}
+
 export async function getNameSymbol(metadata: Metadata): Promise<PublicKey> {
   const PROGRAM_IDS = programIds();
 
@@ -657,6 +758,21 @@ export async function getEdition(tokenMint: PublicKey): Promise<PublicKey> {
         PROGRAM_IDS.metadata.toBuffer(),
         tokenMint.toBuffer(),
         Buffer.from(EDITION),
+      ],
+      PROGRAM_IDS.metadata,
+    )
+  )[0];
+}
+
+export async function getMetadata(tokenMint: PublicKey): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METADATA_PREFIX),
+        PROGRAM_IDS.metadata.toBuffer(),
+        tokenMint.toBuffer(),
       ],
       PROGRAM_IDS.metadata,
     )

@@ -25,6 +25,9 @@ export const useAuction = (id: string) => {
     metadataByMint,
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
+    masterEditions,
+    nameSymbolTuples,
+    vaults,
   } = useMeta();
 
   useEffect(() => {
@@ -35,8 +38,11 @@ export const useAuction = (id: string) => {
         auctionManagers,
         safetyDepositBoxesByVaultAndIndex,
         metadataByMint,
+        nameSymbolTuples,
         bidderMetadataByAuctionAndBidder,
         bidderPotsByAuctionAndBidder,
+        masterEditions,
+        vaults,
         accountByMint,
         clock,
         undefined,
@@ -52,6 +58,9 @@ export const useAuction = (id: string) => {
     metadataByMint,
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
+    vaults,
+    nameSymbolTuples,
+    masterEditions,
     userAccounts,
   ]);
   return existingAuctionView;
