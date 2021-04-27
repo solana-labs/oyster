@@ -24,6 +24,8 @@ import {
   decodeBidderMetadata,
   BidderPot,
   decodeBidderPot,
+  BIDDER_METADATA_LEN,
+  BIDDER_POT_LEN,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
@@ -126,7 +128,10 @@ export function MetaProvider({ children = null as any }) {
         } catch {
           // ignore errors
           // add type as first byte for easier deserialization
-          try {
+        }
+
+        try {
+          if (a.account.data.length == BIDDER_METADATA_LEN) {
             const bidderMetadata = await decodeBidderMetadata(a.account.data);
 
             const account: ParsedAccount<BidderMetadata> = {
@@ -140,28 +145,29 @@ export function MetaProvider({ children = null as any }) {
               '-' +
               bidderMetadata.bidderPubkey.toBase58()]: account,
             }));
-          } catch {
-            // ignore errors
-            // add type as first byte for easier deserialization
-            try {
-              const bidderPot = await decodeBidderPot(a.account.data);
-
-              const account: ParsedAccount<BidderPot> = {
-                pubkey: a.pubkey,
-                account: a.account,
-                info: bidderPot,
-              };
-              setBidderPotsByAuctionAndBidder(e => ({
-                ...e,
-                [bidderPot.auctionAct.toBase58() +
-                '-' +
-                bidderPot.bidderAct.toBase58()]: account,
-              }));
-            } catch {
-              // ignore errors
-              // add type as first byte for easier deserialization
-            }
           }
+        } catch {
+          // ignore errors
+          // add type as first byte for easier deserialization
+        }
+        try {
+          if (a.account.data.length == BIDDER_POT_LEN) {
+            const bidderPot = await decodeBidderPot(a.account.data);
+            const account: ParsedAccount<BidderPot> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: bidderPot,
+            };
+            setBidderPotsByAuctionAndBidder(e => ({
+              ...e,
+              [bidderPot.auctionAct.toBase58() +
+              '-' +
+              bidderPot.bidderAct.toBase58()]: account,
+            }));
+          }
+        } catch {
+          // ignore errors
+          // add type as first byte for easier deserialization
         }
       };
 

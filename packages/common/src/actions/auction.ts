@@ -109,6 +109,7 @@ export class AuctionData {
   }
 }
 
+export const BIDDER_METADATA_LEN = 32 + 32 + 8 + 8 + 1;
 export class BidderMetadata {
   // Relationship with the bidder who's metadata this covers.
   bidderPubkey: PublicKey;
@@ -136,6 +137,7 @@ export class BidderMetadata {
   }
 }
 
+export const BIDDER_POT_LEN = 32 + 32 + 32;
 export class BidderPot {
   /// Points at actual pot that is a token account
   bidderPot: PublicKey;
