@@ -1,4 +1,11 @@
-import { deserializeBorsh } from '@oyster/common';
+import {
+  AUCTION_PREFIX,
+  deserializeBorsh,
+  programIds,
+  METADATA,
+  METADATA_PREFIX,
+  EDITION,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { serialize, BinaryReader, BinaryWriter } from 'borsh';
 
@@ -9,21 +16,61 @@ export * from './redeemMasterEditionBid';
 export * from './redeemOpenEditionBid';
 export * from './startAuction';
 export * from './validateSafetyDepositBox';
+
+export const METAPLEX_PREFIX = 'metaplex';
+export const ORIGINAL_AUTHORITY_LOOKUP_SIZE = 33;
+
+export enum MetaplexKey {
+  AuctionManagerV1 = 0,
+  OriginalAuthorityLookupV1 = 1,
+  BidRedemptionTicketV1 = 2,
+}
 export class AuctionManager {
-  key?: number;
-  authority?: PublicKey;
-  auction?: PublicKey;
-  vault?: PublicKey;
-  auctionProgram?: PublicKey;
-  tokenVaultProgram?: PublicKey;
-  tokenMetadataProgram?: PublicKey;
-  tokenProgram?: PublicKey;
-  state?: AuctionManagerState;
-  settings?: AuctionManagerSettings;
+  key: MetaplexKey;
+  authority: PublicKey;
+  auction: PublicKey;
+  vault: PublicKey;
+  auctionProgram: PublicKey;
+  tokenVaultProgram: PublicKey;
+  tokenMetadataProgram: PublicKey;
+  tokenProgram: PublicKey;
+  acceptPayment: PublicKey;
+  state: AuctionManagerState;
+  settings: AuctionManagerSettings;
+
+  constructor(args: {
+    authority: PublicKey;
+    auction: PublicKey;
+    vault: PublicKey;
+    auctionProgram: PublicKey;
+    tokenVaultProgram: PublicKey;
+    tokenMetadataProgram: PublicKey;
+    tokenProgram: PublicKey;
+    acceptPayment: PublicKey;
+    state: AuctionManagerState;
+    settings: AuctionManagerSettings;
+  }) {
+    this.key = MetaplexKey.AuctionManagerV1;
+    this.authority = args.authority;
+    this.auction = args.auction;
+    this.vault = args.vault;
+    this.auctionProgram = args.auctionProgram;
+    this.tokenVaultProgram = args.tokenVaultProgram;
+    this.tokenMetadataProgram = args.tokenMetadataProgram;
+    this.tokenProgram = args.tokenProgram;
+    this.acceptPayment = args.acceptPayment;
+    this.state = args.state;
+    this.settings = args.settings;
+  }
 }
 
 export class InitAuctionManagerArgs {
   instruction = 0;
+  settings: AuctionManagerSettings;
+
+  constructor(args: { settings: AuctionManagerSettings }) {
+    this.settings = args.settings;
+  }
 }
 
 export class ValidateSafetyDepositBoxArgs {
@@ -55,20 +102,24 @@ export class AuctionManagerSettings {
     WinningConstraint.NoOpenEdition;
   openEditionNonWinningConstraint: NonWinningConstraint =
     NonWinningConstraint.GivenForFixedPrice;
-  winningConfigs?: WinningConfig[];
-  openEditionConfig?: number;
-  openEditionFixedPrice: number = 0;
+  winningConfigs: WinningConfig[] = [];
+  openEditionConfig: number | null = 0;
+  openEditionFixedPrice: number | null = 0;
+
+  constructor(args?: AuctionManagerSettings) {
+    Object.assign(this, args);
+  }
 }
 
 export enum WinningConstraint {
-  NoOpenEdition,
-  OpenEditionGiven,
+  NoOpenEdition = 0,
+  OpenEditionGiven = 1,
 }
 
 export enum NonWinningConstraint {
-  NoOpenEdition,
-  GivenForFixedPrice,
-  GivenForBidPrice,
+  NoOpenEdition = 0,
+  GivenForFixedPrice = 1,
+  GivenForBidPrice = 2,
 }
 
 export enum EditionType {
@@ -81,33 +132,39 @@ export enum EditionType {
 }
 
 export class WinningConfig {
-  safetyDepositBoxIndex?: number;
-  amount?: number;
-  hasAuthority?: boolean;
-  editionType?: EditionType;
+  safetyDepositBoxIndex: number = 0;
+  amount: number = 0;
+  hasAuthority: boolean = false;
+  editionType: EditionType = EditionType.NA;
+
+  constructor(args?: WinningConfig) {
+    Object.assign(this, args);
+  }
 }
+export const decodeAuctionManager = (buffer: Buffer) => {
+  return deserializeBorsh(SCHEMA, AuctionManager, buffer) as AuctionManager;
+};
 
 export class WinningConfigState {
-  /// Used for cases of minting Limited Editions and keeping track of how many have been made so far.
-  amountMinted?: number;
-  /// Each safety deposit box needs to be validated via endpoint before auction manager will agree to let auction begin.
-  validated?: boolean;
-  /// Ticked to true when a prize is claimed
-  claimed?: boolean;
+  amountMinted: number = 0;
+  validated: boolean = false;
+  claimed: boolean = false;
+
+  constructor(args?: WinningConfigState) {
+    Object.assign(this, args);
+  }
 }
 
 export class AuctionManagerState {
   status: AuctionManagerStatus = AuctionManagerStatus.Initialized;
-  /// When all configs are validated the auction is started and auction manager moves to Running
-  winningConfigsValidated?: number;
+  winningConfigsValidated: number = 0;
+  masterEditionsWithAuthoritiesRemainingToReturn: number = 0;
 
-  /// Each master edition used as a template has to grant it's authority to the auction manager.
-  /// This counter is incremented by one each time this is done. At the end of the auction; this is decremented
-  /// each time authority is delegated back to the owner or the new owner and when it hits 0 another condition
-  /// is met for going to Finished state.
-  masterEditionsWithAuthoritiesRemainingToReturn?: number;
+  winningConfigStates: WinningConfigState[] = [];
 
-  winningConfigStates?: WinningConfigState[];
+  constructor(args?: AuctionManagerState) {
+    Object.assign(this, args);
+  }
 }
 
 export enum AuctionManagerStatus {
@@ -119,8 +176,13 @@ export enum AuctionManagerStatus {
 }
 
 export class BidRedemptionTicket {
-  openEditionRedeemed?: boolean;
-  bidRedeemed?: boolean;
+  key: MetaplexKey = MetaplexKey.BidRedemptionTicketV1;
+  openEditionRedeemed: boolean = false;
+  bidRedeemed: boolean = false;
+
+  constructor(args?: BidRedemptionTicket) {
+    Object.assign(this, args);
+  }
 }
 
 export const SCHEMA = new Map<any, any>([
@@ -137,6 +199,7 @@ export const SCHEMA = new Map<any, any>([
         ['tokenVaultProgram', 'pubkey'],
         ['tokenMetadataProgram', 'pubkey'],
         ['tokenProgram', 'pubkey'],
+        ['acceptPayment', 'pubkey'],
         ['state', AuctionManagerState],
         ['settings', AuctionManagerSettings],
       ],
@@ -147,12 +210,9 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        ['openEditionWinnerConstraint', { kind: 'enum', values: [0, 1] }], // TODO:
-        [
-          'openEditionNonWinningConstraint',
-          { kind: 'enum', values: [0, 1, 2] },
-        ], // TODO:
-        ['winningConfigs', [WinningConfig]], // TODO: check
+        ['openEditionWinnerConstraint', 'u8'], // enum
+        ['openEditionNonWinningConstraint', 'u8'],
+        ['winningConfigs', [WinningConfig]],
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
         ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
       ],
@@ -166,7 +226,7 @@ export const SCHEMA = new Map<any, any>([
         ['safetyDepositBoxIndex', 'u8'],
         ['amount', 'u8'],
         ['hasAuthority', 'u8'], // bool
-        ['editionType', { kind: 'enum', values: [0, 1, 2] }], // TODO:
+        ['editionType', 'u8'],
       ],
     },
   ],
@@ -186,8 +246,7 @@ export const SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [
-        // TODO: fix enum
-        ['status', { kind: 'enum', values: [0, 1, 2, 3, 4] }],
+        ['status', 'u8'],
         ['winningConfigsValidated', 'u8'],
         ['masterEditionsWithAuthoritiesRemainingToReturn', 'u8'],
         ['winningConfigStates', [WinningConfigState]],
@@ -208,7 +267,10 @@ export const SCHEMA = new Map<any, any>([
     InitAuctionManagerArgs,
     {
       kind: 'struct',
-      fields: [['instruction', 'u8']],
+      fields: [
+        ['instruction', 'u8'],
+        ['settings', AuctionManagerSettings],
+      ],
     },
   ],
   [
@@ -254,3 +316,88 @@ export const SCHEMA = new Map<any, any>([
     },
   ],
 ]);
+
+export async function getAuctionManagerKey(
+  vault: PublicKey,
+  auctionKey: PublicKey,
+): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [Buffer.from(METAPLEX_PREFIX), auctionKey.toBuffer()],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+}
+
+export async function getAuctionKeys(
+  vault: PublicKey,
+): Promise<{ auctionKey: PublicKey; auctionManagerKey: PublicKey }> {
+  const PROGRAM_IDS = programIds();
+
+  const auctionKey: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(AUCTION_PREFIX),
+        PROGRAM_IDS.auction.toBuffer(),
+        vault.toBuffer(),
+      ],
+      PROGRAM_IDS.auction,
+    )
+  )[0];
+
+  const auctionManagerKey = await getAuctionManagerKey(vault, auctionKey);
+
+  return { auctionKey, auctionManagerKey };
+}
+
+export async function getBidderKeys(
+  auctionKey: PublicKey,
+  bidder: PublicKey,
+): Promise<{ bidMetadata: PublicKey; bidRedemption: PublicKey }> {
+  const PROGRAM_IDS = programIds();
+
+  const bidMetadata: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(AUCTION_PREFIX),
+        auctionKey.toBuffer(),
+        bidder.toBuffer(),
+        Buffer.from(METADATA),
+      ],
+      PROGRAM_IDS.auction,
+    )
+  )[0];
+
+  const bidRedemption: PublicKey = (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METAPLEX_PREFIX),
+        auctionKey.toBuffer(),
+        bidMetadata.toBuffer(),
+      ],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+
+  return { bidMetadata, bidRedemption };
+}
+
+export async function getOriginalAuthority(
+  auctionKey: PublicKey,
+  metadata: PublicKey,
+): Promise<PublicKey> {
+  const PROGRAM_IDS = programIds();
+
+  return (
+    await PublicKey.findProgramAddress(
+      [
+        Buffer.from(METAPLEX_PREFIX),
+        auctionKey.toBuffer(),
+        metadata.toBuffer(),
+      ],
+      PROGRAM_IDS.metaplex,
+    )
+  )[0];
+}

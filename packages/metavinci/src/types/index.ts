@@ -8,6 +8,8 @@ export interface Auction {
   solAmt: number;
   link: string;
   image: string;
+
+  endingTS: number;
 }
 
 export interface Artist {

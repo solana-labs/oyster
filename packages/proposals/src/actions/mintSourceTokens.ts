@@ -4,7 +4,13 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount, actions } from '@oyster/common';
+import {
+  contexts,
+  utils,
+  ParsedAccount,
+  actions,
+  SequenceType,
+} from '@oyster/common';
 
 import { TimelockConfig } from '../models/timelock';
 import { AccountLayout, Token } from '@solana/spl-token';
@@ -79,13 +85,12 @@ export const mintSourceTokens = async (
       wallet,
       allInstructions,
       allSigners,
-      true,
-      true,
+      SequenceType.Sequential,
       'singleGossip',
       (_txId: string, index: number) => {
         setSavePerc(Math.round(100 * ((index + 1) / allInstructions.length)));
       },
-      (_txId: string, index: number) => {
+      (_reason: string, index: number) => {
         setSavePerc(Math.round(100 * ((index + 1) / allInstructions.length)));
         onFailedTxn(index);
         return true; // keep going even on failed save

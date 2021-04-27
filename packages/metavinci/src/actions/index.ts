@@ -1,3 +1,3 @@
 export * from './nft';
-export * from './vault';
-export * from './auction';
+export * from './createVault';
+export * from './makeAuction';

@@ -5,7 +5,13 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
+import {
+  contexts,
+  utils,
+  actions,
+  ParsedAccount,
+  SequenceType,
+} from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initTimelockSetInstruction } from '../models/initTimelockSet';
@@ -159,8 +165,7 @@ export const createProposal = async (
         instructions,
       ],
       [...associatedSigners, createTimelockAccountsSigners, signers],
-      true,
-      true,
+      SequenceType.Sequential,
     );
 
     notify({

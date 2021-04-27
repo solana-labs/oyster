@@ -2,12 +2,15 @@ import {
   createAssociatedTokenAccountInstruction,
   createMint,
   createMetadata,
-  transferMetadata,
+  transferUpdateAuthority,
   programIds,
   sendTransaction,
+  sendTransactions,
   notify,
   ENV,
   updateMetadata,
+  createMasterEdition,
+  sendTransactionWithRetry,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
@@ -61,18 +64,23 @@ export const mintNFT = async (
     MintLayout.span,
   );
 
-  const owner = new Account();
-  const payer = new Account();
+  // This owner is a temporary signer and owner of metadata we use to circumvent requesting signing
+  // twice post Arweave. We store in an account (payer) and use it post-Arweave to update MD with new link
+  // then give control back to the user.
+  // const payer = new Account();
+  const payerPublicKey = wallet.publicKey;
   const instructions: TransactionInstruction[] = [...pushInstructions];
-  const signers: Account[] = [...pushSigners, owner];
+  const signers: Account[] = [...pushSigners];
 
+  // This is only temporarily owned by wallet...transferred to program by createMasterEdition below
   const mintKey = createMint(
     instructions,
     wallet.publicKey,
     mintRent,
     0,
-    owner.publicKey,
-    owner.publicKey,
+    // Some weird bug with phantom where it's public key doesnt mesh with data encode well
+    payerPublicKey,
+    payerPublicKey,
     signers,
   );
 
@@ -100,66 +108,71 @@ export const mintNFT = async (
       TOKEN_PROGRAM_ID,
       mintKey,
       recipientKey,
-      owner.publicKey,
+      payerPublicKey,
       [],
       1,
     ),
   );
 
-  const [metadataAccount, metadataOwnerAccount] = await createMetadata(
+  const [metadataAccount, nameSymbolAccount] = await createMetadata(
     metadata.symbol,
     metadata.name,
     `https://-------.---/rfX69WKd7Bin_RTbcnH4wM3BuWWsR_ZhWSSqZBLYdMY`,
-    false,
-    payer.publicKey,
+    true,
+    payerPublicKey,
     mintKey,
-    owner.publicKey,
+    payerPublicKey,
     instructions,
     wallet.publicKey,
-    signers,
   );
 
-  const block = await connection.getRecentBlockhash('singleGossip');
-  instructions.push(
-    SystemProgram.transfer({
-      fromPubkey: wallet.publicKey,
-      toPubkey: payer.publicKey,
-      lamports: block.feeCalculator.lamportsPerSignature * 2,
-    }));
+  // TODO: enable when using payer account to avoid 2nd popup
+  // const block = await connection.getRecentBlockhash('singleGossip');
+  // instructions.push(
+  //   SystemProgram.transfer({
+  //     fromPubkey: wallet.publicKey,
+  //     toPubkey: payerPublicKey,
+  //     lamports: 0.5 * LAMPORTS_PER_SOL // block.feeCalculator.lamportsPerSignature * 3 + mintRent, // TODO
+  //   }),
+  // );
 
-  const response = await sendTransaction(
+  const { txid } = await sendTransactionWithRetry(
     connection,
     wallet,
     instructions,
     signers,
-    true,
-    'max',
-    false,
-    block);
+  );
+
+  try {
+    await connection.confirmTransaction(txid, 'max');
+  } catch {
+    // ignore
+  }
+
+  // Force wait for max confirmations
+  // await connection.confirmTransaction(txid, 'max');
+  await connection.getParsedConfirmedTransaction(txid);
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
 
   const tags = realFiles.reduce(
-    (
-      acc: Record<string, Array<{ name: string; value: string }>>,
-      f,
-    ) => {
+    (acc: Record<string, Array<{ name: string; value: string }>>, f) => {
       acc[f.name] = [{ name: 'mint', value: mintKey.toBase58() }];
       return acc;
     },
     {},
   );
   data.append('tags', JSON.stringify(tags));
-  data.append('transaction', response.txid);
+  data.append('transaction', txid);
   realFiles.map(f => data.append('file[]', f));
 
   const result: IArweaveResult = await (
     await fetch(
       // TODO: add CNAME
-      env === 'mainnet-beta' ?
-      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd' :
-      'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
+      env === 'mainnet-beta'
+        ? 'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFileProd'
+        : 'https://us-central1-principal-lane-200702.cloudfunctions.net/uploadFile',
       {
         method: 'POST',
         body: data,
@@ -170,10 +183,9 @@ export const mintNFT = async (
   const metadataFile = result.messages?.find(
     m => m.filename == RESERVED_TXN_MANIFEST,
   );
-  if (metadataFile?.transactionId && wallet.publicKey)
-  {
+  if (metadataFile?.transactionId && wallet.publicKey) {
     const updateInstructions: TransactionInstruction[] = [];
-    const updateSigners: Account[] = [payer];
+    const updateSigners: Account[] = [];
 
     // TODO: connect to testnet arweave
     const arweaveLink = `https://arweave.net/${metadataFile.transactionId}`;
@@ -181,38 +193,61 @@ export const mintNFT = async (
       metadata.symbol,
       metadata.name,
       arweaveLink,
+      undefined,
       mintKey,
-      payer.publicKey,
+      payerPublicKey,
       updateInstructions,
-      updateSigners,
       metadataAccount,
-      metadataOwnerAccount,
+      nameSymbolAccount,
     );
 
-    await transferMetadata(
+    // // This mint, which allows limited editions to be made, stays with user's wallet.
+    const masterMint = createMint(
+      updateInstructions,
+      payerPublicKey,
+      mintRent,
+      0,
+      payerPublicKey,
+      payerPublicKey,
+      updateSigners,
+    );
+
+    // // In this instruction, mint authority will be removed from the main mint, while
+    // // minting authority will be maintained for the master mint (which we want.)
+    await createMasterEdition(
       metadata.symbol,
       metadata.name,
-      payer.publicKey,
-      wallet.publicKey,
+      undefined,
+      mintKey,
+      masterMint,
+      payerPublicKey,
+      payerPublicKey,
       updateInstructions,
-      updateSigners,
-      metadataAccount,
-      metadataOwnerAccount,
+      payerPublicKey,
     );
 
-    const txid = await sendTransaction(
+    // TODO: enable when using payer account to avoid 2nd popup
+    // await transferUpdateAuthority(
+    //   metadataAccount,
+    //   payerPublicKey,
+    //   wallet.publicKey,
+    //   updateInstructions,
+    // );
+
+    const txid = await sendTransactionWithRetry(
       connection,
       wallet,
       updateInstructions,
       updateSigners,
-      true,
-      'singleGossip',
-      true
     );
 
     notify({
       message: 'Art created on Solana',
-      description: <a href={arweaveLink} target="_blank" >Arweave Link</a>,
+      description: (
+        <a href={arweaveLink} target="_blank">
+          Arweave Link
+        </a>
+      ),
       type: 'success',
     });
 

@@ -146,9 +146,11 @@ export const useLending = () => {
     const subID = connection.onProgramAccountChange(
       LENDING_PROGRAM_ID,
       async info => {
-        const id = (info.accountId as unknown) as string;
+        const pubkey = typeof info.accountId === 'string' ?
+            new PublicKey((info.accountId as unknown) as string) :
+            info.accountId;
         const item = {
-          pubkey: new PublicKey(id),
+          pubkey,
           account: info.accountInfo,
         };
         processAccount(item);

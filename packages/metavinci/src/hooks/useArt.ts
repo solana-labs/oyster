@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useMeta } from './../contexts';
+import { useMeta } from '../contexts';
 import { Art } from '../types';
 
 export const useArt = (id: PublicKey | string) => {
   const { metadata } = useMeta();
 
-  const key = typeof id === 'string' ? id : (id?.toBase58() || '');
-  const account = useMemo(() => metadata.find(a => a.pubkey.toBase58() === key), [key, metadata]);
+  const key = typeof id === 'string' ? id : id?.toBase58() || '';
+  const account = useMemo(
+    () => metadata.find(a => a.pubkey.toBase58() === key),
+    [key, metadata],
+  );
 
   return {
     image: account?.info.extended?.image,
@@ -16,4 +19,4 @@ export const useArt = (id: PublicKey | string) => {
     about: account?.info.extended?.description,
     royalties: account?.info.extended?.royalty,
   } as Art;
-}
+};
