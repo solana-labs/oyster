@@ -12,6 +12,10 @@ import {
   useUserAccounts,
   hooks,
   contexts,
+  cache,
+  BidderMetadataParser,
+  BidderMetadata,
+  ParsedAccount,
 } from '@oyster/common';
 import { AuctionView } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
@@ -90,6 +94,7 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
         autoFocus
         className="input"
         value={value}
+        style={{ width: '100%', backgroundColor: 'black', marginTop: 20 }}
         onChange={setValue}
       />
 
@@ -121,18 +126,32 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
       >
         PLACE BID
       </Button>
+      <AuctionBids view={auctionView} />
     </div>
   );
 };
 
-export const AuctionBidders = (auctionID: string) => {
-  const bids: any[] = [];
+export const AuctionBids = ({view}: {view : AuctionView}) => {
+  const bids = cache.byParser(BidderMetadataParser).filter(id => {
+    const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
+    if(!bidder) {
+      return false;
+    }
+
+    return bidder.info.auctionPubkey.toBase58() === view.auction.pubkey.toBase58();
+  }).map(id => {
+    const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
+    return bidder;
+  })
+
   return (
-    <Col>
+    <Col style={{ width: '100%' }}>
       {bids.map((bid, index) => {
         return (
           <Row>
-            {index + 1}. {shortenAddress(bid.address)} {bid.amount}
+            <Col span={2}>{index + 1}.</Col>
+            <Col span={17}>{shortenAddress(bid.info.bidderPubkey.toBase58())}</Col>
+            <Col span={5} style={{ textAlign: 'right' }}>{bid.info.lastBid.toString()}</Col>
           </Row>
         );
       })}
