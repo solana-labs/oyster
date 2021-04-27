@@ -86,7 +86,7 @@ export async function redeemBid(
     },
     {
       pubkey: bidder,
-      isSigner: true,
+      isSigner: false,
       isWritable: false,
     },
     {

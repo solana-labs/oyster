@@ -14,6 +14,10 @@ import {
   createMint,
   mintNewEditionFromMasterEditionViaToken,
   SafetyDepositBox,
+  SequenceType,
+  sendTransactions,
+  sendSignedTransaction,
+  sendTransactionWithRetry,
 } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
@@ -57,9 +61,8 @@ export async function sendRedeemBid(
   if (winnerIndex != null) {
     const winningConfig =
       auctionView.auctionManager.info.settings.winningConfigs[winnerIndex];
-    const item = auctionView.items[winningConfig.safetyDepositBoxIndex];
+    const item = auctionView.items[winnerIndex];
     const safetyDeposit = item.safetyDeposit;
-    let newTokenAccount: PublicKey | undefined;
     switch (winningConfig.editionType) {
       case EditionType.LimitedEdition:
         await setupRedeemLimitedInstructions(
@@ -109,6 +112,7 @@ export async function sendRedeemBid(
     (winnerIndex != null &&
       auctionView.auctionManager.info.settings.openEditionWinnerConstraint !=
         WinningConstraint.NoOpenEdition);
+
   if (auctionView.openEditionItem && eligibleForOpenEdition) {
     const item = auctionView.openEditionItem;
     const safetyDeposit = item.safetyDeposit;
@@ -124,6 +128,24 @@ export async function sendRedeemBid(
       instructions,
     );
   }
+
+  if (signers.length == 1)
+    await sendTransactionWithRetry(
+      connection,
+      wallet,
+      instructions[0],
+      signers[0],
+      'single',
+    );
+  else
+    await sendTransactions(
+      connection,
+      wallet,
+      instructions,
+      signers,
+      SequenceType.StopOnFailure,
+      'single',
+    );
 }
 
 async function setupRedeemInstructions(
@@ -224,11 +246,6 @@ async function setupRedeemLimitedInstructions(
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
 ) {
-  let winningPrizeSigner: Account[] = [];
-  let winningPrizeInstructions: TransactionInstruction[] = [];
-
-  signers.push(winningPrizeSigner);
-  instructions.push(winningPrizeInstructions);
   const updateAuth =
     item.metadata.info.nonUniqueSpecificUpdateAuthority ||
     item.nameSymbol?.info.updateAuthority;
@@ -237,39 +254,47 @@ async function setupRedeemLimitedInstructions(
     let newTokenAccount: PublicKey | undefined = accountsByMint.get(
       item.masterEdition.info.masterMint.toBase58(),
     )?.pubkey;
-    if (!newTokenAccount)
-      newTokenAccount = createTokenAccount(
-        winningPrizeInstructions,
-        wallet.publicKey,
-        accountRentExempt,
-        item.masterEdition.info.masterMint,
-        wallet.publicKey,
-        winningPrizeSigner,
-      );
-    const originalAuthorityAcct = await connection.getAccountInfo(
-      await getOriginalAuthority(
-        auctionView.auction.pubkey,
-        item.metadata.pubkey,
-      ),
-    );
-    if (originalAuthorityAcct) {
-      const originalAuthority = new PublicKey(
-        originalAuthorityAcct.data.slice(1, 33),
-      );
 
-      await redeemLimitedEditionBid(
-        auctionView.auctionManager.info.vault,
-        safetyDeposit.info.store,
-        newTokenAccount,
-        safetyDeposit.pubkey,
-        auctionView.vault.info.fractionMint,
-        auctionView.myBidderMetadata.info.bidderPubkey,
-        wallet.publicKey,
-        winningPrizeInstructions,
-        originalAuthority,
-        item.metadata.info.mint,
-        item.masterEdition.info.masterMint,
+    if (!auctionView.myBidRedemption?.info.bidRedeemed) {
+      let winningPrizeSigner: Account[] = [];
+      let winningPrizeInstructions: TransactionInstruction[] = [];
+
+      signers.push(winningPrizeSigner);
+      instructions.push(winningPrizeInstructions);
+      if (!newTokenAccount)
+        newTokenAccount = createTokenAccount(
+          winningPrizeInstructions,
+          wallet.publicKey,
+          accountRentExempt,
+          item.masterEdition.info.masterMint,
+          wallet.publicKey,
+          winningPrizeSigner,
+        );
+      const originalAuthorityAcct = await connection.getAccountInfo(
+        await getOriginalAuthority(
+          auctionView.auction.pubkey,
+          item.metadata.pubkey,
+        ),
       );
+      if (originalAuthorityAcct) {
+        const originalAuthority = new PublicKey(
+          originalAuthorityAcct.data.slice(1, 33),
+        );
+
+        await redeemLimitedEditionBid(
+          auctionView.auctionManager.info.vault,
+          safetyDeposit.info.store,
+          newTokenAccount,
+          safetyDeposit.pubkey,
+          auctionView.vault.info.fractionMint,
+          auctionView.myBidderMetadata.info.bidderPubkey,
+          wallet.publicKey,
+          winningPrizeInstructions,
+          originalAuthority,
+          item.metadata.info.mint,
+          item.masterEdition.info.masterMint,
+        );
+      }
 
       let cashInLimitedPrizeAuthorizationTokenSigner: Account[] = [];
       let cashInLimitedPrizeAuthorizationTokenInstruction: TransactionInstruction[] = [];
@@ -341,108 +366,116 @@ async function setupRedeemOpenInstructions(
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
 ) {
-  let winningPrizeSigner: Account[] = [];
-  let winningPrizeInstructions: TransactionInstruction[] = [];
-
-  signers.push(winningPrizeSigner);
-  instructions.push(winningPrizeInstructions);
   const updateAuth =
     item.metadata.info.nonUniqueSpecificUpdateAuthority ||
     item.nameSymbol?.info.updateAuthority;
-
   if (item.masterEdition && updateAuth && auctionView.myBidderMetadata) {
     let newTokenAccount: PublicKey | undefined = accountsByMint.get(
       item.masterEdition.info.masterMint.toBase58(),
     )?.pubkey;
-    if (!newTokenAccount)
-      newTokenAccount = createTokenAccount(
+
+    if (!auctionView.myBidRedemption?.info.bidRedeemed) {
+      let winningPrizeSigner: Account[] = [];
+      let winningPrizeInstructions: TransactionInstruction[] = [];
+
+      signers.push(winningPrizeSigner);
+      instructions.push(winningPrizeInstructions);
+      if (!newTokenAccount)
+        newTokenAccount = createTokenAccount(
+          winningPrizeInstructions,
+          wallet.publicKey,
+          accountRentExempt,
+          item.masterEdition.info.masterMint,
+          wallet.publicKey,
+          winningPrizeSigner,
+        );
+
+      const transferAuthority = approve(
         winningPrizeInstructions,
+        [],
+        auctionView.myBidderMetadata.info.bidderPubkey,
         wallet.publicKey,
-        accountRentExempt,
-        item.masterEdition.info.masterMint,
-        wallet.publicKey,
-        winningPrizeSigner,
+        auctionView.auctionManager.info.settings.openEditionFixedPrice || 0,
       );
 
-    const transferAuthority = approve(
-      winningPrizeInstructions,
-      [],
-      auctionView.myBidderMetadata.info.bidderPubkey,
-      wallet.publicKey,
-      auctionView.auctionManager.info.settings.openEditionFixedPrice || 0,
-    );
+      winningPrizeSigner.push(transferAuthority);
 
-    winningPrizeSigner.push(transferAuthority);
-
-    await redeemOpenEditionBid(
-      auctionView.auctionManager.info.vault,
-      safetyDeposit.info.store,
-      newTokenAccount,
-      safetyDeposit.pubkey,
-      auctionView.vault.info.fractionMint,
-      auctionView.myBidderMetadata.info.bidderPubkey,
-      wallet.publicKey,
-      winningPrizeInstructions,
-      item.metadata.info.mint,
-      item.masterEdition.info.masterMint,
-      transferAuthority.publicKey,
-      auctionView.auctionManager.info.acceptPayment,
-    );
-
-    let cashInOpenPrizeAuthorizationTokenSigner: Account[] = [];
-    let cashInOpenPrizeAuthorizationTokenInstruction: TransactionInstruction[] = [];
-    signers.push(cashInOpenPrizeAuthorizationTokenSigner);
-    instructions.push(cashInOpenPrizeAuthorizationTokenInstruction);
-
-    const newOpenEditionMint = createMint(
-      cashInOpenPrizeAuthorizationTokenInstruction,
-      wallet.publicKey,
-      mintRentExempt,
-      0,
-      wallet.publicKey,
-      wallet.publicKey,
-      cashInOpenPrizeAuthorizationTokenSigner,
-    );
-    const newOpenEdition = createTokenAccount(
-      cashInOpenPrizeAuthorizationTokenInstruction,
-      wallet.publicKey,
-      accountRentExempt,
-      newOpenEditionMint,
-      wallet.publicKey,
-      cashInOpenPrizeAuthorizationTokenSigner,
-    );
-
-    cashInOpenPrizeAuthorizationTokenInstruction.push(
-      Token.createMintToInstruction(
-        programIds().token,
-        newOpenEditionMint,
-        newOpenEdition,
+      await redeemOpenEditionBid(
+        auctionView.auctionManager.info.vault,
+        safetyDeposit.info.store,
+        newTokenAccount,
+        safetyDeposit.pubkey,
+        auctionView.vault.info.fractionMint,
+        auctionView.myBidderMetadata.info.bidderPubkey,
         wallet.publicKey,
+        winningPrizeInstructions,
+        item.metadata.info.mint,
+        item.masterEdition.info.masterMint,
+        transferAuthority.publicKey,
+        auctionView.auctionManager.info.acceptPayment,
+      );
+    }
+
+    if (newTokenAccount) {
+      let cashInOpenPrizeAuthorizationTokenSigner: Account[] = [];
+      let cashInOpenPrizeAuthorizationTokenInstruction: TransactionInstruction[] = [];
+      signers.push(cashInOpenPrizeAuthorizationTokenSigner);
+      instructions.push(cashInOpenPrizeAuthorizationTokenInstruction);
+
+      const newOpenEditionMint = createMint(
+        cashInOpenPrizeAuthorizationTokenInstruction,
+        wallet.publicKey,
+        mintRentExempt,
+        0,
+        wallet.publicKey,
+        wallet.publicKey,
+        cashInOpenPrizeAuthorizationTokenSigner,
+      );
+      const newOpenEdition = createTokenAccount(
+        cashInOpenPrizeAuthorizationTokenInstruction,
+        wallet.publicKey,
+        accountRentExempt,
+        newOpenEditionMint,
+        wallet.publicKey,
+        cashInOpenPrizeAuthorizationTokenSigner,
+      );
+
+      cashInOpenPrizeAuthorizationTokenInstruction.push(
+        Token.createMintToInstruction(
+          programIds().token,
+          newOpenEditionMint,
+          newOpenEdition,
+          wallet.publicKey,
+          [],
+          1,
+        ),
+      );
+
+      const burnAuthority = approve(
+        cashInOpenPrizeAuthorizationTokenInstruction,
         [],
+        newTokenAccount,
+        wallet.publicKey,
         1,
-      ),
-    );
+      );
 
-    const burnAuthority = approve(
-      cashInOpenPrizeAuthorizationTokenInstruction,
-      [],
-      newTokenAccount,
-      wallet.publicKey,
-      1,
-    );
+      cashInOpenPrizeAuthorizationTokenSigner.push(burnAuthority);
 
-    cashInOpenPrizeAuthorizationTokenSigner.push(burnAuthority);
-
-    mintNewEditionFromMasterEditionViaToken(
-      newOpenEditionMint,
-      item.metadata.info.mint,
-      wallet.publicKey,
-      item.masterEdition.info.masterMint,
-      newTokenAccount,
-      burnAuthority.publicKey,
-      updateAuth,
-      cashInOpenPrizeAuthorizationTokenInstruction,
-      wallet.publicKey,
-    );
+      console.log(
+        'My master edition key',
+        item.masterEdition.pubkey.toBase58(),
+      );
+      await mintNewEditionFromMasterEditionViaToken(
+        newOpenEditionMint,
+        item.metadata.info.mint,
+        wallet.publicKey,
+        item.masterEdition.info.masterMint,
+        newTokenAccount,
+        burnAuthority.publicKey,
+        updateAuth,
+        cashInOpenPrizeAuthorizationTokenInstruction,
+        wallet.publicKey,
+      );
+    }
   }
 }

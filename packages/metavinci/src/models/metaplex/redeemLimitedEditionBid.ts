@@ -99,7 +99,7 @@ export async function redeemLimitedEditionBid(
     },
     {
       pubkey: bidder,
-      isSigner: true,
+      isSigner: false,
       isWritable: false,
     },
     {

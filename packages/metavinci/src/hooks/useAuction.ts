@@ -27,6 +27,7 @@ export const useAuction = (id: string) => {
     bidderPotsByAuctionAndBidder,
     masterEditions,
     nameSymbolTuples,
+    bidRedemptions,
     vaults,
   } = useMeta();
 
@@ -39,6 +40,7 @@ export const useAuction = (id: string) => {
         safetyDepositBoxesByVaultAndIndex,
         metadataByMint,
         nameSymbolTuples,
+        bidRedemptions,
         bidderMetadataByAuctionAndBidder,
         bidderPotsByAuctionAndBidder,
         masterEditions,
@@ -61,6 +63,7 @@ export const useAuction = (id: string) => {
     vaults,
     nameSymbolTuples,
     masterEditions,
+    bidRedemptions,
     userAccounts,
   ]);
   return existingAuctionView;

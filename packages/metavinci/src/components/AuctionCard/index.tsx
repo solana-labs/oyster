@@ -17,8 +17,9 @@ import {
   BidderMetadata,
   ParsedAccount,
 } from '@oyster/common';
-import { AuctionView } from '../../hooks';
+import { AuctionView, AuctionViewState } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
+import { sendRedeemBid } from '../../actions/sendRedeemBid';
 const { useWallet } = contexts.Wallet;
 export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   const [hours, setHours] = useState<number>(23);
@@ -106,26 +107,42 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
         {myPayingAccount ? myPayingAccount.info.amount.toNumber() : 0.0}
       </div>
 
-      <Button
-        type="primary"
-        size="large"
-        className="action-btn"
-        disabled={!myPayingAccount || value === undefined}
-        onClick={() => {
-          console.log('Auctionview', auctionView);
-          if (myPayingAccount && value)
-            sendPlaceBid(
-              connection,
-              wallet,
-              myPayingAccount.pubkey,
-              auctionView,
-              value,
-            );
-        }}
-        style={{ marginTop: 20 }}
-      >
-        PLACE BID
-      </Button>
+      {auctionView.state == AuctionViewState.Ended ? (
+        <Button
+          type="primary"
+          size="large"
+          className="action-btn"
+          disabled={!auctionView.myBidderMetadata}
+          onClick={() => {
+            console.log('Auctionview', auctionView);
+            sendRedeemBid(connection, wallet, auctionView, accountByMint);
+          }}
+          style={{ marginTop: 20 }}
+        >
+          REDEEM BID
+        </Button>
+      ) : (
+        <Button
+          type="primary"
+          size="large"
+          className="action-btn"
+          disabled={!myPayingAccount || value === undefined}
+          onClick={() => {
+            console.log('Auctionview', auctionView);
+            if (myPayingAccount && value)
+              sendPlaceBid(
+                connection,
+                wallet,
+                myPayingAccount.pubkey,
+                auctionView,
+                value,
+              );
+          }}
+          style={{ marginTop: 20 }}
+        >
+          PLACE BID
+        </Button>
+      )}
       <AuctionBids view={auctionView} />
     </div>
   );

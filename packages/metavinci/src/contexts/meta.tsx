@@ -28,6 +28,8 @@ import {
   BIDDER_POT_LEN,
   decodeVault,
   Vault,
+  TokenAccount,
+  useUserAccounts,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
@@ -36,8 +38,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   AuctionManager,
   AuctionManagerStatus,
+  BidRedemptionTicket,
   decodeAuctionManager,
+  decodeBidRedemptionTicket,
   getAuctionManagerKey,
+  getBidderKeys,
   MetaplexKey,
 } from '../models/metaplex';
 
@@ -60,6 +65,7 @@ export interface MetaContextState {
     ParsedAccount<SafetyDepositBox>
   >;
   bidderPotsByAuctionAndBidder: Record<string, ParsedAccount<BidderPot>>;
+  bidRedemptions: Record<string, ParsedAccount<BidRedemptionTicket>>;
 }
 
 const MetaContext = React.createContext<MetaContextState>({
@@ -74,10 +80,17 @@ const MetaContext = React.createContext<MetaContextState>({
   bidderMetadataByAuctionAndBidder: {},
   safetyDepositBoxesByVaultAndIndex: {},
   bidderPotsByAuctionAndBidder: {},
+  bidRedemptions: {},
 });
 
 export function MetaProvider({ children = null as any }) {
   const connection = useConnection();
+  const { userAccounts } = useUserAccounts();
+  const accountByMint = userAccounts.reduce((prev, acc) => {
+    prev.set(acc.info.mint.toBase58(), acc);
+    return prev;
+  }, new Map<string, TokenAccount>());
+
   const [metadata, setMetadata] = useState<ParsedAccount<Metadata>[]>([]);
   const [metadataByMint, setMetadataByMint] = useState<
     Record<string, ParsedAccount<Metadata>>
@@ -93,6 +106,9 @@ export function MetaProvider({ children = null as any }) {
   >({});
   const [auctionManagers, setAuctionManagers] = useState<
     Record<string, ParsedAccount<AuctionManager>>
+  >({});
+  const [bidRedemptions, setBidRedemptions] = useState<
+    Record<string, ParsedAccount<BidRedemptionTicket>>
   >({});
   const [auctions, setAuctions] = useState<
     Record<string, ParsedAccount<AuctionData>>
@@ -129,7 +145,11 @@ export function MetaProvider({ children = null as any }) {
             account.info.resource,
             a.pubkey,
           );
-
+          const payerAcct = accountByMint.get(account.info.tokenMint.toBase58());
+          if (payerAcct)
+            account.info.bidRedemptionKey = (
+              await getBidderKeys(a.pubkey, payerAcct.pubkey)
+            ).bidRedemption;
           setAuctions(e => ({
             ...e,
             [a.pubkey.toBase58()]: account,
@@ -207,7 +227,7 @@ export function MetaProvider({ children = null as any }) {
     return () => {
       dispose();
     };
-  }, [connection, setAuctions]);
+  }, [connection, setAuctions, userAccounts]);
 
   useEffect(() => {
     let dispose = () => {};
@@ -271,7 +291,7 @@ export function MetaProvider({ children = null as any }) {
     return () => {
       dispose();
     };
-  }, [connection, setSafetyDepositBoxesByVaultAndIndex]);
+  }, [connection, setSafetyDepositBoxesByVaultAndIndex, setVaults]);
 
   useEffect(() => {
     let dispose = () => {};
@@ -286,6 +306,17 @@ export function MetaProvider({ children = null as any }) {
               info: auctionManager,
             };
             setAuctionManagers(e => ({
+              ...e,
+              [a.pubkey.toBase58()]: account,
+            }));
+          } else if (a.account.data[0] == MetaplexKey.BidRedemptionTicketV1) {
+            const ticket = await decodeBidRedemptionTicket(a.account.data);
+            const account: ParsedAccount<BidRedemptionTicket> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: ticket,
+            };
+            setBidRedemptions(e => ({
               ...e,
               [a.pubkey.toBase58()]: account,
             }));
@@ -324,7 +355,7 @@ export function MetaProvider({ children = null as any }) {
     return () => {
       dispose();
     };
-  }, [connection, setAuctionManagers]);
+  }, [connection, setAuctionManagers, setBidRedemptions]);
 
   useEffect(() => {
     let dispose = () => {};
@@ -453,6 +484,7 @@ export function MetaProvider({ children = null as any }) {
         bidderMetadataByAuctionAndBidder,
         bidderPotsByAuctionAndBidder,
         vaults,
+        bidRedemptions,
       }}
     >
       {children}

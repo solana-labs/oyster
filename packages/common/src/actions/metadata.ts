@@ -648,7 +648,7 @@ export async function mintNewEditionFromMasterEditionViaToken(
   const newEdition = await getEdition(newMint);
   const masterEdition = await getEdition(tokenMint);
 
-  const data = Buffer.from('5');
+  const data = Buffer.from([5]);
 
   const keys = [
     {

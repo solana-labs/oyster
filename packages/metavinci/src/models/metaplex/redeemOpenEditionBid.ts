@@ -37,7 +37,6 @@ export async function redeemOpenEditionBid(
     auctionKey,
     bidder,
   );
-
   const masterMetadata: PublicKey = await getMetadata(tokenMint);
 
   const masterEdition: PublicKey = await getEdition(tokenMint);
@@ -92,8 +91,8 @@ export async function redeemOpenEditionBid(
     },
     {
       pubkey: bidder,
-      isSigner: true,
-      isWritable: false,
+      isSigner: false,
+      isWritable: true,
     },
     {
       pubkey: payer,
@@ -138,7 +137,7 @@ export async function redeemOpenEditionBid(
     {
       pubkey: masterMint,
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     {
       pubkey: masterEdition,
