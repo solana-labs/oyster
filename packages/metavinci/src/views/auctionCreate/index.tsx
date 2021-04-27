@@ -49,6 +49,7 @@ import {
   EditionType,
   NonWinningConstraint,
   SCHEMA,
+  WinningConfig,
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
@@ -165,7 +166,7 @@ export const AuctionCreateView = () => {
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
-        winningConfigs: attributes.items.map((item, index) => ({
+        winningConfigs: attributes.items.map((item, index) => (new WinningConfig({
           // TODO: check index
           safetyDepositBoxIndex: index,
           amount: 1,
@@ -173,7 +174,7 @@ export const AuctionCreateView = () => {
           editionType: item.masterEdition
             ? EditionType.MasterEdition
             : EditionType.NA,
-        })),
+        }))),
         openEditionConfig: null,
         openEditionFixedPrice: null,
       });

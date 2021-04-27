@@ -16,18 +16,9 @@ export interface ArtSelectorProps extends ButtonProps {
 export const ArtSelector = (props: ArtSelectorProps) => {
   const { selected, setSelected, allowMultiple, ...rest } = props;
   const items = useUserArts();
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(
-    new Set(props.selected.map(item => item.metadata.pubkey.toBase58())),
-  );
-
-  const map = useMemo(
-    () =>
-      items.reduce((acc, item) => {
-        acc.set(item.metadata.pubkey.toBase58(), item.metadata.info);
-        return acc;
-      }, new Map<string, Metadata>()),
-    [items],
-  );
+  const selectedItems = useMemo<Set<string>>(() =>
+    new Set(selected.map(item => item.metadata.pubkey.toBase58()))
+  , [selected]);
 
   const [visible, setVisible] = useState(false);
 
@@ -42,17 +33,11 @@ export const ArtSelector = (props: ArtSelectorProps) => {
   };
 
   const clear = () => {
-    setSelectedItems(new Set());
+    setSelected([]);
   };
 
   const confirm = () => {
-    setTimeout(() => {
-      let list = items.filter(item =>
-        selectedItems.has(item.metadata.pubkey.toBase58()),
-      );
-      setSelected(list);
       close();
-    }, 200);
   };
 
   const breakpointColumnsObj = {
@@ -69,15 +54,16 @@ export const ArtSelector = (props: ArtSelectorProps) => {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {[...selectedItems.keys()].map(m => {
-          const item = map.get(m);
+        {selected.map(m => {
+          let key = m?.metadata.pubkey.toBase58() || '';
+          let item = m?.metadata?.info;
           if (!item) {
             return;
           }
 
           return (
             <ArtCard
-              key={m}
+              key={key}
               image={item.extended?.image}
               category={item.extended?.category}
               name={item?.name}
@@ -85,8 +71,8 @@ export const ArtSelector = (props: ArtSelectorProps) => {
               preview={false}
               onClick={open}
               close={() => {
-                setSelectedItems(
-                  new Set([...selectedItems.keys()].filter(_ => _ !== m)),
+                setSelected(
+                  selected.filter(_ => _.metadata.pubkey.toBase58() !== key)
                 );
                 confirm();
               }}
@@ -137,7 +123,10 @@ export const ArtSelector = (props: ArtSelectorProps) => {
                   ? new Set(list.filter(item => item !== id))
                   : new Set([...list, id]);
 
-                setSelectedItems(newSet);
+                  let selected = items.filter(item =>
+                    newSet.has(item.metadata.pubkey.toBase58()),
+                  );
+                  setSelected(selected);
 
                 if (!allowMultiple) {
                   confirm();
