@@ -10,16 +10,21 @@ import {
   TokenAccount,
   useConnection,
   useUserAccounts,
+  hooks,
+  contexts,
 } from '@oyster/common';
 import { AuctionView } from '../../hooks';
-
+import { sendPlaceBid } from '../../actions/sendPlaceBid';
+const { useWallet } = contexts.Wallet;
 export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   const [hours, setHours] = useState<number>(23);
   const [minutes, setMinutes] = useState<number>(59);
   const [seconds, setSeconds] = useState<number>(59);
   const [clock, setClock] = useState<number>(0);
   const connection = useConnection();
+  const { wallet } = useWallet();
   const { userAccounts } = useUserAccounts();
+  const [value, setValue] = useState<number>();
   const accountByMint = userAccounts.reduce((prev, acc) => {
     prev.set(acc.info.mint.toBase58(), acc);
     return prev;
@@ -84,14 +89,8 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
       <InputNumber
         autoFocus
         className="input"
-        placeholder="Max 50 characters"
-        // value={props.attributes.name}
-        // onChange={info =>
-        //   props.setAttributes({
-        //     ...props.attributes,
-        //     name: info.target.value,
-        //   })
-        // }
+        value={value}
+        onChange={setValue}
       />
 
       <div
@@ -106,6 +105,18 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
         type="primary"
         size="large"
         className="action-btn"
+        disabled={!myPayingAccount || value === undefined}
+        onClick={() => {
+          console.log('Auctionview', auctionView);
+          if (myPayingAccount && value)
+            sendPlaceBid(
+              connection,
+              wallet,
+              myPayingAccount.pubkey,
+              auctionView,
+              value,
+            );
+        }}
         style={{ marginTop: 20 }}
       >
         PLACE BID
