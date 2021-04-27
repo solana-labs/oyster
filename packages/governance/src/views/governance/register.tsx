@@ -3,7 +3,7 @@ import { Button, ButtonProps, InputNumber, Modal, Switch } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
-  CONFIG_NAME_LENGTH,
+  GOVERNANCE_NAME_LENGTH,
   ExecutionType,
   GovernanceType,
   VotingEntryRule,
@@ -154,7 +154,7 @@ export function NewForm({
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
         <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-          <Input maxLength={CONFIG_NAME_LENGTH} />
+          <Input maxLength={GOVERNANCE_NAME_LENGTH} />
         </Form.Item>
         <Form.Item
           name="program"

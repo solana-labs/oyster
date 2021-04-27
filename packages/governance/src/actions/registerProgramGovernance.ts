@@ -14,9 +14,8 @@ import {
   GovernanceType,
   VotingEntryRule,
 } from '../models/governance';
-import { initGovernanceInstruction } from '../models/initGovernance';
+import { createGovernanceInstruction } from '../models/createGovernance';
 import BN from 'bn.js';
-import { createEmptyGovernanceInstruction } from '../models/createEmptyGovernance';
 
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -126,20 +125,11 @@ export const registerProgramGovernance = async (
   );
 
   instructions.push(
-    createEmptyGovernanceInstruction(
+    createGovernanceInstruction(
       governanceKey,
       uninitializedGovernance.program,
       programDataAccount,
       wallet.publicKey,
-      uninitializedGovernance.governanceMint,
-      wallet.publicKey,
-      uninitializedGovernance.councilMint,
-    ),
-  );
-  instructions.push(
-    initGovernanceInstruction(
-      governanceKey,
-      uninitializedGovernance.program,
       uninitializedGovernance.governanceMint,
 
       uninitializedGovernance.voteThreshold!,
@@ -149,6 +139,7 @@ export const registerProgramGovernance = async (
       uninitializedGovernance.minimumSlotWaitingPeriod || new BN(0),
       uninitializedGovernance.timeLimit || new BN(0),
       uninitializedGovernance.name || '',
+      wallet.publicKey,
       uninitializedGovernance.councilMint,
     ),
   );

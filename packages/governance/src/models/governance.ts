@@ -6,7 +6,7 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
-export const CONFIG_NAME_LENGTH = 32;
+export const GOVERNANCE_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
@@ -21,13 +21,12 @@ export enum GovernanceInstruction {
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
   Vote = 9,
-  InitGovernance = 10,
+  CreateGovernance = 10,
 
   Execute = 11,
   DepositGovernanceTokens = 12,
   WithdrawVotingTokens = 13,
-  CreateEmptyGovernance = 14,
-  CreateGovernanceVotingRecord = 15,
+  CreateGovernanceVotingRecord = 14,
 }
 
 export interface GovernanceVotingRecord {
@@ -107,7 +106,7 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
     Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
-    BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
+    BufferLayout.seq(BufferLayout.u8(), GOVERNANCE_NAME_LENGTH, 'name'),
     BufferLayout.u32('count'),
     BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
   ],
