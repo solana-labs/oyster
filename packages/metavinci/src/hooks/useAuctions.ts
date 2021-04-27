@@ -66,23 +66,25 @@ export const useAuctions = (state: AuctionViewState) => {
   } = useMeta();
 
   useEffect(() => {
-    Object.keys(auctions).forEach(a => {
-      const auction = auctions[a];
-      const existingAuctionView = auctionViews[a];
-      const nextAuctionView = processAccountsIntoAuctionView(
-        auction,
-        auctionManagers,
-        safetyDepositBoxesByVaultAndIndex,
-        metadataByMint,
-        bidderMetadataByAuctionAndBidder,
-        bidderPotsByAuctionAndBidder,
-        accountByMint,
-        clock,
-        state,
-        existingAuctionView,
-      );
-      setAuctionViews(nA => ({ ...nA, [a]: nextAuctionView }));
-    });
+    console.log('Clock', clock);
+    if (clock != 0)
+      Object.keys(auctions).forEach(a => {
+        const auction = auctions[a];
+        const existingAuctionView = auctionViews[a];
+        const nextAuctionView = processAccountsIntoAuctionView(
+          auction,
+          auctionManagers,
+          safetyDepositBoxesByVaultAndIndex,
+          metadataByMint,
+          bidderMetadataByAuctionAndBidder,
+          bidderPotsByAuctionAndBidder,
+          accountByMint,
+          clock,
+          state,
+          existingAuctionView,
+        );
+        setAuctionViews(nA => ({ ...nA, [a]: nextAuctionView }));
+      });
   }, [
     clock,
     state,
@@ -117,6 +119,7 @@ export function processAccountsIntoAuctionView(
   existingAuctionView?: AuctionView,
 ): AuctionView | undefined {
   let state: AuctionViewState;
+  console.log(auction?.info?.endedAt?.toNumber(), clock);
   if (
     auction.info.state == AuctionState.Ended ||
     (auction.info.endedAt && auction.info.endedAt.toNumber() <= clock)

@@ -70,18 +70,18 @@ export class AuctionData {
   resource: PublicKey;
   /// Token mint for the SPL token being used to bid
   tokenMint: PublicKey;
+  /// The time the last bid was placed, used to keep track of auction timing.
+  lastBid: BN | null;
+  /// Slot time the auction was officially ended by.
+  endedAt: BN | null;
+  /// End time is the cut-off point that the auction is forced to end by.
+  endAuctionAt: BN | null;
+  /// Gap time is the amount of time in slots after the previous bid at which the auction ends.
+  endAuctionGap: BN | null;
   /// The state the auction is in, whether it has started or ended.
   state: AuctionState;
   /// Auction Bids, each user may have one bid open at a time.
   bidState: BidState;
-  /// The time the last bid was placed, used to keep track of auction timing.
-  lastBid?: BN;
-  /// Slot time the auction was officially ended by.
-  endedAt?: BN;
-  /// End time is the cut-off point that the auction is forced to end by.
-  endAuctionAt?: BN;
-  /// Gap time is the amount of time in slots after the previous bid at which the auction ends.
-  endAuctionGap?: BN;
 
   /// Used for precalculation on the front end, not a backend key
   auctionManagerKey?: PublicKey;
@@ -90,22 +90,22 @@ export class AuctionData {
     authority: PublicKey;
     resource: PublicKey;
     tokenMint: PublicKey;
+    lastBid: BN | null;
+    endedAt: BN | null;
+    endAuctionAt: BN | null;
+    endAuctionGap: BN | null;
     state: AuctionState;
     bidState: BidState;
-    lastBid?: BN;
-    endedAt?: BN;
-    endAuctionAt?: BN;
-    endAuctionGap?: BN;
   }) {
     this.authority = args.authority;
     this.resource = args.resource;
     this.tokenMint = args.tokenMint;
-    this.state = args.state;
-    this.bidState = args.bidState;
     this.lastBid = args.lastBid;
     this.endedAt = args.endedAt;
     this.endAuctionAt = args.endAuctionAt;
     this.endAuctionGap = args.endAuctionGap;
+    this.state = args.state;
+    this.bidState = args.bidState;
   }
 }
 
@@ -273,12 +273,12 @@ export const AUCTION_SCHEMA = new Map<any, any>([
         ['authority', 'pubkey'],
         ['resource', 'pubkey'],
         ['tokenMint', 'pubkey'],
-        ['state', 'u8'],
-        ['bidState', BidState],
         ['lastBid', { kind: 'option', type: 'u64' }],
         ['endedAt', { kind: 'option', type: 'u64' }],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
         ['endAuctionGap', { kind: 'option', type: 'u64' }],
+        ['state', 'u8'],
+        ['bidState', BidState],
       ],
     },
   ],

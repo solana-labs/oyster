@@ -130,7 +130,7 @@ export const AuctionCreateView = () => {
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
-    category: AuctionCategory.Single,
+    category: AuctionCategory.Open,
     saleType: 'auction',
     winnersCount: 1,
   });
@@ -191,7 +191,7 @@ export const AuctionCreateView = () => {
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60),
+      new BN((attributes.auctionDuration || 1) * 60 * 60 * 24),
       new BN((attributes.gapTime || 1) * 60),
       attributes.items,
       // TODO: move to config
