@@ -30,6 +30,7 @@ export const useAuction = (id: string) => {
   useEffect(() => {
     const auction = auctions[id];
     if (auction) {
+      console.log(bidderMetadataByAuctionAndBidder);
       const auctionView = processAccountsIntoAuctionView(
         auction,
         auctionManagers,
