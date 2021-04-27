@@ -49,6 +49,18 @@ export const decodeAuction = (buffer: Buffer) => {
   return deserializeBorsh(AUCTION_SCHEMA, AuctionData, buffer) as AuctionData;
 };
 
+export const decodeBidderPot = (buffer: Buffer) => {
+  return deserializeBorsh(AUCTION_SCHEMA, BidderPot, buffer) as BidderPot;
+};
+
+export const decodeBidderMetadata = (buffer: Buffer) => {
+  return deserializeBorsh(
+    AUCTION_SCHEMA,
+    BidderMetadata,
+    buffer,
+  ) as BidderMetadata;
+};
+
 export const BASE_AUCTION_DATA_SIZE = 32 + 32 + 32 + 8 + 8 + 1 + 9 + 9 + 9 + 9;
 
 export class AuctionData {
@@ -127,8 +139,16 @@ export class BidderMetadata {
 export class BidderPot {
   /// Points at actual pot that is a token account
   bidderPot: PublicKey;
-  constructor(args: { bidderPot: PublicKey }) {
+  bidderAct: PublicKey;
+  auctionAct: PublicKey;
+  constructor(args: {
+    bidderPot: PublicKey;
+    bidderAct: PublicKey;
+    auctionAct: PublicKey;
+  }) {
     this.bidderPot = args.bidderPot;
+    this.bidderAct = args.bidderAct;
+    this.auctionAct = args.auctionAct;
   }
 }
 
@@ -240,8 +260,8 @@ export const AUCTION_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['resource', 'pubkey'],
         ['amount', 'u64'],
+        ['resource', 'pubkey'],
       ],
     },
   ],
@@ -300,7 +320,11 @@ export const AUCTION_SCHEMA = new Map<any, any>([
     BidderPot,
     {
       kind: 'struct',
-      fields: [['bidderPot', 'pubkey']],
+      fields: [
+        ['bidderPot', 'pubkey'],
+        ['bidderAct', 'pubkey'],
+        ['auctionAct', 'pubkey'],
+      ],
     },
   ],
 ]);
@@ -490,7 +514,7 @@ export async function placeBid(
   const keys = [
     {
       pubkey: bidderPubkey,
-      isSigner: true,
+      isSigner: false,
       isWritable: true,
     },
     {

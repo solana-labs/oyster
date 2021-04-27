@@ -20,6 +20,10 @@ import {
   SafetyDepositBox,
   VaultKey,
   decodeSafetyDeposit,
+  BidderMetadata,
+  decodeBidderMetadata,
+  BidderPot,
+  decodeBidderPot,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Connection, PublicKey, PublicKeyAndAccount } from '@solana/web3.js';
@@ -42,10 +46,15 @@ export interface MetaContextState {
   masterEditions: Record<string, ParsedAccount<MasterEdition>>;
   auctionManagers: Record<string, ParsedAccount<AuctionManager>>;
   auctions: Record<string, ParsedAccount<AuctionData>>;
+  bidderMetadataByAuctionAndBidder: Record<
+    string,
+    ParsedAccount<BidderMetadata>
+  >;
   safetyDepositBoxesByVaultAndIndex: Record<
     string,
     ParsedAccount<SafetyDepositBox>
   >;
+  bidderPotsByAuctionAndBidder: Record<string, ParsedAccount<BidderPot>>;
 }
 
 const MetaContext = React.createContext<MetaContextState>({
@@ -56,7 +65,9 @@ const MetaContext = React.createContext<MetaContextState>({
   editions: {},
   auctionManagers: {},
   auctions: {},
+  bidderMetadataByAuctionAndBidder: {},
   safetyDepositBoxesByVaultAndIndex: {},
+  bidderPotsByAuctionAndBidder: {},
 });
 
 export function MetaProvider({ children = null as any }) {
@@ -80,6 +91,14 @@ export function MetaProvider({ children = null as any }) {
   const [auctions, setAuctions] = useState<
     Record<string, ParsedAccount<AuctionData>>
   >({});
+  const [
+    bidderMetadataByAuctionAndBidder,
+    setBidderMetadataByAuctionAndBidder,
+  ] = useState<Record<string, ParsedAccount<BidderMetadata>>>({});
+  const [
+    bidderPotsByAuctionAndBidder,
+    setBidderPotsByAuctionAndBidder,
+  ] = useState<Record<string, ParsedAccount<BidderPot>>>({});
   const [
     safetyDepositBoxesByVaultAndIndex,
     setSafetyDepositBoxesByVaultAndIndex,
@@ -107,6 +126,42 @@ export function MetaProvider({ children = null as any }) {
         } catch {
           // ignore errors
           // add type as first byte for easier deserialization
+          try {
+            const bidderMetadata = await decodeBidderMetadata(a.account.data);
+
+            const account: ParsedAccount<BidderMetadata> = {
+              pubkey: a.pubkey,
+              account: a.account,
+              info: bidderMetadata,
+            };
+            setBidderMetadataByAuctionAndBidder(e => ({
+              ...e,
+              [bidderMetadata.auctionPubkey.toBase58() +
+              '-' +
+              bidderMetadata.bidderPubkey.toBase58()]: account,
+            }));
+          } catch {
+            // ignore errors
+            // add type as first byte for easier deserialization
+            try {
+              const bidderPot = await decodeBidderPot(a.account.data);
+
+              const account: ParsedAccount<BidderPot> = {
+                pubkey: a.pubkey,
+                account: a.account,
+                info: bidderPot,
+              };
+              setBidderPotsByAuctionAndBidder(e => ({
+                ...e,
+                [bidderPot.auctionAct.toBase58() +
+                '-' +
+                bidderPot.bidderAct.toBase58()]: account,
+              }));
+            } catch {
+              // ignore errors
+              // add type as first byte for easier deserialization
+            }
+          }
         }
       };
 
@@ -355,6 +410,8 @@ export function MetaProvider({ children = null as any }) {
         auctions,
         metadataByMint,
         safetyDepositBoxesByVaultAndIndex,
+        bidderMetadataByAuctionAndBidder,
+        bidderPotsByAuctionAndBidder,
       }}
     >
       {children}
