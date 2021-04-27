@@ -1,4 +1,4 @@
-import { getEdition, programIds } from '@oyster/common';
+import { getEdition, programIds, getMetadata } from '@oyster/common';
 import {
   PublicKey,
   SystemProgram,
@@ -11,7 +11,6 @@ import { serialize } from 'borsh';
 import {
   getAuctionKeys,
   getBidderKeys,
-  getMetadata,
   RedeemOpenEditionBidArgs,
   SCHEMA,
 } from '.';

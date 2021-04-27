@@ -151,7 +151,7 @@ export const mintNFT = async (
 
   // Force wait for max confirmations
   // await connection.confirmTransaction(txid, 'max');
-  await connection.getParsedConfirmedTransaction(txid, 'confirmed');
+  await connection.getParsedConfirmedTransaction(txid);
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
@@ -183,8 +183,7 @@ export const mintNFT = async (
   const metadataFile = result.messages?.find(
     m => m.filename == RESERVED_TXN_MANIFEST,
   );
-  if (metadataFile?.transactionId && wallet.publicKey)
-  {
+  if (metadataFile?.transactionId && wallet.publicKey) {
     const updateInstructions: TransactionInstruction[] = [];
     const updateSigners: Account[] = [];
 

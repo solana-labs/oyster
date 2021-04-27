@@ -7,9 +7,11 @@ import {
   AuctionState,
   BidderMetadata,
   BidderPot,
-  useWallet,
   useUserAccounts,
   TokenAccount,
+  Vault,
+  MasterEdition,
+  NameSymbolTuple,
 } from '@oyster/common';
 import { useEffect, useState } from 'react';
 import { useMeta } from '../contexts';
@@ -24,7 +26,9 @@ export enum AuctionViewState {
 
 export interface AuctionViewItem {
   metadata: ParsedAccount<Metadata>;
+  nameSymbol?: ParsedAccount<NameSymbolTuple>;
   safetyDeposit: ParsedAccount<SafetyDepositBox>;
+  masterEdition?: ParsedAccount<MasterEdition>;
 }
 
 // Flattened surface item for easy display
@@ -37,6 +41,7 @@ export interface AuctionView {
   thumbnail: AuctionViewItem;
   myBidderMetadata?: ParsedAccount<BidderMetadata>;
   myBidderPot?: ParsedAccount<BidderPot>;
+  vault: ParsedAccount<Vault>;
   totallyComplete: boolean;
 }
 
@@ -63,6 +68,9 @@ export const useAuctions = (state: AuctionViewState) => {
     metadataByMint,
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
+    vaults,
+    nameSymbolTuples,
+    masterEditions,
   } = useMeta();
 
   useEffect(() => {
@@ -75,8 +83,11 @@ export const useAuctions = (state: AuctionViewState) => {
           auctionManagers,
           safetyDepositBoxesByVaultAndIndex,
           metadataByMint,
+          nameSymbolTuples,
           bidderMetadataByAuctionAndBidder,
           bidderPotsByAuctionAndBidder,
+          masterEditions,
+          vaults,
           accountByMint,
           clock,
           state,
@@ -94,6 +105,9 @@ export const useAuctions = (state: AuctionViewState) => {
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
     userAccounts,
+    vaults,
+    nameSymbolTuples,
+    masterEditions,
   ]);
 
   return Object.values(auctionViews).filter(v => v) as AuctionView[];
@@ -107,11 +121,14 @@ export function processAccountsIntoAuctionView(
     ParsedAccount<SafetyDepositBox>
   >,
   metadataByMint: Record<string, ParsedAccount<Metadata>>,
+  nameSymbolTuples: Record<string, ParsedAccount<NameSymbolTuple>>,
   bidderMetadataByAuctionAndBidder: Record<
     string,
     ParsedAccount<BidderMetadata>
   >,
   bidderPotsByAuctionAndBidder: Record<string, ParsedAccount<BidderPot>>,
+  masterEditions: Record<string, ParsedAccount<MasterEdition>>,
+  vaults: Record<string, ParsedAccount<Vault>>,
   accountByMint: Map<string, TokenAccount>,
   clock: number,
   desiredState: AuctionViewState | undefined,
@@ -150,22 +167,40 @@ export function processAccountsIntoAuctionView(
       bidderPotsByAuctionAndBidder[
         auction.pubkey.toBase58() + '-' + myPayingAccount?.pubkey.toBase58()
       ];
-    if (
-      auction.pubkey.toBase58() ==
-      'CLxhAeuhz8KX3y8yEWHADtmTzE26ofAnd6j8zwMXjW9P'
-    ) {
-      console.log(
-        'I found',
 
-        bidderMetadata,
-        myPayingAccount?.pubkey.toBase58(),
-      );
-    }
     if (existingAuctionView && existingAuctionView.totallyComplete) {
       // If totally complete, we know we arent updating anythign else, let's speed things up
       // and only update the two things that could possibly change
       existingAuctionView.myBidderPot = bidderPot;
       existingAuctionView.myBidderMetadata = bidderMetadata;
+      for (let i = 0; i < existingAuctionView.items.length; i++) {
+        let curr = existingAuctionView.items[i];
+        if (!curr.metadata) {
+          let foundMetadata =
+            metadataByMint[curr.safetyDeposit.info.tokenMint.toBase58()];
+          curr.metadata = foundMetadata;
+          if (
+            curr.metadata &&
+            !curr.nameSymbol &&
+            curr.metadata.info.nameSymbolTuple
+          ) {
+            let foundNS =
+              nameSymbolTuples[curr.metadata.info.nameSymbolTuple.toBase58()];
+            curr.nameSymbol = foundNS;
+          }
+
+          if (
+            curr.metadata &&
+            !curr.masterEdition &&
+            curr.metadata.info.masterEdition
+          ) {
+            let foundMaster =
+              masterEditions[curr.metadata.info.masterEdition.toBase58()];
+            curr.masterEdition = foundMaster;
+          }
+        }
+      }
+
       return existingAuctionView;
     }
 
@@ -193,13 +228,23 @@ export function processAccountsIntoAuctionView(
         auction,
         auctionManager,
         state,
-        items: auctionManager.info.settings.winningConfigs.map(w => ({
-          metadata:
+        vault: vaults[auctionManager.info.vault.toBase58()],
+        items: auctionManager.info.settings.winningConfigs.map(w => {
+          let metadata =
             metadataByMint[
               boxes[w.safetyDepositBoxIndex].info.tokenMint.toBase58()
-            ],
-          safetyDeposit: boxes[w.safetyDepositBoxIndex],
-        })),
+            ];
+          return {
+            metadata,
+            nameSymbol: metadata?.info?.nameSymbolTuple
+              ? nameSymbolTuples[metadata.info.nameSymbolTuple.toBase58()]
+              : undefined,
+            safetyDeposit: boxes[w.safetyDepositBoxIndex],
+            masterEdition: metadata?.info?.masterEdition
+              ? masterEditions[metadata.info.masterEdition.toBase58()]
+              : undefined,
+          };
+        }),
         openEditionItem:
           auctionManager.info.settings.openEditionConfig != null
             ? {
@@ -223,7 +268,8 @@ export function processAccountsIntoAuctionView(
         boxesExpected == (view.items || []).length &&
         (auctionManager.info.settings.openEditionConfig == null ||
           (auctionManager.info.settings.openEditionConfig != null &&
-            view.openEditionItem))
+            view.openEditionItem)) &&
+        view.vault
       );
       if (!view.thumbnail || !view.thumbnail.metadata) return undefined;
       return view as AuctionView;

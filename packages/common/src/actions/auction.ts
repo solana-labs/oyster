@@ -38,6 +38,11 @@ export class BidState {
   bids?: Bid[];
   max?: BN;
 
+  public getWinnerIndex(bidder: PublicKey): number | null {
+    if (!this.bids) return null;
+    return this.bids.findIndex(b => b.key.toBase58() == bidder.toBase58());
+  }
+
   constructor(args: { type: BidStateType; bids?: Bid[]; max?: BN }) {
     this.type = args.type;
     this.bids = args.bids;

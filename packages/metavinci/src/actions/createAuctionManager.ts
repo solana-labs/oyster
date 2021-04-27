@@ -11,6 +11,7 @@ import {
   WinnerLimit,
   MasterEdition,
   NameSymbolTuple,
+  getMetadata,
   SequenceType,
   sendTransactions,
   getSafetyDepositBox,
@@ -22,7 +23,6 @@ import BN from 'bn.js';
 import {
   AuctionManagerSettings,
   getAuctionKeys,
-  getMetadata,
   initAuctionManager,
   startAuction,
   validateSafetyDepositBox,

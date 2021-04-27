@@ -25,19 +25,24 @@ export const useAuction = (id: string) => {
     metadataByMint,
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
+    masterEditions,
+    nameSymbolTuples,
+    vaults,
   } = useMeta();
 
   useEffect(() => {
     const auction = auctions[id];
     if (auction) {
-      console.log(bidderMetadataByAuctionAndBidder);
       const auctionView = processAccountsIntoAuctionView(
         auction,
         auctionManagers,
         safetyDepositBoxesByVaultAndIndex,
         metadataByMint,
+        nameSymbolTuples,
         bidderMetadataByAuctionAndBidder,
         bidderPotsByAuctionAndBidder,
+        masterEditions,
+        vaults,
         accountByMint,
         clock,
         undefined,
@@ -53,6 +58,9 @@ export const useAuction = (id: string) => {
     metadataByMint,
     bidderMetadataByAuctionAndBidder,
     bidderPotsByAuctionAndBidder,
+    vaults,
+    nameSymbolTuples,
+    masterEditions,
     userAccounts,
   ]);
   return existingAuctionView;
