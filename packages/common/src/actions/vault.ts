@@ -219,7 +219,7 @@ export const VAULT_SCHEMA = new Map<any, any>([
         ['authority', 'pubkey'],
         ['fractionTreasury', 'pubkey'],
         ['redeemTreasury', 'pubkey'],
-        ['allowFurtherShareCreation', 'boolean'],
+        ['allowFurtherShareCreation', 'u8'],
         ['pricingLookupAddress', 'u8'],
         ['tokenTypeCount', 'u8'],
         ['state', 'u8'],

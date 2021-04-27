@@ -90,6 +90,8 @@ export class AuctionData {
 
   /// Used for precalculation on the front end, not a backend key
   auctionManagerKey?: PublicKey;
+  /// Used for precalculation on the front end, not a backend key
+  bidRedemptionKey?: PublicKey;
 
   constructor(args: {
     authority: PublicKey;

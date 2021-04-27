@@ -269,7 +269,7 @@ export const sendTransactions = async (
     const instructions = instructionSet[i];
     const signers = signersSet[i];
 
-    if(instructions.length === 0) {
+    if (instructions.length === 0) {
       continue;
     }
 

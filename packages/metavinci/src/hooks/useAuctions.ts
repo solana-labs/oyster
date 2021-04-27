@@ -15,7 +15,7 @@ import {
 } from '@oyster/common';
 import { useEffect, useState } from 'react';
 import { useMeta } from '../contexts';
-import { AuctionManager } from '../models/metaplex';
+import { AuctionManager, BidRedemptionTicket } from '../models/metaplex';
 
 export enum AuctionViewState {
   Live = '0',
@@ -41,6 +41,7 @@ export interface AuctionView {
   thumbnail: AuctionViewItem;
   myBidderMetadata?: ParsedAccount<BidderMetadata>;
   myBidderPot?: ParsedAccount<BidderPot>;
+  myBidRedemption?: ParsedAccount<BidRedemptionTicket>;
   vault: ParsedAccount<Vault>;
   totallyComplete: boolean;
 }
@@ -71,6 +72,7 @@ export const useAuctions = (state: AuctionViewState) => {
     vaults,
     nameSymbolTuples,
     masterEditions,
+    bidRedemptions,
   } = useMeta();
 
   useEffect(() => {
@@ -84,6 +86,7 @@ export const useAuctions = (state: AuctionViewState) => {
           safetyDepositBoxesByVaultAndIndex,
           metadataByMint,
           nameSymbolTuples,
+          bidRedemptions,
           bidderMetadataByAuctionAndBidder,
           bidderPotsByAuctionAndBidder,
           masterEditions,
@@ -108,6 +111,7 @@ export const useAuctions = (state: AuctionViewState) => {
     vaults,
     nameSymbolTuples,
     masterEditions,
+    bidRedemptions,
   ]);
 
   return Object.values(auctionViews).filter(v => v) as AuctionView[];
@@ -122,6 +126,7 @@ export function processAccountsIntoAuctionView(
   >,
   metadataByMint: Record<string, ParsedAccount<Metadata>>,
   nameSymbolTuples: Record<string, ParsedAccount<NameSymbolTuple>>,
+  bidRedemptions: Record<string, ParsedAccount<BidRedemptionTicket>>,
   bidderMetadataByAuctionAndBidder: Record<
     string,
     ParsedAccount<BidderMetadata>
@@ -159,6 +164,14 @@ export function processAccountsIntoAuctionView(
     auctionManagers[auction.info.auctionManagerKey?.toBase58() || ''];
   if (auctionManager) {
     const boxesExpected = auctionManager.info.state.winningConfigsValidated;
+
+    let bidRedemption:
+      | ParsedAccount<BidRedemptionTicket>
+      | undefined = undefined;
+    if (auction.info.bidRedemptionKey?.toBase58()) {
+      bidRedemption = bidRedemptions[auction.info.bidRedemptionKey?.toBase58()];
+    }
+
     const bidderMetadata =
       bidderMetadataByAuctionAndBidder[
         auction.pubkey.toBase58() + '-' + myPayingAccount?.pubkey.toBase58()
@@ -173,6 +186,7 @@ export function processAccountsIntoAuctionView(
       // and only update the two things that could possibly change
       existingAuctionView.myBidderPot = bidderPot;
       existingAuctionView.myBidderMetadata = bidderMetadata;
+      existingAuctionView.myBidRedemption = bidRedemption;
       for (let i = 0; i < existingAuctionView.items.length; i++) {
         let curr = existingAuctionView.items[i];
         if (!curr.metadata) {
@@ -256,16 +270,27 @@ export function processAccountsIntoAuctionView(
                   ],
                 safetyDeposit:
                   boxes[auctionManager.info.settings.openEditionConfig],
+                masterEdition:
+                  masterEditions[
+                    metadataByMint[
+                      boxes[
+                        auctionManager.info.settings.openEditionConfig
+                      ].info.tokenMint.toBase58()
+                    ]?.info.masterEdition?.toBase58() || ''
+                  ],
               }
             : undefined,
         myBidderMetadata: bidderMetadata,
         myBidderPot: bidderPot,
+        myBidRedemption: bidRedemption,
       };
 
       view.thumbnail = (view.items || [])[0] || view.openEditionItem;
       view.totallyComplete = !!(
         view.thumbnail &&
-        boxesExpected == (view.items || []).length &&
+        boxesExpected ==
+          (view.items || []).length +
+            (auctionManager.info.settings.openEditionConfig == null ? 0 : 1) &&
         (auctionManager.info.settings.openEditionConfig == null ||
           (auctionManager.info.settings.openEditionConfig != null &&
             view.openEditionItem)) &&

@@ -145,6 +145,14 @@ export const decodeAuctionManager = (buffer: Buffer) => {
   return deserializeBorsh(SCHEMA, AuctionManager, buffer) as AuctionManager;
 };
 
+export const decodeBidRedemptionTicket = (buffer: Buffer) => {
+  return deserializeBorsh(
+    SCHEMA,
+    BidRedemptionTicket,
+    buffer,
+  ) as BidRedemptionTicket;
+};
+
 export class WinningConfigState {
   amountMinted: number = 0;
   validated: boolean = false;
@@ -362,6 +370,7 @@ export async function getBidderKeys(
     await PublicKey.findProgramAddress(
       [
         Buffer.from(AUCTION_PREFIX),
+        PROGRAM_IDS.auction.toBuffer(),
         auctionKey.toBuffer(),
         bidder.toBuffer(),
         Buffer.from(METADATA),

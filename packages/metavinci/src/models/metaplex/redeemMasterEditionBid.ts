@@ -94,7 +94,7 @@ export async function redeemMasterEditionBid(
     },
     {
       pubkey: bidder,
-      isSigner: true,
+      isSigner: false,
       isWritable: false,
     },
     {
