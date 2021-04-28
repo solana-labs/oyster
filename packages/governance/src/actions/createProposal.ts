@@ -63,8 +63,6 @@ export const createProposal = async (
     adminValidationAccount,
     adminDestinationAccount,
     sigDestinationAccount,
-    yesVoteDumpAccount,
-    noVoteDumpAccount,
     sourceHoldingAccount,
     authority,
     instructions: associatedInstructions,
@@ -131,8 +129,6 @@ export const createProposal = async (
       voteValidationAccount,
       adminDestinationAccount,
       sigDestinationAccount,
-      yesVoteDumpAccount,
-      noVoteDumpAccount,
       sourceHoldingAccount,
       useGovernance
         ? governance.info.governanceMint
@@ -187,8 +183,6 @@ interface ValidationReturn {
   adminValidationAccount: PublicKey;
   adminDestinationAccount: PublicKey;
   sigDestinationAccount: PublicKey;
-  yesVoteDumpAccount: PublicKey;
-  noVoteDumpAccount: PublicKey;
   sourceHoldingAccount: PublicKey;
   authority: PublicKey;
   signers: Account[][];
@@ -323,24 +317,6 @@ async function getAssociatedAccountsAndInstructions(
   let holdingSigners: Account[] = [];
   let holdingInstructions: TransactionInstruction[] = [];
 
-  const yesVoteDumpAccount = createTokenAccount(
-    holdingInstructions,
-    wallet.publicKey,
-    accountRentExempt,
-    yesVoteMint,
-    authority,
-    holdingSigners,
-  );
-
-  const noVoteDumpAccount = createTokenAccount(
-    holdingInstructions,
-    wallet.publicKey,
-    accountRentExempt,
-    noVoteMint,
-    authority,
-    holdingSigners,
-  );
-
   const sourceHoldingAccount = createTokenAccount(
     holdingInstructions,
     wallet.publicKey,
@@ -363,8 +339,6 @@ async function getAssociatedAccountsAndInstructions(
     adminValidationAccount,
     adminDestinationAccount,
     sigDestinationAccount,
-    yesVoteDumpAccount,
-    noVoteDumpAccount,
     sourceHoldingAccount,
     authority,
     signers: [

@@ -23,8 +23,6 @@ import { DESC_SIZE, NAME_SIZE, GovernanceInstruction } from './governance';
 ///   10. `[writable]` Initialized Voting Validation account
 ///   11. `[writable]` Initialized Destination account for first admin token
 ///   12. `[writable]` Initialized Destination account for first signatory token
-///   13. `[writable]` Initialized Yes voting dump account
-///   14. `[writable]` Initialized No voting dump account
 ///   15. `[writable]` Initialized source holding account
 ///   16. `[]` Source mint
 ///   17. `[]` Governance minting authority (pda with seed of Proposal  key)
@@ -44,8 +42,6 @@ export const initProposalInstruction = (
   votingValidationAccount: PublicKey,
   destinationAdminAccount: PublicKey,
   destinationSignatoryAccount: PublicKey,
-  yesVotingDumpAccount: PublicKey,
-  noVotingDumpAccount: PublicKey,
   sourceHoldingAccount: PublicKey,
   sourceMintAccount: PublicKey,
   authority: PublicKey,
@@ -101,8 +97,6 @@ export const initProposalInstruction = (
     { pubkey: votingValidationAccount, isSigner: false, isWritable: true },
     { pubkey: destinationAdminAccount, isSigner: false, isWritable: true },
     { pubkey: destinationSignatoryAccount, isSigner: false, isWritable: true },
-    { pubkey: yesVotingDumpAccount, isSigner: false, isWritable: true },
-    { pubkey: noVotingDumpAccount, isSigner: false, isWritable: true },
     { pubkey: sourceHoldingAccount, isSigner: false, isWritable: true },
     {
       pubkey: sourceMintAccount,

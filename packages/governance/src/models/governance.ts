@@ -191,8 +191,7 @@ export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
     Layout.publicKey('sourceHolding'),
-    Layout.publicKey('yesVotingDump'),
-    Layout.publicKey('noVotingDump'),
+
     BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
@@ -261,12 +260,6 @@ export interface Proposal {
 
   /// Governance holding account
   sourceHolding: PublicKey;
-
-  /// Yes Voting dump account for exchanged vote tokens
-  yesVotingDump: PublicKey;
-
-  /// No Voting dump account for exchanged vote tokens
-  noVotingDump: PublicKey;
 }
 
 export const CustomSingleSignerTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -320,8 +313,6 @@ export const ProposalParser = (
       adminValidation: data.adminValidation,
       votingValidation: data.votingValidation,
       sourceHolding: data.sourceHolding,
-      yesVotingDump: data.yesVotingDump,
-      noVotingDump: data.noVotingDump,
     },
   };
 
