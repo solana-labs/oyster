@@ -16,6 +16,7 @@ import {
   BidderMetadataParser,
   BidderMetadata,
   ParsedAccount,
+  Identicon,
 } from '@oyster/common';
 import { AuctionView, AuctionViewState } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
@@ -164,10 +165,11 @@ export const AuctionBids = ({view}: {view : AuctionView}) => {
   return (
     <Col style={{ width: '100%' }}>
       {bids.map((bid, index) => {
+        const bidder = bid.info.bidderPubkey.toBase58();
         return (
           <Row>
-            <Col span={2}>{index + 1}.</Col>
-            <Col span={17}>{shortenAddress(bid.info.bidderPubkey.toBase58())}</Col>
+            <Col span={1}>{index + 1}.</Col>
+            <Col span={17}><Row><Identicon style={{ width: 24, height: 24, marginRight: 10 }} address={bidder} /> {shortenAddress(bidder)}</Row></Col>
             <Col span={5} style={{ textAlign: 'right' }}>{bid.info.lastBid.toString()}</Col>
           </Row>
         );
