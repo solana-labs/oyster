@@ -62,12 +62,7 @@ export interface Governance {
   accountType: GovernanceAccountType;
   /// Vote threshold
   voteThreshold: number;
-  /// Execution type
-  executionType: ExecutionType;
-  /// Governance Type
-  governanceType: GovernanceType;
-  /// Voting entry rule
-  votingEntryRule: VotingEntryRule;
+
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
   minimumSlotWaitingPeriod: BN;
   /// Governance mint
@@ -97,9 +92,6 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
   [
     BufferLayout.u8('accountType'),
     BufferLayout.u8('voteThreshold'),
-    BufferLayout.u8('executionType'),
-    BufferLayout.u8('governanceType'),
-    BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
     BufferLayout.u8('councilMintOption'),
@@ -111,18 +103,6 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
     BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
   ],
 );
-
-export enum VotingEntryRule {
-  Anytime = 0,
-}
-
-export enum ExecutionType {
-  Independent = 0,
-}
-
-export enum GovernanceType {
-  Governance = 0,
-}
 
 export enum ProposalStateStatus {
   /// Draft
@@ -421,9 +401,7 @@ export const GovernanceParser = (
     info: {
       accountType: data.accountType,
       voteThreshold: data.voteThreshold,
-      executionType: data.executionType,
-      governanceType: data.governanceType,
-      votingEntryRule: data.votingEntryRule,
+
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
       councilMint: data.councilMintOption === 1 ? data.councilMint : null,

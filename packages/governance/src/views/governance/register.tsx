@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps, InputNumber, Modal, Switch } from 'antd';
-import { Form, Input, Select } from 'antd';
+import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import {
-  GOVERNANCE_NAME_LENGTH,
-  ExecutionType,
-  GovernanceType,
-  VotingEntryRule,
-} from '../../models/governance';
+import { GOVERNANCE_NAME_LENGTH } from '../../models/governance';
 import { LABELS } from '../../constants';
 import { contexts, utils, tryParseKey } from '@oyster/common';
 import { registerProgramGovernance } from '../../actions/registerProgramGovernance';
@@ -16,7 +11,6 @@ import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
-const { Option } = Select;
 const { notify } = utils;
 
 const layout = {
@@ -68,10 +62,8 @@ export function NewForm({
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
-    governanceType: GovernanceType;
-    executionType: ExecutionType;
     voteThreshold: number;
-    votingEntryRule: VotingEntryRule;
+
     minimumSlotWaitingPeriod: string;
     timeLimit: string;
     governanceMint: string;
@@ -120,10 +112,8 @@ export function NewForm({
     }
 
     const uninitializedGovernance = {
-      governanceType: values.governanceType,
-      executionType: values.executionType,
       voteThreshold: values.voteThreshold,
-      votingEntryRule: values.votingEntryRule,
+
       minimumSlotWaitingPeriod: new BN(values.minimumSlotWaitingPeriod),
       governanceMint: values.governanceMint
         ? new PublicKey(values.governanceMint)
@@ -203,36 +193,6 @@ export function NewForm({
           initialValue={60}
         >
           <InputNumber maxLength={3} min={1} max={100} />
-        </Form.Item>
-        <Form.Item
-          name="executionType"
-          label={LABELS.EXECUTION_TYPE}
-          rules={[{ required: true }]}
-          initialValue={ExecutionType.Independent}
-        >
-          <Select placeholder={LABELS.SELECT_EXECUTION_TYPE}>
-            <Option value={ExecutionType.Independent}>Independent</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="governanceType"
-          label={LABELS.PROPOSAL_TYPE}
-          rules={[{ required: true }]}
-          initialValue={GovernanceType.Governance}
-        >
-          <Select placeholder={LABELS.SELECT_PROPOSAL_TYPE}>
-            <Option value={GovernanceType.Governance}>Single Signer</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="votingEntryRule"
-          label={LABELS.VOTING_ENTRY_RULES}
-          rules={[{ required: true }]}
-          initialValue={VotingEntryRule.Anytime}
-        >
-          <Select placeholder={LABELS.SELECT_VOTING_ENTRY_RULE}>
-            <Option value={VotingEntryRule.Anytime}>At any time</Option>
-          </Select>
         </Form.Item>
       </Form>
     </Modal>

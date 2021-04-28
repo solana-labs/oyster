@@ -7,13 +7,7 @@ import {
 import { contexts, utils, actions } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import {
-  GOVERNANCE_AUTHORITY_SEED,
-  ExecutionType,
-  Governance,
-  GovernanceType,
-  VotingEntryRule,
-} from '../models/governance';
+import { GOVERNANCE_AUTHORITY_SEED, Governance } from '../models/governance';
 import { createGovernanceInstruction } from '../models/createGovernance';
 import BN from 'bn.js';
 
@@ -133,9 +127,6 @@ export const registerProgramGovernance = async (
       uninitializedGovernance.governanceMint,
 
       uninitializedGovernance.voteThreshold!,
-      uninitializedGovernance.executionType || ExecutionType.Independent,
-      uninitializedGovernance.governanceType || GovernanceType.Governance,
-      uninitializedGovernance.votingEntryRule || VotingEntryRule.Anytime,
       uninitializedGovernance.minimumSlotWaitingPeriod || new BN(0),
       uninitializedGovernance.timeLimit || new BN(0),
       uninitializedGovernance.name || '',
