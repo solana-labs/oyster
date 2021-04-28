@@ -86,6 +86,7 @@ export interface AuctionState {
 
   // listed NFTs
   items: SafetyDepositDraft[];
+  participationNFT?: SafetyDepositDraft;
   // number of editions for this auction (only applicable to limited edition)
   editions?: number;
 
@@ -152,58 +153,54 @@ export const AuctionCreateView = () => {
     if (attributes.category == AuctionCategory.Open) {
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.OpenEditionGiven,
-        openEditionNonWinningConstraint: NonWinningConstraint.GivenForBidPrice,
+        openEditionNonWinningConstraint:
+          NonWinningConstraint.GivenForFixedPrice,
         winningConfigs: [],
         openEditionConfig: 0,
-        openEditionFixedPrice: null,
+        openEditionFixedPrice: new BN(attributes.reservationPrice),
       });
 
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Unlimited,
         usize: ZERO,
       });
-    } else if (attributes.category == AuctionCategory.Limited) {
+    } else if (
+      attributes.category == AuctionCategory.Limited ||
+      attributes.category == AuctionCategory.Single
+    ) {
       settings = new AuctionManagerSettings({
-        openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
-        openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
+        openEditionWinnerConstraint: attributes.participationNFT
+          ? WinningConstraint.OpenEditionGiven
+          : WinningConstraint.NoOpenEdition,
+        openEditionNonWinningConstraint: attributes.participationNFT
+          ? NonWinningConstraint.GivenForFixedPrice
+          : NonWinningConstraint.NoOpenEdition,
         winningConfigs: attributes.items.map(
           (item, index) =>
             new WinningConfig({
               // TODO: check index
               safetyDepositBoxIndex: index,
               amount: 1,
-              editionType: EditionType.LimitedEdition,
+              editionType:
+                attributes.category == AuctionCategory.Limited
+                  ? EditionType.LimitedEdition
+                  : item.masterEdition
+                  ? EditionType.MasterEdition
+                  : EditionType.NA,
             }),
         ),
-        openEditionConfig: null,
-        openEditionFixedPrice: null,
+        openEditionConfig: attributes.participationNFT
+          ? attributes.items.length
+          : null,
+        openEditionFixedPrice: attributes.participationNFT
+          ? new BN(attributes.reservationPrice)
+          : null,
       });
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Capped,
         usize: new BN(attributes.winnersCount),
       });
-    } else if (attributes.category == AuctionCategory.Single) {
-      settings = new AuctionManagerSettings({
-        openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
-        openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
-        winningConfigs: attributes.items.map(
-          (item, index) =>
-            new WinningConfig({
-              // TODO: check index
-              safetyDepositBoxIndex: index,
-              amount: 1,
-              editionType: item.masterEdition
-                ? EditionType.MasterEdition
-                : EditionType.NA,
-            }),
-        ),
-        openEditionConfig: null,
-        openEditionFixedPrice: null,
-      });
-      winnerLimit = new WinnerLimit({
-        type: WinnerLimitType.Capped,
-        usize: new BN(attributes.winnersCount),
-      });
+      console.log('Settings', settings);
     } else {
       throw new Error('Not supported');
     }
@@ -215,7 +212,10 @@ export const AuctionCreateView = () => {
       winnerLimit,
       new BN((attributes.auctionDuration || 1) * 60),
       new BN((attributes.gapTime || 1) * 60),
-      attributes.items,
+      [
+        ...attributes.items,
+        ...(attributes.participationNFT ? [attributes.participationNFT] : []),
+      ],
       // TODO: move to config
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
     );
@@ -480,22 +480,21 @@ const CopiesStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
-  const items = useUserArts();
-  let eligibleItems: SafetyDepositDraft[] = [];
+  let filter: ((i: SafetyDepositDraft) => boolean) | undefined;
   if (props.attributes.category == AuctionCategory.Limited) {
-    eligibleItems = items.filter(i => i.masterEdition);
+    filter = (i: SafetyDepositDraft) => !!i.masterEdition;
   } else if (
     props.attributes.category == AuctionCategory.Single ||
     props.attributes.category == AuctionCategory.Tiered
   ) {
-    eligibleItems = items;
+    filter = undefined;
   } else if (props.attributes.category == AuctionCategory.Open) {
-    eligibleItems = items.filter(
-      i =>
+    filter = (i: SafetyDepositDraft) =>
+      !!(
         i.masterEdition &&
         (i.masterEdition.info.maxSupply == undefined ||
-          i.masterEdition.info.maxSupply == null),
-    );
+          i.masterEdition.info.maxSupply == null)
+      );
   }
 
   return (
@@ -509,6 +508,7 @@ const CopiesStep = (props: {
       <Row className="content-action">
         <Col xl={24}>
           <ArtSelector
+            filter={filter}
             selected={props.attributes.items}
             setSelected={items => {
               props.setAttributes({ ...props.attributes, items });
@@ -1342,11 +1342,21 @@ const ParticipationStep = (props: {
       <Row className="content-action">
         <Col className="section" xl={24}>
           <ArtSelector
-            selected={[]}
-            setSelected={() => {}}
+            filter={(i: SafetyDepositDraft) => !!i.masterEdition}
+            selected={
+              props.attributes.participationNFT
+                ? [props.attributes.participationNFT]
+                : []
+            }
+            setSelected={items => {
+              props.setAttributes({
+                ...props.attributes,
+                participationNFT: items[0],
+              });
+            }}
             allowMultiple={false}
           >
-            Select NFT
+            Select Participation NFT
           </ArtSelector>
         </Col>
       </Row>

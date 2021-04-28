@@ -410,7 +410,8 @@ async function setupRedeemOpenInstructions(
         [],
         auctionView.myBidderMetadata.info.bidderPubkey,
         wallet.publicKey,
-        auctionView.auctionManager.info.settings.openEditionFixedPrice || 0,
+        auctionView.auctionManager.info.settings.openEditionFixedPrice?.toNumber() ||
+          0,
       );
 
       winningPrizeSigner.push(transferAuthority);
