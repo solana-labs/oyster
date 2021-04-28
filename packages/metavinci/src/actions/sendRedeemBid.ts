@@ -30,6 +30,7 @@ import {
   redeemLimitedEditionBid,
   redeemMasterEditionBid,
   redeemOpenEditionBid,
+  WinningConfig,
   WinningConstraint,
 } from '../models/metaplex';
 const { createTokenAccount } = actions;
@@ -78,6 +79,7 @@ export async function sendRedeemBid(
           item,
           signers,
           instructions,
+          winningConfig,
         );
         break;
       case EditionType.MasterEdition:
@@ -249,11 +251,17 @@ async function setupRedeemLimitedInstructions(
   item: AuctionViewItem,
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
+  winningConfig: WinningConfig,
 ) {
   const updateAuth =
     item.metadata.info.nonUniqueSpecificUpdateAuthority ||
     item.nameSymbol?.info.updateAuthority;
-
+  console.log(
+    'item',
+    item,
+    item.metadata.info.mint.toBase58(),
+    item.metadata.info.masterEdition?.toBase58(),
+  );
   if (item.masterEdition && updateAuth && auctionView.myBidderMetadata) {
     let newTokenAccount: PublicKey | undefined = accountsByMint.get(
       item.masterEdition.info.masterMint.toBase58(),
@@ -280,6 +288,7 @@ async function setupRedeemLimitedInstructions(
           item.metadata.pubkey,
         ),
       );
+      console.log('Original auth', originalAuthorityAcct);
       if (originalAuthorityAcct) {
         const originalAuthority = new PublicKey(
           originalAuthorityAcct.data.slice(1, 33),
@@ -300,61 +309,63 @@ async function setupRedeemLimitedInstructions(
         );
       }
 
-      let cashInLimitedPrizeAuthorizationTokenSigner: Account[] = [];
-      let cashInLimitedPrizeAuthorizationTokenInstruction: TransactionInstruction[] = [];
-      signers.push(cashInLimitedPrizeAuthorizationTokenSigner);
-      instructions.push(cashInLimitedPrizeAuthorizationTokenInstruction);
+      for (let i = 0; i < winningConfig.amount; i++) {
+        let cashInLimitedPrizeAuthorizationTokenSigner: Account[] = [];
+        let cashInLimitedPrizeAuthorizationTokenInstruction: TransactionInstruction[] = [];
+        signers.push(cashInLimitedPrizeAuthorizationTokenSigner);
+        instructions.push(cashInLimitedPrizeAuthorizationTokenInstruction);
 
-      const newLimitedEditionMint = createMint(
-        cashInLimitedPrizeAuthorizationTokenInstruction,
-        wallet.publicKey,
-        mintRentExempt,
-        0,
-        wallet.publicKey,
-        wallet.publicKey,
-        cashInLimitedPrizeAuthorizationTokenSigner,
-      );
-      const newLimitedEdition = createTokenAccount(
-        cashInLimitedPrizeAuthorizationTokenInstruction,
-        wallet.publicKey,
-        accountRentExempt,
-        newLimitedEditionMint,
-        wallet.publicKey,
-        cashInLimitedPrizeAuthorizationTokenSigner,
-      );
-
-      cashInLimitedPrizeAuthorizationTokenInstruction.push(
-        Token.createMintToInstruction(
-          programIds().token,
-          newLimitedEditionMint,
-          newLimitedEdition,
+        const newLimitedEditionMint = createMint(
+          cashInLimitedPrizeAuthorizationTokenInstruction,
           wallet.publicKey,
+          mintRentExempt,
+          0,
+          wallet.publicKey,
+          wallet.publicKey,
+          cashInLimitedPrizeAuthorizationTokenSigner,
+        );
+        const newLimitedEdition = createTokenAccount(
+          cashInLimitedPrizeAuthorizationTokenInstruction,
+          wallet.publicKey,
+          accountRentExempt,
+          newLimitedEditionMint,
+          wallet.publicKey,
+          cashInLimitedPrizeAuthorizationTokenSigner,
+        );
+
+        cashInLimitedPrizeAuthorizationTokenInstruction.push(
+          Token.createMintToInstruction(
+            programIds().token,
+            newLimitedEditionMint,
+            newLimitedEdition,
+            wallet.publicKey,
+            [],
+            1,
+          ),
+        );
+
+        const burnAuthority = approve(
+          cashInLimitedPrizeAuthorizationTokenInstruction,
           [],
+          newTokenAccount,
+          wallet.publicKey,
           1,
-        ),
-      );
+        );
 
-      const burnAuthority = approve(
-        cashInLimitedPrizeAuthorizationTokenInstruction,
-        [],
-        newTokenAccount,
-        wallet.publicKey,
-        1,
-      );
+        cashInLimitedPrizeAuthorizationTokenSigner.push(burnAuthority);
 
-      cashInLimitedPrizeAuthorizationTokenSigner.push(burnAuthority);
-
-      mintNewEditionFromMasterEditionViaToken(
-        newLimitedEditionMint,
-        item.metadata.info.mint,
-        wallet.publicKey,
-        item.masterEdition.info.masterMint,
-        newTokenAccount,
-        burnAuthority.publicKey,
-        updateAuth,
-        cashInLimitedPrizeAuthorizationTokenInstruction,
-        wallet.publicKey,
-      );
+        mintNewEditionFromMasterEditionViaToken(
+          newLimitedEditionMint,
+          item.metadata.info.mint,
+          wallet.publicKey,
+          item.masterEdition.info.masterMint,
+          newTokenAccount,
+          burnAuthority.publicKey,
+          updateAuth,
+          cashInLimitedPrizeAuthorizationTokenInstruction,
+          wallet.publicKey,
+        );
+      }
     }
   }
 }
@@ -399,7 +410,8 @@ async function setupRedeemOpenInstructions(
         [],
         auctionView.myBidderMetadata.info.bidderPubkey,
         wallet.publicKey,
-        auctionView.auctionManager.info.settings.openEditionFixedPrice || 0,
+        auctionView.auctionManager.info.settings.openEditionFixedPrice?.toNumber() ||
+          0,
       );
 
       winningPrizeSigner.push(transferAuthority);

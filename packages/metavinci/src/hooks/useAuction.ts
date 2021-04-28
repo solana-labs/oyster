@@ -10,13 +10,9 @@ export const useAuction = (id: string) => {
     prev.set(acc.info.mint.toBase58(), acc);
     return prev;
   }, new Map<string, TokenAccount>());
-  const [clock, setClock] = useState<number>(0);
   const [existingAuctionView, setAuctionView] = useState<AuctionView | null>(
     null,
   );
-  useEffect(() => {
-    connection.getSlot().then(setClock);
-  }, [connection]);
 
   const {
     auctions,
@@ -46,14 +42,12 @@ export const useAuction = (id: string) => {
         masterEditions,
         vaults,
         accountByMint,
-        clock,
         undefined,
         existingAuctionView || undefined,
       );
       if (auctionView) setAuctionView(auctionView);
     }
   }, [
-    clock,
     auctions,
     auctionManagers,
     safetyDepositBoxesByVaultAndIndex,

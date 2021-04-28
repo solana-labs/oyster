@@ -47,20 +47,15 @@ export interface AuctionView {
 }
 
 export const useAuctions = (state: AuctionViewState) => {
-  const connection = useConnection();
   const { userAccounts } = useUserAccounts();
   const accountByMint = userAccounts.reduce((prev, acc) => {
     prev.set(acc.info.mint.toBase58(), acc);
     return prev;
   }, new Map<string, TokenAccount>());
 
-  const [clock, setClock] = useState<number>(0);
   const [auctionViews, setAuctionViews] = useState<
     Record<string, AuctionView | undefined>
   >({});
-  useEffect(() => {
-    connection.getSlot().then(setClock);
-  }, [connection]);
 
   const {
     auctions,
@@ -76,30 +71,27 @@ export const useAuctions = (state: AuctionViewState) => {
   } = useMeta();
 
   useEffect(() => {
-    if (clock != 0)
-      Object.keys(auctions).forEach(a => {
-        const auction = auctions[a];
-        const existingAuctionView = auctionViews[a];
-        const nextAuctionView = processAccountsIntoAuctionView(
-          auction,
-          auctionManagers,
-          safetyDepositBoxesByVaultAndIndex,
-          metadataByMint,
-          nameSymbolTuples,
-          bidRedemptions,
-          bidderMetadataByAuctionAndBidder,
-          bidderPotsByAuctionAndBidder,
-          masterEditions,
-          vaults,
-          accountByMint,
-          clock,
-          state,
-          existingAuctionView,
-        );
-        setAuctionViews(nA => ({ ...nA, [a]: nextAuctionView }));
-      });
+    Object.keys(auctions).forEach(a => {
+      const auction = auctions[a];
+      const existingAuctionView = auctionViews[a];
+      const nextAuctionView = processAccountsIntoAuctionView(
+        auction,
+        auctionManagers,
+        safetyDepositBoxesByVaultAndIndex,
+        metadataByMint,
+        nameSymbolTuples,
+        bidRedemptions,
+        bidderMetadataByAuctionAndBidder,
+        bidderPotsByAuctionAndBidder,
+        masterEditions,
+        vaults,
+        accountByMint,
+        state,
+        existingAuctionView,
+      );
+      setAuctionViews(nA => ({ ...nA, [a]: nextAuctionView }));
+    });
   }, [
-    clock,
     state,
     auctions,
     auctionManagers,
@@ -135,20 +127,13 @@ export function processAccountsIntoAuctionView(
   masterEditions: Record<string, ParsedAccount<MasterEdition>>,
   vaults: Record<string, ParsedAccount<Vault>>,
   accountByMint: Map<string, TokenAccount>,
-  clock: number,
   desiredState: AuctionViewState | undefined,
   existingAuctionView?: AuctionView,
 ): AuctionView | undefined {
   let state: AuctionViewState;
-  if (
-    auction.info.state == AuctionState.Ended ||
-    (auction.info.endedAt && auction.info.endedAt.toNumber() <= clock)
-  ) {
+  if (auction.info.state == AuctionState.Ended) {
     state = AuctionViewState.Ended;
-  } else if (
-    auction.info.state == AuctionState.Started ||
-    (auction.info.endedAt && auction.info.endedAt.toNumber() > clock)
-  ) {
+  } else if (auction.info.state == AuctionState.Started) {
     state = AuctionViewState.Live;
   } else if (auction.info.state == AuctionState.Created) {
     state = AuctionViewState.Upcoming;
@@ -193,25 +178,26 @@ export function processAccountsIntoAuctionView(
           let foundMetadata =
             metadataByMint[curr.safetyDeposit.info.tokenMint.toBase58()];
           curr.metadata = foundMetadata;
-          if (
-            curr.metadata &&
-            !curr.nameSymbol &&
-            curr.metadata.info.nameSymbolTuple
-          ) {
-            let foundNS =
-              nameSymbolTuples[curr.metadata.info.nameSymbolTuple.toBase58()];
-            curr.nameSymbol = foundNS;
-          }
+        }
+        if (
+          curr.metadata &&
+          !curr.nameSymbol &&
+          curr.metadata.info.nameSymbolTuple
+        ) {
+          let foundNS =
+            nameSymbolTuples[curr.metadata.info.nameSymbolTuple.toBase58()];
+          curr.nameSymbol = foundNS;
+        }
 
-          if (
-            curr.metadata &&
-            !curr.masterEdition &&
-            curr.metadata.info.masterEdition
-          ) {
-            let foundMaster =
-              masterEditions[curr.metadata.info.masterEdition.toBase58()];
-            curr.masterEdition = foundMaster;
-          }
+        if (
+          curr.metadata &&
+          !curr.masterEdition &&
+          curr.metadata.info.masterEdition
+        ) {
+          let foundMaster =
+            masterEditions[curr.metadata.info.masterEdition.toBase58()];
+
+          curr.masterEdition = foundMaster;
         }
       }
 
