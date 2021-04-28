@@ -153,7 +153,13 @@ export function MetaProvider({ children = null as any }) {
             ...e,
             [a.pubkey.toBase58()]: account,
           }));
-        } catch {
+        } catch (e) {
+          if (
+            a.pubkey.toBase58() ===
+            'yNPR97243ke5cV3QGW9ZhSxfVP1K2YVQxzkjikCVbee'
+          ) {
+            console.error(e);
+          }
           // ignore errors
           // add type as first byte for easier deserialization
         }

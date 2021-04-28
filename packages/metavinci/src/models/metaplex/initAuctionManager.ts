@@ -37,15 +37,7 @@ export async function initAuctionManager(
   });
 
   const data = Buffer.from(serialize(SCHEMA, value));
-  console.log(
-    'Auction',
-    auctionManagerKey,
-    vault,
-    auctionKey,
-    auctionManagerAuthority,
-    payer,
-    acceptPaymentAccount,
-  );
+  console.log('mData', data, settings);
   const keys = [
     {
       pubkey: auctionManagerKey,
