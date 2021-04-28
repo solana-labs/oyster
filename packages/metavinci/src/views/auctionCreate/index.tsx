@@ -1413,7 +1413,7 @@ const ReviewStep = (props: {
           <Statistic
             className="create-statistic"
             title="Listing go live date"
-            value={props.attributes.startListTS}
+            value={moment.unix((props.attributes.startListTS as number) / 1000).format("dddd, MMMM Do YYYY, h:mm a")}
           />
         )}
         <Divider />
