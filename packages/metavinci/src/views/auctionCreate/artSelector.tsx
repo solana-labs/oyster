@@ -11,14 +11,17 @@ export interface ArtSelectorProps extends ButtonProps {
   selected: SafetyDepositDraft[];
   setSelected: (selected: SafetyDepositDraft[]) => void;
   allowMultiple: boolean;
+  filter?: (i: SafetyDepositDraft) => boolean;
 }
 
 export const ArtSelector = (props: ArtSelectorProps) => {
   const { selected, setSelected, allowMultiple, ...rest } = props;
-  const items = useUserArts();
-  const selectedItems = useMemo<Set<string>>(() =>
-    new Set(selected.map(item => item.metadata.pubkey.toBase58()))
-  , [selected]);
+  let items = useUserArts();
+  if (props.filter) items = items.filter(props.filter);
+  const selectedItems = useMemo<Set<string>>(
+    () => new Set(selected.map(item => item.metadata.pubkey.toBase58())),
+    [selected],
+  );
 
   const [visible, setVisible] = useState(false);
 
@@ -37,7 +40,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
   };
 
   const confirm = () => {
-      close();
+    close();
   };
 
   const breakpointColumnsObj = {
@@ -72,7 +75,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
               onClick={open}
               close={() => {
                 setSelected(
-                  selected.filter(_ => _.metadata.pubkey.toBase58() !== key)
+                  selected.filter(_ => _.metadata.pubkey.toBase58() !== key),
                 );
                 confirm();
               }}
@@ -123,10 +126,10 @@ export const ArtSelector = (props: ArtSelectorProps) => {
                   ? new Set(list.filter(item => item !== id))
                   : new Set([...list, id]);
 
-                  let selected = items.filter(item =>
-                    newSet.has(item.metadata.pubkey.toBase58()),
-                  );
-                  setSelected(selected);
+                let selected = items.filter(item =>
+                  newSet.has(item.metadata.pubkey.toBase58()),
+                );
+                setSelected(selected);
 
                 if (!allowMultiple) {
                   confirm();

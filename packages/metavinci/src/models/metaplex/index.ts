@@ -7,6 +7,7 @@ import {
   EDITION,
 } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
+import BN from 'bn.js';
 import { serialize, BinaryReader, BinaryWriter } from 'borsh';
 
 export * from './initAuctionManager';
@@ -104,7 +105,7 @@ export class AuctionManagerSettings {
     NonWinningConstraint.GivenForFixedPrice;
   winningConfigs: WinningConfig[] = [];
   openEditionConfig: number | null = 0;
-  openEditionFixedPrice: number | null = 0;
+  openEditionFixedPrice: BN | null = new BN(0);
 
   constructor(args?: AuctionManagerSettings) {
     Object.assign(this, args);
@@ -221,7 +222,7 @@ export const SCHEMA = new Map<any, any>([
         ['openEditionNonWinningConstraint', 'u8'],
         ['winningConfigs', [WinningConfig]],
         ['openEditionConfig', { kind: 'option', type: 'u8' }],
-        ['openEditionFixedPrice', { kind: 'option', type: 'u8' }],
+        ['openEditionFixedPrice', { kind: 'option', type: 'u64' }],
       ],
     },
   ],

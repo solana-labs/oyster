@@ -15,7 +15,6 @@ const { Content } = Layout;
 export const HomeView = () => {
   const [activeKey, setActiveKey] = useState(AuctionViewState.Live);
   const auctions = useAuctions(activeKey);
-  console.log('Auctions', auctions);
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,

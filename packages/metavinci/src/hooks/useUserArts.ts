@@ -37,6 +37,7 @@ export const useUserArts = (): SafetyDepositDraft[] => {
   let i = 0;
   ownedMetadata.forEach(m => {
     let a = accountByMint.get(m.info.mint.toBase58());
+
     if (a) {
       safetyDeposits.push({
         holding: a.pubkey,
