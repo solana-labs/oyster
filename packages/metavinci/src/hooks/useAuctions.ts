@@ -178,25 +178,26 @@ export function processAccountsIntoAuctionView(
           let foundMetadata =
             metadataByMint[curr.safetyDeposit.info.tokenMint.toBase58()];
           curr.metadata = foundMetadata;
-          if (
-            curr.metadata &&
-            !curr.nameSymbol &&
-            curr.metadata.info.nameSymbolTuple
-          ) {
-            let foundNS =
-              nameSymbolTuples[curr.metadata.info.nameSymbolTuple.toBase58()];
-            curr.nameSymbol = foundNS;
-          }
+        }
+        if (
+          curr.metadata &&
+          !curr.nameSymbol &&
+          curr.metadata.info.nameSymbolTuple
+        ) {
+          let foundNS =
+            nameSymbolTuples[curr.metadata.info.nameSymbolTuple.toBase58()];
+          curr.nameSymbol = foundNS;
+        }
 
-          if (
-            curr.metadata &&
-            !curr.masterEdition &&
-            curr.metadata.info.masterEdition
-          ) {
-            let foundMaster =
-              masterEditions[curr.metadata.info.masterEdition.toBase58()];
-            curr.masterEdition = foundMaster;
-          }
+        if (
+          curr.metadata &&
+          !curr.masterEdition &&
+          curr.metadata.info.masterEdition
+        ) {
+          let foundMaster =
+            masterEditions[curr.metadata.info.masterEdition.toBase58()];
+
+          curr.masterEdition = foundMaster;
         }
       }
 

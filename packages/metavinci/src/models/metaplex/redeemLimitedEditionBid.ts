@@ -145,7 +145,7 @@ export async function redeemLimitedEditionBid(
     {
       pubkey: masterMint,
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     {
       pubkey: masterEdition,

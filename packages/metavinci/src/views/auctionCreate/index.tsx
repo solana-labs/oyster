@@ -53,7 +53,7 @@ import {
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
-import moment from 'moment'
+import moment from 'moment';
 import {
   createAuctionManager,
   SafetyDepositDraft,
@@ -94,7 +94,6 @@ export interface AuctionState {
 
   // suggested date time when auction should end UTC+0
   endDate?: Date;
-
 
   //////////////////
   category: AuctionCategory;
@@ -163,8 +162,27 @@ export const AuctionCreateView = () => {
         type: WinnerLimitType.Unlimited,
         usize: ZERO,
       });
+    } else if (attributes.category == AuctionCategory.Limited) {
+      settings = new AuctionManagerSettings({
+        openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
+        openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
+        winningConfigs: attributes.items.map(
+          (item, index) =>
+            new WinningConfig({
+              // TODO: check index
+              safetyDepositBoxIndex: index,
+              amount: 1,
+              editionType: EditionType.LimitedEdition,
+            }),
+        ),
+        openEditionConfig: null,
+        openEditionFixedPrice: null,
+      });
+      winnerLimit = new WinnerLimit({
+        type: WinnerLimitType.Capped,
+        usize: new BN(attributes.winnersCount),
+      });
     } else if (attributes.category == AuctionCategory.Single) {
-      console.log('Using single');
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
@@ -195,8 +213,8 @@ export const AuctionCreateView = () => {
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 250),
-      new BN((attributes.gapTime || 1) * 120),
+      new BN((attributes.auctionDuration || 1) * 60),
+      new BN((attributes.gapTime || 1) * 60),
       attributes.items,
       // TODO: move to config
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
@@ -532,12 +550,12 @@ const CopiesStep = (props: {
               tiers:
                 !props.attributes.tiers || props.attributes.tiers?.length == 0
                   ? [
-                    {
-                      to: 0,
-                      name: 'Default Tier',
-                      items: props.attributes.items,
-                    },
-                  ]
+                      {
+                        to: 0,
+                        name: 'Default Tier',
+                        items: props.attributes.items,
+                      },
+                    ]
                   : props.attributes.tiers,
             });
             props.confirm();
@@ -607,7 +625,7 @@ const TierWinners = (props: {
   previousTo?: number;
   lastTier?: Tier;
 }) => {
-  const from = (props.previousTo || 0) + 1
+  const from = (props.previousTo || 0) + 1;
   return (
     <>
       <Divider />
@@ -620,9 +638,7 @@ const TierWinners = (props: {
             type="number"
             className="input"
             style={{ width: '30%' }}
-            onChange={value =>
-              null
-            }
+            onChange={value => null}
           />
           &nbsp;to&nbsp;
           <InputNumber
@@ -671,7 +687,7 @@ const TierWinners = (props: {
         />
       </label>
 
-      <ArtSelector selected={[]} setSelected={_ => { }} allowMultiple={true} />
+      <ArtSelector selected={[]} setSelected={_ => {}} allowMultiple={true} />
     </>
   );
 };
@@ -720,7 +736,7 @@ const TierStep = (props: {
                     (_, idx) => ({
                       to: Math.trunc(
                         ((idx + 1) * (props.attributes.spots as number)) /
-                        parseInt(info.target.value),
+                          parseInt(info.target.value),
                       ),
                       name: '',
                       description: '',
@@ -742,7 +758,6 @@ const TierStep = (props: {
               lastTier={tiers.slice(-1)[0]}
             />
           ))}
-
         </Col>
       </Row>
       <Row>
@@ -959,30 +974,38 @@ const InitialPhaseStep = (props: {
   const [startNow, setStartNow] = useState<boolean>(true);
   const [listNow, setListNow] = useState<boolean>(true);
 
-  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(props.attributes.startSaleTS ? moment.unix(props.attributes.startSaleTS) : undefined)
-  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(props.attributes.startListTS ? moment.unix(props.attributes.startListTS) : undefined)
+  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(
+    props.attributes.startSaleTS
+      ? moment.unix(props.attributes.startSaleTS)
+      : undefined,
+  );
+  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(
+    props.attributes.startListTS
+      ? moment.unix(props.attributes.startListTS)
+      : undefined,
+  );
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      startSaleTS: saleMoment && saleMoment.unix() * 1000
-    })
-  }, [saleMoment])
+      startSaleTS: saleMoment && saleMoment.unix() * 1000,
+    });
+  }, [saleMoment]);
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      startListTS: listMoment && listMoment.unix() * 1000
-    })
-  }, [listMoment])
+      startListTS: listMoment && listMoment.unix() * 1000,
+    });
+  }, [listMoment]);
 
   useEffect(() => {
-    if (startNow) setSaleMoment(moment())
-  }, [startNow])
+    if (startNow) setSaleMoment(moment());
+  }, [startNow]);
 
   useEffect(() => {
-    if (listNow) setListMoment(moment())
-  }, [listNow])
+    if (listNow) setListMoment(moment());
+  }, [listNow]);
 
   return (
     <>
@@ -1201,18 +1224,20 @@ const EndingPhaseSale = (props: {
   confirm: () => void;
 }) => {
   const [untilSold, setUntilSold] = useState<boolean>(true);
-  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined)
+  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(
+    props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined,
+  );
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      endTS: endMoment && endMoment.unix() * 1000
-    })
-  }, [endMoment])
+      endTS: endMoment && endMoment.unix() * 1000,
+    });
+  }, [endMoment]);
 
   useEffect(() => {
-    if (untilSold) setEndMoment(undefined)
-  }, [untilSold])
+    if (untilSold) setEndMoment(undefined);
+  }, [untilSold]);
 
   return (
     <>
@@ -1252,17 +1277,19 @@ const EndingPhaseSale = (props: {
               <DatePicker
                 className="field-date"
                 size="large"
-                disabledDate={current => current && current < moment().endOf('day')}
+                disabledDate={current =>
+                  current && current < moment().endOf('day')
+                }
                 value={endMoment}
                 onChange={value => {
-                  if (!value) return
-                  if (!endMoment) return setEndMoment(value)
+                  if (!value) return;
+                  if (!endMoment) return setEndMoment(value);
 
-                  const currentMoment = endMoment.clone()
-                  currentMoment.hour(value.hour())
-                  currentMoment.minute(value.minute())
-                  currentMoment.second(value.second())
-                  setEndMoment(currentMoment)
+                  const currentMoment = endMoment.clone();
+                  currentMoment.hour(value.hour());
+                  currentMoment.minute(value.minute());
+                  currentMoment.second(value.second());
+                  setEndMoment(currentMoment);
                 }}
               />
               <TimePicker
@@ -1270,14 +1297,14 @@ const EndingPhaseSale = (props: {
                 size="large"
                 value={endMoment}
                 onChange={value => {
-                  if (!value) return
-                  if (!endMoment) return setEndMoment(value)
+                  if (!value) return;
+                  if (!endMoment) return setEndMoment(value);
 
-                  const currentMoment = endMoment.clone()
-                  currentMoment.hour(value.hour())
-                  currentMoment.minute(value.minute())
-                  currentMoment.second(value.second())
-                  setEndMoment(currentMoment)
+                  const currentMoment = endMoment.clone();
+                  currentMoment.hour(value.hour());
+                  currentMoment.minute(value.minute());
+                  currentMoment.second(value.second());
+                  setEndMoment(currentMoment);
                 }}
               />
             </label>
@@ -1316,7 +1343,7 @@ const ParticipationStep = (props: {
         <Col className="section" xl={24}>
           <ArtSelector
             selected={[]}
-            setSelected={() => { }}
+            setSelected={() => {}}
             allowMultiple={false}
           >
             Select NFT
