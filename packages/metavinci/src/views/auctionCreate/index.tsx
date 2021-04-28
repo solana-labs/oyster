@@ -299,7 +299,10 @@ export const AuctionCreateView = () => {
   const reviewStep = (
     <ReviewStep
       attributes={attributes}
-      confirm={() => gotoNextStep()}
+      confirm={() => {
+        setSaving(true)
+        gotoNextStep()
+      }}
       connection={connection}
     />
   );
