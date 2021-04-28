@@ -53,10 +53,11 @@ export async function sendRedeemBid(
   );
 
   let winnerIndex = null;
-  if (auctionView.myBidderMetadata?.info.bidderPubkey)
+  if (auctionView.myBidderPot?.pubkey)
     winnerIndex = auctionView.auction.info.bidState.getWinnerIndex(
-      auctionView.myBidderMetadata?.info.bidderPubkey,
+      auctionView.myBidderPot?.pubkey,
     );
+  console.log('Winner index', winnerIndex);
 
   if (winnerIndex != null) {
     const winningConfig =
@@ -65,6 +66,7 @@ export async function sendRedeemBid(
     const safetyDeposit = item.safetyDeposit;
     switch (winningConfig.editionType) {
       case EditionType.LimitedEdition:
+        console.log('Redeeming limited');
         await setupRedeemLimitedInstructions(
           connection,
           auctionView,
@@ -79,6 +81,7 @@ export async function sendRedeemBid(
         );
         break;
       case EditionType.MasterEdition:
+        console.log('Redeeming master');
         await setupRedeemMasterInstructions(
           auctionView,
           accountsByMint,
@@ -91,6 +94,7 @@ export async function sendRedeemBid(
         );
         break;
       case EditionType.NA:
+        console.log('Redeeming normal');
         await setupRedeemInstructions(
           auctionView,
           accountsByMint,
@@ -461,10 +465,6 @@ async function setupRedeemOpenInstructions(
 
       cashInOpenPrizeAuthorizationTokenSigner.push(burnAuthority);
 
-      console.log(
-        'My master edition key',
-        item.masterEdition.pubkey.toBase58(),
-      );
       await mintNewEditionFromMasterEditionViaToken(
         newOpenEditionMint,
         item.metadata.info.mint,

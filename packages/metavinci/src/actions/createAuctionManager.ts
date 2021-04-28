@@ -170,14 +170,12 @@ export async function createAuctionManager(
       wallet,
       vault,
       // No need to validate open edition, it's already been during init
-      safetyDeposits.filter(
-        (_, i) =>
-          settings.openEditionConfig != null && i != settings.openEditionConfig,
-      ),
+      safetyDeposits.filter((_, i) => i != settings.openEditionConfig),
       stores,
     ),
   };
 
+  console.log('Lookup', lookup.validateBoxes);
   let signers: Account[][] = [
     lookup.externalPriceAccount.signers,
     lookup.createVault.signers,

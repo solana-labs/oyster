@@ -134,7 +134,6 @@ export enum EditionType {
 export class WinningConfig {
   safetyDepositBoxIndex: number = 0;
   amount: number = 0;
-  hasAuthority: boolean = false;
   editionType: EditionType = EditionType.NA;
 
   constructor(args?: WinningConfig) {
@@ -233,7 +232,6 @@ export const SCHEMA = new Map<any, any>([
       fields: [
         ['safetyDepositBoxIndex', 'u8'],
         ['amount', 'u8'],
-        ['hasAuthority', 'u8'], // bool
         ['editionType', 'u8'],
       ],
     },

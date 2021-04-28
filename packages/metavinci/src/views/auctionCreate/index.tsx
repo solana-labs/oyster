@@ -168,15 +168,17 @@ export const AuctionCreateView = () => {
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
         openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
-        winningConfigs: attributes.items.map((item, index) => (new WinningConfig({
-          // TODO: check index
-          safetyDepositBoxIndex: index,
-          amount: 1,
-          hasAuthority: false,
-          editionType: item.masterEdition
-            ? EditionType.MasterEdition
-            : EditionType.NA,
-        }))),
+        winningConfigs: attributes.items.map(
+          (item, index) =>
+            new WinningConfig({
+              // TODO: check index
+              safetyDepositBoxIndex: index,
+              amount: 1,
+              editionType: item.masterEdition
+                ? EditionType.MasterEdition
+                : EditionType.NA,
+            }),
+        ),
         openEditionConfig: null,
         openEditionFixedPrice: null,
       });
@@ -193,7 +195,7 @@ export const AuctionCreateView = () => {
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60 * 60 * 24),
+      new BN((attributes.auctionDuration || 1) * 60),
       new BN((attributes.gapTime || 1) * 60),
       attributes.items,
       // TODO: move to config
@@ -364,7 +366,7 @@ export const AuctionCreateView = () => {
         )}
         <Col {...(saving ? { xl: 24 } : { xl: 16, md: 17 })}>
           {stepsByCategory[attributes.category][step][1]}
-          {0 < step && step < (stepsByCategory[attributes.category].length - 1) && (
+          {0 < step && step < stepsByCategory[attributes.category].length - 1 && (
             <Button
               style={{ width: '100%' }}
               onClick={() => gotoNextStep(step - 1)}
@@ -497,25 +499,27 @@ const CopiesStep = (props: {
           >
             Select NFT
           </ArtSelector>
-          {props.attributes.category !== AuctionCategory.Open && <label className="action-field">
-            <span className="field-title">
-              How many copies do you want to create?
-            </span>
-            <span className="field-info">
-              Each copy will be given unique edition number e.g. 1 of 30
-            </span>
-            <Input
-              autoFocus
-              className="input"
-              placeholder="Enter number of copies sold"
-              allowClear
-              onChange={info =>
-                props.setAttributes({
-                  ...props.attributes,
-                })
-              }
-            />
-          </label>}
+          {props.attributes.category !== AuctionCategory.Open && (
+            <label className="action-field">
+              <span className="field-title">
+                How many copies do you want to create?
+              </span>
+              <span className="field-info">
+                Each copy will be given unique edition number e.g. 1 of 30
+              </span>
+              <Input
+                autoFocus
+                className="input"
+                placeholder="Enter number of copies sold"
+                allowClear
+                onChange={info =>
+                  props.setAttributes({
+                    ...props.attributes,
+                  })
+                }
+              />
+            </label>
+          )}
         </Col>
       </Row>
       <Row>

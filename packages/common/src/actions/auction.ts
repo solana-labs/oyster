@@ -37,15 +37,24 @@ export class Bid {
 
 export class BidState {
   type: BidStateType;
-  bids?: Bid[];
-  max?: BN;
+  bids: Bid[];
+  max: BN;
 
   public getWinnerIndex(bidder: PublicKey): number | null {
     if (!this.bids) return null;
-    return this.bids.findIndex(b => b.key.toBase58() == bidder.toBase58());
+    console.log(
+      'bids',
+      this.bids.map(b => b.key.toBase58()),
+      bidder.toBase58(),
+    );
+    const index = this.bids.findIndex(
+      b => b.key.toBase58() == bidder.toBase58(),
+    );
+    if (index != -1) return index;
+    else return null;
   }
 
-  constructor(args: { type: BidStateType; bids?: Bid[]; max?: BN }) {
+  constructor(args: { type: BidStateType; bids: Bid[]; max: BN }) {
     this.type = args.type;
     this.bids = args.bids;
     this.max = args.max;
@@ -326,8 +335,8 @@ export const AUCTION_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['type', 'u8'],
-        ['bids', { kind: 'option', type: [Bid] }],
-        ['max', { kind: 'option', type: 'u64' }],
+        ['bids', [Bid]],
+        ['max', 'u64'],
       ],
     },
   ],
