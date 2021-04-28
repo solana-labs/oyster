@@ -671,7 +671,11 @@ const TierWinners = (props: {
         />
       </label>
 
-      <ArtSelector selected={[]} setSelected={_ => { }} allowMultiple={true} />
+      <ArtSelector
+        selected={props.tier.items}
+        setSelected={items => props.setTier({ ...props.tier, items })}
+        allowMultiple={true}
+      />
     </>
   );
 };
