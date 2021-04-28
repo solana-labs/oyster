@@ -193,8 +193,8 @@ export const AuctionCreateView = () => {
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60),
-      new BN((attributes.gapTime || 1) * 60),
+      new BN((attributes.auctionDuration || 1) * 250),
+      new BN((attributes.gapTime || 1) * 120),
       attributes.items,
       // TODO: move to config
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
