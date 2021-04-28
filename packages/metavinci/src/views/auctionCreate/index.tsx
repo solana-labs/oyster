@@ -128,7 +128,6 @@ export const AuctionCreateView = () => {
 
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
@@ -290,7 +289,6 @@ export const AuctionCreateView = () => {
   const waitStep = (
     <WaitingStep
       createAuction={createAuction}
-      progress={progress}
       confirm={() => gotoNextStep()}
     />
   );
@@ -1441,12 +1439,15 @@ const ReviewStep = (props: {
 
 const WaitingStep = (props: {
   createAuction: () => Promise<void>;
-  progress: number;
   confirm: () => void;
 }) => {
+  const [progress, setProgress] = useState<number>(0);
+
   useEffect(() => {
     const func = async () => {
+      const inte = setInterval(() => setProgress(prog => prog + 1), 600);
       await props.createAuction();
+      clearInterval(inte);
       props.confirm();
     };
     func();
@@ -1454,7 +1455,7 @@ const WaitingStep = (props: {
 
   return (
     <div style={{ marginTop: 70 }}>
-      <Progress type="circle" percent={props.progress} />
+      <Progress type="circle" percent={progress} />
       <div className="waiting-title">
         Your creation is being listed with Metaplex...
       </div>
