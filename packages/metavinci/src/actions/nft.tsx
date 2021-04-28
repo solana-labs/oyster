@@ -151,7 +151,7 @@ export const mintNFT = async (
 
   // Force wait for max confirmations
   // await connection.confirmTransaction(txid, 'max');
-  await connection.getParsedConfirmedTransaction(txid, 'confirmed');
+  await connection.getParsedConfirmedTransaction(txid);
 
   // this means we're done getting AR txn setup. Ship it off to ARWeave!
   const data = new FormData();
