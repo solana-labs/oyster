@@ -159,7 +159,6 @@ export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct
   [
     BufferLayout.u8('accountType'),
     Layout.publicKey('config'),
-    Layout.publicKey('tokenProgramId'),
     Layout.publicKey('state'),
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
@@ -202,9 +201,6 @@ export interface Proposal {
 
   /// configuration values
   config: PublicKey;
-
-  /// Token Program ID
-  tokenProgramId: PublicKey;
 
   /// state values
   state: PublicKey;
@@ -281,7 +277,6 @@ export const ProposalParser = (
     info: {
       accountType: data.accountType,
       config: data.config,
-      tokenProgramId: data.tokenProgramId,
       state: data.state,
       signatoryMint: data.signatoryMint,
       adminMint: data.adminMint,
