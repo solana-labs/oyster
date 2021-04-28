@@ -199,7 +199,7 @@ export const AuctionCreateView = () => {
       new BN((attributes.gapTime || 1) * 60),
       attributes.items,
       // TODO: move to config
-      new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
+      new PublicKey('3EVo6RQfu5D1DC18jsqrQnbiKLYoig8yckJC7QgMiJVY'),
     );
   };
 
