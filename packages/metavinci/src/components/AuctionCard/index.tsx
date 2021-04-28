@@ -169,7 +169,7 @@ export const AuctionBids = ({view}: {view : AuctionView}) => {
         return (
           <Row>
             <Col span={1}>{index + 1}.</Col>
-            <Col span={17}><Row><Identicon style={{ width: 24, height: 24, marginRight: 10 }} address={bidder} /> {shortenAddress(bidder)}</Row></Col>
+            <Col span={17}><Row><Identicon style={{ width: 24, height: 24, marginRight: 10, marginTop: 2 }} address={bidder} /> {shortenAddress(bidder)}</Row></Col>
             <Col span={5} style={{ textAlign: 'right' }}>{bid.info.lastBid.toString()}</Col>
           </Row>
         );
