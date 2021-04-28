@@ -1,4 +1,5 @@
 import {
+  AccountInfo,
   PublicKey,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
@@ -9,6 +10,7 @@ import { programIds } from '../utils/ids';
 import { deserializeBorsh } from './../utils/borsh';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
+import { AccountParser, cache } from '../contexts';
 
 export const AUCTION_PREFIX = 'auction';
 export const METADATA = 'metadata';
@@ -59,13 +61,40 @@ export class BidState {
   }
 }
 
+export const AuctionParser: AccountParser = (
+  pubkey: PublicKey,
+  account: AccountInfo<Buffer>,
+) => ({
+  pubkey,
+  account,
+  info: decodeAuction(account.data),
+});
+
 export const decodeAuction = (buffer: Buffer) => {
   return deserializeBorsh(AUCTION_SCHEMA, AuctionData, buffer) as AuctionData;
 };
 
+export const BidderPotParser: AccountParser = (
+  pubkey: PublicKey,
+  account: AccountInfo<Buffer>,
+) => ({
+  pubkey,
+  account,
+  info: decodeBidderPot(account.data),
+});
+
 export const decodeBidderPot = (buffer: Buffer) => {
   return deserializeBorsh(AUCTION_SCHEMA, BidderPot, buffer) as BidderPot;
 };
+
+export const BidderMetadataParser: AccountParser = (
+  pubkey: PublicKey,
+  account: AccountInfo<Buffer>,
+) => ({
+  pubkey,
+  account,
+  info: decodeBidderMetadata(account.data),
+});
 
 export const decodeBidderMetadata = (buffer: Buffer) => {
   return deserializeBorsh(

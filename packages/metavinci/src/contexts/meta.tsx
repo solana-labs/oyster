@@ -4,7 +4,7 @@ import {
   useConnection,
   decodeMetadata,
   decodeNameSymbolTuple,
-  decodeAuction,
+  AuctionParser,
   decodeEdition,
   decodeMasterEdition,
   Metadata,
@@ -21,9 +21,9 @@ import {
   VaultKey,
   decodeSafetyDeposit,
   BidderMetadata,
-  decodeBidderMetadata,
+  BidderMetadataParser,
   BidderPot,
-  decodeBidderPot,
+  BidderPotParser,
   BIDDER_METADATA_LEN,
   BIDDER_POT_LEN,
   decodeVault,
@@ -116,6 +116,7 @@ export function MetaProvider({ children = null as any }) {
   const [vaults, setVaults] = useState<Record<string, ParsedAccount<Vault>>>(
     {},
   );
+
   const [
     bidderMetadataByAuctionAndBidder,
     setBidderMetadataByAuctionAndBidder,
@@ -134,21 +135,21 @@ export function MetaProvider({ children = null as any }) {
     (async () => {
       const processAuctions = async (a: PublicKeyAndAccount<Buffer>) => {
         try {
-          const auction = await decodeAuction(a.account.data);
-          auction.auctionManagerKey = await getAuctionManagerKey(
-            auction.resource,
+          const account = cache.add(
+            a.pubkey,
+            a.account,
+            AuctionParser) as
+          ParsedAccount<AuctionData>;
+
+          account.info.auctionManagerKey = await getAuctionManagerKey(
+            account.info.resource,
             a.pubkey,
           );
-          const payerAcct = accountByMint.get(auction.tokenMint.toBase58());
+          const payerAcct = accountByMint.get(account.info.tokenMint.toBase58());
           if (payerAcct)
-            auction.bidRedemptionKey = (
+            account.info.bidRedemptionKey = (
               await getBidderKeys(a.pubkey, payerAcct.pubkey)
             ).bidRedemption;
-          const account: ParsedAccount<AuctionData> = {
-            pubkey: a.pubkey,
-            account: a.account,
-            info: auction,
-          };
           setAuctions(e => ({
             ...e,
             [a.pubkey.toBase58()]: account,
@@ -166,18 +167,17 @@ export function MetaProvider({ children = null as any }) {
 
         try {
           if (a.account.data.length == BIDDER_METADATA_LEN) {
-            const bidderMetadata = await decodeBidderMetadata(a.account.data);
+            const account = cache.add(
+              a.pubkey,
+              a.account,
+              BidderMetadataParser) as
+            ParsedAccount<BidderMetadata>;
 
-            const account: ParsedAccount<BidderMetadata> = {
-              pubkey: a.pubkey,
-              account: a.account,
-              info: bidderMetadata,
-            };
             setBidderMetadataByAuctionAndBidder(e => ({
               ...e,
-              [bidderMetadata.auctionPubkey.toBase58() +
+              [account.info.auctionPubkey.toBase58() +
               '-' +
-              bidderMetadata.bidderPubkey.toBase58()]: account,
+              account.info.bidderPubkey.toBase58()]: account,
             }));
           }
         } catch {
@@ -186,17 +186,17 @@ export function MetaProvider({ children = null as any }) {
         }
         try {
           if (a.account.data.length == BIDDER_POT_LEN) {
-            const bidderPot = await decodeBidderPot(a.account.data);
-            const account: ParsedAccount<BidderPot> = {
-              pubkey: a.pubkey,
-              account: a.account,
-              info: bidderPot,
-            };
+            const account = cache.add(
+              a.pubkey,
+              a.account,
+              BidderPotParser) as
+            ParsedAccount<BidderPot>;
+
             setBidderPotsByAuctionAndBidder(e => ({
               ...e,
-              [bidderPot.auctionAct.toBase58() +
+              [account.info.auctionAct.toBase58() +
               '-' +
-              bidderPot.bidderAct.toBase58()]: account,
+              account.info.bidderAct.toBase58()]: account,
             }));
           }
         } catch {
