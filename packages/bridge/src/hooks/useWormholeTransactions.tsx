@@ -44,7 +44,6 @@ type WrappedTransferMeta = {
   coinId?: string;
   price?: number;
   explorer?: any;
-
   logo?: string;
   symbol?: string;
   amount: number;
@@ -135,6 +134,7 @@ const queryWrappedMetaTransactions = async (
       for (const sig of resp.result) {
         const confirmedTx = await connection.getParsedConfirmedTransaction(
           sig.signature,
+          'finalized',
         );
         if (!confirmedTx) continue;
         const instructions = confirmedTx.transaction?.message?.instructions;
@@ -297,6 +297,7 @@ export const useWormholeTransactions = () => {
 
     if (ids.length === 0) return;
 
+    console.log('Querying Prices...');
     const parameters = `?ids=${ids.join(',')}&vs_currencies=usd`;
     const resp = await window.fetch(COINGECKO_COIN_PRICE_API + parameters);
     const usdByCoinId = await resp.json();
@@ -313,7 +314,7 @@ export const useWormholeTransactions = () => {
       () => dataSourcePriceQuery(),
       COINGECKO_POOL_INTERVAL,
     );
-  }, [transfers, setAmountInUSD]);
+  }, [transfers, setAmountInUSD, coinList]);
 
   useEffect(() => {
     if (transfers && coinList && !loading) {
