@@ -43,7 +43,9 @@ export const mintNFT = async (
   env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },
-): Promise<void> => {
+): Promise<{
+  metadataAccount: PublicKey,
+} | void> => {
   if (!wallet?.publicKey) {
     return;
   }
@@ -258,6 +260,8 @@ export const mintNFT = async (
   // TODO:
   // 1. Jordan: --- upload file and metadata to storage API
   // 2. pay for storage by hashing files and attaching memo for each file
+
+  return { metadataAccount }
 };
 
 export const prepPayForFilesTxn = async (

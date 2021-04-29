@@ -33,7 +33,7 @@ import {
   LAMPORT_MULTIPLIER,
   solanaToUSD,
 } from '../../utils/assets';
-import { Connection } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -51,6 +51,7 @@ export const ArtCreateView = () => {
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+  const [nft, setNft] = useState<{ metadataAccount: PublicKey } | undefined>(undefined);
   const [attributes, setAttributes] = useState<IMetadataExtension>({
     name: '',
     symbol: '',
@@ -82,7 +83,8 @@ export const ArtCreateView = () => {
     setSaving(true);
     const inte = setInterval(() => setProgress(prog => prog + 1), 600);
     // Update progress inside mintNFT
-    await mintNFT(connection, wallet, env, attributes?.files || [], metadata);
+    const _nft = await mintNFT(connection, wallet, env, attributes?.files || [], metadata);
+    if (_nft) setNft(_nft)
     clearInterval(inte);
   };
 
@@ -153,7 +155,7 @@ export const ArtCreateView = () => {
               confirm={() => gotoStep(6)}
             />
           )}
-          {step === 6 && <Congrats />}
+          {step === 6 && <Congrats nft={nft}/>}
           {0 < step && step < 5 && (
             <Button onClick={() => gotoStep(step - 1)}>Back</Button>
           )}
@@ -752,7 +754,26 @@ const WaitingStep = (props: {
   );
 };
 
-const Congrats = () => {
+const Congrats = (props: {
+  nft?: {
+    metadataAccount: PublicKey,
+  }
+}) => {
+
+  const history = useHistory()
+
+  const newTweetURL = () => {
+    const params = {
+      text: "I've created a new NFT artwork on Metaplex, check it out!",
+      url: `${window.location.origin}/#/art/${props.nft?.metadataAccount.toString()}`,
+      hashtags: "NFT,Crypto,Metaplex",
+      // via: "Metaplex",
+      related: "Metaplex,Solana",
+    }
+    const queryParams = new URLSearchParams(params).toString()
+    return `https://twitter.com/intent/tweet?${queryParams}`
+  }
+
   return (
     <>
       <div style={{ marginTop: 70 }}>
@@ -760,15 +781,15 @@ const Congrats = () => {
           Congratulations, you created an NFT!
         </div>
         <div className="congrats-button-container">
-          <Button className="congrats-button">
+          <Button className="congrats-button" onClick={_ => window.open(newTweetURL(), "_blank")}>
             <span>Share it on Twitter</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
+          <Button className="congrats-button" onClick={_ => history.push(`/art/${props.nft?.metadataAccount.toString()}`)}>
             <span>See it in your collection</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
+          <Button className="congrats-button" onClick={_ => history.push("/auction/create")}>
             <span>Sell it via auction</span>
             <span>&gt;</span>
           </Button>
