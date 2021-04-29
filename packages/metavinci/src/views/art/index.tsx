@@ -14,7 +14,7 @@ const { Content } = Layout
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
 
-  const art: Art = useArt(id);
+  const art = useArt(id);
   // const artist: Artist = getArtist(art.artist_id)
   // const presale: Presale = getPresale(art.presale_id)
   const artist: Artist = sampleArtist

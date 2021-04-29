@@ -1413,10 +1413,7 @@ const ReviewStep = (props: {
         <Col xl={12}>
           {item?.metadata.info && (
             <ArtCard
-              image={item.metadata.info.extended?.image}
-              category={item.metadata.info.extended?.category}
-              name={item.metadata.info.name}
-              symbol={item.metadata.info.symbol}
+              pubkey={item.metadata.pubkey}
               small={true}
             />
           )}
