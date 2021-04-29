@@ -131,6 +131,10 @@ export function MetaProvider({ children = null as any }) {
   ] = useState<Record<string, ParsedAccount<SafetyDepositBox>>>({});
 
   useEffect(() => {
+
+  });
+
+  useEffect(() => {
     let dispose = () => {};
     (async () => {
       const processAuctions = async (a: PublicKeyAndAccount<Buffer>) => {
@@ -527,7 +531,7 @@ const queryExtendedMetadata = async (
       if (metadata && metadata.info.uri) {
         extendedMetadataFetch.set(
           key,
-          fetch(metadata.info.uri)
+          fetch(metadata.info.uri, { cache: "force-cache" })
             .then(async _ => {
               try {
                 metadata.info.extended = await _.json();
@@ -538,7 +542,11 @@ const queryExtendedMetadata = async (
                   delete mintToMetadata[key];
                 } else {
                   if (metadata.info.extended?.image) {
-                    metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
+                    const file = `${metadata.info.uri}/${metadata.info.extended.image}`;
+                    metadata.info.extended.image = file;
+                    fetch(file, { cache: "force-cache" })
+                      .then(res => res.blob())
+                      .then(blob => metadata.info.extended && (metadata.info.extended.image = URL.createObjectURL(blob)));
                   }
                 }
               } catch {
