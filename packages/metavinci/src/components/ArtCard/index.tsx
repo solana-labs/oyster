@@ -24,7 +24,7 @@ export interface ArtCardProps extends CardProps {
 }
 
 export const ArtCard = (props: ArtCardProps) => {
-  let { className, small, category, image, name, preview, artist, close, description, pubkey, endAuctionAt, ...rest } = props;
+  let { className, small, category, image, name, preview, artist, description, close, pubkey, endAuctionAt, ...rest } = props;
   const art = useArt(pubkey);
   category = art?.category || category;
   image = art?.image || image;
