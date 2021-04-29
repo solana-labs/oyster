@@ -543,10 +543,10 @@ const queryExtendedMetadata = async (
                 } else {
                   if (metadata.info.extended?.image) {
                     const file = `${metadata.info.uri}/${metadata.info.extended.image}`;
-                    const imageResponse = await fetch(file, { cache: "force-cache" });
-                    const blob = await imageResponse.blob();
-                    const url = URL.createObjectURL(blob);
-                    metadata.info.extended.image = url;
+                    metadata.info.extended.image = file;
+                    fetch(file, { cache: "force-cache" })
+                      .then(res => res.blob())
+                      .then(blob => metadata.info.extended && (metadata.info.extended.image = URL.createObjectURL(blob)));
                   }
                 }
               } catch {
