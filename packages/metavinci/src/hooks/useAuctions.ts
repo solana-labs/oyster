@@ -272,6 +272,7 @@ export function processAccountsIntoAuctionView(
       };
 
       view.thumbnail = (view.items || [])[0] || view.openEditionItem;
+
       view.totallyComplete = !!(
         view.thumbnail &&
         boxesExpected ==

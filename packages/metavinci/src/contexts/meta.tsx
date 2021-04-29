@@ -366,7 +366,6 @@ export function MetaProvider({ children = null as any }) {
         try {
           if (meta.account.data[0] == MetadataKey.MetadataV1) {
             const metadata = await decodeMetadata(meta.account.data);
-
             if (
               isValidHttpUrl(metadata.uri) &&
               metadata.uri.indexOf('arweave') >= 0
@@ -556,7 +555,6 @@ const queryExtendedMetadata = async (
   });
 
   await Promise.all([...extendedMetadataFetch.values()]);
-
   setMetadata([...Object.values(mintToMetadata)]);
   setMetadataByMint(mintToMetadata);
 };
