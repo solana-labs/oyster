@@ -34,11 +34,6 @@ export const HomeView = () => {
           <Link to={`/auction/${id}`}>
             <ArtCard
               key={id}
-              image={m.thumbnail.metadata.info.extended?.image}
-              category={m.thumbnail.metadata.info.extended?.category}
-              name={m.thumbnail.metadata?.info.name}
-              symbol={m.thumbnail.metadata?.info.symbol}
-              description={m.thumbnail.metadata?.info.extended?.description}
               endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
               pubkey={m.thumbnail.metadata.pubkey}
               preview={false}
