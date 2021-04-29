@@ -10,8 +10,8 @@ export async function makeAuction(
   wallet: any,
   winnerLimit: WinnerLimit,
   vault: PublicKey,
-  duration: BN,
-  gap: BN,
+  endAuctionAt: BN,
+  auctionGap: BN,
   paymentMint: PublicKey,
 ): Promise<{
   auction: PublicKey;
@@ -43,8 +43,8 @@ export async function makeAuction(
   createAuction(
     winnerLimit,
     vault,
-    duration,
-    gap,
+    endAuctionAt,
+    auctionGap,
     paymentMint,
     auctionManagerKey,
     wallet.publicKey,
