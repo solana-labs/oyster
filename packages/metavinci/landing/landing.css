@@ -38,6 +38,7 @@ body {
 .image {
   width: 100%;
   height: 100vw;
+  max-height: 630px;
 
   background: url(image.png);
   background-repeat: no-repeat;
