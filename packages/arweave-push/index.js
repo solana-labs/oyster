@@ -129,6 +129,7 @@ exports.uploadFile = async (req, res) => {
             console.log('Calling out for txn', val);
             const transaction = await solanaConnection.getParsedConfirmedTransaction(
               val,
+              'confirmed',
             );
             console.log('I got the transaction');
             // We expect the first command to be a SOL send from them to our holding account.
