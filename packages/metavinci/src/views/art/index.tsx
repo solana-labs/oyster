@@ -28,7 +28,7 @@ export const ArtView = () => {
         </Row>
         <Divider />
         <Row style={{ margin: '0 30px', textAlign: 'left', fontSize: '1.4rem' }}>
-          <Col span={12} >
+          <Col span={24} >
             <div style={{ fontWeight: 700 }}>{art.title}</div>
             <br />
             <div className="info-header">CREATED BY</div>
@@ -42,9 +42,6 @@ export const ArtView = () => {
             <br />
             <div className="info-header">ABOUT THE CREATOR</div>
             <div className="info-content">{artist.about}</div>
-          </Col>
-          <Col span={12}>
-            <PreSaleCard presale={presale} />
           </Col>
         </Row>
       </Col>
