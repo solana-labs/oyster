@@ -97,7 +97,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
         visible={visible}
         onCancel={close}
         onOk={confirm}
-        width="100"
+        width={1100}
         footer={null}
       >
         <Row className="call-to-action" style={{ marginBottom: 0 }}>
@@ -106,7 +106,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
             Select the NFT that you want to sell copy/copies of.
           </p>
         </Row>
-        <Row className="content-action">
+        <Row className="content-action" style={{ overflowY: 'scroll', height: "50vh" }}>
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid"

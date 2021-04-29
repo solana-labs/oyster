@@ -18,7 +18,7 @@ import {
   ParsedAccount,
   Identicon,
 } from '@oyster/common';
-import { AuctionView, AuctionViewState } from '../../hooks';
+import { AuctionView, AuctionViewState, useBidsForAuction } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
 import { sendRedeemBid } from '../../actions/sendRedeemBid';
 const { useWallet } = contexts.Wallet;
@@ -36,6 +36,8 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
     return prev;
   }, new Map<string, TokenAccount>());
 
+  const bids = useBidsForAuction(auctionView.auction.pubkey);
+
   const myPayingAccount = accountByMint.get(
     auctionView.auction.info.tokenMint.toBase58(),
   );
@@ -48,22 +50,27 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
       const slotDiff =
         (auctionView.auction.info.endedAt?.toNumber() || 0) - clock;
 
-      /* const { hours, minutes, seconds } = getCountdown(
-        auctionView.auction.info.endedAt?.toNumber(),
-      );
+      // const { hours, minutes, seconds } = getCountdown(
+      //   auctionView.auction.info.endedAt?.toNumber(),
+      // );
 
-      setHours(hours);
-      setMinutes(minutes);
-      setSeconds(seconds);*/
+      // setHours(hours);
+      // setMinutes(minutes);
+      // setSeconds(seconds);
       setHours(1);
     }, 1000);
     return () => clearInterval(interval);
   }, [clock]);
 
+  const isUpcoming = auctionView.state == AuctionViewState.Upcoming;
+  const isStarted = auctionView.state == AuctionViewState.Live;
+
   return (
     <div className="presale-card-container">
-      <div className="info-header">STARTING BID</div>
-      <div style={{ fontWeight: 700, fontSize: '1.6rem' }}>◎40.00</div>
+      {isUpcoming && <div className="info-header">STARTING BID</div>}
+      {isUpcoming && <div style={{ fontWeight: 700, fontSize: '1.6rem' }}>◎40.00</div>}
+      {isStarted && <div className="info-header">HIGHEST BID</div>}
+      {isStarted && <div style={{ fontWeight: 700, fontSize: '1.6rem' }}>◎40.00</div>}
       <br />
       <div className="info-header">AUCTION ENDS IN</div>
       <Row style={{ width: 300 }}>
@@ -144,24 +151,12 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
           PLACE BID
         </Button>
       )}
-      <AuctionBids view={auctionView} />
+      <AuctionBids bids={bids} />
     </div>
   );
 };
 
-export const AuctionBids = ({view}: {view : AuctionView}) => {
-  const bids = cache.byParser(BidderMetadataParser).filter(id => {
-    const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
-    if(!bidder) {
-      return false;
-    }
-
-    return bidder.info.auctionPubkey.toBase58() === view.auction.pubkey.toBase58();
-  }).map(id => {
-    const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
-    return bidder;
-  })
-
+export const AuctionBids = ({bids}: {bids : ParsedAccount<BidderMetadata>[]}) => {
   return (
     <Col style={{ width: '100%' }}>
       {bids.map((bid, index) => {
