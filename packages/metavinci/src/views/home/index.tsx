@@ -39,6 +39,7 @@ export const HomeView = () => {
               name={m.thumbnail.metadata?.info.name}
               symbol={m.thumbnail.metadata?.info.symbol}
               description={m.thumbnail.metadata?.info.extended?.description}
+              endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
               preview={false}
             />
           </Link>
@@ -52,7 +53,7 @@ export const HomeView = () => {
       <PreSaleBanner
         artistName={'RAC'}
         productName={'THE BOY COLLECTION'}
-        preSaleTS={1618690343000}
+        preSaleTS={1620009209}
         image="img/banner1.jpeg"
       />
       <Layout>
