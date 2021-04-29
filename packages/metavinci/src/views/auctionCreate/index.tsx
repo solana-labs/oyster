@@ -128,6 +128,11 @@ export const AuctionCreateView = () => {
 
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
+  const [auctionObj, setAuctionObj] = useState<{
+    vault: PublicKey;
+    auction: PublicKey;
+    auctionManager: PublicKey;
+  } | undefined>(undefined);
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
@@ -204,7 +209,7 @@ export const AuctionCreateView = () => {
       throw new Error('Not supported');
     }
 
-    await createAuctionManager(
+    const _auctionObj = await createAuctionManager(
       connection,
       wallet,
       settings,
@@ -216,8 +221,9 @@ export const AuctionCreateView = () => {
         ...(attributes.participationNFT ? [attributes.participationNFT] : []),
       ],
       // TODO: move to config
-      new PublicKey('3EVo6RQfu5D1DC18jsqrQnbiKLYoig8yckJC7QgMiJVY'),
+      new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
     );
+    setAuctionObj(_auctionObj)
   };
 
   const categoryStep = (
@@ -314,7 +320,7 @@ export const AuctionCreateView = () => {
     />
   );
 
-  const congratsStep = <Congrats />;
+  const congratsStep = <Congrats auction={auctionObj}/>;
 
   const stepsByCategory = {
     [AuctionCategory.Limited]: [
@@ -1504,7 +1510,27 @@ const WaitingStep = (props: {
   );
 };
 
-const Congrats = () => {
+const Congrats = (props: {
+  auction?: {
+    vault: PublicKey;
+    auction: PublicKey;
+    auctionManager: PublicKey;
+  }
+}) => {
+  const history = useHistory()
+
+  const newTweetURL = () => {
+    const params = {
+      text: "I've created a new NFT auction on Metaplex, check it out!",
+      url: `${window.location.origin}/#/auction/${props.auction?.auction.toString()}`,
+      hashtags: "NFT,Crypto,Metaplex",
+      // via: "Metaplex",
+      related: "Metaplex,Solana",
+    }
+    const queryParams = new URLSearchParams(params).toString()
+    return `https://twitter.com/intent/tweet?${queryParams}`
+  }
+
   return (
     <>
       <div style={{ marginTop: 70 }}>
@@ -1512,18 +1538,18 @@ const Congrats = () => {
           Congratulations! Your auction is now live.
         </div>
         <div className="congrats-button-container">
-          <Button className="congrats-button">
+          <Button className="congrats-button" onClick={_ => window.open(newTweetURL(), "_blank")}>
             <span>Share it on Twitter</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
-            <span>See it in your collection</span>
+          <Button className="congrats-button" onClick={_ => history.push(`/auction/${props.auction?.auction.toString()}`)}>
+            <span>See it in your auctions</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
+          {/* <Button className="congrats-button">
             <span>Sell it via auction</span>
             <span>&gt;</span>
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Confetti />
