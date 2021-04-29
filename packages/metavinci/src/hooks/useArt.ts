@@ -26,7 +26,7 @@ export const useArt = (id?: PublicKey | string) => {
   const [art, setArt] = useState(metadataToArt(account?.info));
 
   useEffect(() => {
-    if (account && account.info.uri && !account.info.extended) {
+    if (account && account.info.uri) {
       fetch(account.info.uri, { cache: 'force-cache' })
         .then(async _ => {
           try {
