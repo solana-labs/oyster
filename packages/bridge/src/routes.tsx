@@ -41,7 +41,7 @@ export function Routes() {
                                 component={() => <HomeView />}
                               />
                               <Route path="/move" children={<TransferView />} />
-                              <Route path="/faq" children={<FaqView />} />
+                              {/*<Route path="/faq" children={<FaqView />} />*/}
                               <Route
                                 path="/proof-of-assets"
                                 children={<ProofOfAssetsView />}

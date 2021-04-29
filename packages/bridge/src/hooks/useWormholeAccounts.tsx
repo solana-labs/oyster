@@ -275,7 +275,8 @@ export const useWormholeAccounts = () => {
     })();
 
     return () => {
-      connection.removeProgramAccountChangeListener(wormholeSubId);
+      if (wormholeSubId !== 0)
+        connection.removeProgramAccountChangeListener(wormholeSubId);
     };
   }, [connection, setExternalAssets]);
 
