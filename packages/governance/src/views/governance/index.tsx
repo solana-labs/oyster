@@ -9,12 +9,7 @@ import {
   deserializeMint,
   ParsedAccount,
 } from '@oyster/common';
-import {
-  ExecutionType,
-  Governance,
-  GovernanceType,
-  VotingEntryRule,
-} from '../../models/governance';
+import { Governance } from '../../models/governance';
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
@@ -32,24 +27,7 @@ const columns = [
     key: 'voteThreshold',
     render: (number: number) => <span>{number}</span>,
   },
-  {
-    title: LABELS.EXECUTION_TYPE,
-    dataIndex: 'executionType',
-    key: 'executionType',
-    render: (number: number) => <span>{ExecutionType[number]}</span>,
-  },
-  {
-    title: LABELS.PROPOSAL_TYPE,
-    dataIndex: 'governanceType',
-    key: 'governanceType',
-    render: (number: number) => <span>{GovernanceType[number]}</span>,
-  },
-  {
-    title: LABELS.VOTING_ENTRY_RULES,
-    dataIndex: 'votingEntryRule',
-    key: 'votingEntryRule',
-    render: (number: number) => <span>{VotingEntryRule[number]}</span>,
-  },
+
   {
     title: LABELS.MINIMUM_SLOT_WAITING_PERIOD,
     dataIndex: 'minimumSlotWaitingPeriod',

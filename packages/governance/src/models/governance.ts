@@ -6,7 +6,7 @@ import { utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
-export const CONFIG_NAME_LENGTH = 32;
+export const GOVERNANCE_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
@@ -21,13 +21,12 @@ export enum GovernanceInstruction {
   AddCustomSingleSignerTransaction = 4,
   Sign = 8,
   Vote = 9,
-  InitGovernance = 10,
+  CreateGovernance = 10,
 
   Execute = 11,
   DepositGovernanceTokens = 12,
   WithdrawVotingTokens = 13,
-  CreateEmptyGovernance = 14,
-  CreateGovernanceVotingRecord = 15,
+  CreateGovernanceVotingRecord = 14,
 }
 
 export interface GovernanceVotingRecord {
@@ -63,12 +62,7 @@ export interface Governance {
   accountType: GovernanceAccountType;
   /// Vote threshold
   voteThreshold: number;
-  /// Execution type
-  executionType: ExecutionType;
-  /// Governance Type
-  governanceType: GovernanceType;
-  /// Voting entry rule
-  votingEntryRule: VotingEntryRule;
+
   /// Minimum slot time-distance from creation of proposal for an instruction to be placed
   minimumSlotWaitingPeriod: BN;
   /// Governance mint
@@ -98,32 +92,17 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
   [
     BufferLayout.u8('accountType'),
     BufferLayout.u8('voteThreshold'),
-    BufferLayout.u8('executionType'),
-    BufferLayout.u8('governanceType'),
-    BufferLayout.u8('votingEntryRule'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.publicKey('governanceMint'),
     BufferLayout.u8('councilMintOption'),
     Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
-    BufferLayout.seq(BufferLayout.u8(), CONFIG_NAME_LENGTH, 'name'),
+    BufferLayout.seq(BufferLayout.u8(), GOVERNANCE_NAME_LENGTH, 'name'),
     BufferLayout.u32('count'),
     BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
   ],
 );
-
-export enum VotingEntryRule {
-  Anytime = 0,
-}
-
-export enum ExecutionType {
-  Independent = 0,
-}
-
-export enum GovernanceType {
-  Governance = 0,
-}
 
 export enum ProposalStateStatus {
   /// Draft
@@ -180,7 +159,6 @@ export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct
   [
     BufferLayout.u8('accountType'),
     Layout.publicKey('config'),
-    Layout.publicKey('tokenProgramId'),
     Layout.publicKey('state'),
     Layout.publicKey('signatoryMint'),
     Layout.publicKey('adminMint'),
@@ -192,8 +170,7 @@ export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct
     Layout.publicKey('adminValidation'),
     Layout.publicKey('votingValidation'),
     Layout.publicKey('sourceHolding'),
-    Layout.publicKey('yesVotingDump'),
-    Layout.publicKey('noVotingDump'),
+
     BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
   ],
 );
@@ -224,9 +201,6 @@ export interface Proposal {
 
   /// configuration values
   config: PublicKey;
-
-  /// Token Program ID
-  tokenProgramId: PublicKey;
 
   /// state values
   state: PublicKey;
@@ -262,12 +236,6 @@ export interface Proposal {
 
   /// Governance holding account
   sourceHolding: PublicKey;
-
-  /// Yes Voting dump account for exchanged vote tokens
-  yesVotingDump: PublicKey;
-
-  /// No Voting dump account for exchanged vote tokens
-  noVotingDump: PublicKey;
 }
 
 export const CustomSingleSignerTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
@@ -309,7 +277,6 @@ export const ProposalParser = (
     info: {
       accountType: data.accountType,
       config: data.config,
-      tokenProgramId: data.tokenProgramId,
       state: data.state,
       signatoryMint: data.signatoryMint,
       adminMint: data.adminMint,
@@ -321,8 +288,6 @@ export const ProposalParser = (
       adminValidation: data.adminValidation,
       votingValidation: data.votingValidation,
       sourceHolding: data.sourceHolding,
-      yesVotingDump: data.yesVotingDump,
-      noVotingDump: data.noVotingDump,
     },
   };
 
@@ -431,9 +396,7 @@ export const GovernanceParser = (
     info: {
       accountType: data.accountType,
       voteThreshold: data.voteThreshold,
-      executionType: data.executionType,
-      governanceType: data.governanceType,
-      votingEntryRule: data.votingEntryRule,
+
       minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
       governanceMint: data.governanceMint,
       councilMint: data.councilMintOption === 1 ? data.councilMint : null,

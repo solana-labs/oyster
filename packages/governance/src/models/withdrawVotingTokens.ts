@@ -15,8 +15,6 @@ import BN from 'bn.js';
 ///   3. `[writable]` Initialized No Voting account from which to remove your voting tokens.
 ///   4. `[writable]` User token account that you wish your actual tokens to be returned to.
 ///   5. `[writable]` Source holding account owned by the Governance that will has the actual tokens in escrow.
-///   6. `[writable]` Initialized Yes Voting dump account owned by Proposal to which to send your voting tokens.
-///   7. `[writable]` Initialized No Voting dump account owned by Proposal to which to send your voting tokens.
 ///   8. `[writable]` Voting mint account.
 ///   9. `[writable]` Yes Voting mint account.
 ///   10. `[writable]` No Voting mint account.
@@ -32,8 +30,6 @@ export const withdrawVotingTokensInstruction = (
   noVotingAccount: PublicKey,
   destinationAccount: PublicKey,
   sourceHoldingAccount: PublicKey,
-  yesVotingDump: PublicKey,
-  noVotingDump: PublicKey,
   votingMint: PublicKey,
   yesVotingMint: PublicKey,
   noVotingMint: PublicKey,
@@ -67,8 +63,6 @@ export const withdrawVotingTokensInstruction = (
     { pubkey: noVotingAccount, isSigner: false, isWritable: true },
     { pubkey: destinationAccount, isSigner: false, isWritable: true },
     { pubkey: sourceHoldingAccount, isSigner: false, isWritable: true },
-    { pubkey: yesVotingDump, isSigner: false, isWritable: true },
-    { pubkey: noVotingDump, isSigner: false, isWritable: true },
     { pubkey: votingMint, isSigner: false, isWritable: true },
     { pubkey: yesVotingMint, isSigner: false, isWritable: true },
     { pubkey: noVotingMint, isSigner: false, isWritable: true },

@@ -27,17 +27,15 @@ export const executeInstruction = (
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
-  const dataLayout = BufferLayout.struct([
-    BufferLayout.u8('instruction'),
-    BufferLayout.u8('numberOfExtraAccounts'),
-  ]);
+  const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
 
   const data = Buffer.alloc(dataLayout.span);
+
+  console.log('ACCTS', accountInfos);
 
   dataLayout.encode(
     {
       instruction: GovernanceInstruction.Execute,
-      numberOfExtraAccounts: accountInfos.length,
     },
     data,
   );
