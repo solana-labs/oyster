@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Row, Col, Divider, Layout, Image, Spin } from 'antd';
 import { AuctionCard } from '../../components/AuctionCard';
-import { useArt, useAuction } from '../../hooks';
+import { metadataToArt, useArt, useAuction } from '../../hooks';
 import { ArtContent } from '../../components/ArtContent';
 import { sampleArtist } from '../home/sampleData';
 
@@ -11,7 +11,7 @@ const { Content } = Layout;
 export const AuctionView = () => {
   const { id } = useParams<{ id: string }>();
   const auction = useAuction(id);
-  const art = useArt(auction?.openEditionItem?.metadata.pubkey.toBase58() as string);
+  const art = useArt(auction?.thumbnail.metadata.pubkey.toBase58() as string);
   const artist = sampleArtist;
 
   return (

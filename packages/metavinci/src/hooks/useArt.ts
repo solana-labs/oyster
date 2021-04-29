@@ -2,6 +2,17 @@ import React, { useMemo } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useMeta } from '../contexts';
 import { Art } from '../types';
+import { Metadata } from '@oyster/common';
+
+export const metadataToArt = (info: Metadata | undefined) => {
+  return {
+    image: info?.extended?.image,
+    category: info?.extended?.category,
+    title: info?.name,
+    about: info?.extended?.description,
+    royalties: info?.extended?.royalty,
+  } as Art;
+};
 
 export const useArt = (id: PublicKey | string) => {
   const { metadata } = useMeta();
@@ -12,11 +23,5 @@ export const useArt = (id: PublicKey | string) => {
     [key, metadata],
   );
 
-  return {
-    image: account?.info.extended?.image,
-    category: account?.info.extended?.category,
-    title: account?.info.name,
-    about: account?.info.extended?.description,
-    royalties: account?.info.extended?.royalty,
-  } as Art;
+  return metadataToArt(account?.info);
 };
