@@ -221,7 +221,7 @@ export const AuctionCreateView = () => {
         ...(attributes.participationNFT ? [attributes.participationNFT] : []),
       ],
       // TODO: move to config
-      new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
+      new PublicKey('3EVo6RQfu5D1DC18jsqrQnbiKLYoig8yckJC7QgMiJVY'),
     );
     setAuctionObj(_auctionObj)
   };
