@@ -2,7 +2,9 @@ import moment from 'moment';
 
 export const getCountdown = (ts: number) => {
   const now = moment().unix();
-  let delta = Math.abs(ts - now);
+  let delta = ts - now;
+
+  if (!ts || delta <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
   const days = Math.floor(delta / 86400);
   delta -= days * 86400;

@@ -71,25 +71,29 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
       {isStarted && <div className="info-header">HIGHEST BID</div>}
       {isStarted && <div style={{ fontWeight: 700, fontSize: '1.6rem' }}>◎40.00</div>}
       <br />
-      <div className="info-header">AUCTION ENDS IN</div>
-      <Row style={{ width: 300 }}>
-        {days > 0 && <Col span={8}>
-          <div className="cd-number">{days || '--'}</div>
-          <div className="cd-label">days</div>
-        </Col>}
-        <Col span={8}>
-          <div className="cd-number">{hours || '--'}</div>
-          <div className="cd-label">hours</div>
-        </Col>
-        <Col span={8}>
-          <div className="cd-number">{minutes || '--'}</div>
-          <div className="cd-label">minutes</div>
-        </Col>
-        {!days && <Col span={8}>
-          <div className="cd-number">{seconds || '--'}</div>
-          <div className="cd-label">seconds</div>
-        </Col>}
-      </Row>
+      {(days == 0 && hours == 0 && minutes == 0 && seconds == 0) ?
+        <div className="info-header">AUCTION HAS ENDED</div>
+        : <>
+          <div className="info-header">AUCTION ENDS IN</div>
+          <Row style={{ width: 300 }}>
+            {days > 0 && <Col span={8}>
+              <div className="cd-number">{days}</div>
+              <div className="cd-label">days</div>
+            </Col>}
+            <Col span={8}>
+              <div className="cd-number">{hours}</div>
+              <div className="cd-label">hours</div>
+            </Col>
+            <Col span={8}>
+              <div className="cd-number">{minutes}</div>
+              <div className="cd-label">minutes</div>
+            </Col>
+            {!days && <Col span={8}>
+              <div className="cd-number">{seconds}</div>
+              <div className="cd-label">seconds</div>
+            </Col>}
+          </Row>
+        </>}
       <br />
       <div
         className="info-content"
@@ -159,7 +163,7 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   );
 };
 
-export const AuctionBids = ({bids}: {bids : ParsedAccount<BidderMetadata>[]}) => {
+export const AuctionBids = ({ bids }: { bids: ParsedAccount<BidderMetadata>[] }) => {
   return (
     <Col style={{ width: '100%' }}>
       {bids.map((bid, index) => {
