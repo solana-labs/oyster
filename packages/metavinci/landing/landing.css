@@ -1,12 +1,12 @@
 
 body {
   background-color: black;
+  font-family: "Inter";
 }
 
 .header {
-  font-family: Graphik Web Regular;
   font-style: italic;
-  font-weight: 500;
+  font-weight: 700;
   font-size: 2rem;
   line-height: 40px;
 
@@ -16,7 +16,6 @@ body {
 }
 
 .subheader {
-  font-family: Graphik Web Regular;
   font-style: normal;
   font-weight: 500;
   font-size: 36px;
@@ -27,7 +26,6 @@ body {
 }
 
 .text {
-  font-family: Graphik Web Regular;
   font-style: normal;
   font-weight: normal;
   font-size: 18px;
