@@ -21,16 +21,16 @@ export const useBidsForAuction = (auctionPubkey: PublicKey | string) => {
 
   const bids = cache
     .byParser(BidderMetadataParser)
-    .filter(id => {
-      const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
+    .filter(key => {
+      const bidder = cache.get(key) as ParsedAccount<BidderMetadata>;
       if (!bidder) {
         return false;
       }
 
       return bidder.info.auctionPubkey.toBase58() === id;
     })
-    .map(id => {
-      const bidder = cache.get(id) as ParsedAccount<BidderMetadata>;
+    .map(key => {
+      const bidder = cache.get(key) as ParsedAccount<BidderMetadata>;
       return bidder;
     })
     .sort((a, b) => a.info.lastBid.sub(a.info.lastBid).toNumber())
