@@ -70,8 +70,8 @@ export async function createAuctionManager(
   wallet: any,
   settings: AuctionManagerSettings,
   winnerLimit: WinnerLimit,
-  duration: BN,
-  gap: BN,
+  endAuctionAt: BN,
+  auctionGap: BN,
   safetyDeposits: SafetyDepositDraft[],
   paymentMint: PublicKey,
 ): Promise<{
@@ -99,7 +99,14 @@ export async function createAuctionManager(
     instructions: makeAuctionInstructions,
     signers: makeAuctionSigners,
     auction,
-  } = await makeAuction(wallet, winnerLimit, vault, duration, gap, paymentMint);
+  } = await makeAuction(
+    wallet,
+    winnerLimit,
+    vault,
+    endAuctionAt,
+    auctionGap,
+    paymentMint,
+  );
 
   let nftConfigs = safetyDeposits.map((w, i) => ({
     tokenAccount: w.holding,
