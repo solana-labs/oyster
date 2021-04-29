@@ -76,7 +76,7 @@ export const PROGRAM_IDS = [
   {
     name: 'testnet',
     governance: () => ({
-      programId: new PublicKey('DCVPuhaGNMLh73FRWFroH4o3ERUhBKMRWfBgJV94VqRk'),
+      programId: new PublicKey('A9KW1nhwZUr1kMX8C6rgzZvAE9AwEEUi2C77SiVvEiuN'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
@@ -91,10 +91,11 @@ export const PROGRAM_IDS = [
       legacy: [],
     }),
   },
+
   {
     name: 'devnet',
     governance: () => ({
-      programId: new PublicKey('DCVPuhaGNMLh73FRWFroH4o3ERUhBKMRWfBgJV94VqRk'),
+      programId: new PublicKey('A9KW1nhwZUr1kMX8C6rgzZvAE9AwEEUi2C77SiVvEiuN'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
