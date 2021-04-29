@@ -11,7 +11,7 @@ const { Content } = Layout;
 export const AuctionView = () => {
   const { id } = useParams<{ id: string }>();
   const auction = useAuction(id);
-  const art = useArt(auction?.thumbnail.metadata.pubkey.toBase58() as string);
+  const art = useArt(auction?.thumbnail.metadata.pubkey);
   const artist = sampleArtist;
 
   return (

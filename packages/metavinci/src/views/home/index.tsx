@@ -3,7 +3,7 @@ import { Layout, Row, Col, Tabs } from 'antd';
 import Masonry from 'react-masonry-css';
 
 import { PreSaleBanner } from '../../components/PreSaleBanner';
-import { AuctionViewState, useAuctions } from '../../hooks';
+import { AuctionViewState, useArt, useAuctions } from '../../hooks';
 
 import './index.less';
 import { ArtCard } from '../../components/ArtCard';
@@ -40,6 +40,7 @@ export const HomeView = () => {
               symbol={m.thumbnail.metadata?.info.symbol}
               description={m.thumbnail.metadata?.info.extended?.description}
               endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
+              pubkey={m.thumbnail.metadata.pubkey}
               preview={false}
             />
           </Link>

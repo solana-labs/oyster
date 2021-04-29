@@ -4,10 +4,13 @@ import { MetadataCategory } from '@oyster/common';
 import { ArtContent } from './../ArtContent';
 import './index.less';
 import { getCountdown } from '../../utils/utils';
+import { useArt } from '../../hooks';
+import { PublicKey } from '@solana/web3.js';
 
 const { Meta } = Card;
 
 export interface ArtCardProps extends CardProps {
+  pubkey?: PublicKey;
   image?: string;
   category?: MetadataCategory
   name?: string;
@@ -21,7 +24,14 @@ export interface ArtCardProps extends CardProps {
 }
 
 export const ArtCard = (props: ArtCardProps) => {
-  const { className, small, category, image, name, preview, artist, close, endAuctionAt, ...rest } = props;
+  let { className, small, category, image, name, preview, artist, close, description, pubkey, endAuctionAt, ...rest } = props;
+  const art = useArt(pubkey);
+  category = art?.category || category;
+  image = art?.image || image;
+  name = art?.title || name || '';
+  artist = art?.artist || artist;
+  description = art?.about || description;
+
   const [hours, setHours] = useState<number>(23)
   const [minutes, setMinutes] = useState<number>(59)
   const [seconds, setSeconds] = useState<number>(59)
@@ -46,7 +56,7 @@ export const ArtCard = (props: ArtCardProps) => {
           {close && <Button className="card-close-button" shape="circle" onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            close();
+            close && close();
           }} >X</Button>}
           <ArtContent category={category} content={image} preview={preview} />
         </>}

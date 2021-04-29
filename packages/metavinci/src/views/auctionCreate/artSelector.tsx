@@ -3,7 +3,7 @@ import { Row, Button, Modal, ButtonProps } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
 import './../styles.less';
 import { Metadata, ParsedAccount } from '@oyster/common';
-import { useUserArts } from '../../hooks';
+import { useArt, useUserArts } from '../../hooks';
 import Masonry from 'react-masonry-css';
 import { SafetyDepositDraft } from '../../actions/createAuctionManager';
 
@@ -59,18 +59,11 @@ export const ArtSelector = (props: ArtSelectorProps) => {
       >
         {selected.map(m => {
           let key = m?.metadata.pubkey.toBase58() || '';
-          let item = m?.metadata?.info;
-          if (!item) {
-            return;
-          }
 
           return (
             <ArtCard
               key={key}
-              image={item.extended?.image}
-              category={item.extended?.category}
-              name={item?.name}
-              symbol={item.symbol}
+              pubkey={m.metadata.pubkey}
               preview={false}
               onClick={open}
               close={() => {
@@ -139,10 +132,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
               return (
                 <ArtCard
                   key={id}
-                  image={m.metadata.info.extended?.image}
-                  category={m.metadata.info.extended?.category}
-                  name={m.metadata.info?.name}
-                  symbol={m.metadata.info.symbol}
+                  pubkey={m.metadata.pubkey}
                   preview={false}
                   onClick={onSelect}
                   className={isSelected ? 'selected-card' : 'not-selected-card'}

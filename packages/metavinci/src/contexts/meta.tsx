@@ -528,42 +528,11 @@ const queryExtendedMetadata = async (
     } else {
       const metadata = mintToMetadata[key];
 
-      if (metadata && metadata.info.uri) {
-        extendedMetadataFetch.set(
-          key,
-          fetch(metadata.info.uri, { cache: "force-cache" })
-            .then(async _ => {
-              try {
-                metadata.info.extended = await _.json();
-                if (
-                  !metadata.info.extended ||
-                  metadata.info.extended?.files?.length === 0
-                ) {
-                  delete mintToMetadata[key];
-                } else {
-                  if (metadata.info.extended?.image) {
-                    const file = `${metadata.info.uri}/${metadata.info.extended.image}`;
-                    metadata.info.extended.image = file;
-                    fetch(file, { cache: "force-cache" })
-                      .then(res => res.blob())
-                      .then(blob => metadata.info.extended && (metadata.info.extended.image = URL.createObjectURL(blob)));
-                  }
-                }
-              } catch {
-                delete mintToMetadata[key];
-                return undefined;
-              }
-            })
-            .catch(() => {
-              delete mintToMetadata[key];
-              return undefined;
-            }),
-        );
-      }
+
     }
   });
 
-  await Promise.all([...extendedMetadataFetch.values()]);
+  // await Promise.all([...extendedMetadataFetch.values()]);
 
   setMetadata([...Object.values(mintToMetadata)]);
   setMetadataByMint(mintToMetadata);
