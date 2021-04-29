@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Divider, Layout, Image } from 'antd';
+import React from 'react';
+import { Row, Col, Divider, Layout } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useArt } from './../../hooks';
 
 import "./index.less"
-import { Art, Artist, Presale } from '../../types';
-import { sampleArtist, samplePresale } from '../home/sampleData';
-import { PreSaleCard } from '../../components/PresaleCard';
+import { Artist } from '../../types';
+import { sampleArtist } from '../home/sampleData';
 import { ArtContent } from '../../components/ArtContent';
 
 const { Content } = Layout
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
-
   const art = useArt(id);
-  // const artist: Artist = getArtist(art.artist_id)
-  // const presale: Presale = getPresale(art.presale_id)
   const artist: Artist = sampleArtist
-  const presale: Presale = samplePresale
 
   return (
     <Content>

@@ -67,8 +67,12 @@ export const ArtCard = (props: ArtCardProps) => {
         description={<div>
           <Avatar src="img/artist1.jpeg" /> {artist}
           <div className="cd-container">
-            <div className="cd-title">Ending in</div>
-            <div className="cd-time">{hours}h {minutes}m {seconds}s</div>
+            {(hours == 0 && minutes == 0 && seconds == 0) ?
+              <div className="cd-title">Finished</div>
+            : <>
+              <div className="cd-title">Ending in</div>
+              <div className="cd-time">{hours}h {minutes}m {seconds}s</div>
+            </>}
           </div>
         </div>}
       />
