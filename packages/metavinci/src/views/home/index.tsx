@@ -34,6 +34,7 @@ export const HomeView = () => {
           <Link to={`/auction/${id}`}>
             <ArtCard
               key={id}
+              endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
               pubkey={m.thumbnail.metadata.pubkey}
               preview={false}
             />
@@ -48,7 +49,7 @@ export const HomeView = () => {
       <PreSaleBanner
         artistName={'RAC'}
         productName={'THE BOY COLLECTION'}
-        preSaleTS={1618690343000}
+        preSaleTS={1620009209}
         image="img/banner1.jpeg"
       />
       <Layout>
