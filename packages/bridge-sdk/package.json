@@ -1,7 +1,7 @@
 {
   "name": "@solana/bridge-sdk",
   "version": "0.0.1",
-  "description": "Bride common sdk utilities",
+  "description": "Bridge common sdk utilities",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "exports": {

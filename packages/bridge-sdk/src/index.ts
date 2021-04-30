@@ -1,4 +1,3 @@
-// TODO: move bridge interaction code to this library
 export * as bridge from './bridge';
 export * from './bridge';
 export * as core from './core';
