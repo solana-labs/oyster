@@ -49,9 +49,7 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
     this._provider = new OpenLogin({
       clientId: process.env.REACT_APP_CLIENT_ID || 'BNxdRWx08cSTPlzMAaShlM62d4f8Tp6racfnCg_gaH0XQ1NfSGo3h5B_IkLtgSnPMhlxsSvhqugWm0x8x-VkUXA',
       network: "mainnet", // mainnet, testnet, development
-
-      // TODO: doesnt work
-      // uxMode: 'popup'
+      uxMode: 'popup'
     });
 
     try {
