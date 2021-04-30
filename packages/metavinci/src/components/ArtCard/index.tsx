@@ -66,14 +66,16 @@ export const ArtCard = (props: ArtCardProps) => {
         title={`${name}`}
         description={<div>
           <Avatar src="img/artist1.jpeg" /> {artist}
-          <div className="cd-container">
-            {(hours == 0 && minutes == 0 && seconds == 0) ?
-              <div className="cd-title">Finished</div>
-            : <>
-              <div className="cd-title">Ending in</div>
-              <div className="cd-time">{hours}h {minutes}m {seconds}s</div>
-            </>}
-          </div>
+          {endAuctionAt &&
+            <div className="cd-container">
+              {(hours == 0 && minutes == 0 && seconds == 0) ?
+                <div className="cd-title">Finished</div>
+                : <>
+                <div className="cd-title">Ending in</div>
+                <div className="cd-time">{hours}h {minutes}m {seconds}s</div>
+              </>}
+            </div>
+          }
         </div>}
       />
     </Card>
