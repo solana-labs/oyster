@@ -33,8 +33,8 @@ export const SideReserveOverview = (props: {
 }) => {
   const reserve = props.reserve.info;
   const mode = props.mode;
-  const name = useTokenName(reserve?.liquidity.mint);
-  const liquidityMint = useMint(reserve.liquidity.mint);
+  const name = useTokenName(reserve?.liquidity.mintPubkey);
+  const liquidityMint = useMint(reserve.liquidity.mintPubkey);
 
   const availableAmount = fromLamports(
     reserve.liquidity.availableAmount,
@@ -113,7 +113,7 @@ export const SideReserveOverview = (props: {
         >
           <Link to={`/reserve/${props.reserve.pubkey}`}>
             <TokenIcon
-              mintAddress={reserve?.liquidity.mint}
+              mintAddress={reserve?.liquidity.mintPubkey}
               style={{ width: 30, height: 30 }}
             />{' '}
             {name} Reserve Overview

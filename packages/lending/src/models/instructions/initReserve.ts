@@ -31,7 +31,7 @@ import { LendingInstruction } from './instruction';
 ///   13 `[]` Clock sysvar.
 ///   13 `[]` Rent sysvar.
 ///   14 `[]` Token program id.
-///   15 `[optional]` Reserve liquidity aggregator account.
+///   15 `[optional]` Reserve liquidity oracle account.
 ///                     Not required for quote currency reserves.
 ///                     Must match base and quote currency mint, and quote currency decimals.
 // InitReserve {
@@ -56,7 +56,7 @@ export const initReserveInstruction = (
   lendingMarketAuthority: PublicKey,
   lendingMarketOwner: PublicKey,
   transferAuthority: PublicKey,
-  aggregator?: PublicKey,
+  oracle?: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
@@ -92,8 +92,8 @@ export const initReserveInstruction = (
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
-  if (aggregator) {
-    keys.push({ pubkey: aggregator, isSigner: false, isWritable: false });
+  if (oracle) {
+    keys.push({ pubkey: oracle, isSigner: false, isWritable: false });
   }
 
   return new TransactionInstruction({

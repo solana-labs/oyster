@@ -17,8 +17,9 @@ export const MarginTradeItem = (props: {
   reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidity.mint);
-  const price = useMidPriceInUSD(props.reserve.liquidity.mint.toBase58()).price;
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
+  const price = useMidPriceInUSD(props.reserve.liquidity.mintPubkey.toBase58())
+    .price;
 
   const apr = calculateBorrowAPY(props.reserve);
 
@@ -33,7 +34,7 @@ export const MarginTradeItem = (props: {
     <Link to={`/margin/${props.address.toBase58()}`}>
       <div className="choose-margin-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mintPubkey} />
           {name}
         </span>
         <div>${formatNumber.format(price)}</div>

@@ -12,9 +12,9 @@ export const DepositInfoLine = (props: {
   reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidity.mint);
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
   const { balance: tokenBalance } = useUserBalance(
-    props.reserve.liquidity.mint,
+    props.reserve.liquidity.mintPubkey,
   );
   const { balance: collateralBalance } = useUserCollateralBalance(
     props.reserve,

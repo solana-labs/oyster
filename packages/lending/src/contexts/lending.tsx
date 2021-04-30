@@ -72,7 +72,9 @@ export const useLending = () => {
   useEffect(() => {
     if (reserveAccounts.length > 0) {
       precacheMarkets(
-        reserveAccounts.map(reserve => reserve.info.liquidity.mint.toBase58()),
+        reserveAccounts.map(reserve =>
+          reserve.info.liquidity.mintPubkey.toBase58(),
+        ),
       );
     }
   }, [reserveAccounts, precacheMarkets]);
@@ -91,25 +93,25 @@ export const useLending = () => {
         .filter(item => item !== undefined);
 
       const lendingReserves = accounts
-        .filter(
-          acc => (acc?.info as Reserve).lendingMarket !== undefined,
-        )
+        .filter(acc => (acc?.info as Reserve).lendingMarket !== undefined)
         .map(acc => acc as ParsedAccount<Reserve>);
 
       const toQuery = [
         ...lendingReserves.map(acc => {
           const result = [
             cache.registerParser(
-              acc?.info.collateral.mint.toBase58(),
+              acc?.info.collateral.mintPubkey.toBase58(),
               MintParser,
             ),
             cache.registerParser(
-              acc?.info.liquidity.mint.toBase58(),
+              acc?.info.liquidity.mintPubkey.toBase58(),
               MintParser,
             ),
             // ignore dex if its not set
             cache.registerParser(
-              acc?.info.liquidity.aggregatorOption ? acc?.info.liquidity.aggregator.toBase58() : '',
+              acc?.info.liquidity.oracleOption
+                ? acc?.info.liquidity.oraclePubkey.toBase58()
+                : '',
               DexMarketParser,
             ),
           ].filter(_ => _);

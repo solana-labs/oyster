@@ -57,7 +57,7 @@ export const repayObligationLiquidity = async (
   let sourceLiquidity = source.pubkey;
   if (
     wallet.publicKey.equals(sourceLiquidity) &&
-    repayReserve.info.liquidity.mint.equals(NATIVE_MINT)
+    repayReserve.info.liquidity.mintPubkey.equals(NATIVE_MINT)
   ) {
     sourceLiquidity = createTokenAccount(
       instructions,
@@ -92,14 +92,14 @@ export const repayObligationLiquidity = async (
   instructions.push(
     refreshReserveInstruction(
       repayReserve.pubkey,
-      repayReserve.info.liquidity.aggregatorOption
-        ? repayReserve.info.liquidity.aggregator
+      repayReserve.info.liquidity.oracleOption
+        ? repayReserve.info.liquidity.oraclePubkey
         : undefined,
     ),
     repayObligationLiquidityInstruction(
       liquidityAmount,
       sourceLiquidity,
-      repayReserve.info.liquidity.mint,
+      repayReserve.info.liquidity.mintPubkey,
       repayReserve.pubkey,
       obligation.pubkey,
       repayReserve.info.lendingMarket,

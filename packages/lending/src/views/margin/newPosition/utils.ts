@@ -23,15 +23,15 @@ export function usePoolAndTradeInfoFrom(
   const desiredValue = newPosition.asset.value || 0;
 
   const pool = usePoolForBasket([
-    collType?.info?.liquidity.mint?.toBase58(),
-    desiredType?.info?.liquidity.mint?.toBase58(),
+    collType?.info?.liquidity.mintPubkey?.toBase58(),
+    desiredType?.info?.liquidity.mintPubkey?.toBase58(),
   ]);
 
   const userDeposits = useUserDeposits();
   const collateralDeposit = userDeposits.userDeposits.find(
     u =>
-      u.reserve.info.liquidity.mint.toBase58() ===
-      collType?.info?.liquidity.mint?.toBase58(),
+      u.reserve.info.liquidity.mintPubkey.toBase58() ===
+      collType?.info?.liquidity.mintPubkey?.toBase58(),
   );
 
   const enrichedPools = useEnrichedPools(pool ? [pool] : []);

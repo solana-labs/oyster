@@ -10,7 +10,7 @@ export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
     BufferLayout.u8('version'),
 
     BufferLayout.struct(
-      [Layout.uint64('lastUpdateSlot'), BufferLayout.u8('lastUpdateStale')],
+      [Layout.uint64('slot'), BufferLayout.u8('stale')],
       'lastUpdate',
     ),
 
@@ -18,29 +18,30 @@ export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
 
     BufferLayout.struct(
       [
-        Layout.publicKey('liquidityMint'),
-        BufferLayout.u8('liquidityMintDecimals'),
-        Layout.publicKey('liquiditySupply'),
-        Layout.publicKey('liquidityFeeReceiver'),
-        Layout.uint128('cumulativeBorrowRateWads'),
-        Layout.uint128('borrowedAmountWads'),
+        Layout.publicKey('mintPubkey'),
+        BufferLayout.u8('mintDecimals'),
+        Layout.publicKey('supplyPubkey'),
+        Layout.publicKey('feeReceiver'),
+        // @FIXME: oracle option
+        // TODO: replace u32 option with generic equivalent
+        BufferLayout.u32('oracleOption'),
+        Layout.publicKey('oracle'),
         Layout.uint64('availableAmount'),
+        Layout.uint128('borrowedAmountWads'),
+        Layout.uint128('cumulativeBorrowRateWads'),
+        Layout.uint64('marketPrice'),
       ],
       'liquidity',
     ),
 
     BufferLayout.struct(
       [
-        Layout.publicKey('collateralMint'),
-        Layout.uint64('collateralMintAmount'),
-        Layout.publicKey('collateralSupply'),
+        Layout.publicKey('mintPubkey'),
+        Layout.uint64('mintTotalSupply'),
+        Layout.publicKey('supplyPubkey'),
       ],
       'collateral',
     ),
-
-    // TODO: replace u32 option with generic equivalent
-    BufferLayout.u32('aggregatorOption'),
-    Layout.publicKey('aggregator'),
 
     BufferLayout.struct(
       [
@@ -59,7 +60,6 @@ export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
       'config',
     ),
 
-    // extra space for future contract changes
     BufferLayout.blob(256, 'padding'),
   ],
 );
@@ -78,28 +78,25 @@ export interface Reserve {
 }
 
 export interface ReserveLiquidity {
-  mint: PublicKey;
+  mintPubkey: PublicKey;
   mintDecimals: number;
-  supply: PublicKey;
+  supplyPubkey: PublicKey;
   feeReceiver: PublicKey;
-
-  // @FIXME: aggregator option
-  aggregatorOption: number;
-  aggregator: PublicKey;
-
-  cumulativeBorrowRateWads: BN;
-  marketPrice: BN;
+  // @FIXME: oracle option
+  oracleOption: number;
+  oraclePubkey: PublicKey;
   availableAmount: BN;
   borrowedAmountWads: BN;
+  cumulativeBorrowRateWads: BN;
+  marketPrice: BN;
 }
 
 export interface ReserveCollateral {
-  mint: PublicKey;
-  mintAmount: BN;
-  supply: PublicKey;
+  mintPubkey: PublicKey;
+  mintTotalSupply: BN;
+  supplyPubkey: PublicKey;
 }
 
-// @FIXME: use BigNumber
 export interface ReserveConfig {
   optimalUtilizationRate: number;
   loanToValueRatio: number;
@@ -159,7 +156,8 @@ export const reserveMarketCap = (reserve?: Reserve) => {
 export const collateralExchangeRate = (reserve?: Reserve) => {
   // @FIXME: use BigNumber
   return (
-    (reserve?.collateral.mintAmount.toNumber() || 1) / reserveMarketCap(reserve)
+    (reserve?.collateral.mintTotalSupply.toNumber() || 1) /
+    reserveMarketCap(reserve)
   );
 };
 

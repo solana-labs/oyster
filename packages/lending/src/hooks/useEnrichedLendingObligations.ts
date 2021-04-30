@@ -77,7 +77,7 @@ export function useEnrichedLendingObligations() {
           const reserve = item.reserve.info;
           const depositReserve = item.reserve.info;
           const liquidityMint = cache.get(
-            reserve.liquidity.mint,
+            reserve.liquidity.mintPubkey,
           ) as ParsedAccount<MintInfo>;
           let ltv = 0;
           let health = 0;
@@ -86,7 +86,7 @@ export function useEnrichedLendingObligations() {
 
           if (liquidityMint) {
             const collateralMint = cache.get(
-              item.depositReserve.info.liquidity.mint,
+              item.depositReserve.info.liquidity.mintPubkey,
             );
 
             const collateral = fromLamports(
@@ -104,14 +104,14 @@ export function useEnrichedLendingObligations() {
             const borrowedAmount = simulateMarketOrderFill(
               borrowed,
               item.reserve.info,
-              // @FIXME: aggregator
-              item.reserve.info.liquidity.aggregatorOption
-                ? item.reserve.info.liquidity.aggregator
-                : item.depositReserve.info.liquidity.aggregator,
+              // @FIXME: oracle
+              item.reserve.info.liquidity.oracleOption
+                ? item.reserve.info.liquidity.oraclePubkey
+                : item.depositReserve.info.liquidity.oraclePubkey,
               true,
             );
 
-            const liquidityMintAddress = item.reserve.info.liquidity.mint.toBase58();
+            const liquidityMintAddress = item.reserve.info.liquidity.mintPubkey.toBase58();
             const liquidityMint = cache.get(
               liquidityMintAddress,
             ) as ParsedAccount<MintInfo>;
@@ -140,10 +140,10 @@ export function useEnrichedLendingObligations() {
               // @FIXME: BigNumber
               liquidationThreshold:
                 item.reserve.info.config.liquidationThreshold,
-              repayName: getTokenName(tokenMap, reserve.liquidity.mint),
+              repayName: getTokenName(tokenMap, reserve.liquidity.mintPubkey),
               collateralName: getTokenName(
                 tokenMap,
-                depositReserve.liquidity.mint,
+                depositReserve.liquidity.mintPubkey,
               ),
             },
           } as EnrichedLendingObligation;

@@ -24,9 +24,9 @@ export const LendingReserveItem = (props: {
   address: PublicKey;
   item?: TotalItem;
 }) => {
-  const name = useTokenName(props.reserve.liquidity.mint);
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
 
-  const liquidityMint = useMint(props.reserve.liquidity.mint);
+  const liquidityMint = useMint(props.reserve.liquidity.mintPubkey);
 
   const availableAmount = fromLamports(
     props.reserve.liquidity.availableAmount,
@@ -56,7 +56,7 @@ export const LendingReserveItem = (props: {
     <Link to={`/reserve/${props.address.toBase58()}`}>
       <div className="home-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mintPubkey} />
           {name}
         </span>
         <div title={marketSize.toString()}>

@@ -4,29 +4,62 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 import { LastUpdate } from './lastUpdate';
 
-// @FIXME: obligation packing
 export const ObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),
-    /// Amount of collateral tokens deposited for this obligation
-    Layout.uint64('collateral.depositedAmount'),
-    /// Reserve which collateral tokens were deposited into
-    Layout.publicKey('depositReserve'),
-    /// Borrow rate used for calculating interest.
-    Layout.uint128('cumulativeBorrowRateWads'),
-    /// Amount of tokens borrowed for this obligation plus interest
-    Layout.uint128('borrowedAmountWads'),
-    /// Reserve which tokens were borrowed from
-    Layout.publicKey('borrowReserve'),
 
-    // extra space for future contract changes
-    BufferLayout.blob(128, 'padding'),
+    BufferLayout.struct(
+      [Layout.uint64('slot'), BufferLayout.u8('stale')],
+      'lastUpdate',
+    ),
+
+    Layout.publicKey('lendingMarket'),
+    Layout.publicKey('owner'),
+    Layout.uint128('depositedValue'),
+    Layout.uint128('borrowedValue'),
+    Layout.uint128('allowedBorrowValue'),
+    Layout.uint128('unhealthyBorrowValue'),
+
+    BufferLayout.u8('depositsLen'),
+    BufferLayout.u8('borrowsLen'),
+    BufferLayout.blob(776, 'dataFlat'),
+  ],
+);
+
+export const ObligationCollateralLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.publicKey('depositReserve'),
+    Layout.uint64('depositedAmount'),
+    Layout.uint64('marketValue'),
+  ],
+);
+
+export const ObligationLiquidityLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    Layout.publicKey('borrowReserve'),
+    Layout.uint128('cumulativeBorrowRateWads'),
+    Layout.uint128('borrowedAmountWads'),
+    Layout.uint64('marketValue'),
   ],
 );
 
 export const isObligation = (info: AccountInfo<Buffer>) => {
   return info.data.length === ObligationLayout.span;
 };
+
+export interface ProtoObligation {
+  version: number;
+  lastUpdate: LastUpdate;
+  lendingMarket: PublicKey;
+  owner: PublicKey;
+  depositedValue: BN; // decimals
+  borrowedValue: BN; // decimals
+  allowedBorrowValue: BN; // decimals
+  unhealthyBorrowValue: BN; // decimals
+  depositsLen: number;
+  borrowsLen: number;
+  dataFlat: Buffer;
+}
 
 export interface Obligation {
   version: number;
@@ -39,8 +72,8 @@ export interface Obligation {
   borrows: ObligationLiquidity[];
   depositedValue: BN; // decimals
   borrowedValue: BN; // decimals
-  loanToValueRatio: BN; // decimals
-  liquidationThreshold: BN; // decimals
+  allowedBorrowValue: BN; // decimals
+  unhealthyBorrowValue: BN; // decimals
 }
 
 export interface ObligationCollateral {
@@ -61,11 +94,54 @@ export const ObligationParser = (
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const obligation = ObligationLayout.decode(buffer) as Obligation;
+  const {
+    version,
+    lastUpdate,
+    lendingMarket,
+    owner,
+    depositedValue,
+    borrowedValue,
+    allowedBorrowValue,
+    unhealthyBorrowValue,
+    depositsLen,
+    borrowsLen,
+    dataFlat,
+  } = ObligationLayout.decode(buffer) as ProtoObligation;
 
-  if (obligation.lastUpdate.slot.isZero()) {
+  if (lastUpdate.slot.isZero()) {
     return;
   }
+
+  const depositsBuffer = dataFlat.slice(
+    0,
+    depositsLen * ObligationCollateralLayout.span,
+  );
+  const deposits = BufferLayout.seq(
+    ObligationCollateralLayout,
+    depositsLen,
+  ).decode(depositsBuffer) as ObligationCollateral[];
+
+  const borrowsBuffer = dataFlat.slice(
+    depositsBuffer.length,
+    borrowsLen * ObligationLiquidityLayout.span,
+  );
+  const borrows = BufferLayout.seq(
+    ObligationLiquidityLayout,
+    borrowsLen,
+  ).decode(borrowsBuffer) as ObligationLiquidity[];
+
+  const obligation = {
+    version,
+    lastUpdate,
+    lendingMarket,
+    owner,
+    depositedValue,
+    borrowedValue,
+    allowedBorrowValue,
+    unhealthyBorrowValue,
+    deposits,
+    borrows,
+  } as Obligation;
 
   const details = {
     pubkey,

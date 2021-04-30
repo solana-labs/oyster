@@ -84,17 +84,17 @@ export const liquidateObligation = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    withdrawReserve.info.collateral.mint,
+    withdrawReserve.info.collateral.mintPubkey,
     signers,
   );
 
-  // @FIXME: aggregator
-  const aggregatorAddress = repayReserve.info.liquidity.aggregatorOption
-    ? repayReserve.info.liquidity.aggregator
-    : withdrawReserve.info.liquidity.aggregator;
-  const aggregator = cache.get(aggregatorAddress);
+  // @FIXME: oracle
+  const oracleAddress = repayReserve.info.liquidity.oracleOption
+    ? repayReserve.info.liquidity.oraclePubkey
+    : withdrawReserve.info.liquidity.oraclePubkey;
+  const oracle = cache.get(oracleAddress);
 
-  if (!aggregator) {
+  if (!oracle) {
     throw new Error(`Dex market doesn't exist.`);
   }
 
@@ -103,10 +103,10 @@ export const liquidateObligation = async (
   ) as ParsedAccount<LendingMarket>;
 
   const dexOrderBookSide = market.info.quoteTokenMint.equals(
-    repayReserve.info.liquidity.mint,
+    repayReserve.info.liquidity.mintPubkey,
   )
-    ? aggregator?.info.asks
-    : aggregator?.info.bids;
+    ? oracle?.info.asks
+    : oracle?.info.bids;
 
   const memory = createTempMemoryAccount(
     instructions,
@@ -116,7 +116,7 @@ export const liquidateObligation = async (
   );
 
   instructions.push(
-    // @FIXME: aggregator needed
+    // @FIXME: oracle needed
     refreshReserveInstruction(repayReserve.pubkey),
     refreshReserveInstruction(withdrawReserve.pubkey),
   );
@@ -127,9 +127,9 @@ export const liquidateObligation = async (
       sourceAccount,
       toAccount,
       repayReserve.pubkey,
-      repayReserve.info.liquidity.supply,
+      repayReserve.info.liquidity.supplyPubkey,
       withdrawReserve.pubkey,
-      withdrawReserve.info.collateral.supply,
+      withdrawReserve.info.collateral.supplyPubkey,
       obligation.pubkey,
       repayReserve.info.lendingMarket,
       lendingMarketAuthority,
@@ -137,7 +137,7 @@ export const liquidateObligation = async (
     ),
   );
 
-  let { txid }  = await sendTransaction(
+  let { txid } = await sendTransaction(
     connection,
     wallet,
     instructions.concat(cleanupInstructions),

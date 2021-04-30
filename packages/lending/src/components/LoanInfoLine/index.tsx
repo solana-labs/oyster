@@ -19,13 +19,17 @@ export const LoanInfoLine = (props: {
 }) => {
   const obligation = props.obligation;
 
-  const repayReserve = useLendingReserve(obligation?.info.borrows[0].borrowReserve);
-  const withdrawReserve = useLendingReserve(obligation?.info.deposits[0].depositReserve);
+  const repayReserve = useLendingReserve(
+    obligation?.info.borrows[0].borrowReserve,
+  );
+  const withdrawReserve = useLendingReserve(
+    obligation?.info.deposits[0].depositReserve,
+  );
 
-  const liquidityMint = useMint(repayReserve?.info.liquidity.mint);
-  const collateralMint = useMint(withdrawReserve?.info.liquidity.mint);
-  const repayName = useTokenName(repayReserve?.info.liquidity.mint);
-  const withdrawName = useTokenName(withdrawReserve?.info.liquidity.mint);
+  const liquidityMint = useMint(repayReserve?.info.liquidity.mintPubkey);
+  const collateralMint = useMint(withdrawReserve?.info.liquidity.mintPubkey);
+  const repayName = useTokenName(repayReserve?.info.liquidity.mintPubkey);
+  const withdrawName = useTokenName(withdrawReserve?.info.liquidity.mintPubkey);
 
   const borrowAPY = useMemo(
     () => (repayReserve ? calculateBorrowAPY(repayReserve?.info) : 0),

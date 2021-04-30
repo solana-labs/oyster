@@ -44,7 +44,7 @@ export const HomeView = () => {
 
         const localCache = cache;
         const liquidityMint = localCache.get(
-          item.info.liquidity.mint.toBase58(),
+          item.info.liquidity.mintPubkey.toBase58(),
         ) as ParsedAccount<MintInfo>;
 
         if (!liquidityMint) {
@@ -62,7 +62,10 @@ export const HomeView = () => {
               wadToLamports(item.info?.liquidity.borrowedAmountWads).toNumber(),
               liquidityMint.info,
             ) * price,
-          name: getTokenName(tokenMap, item.info.liquidity.mint.toBase58()),
+          name: getTokenName(
+            tokenMap,
+            item.info.liquidity.mintPubkey.toBase58(),
+          ),
         };
 
         newTotals.items.push(leaf);

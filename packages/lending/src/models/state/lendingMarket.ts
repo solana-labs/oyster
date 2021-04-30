@@ -9,7 +9,7 @@ export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.s
     Layout.publicKey('owner'),
     Layout.publicKey('quoteTokenMint'),
     Layout.publicKey('tokenProgramId'),
-    // extra space for future contract changes
+
     BufferLayout.blob(128, 'padding'),
   ],
 );

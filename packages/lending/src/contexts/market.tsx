@@ -517,8 +517,8 @@ export const simulateMarketOrderFill = (
   dex: PublicKey,
   useBBO = false,
 ) => {
-  const liquidityMint = cache.get(reserve.liquidity.mint);
-  const collateralMint = cache.get(reserve.collateral.mint);
+  const liquidityMint = cache.get(reserve.liquidity.mintPubkey);
+  const collateralMint = cache.get(reserve.collateral.mintPubkey);
   if (!liquidityMint || !collateralMint) {
     return 0.0;
   }
@@ -538,7 +538,7 @@ export const simulateMarketOrderFill = (
     reserve.lendingMarket,
   ) as ParsedAccount<LendingMarket>;
 
-  const aggregator = new Market(
+  const market = new Market(
     decodedMarket,
     baseMintDecimals,
     quoteTokenMintDecimals,
@@ -552,10 +552,12 @@ export const simulateMarketOrderFill = (
     return 0;
   }
 
-  const bids = new Orderbook(aggregator, bidInfo.accountFlags, bidInfo.slab);
-  const asks = new Orderbook(aggregator, askInfo.accountFlags, askInfo.slab);
+  const bids = new Orderbook(market, bidInfo.accountFlags, bidInfo.slab);
+  const asks = new Orderbook(market, askInfo.accountFlags, askInfo.slab);
 
-  const book = lendingMarket.info.quoteTokenMint.equals(reserve.liquidity.mint)
+  const book = lendingMarket.info.quoteTokenMint.equals(
+    reserve.liquidity.mintPubkey,
+  )
     ? bids
     : asks;
 

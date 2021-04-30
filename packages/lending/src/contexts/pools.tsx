@@ -9,7 +9,7 @@ export function useCachedPool(legacy = false) {
 
   const allPools = context.pools as PoolInfo[];
   const pools = useMemo(() => {
-    return allPools.filter((p) => p.legacy === legacy);
+    return allPools.filter(p => p.legacy === legacy);
   }, [allPools, legacy]);
 
   return {

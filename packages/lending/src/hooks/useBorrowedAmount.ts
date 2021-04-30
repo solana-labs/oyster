@@ -18,7 +18,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     health: 0,
   });
   const reserve = useLendingReserve(address);
-  const liquidityMint = useMint(reserve?.info.liquidity.mint);
+  const liquidityMint = useMint(reserve?.info.liquidity.mintPubkey);
 
   useEffect(() => {
     setBorrowedInfo({

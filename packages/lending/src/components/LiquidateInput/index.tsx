@@ -41,9 +41,9 @@ export const LiquidateInput = (props: {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [collateralValue, setCollateralValue] = useState('');
 
-  const liquidityMint = useMint(repayReserve.info.liquidity.mint);
+  const liquidityMint = useMint(repayReserve.info.liquidity.mintPubkey);
   const { accounts: sourceAccounts, balance: tokenBalance } = useUserBalance(
-    repayReserve?.info.liquidity.mint,
+    repayReserve?.info.liquidity.mintPubkey,
   );
   const borrowAmountLamports = wadToLamports(
     obligation.info.borrows[0].borrowedAmountWads,
@@ -124,7 +124,7 @@ export const LiquidateInput = (props: {
   ]);
 
   const collateralPrice = useMidPriceInUSD(
-    withdrawReserve?.info.liquidity.mint.toBase58(),
+    withdrawReserve?.info.liquidity.mintPubkey.toBase58(),
   )?.price;
 
   useEffect(() => {

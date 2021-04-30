@@ -71,15 +71,15 @@ export const redeemReserveCollateral = async (
     instructions,
     cleanupInstructions,
     accountRentExempt,
-    reserve.liquidity.mint,
+    reserve.liquidity.mintPubkey,
     signers,
   );
 
   instructions.push(
     refreshReserveInstruction(
       reserveAddress,
-      reserve.liquidity.aggregatorOption
-        ? reserve.liquidity.aggregator
+      reserve.liquidity.oracleOption
+        ? reserve.liquidity.oraclePubkey
         : undefined,
     ),
     redeemReserveCollateralInstruction(
@@ -87,8 +87,8 @@ export const redeemReserveCollateral = async (
       sourceCollateral,
       destinationLiquidity,
       reserveAddress,
-      reserve.collateral.mint,
-      reserve.liquidity.supply,
+      reserve.collateral.mintPubkey,
+      reserve.liquidity.supplyPubkey,
       reserve.lendingMarket,
       lendingMarketAuthority,
       transferAuthority.publicKey,

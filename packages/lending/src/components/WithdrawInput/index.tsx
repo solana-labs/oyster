@@ -33,7 +33,7 @@ export const WithdrawInput = (props: {
   const {
     balanceLamports: collateralBalanceLamports,
     accounts: sourceAccounts,
-  } = useUserBalance(reserve?.collateral.mint);
+  } = useUserBalance(reserve?.collateral.mintPubkey);
   const { balance: collateralBalanceInLiquidity } = useUserCollateralBalance(
     reserve,
   );

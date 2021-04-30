@@ -34,8 +34,8 @@ export const ObligationItem = (props: {
     obligation.info.deposits[0].depositReserve,
   ) as ParsedAccount<Reserve>;
 
-  const liquidityMint = useMint(borrowReserve.info.liquidity.mint);
-  const collateralMint = useMint(depositReserve.info.liquidity.mint);
+  const liquidityMint = useMint(borrowReserve.info.liquidity.mintPubkey);
+  const collateralMint = useMint(depositReserve.info.liquidity.mintPubkey);
 
   const borrowAmount = fromLamports(
     wadToLamports(obligation.info.borrows[0].borrowedAmountWads),
@@ -52,8 +52,10 @@ export const ObligationItem = (props: {
   );
   const collateral = fromLamports(collateralLamports, collateralMint);
 
-  const borrowName = useTokenName(borrowReserve?.info.liquidity.mint);
-  const collateralName = useTokenName(depositReserve?.info.liquidity.mint);
+  const borrowName = useTokenName(borrowReserve?.info.liquidity.mintPubkey);
+  const collateralName = useTokenName(
+    depositReserve?.info.liquidity.mintPubkey,
+  );
 
   return (
     <div className="dashboard-item">
@@ -63,10 +65,10 @@ export const ObligationItem = (props: {
           title={`${collateralName}→${borrowName}`}
         >
           <TokenIcon
-            mintAddress={depositReserve?.info.liquidity.mint}
+            mintAddress={depositReserve?.info.liquidity.mintPubkey}
             style={{ marginRight: '-0.5rem' }}
           />
-          <TokenIcon mintAddress={borrowReserve?.info.liquidity.mint} />
+          <TokenIcon mintAddress={borrowReserve?.info.liquidity.mintPubkey} />
         </div>
       </span>
       <div>

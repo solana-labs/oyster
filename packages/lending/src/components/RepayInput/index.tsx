@@ -44,9 +44,9 @@ export const RepayInput = (props: {
   const repayReserve = props.borrowReserve;
   const obligation = props.obligation;
 
-  const liquidityMint = useMint(repayReserve.info.liquidity.mint);
+  const liquidityMint = useMint(repayReserve.info.liquidity.mintPubkey);
   const { balance: tokenBalance } = useUserBalance(
-    repayReserve.info.liquidity.mint,
+    repayReserve.info.liquidity.mintPubkey,
   );
 
   const borrowAmountLamports = wadToLamports(
@@ -56,7 +56,7 @@ export const RepayInput = (props: {
   const depositReserve = props.depositReserve;
 
   const { accounts: sourceAccounts } = useUserBalance(
-    repayReserve.info.liquidity.mint,
+    repayReserve.info.liquidity.mintPubkey,
   );
 
   const convert = useCallback(
@@ -75,11 +75,7 @@ export const RepayInput = (props: {
   const { value, setValue, pct, setPct, type } = useSliderInput(convert);
 
   const onRepay = useCallback(() => {
-    if (
-      !depositReserve ||
-      !obligation ||
-      !repayReserve
-    ) {
+    if (!depositReserve || !obligation || !repayReserve) {
       return;
     }
 
@@ -131,7 +127,7 @@ export const RepayInput = (props: {
   ]);
 
   const collateralPrice = useMidPriceInUSD(
-    depositReserve?.info.liquidity.mint.toBase58(),
+    depositReserve?.info.liquidity.mintPubkey.toBase58(),
   )?.price;
 
   useEffect(() => {

@@ -43,7 +43,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
       }
 
       if (!include || include.has(id)) {
-        result.set(item.info.collateral.mint.toBase58(), item);
+        result.set(item.info.collateral.mintPubkey.toBase58(), item);
       }
 
       return result;
@@ -52,7 +52,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
 
   useEffect(() => {
     const activeMarkets = new Set(
-      reserveAccounts.map(r => r.info.liquidity.aggregator.toBase58()),
+      reserveAccounts.map(r => r.info.liquidity.oraclePubkey.toBase58()),
     );
 
     const userDepositsFactory = () => {
@@ -64,7 +64,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
           ) as ParsedAccount<Reserve>;
 
           let collateralMint = cache.get(
-            reserve.info.collateral.mint,
+            reserve.info.collateral.mintPubkey,
           ) as ParsedAccount<MintInfo>;
 
           const amountLamports = calculateCollateralBalance(
@@ -72,7 +72,9 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
             item?.info.amount.toNumber(),
           );
           const amount = fromLamports(amountLamports, collateralMint?.info);
-          const price = midPriceInUSD(reserve.info.liquidity.mint.toBase58());
+          const price = midPriceInUSD(
+            reserve.info.liquidity.mintPubkey.toBase58(),
+          );
           const amountInQuote = price * amount;
 
           return {
@@ -81,7 +83,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
               amount,
               amountInQuote: amountInQuote,
               apy: calculateDepositAPY(reserve.info),
-              name: getTokenName(tokenMap, reserve.info.liquidity.mint),
+              name: getTokenName(tokenMap, reserve.info.liquidity.mintPubkey),
             },
             reserve,
           } as UserDeposit;

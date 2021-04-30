@@ -26,7 +26,7 @@ export const ReserveStatus = (props: {
     alignItems: 'center',
   };
 
-  const mintAddress = props.reserve.liquidity.mint?.toBase58();
+  const mintAddress = props.reserve.liquidity.mintPubkey?.toBase58();
   const liquidityMint = useMint(mintAddress);
   const { price } = useMidPriceInUSD(mintAddress);
   const availableAmount = fromLamports(

@@ -16,11 +16,11 @@ export const ReserveItem = (props: {
   reserve: Reserve;
   address: PublicKey;
 }) => {
-  const name = useTokenName(props.reserve.liquidity.mint);
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
   const {
     balance: tokenBalance,
     balanceInUSD: tokenBalanceInUSD,
-  } = useUserBalance(props.reserve.liquidity.mint);
+  } = useUserBalance(props.reserve.liquidity.mintPubkey);
   const {
     balance: collateralBalance,
     balanceInUSD: collateralBalanceInUSD,
@@ -32,7 +32,7 @@ export const ReserveItem = (props: {
     <Link to={`/deposit/${props.address.toBase58()}`}>
       <div className="deposit-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mintPubkey} />
           {name}
         </span>
         <div>

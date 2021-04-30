@@ -22,10 +22,12 @@ export default function Breakdown({ item }: { item: Position }) {
   const gains = 'green';
   const losses = 'red';
   const token = tokens.find(
-    t => t.address === item.asset.type?.info?.liquidity.mint?.toBase58(),
+    t => t.address === item.asset.type?.info?.liquidity.mintPubkey?.toBase58(),
   );
   const collateralToken = tokens.find(
-    t => t.address === item.collateral.type?.info?.liquidity.mint?.toBase58(),
+    t =>
+      t.address ===
+      item.collateral.type?.info?.liquidity.mintPubkey?.toBase58(),
   );
 
   const [myGain, setMyGain] = useState<number>(10);

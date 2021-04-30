@@ -23,7 +23,7 @@ export function useBorrowingPower(
 
   const reserve = useLendingReserve(key);
 
-  const liquidityMint = reserve?.info.liquidity.mint;
+  const liquidityMint = reserve?.info.liquidity.mintPubkey;
   const liquidityMintAddress = liquidityMint?.toBase58();
   const market = useLendingMarket(reserve?.info.lendingMarket);
 
@@ -35,7 +35,7 @@ export function useBorrowingPower(
   const exclude = useMemo(() => new Set([key]), [key]);
   const inlcude = useMemo(() => {
     const quoteReserve = getLendingReserves().find(
-      r => r.info.liquidity.mint.toBase58() === quoteTokenMintAddess,
+      r => r.info.liquidity.mintPubkey.toBase58() === quoteTokenMintAddess,
     );
     return onlyQuoteAllowed && quoteReserve
       ? new Set([quoteReserve.pubkey.toBase58()])

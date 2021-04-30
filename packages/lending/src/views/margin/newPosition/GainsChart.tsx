@@ -64,35 +64,35 @@ function getChartData() {
   //the only way to create an immutable copy of array with objects inside.
   const baseDashed = getBaseDashed();
   const baseSolid = JSON.parse(
-    JSON.stringify(baseData.slice(0, Math.floor(baseData.length) / 2 + 1))
+    JSON.stringify(baseData.slice(0, Math.floor(baseData.length) / 2 + 1)),
   );
 
   return {
     datasets: [
       {
-        backgroundColor: "transparent",
-        borderColor: "rgb(39, 107, 251)",
+        backgroundColor: 'transparent',
+        borderColor: 'rgb(39, 107, 251)',
         borderWidth: 4,
         radius: 0,
         data: baseSolid,
       },
       {
-        backgroundColor: "transparent",
+        backgroundColor: 'transparent',
 
         borderWidth: 4,
         radius: 0,
         data: baseDashed,
         borderDash: [15, 3],
-        label: "LEVERAGE",
+        label: 'LEVERAGE',
       },
       {
-        backgroundColor: "transparent",
-        borderColor: "rgb(86, 169, 255)",
+        backgroundColor: 'transparent',
+        borderColor: 'rgb(86, 169, 255)',
         borderWidth: 2,
         radius: 0,
         data: baseDashed,
         borderDash: [8, 4],
-        label: "HOLD",
+        label: 'HOLD',
       },
     ],
   };
@@ -102,7 +102,7 @@ const labelPlugin: ChartPluginsOptions = {};
 
 const getBaseDashed = () => {
   return JSON.parse(
-    JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2))
+    JSON.stringify(baseData.slice(Math.floor(baseData.length) / 2)),
   ) as { x: number; y: number }[];
 };
 
@@ -132,12 +132,12 @@ function updateChartData({
       }
       const gain = (priceChange * leverage) / 100;
       return { x: item.x, y: item.y * (1 + gain) };
-    }
+    },
   );
 
   chart.data.datasets[1].data = leverageData;
   chart.data.datasets[1].borderColor =
-    priceChange >= 0 ? "rgb(51, 223, 204)" : "rgb(255,79,79)";
+    priceChange >= 0 ? 'rgb(51, 223, 204)' : 'rgb(255,79,79)';
 
   baseDashed.forEach((item: { y: number; x: number }, index: number) => {
     if (index !== 0) item.y += (item.y * priceChange) / 100;
@@ -166,8 +166,8 @@ function drawLabels(chart: Chart, leverage: number, priceChange: number) {
   }
 
   ctx.save();
-  ctx.font = "normal normal bold 15px /1.5 Muli";
-  ctx.textBaseline = "bottom";
+  ctx.font = 'normal normal bold 15px /1.5 Muli';
+  ctx.textBaseline = 'bottom';
 
   const datasets = chart.config.data.datasets;
   const element = chart?.canvas?.parentNode as HTMLElement;
@@ -183,7 +183,7 @@ function drawLabels(chart: Chart, leverage: number, priceChange: number) {
     const y = meta.data[pointPostition]._model.y;
     let yOffset;
 
-    if (label === "HOLD") {
+    if (label === 'HOLD') {
       yOffset = leverage * priceChange > 0 ? y * 1.2 : y * 0.8;
     } else {
       yOffset = leverage * priceChange > 0 ? y * 0.8 : y * 1.2;
@@ -215,7 +215,7 @@ export default function GainsChart({
     }
 
     chartRef.current = new Chart(canvasRef.current, {
-      type: "line",
+      type: 'line',
       data: getChartData(),
       plugins: [labelPlugin],
       options: {
@@ -229,12 +229,12 @@ export default function GainsChart({
           },
         },
         labels: {
-          render: "title",
-          fontColor: ["green", "white", "red"],
+          render: 'title',
+          fontColor: ['green', 'white', 'red'],
           precision: 2,
         },
         animation: {
-          easing: "easeOutExpo",
+          easing: 'easeOutExpo',
           duration: 500,
         },
         scales: {
@@ -244,8 +244,8 @@ export default function GainsChart({
               gridLines: {
                 display: false,
               },
-              type: "linear",
-              position: "bottom",
+              type: 'linear',
+              position: 'bottom',
             },
           ],
           yAxes: [
@@ -273,19 +273,19 @@ export default function GainsChart({
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        justifyContent: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        justifyContent: 'center',
       }}
     >
       <canvas ref={canvasRef as any} />
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <span>past</span>

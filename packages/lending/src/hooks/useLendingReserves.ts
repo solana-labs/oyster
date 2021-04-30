@@ -44,7 +44,7 @@ export function useLendingReserve(address?: string | PublicKey) {
     const token: TokenInfo | null = getTokenByName(tokenMap, address);
     if (token) {
       const account = reserveAccounts.filter(
-        acc => acc.info.liquidity.mint.toBase58() === token.address,
+        acc => acc.info.liquidity.mintPubkey.toBase58() === token.address,
       )[0];
       if (account) {
         addressName = account.pubkey;

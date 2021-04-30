@@ -54,7 +54,7 @@ export const CollateralSelector = (props: {
   const quoteTokenMintAddress = market?.info?.quoteTokenMint?.toBase58();
 
   const onlyQuoteAllowed =
-    props.reserve?.liquidity.mint?.toBase58() !== quoteTokenMintAddress;
+    props.reserve?.liquidity.mintPubkey?.toBase58() !== quoteTokenMintAddress;
 
   return (
     <Select
@@ -79,10 +79,12 @@ export const CollateralSelector = (props: {
         .filter(
           reserve =>
             !onlyQuoteAllowed ||
-            reserve.info.liquidity.mint.equals(market.info.quoteTokenMint),
+            reserve.info.liquidity.mintPubkey.equals(
+              market.info.quoteTokenMint,
+            ),
         )
         .map(reserve => {
-          const mint = reserve.info.liquidity.mint.toBase58();
+          const mint = reserve.info.liquidity.mintPubkey.toBase58();
           const address = reserve.pubkey.toBase58();
           const name = getTokenName(tokenMap, mint);
 

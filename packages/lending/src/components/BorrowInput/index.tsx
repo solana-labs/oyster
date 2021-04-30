@@ -43,23 +43,21 @@ export const BorrowInput = (props: {
 
   const depositReserve = useMemo(() => {
     const id: string =
-      cache
-        .byParser(ReserveParser)
-        .find(acc => acc === depositReserveKey) || '';
+      cache.byParser(ReserveParser).find(acc => acc === depositReserveKey) ||
+      '';
 
     return cache.get(id) as ParsedAccount<Reserve>;
   }, [depositReserveKey]);
   const borrowPrice = useMidPriceInUSD(
-    borrowReserve.info.liquidity.mint.toBase58(),
+    borrowReserve.info.liquidity.mintPubkey.toBase58(),
   ).price;
   const collateralPrice = useMidPriceInUSD(
-    depositReserve?.info.liquidity.mint.toBase58(),
+    depositReserve?.info.liquidity.mintPubkey.toBase58(),
   )?.price;
 
-  const include = useMemo(
-    () => new Set([depositReserve?.pubkey.toBase58()]),
-    [depositReserve],
-  );
+  const include = useMemo(() => new Set([depositReserve?.pubkey.toBase58()]), [
+    depositReserve,
+  ]);
 
   const exclude = useMemo(() => new Set([]), []);
 
@@ -130,7 +128,7 @@ export const BorrowInput = (props: {
     depositReserve?.pubkey,
   );
   const { accounts: sourceAccounts } = useUserBalance(
-    depositReserve?.info.collateral.mint,
+    depositReserve?.info.collateral.mintPubkey,
   );
   const onBorrow = useCallback(() => {
     if (!depositReserve) {

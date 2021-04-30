@@ -23,12 +23,12 @@ export const UserLendingCard = (props: {
   const reserve = props.reserve;
   const address = props.address;
 
-  const name = useTokenName(reserve?.liquidity.mint);
+  const name = useTokenName(reserve?.liquidity.mintPubkey);
 
   const {
     balance: tokenBalance,
     balanceInUSD: tokenBalanceInUSD,
-  } = useUserBalance(props.reserve.liquidity.mint);
+  } = useUserBalance(props.reserve.liquidity.mintPubkey);
   const {
     balance: collateralBalance,
     balanceInUSD: collateralBalanceInUSD,

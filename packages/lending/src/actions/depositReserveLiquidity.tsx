@@ -86,7 +86,7 @@ export const depositReserveLiquidity = async (
         instructions,
         cleanupInstructions,
         accountRentExempt,
-        reserve.collateral.mint,
+        reserve.collateral.mintPubkey,
         signers,
       )
     : createUninitializedAccount(
@@ -100,8 +100,8 @@ export const depositReserveLiquidity = async (
     instructions.push(
       refreshReserveInstruction(
         reserveAddress,
-        reserve.liquidity.aggregatorOption
-          ? reserve.liquidity.aggregator
+        reserve.liquidity.oracleOption
+          ? reserve.liquidity.oraclePubkey
           : undefined,
       ),
       depositReserveLiquidityInstruction(
@@ -109,8 +109,8 @@ export const depositReserveLiquidity = async (
         sourceLiquidityAccount,
         destinationCollateralAccount,
         reserveAddress,
-        reserve.liquidity.supply,
-        reserve.collateral.mint,
+        reserve.liquidity.supplyPubkey,
+        reserve.collateral.mintPubkey,
         reserve.lendingMarket,
         lendingMarketAuthority,
         transferAuthority.publicKey,
@@ -127,18 +127,18 @@ export const depositReserveLiquidity = async (
         sourceLiquidityAccount,
         destinationCollateralAccount,
         reserveAddress,
-        reserve.liquidity.mint,
-        reserve.liquidity.supply,
+        reserve.liquidity.mintPubkey,
+        reserve.liquidity.supplyPubkey,
         reserve.liquidity.feeReceiver,
-        reserve.collateral.mint,
-        reserve.collateral.supply,
+        reserve.collateral.mintPubkey,
+        reserve.collateral.supplyPubkey,
         reserve.lendingMarket,
         lendingMarketAuthority,
         // @FIXME: lending market owner
         lendingMarketOwner,
         transferAuthority.publicKey,
-        reserve.liquidity.aggregatorOption
-          ? reserve.liquidity.aggregator
+        reserve.liquidity.oracleOption
+          ? reserve.liquidity.oraclePubkey
           : undefined,
       ),
     );

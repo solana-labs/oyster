@@ -26,7 +26,7 @@ export const DepositInput = (props: {
   const address = props.address;
 
   const { accounts: sourceAccounts, balance, balanceLamports } = useUserBalance(
-    reserve?.liquidity.mint,
+    reserve?.liquidity.mintPubkey,
   );
 
   const convert = useCallback(

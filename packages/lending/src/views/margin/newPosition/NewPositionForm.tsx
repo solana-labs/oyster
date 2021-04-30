@@ -140,9 +140,7 @@ export default function NewPositionForm({
               }}
               onCollateralReserve={key => {
                 const id: string =
-                  cache
-                    .byParser(ReserveParser)
-                    .find(acc => acc === key) || '';
+                  cache.byParser(ReserveParser).find(acc => acc === key) || '';
                 const parser = cache.get(id) as ParsedAccount<Reserve>;
                 const newPos = {
                   ...newPosition,

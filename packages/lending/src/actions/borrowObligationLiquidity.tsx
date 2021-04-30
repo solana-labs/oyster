@@ -61,14 +61,14 @@ export const borrowObligationLiquidity = async (
         instructions,
         [],
         accountRentExempt,
-        borrowReserve.info.liquidity.mint,
+        borrowReserve.info.liquidity.mintPubkey,
         signers,
       )
     : undefined;
 
   const mint = (await cache.query(
     connection,
-    borrowReserve.info.liquidity.mint,
+    borrowReserve.info.liquidity.mintPubkey,
     MintParser,
   )) as ParsedAccount<MintInfo>;
 
@@ -81,7 +81,7 @@ export const borrowObligationLiquidity = async (
     instructions,
     finalCleanupInstructions,
     accountRentExempt,
-    borrowReserve.info.liquidity.mint,
+    borrowReserve.info.liquidity.mintPubkey,
     signers,
   );
 
@@ -113,18 +113,18 @@ export const borrowObligationLiquidity = async (
   instructions.push(
     refreshReserveInstruction(
       borrowReserve.pubkey,
-      borrowReserve.info.liquidity.aggregatorOption
-        ? borrowReserve.info.liquidity.aggregator
+      borrowReserve.info.liquidity.oracleOption
+        ? borrowReserve.info.liquidity.oraclePubkey
         : undefined,
     ),
     refreshObligationInstruction(
       obligation.pubkey,
-      obligation.info.deposits.map((collateral) => collateral.depositReserve),
-      obligation.info.borrows.map((liquidity) => liquidity.borrowReserve),
+      obligation.info.deposits.map(collateral => collateral.depositReserve),
+      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
     ),
     borrowObligationLiquidityInstruction(
       amountLamports,
-      borrowReserve.info.liquidity.supply,
+      borrowReserve.info.liquidity.supplyPubkey,
       destinationLiquidity,
       borrowReserve.pubkey,
       borrowReserve.info.liquidity.feeReceiver,

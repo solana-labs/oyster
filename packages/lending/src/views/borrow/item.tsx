@@ -14,8 +14,9 @@ import { useBorrowingPower } from '../../hooks';
 import { calculateBorrowAPY, Reserve } from '../../models';
 
 export const BorrowItem = (props: { reserve: Reserve; address: PublicKey }) => {
-  const name = useTokenName(props.reserve.liquidity.mint);
-  const price = useMidPriceInUSD(props.reserve.liquidity.mint.toBase58()).price;
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
+  const price = useMidPriceInUSD(props.reserve.liquidity.mintPubkey.toBase58())
+    .price;
 
   const { borrowingPower, totalInQuote } = useBorrowingPower(props.address);
 
@@ -25,7 +26,7 @@ export const BorrowItem = (props: { reserve: Reserve; address: PublicKey }) => {
     <Link to={`/borrow/${props.address.toBase58()}`}>
       <div className="borrow-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidity.mint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mintPubkey} />
           {name}
         </span>
         <div>${formatNumber.format(price)}</div>

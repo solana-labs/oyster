@@ -13,12 +13,12 @@ import { LendingInstruction } from './instruction';
 ///
 ///   0. `[writable]` Reserve account.
 ///   1. `[]` Clock sysvar.
-///   2. `[optional]` Reserve liquidity aggregator account.
+///   2. `[optional]` Reserve liquidity oracle account.
 ///                     Required if the reserve currency is not the lending market quote
 ///                     currency.
 export const refreshReserveInstruction = (
   reserve: PublicKey,
-  aggregator?: PublicKey,
+  oracle?: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
 
@@ -30,8 +30,8 @@ export const refreshReserveInstruction = (
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
   ];
 
-  if (aggregator) {
-    keys.push({ pubkey: aggregator, isSigner: false, isWritable: false });
+  if (oracle) {
+    keys.push({ pubkey: oracle, isSigner: false, isWritable: false });
   }
 
   return new TransactionInstruction({

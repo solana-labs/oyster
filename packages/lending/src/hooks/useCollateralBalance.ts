@@ -11,9 +11,9 @@ export function useUserCollateralBalance(
   reserve?: Reserve,
   account?: PublicKey,
 ) {
-  const mint = useMint(reserve?.collateral.mint);
+  const mint = useMint(reserve?.collateral.mintPubkey);
   const { balanceLamports: userBalance, accounts } = useUserBalance(
-    reserve?.collateral.mint,
+    reserve?.collateral.mintPubkey,
     account,
   );
 
@@ -33,12 +33,13 @@ export function useUserCollateralBalance(
   useEffect(() => {
     const updateBalance = () => {
       setBalanceInUSD(
-        balance * midPriceInUSD(reserve?.liquidity.mint?.toBase58() || ''),
+        balance *
+          midPriceInUSD(reserve?.liquidity.mintPubkey?.toBase58() || ''),
       );
     };
 
     const dispose = marketEmitter.onMarket(args => {
-      if (args.ids.has(reserve?.liquidity.aggregator.toBase58() || '')) {
+      if (args.ids.has(reserve?.liquidity.oraclePubkey.toBase58() || '')) {
         updateBalance();
       }
     });
@@ -54,7 +55,7 @@ export function useUserCollateralBalance(
     balance,
     balanceLamports,
     balanceInUSD,
-    mint: reserve?.collateral.mint,
+    mint: reserve?.collateral.mintPubkey,
     accounts,
     hasBalance: accounts.length > 0 && balance > 0,
   };
@@ -66,6 +67,6 @@ export function calculateCollateralBalance(
   // @FIXME: use BigNumber
   return (
     reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.collateral.mintAmount.toNumber() || 1))
+    (balanceLamports / (reserve?.collateral.mintTotalSupply.toNumber() || 1))
   );
 }
