@@ -8,9 +8,8 @@ import {
   useWallet,
 } from '@oyster/common';
 import './style.less';
-import { ASSET_CHAIN } from '../../models/bridge/constants';
 import { TokenSelectModal } from '../TokenSelectModal';
-import { chainToName } from '../../utils/assets';
+import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import { TokenChain } from '../TokenDisplay/tokenChain';
 import { EthereumConnect } from '../EthereumConnect';
 import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';

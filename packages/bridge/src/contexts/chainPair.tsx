@@ -21,13 +21,13 @@ import {
 } from '../utils/assets';
 import { useEthereum } from './ethereum';
 import { BigNumber } from 'ethers/utils';
-import { WrappedAssetFactory } from '../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../contracts/WormholeFactory';
+import { WrappedAssetFactory } from '@solana/bridge-sdk';
+import { WormholeFactory } from '@solana/bridge-sdk';
 import {
   bridgeAuthorityKey,
   TransferRequestInfo,
   wrappedAssetMintKey,
-} from '../models/bridge';
+} from '@solana/bridge-sdk';
 import { useBridge } from './bridge';
 import { PublicKey } from '@solana/web3.js';
 

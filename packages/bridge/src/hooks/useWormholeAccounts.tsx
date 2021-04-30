@@ -20,7 +20,7 @@ import {
   bridgeAuthorityKey,
   wrappedAssetMintKey,
   WrappedMetaLayout,
-} from './../models/bridge';
+} from '@solana/bridge-sdk';
 
 import bs58 from 'bs58';
 import {

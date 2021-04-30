@@ -1,5 +1,3 @@
-import BN from 'bn.js';
-import { ethers } from 'ethers';
 import { BigNumber } from 'ethers/utils';
 import { ASSET_CHAIN } from '../constants';
 

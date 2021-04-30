@@ -21,8 +21,8 @@ import { TokenChain } from '../TokenDisplay/tokenChain';
 import bs58 from 'bs58';
 import { SyncOutlined } from '@ant-design/icons';
 import { typeToIcon } from '../Transfer';
-import { ProgressUpdate } from '../../models/bridge';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
+import { ProgressUpdate } from '@solana/bridge-sdk';
+import { WormholeFactory } from '@solana/bridge-sdk';
 import { useEthereum } from '../../contexts';
 import { useBridge } from '../../contexts/bridge';
 

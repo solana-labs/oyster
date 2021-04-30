@@ -8,8 +8,8 @@ import {
   createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
 import { ethers } from 'ethers';
-import { ERC20Factory } from '../../../contracts/ERC20Factory';
-import { WormholeFactory } from '../../../contracts/WormholeFactory';
+import { ERC20Factory } from '../../contracts/ERC20Factory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
 import { AssetMeta, createWrappedAssetInstruction } from './../meta';
 import { bridgeAuthorityKey, wrappedAssetMintKey } from './../helpers';
 import {
