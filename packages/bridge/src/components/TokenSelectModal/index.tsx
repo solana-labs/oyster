@@ -8,7 +8,7 @@ import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../models/bridge/constants';
 import { useConnectionConfig } from '@oyster/common';
-import { filterModalSolTokens } from '../../utils/assets';
+import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
 
 export const TokenSelectModal = (props: {
   onSelectToken: (token: string) => void;
@@ -24,7 +24,10 @@ export const TokenSelectModal = (props: {
 
   const inputRef = useRef<Input>(null);
   const tokens = useMemo(
-    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    () => [
+      ...filterModalEthTokens(ethTokens),
+      ...filterModalSolTokens(solTokens),
+    ],
     [ethTokens, solTokens],
   );
 

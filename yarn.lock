@@ -3418,10 +3418,10 @@
     keccak "^3.0.1"
     randombytes "^2.1.0"
 
-"@toruslabs/openlogin@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin/-/openlogin-0.7.0.tgz#0169a38b0ab634f13354ded010565ff8ba179db1"
-  integrity sha512-p3s1i3VaHOLBdSjgYtUhW59FdYuAp3FkTxoQHmVr2Yr8NoIhAtRBd9JWKuHm5kGtjmb6+eI7pQx1CVoIph5yWw==
+"@toruslabs/openlogin@^0.7.8":
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin/-/openlogin-0.7.8.tgz#e77b2e0280289f3f374e489ceff9400e505e26e7"
+  integrity sha512-mHXZiODDMsU+GNcnvuEpYASnaIqlyLBZe+yHbpBoOeihq4h5s7mS8SK8Vx88DiHIHsdppVFl9J4IA56S2oGIYg==
   dependencies:
     "@toruslabs/eccrypto" "^1.1.6"
     "@toruslabs/openlogin-jrpc" "^0.7.0"

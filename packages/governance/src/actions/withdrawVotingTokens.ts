@@ -136,8 +136,6 @@ export const withdrawVotingTokens = async (
       existingNoVoteAccount,
       destinationAccount,
       proposal.info.sourceHolding,
-      proposal.info.yesVotingDump,
-      proposal.info.noVotingDump,
       proposal.info.votingMint,
       proposal.info.yesVotingMint,
       proposal.info.noVotingMint,

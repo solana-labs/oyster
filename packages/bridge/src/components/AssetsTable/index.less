@@ -1,0 +1,45 @@
+@import "_colors";
+
+#recent-tx-container {
+  max-width: 70%;
+  margin: auto;
+  padding-bottom: 70px;
+  .description-text {
+    color: @tungsten-60
+  }
+  .ant-table-pagination.ant-pagination {
+    margin: 16px 100px;
+  }
+  .ant-table {
+    thead {
+      tr > th.ant-table-cell {
+        background-color: @tungsten-100;
+        border: none;
+      }
+    }
+    tbody > tr:nth-child(even) > td.ant-table-cell {
+      background-color: @tungsten-100;
+      border: none;
+    }
+    tbody > tr:nth-child(odd) > td.ant-table-cell {
+      background-color: @tungsten-50;
+      border: none;
+    }
+  }
+}
+
+@media screen and (max-width: 900px) {
+
+    #recent-tx-container {
+      max-width: 100%;
+    }
+}
+
+
+@media screen and (max-width: 1200px) {
+
+    #recent-tx-container {
+      max-width: 90%;
+    }
+
+}
