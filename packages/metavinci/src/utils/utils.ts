@@ -19,3 +19,7 @@ export const getCountdown = (ts: number) => {
 
   return { days, hours, minutes, seconds };
 };
+
+export const cleanName = (name: string): string => {
+  return name.replaceAll(' ', '-');
+};

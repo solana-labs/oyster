@@ -36,6 +36,7 @@ import {
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MintLayout } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
+import { cleanName } from '../../utils/utils';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -344,7 +345,7 @@ const UploadStep = (props: {
           onClick={() => {
             props.setAttributes({
               ...props.attributes,
-              files: [mainFile, coverFile].filter(f => f),
+              files: [mainFile, coverFile].filter(f => f).map(f => new File([f], cleanName(f.name), { type: f.type })),
               image,
             });
             props.confirm();
