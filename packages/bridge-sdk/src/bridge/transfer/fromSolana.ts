@@ -1,7 +1,7 @@
 import { programIds, sendTransactionWithRetry } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
-import { WormholeFactory } from '../../../contracts/WormholeFactory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
 import { bridgeAuthorityKey } from './../helpers';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
@@ -9,7 +9,7 @@ import { ProgressUpdate, TransferRequest } from './interface';
 import BN from 'bn.js';
 import { createLockAssetInstruction } from '../lock';
 import { TransferOutProposalLayout } from '../transferOutProposal';
-import { SolanaBridge } from '../../../core';
+import { SolanaBridge } from '../../core';
 
 export const fromSolana = async (
   connection: Connection,

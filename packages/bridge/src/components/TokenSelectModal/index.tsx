@@ -6,7 +6,7 @@ import './style.less';
 import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { ASSET_CHAIN } from '../../models/bridge/constants';
+import { ASSET_CHAIN } from '../../utils/assets';
 import { useConnectionConfig } from '@oyster/common';
 import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
 

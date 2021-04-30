@@ -1,5 +1,5 @@
 import React from 'react';
-import { ASSET_CHAIN } from '../../models/bridge/constants';
+import { ASSET_CHAIN } from '../../utils/assets';
 
 export const TokenChain = (props: {
   chain?: ASSET_CHAIN;

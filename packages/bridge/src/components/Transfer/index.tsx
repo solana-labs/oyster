@@ -11,7 +11,7 @@ import {
   ProgressUpdate,
   toSolana,
   TransferRequest,
-} from '../../models/bridge';
+} from '@solana/bridge-sdk';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { useTokenChainPairState } from '../../contexts/chainPair';

@@ -14,6 +14,7 @@
     "@solana/spl-token-swap": "0.1.0",
     "@solana/wallet-base": "0.0.1",
     "@solana/wallet-ledger": "0.0.1",
+    "@solana/bridge-sdk": "0.0.1",
     "@solana/web3.js": "^1.5.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
