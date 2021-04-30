@@ -14,7 +14,11 @@ import {
   useUserAccounts,
 } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
-import { ASSET_CHAIN, filterModalSolTokens } from '../utils/assets';
+import {
+  ASSET_CHAIN,
+  filterModalEthTokens,
+  filterModalSolTokens,
+} from '../utils/assets';
 import { useEthereum } from './ethereum';
 import { BigNumber } from 'ethers/utils';
 import { WrappedAssetFactory } from '../contracts/WrappedAssetFactory';
@@ -252,7 +256,10 @@ export function TokenChainPairProvider({ children = null as any }) {
   const setChainB = quote.setChain;
 
   const tokens = useMemo(
-    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    () => [
+      ...filterModalEthTokens(ethTokens),
+      ...filterModalSolTokens(solTokens),
+    ],
     [ethTokens, solTokens],
   );
 

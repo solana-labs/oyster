@@ -108,10 +108,9 @@ export const LABELS = {
   GOVERNANCE_MINT: 'Governance Mint ID',
   USE_COUNCIL_MINT: 'Allow Council Mint?',
   COUNCIL_MINT: 'Council Mint ID',
-  PROPOSAL_TYPE: 'Proposal Type',
-  EXECUTION_TYPE: 'Execution Type',
+
   VOTE_PERCENT_THRESHOLD: 'Vote Threshold (%)',
-  VOTING_ENTRY_RULES: 'Voting Entry Rules',
+
   SELECT_PROPOSAL_TYPE: 'Select the type of proposals this app will generate',
   SELECT_EXECUTION_TYPE: 'Select how transactions will be executed',
 
