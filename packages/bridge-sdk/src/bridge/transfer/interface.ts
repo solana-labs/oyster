@@ -1,6 +1,5 @@
-import BN from 'bn.js';
+import { BigNumber } from 'bignumber.js';
 import { ethers } from 'ethers';
-import { BigNumber } from 'ethers/utils';
 import { ASSET_CHAIN } from '../constants';
 
 export interface ProgressUpdate {
@@ -16,7 +15,7 @@ export interface TransferRequestInfo {
   name: string;
   balance: BigNumber;
   decimals: number;
-  allowance: BigNumber;
+  allowance: ethers.utils.BigNumber;
   isWrapped: boolean;
   chainID: number;
   assetAddress: Buffer;

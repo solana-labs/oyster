@@ -20,7 +20,7 @@ import {
   bridgeAuthorityKey,
   wrappedAssetMintKey,
   WrappedMetaLayout,
-} from './../models/bridge';
+} from '@solana/bridge-sdk';
 
 import bs58 from 'bs58';
 import {
@@ -275,7 +275,8 @@ export const useWormholeAccounts = () => {
     })();
 
     return () => {
-      connection.removeProgramAccountChangeListener(wormholeSubId);
+      if (wormholeSubId !== 0)
+        connection.removeProgramAccountChangeListener(wormholeSubId);
     };
   }, [connection, setExternalAssets]);
 
@@ -330,7 +331,7 @@ export const useWormholeAccounts = () => {
     if (ids.length === 0) {
       return;
     }
-
+    console.log('Querying Prices...');
     const parameters = `?ids=${ids.join(',')}&vs_currencies=usd`;
     const resp = await window.fetch(COINGECKO_COIN_PRICE_API + parameters);
     const data = await resp.json();

@@ -34,11 +34,7 @@ export const createEmptyGovernanceVotingRecordInstruction = (
     { pubkey: proposalAccount, isSigner: false, isWritable: false },
     { pubkey: votingAccount, isSigner: false, isWritable: false },
     { pubkey: payer, isSigner: true, isWritable: false },
-    {
-      pubkey: PROGRAM_IDS.governance.programId,
-      isSigner: false,
-      isWritable: false,
-    },
+
     { pubkey: PROGRAM_IDS.system, isSigner: false, isWritable: false },
   ];
   return new TransactionInstruction({

@@ -24,6 +24,7 @@ import {
 
 export type ENV =
   | 'mainnet-beta'
+  | 'mainnet-beta (Serum)'
   | 'testnet'
   | 'devnet'
   | 'localnet'
@@ -32,6 +33,11 @@ export type ENV =
 export const ENDPOINTS = [
   {
     name: 'mainnet-beta' as ENV,
+    endpoint: 'https://api.mainnet-beta.solana.com',
+    ChainId: ChainId.MainnetBeta,
+  },
+  {
+    name: 'mainnet-beta (Serum)' as ENV,
     endpoint: 'https://solana-api.projectserum.com/',
     ChainId: ChainId.MainnetBeta,
   },
@@ -412,6 +418,7 @@ export const sendTransactionWithRetry = async (
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
   block?: BlockhashAndFeeCalculator,
+  beforeSend?: () => void,
 ) => {
   let transaction = new Transaction();
   instructions.forEach(instruction => transaction.add(instruction));
@@ -434,6 +441,10 @@ export const sendTransactionWithRetry = async (
   }
   if (!includesFeePayer) {
     transaction = await wallet.signTransaction(transaction);
+  }
+
+  if (beforeSend) {
+    beforeSend();
   }
 
   const { txid, slot } = await sendSignedTransaction({
@@ -480,7 +491,7 @@ export async function sendSignedTransaction({
       connection.sendRawTransaction(rawTransaction, {
         skipPreflight: true,
       });
-      await sleep(300);
+      await sleep(500);
     }
   })();
   try {
@@ -521,7 +532,7 @@ export async function sendSignedTransaction({
       }
       throw new Error(JSON.stringify(simulateResult.err));
     }
-    throw new Error('Transaction failed');
+    // throw new Error('Transaction failed');
   } finally {
     done = true;
   }
@@ -632,7 +643,7 @@ async function awaitTransactionSignatureConfirmation(
             }
           }
         })();
-        await sleep(1000);
+        await sleep(2000);
       }
     })();
   })

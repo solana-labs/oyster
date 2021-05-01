@@ -328,22 +328,30 @@ const UseNativeAccount = () => {
   );
 
   useEffect(() => {
-    if (!connection || !wallet?.publicKey) {
-      return;
-    }
+    let subId = 0;
+    const updateAccount = (account: AccountInfo<Buffer> | null) => {
+      if (account) {
+        updateCache(account);
+        setNativeAccount(account);
+      }
+    };
 
-    connection.getAccountInfo(wallet.publicKey).then(acc => {
-      if (acc) {
-        updateCache(acc);
-        setNativeAccount(acc);
+    (async () => {
+      if (!connection || !wallet?.publicKey) {
+        return;
       }
-    });
-    connection.onAccountChange(wallet.publicKey, acc => {
-      if (acc) {
-        updateCache(acc);
-        setNativeAccount(acc);
+
+      const account = await connection.getAccountInfo(wallet.publicKey)
+      updateAccount(account);
+
+      subId = connection.onAccountChange(wallet.publicKey, updateAccount);
+    })();
+
+    return () => {
+      if (subId) {
+        connection.removeAccountChangeListener(subId);
       }
-    });
+    }
   }, [setNativeAccount, wallet, wallet?.publicKey, connection, updateCache]);
 
   return { nativeAccount };

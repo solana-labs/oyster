@@ -8,8 +8,8 @@ import {
   createAssociatedTokenAccountInstruction,
 } from '@oyster/common';
 import { ethers } from 'ethers';
-import { ERC20Factory } from '../../../contracts/ERC20Factory';
-import { WormholeFactory } from '../../../contracts/WormholeFactory';
+import { ERC20Factory } from '../../contracts/ERC20Factory';
+import { WormholeFactory } from '../../contracts/WormholeFactory';
 import { AssetMeta, createWrappedAssetInstruction } from './../meta';
 import { bridgeAuthorityKey, wrappedAssetMintKey } from './../helpers';
 import {
@@ -21,6 +21,7 @@ import {
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
 import { WalletAdapter } from '@solana/wallet-base';
+import { BigNumber } from 'bignumber.js';
 
 export const toSolana = async (
   connection: Connection,
@@ -38,6 +39,9 @@ export const toSolana = async (
   const nonce = await provider.getTransactionCount(
     signer.getAddress(),
     'pending',
+  );
+  const amountBigNumber = new BigNumber(request.amount.toString()).toFormat(
+    request.info.decimals,
   );
 
   const amountBN = ethers.utils.parseUnits(

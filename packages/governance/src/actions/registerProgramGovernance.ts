@@ -7,16 +7,9 @@ import {
 import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import {
-  GOVERNANCE_AUTHORITY_SEED,
-  ExecutionType,
-  Governance,
-  GovernanceType,
-  VotingEntryRule,
-} from '../models/governance';
-import { initGovernanceInstruction } from '../models/initGovernance';
+import { GOVERNANCE_AUTHORITY_SEED, Governance } from '../models/governance';
+import { createGovernanceInstruction } from '../models/createGovernance';
 import BN from 'bn.js';
-import { createEmptyGovernanceInstruction } from '../models/createEmptyGovernance';
 
 const { sendTransactions } = contexts.Connection;
 const { createMint, createTokenAccount } = actions;
@@ -126,29 +119,18 @@ export const registerProgramGovernance = async (
   );
 
   instructions.push(
-    createEmptyGovernanceInstruction(
+    createGovernanceInstruction(
       governanceKey,
       uninitializedGovernance.program,
       programDataAccount,
       wallet.publicKey,
       uninitializedGovernance.governanceMint,
-      wallet.publicKey,
-      uninitializedGovernance.councilMint,
-    ),
-  );
-  instructions.push(
-    initGovernanceInstruction(
-      governanceKey,
-      uninitializedGovernance.program,
-      uninitializedGovernance.governanceMint,
 
       uninitializedGovernance.voteThreshold!,
-      uninitializedGovernance.executionType || ExecutionType.Independent,
-      uninitializedGovernance.governanceType || GovernanceType.Governance,
-      uninitializedGovernance.votingEntryRule || VotingEntryRule.Anytime,
       uninitializedGovernance.minimumSlotWaitingPeriod || new BN(0),
       uninitializedGovernance.timeLimit || new BN(0),
       uninitializedGovernance.name || '',
+      wallet.publicKey,
       uninitializedGovernance.councilMint,
     ),
   );

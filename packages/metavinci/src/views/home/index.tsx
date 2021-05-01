@@ -3,7 +3,7 @@ import { Layout, Row, Col, Tabs } from 'antd';
 import Masonry from 'react-masonry-css';
 
 import { PreSaleBanner } from '../../components/PreSaleBanner';
-import { AuctionViewState, useAuctions } from '../../hooks';
+import { AuctionViewState, useArt, useAuctions } from '../../hooks';
 
 import './index.less';
 import { ArtCard } from '../../components/ArtCard';
@@ -34,11 +34,8 @@ export const HomeView = () => {
           <Link to={`/auction/${id}`}>
             <ArtCard
               key={id}
-              image={m.thumbnail.metadata.info.extended?.image}
-              category={m.thumbnail.metadata.info.extended?.category}
-              name={m.thumbnail.metadata?.info.name}
-              symbol={m.thumbnail.metadata?.info.symbol}
-              description={m.thumbnail.metadata?.info.extended?.description}
+              endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
+              pubkey={m.thumbnail.metadata.pubkey}
               preview={false}
             />
           </Link>
@@ -52,7 +49,7 @@ export const HomeView = () => {
       <PreSaleBanner
         artistName={'RAC'}
         productName={'THE BOY COLLECTION'}
-        preSaleTS={1618690343000}
+        preSaleTS={1620009209}
         image="img/banner1.jpeg"
       />
       <Layout>

@@ -25,7 +25,7 @@ export const AppLayout = React.memo((props: any) => {
           </Content>
           <Footer>
             <div className={'description-text'} style={{ color: '#2F506F' }}>
-              © Solana Foundation
+
             </div>
           </Footer>
         </Layout>

@@ -209,13 +209,15 @@ export const AuctionCreateView = () => {
       throw new Error('Not supported');
     }
 
+    const endAuctionAt = moment().unix() + ((attributes.auctionDuration || 0) * 60)
+    
     const _auctionObj = await createAuctionManager(
       connection,
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60),
-      new BN((attributes.gapTime || 1) * 60),
+      new BN(endAuctionAt),
+      new BN((attributes.gapTime || 0) * 60),
       [
         ...attributes.items,
         ...(attributes.participationNFT ? [attributes.participationNFT] : []),
@@ -1413,10 +1415,7 @@ const ReviewStep = (props: {
         <Col xl={12}>
           {item?.metadata.info && (
             <ArtCard
-              image={item.metadata.info.extended?.image}
-              category={item.metadata.info.extended?.category}
-              name={item.metadata.info.name}
-              symbol={item.metadata.info.symbol}
+              pubkey={item.metadata.pubkey}
               small={true}
             />
           )}

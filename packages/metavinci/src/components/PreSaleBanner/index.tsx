@@ -19,7 +19,7 @@ export const PreSaleBanner = ({ artistName, productName, preSaleTS, image }: IPr
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const {days, hours, minutes } = getCountdown(preSaleTS)
+      const { days, hours, minutes } = getCountdown(preSaleTS)
 
       setDays(days)
       setHours(hours)

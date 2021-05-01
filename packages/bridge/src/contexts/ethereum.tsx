@@ -224,6 +224,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
 
           return (
             <Button
+              key={provider.url}
               size="large"
               type={providerUrl === provider.url ? 'primary' : 'ghost'}
               onClick={onClick}

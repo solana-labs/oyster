@@ -120,7 +120,7 @@ export class AuctionData {
   /// End time is the cut-off point that the auction is forced to end by.
   endAuctionAt: BN | null;
   /// Gap time is the amount of time in slots after the previous bid at which the auction ends.
-  endAuctionGap: BN | null;
+  auctionGap: BN | null;
   /// The state the auction is in, whether it has started or ended.
   state: AuctionState;
   /// Auction Bids, each user may have one bid open at a time.
@@ -138,7 +138,7 @@ export class AuctionData {
     lastBid: BN | null;
     endedAt: BN | null;
     endAuctionAt: BN | null;
-    endAuctionGap: BN | null;
+    auctionGap: BN | null;
     state: AuctionState;
     bidState: BidState;
   }) {
@@ -148,7 +148,7 @@ export class AuctionData {
     this.lastBid = args.lastBid;
     this.endedAt = args.endedAt;
     this.endAuctionAt = args.endAuctionAt;
-    this.endAuctionGap = args.endAuctionGap;
+    this.auctionGap = args.auctionGap;
     this.state = args.state;
     this.bidState = args.bidState;
   }
@@ -220,7 +220,7 @@ class CreateAuctionArgs {
   /// End time is the cut-off point that the auction is forced to end by. See AuctionData.
   endAuctionAt: BN | null;
   /// Gap time is how much time after the previous bid where the auction ends. See AuctionData.
-  endAuctionGap: BN | null;
+  auctionGap: BN | null;
   /// Token mint for the SPL token used for bidding.
   tokenMint: PublicKey;
   /// Authority
@@ -231,14 +231,14 @@ class CreateAuctionArgs {
   constructor(args: {
     winners: WinnerLimit;
     endAuctionAt: BN | null;
-    endAuctionGap: BN | null;
+    auctionGap: BN | null;
     tokenMint: PublicKey;
     authority: PublicKey;
     resource: PublicKey;
   }) {
     this.winners = args.winners;
     this.endAuctionAt = args.endAuctionAt;
-    this.endAuctionGap = args.endAuctionGap;
+    this.auctionGap = args.auctionGap;
     this.tokenMint = args.tokenMint;
     this.authority = args.authority;
     this.resource = args.resource;
@@ -274,7 +274,7 @@ export const AUCTION_SCHEMA = new Map<any, any>([
         ['instruction', 'u8'],
         ['winners', WinnerLimit],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
-        ['endAuctionGap', { kind: 'option', type: 'u64' }],
+        ['auctionGap', { kind: 'option', type: 'u64' }],
         ['tokenMint', 'pubkey'],
         ['authority', 'pubkey'],
         ['resource', 'pubkey'],
@@ -323,7 +323,7 @@ export const AUCTION_SCHEMA = new Map<any, any>([
         ['lastBid', { kind: 'option', type: 'u64' }],
         ['endedAt', { kind: 'option', type: 'u64' }],
         ['endAuctionAt', { kind: 'option', type: 'u64' }],
-        ['endAuctionGap', { kind: 'option', type: 'u64' }],
+        ['auctionGap', { kind: 'option', type: 'u64' }],
         ['state', 'u8'],
         ['bidState', BidState],
       ],
@@ -384,7 +384,7 @@ export async function createAuction(
   winners: WinnerLimit,
   resource: PublicKey,
   endAuctionAt: BN | null,
-  endAuctionGap: BN | null,
+  auctionGap: BN | null,
   tokenMint: PublicKey,
   authority: PublicKey,
   creator: PublicKey,
@@ -399,7 +399,7 @@ export async function createAuction(
         winners,
         resource,
         endAuctionAt,
-        endAuctionGap,
+        auctionGap,
         tokenMint,
         authority,
       }),

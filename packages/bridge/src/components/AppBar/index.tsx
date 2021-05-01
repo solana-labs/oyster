@@ -51,9 +51,9 @@ export const AppBar = (props: { isRoot?: boolean }) => {
         <div className={`app-bar-item ${isActiveClass('move')}`}>
           <Link to="/move">Bridge</Link>
         </div>
-        <div className={`app-bar-item ${isActiveClass('faq')}`}>
-          <Link to="/faq">FAQ</Link>
-        </div>
+        {/*<div className={`app-bar-item ${isActiveClass('faq')}`}>*/}
+        {/*  <Link to="/faq">FAQ</Link>*/}
+        {/*</div>*/}
         <div className={`app-bar-item ${isActiveClass('proof-of-assets')}`}>
           <Link to="/proof-of-assets">Proof-of-Assets</Link>
         </div>
