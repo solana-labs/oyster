@@ -7,6 +7,7 @@ import { getCountdown } from '../../utils/utils';
 import { useArt } from '../../hooks';
 import { PublicKey } from '@solana/web3.js';
 import { ArtType } from '../../types';
+import { EditionType } from '../../models/metaplex';
 
 const { Meta } = Card;
 
@@ -21,6 +22,7 @@ export interface ArtCardProps extends CardProps {
   preview?: boolean;
   small?: boolean;
   close?: () => void;
+  editionType?: EditionType;
   endAuctionAt?: number;
 }
 
@@ -37,6 +39,7 @@ export const ArtCard = (props: ArtCardProps) => {
     close,
     pubkey,
     endAuctionAt,
+    editionType,
     ...rest
   } = props;
   const art = useArt(pubkey);
@@ -94,10 +97,12 @@ export const ArtCard = (props: ArtCardProps) => {
             {art.type == ArtType.LimitedMasterEdition && (
               <>
                 <br />
-                <span style={{ padding: '24px' }}>
-                  {(art.maxSupply || 0) - (art.supply || 0)}/
-                  {art.maxSupply || 0} prints remaining
-                </span>
+                {!endAuctionAt && (
+                  <span style={{ padding: '24px' }}>
+                    {(art.maxSupply || 0) - (art.supply || 0)}/
+                    {art.maxSupply || 0} prints remaining
+                  </span>
+                )}
               </>
             )}
             {endAuctionAt && (
@@ -136,16 +141,42 @@ export const ArtCard = (props: ArtCardProps) => {
     );
   } else if (art.type == ArtType.LimitedMasterEdition) {
     return (
-      <div className="limited-master-record">
-        <Badge.Ribbon text={`Limited Edition Master Record`}>
+      <div
+        className={
+          editionType == EditionType.LimitedEdition
+            ? 'normal-record'
+            : 'limited-master-record'
+        }
+      >
+        <Badge.Ribbon
+          text={`Limited Edition ${
+            editionType == EditionType.LimitedEdition
+              ? 'Printing'
+              : 'Master Record'
+          }`}
+        >
           {card}
         </Badge.Ribbon>
       </div>
     );
   } else if (art.type == ArtType.OpenMasterEdition) {
     return (
-      <div className="open-master-record">
-        <Badge.Ribbon text={`Open Edition Master Record`}>{card}</Badge.Ribbon>
+      <div
+        className={
+          editionType == EditionType.OpenEdition
+            ? 'normal-record'
+            : 'open-master-record'
+        }
+      >
+        <Badge.Ribbon
+          text={`Open Edition ${
+            editionType == EditionType.OpenEdition
+              ? 'Printing'
+              : 'Master Record'
+          }`}
+        >
+          {card}
+        </Badge.Ribbon>
       </div>
     );
   } else return card;

@@ -8,6 +8,7 @@ import { AuctionViewState, useArt, useAuctions } from '../../hooks';
 import './index.less';
 import { ArtCard } from '../../components/ArtCard';
 import { Link } from 'react-router-dom';
+import { EditionType } from '../../models/metaplex';
 
 const { TabPane } = Tabs;
 
@@ -30,12 +31,20 @@ export const HomeView = () => {
     >
       {auctions.map(m => {
         const id = m.auction.pubkey.toBase58();
+        const winningConfig = m.auctionManager.info.settings.winningConfigs.find(
+          w => w.safetyDepositBoxIndex == m.thumbnail.safetyDeposit.info.order,
+        );
         return (
           <Link to={`/auction/${id}`}>
             <ArtCard
               key={id}
               endAuctionAt={m.auction.info.endAuctionAt?.toNumber()}
               pubkey={m.thumbnail.metadata.pubkey}
+              editionType={
+                winningConfig
+                  ? winningConfig.editionType
+                  : EditionType.OpenEdition
+              }
               preview={false}
             />
           </Link>

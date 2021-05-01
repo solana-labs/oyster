@@ -282,7 +282,7 @@ export function processAccountsIntoAuctionView(
                   metadataByMint[
                     boxes[
                       auctionManager.info.settings.openEditionConfig
-                    ].info.tokenMint.toBase58()
+                    ]?.info.tokenMint.toBase58()
                   ],
                 safetyDeposit:
                   boxes[auctionManager.info.settings.openEditionConfig],
@@ -291,7 +291,7 @@ export function processAccountsIntoAuctionView(
                     metadataByMint[
                       boxes[
                         auctionManager.info.settings.openEditionConfig
-                      ].info.tokenMint.toBase58()
+                      ]?.info.tokenMint.toBase58()
                     ]?.info.masterEdition?.toBase58() || ''
                   ],
               }
