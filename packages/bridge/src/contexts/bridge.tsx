@@ -1,5 +1,5 @@
 import React, { createContext, FunctionComponent, useContext } from 'react';
-import { SolanaBridge } from '../core';
+import { SolanaBridge } from '@solana/bridge-sdk';
 import {
   useConnection,
   useConnectionConfig,

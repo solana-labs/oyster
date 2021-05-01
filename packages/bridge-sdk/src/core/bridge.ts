@@ -5,7 +5,7 @@ import assert from 'assert';
 // @ts-ignore
 import * as BufferLayout from 'buffer-layout';
 import * as bs58 from 'bs58';
-import { AssetMeta } from '../models/bridge';
+import { AssetMeta } from '../bridge';
 
 export interface Lockup {
   lockupAddress: PublicKey;

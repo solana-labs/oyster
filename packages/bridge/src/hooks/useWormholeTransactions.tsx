@@ -21,7 +21,7 @@ import {
 import {
   bridgeAuthorityKey,
   TransferOutProposalLayout,
-} from './../models/bridge';
+} from '@solana/bridge-sdk';
 
 import bs58 from 'bs58';
 import {
@@ -30,17 +30,16 @@ import {
   useCoingecko,
 } from '../contexts/coingecko';
 import { BN } from 'bn.js';
-import { WormholeFactory } from '../contracts/WormholeFactory';
+import { WormholeFactory } from '@solana/bridge-sdk';
 import { ethers } from 'ethers';
 import { useBridge } from '../contexts/bridge';
-import { SolanaBridge } from '../core';
+import { SolanaBridge } from '@solana/bridge-sdk';
 
 type WrappedTransferMeta = {
   chain: number;
   decimals: number;
   address: string;
   publicKey: PublicKey;
-
   coinId?: string;
   price?: number;
   explorer?: any;
