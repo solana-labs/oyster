@@ -7,6 +7,16 @@ import * as BufferLayout from 'buffer-layout';
 import * as bs58 from 'bs58';
 import { AssetMeta } from '../bridge';
 
+export enum LockupStatus {
+  AWAITING_VAA,
+  UNCLAIMED_VAA,
+  COMPLETED,
+}
+
+export interface LockupWithStatus extends Lockup {
+  status: LockupStatus;
+}
+
 export interface Lockup {
   lockupAddress: PublicKey;
   amount: BN;

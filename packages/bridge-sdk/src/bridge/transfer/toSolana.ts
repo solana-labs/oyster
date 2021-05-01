@@ -21,7 +21,7 @@ import {
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
 import { WalletAdapter } from '@solana/wallet-base';
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from 'bignumber.js';
 
 export const toSolana = async (
   connection: Connection,

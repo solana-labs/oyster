@@ -34,11 +34,7 @@ const { TabPane } = Tabs;
 export const RecentTransactionsTable = (props: {
   showUserTransactions?: boolean;
 }) => {
-  const {
-    loading: loadingTransfers,
-    transfers,
-    userTransfers,
-  } = useWormholeTransactions();
+  const { loading: loadingTransfers, transfers } = useWormholeTransactions();
   const { provider } = useEthereum();
   const bridge = useBridge();
 
@@ -154,24 +150,6 @@ export const RecentTransactionsTable = (props: {
       },
     },
   ];
-  const columns = [
-    ...baseColumns,
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render(text: string, record: any) {
-        return {
-          props: { style: {} },
-          children: (
-            <span className={`${record.status?.toLowerCase()}`}>
-              {record.status}
-            </span>
-          ),
-        };
-      },
-    },
-  ];
 
   const userColumns = [
     ...baseColumns,
@@ -277,6 +255,7 @@ export const RecentTransactionsTable = (props: {
                                 step: counter++,
                               },
                             ]);
+                            setCompletedVAAs([...completedVAAs, record.txhash]);
                           }
                         })();
                       }, [setActiveSteps]);
@@ -343,32 +322,17 @@ export const RecentTransactionsTable = (props: {
   return (
     <div id={'recent-tx-container'}>
       <div className={'home-subtitle'} style={{ marginBottom: '70px' }}>
-        Transactions
+        My Recent Transactions
       </div>
-      <Tabs defaultActiveKey="1" centered>
-        <TabPane tab="Recent Transactions" key="1">
-          <Table
-            scroll={{
-              scrollToFirstRowOnChange: false,
-              x: 900,
-            }}
-            dataSource={transfers.sort((a, b) => b.date - a.date)}
-            columns={columns}
-            loading={loadingTransfers}
-          />
-        </TabPane>
-        <TabPane tab="My Transactions" key="2">
-          <Table
-            scroll={{
-              scrollToFirstRowOnChange: false,
-              x: 900,
-            }}
-            dataSource={userTransfers.sort((a, b) => b.date - a.date)}
-            columns={userColumns}
-            loading={loadingTransfers}
-          />
-        </TabPane>
-      </Tabs>
+      <Table
+        scroll={{
+          scrollToFirstRowOnChange: false,
+          x: 900,
+        }}
+        dataSource={transfers.sort((a, b) => b.date - a.date)}
+        columns={userColumns}
+        loading={loadingTransfers}
+      />
     </div>
   );
 };

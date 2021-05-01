@@ -23,8 +23,8 @@ import {
 } from '@solana/spl-token-registry';
 
 export type ENV =
-  | 'mainnet-beta'
   | 'mainnet-beta (Serum)'
+  | 'mainnet-beta'
   | 'testnet'
   | 'devnet'
   | 'localnet'
@@ -32,13 +32,13 @@ export type ENV =
 
 export const ENDPOINTS = [
   {
-    name: 'mainnet-beta' as ENV,
-    endpoint: 'https://api.mainnet-beta.solana.com',
+    name: 'mainnet-beta (Serum)' as ENV,
+    endpoint: 'https://solana-api.projectserum.com/',
     ChainId: ChainId.MainnetBeta,
   },
   {
-    name: 'mainnet-beta (Serum)' as ENV,
-    endpoint: 'https://solana-api.projectserum.com/',
+    name: 'mainnet-beta' as ENV,
+    endpoint: 'https://api.mainnet-beta.solana.com',
     ChainId: ChainId.MainnetBeta,
   },
   {

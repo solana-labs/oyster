@@ -14,7 +14,7 @@ export const useCorrectNetwork = () => {
       if (chainId === 5) {
         setHasCorrespondingNetworks(env === 'testnet');
       } else if (chainId === 1) {
-        setHasCorrespondingNetworks(env === 'mainnet-beta');
+        setHasCorrespondingNetworks(env.includes('mainnet-beta'));
       } else {
         setHasCorrespondingNetworks(false);
       }
