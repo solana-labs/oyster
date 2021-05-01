@@ -21,6 +21,7 @@ import {
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
 import { WalletAdapter } from '@solana/wallet-base';
+import { BigNumber } from "bignumber.js";
 
 export const toSolana = async (
   connection: Connection,
@@ -38,6 +39,9 @@ export const toSolana = async (
   const nonce = await provider.getTransactionCount(
     signer.getAddress(),
     'pending',
+  );
+  const amountBigNumber = new BigNumber(request.amount.toString()).toFormat(
+    request.info.decimals,
   );
 
   const amountBN = ethers.utils.parseUnits(
