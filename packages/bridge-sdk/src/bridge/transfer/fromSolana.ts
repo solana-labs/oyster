@@ -1,4 +1,4 @@
-import { programIds, sendTransactionWithRetry } from '@oyster/common';
+import { programIds, sendTransactionWithRetry, sleep } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
@@ -113,6 +113,17 @@ export const fromSolana = async (
         wallet,
         [ix, fee_ix, lock_ix],
         [],
+        undefined,
+        false,
+        undefined,
+        () => {
+          setProgress({
+            message: 'Executing Solana Transaction',
+            type: 'wait',
+            group,
+            step: counter++,
+          });
+        },
       );
 
       return steps.wait(request, transferKey, slot);
@@ -124,31 +135,39 @@ export const fromSolana = async (
     ) => {
       return new Promise<void>((resolve, reject) => {
         let completed = false;
+        let unsubscribed = false;
         let startSlot = slot;
 
         let group = 'Lock assets';
         const solConfirmationMessage = (current: number) =>
-          `Awaiting ETH confirmations: ${current} out of 32`;
+          `Awaiting Solana confirmations: ${current} out of 32`;
+        let replaceMessage = false;
         let slotUpdateListener = connection.onSlotChange(slot => {
-          if (completed) return;
-          const passedSlots = slot.slot - startSlot;
+          if (unsubscribed) {
+            return;
+          }
+
+          const passedSlots = Math.max(Math.min(slot.slot - startSlot, 0), 32);
           const isLast = passedSlots - 1 === 31;
-          if (passedSlots < 32) {
+          if (passedSlots <= 32) {
             setProgress({
               message: solConfirmationMessage(passedSlots),
               type: isLast ? 'done' : 'wait',
               step: counter++,
               group,
-              replace: passedSlots > 0,
+              replace: replaceMessage,
             });
-            if (isLast) {
-              setProgress({
-                message: 'Awaiting guardian confirmation',
-                type: 'wait',
-                step: counter++,
-                group,
-              });
-            }
+            replaceMessage = true;
+          }
+
+          if (completed || isLast) {
+            unsubscribed = true;
+            setProgress({
+              message: 'Awaiting guardian confirmation. (Up to few min.)',
+              type: 'wait',
+              step: counter++,
+              group,
+            });
           }
         });
 
@@ -175,10 +194,19 @@ export const fromSolana = async (
             completed = true;
             connection.removeAccountChangeListener(accountChangeListener);
             connection.removeSlotChangeListener(slotUpdateListener);
+            let signatures;
 
-            let signatures = await bridge.fetchSignatureStatus(
-              lockup.signatureAccount,
-            );
+            while (!signatures) {
+              try {
+                signatures = await bridge.fetchSignatureStatus(
+                  lockup.signatureAccount,
+                );
+                break;
+              } catch {
+                await sleep(500);
+              }
+            }
+
             let sigData = Buffer.of(
               ...signatures.reduce((previousValue, currentValue) => {
                 previousValue.push(currentValue.index);
