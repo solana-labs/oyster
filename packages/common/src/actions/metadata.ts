@@ -50,6 +50,7 @@ export interface IMetadataExtension {
   royalty: number;
   files?: File[];
   category: MetadataCategory;
+  maxSupply?: number;
 }
 
 export class MasterEdition {
@@ -523,6 +524,8 @@ export async function createMasterEdition(
   mintAuthorityKey: PublicKey,
   instructions: TransactionInstruction[],
   payer: PublicKey,
+  authTokenAccount?: PublicKey,
+  masterMintAuthority?: PublicKey,
 ) {
   const metadataProgramId = programIds().metadata;
 
@@ -621,6 +624,22 @@ export async function createMasterEdition(
       isWritable: false,
     },
   ];
+
+  if (authTokenAccount) {
+    keys.push({
+      pubkey: authTokenAccount,
+      isSigner: false,
+      isWritable: true,
+    });
+  }
+
+  if (masterMintAuthority) {
+    keys.push({
+      pubkey: masterMintAuthority,
+      isSigner: true,
+      isWritable: false,
+    });
+  }
   instructions.push(
     new TransactionInstruction({
       keys,

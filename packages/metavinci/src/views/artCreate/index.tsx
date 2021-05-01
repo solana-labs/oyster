@@ -52,7 +52,9 @@ export const ArtCreateView = () => {
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
-  const [nft, setNft] = useState<{ metadataAccount: PublicKey } | undefined>(undefined);
+  const [nft, setNft] = useState<{ metadataAccount: PublicKey } | undefined>(
+    undefined,
+  );
   const [attributes, setAttributes] = useState<IMetadataExtension>({
     name: '',
     symbol: '',
@@ -84,8 +86,15 @@ export const ArtCreateView = () => {
     setSaving(true);
     const inte = setInterval(() => setProgress(prog => prog + 1), 600);
     // Update progress inside mintNFT
-    const _nft = await mintNFT(connection, wallet, env, attributes?.files || [], metadata);
-    if (_nft) setNft(_nft)
+    const _nft = await mintNFT(
+      connection,
+      wallet,
+      env,
+      attributes?.files || [],
+      metadata,
+      attributes.maxSupply,
+    );
+    if (_nft) setNft(_nft);
     clearInterval(inte);
   };
 
@@ -156,7 +165,7 @@ export const ArtCreateView = () => {
               confirm={() => gotoStep(6)}
             />
           )}
-          {step === 6 && <Congrats nft={nft}/>}
+          {step === 6 && <Congrats nft={nft} />}
           {0 < step && step < 5 && (
             <Button onClick={() => gotoStep(step - 1)}>Back</Button>
           )}
@@ -345,7 +354,9 @@ const UploadStep = (props: {
           onClick={() => {
             props.setAttributes({
               ...props.attributes,
-              files: [mainFile, coverFile].filter(f => f).map(f => new File([f], cleanName(f.name), { type: f.type })),
+              files: [mainFile, coverFile]
+                .filter(f => f)
+                .map(f => new File([f], cleanName(f.name), { type: f.type })),
               image,
             });
             props.confirm();
@@ -564,10 +575,16 @@ const RoyaltiesStep = (props: {
   return (
     <>
       <Row className="call-to-action">
-        <h2>Set royalties for the creation</h2>
+        <h2>Set royalties and supply limits for the creation</h2>
         <p>
           A royalty is a payment made by the seller of this item to the creator.
           It is charged after every successful auction.
+        </p>
+        <p>
+          Setting a maximum supply on your NFT is entirely optional, but once
+          set, no more than this number of limited editions can ever be printed
+          in auctions. Leaving this field blank gives you the latitude to decide
+          on a per-auction basis how many prints you wish to make.
         </p>
       </Row>
       <Row className="content-action">
@@ -592,6 +609,16 @@ const RoyaltiesStep = (props: {
               placeholder="Between 0 and 100"
               onChange={(val: number) => {
                 props.setAttributes({ ...props.attributes, royalty: val });
+              }}
+              className="royalties-input"
+            />
+          </label>
+          <label className="action-field">
+            <span className="field-title">Maximum Supply</span>
+            <InputNumber
+              autoFocus
+              onChange={(val: number) => {
+                props.setAttributes({ ...props.attributes, maxSupply: val });
               }}
               className="royalties-input"
             />
@@ -757,23 +784,24 @@ const WaitingStep = (props: {
 
 const Congrats = (props: {
   nft?: {
-    metadataAccount: PublicKey,
-  }
+    metadataAccount: PublicKey;
+  };
 }) => {
-
-  const history = useHistory()
+  const history = useHistory();
 
   const newTweetURL = () => {
     const params = {
       text: "I've created a new NFT artwork on Metaplex, check it out!",
-      url: `${window.location.origin}/#/art/${props.nft?.metadataAccount.toString()}`,
-      hashtags: "NFT,Crypto,Metaplex",
+      url: `${
+        window.location.origin
+      }/#/art/${props.nft?.metadataAccount.toString()}`,
+      hashtags: 'NFT,Crypto,Metaplex',
       // via: "Metaplex",
-      related: "Metaplex,Solana",
-    }
-    const queryParams = new URLSearchParams(params).toString()
-    return `https://twitter.com/intent/tweet?${queryParams}`
-  }
+      related: 'Metaplex,Solana',
+    };
+    const queryParams = new URLSearchParams(params).toString();
+    return `https://twitter.com/intent/tweet?${queryParams}`;
+  };
 
   return (
     <>
@@ -782,15 +810,26 @@ const Congrats = (props: {
           Congratulations, you created an NFT!
         </div>
         <div className="congrats-button-container">
-          <Button className="congrats-button" onClick={_ => window.open(newTweetURL(), "_blank")}>
+          <Button
+            className="congrats-button"
+            onClick={_ => window.open(newTweetURL(), '_blank')}
+          >
             <span>Share it on Twitter</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button" onClick={_ => history.push(`/art/${props.nft?.metadataAccount.toString()}`)}>
+          <Button
+            className="congrats-button"
+            onClick={_ =>
+              history.push(`/art/${props.nft?.metadataAccount.toString()}`)
+            }
+          >
             <span>See it in your collection</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button" onClick={_ => history.push("/auction/create")}>
+          <Button
+            className="congrats-button"
+            onClick={_ => history.push('/auction/create')}
+          >
             <span>Sell it via auction</span>
             <span>&gt;</span>
           </Button>

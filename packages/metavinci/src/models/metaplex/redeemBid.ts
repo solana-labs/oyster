@@ -120,11 +120,6 @@ export async function redeemBid(
       isWritable: false,
     },
     {
-      pubkey: SYSVAR_CLOCK_PUBKEY,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
       pubkey: transferAuthority,
       isSigner: false,
       isWritable: false,
