@@ -5,6 +5,7 @@ import {
   programIds,
   notify,
   useWallet,
+  ParsedAccountBase,
 } from '@oyster/common';
 import {
   WORMHOLE_PROGRAM_ID,
@@ -29,11 +30,12 @@ import {
   COINGECKO_POOL_INTERVAL,
   useCoingecko,
 } from '../contexts/coingecko';
-import { BN } from 'bn.js';
+import { BigNumber } from 'bignumber.js';
 import { WormholeFactory } from '@solana/bridge-sdk';
 import { ethers } from 'ethers';
 import { useBridge } from '../contexts/bridge';
 import { SolanaBridge } from '@solana/bridge-sdk';
+import BN from 'bn.js';
 
 type WrappedTransferMeta = {
   chain: number;
@@ -47,13 +49,15 @@ type WrappedTransferMeta = {
   symbol?: string;
   amount: number;
   value?: number | string;
-  txhash?: string;
+  txhash: string;
   date: number; // timestamp
   status?: string;
   owner?: string;
   lockup?: any;
   vaa?: any;
 };
+
+const transferCache = new Map<string, WrappedTransferMeta>();
 
 const queryWrappedMetaTransactions = async (
   authorityKey: PublicKey,
@@ -101,14 +105,16 @@ const queryWrappedMetaTransactions = async (
           assetAddress = new PublicKey(metaTransfer.assetAddress).toBase58();
         }
 
-        const dec = new BN(10).pow(new BN(metaTransfer.assetDecimals));
-        const rawAmount = new BN(metaTransfer.amount, 2, 'le');
-        const div = rawAmount.div(dec).toNumber();
-        const mod = rawAmount.mod(dec).toNumber();
-        const amount = parseFloat(div + '.' + mod.toString());
+        const dec = new BigNumber(10).pow(
+          new BigNumber(metaTransfer.assetDecimals),
+        );
+        const rawAmount = new BigNumber(
+          new BN(metaTransfer.amount, 2, 'le').toString(),
+        );
+        const amount = rawAmount.div(dec).toNumber();
         const txhash = acc.publicKey.toBase58();
 
-        transfers.set(assetAddress, {
+        transfers.set(txhash, {
           publicKey: acc.publicKey,
           amount,
           date: metaTransfer.vaaTime,
@@ -125,81 +131,97 @@ const queryWrappedMetaTransactions = async (
 
   await Promise.all(
     [...transfers.values()].map(async transfer => {
-      const resp = await (connection as any)._rpcRequest(
-        'getConfirmedSignaturesForAddress2',
-        [transfer.publicKey.toBase58()],
-      );
-
-      for (const sig of resp.result) {
-        const confirmedTx = await connection.getParsedConfirmedTransaction(
-          sig.signature,
-          'finalized',
+      const cachedTransfer = transferCache.get(transfer.txhash);
+      if (cachedTransfer && cachedTransfer.status === 'Completed') {
+        transfer.vaa = cachedTransfer.vaa;
+        transfer.status = cachedTransfer.status;
+        transfer.owner = cachedTransfer.owner;
+      } else {
+        const resp = await (connection as any)._rpcRequest(
+          'getConfirmedSignaturesForAddress2',
+          [transfer.publicKey.toBase58()],
         );
-        if (!confirmedTx) continue;
-        const instructions = confirmedTx.transaction?.message?.instructions;
-        const filteredInstructions = instructions?.filter(ins => {
-          return ins.programId.toBase58() === WORMHOLE_PROGRAM_ID.toBase58();
-        });
-        if (filteredInstructions && filteredInstructions?.length > 0) {
-          for (const ins of filteredInstructions) {
-            const data = bs58.decode((ins as PartiallyDecodedInstruction).data);
-            if (data[0] === TRANSFER_ASSETS_OUT_INSTRUCTION) {
-              try {
-                transfer.owner = (ins as PartiallyDecodedInstruction).accounts[10].toBase58();
-              } catch {
-                // Catch no owner
-                transfer.owner = '';
-              }
-            }
 
-            if (
-              data[0] === POSTVAA_INSTRUCTION &&
-              confirmedTx.meta?.err == null &&
-              bridge
-            ) {
-              const lockup = transfer.lockup;
-              let vaa = lockup.vaa;
-              for (let i = vaa.length; i > 0; i--) {
-                if (vaa[i] == 0xff) {
-                  vaa = vaa.slice(0, i);
-                  break;
+        for (const sig of resp.result) {
+          const confirmedTx = await connection.getParsedConfirmedTransaction(
+            sig.signature,
+            'finalized',
+          );
+          if (!confirmedTx) continue;
+          const instructions = confirmedTx.transaction?.message?.instructions;
+          const filteredInstructions = instructions?.filter(ins => {
+            return ins.programId.toBase58() === WORMHOLE_PROGRAM_ID.toBase58();
+          });
+          if (filteredInstructions && filteredInstructions?.length > 0) {
+            for (const ins of filteredInstructions) {
+              const data = bs58.decode(
+                (ins as PartiallyDecodedInstruction).data,
+              );
+              if (data[0] === TRANSFER_ASSETS_OUT_INSTRUCTION) {
+                try {
+                  transfer.owner = (ins as PartiallyDecodedInstruction).accounts[10].toBase58();
+                } catch {
+                  // Catch no owner
+                  transfer.owner = '';
                 }
               }
-              let signatures = await bridge.fetchSignatureStatus(
-                lockup.signatureAccount,
-              );
-              let sigData = Buffer.of(
-                ...signatures.reduce((previousValue, currentValue) => {
-                  previousValue.push(currentValue.index);
-                  previousValue.push(...currentValue.signature);
 
-                  return previousValue;
-                }, new Array<number>()),
-              );
+              if (
+                data[0] === POSTVAA_INSTRUCTION &&
+                confirmedTx.meta?.err == null &&
+                bridge
+              ) {
+                const lockup = transfer.lockup;
+                let vaa = lockup.vaa;
+                for (let i = vaa.length; i > 0; i--) {
+                  if (vaa[i] == 0xff) {
+                    vaa = vaa.slice(0, i);
+                    break;
+                  }
+                }
+                try {
+                  let signatures = await bridge.fetchSignatureStatus(
+                    lockup.signatureAccount,
+                  );
+                  let sigData = Buffer.of(
+                    ...signatures.reduce((previousValue, currentValue) => {
+                      previousValue.push(currentValue.index);
+                      previousValue.push(...currentValue.signature);
 
-              vaa = Buffer.concat([
-                vaa.slice(0, 5),
-                Buffer.of(signatures.length),
-                sigData,
-                vaa.slice(6),
-              ]);
-              try {
-                if (vaa?.length) {
-                  const _ = await wh.parseAndVerifyVAA(vaa);
-                  transfer.status = 'Failed';
-                  transfer.vaa = vaa;
-                  //TODO: handle vaa not posted
-                  //console.log({ result });
-                } else {
+                      return previousValue;
+                    }, new Array<number>()),
+                  );
+
+                  vaa = Buffer.concat([
+                    vaa.slice(0, 5),
+                    Buffer.of(signatures.length),
+                    sigData,
+                    vaa.slice(6),
+                  ]);
+                  try {
+                    if (vaa?.length) {
+                      const _ = await wh.parseAndVerifyVAA(vaa);
+                      transfer.status = 'Failed';
+                      transfer.vaa = vaa;
+                      //TODO: handle vaa not posted
+                      //console.log({ result });
+                    } else {
+                      transfer.status = 'Error';
+                      transfer.vaa = vaa;
+                      //TODO: handle empty data
+                      //console.log({ vaa });
+                    }
+                  } catch (e) {
+                    //console.log({ error: e });
+                    transfer.vaa = vaa;
+                    transfer.status = 'Completed';
+                    transferCache.set(transfer.txhash, transfer);
+                  }
+                } catch (e) {
                   transfer.status = 'Error';
                   transfer.vaa = vaa;
-                  //TODO: handle empty data
-                  //console.log({ vaa });
+                  //TODO: handle error
                 }
-              } catch (e) {
-                //console.log({ error: e });
-                transfer.vaa = vaa;
-                transfer.status = 'Completed';
               }
             }
           }

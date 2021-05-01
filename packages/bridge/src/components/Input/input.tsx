@@ -40,7 +40,7 @@ export function Input(props: {
             props.onInputChange && props.onInputChange(props.balance)
           }
         >
-          {props.balance}
+          {props.balance?.toFixed(6)}
         </div>
       </div>
       <div className="input-container">
