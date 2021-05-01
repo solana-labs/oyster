@@ -56,7 +56,7 @@ export const EthereumConnect = () => {
         </Dropdown.Button>
       ) : (
         <Button onClick={() => onConnectEthereum && onConnectEthereum()}>
-          CONNECT WALLET
+          CONNECT
         </Button>
       )}
     </div>
