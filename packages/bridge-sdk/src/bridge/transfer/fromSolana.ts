@@ -147,7 +147,7 @@ export const fromSolana = async (
             return;
           }
 
-          const passedSlots = Math.max(Math.min(slot.slot - startSlot, 0), 32);
+          const passedSlots = Math.min(Math.max(slot.slot - startSlot, 0), 32);
           const isLast = passedSlots - 1 === 31;
           if (passedSlots <= 32) {
             setProgress({
@@ -245,7 +245,7 @@ export const fromSolana = async (
       });
       let tx = await wh.submitVAA(vaa);
       setProgress({
-        message: 'Waiting for tokens unlock to be mined...',
+        message: 'Waiting for tokens unlock to be mined... (Up to few min.)',
         type: 'wait',
         group,
         step: counter++,

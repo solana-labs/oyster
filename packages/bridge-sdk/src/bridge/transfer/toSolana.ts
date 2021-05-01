@@ -180,7 +180,7 @@ export const toSolana = async (
           });
           let res = await e.approve(programIds().wormhole.bridge, amountBN);
           setProgress({
-            message: 'Waiting for ETH transaction to be mined...',
+            message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
             type: 'wait',
             group,
             step: counter++,
@@ -243,7 +243,7 @@ export const toSolana = async (
           false,
         );
         setProgress({
-          message: 'Waiting for ETH transaction to be mined...',
+          message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
           type: 'wait',
           group,
           step: counter++,

@@ -133,7 +133,11 @@ const queryOwnWrappedMetaTransactions = async (
         explorer: `https://explorer.solana.com/address/${txhash}`,
         lockup: ls,
         status:
-          ls.status === LockupStatus.UNCLAIMED_VAA ? 'Failed' : 'Completed',
+          ls.status === LockupStatus.UNCLAIMED_VAA
+            ? 'Failed'
+            : ls.status === LockupStatus.AWAITING_VAA
+            ? 'In Process'
+            : 'Completed',
       });
     }
     setTransfers([...transfers.values()]);
