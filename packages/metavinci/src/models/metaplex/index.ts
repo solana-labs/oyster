@@ -12,7 +12,6 @@ import { serialize, BinaryReader, BinaryWriter } from 'borsh';
 
 export * from './initAuctionManager';
 export * from './redeemBid';
-export * from './redeemLimitedEditionBid';
 export * from './redeemMasterEditionBid';
 export * from './redeemOpenEditionBid';
 export * from './startAuction';
@@ -86,16 +85,12 @@ export class RedeemMasterEditionBidArgs {
   instruction = 3;
 }
 
-export class RedeemLimitedEditionBidArgs {
+export class RedeemOpenEditionBidArgs {
   instruction = 4;
 }
 
-export class RedeemOpenEditionBidArgs {
-  instruction = 5;
-}
-
 export class StartAuctionArgs {
-  instruction = 6;
+  instruction = 5;
 }
 
 export class AuctionManagerSettings {
@@ -128,8 +123,10 @@ export enum EditionType {
   NA,
   /// Means you are auctioning off the master edition record
   MasterEdition,
-  /// Means you are using the master edition to print off new editions during the auction (limited or open edition)
+  /// Means you are using authorization tokens to print off limited editions during the auction
   LimitedEdition,
+  /// Means you are using the master edition to print off new editions during the auction
+  OpenEdition,
 }
 
 export class WinningConfig {
@@ -296,13 +293,6 @@ export const SCHEMA = new Map<any, any>([
   ],
   [
     RedeemMasterEditionBidArgs,
-    {
-      kind: 'struct',
-      fields: [['instruction', 'u8']],
-    },
-  ],
-  [
-    RedeemLimitedEditionBidArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],

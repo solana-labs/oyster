@@ -68,6 +68,8 @@ export const useAuctions = (state: AuctionViewState) => {
     nameSymbolTuples,
     masterEditions,
     bidRedemptions,
+    masterEditionsByMasterMint,
+    metadataByMasterEdition,
   } = useMeta();
 
   useEffect(() => {
@@ -85,6 +87,8 @@ export const useAuctions = (state: AuctionViewState) => {
         bidderPotsByAuctionAndBidder,
         masterEditions,
         vaults,
+        masterEditionsByMasterMint,
+        metadataByMasterEdition,
         accountByMint,
         state,
         existingAuctionView,
@@ -104,6 +108,8 @@ export const useAuctions = (state: AuctionViewState) => {
     nameSymbolTuples,
     masterEditions,
     bidRedemptions,
+    masterEditionsByMasterMint,
+    metadataByMasterEdition,
   ]);
 
   return Object.values(auctionViews).filter(v => v) as AuctionView[];
@@ -126,6 +132,8 @@ export function processAccountsIntoAuctionView(
   bidderPotsByAuctionAndBidder: Record<string, ParsedAccount<BidderPot>>,
   masterEditions: Record<string, ParsedAccount<MasterEdition>>,
   vaults: Record<string, ParsedAccount<Vault>>,
+  masterEditionsByMasterMint: Record<string, ParsedAccount<MasterEdition>>,
+  metadataByMasterEdition: Record<string, ParsedAccount<Metadata>>,
   accountByMint: Map<string, TokenAccount>,
   desiredState: AuctionViewState | undefined,
   existingAuctionView?: AuctionView,
@@ -177,6 +185,17 @@ export function processAccountsIntoAuctionView(
         if (!curr.metadata) {
           let foundMetadata =
             metadataByMint[curr.safetyDeposit.info.tokenMint.toBase58()];
+          if (!foundMetadata) {
+            // Means is a limited edition, so the tokenMint is the masterMint
+            let masterEdition =
+              masterEditionsByMasterMint[
+                curr.safetyDeposit.info.tokenMint.toBase58()
+              ];
+            if (masterEdition) {
+              foundMetadata =
+                metadataByMasterEdition[masterEdition.pubkey.toBase58()];
+            }
+          }
           curr.metadata = foundMetadata;
         }
         if (
@@ -234,6 +253,17 @@ export function processAccountsIntoAuctionView(
             metadataByMint[
               boxes[w.safetyDepositBoxIndex].info.tokenMint.toBase58()
             ];
+          if (!metadata) {
+            // Means is a limited edition, so the tokenMint is the masterMint
+            let masterEdition =
+              masterEditionsByMasterMint[
+                boxes[w.safetyDepositBoxIndex].info.tokenMint.toBase58()
+              ];
+            if (masterEdition) {
+              metadata =
+                metadataByMasterEdition[masterEdition.pubkey.toBase58()];
+            }
+          }
           return {
             metadata,
             nameSymbol: metadata?.info?.nameSymbolTuple
@@ -252,7 +282,7 @@ export function processAccountsIntoAuctionView(
                   metadataByMint[
                     boxes[
                       auctionManager.info.settings.openEditionConfig
-                    ].info.tokenMint.toBase58()
+                    ]?.info.tokenMint.toBase58()
                   ],
                 safetyDeposit:
                   boxes[auctionManager.info.settings.openEditionConfig],
@@ -261,7 +291,7 @@ export function processAccountsIntoAuctionView(
                     metadataByMint[
                       boxes[
                         auctionManager.info.settings.openEditionConfig
-                      ].info.tokenMint.toBase58()
+                      ]?.info.tokenMint.toBase58()
                     ]?.info.masterEdition?.toBase58() || ''
                   ],
               }
@@ -272,6 +302,7 @@ export function processAccountsIntoAuctionView(
       };
 
       view.thumbnail = (view.items || [])[0] || view.openEditionItem;
+
       view.totallyComplete = !!(
         view.thumbnail &&
         boxesExpected ==
@@ -283,6 +314,11 @@ export function processAccountsIntoAuctionView(
         view.vault
       );
       if (!view.thumbnail || !view.thumbnail.metadata) return undefined;
+      if (
+        auctionManager.pubkey.toBase58() ==
+        '8wmPH76W8tkek269cPwSHJ1xhhcobCZCjXYdedBhaboJ'
+      )
+        console.log('Got here', view);
       return view as AuctionView;
     }
   }

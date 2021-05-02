@@ -4,7 +4,6 @@ import { AuctionView, processAccountsIntoAuctionView } from '.';
 import { useMeta } from '../contexts';
 
 export const useAuction = (id: string) => {
-  const connection = useConnection();
   const { userAccounts } = useUserAccounts();
   const accountByMint = userAccounts.reduce((prev, acc) => {
     prev.set(acc.info.mint.toBase58(), acc);
@@ -25,6 +24,9 @@ export const useAuction = (id: string) => {
     nameSymbolTuples,
     bidRedemptions,
     vaults,
+
+    masterEditionsByMasterMint,
+    metadataByMasterEdition,
   } = useMeta();
 
   useEffect(() => {
@@ -41,6 +43,8 @@ export const useAuction = (id: string) => {
         bidderPotsByAuctionAndBidder,
         masterEditions,
         vaults,
+        masterEditionsByMasterMint,
+        metadataByMasterEdition,
         accountByMint,
         undefined,
         existingAuctionView || undefined,
@@ -59,6 +63,9 @@ export const useAuction = (id: string) => {
     masterEditions,
     bidRedemptions,
     userAccounts,
+
+    masterEditionsByMasterMint,
+    metadataByMasterEdition,
   ]);
   return existingAuctionView;
 };

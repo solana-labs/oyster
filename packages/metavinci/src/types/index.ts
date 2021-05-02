@@ -21,6 +21,13 @@ export interface Artist {
   about?: string;
 }
 
+export enum ArtType {
+  LimitedEditionPrint,
+  LimitedMasterEdition,
+  OpenMasterEdition,
+  OpenEditionPrint,
+  NFT,
+}
 export interface Art {
   image: string;
   category: MetadataCategory;
@@ -32,6 +39,10 @@ export interface Art {
   endingTS?: number;
   royalties?: number;
   about?: string;
+  type: ArtType;
+  edition?: number;
+  supply?: number;
+  maxSupply?: number;
 }
 
 export interface Presale {

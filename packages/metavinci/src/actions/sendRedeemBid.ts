@@ -27,7 +27,6 @@ import {
   getOriginalAuthority,
   NonWinningConstraint,
   redeemBid,
-  redeemLimitedEditionBid,
   redeemMasterEditionBid,
   redeemOpenEditionBid,
   WinningConfig,
@@ -69,7 +68,6 @@ export async function sendRedeemBid(
       case EditionType.LimitedEdition:
         console.log('Redeeming limited');
         await setupRedeemLimitedInstructions(
-          connection,
           auctionView,
           accountsByMint,
           accountRentExempt,
@@ -241,7 +239,6 @@ async function setupRedeemMasterInstructions(
 }
 
 async function setupRedeemLimitedInstructions(
-  connection: Connection,
   auctionView: AuctionView,
   accountsByMint: Map<string, TokenAccount>,
   accountRentExempt: number,
@@ -282,32 +279,17 @@ async function setupRedeemLimitedInstructions(
           wallet.publicKey,
           winningPrizeSigner,
         );
-      const originalAuthorityAcct = await connection.getAccountInfo(
-        await getOriginalAuthority(
-          auctionView.auction.pubkey,
-          item.metadata.pubkey,
-        ),
-      );
-      console.log('Original auth', originalAuthorityAcct);
-      if (originalAuthorityAcct) {
-        const originalAuthority = new PublicKey(
-          originalAuthorityAcct.data.slice(1, 33),
-        );
 
-        await redeemLimitedEditionBid(
-          auctionView.auctionManager.info.vault,
-          safetyDeposit.info.store,
-          newTokenAccount,
-          safetyDeposit.pubkey,
-          auctionView.vault.info.fractionMint,
-          auctionView.myBidderMetadata.info.bidderPubkey,
-          wallet.publicKey,
-          winningPrizeInstructions,
-          originalAuthority,
-          item.metadata.info.mint,
-          item.masterEdition.info.masterMint,
-        );
-      }
+      await redeemBid(
+        auctionView.auctionManager.info.vault,
+        safetyDeposit.info.store,
+        newTokenAccount,
+        safetyDeposit.pubkey,
+        auctionView.vault.info.fractionMint,
+        auctionView.myBidderMetadata.info.bidderPubkey,
+        wallet.publicKey,
+        winningPrizeInstructions,
+      );
 
       for (let i = 0; i < winningConfig.amount; i++) {
         let cashInLimitedPrizeAuthorizationTokenSigner: Account[] = [];

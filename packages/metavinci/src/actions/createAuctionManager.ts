@@ -16,12 +16,14 @@ import {
   sendTransactions,
   getSafetyDepositBox,
   Edition,
+  getEdition,
 } from '@oyster/common';
 
 import { AccountLayout } from '@solana/spl-token';
 import BN from 'bn.js';
 import {
   AuctionManagerSettings,
+  EditionType,
   getAuctionKeys,
   initAuctionManager,
   startAuction,
@@ -61,6 +63,7 @@ export interface SafetyDepositDraft {
   masterEdition?: ParsedAccount<MasterEdition>;
   edition?: ParsedAccount<Edition>;
   holding: PublicKey;
+  masterMintHolding?: PublicKey;
 }
 
 // This is a super command that executes many transactions to create a Vault, Auction, and AuctionManager starting
@@ -108,14 +111,29 @@ export async function createAuctionManager(
     paymentMint,
   );
 
-  let nftConfigs = safetyDeposits.map((w, i) => ({
-    tokenAccount: w.holding,
-    tokenMint: w.metadata.info.mint,
-    amount: new BN(
-      settings.winningConfigs.find(w => w.safetyDepositBoxIndex == i)?.amount ||
-        1,
-    ),
-  }));
+  let nftConfigs = safetyDeposits.map((w, i) => {
+    let winningConfig = settings.winningConfigs.find(
+      ow => ow.safetyDepositBoxIndex == i,
+    );
+    let mintToUse = w.metadata.info.mint;
+    let holdingToUse = w.holding;
+    // When selling a Limited Edition with intention to print copies of it, we use it's master mint
+    // as token type because we are actually selling authorization tokens, not the limited edition itself..
+    if (
+      winningConfig &&
+      winningConfig.editionType == EditionType.LimitedEdition &&
+      w.masterEdition?.info.masterMint &&
+      w.masterMintHolding
+    ) {
+      mintToUse = w.masterEdition?.info.masterMint;
+      holdingToUse = w.masterMintHolding;
+    }
+    return {
+      tokenAccount: holdingToUse,
+      tokenMint: mintToUse,
+      amount: new BN(winningConfig?.amount || 1),
+    };
+  });
 
   let openEditionSafetyDeposit = undefined;
   if (
@@ -179,6 +197,7 @@ export async function createAuctionManager(
       // No need to validate open edition, it's already been during init
       safetyDeposits.filter((_, i) => i != settings.openEditionConfig),
       stores,
+      settings,
     ),
   };
 
@@ -287,6 +306,7 @@ async function validateBoxes(
   vault: PublicKey,
   safetyDeposits: SafetyDepositDraft[],
   stores: PublicKey[],
+  settings: AuctionManagerSettings,
 ): Promise<{
   instructions: TransactionInstruction[][];
   signers: Account[][];
@@ -297,26 +317,52 @@ async function validateBoxes(
   for (let i = 0; i < safetyDeposits.length; i++) {
     let tokenSigners: Account[] = [];
     let tokenInstructions: TransactionInstruction[] = [];
-    const safetyDepositBox: PublicKey = await getSafetyDepositBox(
-      vault,
-      safetyDeposits[i].metadata.info.mint,
+
+    let safetyDepositBox: PublicKey;
+
+    let winningConfig = settings.winningConfigs.find(
+      ow => ow.safetyDepositBoxIndex == i,
     );
 
-    await validateSafetyDepositBox(
-      vault,
-      safetyDeposits[i].metadata.pubkey,
-      safetyDeposits[i].nameSymbol?.pubkey,
-      safetyDepositBox,
-      stores[i],
-      safetyDeposits[i].metadata.info.mint,
-      wallet.publicKey,
-      wallet.publicKey,
-      wallet.publicKey,
-      tokenInstructions,
-      safetyDeposits[i].masterEdition?.info.masterMint,
-      safetyDeposits[i].masterEdition ? wallet.publicKey : undefined,
-    );
+    if (winningConfig) {
+      if (
+        winningConfig.editionType == EditionType.LimitedEdition &&
+        safetyDeposits[i].masterEdition &&
+        safetyDeposits[i].masterEdition?.info.masterMint
+      )
+        safetyDepositBox = await getSafetyDepositBox(
+          vault,
+          //@ts-ignore
+          safetyDeposits[i].masterEdition.info.masterMint,
+        );
+      else
+        safetyDepositBox = await getSafetyDepositBox(
+          vault,
+          safetyDeposits[i].metadata.info.mint,
+        );
+      const edition: PublicKey = await getEdition(
+        safetyDeposits[i].metadata.info.mint,
+      );
 
+      await validateSafetyDepositBox(
+        vault,
+        safetyDeposits[i].metadata.pubkey,
+        safetyDeposits[i].nameSymbol?.pubkey,
+        safetyDepositBox,
+        stores[i],
+        //@ts-ignore
+        winningConfig.editionType == EditionType.LimitedEdition
+          ? safetyDeposits[i].masterEdition?.info.masterMint
+          : safetyDeposits[i].metadata.info.mint,
+        wallet.publicKey,
+        wallet.publicKey,
+        wallet.publicKey,
+        tokenInstructions,
+        edition,
+        safetyDeposits[i].masterEdition?.info.masterMint,
+        safetyDeposits[i].masterEdition ? wallet.publicKey : undefined,
+      );
+    }
     signers.push(tokenSigners);
     instructions.push(tokenInstructions);
   }

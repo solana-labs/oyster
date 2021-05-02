@@ -50,9 +50,11 @@ const { MetadataKey } = actions;
 export interface MetaContextState {
   metadata: ParsedAccount<Metadata>[];
   metadataByMint: Record<string, ParsedAccount<Metadata>>;
+  metadataByMasterEdition: Record<string, ParsedAccount<Metadata>>;
   nameSymbolTuples: Record<string, ParsedAccount<NameSymbolTuple>>;
   editions: Record<string, ParsedAccount<Edition>>;
   masterEditions: Record<string, ParsedAccount<MasterEdition>>;
+  masterEditionsByMasterMint: Record<string, ParsedAccount<MasterEdition>>;
   auctionManagers: Record<string, ParsedAccount<AuctionManager>>;
   auctions: Record<string, ParsedAccount<AuctionData>>;
   vaults: Record<string, ParsedAccount<Vault>>;
@@ -73,6 +75,8 @@ const MetaContext = React.createContext<MetaContextState>({
   metadataByMint: {},
   nameSymbolTuples: {},
   masterEditions: {},
+  masterEditionsByMasterMint: {},
+  metadataByMasterEdition: {},
   editions: {},
   auctionManagers: {},
   auctions: {},
@@ -101,6 +105,15 @@ export function MetaProvider({ children = null as any }) {
   const [masterEditions, setMasterEditions] = useState<
     Record<string, ParsedAccount<MasterEdition>>
   >({});
+
+  const [masterEditionsByMasterMint, setMasterEditionsByMasterMint] = useState<
+    Record<string, ParsedAccount<MasterEdition>>
+  >({});
+
+  const [metadataByMasterEdition, setMetadataByMasterEdition] = useState<
+    Record<string, ParsedAccount<Metadata>>
+  >({});
+
   const [editions, setEditions] = useState<
     Record<string, ParsedAccount<Edition>>
   >({});
@@ -130,9 +143,7 @@ export function MetaProvider({ children = null as any }) {
     setSafetyDepositBoxesByVaultAndIndex,
   ] = useState<Record<string, ParsedAccount<SafetyDepositBox>>>({});
 
-  useEffect(() => {
-
-  });
+  useEffect(() => {});
 
   useEffect(() => {
     let dispose = () => {};
@@ -144,7 +155,6 @@ export function MetaProvider({ children = null as any }) {
             a.account,
             AuctionParser,
           ) as ParsedAccount<AuctionData>;
-
           account.info.auctionManagerKey = await getAuctionManagerKey(
             account.info.resource,
             a.pubkey,
@@ -370,7 +380,6 @@ export function MetaProvider({ children = null as any }) {
         try {
           if (meta.account.data[0] == MetadataKey.MetadataV1) {
             const metadata = await decodeMetadata(meta.account.data);
-
             if (
               isValidHttpUrl(metadata.uri) &&
               metadata.uri.indexOf('arweave') >= 0
@@ -383,6 +392,10 @@ export function MetaProvider({ children = null as any }) {
               setMetadataByMint(e => ({
                 ...e,
                 [metadata.mint.toBase58()]: account,
+              }));
+              setMetadataByMasterEdition(e => ({
+                ...e,
+                [metadata.masterEdition?.toBase58() || '']: account,
               }));
             }
           } else if (meta.account.data[0] == MetadataKey.EditionV1) {
@@ -403,6 +416,10 @@ export function MetaProvider({ children = null as any }) {
             setMasterEditions(e => ({
               ...e,
               [meta.pubkey.toBase58()]: account,
+            }));
+            setMasterEditionsByMasterMint(e => ({
+              ...e,
+              [masterEdition.masterMint.toBase58()]: account,
             }));
           } else if (meta.account.data[0] == MetadataKey.NameSymbolTupleV1) {
             const nameSymbolTuple = decodeNameSymbolTuple(meta.account.data);
@@ -474,6 +491,8 @@ export function MetaProvider({ children = null as any }) {
     setMetadata,
     setMasterEditions,
     setNameSymbolTuples,
+    setMasterEditionsByMasterMint,
+    setMetadataByMasterEdition,
     setEditions,
   ]);
 
@@ -492,6 +511,8 @@ export function MetaProvider({ children = null as any }) {
         bidderPotsByAuctionAndBidder,
         vaults,
         bidRedemptions,
+        masterEditionsByMasterMint,
+        metadataByMasterEdition,
       }}
     >
       {children}
@@ -527,8 +548,6 @@ const queryExtendedMetadata = async (
       delete mintToMetadata[key];
     } else {
       const metadata = mintToMetadata[key];
-
-
     }
   });
 

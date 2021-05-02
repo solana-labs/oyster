@@ -2,18 +2,16 @@ import {
   createAssociatedTokenAccountInstruction,
   createMint,
   createMetadata,
-  transferUpdateAuthority,
   programIds,
-  sendTransaction,
-  sendTransactions,
   notify,
   ENV,
   updateMetadata,
   createMasterEdition,
   sendTransactionWithRetry,
+  createTokenAccount,
 } from '@oyster/common';
 import React from 'react';
-import { MintLayout, Token } from '@solana/spl-token';
+import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import { WalletAdapter } from '@solana/wallet-base';
 import {
   Account,
@@ -25,6 +23,8 @@ import {
 import crypto from 'crypto';
 import { getAssetCostToStore } from '../utils/assets';
 import { AR_SOL_HOLDER_ID } from '../utils/ids';
+import BN from 'bn.js';
+import { setAuthority } from '@project-serum/serum/lib/token-instructions';
 const RESERVED_TXN_MANIFEST = 'manifest.json';
 
 interface IArweaveResult {
@@ -43,8 +43,9 @@ export const mintNFT = async (
   env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },
+  maxSupply?: number,
 ): Promise<{
-  metadataAccount: PublicKey,
+  metadataAccount: PublicKey;
 } | void> => {
   if (!wallet?.publicKey) {
     return;
@@ -64,6 +65,9 @@ export const mintNFT = async (
   // Allocate memory for the account
   const mintRent = await connection.getMinimumBalanceForRentExemption(
     MintLayout.span,
+  );
+  const accountRent = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
   );
 
   // This owner is a temporary signer and owner of metadata we use to circumvent requesting signing
@@ -214,20 +218,43 @@ export const mintNFT = async (
       updateSigners,
     );
 
+    let authTokenAccount = undefined;
+    if (maxSupply != undefined) {
+      authTokenAccount = createTokenAccount(
+        updateInstructions,
+        payerPublicKey,
+        accountRent,
+        masterMint,
+        payerPublicKey,
+        updateSigners,
+      );
+    }
     // // In this instruction, mint authority will be removed from the main mint, while
     // // minting authority will be maintained for the master mint (which we want.)
     await createMasterEdition(
       metadata.symbol,
       metadata.name,
-      undefined,
+      maxSupply != undefined ? new BN(maxSupply) : maxSupply,
       mintKey,
       masterMint,
       payerPublicKey,
       payerPublicKey,
       updateInstructions,
       payerPublicKey,
+      authTokenAccount,
+      maxSupply != undefined ? payerPublicKey : undefined,
     );
-
+    // TODO: enable when using payer account to avoid 2nd popup
+    /*  if (maxSupply != undefined)
+      updateInstructions.push(
+        setAuthority({
+          target: authTokenAccount,
+          currentAuthority: payerPublicKey,
+          newAuthority: wallet.publicKey,
+          authorityType: 'AccountOwner',
+        }),
+      );
+*/
     // TODO: enable when using payer account to avoid 2nd popup
     // await transferUpdateAuthority(
     //   metadataAccount,
@@ -261,7 +288,7 @@ export const mintNFT = async (
   // 1. Jordan: --- upload file and metadata to storage API
   // 2. pay for storage by hashing files and attaching memo for each file
 
-  return { metadataAccount }
+  return { metadataAccount };
 };
 
 export const prepPayForFilesTxn = async (

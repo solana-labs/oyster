@@ -37,6 +37,9 @@ export const useUserArts = (): SafetyDepositDraft[] => {
   let i = 0;
   ownedMetadata.forEach(m => {
     let a = accountByMint.get(m.info.mint.toBase58());
+    let masterA = accountByMint.get(
+      possibleMasterEditions[i]?.info.masterMint?.toBase58() || '',
+    );
 
     if (a) {
       safetyDeposits.push({
@@ -45,6 +48,7 @@ export const useUserArts = (): SafetyDepositDraft[] => {
         edition: possibleEditions[i],
         masterEdition: possibleMasterEditions[i],
         metadata: m,
+        masterMintHolding: masterA?.pubkey,
       });
     }
     i++;

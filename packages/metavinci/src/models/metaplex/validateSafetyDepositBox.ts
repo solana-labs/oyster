@@ -25,6 +25,7 @@ export async function validateSafetyDepositBox(
   metadataAuthority: PublicKey,
   payer: PublicKey,
   instructions: TransactionInstruction[],
+  edition: PublicKey,
   masterMint?: PublicKey,
   masterMintAuthority?: PublicKey,
 ) {
@@ -37,7 +38,6 @@ export async function validateSafetyDepositBox(
     metadata,
   );
 
-  const edition: PublicKey = await getEdition(tokenMint);
   const value = new ValidateSafetyDepositBoxArgs();
 
   const data = Buffer.from(serialize(SCHEMA, value));
@@ -105,11 +105,6 @@ export async function validateSafetyDepositBox(
     },
     {
       pubkey: PROGRAM_IDS.metadata,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: PROGRAM_IDS.token,
       isSigner: false,
       isWritable: false,
     },

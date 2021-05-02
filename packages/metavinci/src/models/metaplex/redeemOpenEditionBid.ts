@@ -125,11 +125,6 @@ export async function redeemOpenEditionBid(
       isWritable: false,
     },
     {
-      pubkey: SYSVAR_CLOCK_PUBKEY,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
       pubkey: masterMetadata,
       isSigner: false,
       isWritable: false,
