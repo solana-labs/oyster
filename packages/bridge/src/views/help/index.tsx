@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Button } from 'antd';
 
 import './index.less';
 
@@ -7,7 +7,7 @@ export const HelpView = () => {
   return (
     <div
       className="flexColumn transfer-bg"
-      style={{ flex: 1, minHeight: '90vh', paddingTop: '200px' }}
+      style={{ flex: 1, minHeight: '90vh', paddingTop: '100px' }}
     >
       <div className={'description-container'}>
         <Row>
@@ -29,14 +29,10 @@ export const HelpView = () => {
         </Row>
         <Row>
           <Col xs={24} sm={12}>
-            <div className={'main-logo'}>
-              <a
-                href={'https://github.com/certusone/wormhole'}
-                target={'_blank'}
-              >
-                <div className={'logo-title'}> get started</div>
-              </a>
-            </div>
+            <Button className="action-button"
+                    onClick={() => window.open('https://github.com/certusone/wormhole', '_blank')}>
+              View the Code
+            </Button>
           </Col>
           <Col xs={24} sm={12}>
             <div className={'q-title'}>

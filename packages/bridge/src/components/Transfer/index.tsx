@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import { contexts } from '@oyster/common';
+import { contexts, TokenAccount, useUserAccounts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
@@ -44,6 +44,7 @@ export const Transfer = () => {
   const bridge = useBridge();
   const { wallet, connected } = useWallet();
   const { provider, tokenMap } = useEthereum();
+  const { userAccounts } = useUserAccounts();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
     A,
@@ -52,6 +53,8 @@ export const Transfer = () => {
     setMintAddress,
     setLastTypedAccount,
   } = useTokenChainPairState();
+
+
 
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
@@ -81,6 +84,9 @@ export const Transfer = () => {
       info: A.info,
     });
   }, [A, B, mintAddress, A.info]);
+
+
+  const tokenAccounts = useMemo(() => userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint), [request.info?.mint])
 
   return (
     <>
@@ -288,7 +294,7 @@ export const Transfer = () => {
             : LABELS.TRANSFER
           : LABELS.SET_CORRECT_WALLET_NETWORK}
       </Button>
-      <RecentTransactionsTable />
+      <RecentTransactionsTable tokenAccounts={tokenAccounts} />
     </>
   );
 };

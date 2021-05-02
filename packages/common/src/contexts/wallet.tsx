@@ -14,13 +14,13 @@ import { useLocation } from "react-router";
 
 const ASSETS_URL = 'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
 export const WALLET_PROVIDERS = [
-  LedgerProvider,
   {
     name: "Phantom",
     url: "https://www.phantom.app",
     icon: `https://www.phantom.app/img/logo.png`,
     adapter: PhantomWalletAdapter,
   },
+  LedgerProvider,
   {
     name: "Sollet",
     url: "https://www.sollet.io",
@@ -30,21 +30,26 @@ export const WALLET_PROVIDERS = [
     url: "https://solongwallet.com",
     icon: `${ASSETS_URL}solong.png`,
     adapter: SolongWalletAdapter,
-  }, {
-    name: "Solflare",
-    url: "https://solflare.com/access-wallet",
-    icon: `${ASSETS_URL}solflare.svg`,
-  }, {
-    name: "MathWallet",
-    url: "https://mathwallet.org",
-    icon: `${ASSETS_URL}mathwallet.svg`,
   },
-  {
-    name: 'Torus',
-    url: 'https://tor.us',
-    icon: `${ASSETS_URL}torus.svg`,
-    adapter: TorusWalletAdapter,
-  }
+  // TODO: enable when fully functional
+  // {
+  //   name: "MathWallet",
+  //   url: "https://mathwallet.org",
+  //   icon: `${ASSETS_URL}mathwallet.svg`,
+  // },
+  // {
+  //   name: 'Torus',
+  //   url: 'https://tor.us',
+  //   icon: `${ASSETS_URL}torus.svg`,
+  //   adapter: TorusWalletAdapter,
+  // }
+
+  // Solflare doesnt allow external connections for all apps
+  // {
+  //   name: "Solflare",
+  //   url: "https://solflare.com/access-wallet",
+  //   icon: `${ASSETS_URL}solflare.svg`,
+  // },
 ];
 
 const WalletContext = React.createContext<{

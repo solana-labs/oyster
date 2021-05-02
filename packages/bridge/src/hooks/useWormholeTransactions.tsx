@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   notify,
   programIds,
+  TokenAccount,
   useConnection,
   useConnectionConfig,
+  useUserAccounts,
   useWallet,
 } from '@oyster/common';
 import {
@@ -69,21 +71,15 @@ const queryOwnWrappedMetaTransactions = async (
   connection: Connection,
   setTransfers: (arr: WrappedTransferMeta[]) => void,
   provider: ethers.providers.Web3Provider,
+  tokenAccounts: TokenAccount[],
   bridge?: SolanaBridge,
-  owner?: PublicKey | null,
 ) => {
-  if (owner && bridge) {
+  if (tokenAccounts && tokenAccounts.length > 0 && bridge) {
     const transfers = new Map<string, WrappedTransferMeta>();
     let wh = WormholeFactory.connect(programIds().wormhole.bridge, provider);
-    const res: RpcResponseAndContext<
-      Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }>
-    > = await connection.getParsedTokenAccountsByOwner(
-      owner,
-      { programId: programIds().token },
-      'single',
-    );
+
     let lockups: LockupWithStatus[] = [];
-    for (const acc of res.value) {
+    for (const acc of tokenAccounts) {
       const accLockups = await bridge.fetchTransferProposals(acc.pubkey);
       lockups.push(
         ...accLockups.map(v => {
@@ -318,12 +314,11 @@ const queryWrappedMetaTransactions = async (
   setTransfers([...transfers.values()]);
 };
 
-export const useWormholeTransactions = () => {
+export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
   const connection = useConnection();
   const { tokenMap: ethTokens } = useEthereum();
   const { tokenMap } = useConnectionConfig();
   const { coinList } = useCoingecko();
-  const { wallet } = useWallet();
   const bridge = useBridge();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -352,12 +347,12 @@ export const useWormholeTransactions = () => {
           connection,
           setTransfers,
           provider,
+          tokenAccounts,
           bridge,
-          wallet?.publicKey,
         ).then(() => setLoading(false));
       }
     })();
-  }, [connection, setTransfers, wallet?.publicKey]);
+  }, [connection, setTransfers, tokenAccounts]);
 
   const coingeckoTimer = useRef<number>(0);
   const dataSourcePriceQuery = useCallback(async () => {

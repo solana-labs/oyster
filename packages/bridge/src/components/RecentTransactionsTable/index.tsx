@@ -1,4 +1,4 @@
-import { Button, Table, Tabs, notification } from 'antd';
+import { Button, Table, notification } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import './index.less';
@@ -14,6 +14,7 @@ import {
   shortenAddress,
   Identicon,
   programIds,
+  TokenAccount,
 } from '@oyster/common';
 import { useWormholeTransactions } from '../../hooks/useWormholeTransactions';
 import { ASSET_CHAIN } from '../../utils/assets';
@@ -29,12 +30,11 @@ import { useBridge } from '../../contexts/bridge';
 TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
-const { TabPane } = Tabs;
-
 export const RecentTransactionsTable = (props: {
   showUserTransactions?: boolean;
+  tokenAccounts: TokenAccount[];
 }) => {
-  const { loading: loadingTransfers, transfers } = useWormholeTransactions();
+  const { loading: loadingTransfers, transfers } = useWormholeTransactions(props.tokenAccounts);
   const { provider } = useEthereum();
   const bridge = useBridge();
 
@@ -331,12 +331,14 @@ export const RecentTransactionsTable = (props: {
     <div id={'recent-tx-container'}>
       <div className={'home-subtitle'} style={{ marginBottom: '70px' }}>
         My Recent Transactions
+        <div>(selected token only)</div>
       </div>
       <Table
         scroll={{
           scrollToFirstRowOnChange: false,
           x: 900,
         }}
+
         dataSource={transfers.sort((a, b) => b.date - a.date)}
         columns={userColumns}
         loading={loadingTransfers}
