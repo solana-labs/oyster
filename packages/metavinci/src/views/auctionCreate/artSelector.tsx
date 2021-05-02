@@ -3,7 +3,7 @@ import { Row, Button, Modal, ButtonProps } from 'antd';
 import { ArtCard } from './../../components/ArtCard';
 import './../styles.less';
 import { Metadata, ParsedAccount } from '@oyster/common';
-import { useUserArts } from '../../hooks';
+import { useArt, useUserArts } from '../../hooks';
 import Masonry from 'react-masonry-css';
 import { SafetyDepositDraft } from '../../actions/createAuctionManager';
 
@@ -11,14 +11,17 @@ export interface ArtSelectorProps extends ButtonProps {
   selected: SafetyDepositDraft[];
   setSelected: (selected: SafetyDepositDraft[]) => void;
   allowMultiple: boolean;
+  filter?: (i: SafetyDepositDraft) => boolean;
 }
 
 export const ArtSelector = (props: ArtSelectorProps) => {
   const { selected, setSelected, allowMultiple, ...rest } = props;
-  const items = useUserArts();
-  const selectedItems = useMemo<Set<string>>(() =>
-    new Set(selected.map(item => item.metadata.pubkey.toBase58()))
-  , [selected]);
+  let items = useUserArts();
+  if (props.filter) items = items.filter(props.filter);
+  const selectedItems = useMemo<Set<string>>(
+    () => new Set(selected.map(item => item.metadata.pubkey.toBase58())),
+    [selected],
+  );
 
   const [visible, setVisible] = useState(false);
 
@@ -37,7 +40,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
   };
 
   const confirm = () => {
-      close();
+    close();
   };
 
   const breakpointColumnsObj = {
@@ -56,23 +59,16 @@ export const ArtSelector = (props: ArtSelectorProps) => {
       >
         {selected.map(m => {
           let key = m?.metadata.pubkey.toBase58() || '';
-          let item = m?.metadata?.info;
-          if (!item) {
-            return;
-          }
 
           return (
             <ArtCard
               key={key}
-              image={item.extended?.image}
-              category={item.extended?.category}
-              name={item?.name}
-              symbol={item.symbol}
+              pubkey={m.metadata.pubkey}
               preview={false}
               onClick={open}
               close={() => {
                 setSelected(
-                  selected.filter(_ => _.metadata.pubkey.toBase58() !== key)
+                  selected.filter(_ => _.metadata.pubkey.toBase58() !== key),
                 );
                 confirm();
               }}
@@ -94,7 +90,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
         visible={visible}
         onCancel={close}
         onOk={confirm}
-        width="100"
+        width={1100}
         footer={null}
       >
         <Row className="call-to-action" style={{ marginBottom: 0 }}>
@@ -103,7 +99,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
             Select the NFT that you want to sell copy/copies of.
           </p>
         </Row>
-        <Row className="content-action">
+        <Row className="content-action" style={{ overflowY: 'scroll', height: "50vh" }}>
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid"
@@ -123,10 +119,10 @@ export const ArtSelector = (props: ArtSelectorProps) => {
                   ? new Set(list.filter(item => item !== id))
                   : new Set([...list, id]);
 
-                  let selected = items.filter(item =>
-                    newSet.has(item.metadata.pubkey.toBase58()),
-                  );
-                  setSelected(selected);
+                let selected = items.filter(item =>
+                  newSet.has(item.metadata.pubkey.toBase58()),
+                );
+                setSelected(selected);
 
                 if (!allowMultiple) {
                   confirm();
@@ -136,10 +132,7 @@ export const ArtSelector = (props: ArtSelectorProps) => {
               return (
                 <ArtCard
                   key={id}
-                  image={m.metadata.info.extended?.image}
-                  category={m.metadata.info.extended?.category}
-                  name={m.metadata.info?.name}
-                  symbol={m.metadata.info.symbol}
+                  pubkey={m.metadata.pubkey}
                   preview={false}
                   onClick={onSelect}
                   className={isSelected ? 'selected-card' : 'not-selected-card'}

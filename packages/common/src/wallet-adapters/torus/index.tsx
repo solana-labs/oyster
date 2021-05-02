@@ -46,9 +46,11 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   connect = async () => {
+    const clientId = process.env.REACT_APP_CLIENT_ID || 'BNxdRWx08cSTPlzMAaShlM62d4f8Tp6racfnCg_gaH0XQ1NfSGo3h5B_IkLtgSnPMhlxsSvhqugWm0x8x-VkUXA';
     this._provider = new OpenLogin({
-      clientId: process.env.REACT_APP_CLIENT_ID || 'BNxdRWx08cSTPlzMAaShlM62d4f8Tp6racfnCg_gaH0XQ1NfSGo3h5B_IkLtgSnPMhlxsSvhqugWm0x8x-VkUXA',
-      network: "mainnet", // mainnet, testnet, development
+      clientId,
+      network: "testnet", // mainnet, testnet, development
+      uxMode: 'popup'
     });
 
     try {
@@ -65,7 +67,7 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
       this.account = new Account(secretKey);
     } else {
       try {
-        const { privKey } = await this._provider.login();
+        const { privKey } = await this._provider.login({ loginProvider: "unselected"} as any);
         const secretKey = getSolanaPrivateKey(privKey);
         this.account = new Account(secretKey);
       } catch(ex) {
@@ -74,7 +76,8 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
     }
 
     this.name = this._provider?.state.store.get('name');;
-    this.image = this._provider?.state.store.get('profileImage');;
+    this.image = this._provider?.state.store.get('profileImage');
+    debugger;
 
     this.emit("connect");
   }

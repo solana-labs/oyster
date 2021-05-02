@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Divider, Layout, Image } from 'antd';
+import React from 'react';
+import { Row, Col, Divider, Layout } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useArt } from './../../hooks';
 
 import "./index.less"
-import { Art, Artist, Presale } from '../../types';
-import { sampleArtist, samplePresale } from '../home/sampleData';
-import { PreSaleCard } from '../../components/PresaleCard';
+import { Artist } from '../../types';
+import { sampleArtist } from '../home/sampleData';
 import { ArtContent } from '../../components/ArtContent';
 
 const { Content } = Layout
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
-
-  const art: Art = useArt(id);
-  // const artist: Artist = getArtist(art.artist_id)
-  // const presale: Presale = getPresale(art.presale_id)
+  const art = useArt(id);
   const artist: Artist = sampleArtist
-  const presale: Presale = samplePresale
 
   return (
     <Content>
@@ -28,7 +23,7 @@ export const ArtView = () => {
         </Row>
         <Divider />
         <Row style={{ margin: '0 30px', textAlign: 'left', fontSize: '1.4rem' }}>
-          <Col span={12} >
+          <Col span={24} >
             <div style={{ fontWeight: 700 }}>{art.title}</div>
             <br />
             <div className="info-header">CREATED BY</div>
@@ -42,9 +37,6 @@ export const ArtView = () => {
             <br />
             <div className="info-header">ABOUT THE CREATOR</div>
             <div className="info-content">{artist.about}</div>
-          </Col>
-          <Col span={12}>
-            <PreSaleCard presale={presale} />
           </Col>
         </Row>
       </Col>

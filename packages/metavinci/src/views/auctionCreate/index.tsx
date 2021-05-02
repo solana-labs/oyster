@@ -53,7 +53,7 @@ import {
   WinningConstraint,
 } from '../../models/metaplex';
 import { serialize } from 'borsh';
-import moment from 'moment'
+import moment from 'moment';
 import {
   createAuctionManager,
   SafetyDepositDraft,
@@ -86,6 +86,7 @@ export interface AuctionState {
 
   // listed NFTs
   items: SafetyDepositDraft[];
+  participationNFT?: SafetyDepositDraft;
   // number of editions for this auction (only applicable to limited edition)
   editions?: number;
 
@@ -94,7 +95,6 @@ export interface AuctionState {
 
   // suggested date time when auction should end UTC+0
   endDate?: Date;
-
 
   //////////////////
   category: AuctionCategory;
@@ -128,7 +128,11 @@ export const AuctionCreateView = () => {
 
   const [step, setStep] = useState<number>(0);
   const [saving, setSaving] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [auctionObj, setAuctionObj] = useState<{
+    vault: PublicKey;
+    auction: PublicKey;
+    auctionManager: PublicKey;
+  } | undefined>(undefined);
   const [attributes, setAttributes] = useState<AuctionState>({
     reservationPrice: 0,
     items: [],
@@ -153,54 +157,75 @@ export const AuctionCreateView = () => {
     if (attributes.category == AuctionCategory.Open) {
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: WinningConstraint.OpenEditionGiven,
-        openEditionNonWinningConstraint: NonWinningConstraint.GivenForBidPrice,
+        openEditionNonWinningConstraint:
+          NonWinningConstraint.GivenForFixedPrice,
         winningConfigs: [],
         openEditionConfig: 0,
-        openEditionFixedPrice: null,
+        openEditionFixedPrice: new BN(attributes.reservationPrice),
       });
 
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Unlimited,
         usize: ZERO,
       });
-    } else if (attributes.category == AuctionCategory.Single) {
-      console.log('Using single');
+    } else if (
+      attributes.category == AuctionCategory.Limited ||
+      attributes.category == AuctionCategory.Single
+    ) {
       settings = new AuctionManagerSettings({
-        openEditionWinnerConstraint: WinningConstraint.NoOpenEdition,
-        openEditionNonWinningConstraint: NonWinningConstraint.NoOpenEdition,
+        openEditionWinnerConstraint: attributes.participationNFT
+          ? WinningConstraint.OpenEditionGiven
+          : WinningConstraint.NoOpenEdition,
+        openEditionNonWinningConstraint: attributes.participationNFT
+          ? NonWinningConstraint.GivenForFixedPrice
+          : NonWinningConstraint.NoOpenEdition,
         winningConfigs: attributes.items.map(
           (item, index) =>
             new WinningConfig({
               // TODO: check index
               safetyDepositBoxIndex: index,
               amount: 1,
-              editionType: item.masterEdition
-                ? EditionType.MasterEdition
-                : EditionType.NA,
+              editionType:
+                attributes.category == AuctionCategory.Limited
+                  ? EditionType.LimitedEdition
+                  : item.masterEdition
+                  ? EditionType.MasterEdition
+                  : EditionType.NA,
             }),
         ),
-        openEditionConfig: null,
-        openEditionFixedPrice: null,
+        openEditionConfig: attributes.participationNFT
+          ? attributes.items.length
+          : null,
+        openEditionFixedPrice: attributes.participationNFT
+          ? new BN(attributes.reservationPrice)
+          : null,
       });
       winnerLimit = new WinnerLimit({
         type: WinnerLimitType.Capped,
         usize: new BN(attributes.winnersCount),
       });
+      console.log('Settings', settings);
     } else {
       throw new Error('Not supported');
     }
 
-    await createAuctionManager(
+    const endAuctionAt = moment().unix() + ((attributes.auctionDuration || 0) * 60)
+    
+    const _auctionObj = await createAuctionManager(
       connection,
       wallet,
       settings,
       winnerLimit,
-      new BN((attributes.auctionDuration || 1) * 60),
-      new BN((attributes.gapTime || 1) * 60),
-      attributes.items,
+      new BN(endAuctionAt),
+      new BN((attributes.gapTime || 0) * 60),
+      [
+        ...attributes.items,
+        ...(attributes.participationNFT ? [attributes.participationNFT] : []),
+      ],
       // TODO: move to config
-      new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
+      new PublicKey('3EVo6RQfu5D1DC18jsqrQnbiKLYoig8yckJC7QgMiJVY'),
     );
+    setAuctionObj(_auctionObj)
   };
 
   const categoryStep = (
@@ -282,7 +307,10 @@ export const AuctionCreateView = () => {
   const reviewStep = (
     <ReviewStep
       attributes={attributes}
-      confirm={() => gotoNextStep()}
+      confirm={() => {
+        setSaving(true)
+        gotoNextStep()
+      }}
       connection={connection}
     />
   );
@@ -290,12 +318,11 @@ export const AuctionCreateView = () => {
   const waitStep = (
     <WaitingStep
       createAuction={createAuction}
-      progress={progress}
       confirm={() => gotoNextStep()}
     />
   );
 
-  const congratsStep = <Congrats />;
+  const congratsStep = <Congrats auction={auctionObj}/>;
 
   const stepsByCategory = {
     [AuctionCategory.Limited]: [
@@ -462,22 +489,21 @@ const CopiesStep = (props: {
   setAttributes: (attr: AuctionState) => void;
   confirm: () => void;
 }) => {
-  const items = useUserArts();
-  let eligibleItems: SafetyDepositDraft[] = [];
+  let filter: ((i: SafetyDepositDraft) => boolean) | undefined;
   if (props.attributes.category == AuctionCategory.Limited) {
-    eligibleItems = items.filter(i => i.masterEdition);
+    filter = (i: SafetyDepositDraft) => !!i.masterEdition;
   } else if (
     props.attributes.category == AuctionCategory.Single ||
     props.attributes.category == AuctionCategory.Tiered
   ) {
-    eligibleItems = items;
+    filter = undefined;
   } else if (props.attributes.category == AuctionCategory.Open) {
-    eligibleItems = items.filter(
-      i =>
+    filter = (i: SafetyDepositDraft) =>
+      !!(
         i.masterEdition &&
         (i.masterEdition.info.maxSupply == undefined ||
-          i.masterEdition.info.maxSupply == null),
-    );
+          i.masterEdition.info.maxSupply == null)
+      );
   }
 
   return (
@@ -491,6 +517,7 @@ const CopiesStep = (props: {
       <Row className="content-action">
         <Col xl={24}>
           <ArtSelector
+            filter={filter}
             selected={props.attributes.items}
             setSelected={items => {
               props.setAttributes({ ...props.attributes, items });
@@ -532,12 +559,12 @@ const CopiesStep = (props: {
               tiers:
                 !props.attributes.tiers || props.attributes.tiers?.length == 0
                   ? [
-                    {
-                      to: 0,
-                      name: 'Default Tier',
-                      items: props.attributes.items,
-                    },
-                  ]
+                      {
+                        to: 0,
+                        name: 'Default Tier',
+                        items: props.attributes.items,
+                      },
+                    ]
                   : props.attributes.tiers,
             });
             props.confirm();
@@ -607,7 +634,7 @@ const TierWinners = (props: {
   previousTo?: number;
   lastTier?: Tier;
 }) => {
-  const from = (props.previousTo || 0) + 1
+  const from = (props.previousTo || 0) + 1;
   return (
     <>
       <Divider />
@@ -620,9 +647,7 @@ const TierWinners = (props: {
             type="number"
             className="input"
             style={{ width: '30%' }}
-            onChange={value =>
-              null
-            }
+            onChange={value => null}
           />
           &nbsp;to&nbsp;
           <InputNumber
@@ -671,7 +696,11 @@ const TierWinners = (props: {
         />
       </label>
 
-      <ArtSelector selected={[]} setSelected={_ => { }} allowMultiple={true} />
+      <ArtSelector
+        selected={props.tier.items}
+        setSelected={items => props.setTier({ ...props.tier, items })}
+        allowMultiple={true}
+      />
     </>
   );
 };
@@ -720,7 +749,7 @@ const TierStep = (props: {
                     (_, idx) => ({
                       to: Math.trunc(
                         ((idx + 1) * (props.attributes.spots as number)) /
-                        parseInt(info.target.value),
+                          parseInt(info.target.value),
                       ),
                       name: '',
                       description: '',
@@ -742,7 +771,6 @@ const TierStep = (props: {
               lastTier={tiers.slice(-1)[0]}
             />
           ))}
-
         </Col>
       </Row>
       <Row>
@@ -959,30 +987,38 @@ const InitialPhaseStep = (props: {
   const [startNow, setStartNow] = useState<boolean>(true);
   const [listNow, setListNow] = useState<boolean>(true);
 
-  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(props.attributes.startSaleTS ? moment.unix(props.attributes.startSaleTS) : undefined)
-  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(props.attributes.startListTS ? moment.unix(props.attributes.startListTS) : undefined)
+  const [saleMoment, setSaleMoment] = useState<moment.Moment | undefined>(
+    props.attributes.startSaleTS
+      ? moment.unix(props.attributes.startSaleTS)
+      : undefined,
+  );
+  const [listMoment, setListMoment] = useState<moment.Moment | undefined>(
+    props.attributes.startListTS
+      ? moment.unix(props.attributes.startListTS)
+      : undefined,
+  );
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      startSaleTS: saleMoment && saleMoment.unix() * 1000
-    })
-  }, [saleMoment])
+      startSaleTS: saleMoment && saleMoment.unix() * 1000,
+    });
+  }, [saleMoment]);
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      startListTS: listMoment && listMoment.unix() * 1000
-    })
-  }, [listMoment])
+      startListTS: listMoment && listMoment.unix() * 1000,
+    });
+  }, [listMoment]);
 
   useEffect(() => {
-    if (startNow) setSaleMoment(moment())
-  }, [startNow])
+    if (startNow) setSaleMoment(moment());
+  }, [startNow]);
 
   useEffect(() => {
-    if (listNow) setListMoment(moment())
-  }, [listNow])
+    if (listNow) setListMoment(moment());
+  }, [listNow]);
 
   return (
     <>
@@ -1201,18 +1237,20 @@ const EndingPhaseSale = (props: {
   confirm: () => void;
 }) => {
   const [untilSold, setUntilSold] = useState<boolean>(true);
-  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined)
+  const [endMoment, setEndMoment] = useState<moment.Moment | undefined>(
+    props.attributes.endTS ? moment.unix(props.attributes.endTS) : undefined,
+  );
 
   useEffect(() => {
     props.setAttributes({
       ...props.attributes,
-      endTS: endMoment && endMoment.unix() * 1000
-    })
-  }, [endMoment])
+      endTS: endMoment && endMoment.unix() * 1000,
+    });
+  }, [endMoment]);
 
   useEffect(() => {
-    if (untilSold) setEndMoment(undefined)
-  }, [untilSold])
+    if (untilSold) setEndMoment(undefined);
+  }, [untilSold]);
 
   return (
     <>
@@ -1252,17 +1290,19 @@ const EndingPhaseSale = (props: {
               <DatePicker
                 className="field-date"
                 size="large"
-                disabledDate={current => current && current < moment().endOf('day')}
+                disabledDate={current =>
+                  current && current < moment().endOf('day')
+                }
                 value={endMoment}
                 onChange={value => {
-                  if (!value) return
-                  if (!endMoment) return setEndMoment(value)
+                  if (!value) return;
+                  if (!endMoment) return setEndMoment(value);
 
-                  const currentMoment = endMoment.clone()
-                  currentMoment.hour(value.hour())
-                  currentMoment.minute(value.minute())
-                  currentMoment.second(value.second())
-                  setEndMoment(currentMoment)
+                  const currentMoment = endMoment.clone();
+                  currentMoment.hour(value.hour());
+                  currentMoment.minute(value.minute());
+                  currentMoment.second(value.second());
+                  setEndMoment(currentMoment);
                 }}
               />
               <TimePicker
@@ -1270,14 +1310,14 @@ const EndingPhaseSale = (props: {
                 size="large"
                 value={endMoment}
                 onChange={value => {
-                  if (!value) return
-                  if (!endMoment) return setEndMoment(value)
+                  if (!value) return;
+                  if (!endMoment) return setEndMoment(value);
 
-                  const currentMoment = endMoment.clone()
-                  currentMoment.hour(value.hour())
-                  currentMoment.minute(value.minute())
-                  currentMoment.second(value.second())
-                  setEndMoment(currentMoment)
+                  const currentMoment = endMoment.clone();
+                  currentMoment.hour(value.hour());
+                  currentMoment.minute(value.minute());
+                  currentMoment.second(value.second());
+                  setEndMoment(currentMoment);
                 }}
               />
             </label>
@@ -1315,11 +1355,21 @@ const ParticipationStep = (props: {
       <Row className="content-action">
         <Col className="section" xl={24}>
           <ArtSelector
-            selected={[]}
-            setSelected={() => { }}
+            filter={(i: SafetyDepositDraft) => !!i.masterEdition}
+            selected={
+              props.attributes.participationNFT
+                ? [props.attributes.participationNFT]
+                : []
+            }
+            setSelected={items => {
+              props.setAttributes({
+                ...props.attributes,
+                participationNFT: items[0],
+              });
+            }}
             allowMultiple={false}
           >
-            Select NFT
+            Select Participation NFT
           </ArtSelector>
         </Col>
       </Row>
@@ -1365,10 +1415,7 @@ const ReviewStep = (props: {
         <Col xl={12}>
           {item?.metadata.info && (
             <ArtCard
-              image={item.metadata.info.extended?.image}
-              category={item.metadata.info.extended?.category}
-              name={item.metadata.info.name}
-              symbol={item.metadata.info.symbol}
+              pubkey={item.metadata.pubkey}
               small={true}
             />
           )}
@@ -1409,7 +1456,7 @@ const ReviewStep = (props: {
           <Statistic
             className="create-statistic"
             title="Listing go live date"
-            value={props.attributes.startListTS}
+            value={moment.unix((props.attributes.startListTS as number) / 1000).format("dddd, MMMM Do YYYY, h:mm a")}
           />
         )}
         <Divider />
@@ -1437,12 +1484,15 @@ const ReviewStep = (props: {
 
 const WaitingStep = (props: {
   createAuction: () => Promise<void>;
-  progress: number;
   confirm: () => void;
 }) => {
+  const [progress, setProgress] = useState<number>(0);
+
   useEffect(() => {
     const func = async () => {
+      const inte = setInterval(() => setProgress(prog => prog + 1), 600);
       await props.createAuction();
+      clearInterval(inte);
       props.confirm();
     };
     func();
@@ -1450,7 +1500,7 @@ const WaitingStep = (props: {
 
   return (
     <div style={{ marginTop: 70 }}>
-      <Progress type="circle" percent={props.progress} />
+      <Progress type="circle" percent={progress} />
       <div className="waiting-title">
         Your creation is being listed with Metaplex...
       </div>
@@ -1459,7 +1509,27 @@ const WaitingStep = (props: {
   );
 };
 
-const Congrats = () => {
+const Congrats = (props: {
+  auction?: {
+    vault: PublicKey;
+    auction: PublicKey;
+    auctionManager: PublicKey;
+  }
+}) => {
+  const history = useHistory()
+
+  const newTweetURL = () => {
+    const params = {
+      text: "I've created a new NFT auction on Metaplex, check it out!",
+      url: `${window.location.origin}/#/auction/${props.auction?.auction.toString()}`,
+      hashtags: "NFT,Crypto,Metaplex",
+      // via: "Metaplex",
+      related: "Metaplex,Solana",
+    }
+    const queryParams = new URLSearchParams(params).toString()
+    return `https://twitter.com/intent/tweet?${queryParams}`
+  }
+
   return (
     <>
       <div style={{ marginTop: 70 }}>
@@ -1467,18 +1537,18 @@ const Congrats = () => {
           Congratulations! Your auction is now live.
         </div>
         <div className="congrats-button-container">
-          <Button className="congrats-button">
+          <Button className="congrats-button" onClick={_ => window.open(newTweetURL(), "_blank")}>
             <span>Share it on Twitter</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
-            <span>See it in your collection</span>
+          <Button className="congrats-button" onClick={_ => history.push(`/auction/${props.auction?.auction.toString()}`)}>
+            <span>See it in your auctions</span>
             <span>&gt;</span>
           </Button>
-          <Button className="congrats-button">
+          {/* <Button className="congrats-button">
             <span>Sell it via auction</span>
             <span>&gt;</span>
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Confetti />

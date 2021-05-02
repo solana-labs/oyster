@@ -25,6 +25,7 @@ import {
 export type ENV =
   | 'mainnet-beta (Serum)'
   | 'mainnet-beta'
+  | 'mainnet-beta (Serum)'
   | 'testnet'
   | 'devnet'
   | 'localnet'
@@ -491,7 +492,7 @@ export async function sendSignedTransaction({
       connection.sendRawTransaction(rawTransaction, {
         skipPreflight: true,
       });
-      await sleep(300);
+      await sleep(500);
     }
   })();
   try {
@@ -643,7 +644,7 @@ async function awaitTransactionSignatureConfirmation(
             }
           }
         })();
-        await sleep(1000);
+        await sleep(2000);
       }
     })();
   })

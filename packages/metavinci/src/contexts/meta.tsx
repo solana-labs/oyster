@@ -131,6 +131,10 @@ export function MetaProvider({ children = null as any }) {
   ] = useState<Record<string, ParsedAccount<SafetyDepositBox>>>({});
 
   useEffect(() => {
+
+  });
+
+  useEffect(() => {
     let dispose = () => {};
     (async () => {
       const processAuctions = async (a: PublicKeyAndAccount<Buffer>) => {
@@ -138,14 +142,16 @@ export function MetaProvider({ children = null as any }) {
           const account = cache.add(
             a.pubkey,
             a.account,
-            AuctionParser) as
-          ParsedAccount<AuctionData>;
+            AuctionParser,
+          ) as ParsedAccount<AuctionData>;
 
           account.info.auctionManagerKey = await getAuctionManagerKey(
             account.info.resource,
             a.pubkey,
           );
-          const payerAcct = accountByMint.get(account.info.tokenMint.toBase58());
+          const payerAcct = accountByMint.get(
+            account.info.tokenMint.toBase58(),
+          );
           if (payerAcct)
             account.info.bidRedemptionKey = (
               await getBidderKeys(a.pubkey, payerAcct.pubkey)
@@ -154,13 +160,7 @@ export function MetaProvider({ children = null as any }) {
             ...e,
             [a.pubkey.toBase58()]: account,
           }));
-        } catch (e) {
-          if (
-            a.pubkey.toBase58() ===
-            'yNPR97243ke5cV3QGW9ZhSxfVP1K2YVQxzkjikCVbee'
-          ) {
-            console.error(e);
-          }
+        } catch {
           // ignore errors
           // add type as first byte for easier deserialization
         }
@@ -170,8 +170,8 @@ export function MetaProvider({ children = null as any }) {
             const account = cache.add(
               a.pubkey,
               a.account,
-              BidderMetadataParser) as
-            ParsedAccount<BidderMetadata>;
+              BidderMetadataParser,
+            ) as ParsedAccount<BidderMetadata>;
 
             setBidderMetadataByAuctionAndBidder(e => ({
               ...e,
@@ -189,8 +189,8 @@ export function MetaProvider({ children = null as any }) {
             const account = cache.add(
               a.pubkey,
               a.account,
-              BidderPotParser) as
-            ParsedAccount<BidderPot>;
+              BidderPotParser,
+            ) as ParsedAccount<BidderPot>;
 
             setBidderPotsByAuctionAndBidder(e => ({
               ...e,
@@ -370,6 +370,7 @@ export function MetaProvider({ children = null as any }) {
         try {
           if (meta.account.data[0] == MetadataKey.MetadataV1) {
             const metadata = await decodeMetadata(meta.account.data);
+
             if (
               isValidHttpUrl(metadata.uri) &&
               metadata.uri.indexOf('arweave') >= 0
@@ -527,38 +528,11 @@ const queryExtendedMetadata = async (
     } else {
       const metadata = mintToMetadata[key];
 
-      if (metadata && metadata.info.uri) {
-        extendedMetadataFetch.set(
-          key,
-          fetch(metadata.info.uri)
-            .then(async _ => {
-              try {
-                metadata.info.extended = await _.json();
-                if (
-                  !metadata.info.extended ||
-                  metadata.info.extended?.files?.length === 0
-                ) {
-                  delete mintToMetadata[key];
-                } else {
-                  if (metadata.info.extended?.image) {
-                    metadata.info.extended.image = `${metadata.info.uri}/${metadata.info.extended.image}`;
-                  }
-                }
-              } catch {
-                delete mintToMetadata[key];
-                return undefined;
-              }
-            })
-            .catch(() => {
-              delete mintToMetadata[key];
-              return undefined;
-            }),
-        );
-      }
+
     }
   });
 
-  await Promise.all([...extendedMetadataFetch.values()]);
+  // await Promise.all([...extendedMetadataFetch.values()]);
 
   setMetadata([...Object.values(mintToMetadata)]);
   setMetadataByMint(mintToMetadata);
