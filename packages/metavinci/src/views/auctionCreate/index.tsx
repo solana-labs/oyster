@@ -175,6 +175,31 @@ export const AuctionCreateView = () => {
       attributes.category == AuctionCategory.Limited ||
       attributes.category == AuctionCategory.Single
     ) {
+      // In these cases there is only ever one item in the array.
+
+      let winningConfigs: WinningConfig[];
+      if (attributes.category == AuctionCategory.Single)
+        winningConfigs = [
+          new WinningConfig({
+            safetyDepositBoxIndex: 0,
+            amount: 1,
+            editionType: attributes.items[0].masterEdition
+              ? EditionType.MasterEdition
+              : EditionType.NA,
+          }),
+        ];
+      else {
+        winningConfigs = [];
+        for (let i = 0; i < (attributes.editions || 1); i++) {
+          winningConfigs.push(
+            new WinningConfig({
+              safetyDepositBoxIndex: 0,
+              amount: 1,
+              editionType: EditionType.LimitedEdition,
+            }),
+          );
+        }
+      }
       settings = new AuctionManagerSettings({
         openEditionWinnerConstraint: attributes.participationNFT
           ? WinningConstraint.OpenEditionGiven
@@ -182,20 +207,7 @@ export const AuctionCreateView = () => {
         openEditionNonWinningConstraint: attributes.participationNFT
           ? NonWinningConstraint.GivenForFixedPrice
           : NonWinningConstraint.NoOpenEdition,
-        winningConfigs: attributes.items.map(
-          (item, index) =>
-            new WinningConfig({
-              // TODO: check index
-              safetyDepositBoxIndex: index,
-              amount: 1,
-              editionType:
-                attributes.category == AuctionCategory.Limited
-                  ? EditionType.LimitedEdition
-                  : item.masterEdition
-                  ? EditionType.MasterEdition
-                  : EditionType.NA,
-            }),
-        ),
+        winningConfigs,
         openEditionConfig: attributes.participationNFT
           ? attributes.items.length
           : null,
@@ -222,10 +234,8 @@ export const AuctionCreateView = () => {
       winnerLimit,
       new BN(endAuctionAt),
       new BN((attributes.gapTime || 0) * 60),
-      [
-        ...attributes.items,
-        ...(attributes.participationNFT ? [attributes.participationNFT] : []),
-      ],
+      attributes.items,
+      attributes.participationNFT,
       // TODO: move to config
       new PublicKey('4XEUcBjLyBHuMDKTARycf4VXqpsAsDcThMbhWgFuDGsC'),
     );
@@ -527,7 +537,7 @@ const CopiesStep = (props: {
           >
             Select NFT
           </ArtSelector>
-          {props.attributes.category !== AuctionCategory.Open && (
+          {props.attributes.category == AuctionCategory.Limited && (
             <label className="action-field">
               <span className="field-title">
                 How many copies do you want to create?
@@ -543,6 +553,7 @@ const CopiesStep = (props: {
                 onChange={info =>
                   props.setAttributes({
                     ...props.attributes,
+                    editions: parseInt(info.target.value),
                   })
                 }
               />

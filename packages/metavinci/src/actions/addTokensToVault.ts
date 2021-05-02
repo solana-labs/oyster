@@ -4,12 +4,27 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { utils, actions, models } from '@oyster/common';
+import {
+  utils,
+  actions,
+  models,
+  MasterEdition,
+  Metadata,
+  ParsedAccount,
+} from '@oyster/common';
 
 import { AccountLayout } from '@solana/spl-token';
 import BN from 'bn.js';
+import { SafetyDepositDraft } from './createAuctionManager';
 const { createTokenAccount, addTokenToInactiveVault, VAULT_PREFIX } = actions;
 const { approve } = models;
+
+export interface SafetyDepositInstructionConfig {
+  tokenAccount: PublicKey;
+  tokenMint: PublicKey;
+  amount: BN;
+  draft: SafetyDepositDraft;
+}
 
 const BATCH_SIZE = 4;
 // This command batches out adding tokens to a vault using a prefilled payer account, and then activates and combines
@@ -18,7 +33,7 @@ export async function addTokensToVault(
   connection: Connection,
   wallet: any,
   vault: PublicKey,
-  nfts: { tokenAccount: PublicKey; tokenMint: PublicKey; amount: BN }[],
+  nfts: SafetyDepositInstructionConfig[],
 ): Promise<{
   instructions: Array<TransactionInstruction[]>;
   signers: Array<Account[]>;
