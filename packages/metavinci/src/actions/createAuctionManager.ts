@@ -28,10 +28,14 @@ import {
   initAuctionManager,
   startAuction,
   validateSafetyDepositBox,
+  WinningConfig,
 } from '../models/metaplex';
 import { createVault } from './createVault';
 import { closeVault } from './closeVault';
-import { addTokensToVault } from './addTokensToVault';
+import {
+  addTokensToVault,
+  SafetyDepositInstructionConfig,
+} from './addTokensToVault';
 import { makeAuction } from './makeAuction';
 import { createExternalPriceAccount } from './createExternalPriceAccount';
 const { createTokenAccount } = actions;
@@ -75,7 +79,8 @@ export async function createAuctionManager(
   winnerLimit: WinnerLimit,
   endAuctionAt: BN,
   auctionGap: BN,
-  safetyDeposits: SafetyDepositDraft[],
+  safetyDepositDrafts: SafetyDepositDraft[],
+  openEditionSafetyDepositDraft: SafetyDepositDraft | undefined,
   paymentMint: PublicKey,
 ): Promise<{
   vault: PublicKey;
@@ -111,37 +116,11 @@ export async function createAuctionManager(
     paymentMint,
   );
 
-  let nftConfigs = safetyDeposits.map((w, i) => {
-    let winningConfig = settings.winningConfigs.find(
-      ow => ow.safetyDepositBoxIndex == i,
-    );
-    let mintToUse = w.metadata.info.mint;
-    let holdingToUse = w.holding;
-    // When selling a Limited Edition with intention to print copies of it, we use it's master mint
-    // as token type because we are actually selling authorization tokens, not the limited edition itself..
-    if (
-      winningConfig &&
-      winningConfig.editionType == EditionType.LimitedEdition &&
-      w.masterEdition?.info.masterMint &&
-      w.masterMintHolding
-    ) {
-      mintToUse = w.masterEdition?.info.masterMint;
-      holdingToUse = w.masterMintHolding;
-    }
-    return {
-      tokenAccount: holdingToUse,
-      tokenMint: mintToUse,
-      amount: new BN(winningConfig?.amount || 1),
-    };
-  });
-
-  let openEditionSafetyDeposit = undefined;
-  if (
-    settings.openEditionConfig != null &&
-    settings.openEditionConfig != undefined
-  ) {
-    openEditionSafetyDeposit = safetyDeposits[settings.openEditionConfig];
-  }
+  let safetyDepositConfigs = buildSafetyDepositArray(
+    safetyDepositDrafts,
+    openEditionSafetyDepositDraft,
+    settings.winningConfigs,
+  );
 
   const {
     instructions: auctionManagerInstructions,
@@ -153,14 +132,14 @@ export async function createAuctionManager(
     vault,
     paymentMint,
     settings,
-    openEditionSafetyDeposit,
+    openEditionSafetyDepositDraft,
   );
 
   const {
     instructions: addTokenInstructions,
     signers: addTokenSigners,
     stores,
-  } = await addTokensToVault(connection, wallet, vault, nftConfigs);
+  } = await addTokensToVault(connection, wallet, vault, safetyDepositConfigs);
 
   let lookup: byType = {
     externalPriceAccount: {
@@ -194,8 +173,13 @@ export async function createAuctionManager(
     validateBoxes: await validateBoxes(
       wallet,
       vault,
-      // No need to validate open edition, it's already been during init
-      safetyDeposits.filter((_, i) => i != settings.openEditionConfig),
+      // No need to validate open edition, it's already been during init, or if not present, let all in
+      safetyDepositConfigs.filter(
+        c =>
+          !openEditionSafetyDepositDraft ||
+          c.draft.metadata.pubkey.toBase58() !=
+            openEditionSafetyDepositDraft.metadata.pubkey.toBase58(),
+      ),
       stores,
       settings,
     ),
@@ -238,13 +222,75 @@ export async function createAuctionManager(
   return { vault, auction, auctionManager };
 }
 
+function buildSafetyDepositArray(
+  safetyDeposits: SafetyDepositDraft[],
+  openEditionSafetyDepositDraft: SafetyDepositDraft | undefined,
+  winningConfigs: WinningConfig[],
+): SafetyDepositInstructionConfig[] {
+  let safetyDepositConfig: SafetyDepositInstructionConfig[] = [];
+  safetyDeposits.forEach((w, i) => {
+    let winningConfigsThatShareThisBox = winningConfigs.filter(
+      ow => ow.safetyDepositBoxIndex == i,
+    );
+
+    // Configs where we are selling this safety deposit as a master edition or single nft
+    let nonLimitedEditionConfigs = winningConfigsThatShareThisBox.filter(
+      ow => ow.editionType != EditionType.LimitedEdition,
+    );
+    // we may also have an auction where we are selling prints of the master too as secondary prizes
+    let limitedEditionConfigs = winningConfigsThatShareThisBox.filter(
+      ow => ow.editionType == EditionType.LimitedEdition,
+    );
+
+    const nonLimitedEditionTotal = nonLimitedEditionConfigs
+      .map(ow => ow.amount)
+      .reduce((sum, acc) => (sum += acc), 0);
+    const limitedEditionTotal = limitedEditionConfigs
+      .map(ow => ow.amount)
+      .reduce((sum, acc) => (sum += acc), 0);
+
+    if (nonLimitedEditionTotal > 0) {
+      safetyDepositConfig.push({
+        tokenAccount: w.holding,
+        tokenMint: w.metadata.info.mint,
+        amount: new BN(nonLimitedEditionTotal),
+        draft: w,
+      });
+    }
+
+    if (
+      limitedEditionTotal > 0 &&
+      w.masterEdition?.info.masterMint &&
+      w.masterMintHolding
+    ) {
+      safetyDepositConfig.push({
+        tokenAccount: w.masterMintHolding,
+        tokenMint: w.masterEdition?.info.masterMint,
+        amount: new BN(limitedEditionTotal),
+        draft: w,
+      });
+    }
+  });
+
+  if (openEditionSafetyDepositDraft) {
+    safetyDepositConfig.push({
+      tokenAccount: openEditionSafetyDepositDraft.holding,
+      tokenMint: openEditionSafetyDepositDraft.metadata.info.mint,
+      amount: new BN(1),
+      draft: openEditionSafetyDepositDraft,
+    });
+  }
+
+  return safetyDepositConfig;
+}
+
 async function setupAuctionManagerInstructions(
   connection: Connection,
   wallet: any,
   vault: PublicKey,
   paymentMint: PublicKey,
   settings: AuctionManagerSettings,
-  openEditionSafetyDeposit?: SafetyDepositDraft,
+  openEditionSafetyDepositDraft?: SafetyDepositDraft,
 ): Promise<{
   instructions: TransactionInstruction[];
   signers: Account[];
@@ -269,12 +315,12 @@ async function setupAuctionManagerInstructions(
 
   await initAuctionManager(
     vault,
-    openEditionSafetyDeposit?.metadata.pubkey,
-    openEditionSafetyDeposit?.nameSymbol?.pubkey,
+    openEditionSafetyDepositDraft?.metadata.pubkey,
+    openEditionSafetyDepositDraft?.nameSymbol?.pubkey,
     wallet.publicKey,
-    openEditionSafetyDeposit?.masterEdition?.pubkey,
-    openEditionSafetyDeposit?.metadata.info.mint,
-    openEditionSafetyDeposit?.masterEdition?.info.masterMint,
+    openEditionSafetyDepositDraft?.masterEdition?.pubkey,
+    openEditionSafetyDepositDraft?.metadata.info.mint,
+    openEditionSafetyDepositDraft?.masterEdition?.info.masterMint,
     wallet.publicKey,
     wallet.publicKey,
     wallet.publicKey,
@@ -304,7 +350,7 @@ async function setupStartAuction(
 async function validateBoxes(
   wallet: any,
   vault: PublicKey,
-  safetyDeposits: SafetyDepositDraft[],
+  safetyDeposits: SafetyDepositInstructionConfig[],
   stores: PublicKey[],
   settings: AuctionManagerSettings,
 ): Promise<{
@@ -327,40 +373,40 @@ async function validateBoxes(
     if (winningConfig) {
       if (
         winningConfig.editionType == EditionType.LimitedEdition &&
-        safetyDeposits[i].masterEdition &&
-        safetyDeposits[i].masterEdition?.info.masterMint
+        safetyDeposits[i].draft.masterEdition &&
+        safetyDeposits[i].draft.masterEdition?.info.masterMint
       )
         safetyDepositBox = await getSafetyDepositBox(
           vault,
           //@ts-ignore
-          safetyDeposits[i].masterEdition.info.masterMint,
+          safetyDeposits[i].draft.masterEdition.info.masterMint,
         );
       else
         safetyDepositBox = await getSafetyDepositBox(
           vault,
-          safetyDeposits[i].metadata.info.mint,
+          safetyDeposits[i].draft.metadata.info.mint,
         );
       const edition: PublicKey = await getEdition(
-        safetyDeposits[i].metadata.info.mint,
+        safetyDeposits[i].draft.metadata.info.mint,
       );
 
       await validateSafetyDepositBox(
         vault,
-        safetyDeposits[i].metadata.pubkey,
-        safetyDeposits[i].nameSymbol?.pubkey,
+        safetyDeposits[i].draft.metadata.pubkey,
+        safetyDeposits[i].draft.nameSymbol?.pubkey,
         safetyDepositBox,
         stores[i],
         //@ts-ignore
         winningConfig.editionType == EditionType.LimitedEdition
-          ? safetyDeposits[i].masterEdition?.info.masterMint
-          : safetyDeposits[i].metadata.info.mint,
+          ? safetyDeposits[i].draft.masterEdition?.info.masterMint
+          : safetyDeposits[i].draft.metadata.info.mint,
         wallet.publicKey,
         wallet.publicKey,
         wallet.publicKey,
         tokenInstructions,
         edition,
-        safetyDeposits[i].masterEdition?.info.masterMint,
-        safetyDeposits[i].masterEdition ? wallet.publicKey : undefined,
+        safetyDeposits[i].draft.masterEdition?.info.masterMint,
+        safetyDeposits[i].draft.masterEdition ? wallet.publicKey : undefined,
       );
     }
     signers.push(tokenSigners);
