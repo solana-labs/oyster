@@ -66,7 +66,10 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
       this.account = new Account(secretKey);
     } else {
       try {
-        const { privKey } = await this._provider.login();
+        const { privKey } = await this._provider.login({
+          loginProvider: '_modal',
+          relogin: true
+        });
         const secretKey = getSolanaPrivateKey(privKey);
         this.account = new Account(secretKey);
       } catch(ex) {
@@ -75,7 +78,8 @@ export class TorusWalletAdapter extends EventEmitter implements WalletAdapter {
     }
 
     this.name = this._provider?.state.store.get('name');;
-    this.image = this._provider?.state.store.get('profileImage');;
+    this.image = this._provider?.state.store.get('profileImage');
+    debugger;
 
     this.emit("connect");
   }
