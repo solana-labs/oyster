@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js';
-import {ethers} from "ethers";
+import { ethers } from 'ethers';
 import { ASSET_CHAIN } from '../constants';
 
 export interface ProgressUpdate {

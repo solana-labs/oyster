@@ -23,6 +23,7 @@ import {
 } from '@solana/spl-token-registry';
 
 export type ENV =
+  | 'mainnet-beta (Serum)'
   | 'mainnet-beta'
   | 'testnet'
   | 'devnet'
@@ -31,8 +32,13 @@ export type ENV =
 
 export const ENDPOINTS = [
   {
-    name: 'mainnet-beta' as ENV,
+    name: 'mainnet-beta (Serum)' as ENV,
     endpoint: 'https://solana-api.projectserum.com/',
+    ChainId: ChainId.MainnetBeta,
+  },
+  {
+    name: 'mainnet-beta' as ENV,
+    endpoint: 'https://api.mainnet-beta.solana.com',
     ChainId: ChainId.MainnetBeta,
   },
   {
@@ -412,6 +418,7 @@ export const sendTransactionWithRetry = async (
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
   block?: BlockhashAndFeeCalculator,
+  beforeSend?: () => void,
 ) => {
   let transaction = new Transaction();
   instructions.forEach(instruction => transaction.add(instruction));
@@ -434,6 +441,10 @@ export const sendTransactionWithRetry = async (
   }
   if (!includesFeePayer) {
     transaction = await wallet.signTransaction(transaction);
+  }
+
+  if (beforeSend) {
+    beforeSend();
   }
 
   const { txid, slot } = await sendSignedTransaction({
@@ -521,7 +532,7 @@ export async function sendSignedTransaction({
       }
       throw new Error(JSON.stringify(simulateResult.err));
     }
-    throw new Error('Transaction failed');
+    // throw new Error('Transaction failed');
   } finally {
     done = true;
   }

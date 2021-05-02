@@ -1,5 +1,5 @@
 import { Button, Table, Tabs, notification } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import './index.less';
 
@@ -34,11 +34,7 @@ const { TabPane } = Tabs;
 export const RecentTransactionsTable = (props: {
   showUserTransactions?: boolean;
 }) => {
-  const {
-    loading: loadingTransfers,
-    transfers,
-    userTransfers,
-  } = useWormholeTransactions();
+  const { loading: loadingTransfers, transfers } = useWormholeTransactions();
   const { provider } = useEthereum();
   const bridge = useBridge();
 
@@ -154,221 +150,197 @@ export const RecentTransactionsTable = (props: {
       },
     },
   ];
-  const columns = [
-    ...baseColumns,
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render(text: string, record: any) {
-        return {
-          props: { style: {} },
-          children: (
-            <span className={`${record.status?.toLowerCase()}`}>
-              {record.status}
-            </span>
-          ),
-        };
-      },
-    },
-  ];
 
-  const userColumns = [
-    ...baseColumns,
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render(text: string, record: any) {
-        const status =
-          completedVAAs.indexOf(record.txhash) > 0
-            ? 'Completed'
-            : record.status;
-        return {
-          props: { style: {} },
-          children: (
-            <>
-              <span className={`${record.status?.toLowerCase()}`}>
-                {status}
-              </span>
-              {status === 'Failed' ? (
-                <Button
-                  onClick={() => {
-                    const NotificationContent = () => {
-                      const [activeSteps, setActiveSteps] = useState<
-                        ProgressUpdate[]
-                      >([]);
-                      let counter = 0;
-                      useEffect(() => {
-                        (async () => {
-                          const signer = provider?.getSigner();
-                          if (!signer || !bridge) {
-                            setActiveSteps([
-                              ...activeSteps,
-                              {
-                                message: 'Connect your Ethereum Wallet',
-                                type: 'error',
-                                group: 'error',
-                                step: counter++,
-                              },
-                            ]);
-                          } else {
-                            const lockup = record.lockup;
-                            let vaa = lockup.vaa;
-                            for (let i = vaa.length; i > 0; i--) {
-                              if (vaa[i] == 0xff) {
-                                vaa = vaa.slice(0, i);
-                                break;
-                              }
-                            }
-                            let signatures = await bridge.fetchSignatureStatus(
-                              lockup.signatureAccount,
-                            );
-                            let sigData = Buffer.of(
-                              ...signatures.reduce(
-                                (previousValue, currentValue) => {
-                                  previousValue.push(currentValue.index);
-                                  previousValue.push(...currentValue.signature);
-
-                                  return previousValue;
+  const userColumns = useMemo(
+    () => [
+      ...baseColumns,
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        key: 'status',
+        render(text: string, record: any) {
+          const status =
+            completedVAAs.indexOf(record.txhash) > 0
+              ? 'Completed'
+              : record.status;
+          return {
+            props: { style: {} },
+            children: (
+              <>
+                <span className={`${record.status?.toLowerCase()}`}>
+                  {status}
+                </span>
+                {status === 'Failed' ? (
+                  <Button
+                    onClick={() => {
+                      const NotificationContent = () => {
+                        const [activeSteps, setActiveSteps] = useState<
+                          ProgressUpdate[]
+                        >([]);
+                        let counter = 0;
+                        useEffect(() => {
+                          (async () => {
+                            const signer = provider?.getSigner();
+                            if (!signer || !bridge) {
+                              setActiveSteps([
+                                ...activeSteps,
+                                {
+                                  message: 'Connect your Ethereum Wallet',
+                                  type: 'error',
+                                  group: 'error',
+                                  step: counter++,
                                 },
-                                new Array<number>(),
-                              ),
-                            );
+                              ]);
+                            } else {
+                              const lockup = record.lockup;
+                              let vaa = lockup.vaa;
+                              for (let i = vaa.length; i > 0; i--) {
+                                if (vaa[i] == 0xff) {
+                                  vaa = vaa.slice(0, i);
+                                  break;
+                                }
+                              }
+                              let signatures = await bridge.fetchSignatureStatus(
+                                lockup.signatureAccount,
+                              );
+                              let sigData = Buffer.of(
+                                ...signatures.reduce(
+                                  (previousValue, currentValue) => {
+                                    previousValue.push(currentValue.index);
+                                    previousValue.push(
+                                      ...currentValue.signature,
+                                    );
 
-                            vaa = Buffer.concat([
-                              vaa.slice(0, 5),
-                              Buffer.of(signatures.length),
-                              sigData,
-                              vaa.slice(6),
-                            ]);
-                            let wh = WormholeFactory.connect(
-                              programIds().wormhole.bridge,
-                              signer,
-                            );
-                            let group = 'Finalizing transfer';
-                            setActiveSteps([
-                              ...activeSteps,
-                              {
-                                message: 'Sign the claim...',
-                                type: 'wait',
-                                group,
-                                step: counter++,
-                              },
-                            ]);
-                            let tx = await wh.submitVAA(vaa);
-                            setActiveSteps([
-                              ...activeSteps,
-                              {
-                                message:
-                                  'Waiting for tokens unlock to be mined...',
-                                type: 'wait',
-                                group,
-                                step: counter++,
-                              },
-                            ]);
-                            await tx.wait(1);
-                            setActiveSteps([
-                              ...activeSteps,
-                              {
-                                message: 'Execution of VAA succeeded',
-                                type: 'done',
-                                group,
-                                step: counter++,
-                              },
-                            ]);
-                          }
-                        })();
-                      }, [setActiveSteps]);
+                                    return previousValue;
+                                  },
+                                  new Array<number>(),
+                                ),
+                              );
 
-                      return (
-                        <div>
-                          <div
-                            style={{
-                              textAlign: 'left',
-                              display: 'flex',
-                              flexDirection: 'column',
-                            }}
-                          >
-                            {(() => {
-                              let group = '';
-                              return activeSteps.map((step, i) => {
-                                let prevGroup = group;
-                                group = step.group;
-                                let newGroup = prevGroup !== group;
-                                return (
-                                  <>
-                                    {newGroup && <span>{group}</span>}
-                                    <span style={{ marginLeft: 15 }}>
-                                      {typeToIcon(
-                                        step.type,
-                                        activeSteps.length - 1 === i,
-                                      )}{' '}
-                                      {step.message}
-                                    </span>
-                                  </>
-                                );
-                              });
-                            })()}
+                              vaa = Buffer.concat([
+                                vaa.slice(0, 5),
+                                Buffer.of(signatures.length),
+                                sigData,
+                                vaa.slice(6),
+                              ]);
+                              let wh = WormholeFactory.connect(
+                                programIds().wormhole.bridge,
+                                signer,
+                              );
+                              let group = 'Finalizing transfer';
+                              setActiveSteps([
+                                ...activeSteps,
+                                {
+                                  message: 'Sign the claim...',
+                                  type: 'wait',
+                                  group,
+                                  step: counter++,
+                                },
+                              ]);
+                              let tx = await wh.submitVAA(vaa);
+                              setActiveSteps([
+                                ...activeSteps,
+                                {
+                                  message:
+                                    'Waiting for tokens unlock to be mined... (Up to few min.)',
+                                  type: 'wait',
+                                  group,
+                                  step: counter++,
+                                },
+                              ]);
+                              await tx.wait(1);
+                              setActiveSteps([
+                                ...activeSteps,
+                                {
+                                  message: 'Execution of VAA succeeded',
+                                  type: 'done',
+                                  group,
+                                  step: counter++,
+                                },
+                              ]);
+                              setCompletedVAAs([
+                                ...completedVAAs,
+                                record.txhash,
+                              ]);
+                            }
+                          })();
+                        }, [setActiveSteps]);
+
+                        return (
+                          <div>
+                            <div
+                              style={{
+                                textAlign: 'left',
+                                display: 'flex',
+                                flexDirection: 'column',
+                              }}
+                            >
+                              {(() => {
+                                let group = '';
+                                return activeSteps.map((step, i) => {
+                                  let prevGroup = group;
+                                  group = step.group;
+                                  let newGroup = prevGroup !== group;
+                                  return (
+                                    <>
+                                      {newGroup && <span>{group}</span>}
+                                      <span style={{ marginLeft: 15 }}>
+                                        {typeToIcon(
+                                          step.type,
+                                          activeSteps.length - 1 === i,
+                                        )}{' '}
+                                        {step.message}
+                                      </span>
+                                    </>
+                                  );
+                                });
+                              })()}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    };
+                        );
+                      };
 
-                    notification.open({
-                      message: '',
-                      duration: 0,
-                      placement: 'bottomLeft',
-                      description: <NotificationContent />,
-                      className: 'custom-class',
-                      style: {
-                        width: 500,
-                      },
-                    });
-                  }}
-                  shape="circle"
-                  size="large"
-                  type="text"
-                  style={{ color: '#547595', fontSize: '18px' }}
-                  title={'Retry Transaction'}
-                  icon={<SyncOutlined />}
-                />
-              ) : null}
-            </>
-          ),
-        };
+                      notification.open({
+                        message: '',
+                        duration: 0,
+                        placement: 'bottomLeft',
+                        description: <NotificationContent />,
+                        className: 'custom-class',
+                        style: {
+                          width: 500,
+                        },
+                      });
+                    }}
+                    shape="circle"
+                    size="large"
+                    type="text"
+                    style={{ color: '#547595', fontSize: '18px' }}
+                    title={'Retry Transaction'}
+                    icon={<SyncOutlined />}
+                  />
+                ) : null}
+              </>
+            ),
+          };
+        },
       },
-    },
-  ];
+    ],
+    [completedVAAs, bridge, provider],
+  );
   return (
     <div id={'recent-tx-container'}>
       <div className={'home-subtitle'} style={{ marginBottom: '70px' }}>
-        Transactions
+        My Recent Transactions
       </div>
-      <Tabs defaultActiveKey="1" centered>
-        <TabPane tab="Recent Transactions" key="1">
-          <Table
-            scroll={{
-              scrollToFirstRowOnChange: false,
-              x: 900,
-            }}
-            dataSource={transfers.sort((a, b) => b.date - a.date)}
-            columns={columns}
-            loading={loadingTransfers}
-          />
-        </TabPane>
-        <TabPane tab="My Transactions" key="2">
-          <Table
-            scroll={{
-              scrollToFirstRowOnChange: false,
-              x: 900,
-            }}
-            dataSource={userTransfers.sort((a, b) => b.date - a.date)}
-            columns={userColumns}
-            loading={loadingTransfers}
-          />
-        </TabPane>
-      </Tabs>
+      <Table
+        scroll={{
+          scrollToFirstRowOnChange: false,
+          x: 900,
+        }}
+        dataSource={transfers.sort((a, b) => b.date - a.date)}
+        columns={userColumns}
+        loading={loadingTransfers}
+      />
     </div>
   );
 };

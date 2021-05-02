@@ -1,27 +1,33 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  notify,
+  programIds,
   useConnection,
   useConnectionConfig,
-  programIds,
-  notify,
   useWallet,
-  ParsedAccountBase,
 } from '@oyster/common';
 import {
-  WORMHOLE_PROGRAM_ID,
   POSTVAA_INSTRUCTION,
   TRANSFER_ASSETS_OUT_INSTRUCTION,
+  WORMHOLE_PROGRAM_ID,
 } from '../utils/ids';
 import { ASSET_CHAIN } from '../utils/assets';
 import { useEthereum } from '../contexts';
 import {
+  AccountInfo,
   Connection,
+  ParsedAccountData,
   PartiallyDecodedInstruction,
   PublicKey,
+  RpcResponseAndContext,
 } from '@solana/web3.js';
 import {
   bridgeAuthorityKey,
+  LockupStatus,
+  LockupWithStatus,
+  SolanaBridge,
   TransferOutProposalLayout,
+  WormholeFactory,
 } from '@solana/bridge-sdk';
 
 import bs58 from 'bs58';
@@ -31,11 +37,10 @@ import {
   useCoingecko,
 } from '../contexts/coingecko';
 import { BigNumber } from 'bignumber.js';
-import { WormholeFactory } from '@solana/bridge-sdk';
 import { ethers } from 'ethers';
 import { useBridge } from '../contexts/bridge';
-import { SolanaBridge } from '@solana/bridge-sdk';
 import BN from 'bn.js';
+import { keccak256 } from 'ethers/utils';
 
 type WrappedTransferMeta = {
   chain: number;
@@ -58,6 +63,86 @@ type WrappedTransferMeta = {
 };
 
 const transferCache = new Map<string, WrappedTransferMeta>();
+
+const queryOwnWrappedMetaTransactions = async (
+  authorityKey: PublicKey,
+  connection: Connection,
+  setTransfers: (arr: WrappedTransferMeta[]) => void,
+  provider: ethers.providers.Web3Provider,
+  bridge?: SolanaBridge,
+  owner?: PublicKey | null,
+) => {
+  if (owner && bridge) {
+    const transfers = new Map<string, WrappedTransferMeta>();
+    let wh = WormholeFactory.connect(programIds().wormhole.bridge, provider);
+    const res: RpcResponseAndContext<
+      Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }>
+    > = await connection.getParsedTokenAccountsByOwner(
+      owner,
+      { programId: programIds().token },
+      'single',
+    );
+    let lockups: LockupWithStatus[] = [];
+    for (const acc of res.value) {
+      const accLockups = await bridge.fetchTransferProposals(acc.pubkey);
+      lockups.push(
+        ...accLockups.map(v => {
+          return {
+            status: LockupStatus.AWAITING_VAA,
+            ...v,
+          };
+        }),
+      );
+      for (let lockup of lockups) {
+        if (lockup.vaaTime === undefined || lockup.vaaTime === 0) continue;
+
+        let signingData = lockup.vaa.slice(lockup.vaa[5] * 66 + 6);
+        for (let i = signingData.length; i > 0; i--) {
+          if (signingData[i] == 0xff) {
+            signingData = signingData.slice(0, i);
+            break;
+          }
+        }
+        let hash = keccak256(signingData);
+        let submissionStatus = await wh.consumedVAAs(hash);
+
+        lockup.status = submissionStatus
+          ? LockupStatus.COMPLETED
+          : LockupStatus.UNCLAIMED_VAA;
+      }
+    }
+    for (const ls of lockups) {
+      const txhash = ls.lockupAddress.toBase58();
+      let assetAddress: string = '';
+      if (ls.assetChain !== ASSET_CHAIN.Solana) {
+        assetAddress = Buffer.from(ls.assetAddress.slice(12)).toString('hex');
+      } else {
+        assetAddress = new PublicKey(ls.assetAddress).toBase58();
+      }
+      const dec = new BigNumber(10).pow(new BigNumber(ls.assetDecimals));
+      const rawAmount = new BigNumber(ls.amount.toString());
+      const amount = rawAmount.div(dec).toNumber();
+      transfers.set(txhash, {
+        publicKey: ls.lockupAddress,
+        amount,
+        date: ls.vaaTime,
+        chain: ls.assetChain,
+        address: assetAddress,
+        decimals: 9,
+        txhash,
+        explorer: `https://explorer.solana.com/address/${txhash}`,
+        lockup: ls,
+        status:
+          ls.status === LockupStatus.UNCLAIMED_VAA
+            ? 'Failed'
+            : ls.status === LockupStatus.AWAITING_VAA
+            ? 'In Process'
+            : 'Completed',
+      });
+    }
+    setTransfers([...transfers.values()]);
+  }
+};
 
 const queryWrappedMetaTransactions = async (
   authorityKey: PublicKey,
@@ -238,12 +323,11 @@ export const useWormholeTransactions = () => {
   const { tokenMap: ethTokens } = useEthereum();
   const { tokenMap } = useConnectionConfig();
   const { coinList } = useCoingecko();
-  const { wallet, connected: walletConnected } = useWallet();
+  const { wallet } = useWallet();
   const bridge = useBridge();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [transfers, setTransfers] = useState<WrappedTransferMeta[]>([]);
-  const [userTransfers, setUserTransfers] = useState<WrappedTransferMeta[]>([]);
   const [amountInUSD, setAmountInUSD] = useState<number>(0);
 
   useEffect(() => {
@@ -263,26 +347,17 @@ export const useWormholeTransactions = () => {
           (window as any).ethereum,
         );
         // query wrapped assets that were imported to solana from other chains
-        queryWrappedMetaTransactions(
+        queryOwnWrappedMetaTransactions(
           authorityKey,
           connection,
           setTransfers,
           provider,
           bridge,
+          wallet?.publicKey,
         ).then(() => setLoading(false));
       }
     })();
-  }, [connection, setTransfers]);
-
-  useEffect(() => {
-    if (transfers && walletConnected && wallet?.publicKey) {
-      setUserTransfers(
-        transfers.filter(t => {
-          return t.owner === wallet?.publicKey?.toBase58();
-        }),
-      );
-    }
-  }, [wallet, walletConnected, transfers]);
+  }, [connection, setTransfers, wallet?.publicKey]);
 
   const coingeckoTimer = useRef<number>(0);
   const dataSourcePriceQuery = useCallback(async () => {
@@ -350,7 +425,6 @@ export const useWormholeTransactions = () => {
   return {
     loading,
     transfers,
-    userTransfers,
     totalInUSD: amountInUSD,
   };
 };

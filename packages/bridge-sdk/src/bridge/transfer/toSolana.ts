@@ -21,7 +21,7 @@ import {
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
 import { WalletAdapter } from '@solana/wallet-base';
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from 'bignumber.js';
 
 export const toSolana = async (
   connection: Connection,
@@ -180,7 +180,7 @@ export const toSolana = async (
           });
           let res = await e.approve(programIds().wormhole.bridge, amountBN);
           setProgress({
-            message: 'Waiting for ETH transaction to be mined...',
+            message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
             type: 'wait',
             group,
             step: counter++,
@@ -243,7 +243,7 @@ export const toSolana = async (
           false,
         );
         setProgress({
-          message: 'Waiting for ETH transaction to be mined...',
+          message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
           type: 'wait',
           group,
           step: counter++,
