@@ -5,5 +5,12 @@
   "main": "index.js",
   "author": "Thomas Lisankie (Monadical)",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "devDependencies": {
+    "tslint": "^6.1.3",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "jayson": "^3.6.2"
+  }
 }
