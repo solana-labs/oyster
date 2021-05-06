@@ -2,7 +2,7 @@
   "name": "rpc-cache-server",
   "version": "0.0.1",
   "description": "A server to cache results of (expensive) RPC requests made to the Solana JSON RPC API",
-  "main": "index.js",
+  "main": "src/index.js",
   "author": "Thomas Lisankie (Monadical)",
   "license": "MIT",
   "private": false,
@@ -11,6 +11,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "json-rpc-2.0": "^0.2.16",
     "redis": "^3.1.2"
   }
