@@ -2,6 +2,13 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 
+export interface LendingMarket {
+  version: number;
+  isInitialized: boolean;
+  quoteTokenMint: PublicKey;
+  tokenProgramId: PublicKey;
+}
+
 export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),
@@ -13,13 +20,6 @@ export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.s
     BufferLayout.blob(128, 'padding'),
   ],
 );
-
-export interface LendingMarket {
-  version: number;
-  isInitialized: boolean;
-  quoteTokenMint: PublicKey;
-  tokenProgramId: PublicKey;
-}
 
 export const isLendingMarket = (info: AccountInfo<Buffer>) => {
   return info.data.length === LendingMarketLayout.span;

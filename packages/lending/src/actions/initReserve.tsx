@@ -1,6 +1,6 @@
 import {
+  actions,
   contexts,
-  findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
   models,
   notify,
@@ -13,26 +13,26 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  redeemReserveCollateralInstruction,
-  refreshReserveInstruction,
-  Reserve,
-} from '../models';
+import { initReserveInstruction, Reserve } from '../models';
 
-const { approve } = models;
 const { sendTransaction } = contexts.Connection;
+const {
+  createUninitializedAccount,
+  ensureSplAccount,
+} = actions;
+const { approve } = models;
 
-// @FIXME
-export const redeemReserveCollateral = async (
+export const initReserve = async (
   connection: Connection,
+  // @FIXME: wallet must be lending market owner
   wallet: any,
-  collateralAmount: number,
+  liquidityAmount: number,
   source: TokenAccount,
   reserve: Reserve,
   reserveAddress: PublicKey,
 ) => {
   notify({
-    message: 'Redeeming collateral...',
+    message: 'Initializing reserve...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });
@@ -47,51 +47,57 @@ export const redeemReserveCollateral = async (
   );
 
   const [lendingMarketAuthority] = await PublicKey.findProgramAddress(
-    [reserve.lendingMarket.toBuffer()],
+    [reserve.lendingMarket.toBuffer()], // which account should be authority
     LENDING_PROGRAM_ID,
   );
 
-  const sourceCollateral = source.pubkey;
+  const sourceLiquidityAccount = ensureSplAccount(
+    instructions,
+    cleanupInstructions,
+    source,
+    wallet.publicKey,
+    liquidityAmount + accountRentExempt,
+    signers,
+  );
 
   // create approval for transfer transactions
   const transferAuthority = approve(
     instructions,
     cleanupInstructions,
-    sourceCollateral,
+    sourceLiquidityAccount,
     wallet.publicKey,
-    collateralAmount,
+    liquidityAmount,
   );
 
   signers.push(transferAuthority);
 
-  // get destination account
-  const destinationLiquidity = await findOrCreateAccountByMint(
-    wallet.publicKey,
-    wallet.publicKey,
+  let destinationCollateralAccount: PublicKey = createUninitializedAccount(
     instructions,
-    cleanupInstructions,
+    wallet.publicKey,
     accountRentExempt,
-    reserve.liquidity.mintPubkey,
     signers,
   );
 
   instructions.push(
-    refreshReserveInstruction(
+    initReserveInstruction(
+      liquidityAmount,
+      reserve.config,
+      sourceLiquidityAccount,
+      destinationCollateralAccount,
       reserveAddress,
+      reserve.liquidity.mintPubkey,
+      reserve.liquidity.supplyPubkey,
+      reserve.liquidity.feeReceiver,
+      reserve.collateral.mintPubkey,
+      reserve.collateral.supplyPubkey,
+      reserve.lendingMarket,
+      lendingMarketAuthority,
+      // @FIXME: need to sign with wallet as lending market owner
+      wallet.publicKey,
+      transferAuthority.publicKey,
       reserve.liquidity.oracleOption
         ? reserve.liquidity.oraclePubkey
         : undefined,
-    ),
-    redeemReserveCollateralInstruction(
-      collateralAmount,
-      sourceCollateral,
-      destinationLiquidity,
-      reserveAddress,
-      reserve.collateral.mintPubkey,
-      reserve.liquidity.supplyPubkey,
-      reserve.lendingMarket,
-      lendingMarketAuthority,
-      transferAuthority.publicKey,
     ),
   );
 
@@ -105,11 +111,12 @@ export const redeemReserveCollateral = async (
     );
 
     notify({
-      message: 'Collateral redeemed.',
+      message: 'Reserve initialized.',
       type: 'success',
       description: `Transaction - ${txid}`,
     });
   } catch {
     // TODO:
+    throw new Error();
   }
 };

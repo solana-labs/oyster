@@ -1,12 +1,10 @@
 import {
   contexts,
-  findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
   models,
   notify,
   TokenAccount,
 } from '@oyster/common';
-import { AccountLayout } from '@solana/spl-token';
 import {
   Account,
   Connection,
@@ -14,7 +12,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
-  redeemReserveCollateralInstruction,
+  depositObligationCollateralInstruction,
   refreshReserveInstruction,
   Reserve,
 } from '../models';
@@ -23,16 +21,17 @@ const { approve } = models;
 const { sendTransaction } = contexts.Connection;
 
 // @FIXME
-export const redeemReserveCollateral = async (
+export const depositObligationCollateral = async (
   connection: Connection,
   wallet: any,
   collateralAmount: number,
   source: TokenAccount,
   reserve: Reserve,
   reserveAddress: PublicKey,
+  obligationAddress: PublicKey
 ) => {
   notify({
-    message: 'Redeeming collateral...',
+    message: 'Depositing collateral...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });
@@ -41,10 +40,6 @@ export const redeemReserveCollateral = async (
   const signers: Account[] = [];
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
-
-  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-    AccountLayout.span,
-  );
 
   const [lendingMarketAuthority] = await PublicKey.findProgramAddress(
     [reserve.lendingMarket.toBuffer()],
@@ -64,17 +59,6 @@ export const redeemReserveCollateral = async (
 
   signers.push(transferAuthority);
 
-  // get destination account
-  const destinationLiquidity = await findOrCreateAccountByMint(
-    wallet.publicKey,
-    wallet.publicKey,
-    instructions,
-    cleanupInstructions,
-    accountRentExempt,
-    reserve.liquidity.mintPubkey,
-    signers,
-  );
-
   instructions.push(
     refreshReserveInstruction(
       reserveAddress,
@@ -82,15 +66,16 @@ export const redeemReserveCollateral = async (
         ? reserve.liquidity.oraclePubkey
         : undefined,
     ),
-    redeemReserveCollateralInstruction(
+    depositObligationCollateralInstruction(
       collateralAmount,
       sourceCollateral,
-      destinationLiquidity,
-      reserveAddress,
       reserve.collateral.mintPubkey,
-      reserve.liquidity.supplyPubkey,
+      reserveAddress,
+      obligationAddress,
       reserve.lendingMarket,
       lendingMarketAuthority,
+      // @FIXME: wallet must sign
+      wallet.publicKey,
       transferAuthority.publicKey,
     ),
   );
@@ -105,7 +90,7 @@ export const redeemReserveCollateral = async (
     );
 
     notify({
-      message: 'Collateral redeemed.',
+      message: 'Collateral deposited.',
       type: 'success',
       description: `Transaction - ${txid}`,
     });

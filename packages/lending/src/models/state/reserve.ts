@@ -3,70 +3,7 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
-import { LastUpdate } from './lastUpdate';
-
-export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('version'),
-
-    BufferLayout.struct(
-      [Layout.uint64('slot'), BufferLayout.u8('stale')],
-      'lastUpdate',
-    ),
-
-    Layout.publicKey('lendingMarket'),
-
-    BufferLayout.struct(
-      [
-        Layout.publicKey('mintPubkey'),
-        BufferLayout.u8('mintDecimals'),
-        Layout.publicKey('supplyPubkey'),
-        Layout.publicKey('feeReceiver'),
-        // @FIXME: oracle option
-        // TODO: replace u32 option with generic equivalent
-        BufferLayout.u32('oracleOption'),
-        Layout.publicKey('oracle'),
-        Layout.uint64('availableAmount'),
-        Layout.uint128('borrowedAmountWads'),
-        Layout.uint128('cumulativeBorrowRateWads'),
-        Layout.uint64('marketPrice'),
-      ],
-      'liquidity',
-    ),
-
-    BufferLayout.struct(
-      [
-        Layout.publicKey('mintPubkey'),
-        Layout.uint64('mintTotalSupply'),
-        Layout.publicKey('supplyPubkey'),
-      ],
-      'collateral',
-    ),
-
-    BufferLayout.struct(
-      [
-        BufferLayout.u8('optimalUtilizationRate'),
-        BufferLayout.u8('loanToValueRatio'),
-        BufferLayout.u8('liquidationBonus'),
-        BufferLayout.u8('liquidationThreshold'),
-        BufferLayout.u8('minBorrowRate'),
-        BufferLayout.u8('optimalBorrowRate'),
-        BufferLayout.u8('maxBorrowRate'),
-        BufferLayout.struct(
-          [Layout.uint64('borrowFeeWad'), BufferLayout.u8('hostFeePercentage')],
-          'fees',
-        ),
-      ],
-      'config',
-    ),
-
-    BufferLayout.blob(256, 'padding'),
-  ],
-);
-
-export const isReserve = (info: AccountInfo<Buffer>) => {
-  return info.data.length === ReserveLayout.span;
-};
+import { LastUpdate, LastUpdateLayout } from './lastUpdate';
 
 export interface Reserve {
   version: number;
@@ -110,6 +47,66 @@ export interface ReserveConfig {
     hostFeePercentage: number;
   };
 }
+
+export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    BufferLayout.u8('version'),
+
+    LastUpdateLayout,
+
+    Layout.publicKey('lendingMarket'),
+
+    BufferLayout.struct(
+      [
+        Layout.publicKey('mintPubkey'),
+        BufferLayout.u8('mintDecimals'),
+        Layout.publicKey('supplyPubkey'),
+        Layout.publicKey('feeReceiver'),
+        // @FIXME: oracle option
+        // TODO: replace u32 option with generic equivalent
+        BufferLayout.u32('oracleOption'),
+        Layout.publicKey('oracle'),
+        Layout.uint64('availableAmount'),
+        Layout.uint128('borrowedAmountWads'),
+        Layout.uint128('cumulativeBorrowRateWads'),
+        Layout.uint64('marketPrice'),
+      ],
+      'liquidity',
+    ),
+
+    BufferLayout.struct(
+      [
+        Layout.publicKey('mintPubkey'),
+        Layout.uint64('mintTotalSupply'),
+        Layout.publicKey('supplyPubkey'),
+      ],
+      'collateral'
+    ),
+
+    BufferLayout.struct(
+      [
+        BufferLayout.u8('optimalUtilizationRate'),
+        BufferLayout.u8('loanToValueRatio'),
+        BufferLayout.u8('liquidationBonus'),
+        BufferLayout.u8('liquidationThreshold'),
+        BufferLayout.u8('minBorrowRate'),
+        BufferLayout.u8('optimalBorrowRate'),
+        BufferLayout.u8('maxBorrowRate'),
+        BufferLayout.struct(
+          [Layout.uint64('borrowFeeWad'), BufferLayout.u8('hostFeePercentage')],
+          'fees',
+        ),
+      ],
+      'config'
+    ),
+
+    BufferLayout.blob(256, 'padding'),
+  ],
+);
+
+export const isReserve = (info: AccountInfo<Buffer>) => {
+  return info.data.length === ReserveLayout.span;
+};
 
 export const ReserveParser = (pubkey: PublicKey, info: AccountInfo<Buffer>) => {
   const buffer = Buffer.from(info.data);

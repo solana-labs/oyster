@@ -39,7 +39,7 @@ export const liquidateObligation = async (
   obligation: ParsedAccount<Obligation>,
 ) => {
   notify({
-    message: 'Repaying funds...',
+    message: 'Liquidating obligation...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });
@@ -146,7 +146,7 @@ export const liquidateObligation = async (
   );
 
   notify({
-    message: 'Funds liquidated.',
+    message: 'Obligation liquidated.',
     type: 'success',
     description: `Transaction - ${txid}`,
   });

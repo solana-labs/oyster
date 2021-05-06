@@ -2,16 +2,41 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
-import { LastUpdate } from './lastUpdate';
+import { LastUpdate, LastUpdateLayout } from './lastUpdate';
+
+export interface Obligation {
+  version: number;
+  lastUpdate: LastUpdate;
+  lendingMarket: PublicKey;
+  owner: PublicKey;
+  // @FIXME: check usages
+  deposits: ObligationCollateral[];
+  // @FIXME: check usages
+  borrows: ObligationLiquidity[];
+  depositedValue: BN; // decimals
+  borrowedValue: BN; // decimals
+  allowedBorrowValue: BN; // decimals
+  unhealthyBorrowValue: BN; // decimals
+}
+
+export interface ObligationCollateral {
+  depositReserve: PublicKey;
+  depositedAmount: BN;
+  marketValue: BN; // decimals
+}
+
+export interface ObligationLiquidity {
+  borrowReserve: PublicKey;
+  cumulativeBorrowRateWads: BN; // decimals
+  borrowedAmountWads: BN; // decimals
+  marketValue: BN; // decimals
+}
 
 export const ObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('version'),
 
-    BufferLayout.struct(
-      [Layout.uint64('slot'), BufferLayout.u8('stale')],
-      'lastUpdate',
-    ),
+    LastUpdateLayout,
 
     Layout.publicKey('lendingMarket'),
     Layout.publicKey('owner'),
@@ -59,34 +84,6 @@ export interface ProtoObligation {
   depositsLen: number;
   borrowsLen: number;
   dataFlat: Buffer;
-}
-
-export interface Obligation {
-  version: number;
-  lastUpdate: LastUpdate;
-  lendingMarket: PublicKey;
-  owner: PublicKey;
-  // @FIXME: check usages
-  deposits: ObligationCollateral[];
-  // @FIXME: check usages
-  borrows: ObligationLiquidity[];
-  depositedValue: BN; // decimals
-  borrowedValue: BN; // decimals
-  allowedBorrowValue: BN; // decimals
-  unhealthyBorrowValue: BN; // decimals
-}
-
-export interface ObligationCollateral {
-  depositReserve: PublicKey;
-  depositedAmount: BN;
-  marketValue: BN; // decimals
-}
-
-export interface ObligationLiquidity {
-  borrowReserve: PublicKey;
-  cumulativeBorrowRateWads: BN; // decimals
-  borrowedAmountWads: BN; // decimals
-  marketValue: BN; // decimals
 }
 
 export const ObligationParser = (

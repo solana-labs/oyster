@@ -145,9 +145,7 @@ export const BorrowInput = (props: {
           parseFloat(value),
           borrowReserve,
           // TODO: select existing obligations by collateral reserve
-          userObligationsByReserve.length > 0
-            ? userObligationsByReserve[0].obligation.account
-            : undefined,
+          userObligationsByReserve[0].obligation.account
         );
 
         setValue('');

@@ -34,7 +34,7 @@ export const borrowObligationLiquidity = async (
   obligation: ParsedAccount<Obligation>,
 ) => {
   notify({
-    message: 'Borrowing funds...',
+    message: 'Borrowing liquidity...',
     description: 'Please review transactions to approve.',
     type: 'warn',
   });
@@ -146,7 +146,7 @@ export const borrowObligationLiquidity = async (
     );
 
     notify({
-      message: 'Funds borrowed.',
+      message: 'Liquidity borrowed.',
       type: 'success',
       description: `Transaction - ${txid}`,
     });

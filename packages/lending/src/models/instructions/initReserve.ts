@@ -8,6 +8,7 @@ import {
 import BN from 'bn.js';
 import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
+import { ReserveConfig } from '../state';
 import { LendingInstruction } from './instruction';
 
 /// Initializes a new lending market reserve.
@@ -42,8 +43,7 @@ import { LendingInstruction } from './instruction';
 // },
 export const initReserveInstruction = (
   liquidityAmount: number | BN,
-  // @FIXME: reserve config
-  maxUtilizationRate: number,
+  config: ReserveConfig,
   sourceLiquidity: PublicKey,
   destinationCollateral: PublicKey,
   reserve: PublicKey,
@@ -61,8 +61,15 @@ export const initReserveInstruction = (
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
     Layout.uint64('liquidityAmount'),
-    // @FIXME: reserve config
-    BufferLayout.u8('maxUtilizationRate'),
+    BufferLayout.u8('optimalUtilizationRate'),
+    BufferLayout.u8('loanToValueRatio'),
+    BufferLayout.u8('liquidationBonus'),
+    BufferLayout.u8('liquidationThreshold'),
+    BufferLayout.u8('minBorrowRate'),
+    BufferLayout.u8('optimalBorrowRate'),
+    BufferLayout.u8('maxBorrowRate'),
+    Layout.uint64('borrowFeeWad'),
+    BufferLayout.u8('hostFeePercentage'),
   ]);
 
   const data = Buffer.alloc(dataLayout.span);
@@ -70,7 +77,15 @@ export const initReserveInstruction = (
     {
       instruction: LendingInstruction.InitReserve,
       liquidityAmount: new BN(liquidityAmount),
-      maxUtilizationRate,
+      optimalUtilizationRate: config.optimalUtilizationRate,
+      loanToValueRatio: config.loanToValueRatio,
+      liquidationBonus: config.liquidationBonus,
+      liquidationThreshold: config.liquidationThreshold,
+      minBorrowRate: config.minBorrowRate,
+      optimalBorrowRate: config.optimalBorrowRate,
+      maxBorrowRate: config.maxBorrowRate,
+      borrowFeeWad: config.fees.borrowFeeWad,
+      hostFeePercentage: config.fees.hostFeePercentage,
     },
     data,
   );

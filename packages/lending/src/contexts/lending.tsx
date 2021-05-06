@@ -45,13 +45,11 @@ export const useLending = () => {
   const processAccount = useCallback(
     (item: { pubkey: PublicKey; account: AccountInfo<Buffer> }) => {
       if (isReserve(item.account)) {
-        const reserve = cache.add(
+        return cache.add(
           item.pubkey.toBase58(),
           item.account,
           ReserveParser,
         );
-
-        return reserve;
       } else if (isLendingMarket(item.account)) {
         return cache.add(
           item.pubkey.toBase58(),
