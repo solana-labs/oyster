@@ -4,9 +4,13 @@ const bodyParser = require("body-parser");
 const redis = require("redis");
 const crypto = require("crypto");
 const axios = require("axios");
+const settings = require("./config");
 
 const server = new JSONRPCServer();
 const redisClient = redis.createClient();
+
+const programIDs = settings.programIDs;
+
 const getProgramAccounts = function({ wormholeID })
 {
     return new Promise((resolve, reject) => {
