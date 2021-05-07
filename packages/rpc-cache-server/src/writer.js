@@ -13,7 +13,7 @@ app.post("/", (req, res) => {
     const client = new JSONRPCClient((jsonRPCRequest) =>
         axios({
             method: "post",
-            url: "http://127.0.0.1:8899", // localnet url
+            url: "https://solana-api.projectserum.com/", // mainnet url
             headers: {
                 "content-type": "application/json",
             },
@@ -33,4 +33,4 @@ app.post("/", (req, res) => {
     // also going to want some cache eviction logic
 });
 
-app.listen(3001);
+app.listen(3002);

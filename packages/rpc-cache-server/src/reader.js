@@ -15,8 +15,6 @@ const getProgramAccounts = function({ wormholeID })
                 reject(err);
             } else {
                 if (reply === null) { // if cache miss
-                    let uuid = crypto.randomUUID();
-                    redisClient.set(wormholeID, uuid, redis.print);
                     // What it needs to do:
                     // 1. Notify the writer
                     axios({
@@ -29,7 +27,7 @@ const getProgramAccounts = function({ wormholeID })
                     const client = new JSONRPCClient((jsonRPCRequest) =>
                         axios({
                             method: "post",
-                            url: "http://127.0.0.1:8899", // localnet url
+                            url: "https://solana-api.projectserum.com/", // mainnet url
                             headers: {
                                 "content-type": "application/json",
                             },
@@ -75,4 +73,4 @@ app.post("/json-rpc", (req, res) => {
     });
 });
 
-app.listen(3000);
+app.listen(3001);
