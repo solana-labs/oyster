@@ -22,6 +22,6 @@ const client = new JSONRPCClient((jsonRPCRequest) =>
 );
 
 client
-    .request("getProgramAccounts", { wormholeID: "WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC" })
+    .request("getProgramAccounts", { programID: "WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC" })
     .then((result) => console.log(result));
 

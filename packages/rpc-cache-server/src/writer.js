@@ -28,8 +28,8 @@ app.post("/", (req, res) => {
         })
     );
 
-    client.request("getProgramAccounts", {wormholdID: req.body.wormholeID})
-        .then((result) => redis.set(req.body.wormholeID, result));
+    client.request("getProgramAccounts", {wormholdID: req.body.programID})
+        .then((result) => redis.set(req.body.programID, result));
     // also going to want some cache eviction logic
 });
 

@@ -11,10 +11,10 @@ const redisClient = redis.createClient();
 
 const programIDs = settings.programIDs;
 
-const getProgramAccounts = function({ wormholeID })
+const getProgramAccounts = function({ programID })
 {
     return new Promise((resolve, reject) => {
-        redisClient.get(wormholeID, function(err, reply) {
+        redisClient.get(programID, function(err, reply) {
             if (err) {
                 reject(err);
             } else {
@@ -24,7 +24,7 @@ const getProgramAccounts = function({ wormholeID })
                     axios({
                         method : "post",
                         url : "http://localhost:3001/",
-                        data : {identifier : wormholeID}
+                        data : {identifier : programID}
                     });
 
                     // 2. Send an RPC request to the full node on behalf of the client
@@ -47,7 +47,7 @@ const getProgramAccounts = function({ wormholeID })
                     );
                     var val = null;
                     client
-                        .request("getProgramAccounts", { wormholeID: wormholeID })
+                        .request("getProgramAccounts", { programID: programID })
                         .then((result) => val = result);
                     resolve(val);
                     return;
