@@ -36,7 +36,7 @@ export const TokenSelectModal = (props: {
       return tokens.filter(token => {
         return (
           (token.tags?.indexOf('longList') || -1) < 0 &&
-          (token.symbol.toLowerCase().includes(search.toUpperCase()) ||
+          (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
             token.name.toLowerCase().includes(search.toLowerCase()))
         );
       });
