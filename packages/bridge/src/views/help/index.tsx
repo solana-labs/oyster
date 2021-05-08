@@ -29,8 +29,12 @@ export const HelpView = () => {
         </Row>
         <Row>
           <Col xs={24} sm={12}>
-            <Button className="action-button"
-                    onClick={() => window.open('https://github.com/certusone/wormhole', '_blank')}>
+            <Button
+              className="action-button"
+              onClick={() =>
+                window.open('https://github.com/certusone/wormhole', '_blank')
+              }
+            >
               View the Code
             </Button>
           </Col>
