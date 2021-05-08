@@ -6,11 +6,11 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from "re
 import { notify } from "./../utils/notifications";
 import { useConnectionConfig } from "./connection";
 import { useLocalStorageState } from "../utils/utils";
-import { LedgerProvider } from "@solana/wallet-ledger";
 import { SolongWalletAdapter } from "../wallet-adapters/solong";
 import { PhantomWalletAdapter } from "../wallet-adapters/phantom";
 import { TorusWalletAdapter } from "../wallet-adapters/torus";
 import { useLocation } from "react-router";
+import { LedgerWalletAdapter } from "@solana/wallet-ledger";
 
 const ASSETS_URL = 'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
 export const WALLET_PROVIDERS = [
@@ -20,7 +20,12 @@ export const WALLET_PROVIDERS = [
     icon: `https://www.phantom.app/img/logo.png`,
     adapter: PhantomWalletAdapter,
   },
-  LedgerProvider,
+  {
+    name: 'Ledger',
+    url: 'https://www.ledger.com',
+    icon: `${ASSETS_URL}ledger.svg`,
+    adapter: LedgerWalletAdapter,
+  },
   {
     name: "Sollet",
     url: "https://www.sollet.io",
@@ -32,11 +37,11 @@ export const WALLET_PROVIDERS = [
     adapter: SolongWalletAdapter,
   },
   // TODO: enable when fully functional
-  // {
-  //   name: "MathWallet",
-  //   url: "https://mathwallet.org",
-  //   icon: `${ASSETS_URL}mathwallet.svg`,
-  // },
+  {
+    name: "MathWallet",
+    url: "https://mathwallet.org",
+    icon: `${ASSETS_URL}mathwallet.svg`,
+  },
   // {
   //   name: 'Torus',
   //   url: 'https://tor.us',
@@ -74,7 +79,12 @@ export function WalletProvider({ children = null as any }) {
 
   const wallet = useMemo(function () {
     if (provider) {
-      return new (provider.adapter || Wallet)(providerUrl, endpoint) as WalletAdapter;
+      try {
+        return new (provider.adapter || Wallet)(providerUrl, endpoint) as WalletAdapter;
+      } catch (e) {
+        console.log(`Error connecting to wallet ${provider.name}: ${e}`)
+        return undefined;
+      }
     }
   }, [provider, providerUrl, endpoint]);
 
