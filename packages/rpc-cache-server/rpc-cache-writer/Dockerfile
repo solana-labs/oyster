@@ -4,4 +4,4 @@ RUN apt install python g++ make
 WORKDIR /rpc-cache-reader
 COPY . .
 RUN yarn
-CMD ["node", "src/reader.js"]
+CMD ["node", "src/writer.js"]
