@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM node:15
-RUN apk add --no-cache python g++ make
+FROM node:15-buster
+RUN apt install python g++ make
 WORKDIR /rpc-cache-reader
 COPY . .
-RUN yarn install --production
+RUN npm install
 CMD ["node", "src/reader.js"]
