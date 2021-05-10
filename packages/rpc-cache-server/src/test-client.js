@@ -6,7 +6,7 @@ const axios = require("axios");
 const client = new JSONRPCClient((jsonRPCRequest) =>
     axios({
         method: "post",
-        url: "http://localhost:3000/json-rpc",
+        url: "http://localhost:3001/json-rpc",
         headers: {
             "content-type": "application/json",
         },
@@ -22,6 +22,6 @@ const client = new JSONRPCClient((jsonRPCRequest) =>
 );
 
 client
-    .request("getProgramAccounts", {programID: "WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC"})
+    .request("getAccountInfo", ["HbMGwfGjGPchtaPwyrtJFy8APZN5w1hi63xnzmj1f23v", {}]).catch(console.error)
     .then((result) => console.log(result));
 

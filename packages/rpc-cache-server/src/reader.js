@@ -6,6 +6,10 @@ const cors = require("cors");
 const axios = require("axios");
 const settings = require("./config");
 
+const {Connection} = require("@solana/web3.js");
+
+const connection = new Connection("https://solana-api.projectserum.com/", 'recent')
+
 const server = new JSONRPCServer();
 const redisClient = redis.createClient();
 
@@ -31,28 +35,44 @@ const getProgramAccounts = function (params) {
           });
           reject(err)
         }
-        console.log(JSON.parse(reply))
-        resolve(reply);
+        let parsed = []
+        for (const acc of reply) {
+          try {
+            parsed.push(JSON.parse(acc))
+          } catch (e) {
+            console.log(acc);
+          }
+        }
+        resolve(parsed);
       }
     });
   });
 };
-server.addMethod("getProgramAccounts", getProgramAccounts);
 
+server.addMethod("getProgramAccounts", getProgramAccounts);
 
 app.post("/json-rpc", (req, res) => {
   const jsonRPCRequest = req.body;
   // server.receive takes a JSON-RPC request and returns a Promise of a JSON-RPC response.
-  // console.log("received request");
-  // console.log(jsonRPCRequest);
-  server.receive(jsonRPCRequest).then((jsonRPCResponse) => {
-    if (jsonRPCResponse) {
-      res.json(jsonRPCResponse);
-    } else {
-      console.log("no response");
-      res.sendStatus(204);
-    }
-  });
+  console.log("received request");
+  console.log(jsonRPCRequest);
+  if (settings.cacheFunctions.indexOf(jsonRPCRequest.method) >= 0) {
+    server.receive(jsonRPCRequest).then((jsonRPCResponse) => {
+      if (jsonRPCResponse) {
+        res.json(jsonRPCResponse);
+      } else {
+        console.log("no response");
+        res.sendStatus(204);
+      }
+    });
+  } else {
+    connection._rpcRequest(
+      jsonRPCRequest.method,
+      jsonRPCRequest.params
+    ).then((resp) => {
+      res.json(resp);
+    });
+  }
 });
 
 app.listen(3001);
