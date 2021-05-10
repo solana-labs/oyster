@@ -30,7 +30,7 @@ const setRedisAccounts = (accounts, programId, setWebsockets = false) => {
       webSocketsIds.push(subId)
     }
     console.log(`saving in cache ${pubkey} of ${programId}`)
-    redisClient.hset(programId, pubkey, JSON.stringify(acc.account))
+    redisClient.hset(programId, pubkey, JSON.stringify(acc))
   }
 }
 
