@@ -28,7 +28,7 @@ import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEm
 import { voteInstruction } from '../models/vote';
 
 const { createTokenAccount } = actions;
-const { sendTransactions } = contexts.Connection;
+const { sendTransactions, SequenceType } = contexts.Connection;
 const { notify } = utils;
 const { approve } = models;
 
@@ -199,8 +199,7 @@ export const depositSourceTokensAndVote = async (
       wallet,
       [depositInstructions, voteInstructions],
       [depositSigners, voteSigners],
-      true,
-      true,
+      SequenceType.Sequential,
     );
 
     notify({

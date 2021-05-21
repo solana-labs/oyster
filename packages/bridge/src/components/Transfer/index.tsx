@@ -54,8 +54,6 @@ export const Transfer = () => {
     setLastTypedAccount,
   } = useTokenChainPairState();
 
-
-
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
     to: ASSET_CHAIN.Solana,
@@ -85,8 +83,11 @@ export const Transfer = () => {
     });
   }, [A, B, mintAddress, A.info]);
 
-
-  const tokenAccounts = useMemo(() => userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint), [request.info?.mint])
+  const tokenAccounts = useMemo(
+    () =>
+      userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint),
+    [request.info?.mint],
+  );
 
   return (
     <>

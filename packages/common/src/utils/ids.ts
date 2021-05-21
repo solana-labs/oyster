@@ -107,7 +107,7 @@ export const PROGRAM_IDS = [
   {
     name: 'devnet',
     governance: () => ({
-      programId: new PublicKey('A9KW1nhwZUr1kMX8C6rgzZvAE9AwEEUi2C77SiVvEiuN'),
+      programId: new PublicKey('C3FdFYAwoAanUUHrtxnnzN8A6R13RmRoDRWmLbcpZATp'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),

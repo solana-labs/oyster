@@ -18,11 +18,9 @@ export const AppBar = (props: {
   const TopBar = (
     <div className="App-Bar-right">
       {props.left}
-      {connected ?
-        (
-          <CurrentUserBadge />
-        )
-     : (
+      {connected ? (
+        <CurrentUserBadge />
+      ) : (
         <ConnectButton
           type="text"
           size="large"

@@ -341,7 +341,7 @@ const UseNativeAccount = () => {
         return;
       }
 
-      const account = await connection.getAccountInfo(wallet.publicKey)
+      const account = await connection.getAccountInfo(wallet.publicKey);
       updateAccount(account);
 
       subId = connection.onAccountChange(wallet.publicKey, updateAccount);
@@ -351,7 +351,7 @@ const UseNativeAccount = () => {
       if (subId) {
         connection.removeAccountChangeListener(subId);
       }
-    }
+    };
   }, [setNativeAccount, wallet, wallet?.publicKey, connection, updateCache]);
 
   return { nativeAccount };

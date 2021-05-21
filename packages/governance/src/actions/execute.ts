@@ -4,7 +4,12 @@ import {
   Message,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import {
+  contexts,
+  utils,
+  ParsedAccount,
+  sendTransactionWithRetry,
+} from '@oyster/common';
 
 import {
   Proposal,
@@ -14,7 +19,6 @@ import {
 import { executeInstruction } from '../models/execute';
 import { LABELS } from '../constants';
 import { getMessageAccountInfos } from '../utils/transactions';
-const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
 
 export const execute = async (
@@ -47,12 +51,11 @@ export const execute = async (
   });
 
   try {
-    let tx = await sendTransaction(
+    let tx = await sendTransactionWithRetry(
       connection,
       wallet,
       instructions,
       signers,
-      true,
     );
 
     notify({
