@@ -113,7 +113,6 @@ export const Transfer = () => {
           className={'left'}
         />
         <Button
-          type="primary"
           className="swap-button"
           style={{ padding: 0 }}
           disabled={false}

@@ -50,7 +50,15 @@ export const chainToName = (chain?: ASSET_CHAIN) => {
 };
 
 const EXCLUDED_COMMON_TOKENS = ['usdt', 'usdc'];
-const EXCLUDED_SPL_TOKENS = ['sol', 'srm', ...EXCLUDED_COMMON_TOKENS];
+const EXCLUDED_SPL_TOKENS = [
+  'sol',
+  'srm',
+  'ray',
+  'oxy',
+  'mer',
+  'maps',
+  ...EXCLUDED_COMMON_TOKENS,
+];
 
 export const filterModalSolTokens = (tokens: TokenInfo[]) => {
   return tokens.filter(
