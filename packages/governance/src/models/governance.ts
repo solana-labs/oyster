@@ -53,26 +53,26 @@ export class CreateRealmArgs {
 
 export class GovernanceConfig {
   realm: PublicKey;
-  // governedAccount: PublicKey;
-  // yesVoteThresholdPercentage: number;
-  // minTokensToCreateProposal: number;
-  // minInstructionHoldUpTime: BN;
-  // maxVotingTime: BN;
+  governedAccount: PublicKey;
+  yesVoteThresholdPercentage: number;
+  minTokensToCreateProposal: number;
+  minInstructionHoldUpTime: BN;
+  maxVotingTime: BN;
 
   constructor(args: {
     realm: PublicKey;
-    // governedAccount: PublicKey;
-    // yesVoteThresholdPercentage: number;
-    // minTokensToCreateProposal: number;
-    // minInstructionHoldUpTime: BN;
-    // maxVotingTime: BN;
+    governedAccount: PublicKey;
+    yesVoteThresholdPercentage: number;
+    minTokensToCreateProposal: number;
+    minInstructionHoldUpTime: BN;
+    maxVotingTime: BN;
   }) {
     this.realm = args.realm;
-    // this.governedAccount = args.governedAccount;
-    // this.yesVoteThresholdPercentage = args.yesVoteThresholdPercentage;
-    // this.minTokensToCreateProposal = args.minTokensToCreateProposal;
-    // this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
-    // this.maxVotingTime = args.maxVotingTime;
+    this.governedAccount = args.governedAccount;
+    this.yesVoteThresholdPercentage = args.yesVoteThresholdPercentage;
+    this.minTokensToCreateProposal = args.minTokensToCreateProposal;
+    this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
+    this.maxVotingTime = args.maxVotingTime;
   }
 }
 
@@ -142,24 +142,24 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['realm', 'pubkey'],
-        // ['governedAccount', 'pubkey'],
-        // ['yesVoteThresholdPercentage', 'u8'],
-        // ['minTokensToCreateProposal', 'u8'],
-        // ['minInstructionHoldUpTime', 'u64'],
-        // ['maxVotingTime', 'u64'],
+        ['governedAccount', 'pubkey'],
+        ['yesVoteThresholdPercentage', 'u8'],
+        ['minTokensToCreateProposal', 'u32'],
+        ['minInstructionHoldUpTime', 'u64'],
+        ['maxVotingTime', 'u64'],
       ],
     },
   ],
-  // [
-  //   CreateAccountGovernanceArgs,
-  //   {
-  //     kind: 'struct',
-  //     fields: [
-  //       ['instruction', 'u8'],
-  //       ['config', GovernanceConfig],
-  //     ],
-  //   },
-  // ],
+  [
+    CreateAccountGovernanceArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
+      ],
+    },
+  ],
 ]);
 
 export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {

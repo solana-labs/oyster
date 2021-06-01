@@ -29,7 +29,7 @@ export const createAccountGovernance = async (
     [
       Buffer.from('account-governance'),
       realm.toBuffer(),
-      //  config.governedAccount.toBuffer(),
+      config.governedAccount.toBuffer(),
     ],
     PROGRAM_IDS.governance.programId,
   );

@@ -83,11 +83,11 @@ export function NewGovernanceForm({
 
     const config = new GovernanceConfig({
       realm: realm,
-      //governedAccount: new PublicKey(values.governedAccountAddress),
-      // yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
-      // minTokensToCreateProposal: values.minTokensToCreateProposal,
-      // minInstructionHoldUpTime: new BN(values.minInstructionHoldUpTime),
-      // maxVotingTime: new BN(values.maxVotingTime),
+      governedAccount: new PublicKey(values.governedAccountAddress),
+      yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
+      minTokensToCreateProposal: values.minTokensToCreateProposal,
+      minInstructionHoldUpTime: new BN(values.minInstructionHoldUpTime),
+      maxVotingTime: new BN(values.maxVotingTime),
     });
 
     const governanceAddress = await registerGovernance(
