@@ -1,9 +1,10 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
 
-import { Realm } from '../models/governance';
+import { GOVERNANCE_SCHEMA, Realm } from '../models/governance';
 
 import { createRealm } from '../models/createRealm';
+import { serialize } from 'borsh';
 
 const { notify } = utils;
 
@@ -13,6 +14,8 @@ export const registerRealm = async (
   realm: Realm,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
+
+  const realm_data = Buffer.from(serialize(GOVERNANCE_SCHEMA, realm));
 
   const { realmAddress } = await createRealm(
     instructions,

@@ -8,7 +8,7 @@ import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import { GOVERNANCE_PROGRAM_SEED, Governance } from '../models/governance';
-import { createGovernanceInstruction } from '../models/createGovernance';
+import { createGovernanceInstruction } from '../models/createGovernanceOld';
 import BN from 'bn.js';
 
 const { sendTransactions } = contexts.Connection;

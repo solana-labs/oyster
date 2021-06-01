@@ -9,6 +9,8 @@ import { Redirect } from 'react-router';
 
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
+import { GovernanceConfig } from '../../models/governance';
+import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -60,14 +62,12 @@ export function NewGovernanceForm({
   const wallet = useWallet();
   const connection = useConnection();
   const onFinish = async (values: {
-    voteThreshold: number;
-
-    minimumSlotWaitingPeriod: string;
-    timeLimit: string;
-    governanceMint: string;
-    councilMint: string;
+    governanceType: GovernanceType;
+    minTokensToCreateProposal: number;
+    minInstructionHoldUpTime: number;
+    maxVotingTime: number;
+    yesVoteThresholdPercentage: number;
     governedAccountAddress: string;
-    name: string;
   }) => {
     if (!tryParseKey(values.governedAccountAddress)) {
       notify({
@@ -78,10 +78,26 @@ export function NewGovernanceForm({
       });
       return;
     }
+
+    const realm = new PublicKey('9nnHdtxTEiGyVPTdmdPBi472i8mN6gKDxoMVHoHJgX3Q');
+
+    const config = new GovernanceConfig({
+      realm: realm,
+      //governedAccount: new PublicKey(values.governedAccountAddress),
+      // yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
+      // minTokensToCreateProposal: values.minTokensToCreateProposal,
+      // minInstructionHoldUpTime: new BN(values.minInstructionHoldUpTime),
+      // maxVotingTime: new BN(values.maxVotingTime),
+    });
+
     const governanceAddress = await registerGovernance(
       connection,
       wallet.wallet,
+      values.governanceType,
+      realm,
+      config,
     );
+
     handleOk(governanceAddress);
   };
 

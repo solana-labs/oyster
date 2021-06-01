@@ -16,11 +16,12 @@ export const GOVERNANCE_PROGRAM_SEED = 'governance';
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
+  CreateAccountGovernance = 4,
 
   InitProposal = 1,
   AddSigner = 2,
   RemoveSigner = 3,
-  AddCustomSingleSignerTransaction = 4,
+  AddCustomSingleSignerTransaction = 15,
   Sign = 8,
   Vote = 9,
   CreateGovernance = 10,
@@ -47,6 +48,41 @@ export class CreateRealmArgs {
 
   constructor(args: { name: string }) {
     this.name = args.name;
+  }
+}
+
+export class GovernanceConfig {
+  realm: PublicKey;
+  // governedAccount: PublicKey;
+  // yesVoteThresholdPercentage: number;
+  // minTokensToCreateProposal: number;
+  // minInstructionHoldUpTime: BN;
+  // maxVotingTime: BN;
+
+  constructor(args: {
+    realm: PublicKey;
+    // governedAccount: PublicKey;
+    // yesVoteThresholdPercentage: number;
+    // minTokensToCreateProposal: number;
+    // minInstructionHoldUpTime: BN;
+    // maxVotingTime: BN;
+  }) {
+    this.realm = args.realm;
+    // this.governedAccount = args.governedAccount;
+    // this.yesVoteThresholdPercentage = args.yesVoteThresholdPercentage;
+    // this.minTokensToCreateProposal = args.minTokensToCreateProposal;
+    // this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
+    // this.maxVotingTime = args.maxVotingTime;
+  }
+}
+
+export class CreateAccountGovernanceArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.CreateAccountGovernance;
+  config: GovernanceConfig;
+
+  constructor(args: { config: GovernanceConfig }) {
+    this.config = args.config;
   }
 }
 
@@ -100,6 +136,30 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
+  [
+    GovernanceConfig,
+    {
+      kind: 'struct',
+      fields: [
+        ['realm', 'pubkey'],
+        // ['governedAccount', 'pubkey'],
+        // ['yesVoteThresholdPercentage', 'u8'],
+        // ['minTokensToCreateProposal', 'u8'],
+        // ['minInstructionHoldUpTime', 'u64'],
+        // ['maxVotingTime', 'u64'],
+      ],
+    },
+  ],
+  // [
+  //   CreateAccountGovernanceArgs,
+  //   {
+  //     kind: 'struct',
+  //     fields: [
+  //       ['instruction', 'u8'],
+  //       ['config', GovernanceConfig],
+  //     ],
+  //   },
+  // ],
 ]);
 
 export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {

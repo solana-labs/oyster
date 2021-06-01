@@ -1,17 +1,21 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
+import { createAccountGovernance } from '../models/createAccountGovernance';
+import { GovernanceType } from '../models/enums';
+import { GovernanceConfig } from '../models/governance';
 
 const { notify } = utils;
 
 export const registerGovernance = async (
   connection: Connection,
   wallet: any,
+  governanceType: GovernanceType,
+  realm: PublicKey,
+  config: GovernanceConfig,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
-  let governanceAddress = new PublicKey(
-    'metaTA73sFPqA8whreUbBsbn3SLJH2vhrW9fP5dmfdC',
-  );
+  let governanceAddress;
 
   notify({
     message: 'Registering governance...',
@@ -19,7 +23,20 @@ export const registerGovernance = async (
     type: 'warn',
   });
 
-  return governanceAddress;
+  if (governanceType === GovernanceType.Account) {
+    governanceAddress = (
+      await createAccountGovernance(
+        instructions,
+        realm,
+        config,
+        wallet.publicKey,
+      )
+    ).governanceAddress;
+  } else {
+    throw new Error(`Governance type ${governanceType} is not supported yet.`);
+  }
+
+  console.log('EXECUTING ...');
 
   try {
     let tx = await sendTransaction(connection, wallet, instructions, []);
