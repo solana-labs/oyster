@@ -16,18 +16,16 @@ export const TEMP_FILE_TXN_SIZE = 1000;
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
 
+// temp workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader;
   const value = reader.buf.readUInt16LE(reader.offset);
   reader.offset += 2;
-
-  console.log('READ U16', value);
   return value;
 };
 
+// temp workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
-  console.log('WRITE U16', value);
-
   const reader = (this as unknown) as BinaryWriter;
   reader.maybeResize();
   reader.buf.writeUInt16LE(value, reader.length);

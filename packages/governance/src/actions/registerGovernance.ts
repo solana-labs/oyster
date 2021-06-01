@@ -36,8 +36,6 @@ export const registerGovernance = async (
     throw new Error(`Governance type ${governanceType} is not supported yet.`);
   }
 
-  console.log('EXECUTING ...');
-
   try {
     let tx = await sendTransaction(connection, wallet, instructions, []);
 

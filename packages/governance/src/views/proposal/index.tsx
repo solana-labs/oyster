@@ -30,8 +30,8 @@ import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
 const { TabPane } = Tabs;
 
-// eslint-disable-next-line
 export const urlRegex =
+  // eslint-disable-next-line
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;

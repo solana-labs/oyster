@@ -68,7 +68,7 @@ export const RealmView = () => {
             <h1>{LABELS.REALM}</h1>
             <RegisterGovernance
               style={{ marginLeft: 'auto', marginRight: 0 }}
-              //  disabled={!connected}
+              disabled={!connected}
             />
           </div>
           <List

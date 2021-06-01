@@ -19,9 +19,6 @@ export const createAccountGovernance = async (
 ): Promise<{ governanceAddress: PublicKey }> => {
   const PROGRAM_IDS = utils.programIds();
 
-  console.log('CONFIG', config);
-  const config_data = Buffer.from(serialize(GOVERNANCE_SCHEMA, config));
-
   const args = new CreateAccountGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
