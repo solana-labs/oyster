@@ -99,17 +99,31 @@ export const LABELS = {
   TOKENS_REFUNDED: 'Your voting tokens have been refunded',
 
   REGISTER_REALM: 'Register Realm',
+  REALMS: 'Realms',
+  REALM: 'Realm',
+
+  REGISTER_GOVERNANCE: 'Register Governance',
+  GOVERNANCE_OVER: 'governance over',
+  PROGRAM: 'Program',
+
+  PROGRAM_ID_LABEL: 'program id',
+  ACCOUNT_ADDRESS: 'account address',
+
+  MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
+  MIN_INSTRUCTION_HOLD_UP_TIME: 'min instruction hold up time (slots)',
+  MAX_VOTING_TIME: 'max voting time (slots)',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
 
   GOVERNANCE: 'Governance Token Holders',
   COUNCIL: 'The Council',
-  COMMUNITY_TOKEN_MINT: 'Community Token Mint',
-  USE_COUNCIL_TOKEN: 'Use Council Token',
-  COUNCIL_TOKEN_MINT: 'Council Token Mint',
+  COMMUNITY_TOKEN_MINT: 'community token mint',
+  USE_COUNCIL_TOKEN: 'use council token',
+  COUNCIL_TOKEN_MINT: 'council token mint',
+  NAME_LABEL: 'name',
 
-  VOTE_PERCENT_THRESHOLD: 'Vote Threshold (%)',
+  YES_VOTE_THRESHOLD_PERCENTAGE: 'yes vote threshold (%)',
 
   SELECT_PROPOSAL_TYPE: 'Select the type of proposals this app will generate',
   SELECT_EXECUTION_TYPE: 'Select how transactions will be executed',
@@ -132,14 +146,13 @@ export const LABELS = {
 
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',
-  PROGRAM_ID_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
-    `Program ID: '${programId}' is not a valid public key`,
+  ACCOUNT_ADDRESS_IS_NOT_A_VALID_PUBLIC_KEY: (accountAddress: string) =>
+    `Account address: '${accountAddress}' is not a valid public key`,
   GOVERNANCE_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
     `Governance Mint ID: '${programId}' is not a valid public key`,
   COUNCIL_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
     `Council Mint ID: '${programId}' is not a valid public key`,
 
-  TIME_LIMIT: 'Voting Time Limit',
   THIS_CONFIG_LACKS_COUNCIL: 'This program does not have a council.',
   GIT_CONTENT_EXCEEDED:
     'Gist Github API limit exceeded. Click to view on Github directly.',
@@ -149,4 +162,5 @@ export const LABELS = {
   LARGEST_VOTERS_BUBBLE: 'Top Voters Visualization',
   LARGEST_VOTERS_TABLE: 'Top Voters',
   PERCENTAGE: 'Percentage',
+  TIME_LIMIT: 'time limit',
 };

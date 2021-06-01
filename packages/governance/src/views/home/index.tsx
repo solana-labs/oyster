@@ -7,6 +7,7 @@ import { Background } from './../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { RegisterRealm } from './registerRealm';
+import { LABELS } from '../../constants';
 
 export const HomeView = () => {
   const history = useHistory();
@@ -16,15 +17,15 @@ export const HomeView = () => {
   const listData = useMemo(() => {
     const newListData: any[] = [];
 
-    Object.keys(realms).forEach(realmKey => {
-      const realm = realms[realmKey];
+    Object.keys(realms).forEach(realmAddress => {
+      const realm = realms[realmAddress];
       const communityMint = realm.info.communityMint.toBase58();
 
       newListData.push({
-        href: '/governance/' + realmKey,
+        href: '/realm/' + realmAddress,
         title: realm.info.name,
         badge: <TokenIcon mintAddress={communityMint} size={40} />,
-        realmKey: realmKey,
+        realmKey: realmAddress,
         realm,
       });
     });
@@ -37,7 +38,7 @@ export const HomeView = () => {
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
-            <h1>Governance</h1>
+            <h1>{LABELS.REALMS}</h1>
             <RegisterRealm
               style={{ marginLeft: 'auto', marginRight: 0 }}
               disabled={!connected}

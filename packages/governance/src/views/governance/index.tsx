@@ -22,7 +22,7 @@ const columns = [
     key: 'name',
   },
   {
-    title: LABELS.VOTE_PERCENT_THRESHOLD,
+    title: LABELS.YES_VOTE_THRESHOLD_PERCENTAGE,
     dataIndex: 'voteThreshold',
     key: 'voteThreshold',
     render: (number: number) => <span>{number}</span>,

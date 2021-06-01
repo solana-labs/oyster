@@ -32,7 +32,7 @@ export function RegisterRealm(props: ButtonProps) {
 
   if (redirect) {
     setTimeout(() => setRedirect(''), 100);
-    return <Redirect push to={'/governance/' + redirect} />;
+    return <Redirect push to={'/realm/' + redirect} />;
   }
 
   return (
@@ -108,7 +108,11 @@ export function NewRealmForm({
       onCancel={handleCancel}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+        <Form.Item
+          name="name"
+          label={LABELS.NAME_LABEL}
+          rules={[{ required: true }]}
+        >
           <Input maxLength={MAX_REALM_NAME_LENGTH} />
         </Form.Item>
 

@@ -5,10 +5,11 @@ import './style.less'; // Don't remove this line, it will break dark mode if you
 import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
-import { RegisterGovernanceMenuItem } from '../governance/register';
+import { RegisterGovernance } from './registerGovernance';
 import { ProposalStateStatus } from '../../models/governance';
+import { LABELS } from '../../constants';
 
-export const GovernancesView = () => {
+export const RealmView = () => {
   const history = useHistory();
   const { configs, proposals, states } = useProposals();
   const { connected } = useWallet();
@@ -64,10 +65,10 @@ export const GovernancesView = () => {
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
-            <h1>Governance</h1>
-            <RegisterGovernanceMenuItem
+            <h1>{LABELS.REALM}</h1>
+            <RegisterGovernance
               style={{ marginLeft: 'auto', marginRight: 0 }}
-              disabled={!connected}
+              //  disabled={!connected}
             />
           </div>
           <List
