@@ -4,6 +4,8 @@ import BN from 'bn.js';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
+import { BinaryReader, BinaryWriter } from 'borsh';
+
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const MAX_REALM_NAME_LENGTH = 32;
@@ -13,6 +15,24 @@ export const TEMP_FILE_TXN_SIZE = 1000;
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
+
+(BinaryReader.prototype as any).readU16 = function () {
+  const reader = (this as unknown) as BinaryReader;
+  const value = reader.buf.readUInt16LE(reader.offset);
+  reader.offset += 2;
+
+  console.log('READ U16', value);
+  return value;
+};
+
+(BinaryWriter.prototype as any).writeU16 = function (value: number) {
+  console.log('WRITE U16', value);
+
+  const reader = (this as unknown) as BinaryWriter;
+  reader.maybeResize();
+  reader.buf.writeUInt16LE(value, reader.length);
+  reader.length += 2;
+};
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
@@ -144,7 +164,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['realm', 'pubkey'],
         ['governedAccount', 'pubkey'],
         ['yesVoteThresholdPercentage', 'u8'],
-        ['minTokensToCreateProposal', 'u32'],
+        ['minTokensToCreateProposal', 'u16'],
         ['minInstructionHoldUpTime', 'u64'],
         ['maxVotingTime', 'u64'],
       ],

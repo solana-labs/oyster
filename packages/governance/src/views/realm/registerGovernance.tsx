@@ -79,7 +79,7 @@ export function NewGovernanceForm({
       return;
     }
 
-    const realm = new PublicKey('9nnHdtxTEiGyVPTdmdPBi472i8mN6gKDxoMVHoHJgX3Q');
+    const realm = new PublicKey('7AseJVKuWkNJb9VHwbW2J5j5F6HjkBYrQjGCf1MegoXf');
 
     const config = new GovernanceConfig({
       realm: realm,
