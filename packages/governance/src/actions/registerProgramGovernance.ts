@@ -7,7 +7,7 @@ import {
 import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import { GOVERNANCE_PROGRAM_SEED, Governance } from '../models/governance';
+import { GOVERNANCE_PROGRAM_SEED, GovernanceOld } from '../models/governance';
 import { createGovernanceInstruction } from '../models/createGovernanceOld';
 import BN from 'bn.js';
 
@@ -18,7 +18,7 @@ const { notify } = utils;
 export const registerProgramGovernance = async (
   connection: Connection,
   wallet: any,
-  uninitializedGovernance: Partial<Governance>,
+  uninitializedGovernance: Partial<GovernanceOld>,
   useCouncil: boolean,
 ): Promise<PublicKey> => {
   const PROGRAM_IDS = utils.programIds();

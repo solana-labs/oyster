@@ -9,7 +9,7 @@ import {
   deserializeMint,
   ParsedAccount,
 } from '@oyster/common';
-import { Governance } from '../../models/governance';
+import { GovernanceOld } from '../../models/governance';
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
@@ -63,7 +63,7 @@ const columns = [
     title: LABELS.ACTIONS,
     dataIndex: 'config',
     key: 'config',
-    render: (config: ParsedAccount<Governance>) => (
+    render: (config: ParsedAccount<GovernanceOld>) => (
       <>
         <MintSourceTokens governance={config} useGovernance={true} />
         {config.info.councilMint && (

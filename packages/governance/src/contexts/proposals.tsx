@@ -17,9 +17,9 @@ import {
 import {
   CustomSingleSignerTransactionLayout,
   CustomSingleSignerTransactionParser,
-  Governance,
+  GovernanceOld,
   GovernanceLayout,
-  GovernanceParser,
+  GovernanceOldParser,
   Proposal,
   ProposalState,
   ProposalLayout,
@@ -31,14 +31,17 @@ import {
   Realm,
   RealmParser,
   GovernanceAccountType,
+  Governance,
+  GovernanceParser,
 } from '../models/governance';
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<Proposal>>;
   transactions: Record<string, ParsedAccount<GovernanceTransaction>>;
   states: Record<string, ParsedAccount<ProposalState>>;
-  configs: Record<string, ParsedAccount<Governance>>;
+  configs: Record<string, ParsedAccount<GovernanceOld>>;
   realms: Record<string, ParsedAccount<Realm>>;
+  governances: Record<string, ParsedAccount<Governance>>;
 }
 
 export const ProposalsContext =
@@ -56,6 +59,7 @@ export default function ProposalsProvider({ children = null as any }) {
   const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
   const [realms, setRealms] = useState({});
+  const [governances, setGovernances] = useState({});
 
   useSetupProposalsCache({
     connection,
@@ -64,11 +68,12 @@ export default function ProposalsProvider({ children = null as any }) {
     setStates,
     setConfigs,
     setRealms,
+    setGovernances,
   });
 
   return (
     <ProposalsContext.Provider
-      value={{ proposals, transactions, configs, states, realms }}
+      value={{ proposals, transactions, configs, states, realms, governances }}
     >
       {children}
     </ProposalsContext.Provider>
@@ -82,6 +87,7 @@ function useSetupProposalsCache({
   setStates,
   setConfigs,
   setRealms,
+  setGovernances,
 }: {
   connection: Connection;
   setProposals: React.Dispatch<React.SetStateAction<{}>>;
@@ -89,6 +95,7 @@ function useSetupProposalsCache({
   setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
+  setGovernances: React.Dispatch<React.SetStateAction<{}>>;
 }) {
   useEffect(() => {
     const PROGRAM_IDS = utils.programIds();
@@ -106,8 +113,9 @@ function useSetupProposalsCache({
         ParsedAccount<GovernanceTransaction>
       > = {};
       const newStates: Record<string, ParsedAccount<ProposalState>> = {};
-      const newConfigs: Record<string, ParsedAccount<Governance>> = {};
+      const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
       const newRealms: Record<string, ParsedAccount<Realm>> = {};
+      const newGovernances: Record<string, ParsedAccount<Governance>> = {};
 
       all[0].forEach(a => {
         let cached;
@@ -116,6 +124,12 @@ function useSetupProposalsCache({
           cache.add(a.pubkey, a.account, RealmParser);
           cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
           newRealms[a.pubkey.toBase58()] = cached;
+        } else if (
+          a.account.data[0] === GovernanceAccountType.AccountGovernance
+        ) {
+          cache.add(a.pubkey, a.account, GovernanceParser);
+          cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
+          newGovernances[a.pubkey.toBase58()] = cached;
         }
 
         switch (a.account.data.length) {
@@ -132,8 +146,8 @@ function useSetupProposalsCache({
             newTransactions[a.pubkey.toBase58()] = cached;
             break;
           case GovernanceLayout.span:
-            cache.add(a.pubkey, a.account, GovernanceParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
+            cache.add(a.pubkey, a.account, GovernanceOldParser);
+            cached = cache.get(a.pubkey) as ParsedAccount<GovernanceOld>;
             newConfigs[a.pubkey.toBase58()] = cached;
             break;
           case ProposalStateLayout.span:
@@ -149,6 +163,7 @@ function useSetupProposalsCache({
       setStates(newStates);
       setConfigs(newConfigs);
       setRealms(newRealms);
+      setGovernances(newGovernances);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
@@ -166,6 +181,16 @@ function useSetupProposalsCache({
             ...objs,
             [pubkey.toBase58()]: cached,
           }));
+        } else if (
+          info.accountInfo.data[0] === GovernanceAccountType.AccountGovernance
+        ) {
+          cache.add(info.accountId, info.accountInfo, GovernanceParser);
+          let cached = cache.get(info.accountId) as ParsedAccount<Governance>;
+
+          setGovernances((objs: any) => ({
+            ...objs,
+            [pubkey.toBase58()]: cached,
+          }));
         }
 
         [
@@ -176,7 +201,7 @@ function useSetupProposalsCache({
             setTransactions,
           ],
           [ProposalStateLayout.span, ProposalStateParser, setStates],
-          [GovernanceLayout.span, GovernanceParser, setConfigs],
+          [GovernanceLayout.span, GovernanceOldParser, setConfigs],
         ].forEach(arr => {
           const [span, parser, setter] = arr;
           if (info.accountInfo.data.length === span) {
@@ -192,7 +217,9 @@ function useSetupProposalsCache({
                 ) as ParsedAccount<CustomSingleSignerTransaction>;
                 break;
               case GovernanceLayout.span:
-                cached = cache.get(info.accountId) as ParsedAccount<Governance>;
+                cached = cache.get(
+                  info.accountId,
+                ) as ParsedAccount<GovernanceOld>;
                 break;
               case ProposalStateLayout.span:
                 cached = cache.get(

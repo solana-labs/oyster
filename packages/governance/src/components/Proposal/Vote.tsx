@@ -2,7 +2,7 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
-  Governance,
+  GovernanceOld,
   Proposal,
   ProposalState,
   ProposalStateStatus,
@@ -27,7 +27,7 @@ export function Vote({
 }: {
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
-  governance: ParsedAccount<Governance>;
+  governance: ParsedAccount<GovernanceOld>;
   yeahVote: boolean;
 }) {
   const wallet = useWallet();

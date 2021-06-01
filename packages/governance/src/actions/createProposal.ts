@@ -11,7 +11,7 @@ import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initProposalInstruction } from '../models/initProposal';
 import {
   GOVERNANCE_PROGRAM_SEED,
-  Governance,
+  GovernanceOld,
   ProposalLayout,
   ProposalStateLayout,
 } from '../models/governance';
@@ -27,7 +27,7 @@ export const createProposal = async (
   name: string,
   description: string,
   useGovernance: boolean,
-  governance: ParsedAccount<Governance>,
+  governance: ParsedAccount<GovernanceOld>,
 ): Promise<Account> => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -191,7 +191,7 @@ async function getAssociatedAccountsAndInstructions(
   wallet: any,
   accountRentExempt: number,
   mintRentExempt: number,
-  governance: ParsedAccount<Governance>,
+  governance: ParsedAccount<GovernanceOld>,
   useGovernance: boolean,
   sourceMintDecimals: number,
   newProposalKey: Account,

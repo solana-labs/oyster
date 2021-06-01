@@ -54,9 +54,9 @@ export enum GovernanceInstruction {
 export enum GovernanceAccountType {
   Uninitialized = 0,
   Realm = 1,
+  AccountGovernance = 3,
 
-  Governance = 2,
-  Proposal = 3,
+  Proposal = 7,
   ProposalState = 4,
   VoteRecord = 5,
   CustomSingleSignerTransaction = 6,
@@ -133,6 +133,22 @@ export class Realm {
   }
 }
 
+export class Governance {
+  accountType: GovernanceAccountType;
+  config: GovernanceConfig;
+  proposalCount: number;
+
+  constructor(args: {
+    accountType: number;
+    config: GovernanceConfig;
+    proposalCount: number;
+  }) {
+    this.accountType = args.accountType;
+    this.config = args.config;
+    this.proposalCount = args.proposalCount;
+  }
+}
+
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
     CreateRealmArgs,
@@ -153,6 +169,17 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['communityMint', 'pubkey'],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
+      ],
+    },
+  ],
+  [
+    Governance,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['config', GovernanceConfig],
+        ['proposalCount', 'u32'],
       ],
     },
   ],
@@ -195,6 +222,26 @@ export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
   } as ParsedAccountBase;
 };
 
+export const GovernanceParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = deserializeBorsh(
+    GOVERNANCE_SCHEMA,
+    Governance,
+    buffer,
+  ) as Governance;
+
+  return {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: data,
+  } as ParsedAccountBase;
+};
+
 export interface GovernanceVotingRecord {
   /// Account type
   accountType: GovernanceAccountType;
@@ -223,7 +270,7 @@ export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = Buffe
   ],
 );
 
-export interface Governance {
+export interface GovernanceOld {
   /// Account type
   accountType: GovernanceAccountType;
   /// Vote threshold
@@ -538,7 +585,7 @@ export const CustomSingleSignerTransactionParser = (
   return details;
 };
 
-export const GovernanceParser = (
+export const GovernanceOldParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {

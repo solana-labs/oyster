@@ -14,7 +14,7 @@ import {
 
 import {
   GOVERNANCE_PROGRAM_SEED,
-  Governance,
+  GovernanceOld,
   Proposal,
   ProposalState,
 } from '../models/governance';
@@ -40,7 +40,7 @@ export const depositSourceTokensAndVote = async (
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
   sourceAccount: PublicKey,
-  governance: ParsedAccount<Governance>,
+  governance: ParsedAccount<GovernanceOld>,
   state: ParsedAccount<ProposalState>,
   yesVotingTokenAmount: number,
   noVotingTokenAmount: number,

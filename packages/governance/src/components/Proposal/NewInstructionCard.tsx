@@ -3,7 +3,7 @@ import { Card } from 'antd';
 import { Form, Input } from 'antd';
 import {
   INSTRUCTION_LIMIT,
-  Governance,
+  GovernanceOld,
   Proposal,
   ProposalState,
 } from '../../models/governance';
@@ -30,7 +30,7 @@ export function NewInstructionCard({
 }: {
   proposal: ParsedAccount<Proposal>;
   state: ParsedAccount<ProposalState>;
-  config: ParsedAccount<Governance>;
+  config: ParsedAccount<GovernanceOld>;
   position: number;
 }) {
   const [form] = Form.useForm();

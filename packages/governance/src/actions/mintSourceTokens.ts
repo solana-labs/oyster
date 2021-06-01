@@ -12,7 +12,7 @@ import {
   SequenceType,
 } from '@oyster/common';
 
-import { Governance } from '../models/governance';
+import { GovernanceOld } from '../models/governance';
 import { AccountLayout, Token } from '@solana/spl-token';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;
@@ -26,7 +26,7 @@ export interface SourceEntryInterface {
 export const mintSourceTokens = async (
   connection: Connection,
   wallet: any,
-  governance: ParsedAccount<Governance>,
+  governance: ParsedAccount<GovernanceOld>,
   useGovernance: boolean,
   entries: SourceEntryInterface[],
   setSavePerc: (num: number) => void,

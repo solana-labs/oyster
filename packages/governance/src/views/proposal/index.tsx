@@ -4,7 +4,7 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   INSTRUCTION_LIMIT,
-  Governance,
+  GovernanceOld,
   Proposal,
   ProposalState,
   ProposalStateStatus,
@@ -31,7 +31,8 @@ import { VoterTable } from '../../components/Proposal/VoterTable';
 const { TabPane } = Tabs;
 
 // eslint-disable-next-line
-export const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+export const urlRegex =
+  /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 const { useAccountByMint } = hooks;
@@ -218,7 +219,7 @@ function InnerProposalView({
   endpoint,
 }: {
   proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<Governance>;
+  governance: ParsedAccount<GovernanceOld>;
   proposalState: ParsedAccount<ProposalState>;
   sigMint: MintInfo;
   votingMint: MintInfo;
@@ -232,9 +233,10 @@ function InnerProposalView({
   const sigAccount = useAccountByMint(proposal.info.signatoryMint);
   const adminAccount = useAccountByMint(proposal.info.adminMint);
 
-  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = proposalState.info.proposalTransactions
-    .map(k => instructions[k.toBase58()])
-    .filter(k => k);
+  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] =
+    proposalState.info.proposalTransactions
+      .map(k => instructions[k.toBase58()])
+      .filter(k => k);
   const isUrl = !!proposalState.info.descLink.match(urlRegex);
   const isGist =
     !!proposalState.info.descLink.match(/gist/i) &&
@@ -461,7 +463,7 @@ function InnerProposalView({
 }
 
 function getVotesRequired(
-  governance: ParsedAccount<Governance>,
+  governance: ParsedAccount<GovernanceOld>,
   sourceMint: MintInfo,
 ): number {
   return governance.info.voteThreshold === 100
