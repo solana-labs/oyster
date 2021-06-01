@@ -13,7 +13,7 @@ import {
 } from '@oyster/common';
 
 import {
-  GOVERNANCE_AUTHORITY_SEED,
+  GOVERNANCE_PROGRAM_SEED,
   Proposal,
   ProposalState,
 } from '../models/governance';
@@ -51,7 +51,7 @@ export const addSigner = async (
   );
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 

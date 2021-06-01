@@ -6,7 +6,7 @@ import {
   PublicKey,
   Message,
 } from '@solana/web3.js';
-import { GOVERNANCE_AUTHORITY_SEED, Proposal } from '../models/governance';
+import { GOVERNANCE_PROGRAM_SEED, Proposal } from '../models/governance';
 export async function serializeInstruction({
   connection,
   instr,
@@ -23,7 +23,7 @@ export async function serializeInstruction({
     await connection.getRecentBlockhash('max')
   ).blockhash;
   const [authority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
   instructionTransaction.setSigners(authority);

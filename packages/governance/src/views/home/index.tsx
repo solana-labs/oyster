@@ -1,62 +1,35 @@
-import { Badge, Col, List, Row, Statistic } from 'antd';
+import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import { useProposals } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from './../../components/Background';
 import { useHistory } from 'react-router-dom';
-import { RegisterGovernanceMenuItem } from '../governance/register';
-import { ProposalStateStatus } from '../../models/governance';
+
+import { RegisterRealm } from './registerRealm';
 
 export const HomeView = () => {
   const history = useHistory();
-  const { configs, proposals, states } = useProposals();
+  const { realms } = useProposals();
   const { connected } = useWallet();
+
   const listData = useMemo(() => {
     const newListData: any[] = [];
 
-    Object.keys(configs).forEach(configKey => {
-      const config = configs[configKey];
-      const mint = config.info.governanceMint.toBase58();
-
-      const proposalCount = Object.keys(proposals).reduce(
-        (acc, proposalKey) => {
-          let proposal = proposals[proposalKey];
-          let state = states[proposal.info.state.toBase58()];
-          if (proposal.info.config.toBase58() === configKey) {
-            acc.active =
-              acc.active +
-              (state.info.status === ProposalStateStatus.Voting ||
-              state.info.status === ProposalStateStatus.Draft
-                ? 1
-                : 0);
-
-            acc.total = acc.total + 1;
-          }
-
-          return acc;
-        },
-        {
-          active: 0,
-          total: 0,
-        },
-      );
+    Object.keys(realms).forEach(realmKey => {
+      const realm = realms[realmKey];
+      const communityMint = realm.info.communityMint.toBase58();
 
       newListData.push({
-        href: '/governance/' + configKey,
-        title: config.info.name,
-        badge: (
-          <Badge count={proposalCount.active}>
-            <TokenIcon mintAddress={mint} size={40} />
-          </Badge>
-        ),
-        proposalCount,
-        configKey,
-        config,
+        href: '/governance/' + realmKey,
+        title: realm.info.name,
+        badge: <TokenIcon mintAddress={communityMint} size={40} />,
+        realmKey: realmKey,
+        realm,
       });
     });
     return newListData;
-  }, [configs, proposals, states]);
+  }, [realms]);
 
   return (
     <>
@@ -65,7 +38,7 @@ export const HomeView = () => {
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
             <h1>Governance</h1>
-            <RegisterGovernanceMenuItem
+            <RegisterRealm
               style={{ marginLeft: 'auto', marginRight: 0 }}
               disabled={!connected}
             />
@@ -78,22 +51,13 @@ export const HomeView = () => {
             dataSource={listData}
             renderItem={item => (
               <List.Item
-                key={item.configKey}
+                key={item.realmKey}
                 className="governance-item"
                 onClick={() => history.push(item.href)}
-                extra={
-                  <>
-                    <Statistic
-                      title="Proposals"
-                      value={item.proposalCount.total}
-                    />
-                  </>
-                }
               >
                 <List.Item.Meta
                   avatar={item.badge}
                   title={item.title}
-                  description={item.description}
                 ></List.Item.Meta>
               </List.Item>
             )}

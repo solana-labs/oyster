@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import { GOVERNANCE_AUTHORITY_SEED, Proposal } from '../models/governance';
+import { GOVERNANCE_PROGRAM_SEED, Proposal } from '../models/governance';
 import { removeSignerInstruction } from '../models/removeSigner';
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -25,7 +25,7 @@ export const removeSigner = async (
   let instructions: TransactionInstruction[] = [];
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_AUTHORITY_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 

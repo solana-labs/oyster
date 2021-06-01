@@ -7,6 +7,7 @@ import { HomeView } from './views';
 import { ProposalView } from './views/proposal';
 import { ProposalsView } from './views/proposals';
 import { GovernanceDashboard } from './views/governance';
+import { GovernancesView } from './views/governances';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
@@ -23,7 +24,11 @@ export function Routes() {
                   <Switch>
                     <Route exact path="/" component={() => <HomeView />} />
                     <Route path="/proposal/:id" children={<ProposalView />} />
-                    <Route path="/governance/:id" children={<ProposalsView />} />
+                    <Route
+                      path="/governance/:id"
+                      children={<ProposalsView />}
+                    />
+                    <Route path="/governances" children={<GovernancesView />} />
 
                     <Route
                       exact

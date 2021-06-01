@@ -4,12 +4,7 @@ import {
   Message,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  contexts,
-  utils,
-  ParsedAccount,
-  sendTransactionWithRetry,
-} from '@oyster/common';
+import { utils, ParsedAccount, sendTransactionWithRetry } from '@oyster/common';
 
 import {
   Proposal,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, ButtonProps, InputNumber, Modal, Switch } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import { GOVERNANCE_NAME_LENGTH } from '../../models/governance';
+import { MAX_REALM_NAME_LENGTH } from '../../models/governance';
 import { LABELS } from '../../constants';
 import { contexts, utils, tryParseKey } from '@oyster/common';
 import { registerProgramGovernance } from '../../actions/registerProgramGovernance';
@@ -37,7 +37,7 @@ export function RegisterGovernanceMenuItem(props: ButtonProps) {
   return (
     <>
       <Button onClick={() => setIsModalVisible(true)} {...props}>
-        {LABELS.REGISTER_GOVERNANCE}
+        {LABELS.REGISTER_REALM}
       </Button>
       <NewForm
         handleOk={handleOk}
@@ -137,14 +137,14 @@ export function NewForm({
   };
   return (
     <Modal
-      title={LABELS.REGISTER_GOVERNANCE}
+      title={LABELS.REGISTER_REALM}
       visible={isModalVisible}
       onOk={form.submit}
       onCancel={handleCancel}
     >
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
         <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-          <Input maxLength={GOVERNANCE_NAME_LENGTH} />
+          <Input maxLength={MAX_REALM_NAME_LENGTH} />
         </Form.Item>
         <Form.Item
           name="program"
@@ -155,18 +155,18 @@ export function NewForm({
         </Form.Item>
         <Form.Item
           name="governanceMint"
-          label={LABELS.GOVERNANCE_MINT}
+          label={LABELS.COMMUNITY_TOKEN_MINT}
           rules={[{ required: false }]}
         >
           <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />
         </Form.Item>
-        <Form.Item label={LABELS.USE_COUNCIL_MINT}>
+        <Form.Item label={LABELS.USE_COUNCIL_TOKEN}>
           <Switch onChange={setCouncilVisible} defaultChecked={false} />
         </Form.Item>
         {councilVisible && (
           <Form.Item
             name="councilMint"
-            label={LABELS.COUNCIL_MINT}
+            label={LABELS.COUNCIL_TOKEN_MINT}
             rules={[{ required: false }]}
           >
             <Input placeholder={LABELS.LEAVE_BLANK_IF_YOU_WANT_ONE} />

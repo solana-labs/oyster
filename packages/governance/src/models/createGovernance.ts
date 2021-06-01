@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { GOVERNANCE_NAME_LENGTH, GovernanceInstruction } from './governance';
+import { MAX_REALM_NAME_LENGTH, GovernanceInstruction } from './governance';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 
@@ -30,8 +30,8 @@ export const createGovernanceInstruction = (
 ): TransactionInstruction => {
   const PROGRAM_IDS = utils.programIds();
 
-  if (name.length > GOVERNANCE_NAME_LENGTH) {
-    throw new Error('Name is more than ' + GOVERNANCE_NAME_LENGTH);
+  if (name.length > MAX_REALM_NAME_LENGTH) {
+    throw new Error('Name is more than ' + MAX_REALM_NAME_LENGTH);
   }
 
   const dataLayout = BufferLayout.struct([
@@ -39,11 +39,11 @@ export const createGovernanceInstruction = (
     BufferLayout.u8('voteThreshold'),
     Layout.uint64('minimumSlotWaitingPeriod'),
     Layout.uint64('timeLimit'),
-    BufferLayout.seq(BufferLayout.u8(), GOVERNANCE_NAME_LENGTH, 'name'),
+    BufferLayout.seq(BufferLayout.u8(), MAX_REALM_NAME_LENGTH, 'name'),
   ]);
 
   const nameAsBytes = utils.toUTF8Array(name);
-  for (let i = nameAsBytes.length; i <= GOVERNANCE_NAME_LENGTH - 1; i++) {
+  for (let i = nameAsBytes.length; i <= MAX_REALM_NAME_LENGTH - 1; i++) {
     nameAsBytes.push(0);
   }
 

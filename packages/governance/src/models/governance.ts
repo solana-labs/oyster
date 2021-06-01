@@ -2,19 +2,21 @@ import * as Layout from '../utils/layout';
 import * as BufferLayout from 'buffer-layout';
 import BN from 'bn.js';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
-import { utils } from '@oyster/common';
+import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
-export const GOVERNANCE_NAME_LENGTH = 32;
+export const MAX_REALM_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
 export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
-/// Seed for proposal authority
-export const GOVERNANCE_AUTHORITY_SEED = 'governance';
+/// Seed  prefix for Governance Program PDAs
+export const GOVERNANCE_PROGRAM_SEED = 'governance';
 
 export enum GovernanceInstruction {
+  CreateRealm = 0,
+
   InitProposal = 1,
   AddSigner = 2,
   RemoveSigner = 3,
@@ -22,12 +24,96 @@ export enum GovernanceInstruction {
   Sign = 8,
   Vote = 9,
   CreateGovernance = 10,
-
   Execute = 11,
   DepositGovernanceTokens = 12,
   WithdrawVotingTokens = 13,
   CreateGovernanceVotingRecord = 14,
 }
+
+export enum GovernanceAccountType {
+  Uninitialized = 0,
+  Realm = 1,
+
+  Governance = 2,
+  Proposal = 3,
+  ProposalState = 4,
+  VoteRecord = 5,
+  CustomSingleSignerTransaction = 6,
+}
+
+export class CreateRealmArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.CreateRealm;
+  name: string;
+
+  constructor(args: { name: string }) {
+    this.name = args.name;
+  }
+}
+
+export class Realm {
+  accountType: GovernanceAccountType;
+
+  communityMint: PublicKey;
+
+  councilMint?: PublicKey | null;
+
+  name: string;
+
+  constructor(args: {
+    accountType: number;
+    communityMint: PublicKey;
+    councilMint?: string;
+    name: string;
+  }) {
+    this.accountType = args.accountType;
+
+    this.communityMint = args.communityMint;
+
+    this.councilMint = args.councilMint
+      ? new PublicKey(args.councilMint)
+      : null;
+
+    this.name = args.name;
+  }
+}
+
+export const GOVERNANCE_SCHEMA = new Map<any, any>([
+  [
+    CreateRealmArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['name', 'string'],
+      ],
+    },
+  ],
+  [
+    Realm,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['communityMint', 'pubkey'],
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ['name', 'string'],
+      ],
+    },
+  ],
+]);
+
+export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+  const buffer = Buffer.from(info.data);
+  const data = deserializeBorsh(GOVERNANCE_SCHEMA, Realm, buffer) as Realm;
+
+  return {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: data,
+  } as ParsedAccountBase;
+};
 
 export interface GovernanceVotingRecord {
   /// Account type
@@ -79,15 +165,6 @@ export interface Governance {
   count: number;
 }
 
-export enum GovernanceAccountType {
-  Uninitialized = 0,
-  Governance = 1,
-  Proposal = 2,
-  ProposalState = 3,
-  VoteRecord = 4,
-  CustomSingleSignerTransaction = 5,
-}
-
 export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.struct(
   [
     BufferLayout.u8('accountType'),
@@ -98,7 +175,7 @@ export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.stru
     Layout.publicKey('councilMint'),
     Layout.publicKey('program'),
     Layout.uint64('timeLimit'),
-    BufferLayout.seq(BufferLayout.u8(), GOVERNANCE_NAME_LENGTH, 'name'),
+    BufferLayout.seq(BufferLayout.u8(), MAX_REALM_NAME_LENGTH, 'name'),
     BufferLayout.u32('count'),
     BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
   ],

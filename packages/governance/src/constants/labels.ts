@@ -98,16 +98,16 @@ export const LABELS = {
   REFUNDING_YOUR_TOKENS: 'Refunding your tokens',
   TOKENS_REFUNDED: 'Your voting tokens have been refunded',
 
-  REGISTER_GOVERNANCE: 'Register',
+  REGISTER_REALM: 'Register Realm',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
 
   GOVERNANCE: 'Governance Token Holders',
   COUNCIL: 'The Council',
-  GOVERNANCE_MINT: 'Governance Mint ID',
-  USE_COUNCIL_MINT: 'Allow Council Mint?',
-  COUNCIL_MINT: 'Council Mint ID',
+  COMMUNITY_TOKEN_MINT: 'Community Token Mint',
+  USE_COUNCIL_TOKEN: 'Use Council Token',
+  COUNCIL_TOKEN_MINT: 'Council Token Mint',
 
   VOTE_PERCENT_THRESHOLD: 'Vote Threshold (%)',
 

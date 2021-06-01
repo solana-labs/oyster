@@ -5,18 +5,12 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  contexts,
-  utils,
-  actions,
-  ParsedAccount,
-  SequenceType,
-} from '@oyster/common';
+import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initProposalInstruction } from '../models/initProposal';
 import {
-  GOVERNANCE_AUTHORITY_SEED,
+  GOVERNANCE_PROGRAM_SEED,
   Governance,
   ProposalLayout,
   ProposalStateLayout,
@@ -205,10 +199,7 @@ async function getAssociatedAccountsAndInstructions(
   const PROGRAM_IDS = utils.programIds();
 
   const [authority] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
-      newProposalKey.publicKey.toBuffer(),
-    ],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), newProposalKey.publicKey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 

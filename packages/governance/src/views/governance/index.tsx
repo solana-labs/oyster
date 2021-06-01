@@ -41,13 +41,13 @@ const columns = [
     render: (number: BN) => <span>{number.toNumber()}</span>,
   },
   {
-    title: LABELS.GOVERNANCE_MINT,
+    title: LABELS.COMMUNITY_TOKEN_MINT,
     dataIndex: 'governanceMint',
     key: 'governanceMint',
     render: (key: PublicKey) => <span>{key.toBase58()}</span>,
   },
   {
-    title: LABELS.COUNCIL_MINT,
+    title: LABELS.COUNCIL_TOKEN_MINT,
     dataIndex: 'councilMint',
     key: 'councilMint',
     render: (key: PublicKey) => <span>{key?.toBase58()}</span>,

@@ -7,7 +7,7 @@ import {
 import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
-import { GOVERNANCE_AUTHORITY_SEED, Governance } from '../models/governance';
+import { GOVERNANCE_PROGRAM_SEED, Governance } from '../models/governance';
 import { createGovernanceInstruction } from '../models/createGovernance';
 import BN from 'bn.js';
 
@@ -107,7 +107,7 @@ export const registerProgramGovernance = async (
 
   const [governanceKey] = await PublicKey.findProgramAddress(
     [
-      Buffer.from(GOVERNANCE_AUTHORITY_SEED),
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
       uninitializedGovernance.program.toBuffer(),
     ],
     PROGRAM_IDS.governance.programId,

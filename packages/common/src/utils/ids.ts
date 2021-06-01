@@ -125,7 +125,7 @@ export const PROGRAM_IDS = [
   {
     name: 'localnet',
     governance: () => ({
-      programId: new PublicKey('2uWrXQ3tMurqTLe3Dmue6DzasUGV9UPqK7AK7HzS7v3D'),
+      programId: new PublicKey('GovernancerdmUu324nahyv33G5poQdLUEZ1nEytDeP'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),

@@ -28,6 +28,9 @@ import {
   ProposalStateParser,
   ProposalStateLayout,
   CustomSingleSignerTransaction,
+  Realm,
+  RealmParser,
+  GovernanceAccountType,
 } from '../models/governance';
 
 export interface ProposalsContextState {
@@ -35,22 +38,24 @@ export interface ProposalsContextState {
   transactions: Record<string, ParsedAccount<GovernanceTransaction>>;
   states: Record<string, ParsedAccount<ProposalState>>;
   configs: Record<string, ParsedAccount<Governance>>;
+  realms: Record<string, ParsedAccount<Realm>>;
 }
 
-export const ProposalsContext = React.createContext<ProposalsContextState | null>(
-  null,
-);
+export const ProposalsContext =
+  React.createContext<ProposalsContextState | null>(null);
 export default function ProposalsProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
 
-  const connection = useMemo(() => new Connection(endpoint, 'recent'), [
-    endpoint,
-  ]);
+  const connection = useMemo(
+    () => new Connection(endpoint, 'recent'),
+    [endpoint],
+  );
 
   const [proposals, setProposals] = useState({});
   const [transactions, setTransactions] = useState({});
   const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
+  const [realms, setRealms] = useState({});
 
   useSetupProposalsCache({
     connection,
@@ -58,11 +63,12 @@ export default function ProposalsProvider({ children = null as any }) {
     setTransactions,
     setStates,
     setConfigs,
+    setRealms,
   });
 
   return (
     <ProposalsContext.Provider
-      value={{ proposals, transactions, configs, states }}
+      value={{ proposals, transactions, configs, states, realms }}
     >
       {children}
     </ProposalsContext.Provider>
@@ -75,12 +81,14 @@ function useSetupProposalsCache({
   setTransactions,
   setStates,
   setConfigs,
+  setRealms,
 }: {
   connection: Connection;
   setProposals: React.Dispatch<React.SetStateAction<{}>>;
   setTransactions: React.Dispatch<React.SetStateAction<{}>>;
   setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
+  setRealms: React.Dispatch<React.SetStateAction<{}>>;
 }) {
   useEffect(() => {
     const PROGRAM_IDS = utils.programIds();
@@ -99,9 +107,17 @@ function useSetupProposalsCache({
       > = {};
       const newStates: Record<string, ParsedAccount<ProposalState>> = {};
       const newConfigs: Record<string, ParsedAccount<Governance>> = {};
+      const newRealms: Record<string, ParsedAccount<Realm>> = {};
 
       all[0].forEach(a => {
         let cached;
+
+        if (a.account.data[0] === GovernanceAccountType.Realm) {
+          cache.add(a.pubkey, a.account, RealmParser);
+          cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
+          newRealms[a.pubkey.toBase58()] = cached;
+        }
+
         switch (a.account.data.length) {
           case ProposalLayout.span:
             cache.add(a.pubkey, a.account, ProposalParser);
@@ -132,13 +148,25 @@ function useSetupProposalsCache({
       setTransactions(newTransactions);
       setStates(newStates);
       setConfigs(newConfigs);
+      setRealms(newRealms);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
       async (info: KeyedAccountInfo) => {
-        const pubkey = typeof info.accountId === 'string' ?
-            new PublicKey((info.accountId as unknown) as string) :
-            info.accountId;
+        const pubkey =
+          typeof info.accountId === 'string'
+            ? new PublicKey(info.accountId as unknown as string)
+            : info.accountId;
+
+        if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
+          cache.add(info.accountId, info.accountInfo, RealmParser);
+          let cached = cache.get(info.accountId) as ParsedAccount<Realm>;
+
+          setRealms((objs: any) => ({
+            ...objs,
+            [pubkey.toBase58()]: cached,
+          }));
+        }
 
         [
           [ProposalLayout.span, ProposalParser, setProposals],
