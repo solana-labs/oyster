@@ -3,7 +3,7 @@ import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { sign } from '../../actions/sign';
-import { Proposal, ProposalState } from '../../models/governance';
+import { Proposal, ProposalState } from '../../models/serialisation';
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;

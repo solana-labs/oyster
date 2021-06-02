@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { MAX_REALM_NAME_LENGTH } from './governance';
+import { MAX_REALM_NAME_LENGTH } from './serialisation';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
 

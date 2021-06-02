@@ -4,9 +4,10 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_PROGRAM_SEED, GOVERNANCE_SCHEMA } from './governance';
+import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { DepositGoverningTokensArgs } from './instructions';
+import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],

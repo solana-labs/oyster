@@ -6,7 +6,8 @@ import {
   PublicKey,
   Message,
 } from '@solana/web3.js';
-import { GOVERNANCE_PROGRAM_SEED, Proposal } from '../models/governance';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
+import { Proposal } from '../models/serialisation';
 export async function serializeInstruction({
   connection,
   instr,

@@ -5,7 +5,7 @@ import {
 } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { DESC_SIZE, NAME_SIZE } from './governance';
+import { DESC_SIZE, NAME_SIZE } from './serialisation';
 import { GovernanceInstruction } from './instructions';
 
 /// Initializes a new empty Proposal for Instructions that will be executed at various slots in the future in draft mode.

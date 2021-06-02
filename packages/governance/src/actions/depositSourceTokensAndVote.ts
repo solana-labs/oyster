@@ -13,11 +13,10 @@ import {
 } from '@oyster/common';
 
 import {
-  GOVERNANCE_PROGRAM_SEED,
   GovernanceOld,
   Proposal,
   ProposalState,
-} from '../models/governance';
+} from '../models/serialisation';
 
 import { AccountLayout } from '@solana/spl-token';
 
@@ -26,6 +25,7 @@ import { LABELS } from '../constants';
 import { depositSourceTokensInstruction } from '../models/depositSourceTokens';
 import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEmptyGovernanceVotingRecord';
 import { voteInstruction } from '../models/vote';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { createTokenAccount } = actions;
 const { sendTransactions, SequenceType } = contexts.Connection;

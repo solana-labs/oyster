@@ -11,7 +11,7 @@ import {
   GovernanceVotingRecord,
   GovernanceVotingRecordLayout,
   GovernanceVotingRecordParser,
-} from '../models/governance';
+} from '../models/serialisation';
 import { getGovernanceVotingRecords } from '../utils/lookups';
 
 export function useVotingRecords(proposal: PublicKey) {

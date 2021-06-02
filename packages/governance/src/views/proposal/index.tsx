@@ -9,7 +9,7 @@ import {
   ProposalState,
   ProposalStateStatus,
   GovernanceTransaction,
-} from '../../models/governance';
+} from '../../models/serialisation';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useGovernanceAccounts } from '../../contexts/proposals';

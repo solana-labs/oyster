@@ -1,6 +1,9 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
+/// Seed  prefix for Governance Program PDAs
+export const GOVERNANCE_PROGRAM_SEED = 'governance';
+
 export enum GovernanceAccountType {
   Uninitialized = 0,
   Realm = 1,

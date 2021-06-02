@@ -4,7 +4,7 @@ import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
 import './style.less';
 import { useGovernanceAccounts } from '../../contexts/proposals';
-import { Proposal } from '../../models/governance';
+import { Proposal } from '../../models/serialisation';
 import { Connection } from '@solana/web3.js';
 import { WalletAdapter } from '@solana/wallet-base';
 const { useWallet } = contexts.Wallet;

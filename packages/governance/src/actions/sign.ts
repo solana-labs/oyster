@@ -6,12 +6,9 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import {
-  GOVERNANCE_PROGRAM_SEED,
-  Proposal,
-  ProposalState,
-} from '../models/governance';
+import { Proposal, ProposalState } from '../models/serialisation';
 import { signInstruction } from '../models/sign';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;

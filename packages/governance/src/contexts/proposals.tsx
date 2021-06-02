@@ -30,7 +30,7 @@ import {
   CustomSingleSignerTransaction,
   RealmParser,
   GovernanceParser,
-} from '../models/governance';
+} from '../models/serialisation';
 import { Governance, GovernanceAccountType, Realm } from '../models/accounts';
 
 export interface ProposalsContextState {

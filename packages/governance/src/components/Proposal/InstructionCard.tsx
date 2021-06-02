@@ -18,7 +18,7 @@ import {
   ProposalState,
   ProposalStateStatus,
   GovernanceTransaction,
-} from '../../models/governance';
+} from '../../models/serialisation';
 
 import './style.less';
 

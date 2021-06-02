@@ -5,7 +5,7 @@ import {
   STATE_COLOR,
   ProposalState,
   ProposalStateStatus,
-} from '../../models/governance';
+} from '../../models/serialisation';
 
 export function StateBadgeRibbon({
   state,

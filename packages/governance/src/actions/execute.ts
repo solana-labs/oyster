@@ -10,7 +10,7 @@ import {
   Proposal,
   ProposalState,
   GovernanceTransaction,
-} from '../models/governance';
+} from '../models/serialisation';
 import { executeInstruction } from '../models/execute';
 import { LABELS } from '../constants';
 import { getMessageAccountInfos } from '../utils/transactions';

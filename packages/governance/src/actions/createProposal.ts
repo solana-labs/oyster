@@ -10,11 +10,11 @@ import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { initProposalInstruction } from '../models/initProposal';
 import {
-  GOVERNANCE_PROGRAM_SEED,
   GovernanceOld,
   ProposalLayout,
   ProposalStateLayout,
-} from '../models/governance';
+} from '../models/serialisation';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { cache } = contexts.Accounts;
 const { sendTransactions } = contexts.Connection;

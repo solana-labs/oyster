@@ -25,9 +25,6 @@ export const INSTRUCTION_LIMIT = 450;
 export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
-/// Seed  prefix for Governance Program PDAs
-export const GOVERNANCE_PROGRAM_SEED = 'governance';
-
 // temp workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader;

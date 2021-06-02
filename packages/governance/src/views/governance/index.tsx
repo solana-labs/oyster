@@ -9,7 +9,7 @@ import {
   deserializeMint,
   ParsedAccount,
 } from '@oyster/common';
-import { GovernanceOld } from '../../models/governance';
+import { GovernanceOld } from '../../models/serialisation';
 import { PublicKey } from '@solana/web3.js';
 import { Table } from 'antd';
 import MintSourceTokens from '../../components/Proposal/MintSourceTokens';

@@ -13,14 +13,14 @@ import {
 } from '@oyster/common';
 
 import {
-  GOVERNANCE_PROGRAM_SEED,
   Proposal,
   ProposalState,
   ProposalStateStatus,
-} from '../models/governance';
+} from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
 import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
 import { LABELS } from '../constants';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;

@@ -7,12 +7,12 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
-  GOVERNANCE_PROGRAM_SEED,
   CustomSingleSignerTransactionLayout,
   Proposal,
   ProposalState,
-} from '../models/governance';
+} from '../models/serialisation';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;

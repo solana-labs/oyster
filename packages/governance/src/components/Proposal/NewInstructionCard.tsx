@@ -6,7 +6,7 @@ import {
   GovernanceOld,
   Proposal,
   ProposalState,
-} from '../../models/governance';
+} from '../../models/serialisation';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';

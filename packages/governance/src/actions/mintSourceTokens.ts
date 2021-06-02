@@ -12,7 +12,7 @@ import {
   SequenceType,
 } from '@oyster/common';
 
-import { GovernanceOld } from '../models/governance';
+import { GovernanceOld } from '../models/serialisation';
 import { AccountLayout, Token } from '@solana/spl-token';
 import { LABELS } from '../constants';
 const { createTokenAccount } = actions;

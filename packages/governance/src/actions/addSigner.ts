@@ -12,13 +12,10 @@ import {
   actions,
 } from '@oyster/common';
 
-import {
-  GOVERNANCE_PROGRAM_SEED,
-  Proposal,
-  ProposalState,
-} from '../models/governance';
+import { Proposal, ProposalState } from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
 import { addSignerInstruction } from '../models/addSigner';
+import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;

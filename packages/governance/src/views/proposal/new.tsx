@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, ButtonProps, Modal, Radio } from 'antd';
 import { Form, Input, Select } from 'antd';
 import { Account } from '@solana/web3.js';
-import { DESC_SIZE, NAME_SIZE } from '../../models/governance';
+import { DESC_SIZE, NAME_SIZE } from '../../models/serialisation';
 import { LABELS } from '../../constants';
 import { contexts, utils } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, ButtonProps, Modal, Switch } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import { MAX_REALM_NAME_LENGTH } from '../../models/governance';
+import { MAX_REALM_NAME_LENGTH } from '../../models/serialisation';
 import { LABELS } from '../../constants';
 import { contexts, utils, tryParseKey } from '@oyster/common';
 import { Redirect } from 'react-router';

@@ -6,7 +6,7 @@ import {
   Proposal,
   ProposalState,
   ProposalStateStatus,
-} from '../../models/governance';
+} from '../../models/serialisation';
 import { LABELS } from '../../constants';
 import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
 import { contexts, hooks } from '@oyster/common';
