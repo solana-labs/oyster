@@ -83,7 +83,7 @@ export const ProposalsView = () => {
           </div>
 
           <NewProposal
-            props={{ className: 'proposals-new-btn' }}
+            props={{ className: 'proposals-new-btn', disabled: !connected }}
             governance={governance}
             // disabled={!connected}
           />
