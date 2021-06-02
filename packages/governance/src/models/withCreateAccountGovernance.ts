@@ -11,7 +11,7 @@ import {
 } from './governance';
 import { serialize } from 'borsh';
 
-export const createAccountGovernance = async (
+export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],
   realm: PublicKey,
   config: GovernanceConfig,

@@ -3,7 +3,7 @@ import { utils, sendTransaction } from '@oyster/common';
 
 import { Realm } from '../models/governance';
 
-import { createRealm } from '../models/createRealm';
+import { withCreateRealm } from '../models/withCreateRealm';
 
 const { notify } = utils;
 
@@ -14,7 +14,7 @@ export const registerRealm = async (
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
-  const { realmAddress } = await createRealm(
+  const { realmAddress } = await withCreateRealm(
     instructions,
     realm.name,
     realm.communityMint,

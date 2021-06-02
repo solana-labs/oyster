@@ -1,6 +1,6 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
-import { createAccountGovernance } from '../models/createAccountGovernance';
+import { withCreateAccountGovernance } from '../models/withCreateAccountGovernance';
 import { GovernanceType } from '../models/enums';
 import { GovernanceConfig } from '../models/governance';
 
@@ -25,7 +25,7 @@ export const registerGovernance = async (
 
   if (governanceType === GovernanceType.Account) {
     governanceAddress = (
-      await createAccountGovernance(
+      await withCreateAccountGovernance(
         instructions,
         realm,
         config,
