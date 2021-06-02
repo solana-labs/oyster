@@ -14,6 +14,7 @@ export const LABELS = {
   SETTINGS_TOOLTIP: 'Settings',
   DASHBOARD_INFO: 'Connect to a wallet to view proposals.',
   DESCRIPTION: 'Description',
+  DESCRIPTION_LABEL: 'description',
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
   SIG_GIVEN: 'Signatories',
@@ -45,7 +46,7 @@ export const LABELS = {
   GOVERNANCE_TOKENS_ADDED: 'Governance tokens added.',
   NEW_VOTED_ACCOUNT_ADDED: 'New vote account added.',
   ADDING_NEW_VOTE_ACCOUNT: 'Adding new vote account...',
-  PROPOSAL_MINT_TYPE: 'Who votes?',
+  WHO_VOTES_QUESTION: 'who votes?',
   TRANSACTION: 'Transaction - ',
   CANT_GIVE_ZERO_TOKENS: "Can't give zero tokens to a user!",
   BULK_TOKENS: 'Token Holders',
@@ -116,7 +117,7 @@ export const LABELS = {
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
 
-  GOVERNANCE: 'Governance Token Holders',
+  COMMUNITY_TOKEN_HOLDERS: 'Community Token Holders',
   COUNCIL: 'The Council',
   COMMUNITY_TOKEN_MINT: 'community token mint',
   USE_COUNCIL_TOKEN: 'use council token',
@@ -135,6 +136,7 @@ export const LABELS = {
   CONFIG: 'Governed Program',
   GIST_PLACEHOLDER: 'Github Gist link',
   NAME: 'Name',
+
   PUBLIC_KEY: 'Public Key',
   MENU_GOVERNANCE: 'My Governed Programs',
   LEAVE_BLANK_IF_YOU_WANT_ONE: 'Leave blank if you want one made for you',

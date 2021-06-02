@@ -5,7 +5,7 @@ import './style.less'; // Don't remove this line, it will break dark mode if you
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { useHistory, useParams } from 'react-router-dom';
 import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
-import { NewProposalMenuItem } from '../proposal/new';
+import { NewProposal } from '../proposal/NewProposal';
 const PAGE_SIZE = 10;
 
 export const ProposalsView = () => {
@@ -74,9 +74,9 @@ export const ProposalsView = () => {
             </a>
           </div>
 
-          <NewProposalMenuItem
+          <NewProposal
             className="proposals-new-btn"
-            disabled={!connected}
+            // disabled={!connected}
           />
         </div>
         <h1 className="proposals-list-title">Proposals</h1>

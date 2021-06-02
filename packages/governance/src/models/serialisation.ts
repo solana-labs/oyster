@@ -7,6 +7,7 @@ import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
   CreateAccountGovernanceArgs,
+  CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
   WithdrawGoverningTokensArgs,
@@ -54,18 +55,6 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
-    Realm,
-    {
-      kind: 'struct',
-      fields: [
-        ['accountType', 'u8'],
-        ['communityMint', 'pubkey'],
-        ['councilMint', { kind: 'option', type: 'pubkey' }],
-        ['name', 'string'],
-      ],
-    },
-  ],
-  [
     DepositGoverningTokensArgs,
     {
       kind: 'struct',
@@ -77,6 +66,40 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    CreateAccountGovernanceArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
+      ],
+    },
+  ],
+  [
+    CreateProposalArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['name', 'string'],
+        ['descriptionLink', 'string'],
+        ['governingTokenMint', 'pubkey'],
+      ],
+    },
+  ],
+  [
+    Realm,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['communityMint', 'pubkey'],
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ['name', 'string'],
+      ],
     },
   ],
   [
@@ -104,16 +127,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
-  [
-    CreateAccountGovernanceArgs,
-    {
-      kind: 'struct',
-      fields: [
-        ['instruction', 'u8'],
-        ['config', GovernanceConfig],
-      ],
-    },
-  ],
+
   [
     TokenOwnerRecord,
     {

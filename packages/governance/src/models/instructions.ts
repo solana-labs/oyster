@@ -1,22 +1,39 @@
+import { PublicKey } from '@solana/web3.js';
+
 import { GovernanceConfig } from './accounts';
 
 export enum GovernanceInstruction {
-  CreateRealm = 0,
-  DepositGoverningTokens = 1,
-  WithdrawGoverningTokens = 2,
-  CreateAccountGovernance = 4,
+  CreateRealm = 0, // done
+  DepositGoverningTokens = 1, // done
+  WithdrawGoverningTokens = 2, // done
+  SetGovernanceDelegate = 3, // --
+  CreateAccountGovernance = 4, // done
+  CreateProgramGovernance = 5,
 
-  InitProposal = 1,
-  AddSigner = 2,
-  RemoveSigner = 3,
-  AddCustomSingleSignerTransaction = 15,
-  Sign = 8,
-  Vote = 9,
-  CreateGovernance = 10,
-  Execute = 11,
-  DepositGovernanceTokens = 12,
-  WithdrawVotingTokens = 13,
-  CreateGovernanceVotingRecord = 14,
+  CreateProposal = 6,
+
+  AddSignatory = 7,
+  RemoveSignatory = 8,
+  InsertInstruction = 9,
+  RemoveInstruction = 10,
+  CancelProposal = 11,
+  SignOffProposal = 12,
+  CastVote = 13,
+  FinalizeVote = 14,
+  RelinquishVote = 15,
+  ExecuteInstruction = 16,
+
+  InitProposal = 17,
+  AddSigner = 18,
+  RemoveSigner = 19,
+  AddCustomSingleSignerTransaction = 20,
+  Sign = 21,
+  Vote = 22,
+  CreateGovernance = 23,
+  Execute = 24,
+  DepositGovernanceTokens = 25,
+  WithdrawVotingTokens = 26,
+  CreateGovernanceVotingRecord = 27,
 }
 
 export class CreateRealmArgs {
@@ -45,5 +62,22 @@ export class CreateAccountGovernanceArgs {
 
   constructor(args: { config: GovernanceConfig }) {
     this.config = args.config;
+  }
+}
+
+export class CreateProposalArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.CreateProposal;
+  name: string;
+  descriptionLink: string;
+  governingTokenMint: PublicKey;
+
+  constructor(args: {
+    name: string;
+    descriptionLink: string;
+    governingTokenMint: PublicKey;
+  }) {
+    this.name = args.name;
+    this.descriptionLink = args.descriptionLink;
+    this.governingTokenMint = args.governingTokenMint;
   }
 }
