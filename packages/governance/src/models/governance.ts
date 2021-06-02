@@ -5,7 +5,10 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
-import { GovernanceInstruction } from './instructions';
+import {
+  GovernanceInstruction,
+  WithdrawGoverningTokensArgs,
+} from './instructions';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
@@ -161,6 +164,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
   [
     DepositGoverningTokensArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    WithdrawGoverningTokensArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],

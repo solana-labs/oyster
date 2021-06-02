@@ -1,28 +1,19 @@
 import { utils } from '@oyster/common';
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
-import {
-  DepositGoverningTokensArgs,
-  GOVERNANCE_PROGRAM_SEED,
-  GOVERNANCE_SCHEMA,
-} from './governance';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { GOVERNANCE_PROGRAM_SEED, GOVERNANCE_SCHEMA } from './governance';
 import { serialize } from 'borsh';
+import { WithdrawGoverningTokensArgs } from './instructions';
 
 export const withWithdrawGoverningTokens = async (
   instructions: TransactionInstruction[],
   realm: PublicKey,
-  governingTokenSource: PublicKey,
+  governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
-  transferAuthority: PublicKey,
-  payer: PublicKey,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
-  const args = new DepositGoverningTokensArgs();
+  const args = new WithdrawGoverningTokensArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
@@ -56,7 +47,7 @@ export const withWithdrawGoverningTokens = async (
       isSigner: false,
     },
     {
-      pubkey: governingTokenSource,
+      pubkey: governingTokenDestination,
       isWritable: true,
       isSigner: false,
     },
@@ -66,32 +57,13 @@ export const withWithdrawGoverningTokens = async (
       isSigner: true,
     },
     {
-      pubkey: transferAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
       pubkey: tokenOwnerRecordAddress,
       isWritable: true,
       isSigner: false,
     },
-    {
-      pubkey: payer,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: PROGRAM_IDS.system,
-      isWritable: false,
-      isSigner: false,
-    },
+
     {
       pubkey: PROGRAM_IDS.token,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

@@ -54,7 +54,7 @@ export function WithdrawGoverningTokens({
               await withdrawGoverningTokens(
                 connection,
                 realm!.pubkey,
-                governingTokenAccount,
+                governingTokenAccount.pubkey,
                 governingTokenMint,
                 wallet.wallet,
               );

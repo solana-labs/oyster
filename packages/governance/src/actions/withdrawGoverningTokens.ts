@@ -1,43 +1,23 @@
-import {
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-  Account,
-} from '@solana/web3.js';
-import { utils, models, sendTransaction, TokenAccount } from '@oyster/common';
-import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens';
-
-const { approve } = models;
+import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { utils, sendTransaction } from '@oyster/common';
+import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
 
 const { notify } = utils;
 
 export const withdrawGoverningTokens = async (
   connection: Connection,
   realm: PublicKey,
-  governingTokenSource: TokenAccount,
+  governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
   wallet: any,
 ) => {
   let instructions: TransactionInstruction[] = [];
-  let signers: Account[] = [];
 
-  const transferAuthority = approve(
-    instructions,
-    [],
-    governingTokenSource.pubkey,
-    wallet.publicKey,
-    governingTokenSource.info.amount.toNumber(),
-  );
-
-  signers.push(transferAuthority);
-
-  await withDepositGoverningTokens(
+  await withWithdrawGoverningTokens(
     instructions,
     realm,
-    governingTokenSource.pubkey,
+    governingTokenDestination,
     governingTokenMint,
-    wallet.publicKey,
-    transferAuthority.publicKey,
     wallet.publicKey,
   );
 
@@ -48,7 +28,7 @@ export const withdrawGoverningTokens = async (
   });
 
   try {
-    let tx = await sendTransaction(connection, wallet, instructions, signers);
+    let tx = await sendTransaction(connection, wallet, instructions, []);
 
     notify({
       message: 'Tokens have been deposited.',
