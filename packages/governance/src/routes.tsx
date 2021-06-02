@@ -25,7 +25,7 @@ export function Routes() {
                     <Route exact path="/" component={() => <HomeView />} />
                     <Route path="/proposal/:id" children={<ProposalView />} />
                     <Route
-                      path="/governance/:id"
+                      path="/governance/:key"
                       children={<ProposalsView />}
                     />
                     <Route path="/realm/:key" children={<RealmView />} />

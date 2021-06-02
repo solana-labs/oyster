@@ -4,18 +4,30 @@ import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import { DESC_SIZE, NAME_SIZE } from '../../models/serialisation';
 import { LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
+import { contexts, ParsedAccount } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
+import { Governance } from '../../models/accounts';
+import { useRealm } from '../../contexts/proposals';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 
-export function NewProposal(props: ButtonProps) {
+export function NewProposal({
+  props,
+  governance,
+}: {
+  props: ButtonProps;
+  governance: ParsedAccount<Governance> | undefined;
+}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
+
+  if (!governance) {
+    return null;
+  }
 
   const handleOk = (a: PublicKey) => {
     setIsModalVisible(false);
@@ -39,6 +51,7 @@ export function NewProposal(props: ButtonProps) {
         handleOk={handleOk}
         handleCancel={handleCancel}
         isModalVisible={isModalVisible}
+        governance={governance!}
       />
     </>
   );
@@ -48,37 +61,31 @@ export function NewProposalForm({
   handleOk,
   handleCancel,
   isModalVisible,
+  governance,
 }: {
   handleOk: (a: PublicKey) => void;
   handleCancel: () => void;
   isModalVisible: boolean;
+  governance: ParsedAccount<Governance>;
 }) {
   const [form] = Form.useForm();
   const wallet = useWallet();
   const connection = useConnection();
+  const realm = useRealm(governance.info.config.realm);
 
   const onFinish = async (values: {
     name: string;
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
   }) => {
-    const governingTokenMint = new PublicKey(
-      '96FzwVB3khGLWf7Wz1bWCV3jH53ebU7FyUYQd4PYbBAH',
-    );
-
-    const realm = new PublicKey('EBtaPjFZ4TUbDiZZAu99soRD5FKq7P8LeA6B6kePZ88x');
-
-    const governance = new PublicKey(
-      'AcJZR2Y41c8YVDFCuxruUCSmxA9oG6Hfq9okyuXpHMeN',
-    );
-
-    const proposalIndex = 0;
+    const governingTokenMint = realm.info.communityMint;
+    const proposalIndex = governance.info.proposalCount;
 
     const proposalAddress = await createProposal(
       connection,
       wallet.wallet,
-      realm,
-      governance,
+      governance.info.config.realm,
+      governance.pubkey,
       values.name,
       values.descriptionLink,
       governingTokenMint,

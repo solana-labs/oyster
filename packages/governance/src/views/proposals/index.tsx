@@ -1,11 +1,16 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { useConfig, useGovernanceAccounts } from '../../contexts/proposals';
+import {
+  useConfig,
+  useGovernanceAccounts,
+  useGovernance,
+} from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { useHistory, useParams } from 'react-router-dom';
 import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
-import { NewProposal } from '../proposal/NewProposal';
+import { NewProposal } from './NewProposal';
+import { useKeyParam } from '../../hooks/useKeyParam';
 const PAGE_SIZE = 10;
 
 export const ProposalsView = () => {
@@ -22,6 +27,9 @@ export const ProposalsView = () => {
   const tokenBackground =
     token?.extensions?.background ||
     'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
+
+  const governanceKey = useKeyParam();
+  const governance = useGovernance(governanceKey);
 
   const mint = config?.info.governanceMint.toBase58() || '';
 
@@ -75,7 +83,8 @@ export const ProposalsView = () => {
           </div>
 
           <NewProposal
-            className="proposals-new-btn"
+            props={{ className: 'proposals-new-btn' }}
+            governance={governance}
             // disabled={!connected}
           />
         </div>
