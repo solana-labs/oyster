@@ -7,7 +7,7 @@ import { HomeView } from './views';
 import { ProposalView } from './views/proposal';
 import { ProposalsView } from './views/proposals';
 import { GovernanceDashboard } from './views/governance';
-import { RealmView } from './views/realm';
+import { RealmView } from './views/realm/RealmView';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
