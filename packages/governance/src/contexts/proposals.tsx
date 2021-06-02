@@ -271,3 +271,8 @@ export const useRealmGovernances = (realm: PublicKey) => {
 
   return governances;
 };
+
+export const useRealm = (realm: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  return ctx.realms[realm.toBase58()];
+};

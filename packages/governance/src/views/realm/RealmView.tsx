@@ -1,21 +1,20 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
-import { useRealmGovernances } from '../../contexts/proposals';
+import { useRealmGovernances, useRealm } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { useWallet } from '@oyster/common';
+import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
-import { RegisterGovernance } from './registerGovernance';
-
-import { LABELS } from '../../constants';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
+import { RegisterGovernance } from './registerGovernance';
 
 export const RealmView = () => {
   const history = useHistory();
   const { connected } = useWallet();
   let realmKey = useKeyParam();
 
+  const realm = useRealm(realmKey);
   const governances = useRealmGovernances(realmKey);
 
   const listData = useMemo(() => {
@@ -37,7 +36,8 @@ export const RealmView = () => {
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
-            <h1>{LABELS.REALM}</h1>
+            <TokenIcon mintAddress={realm?.info.communityMint} size={40} />
+            <h1>{realm?.info.name}</h1>
             <RegisterGovernance
               style={{ marginLeft: 'auto', marginRight: 0 }}
               disabled={!connected}
