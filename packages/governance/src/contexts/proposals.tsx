@@ -28,12 +28,10 @@ import {
   ProposalStateParser,
   ProposalStateLayout,
   CustomSingleSignerTransaction,
-  Realm,
   RealmParser,
-  GovernanceAccountType,
-  Governance,
   GovernanceParser,
 } from '../models/governance';
+import { Governance, GovernanceAccountType, Realm } from '../models/accounts';
 
 export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<Proposal>>;

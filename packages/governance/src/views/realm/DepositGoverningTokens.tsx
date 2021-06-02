@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, ButtonProps, Col, Modal, Row } from 'antd';
 import React from 'react';
-import { Realm } from '../../models/governance';
+import { Realm } from '../../models/accounts';
 import { LABELS } from '../../constants';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';

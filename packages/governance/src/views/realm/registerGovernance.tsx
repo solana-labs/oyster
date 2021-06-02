@@ -9,7 +9,7 @@ import { Redirect } from 'react-router';
 
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
-import { GovernanceConfig } from '../../models/governance';
+import { GovernanceConfig } from '../../models/accounts';
 import BN from 'bn.js';
 
 import { useKeyParam } from '../../hooks/useKeyParam';

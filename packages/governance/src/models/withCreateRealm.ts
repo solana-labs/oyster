@@ -4,12 +4,9 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  CreateRealmArgs,
-  GOVERNANCE_PROGRAM_SEED,
-  GOVERNANCE_SCHEMA,
-} from './governance';
+import { GOVERNANCE_PROGRAM_SEED, GOVERNANCE_SCHEMA } from './governance';
 import { serialize } from 'borsh';
+import { CreateRealmArgs } from './instructions';
 
 export const withCreateRealm = async (
   instructions: TransactionInstruction[],

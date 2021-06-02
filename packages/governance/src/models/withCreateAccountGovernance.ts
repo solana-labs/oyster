@@ -4,12 +4,10 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  CreateAccountGovernanceArgs,
-  GovernanceConfig,
-  GOVERNANCE_SCHEMA,
-} from './governance';
+import { GOVERNANCE_SCHEMA } from './governance';
 import { serialize } from 'borsh';
+import { GovernanceConfig } from './accounts';
+import { CreateAccountGovernanceArgs } from './instructions';
 
 export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],

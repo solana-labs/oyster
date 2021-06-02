@@ -8,7 +8,7 @@ import { contexts, utils, tryParseKey } from '@oyster/common';
 import { Redirect } from 'react-router';
 
 import { registerRealm } from '../../actions/registerRealm';
-import { Realm } from '../../models/governance';
+import { Realm } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

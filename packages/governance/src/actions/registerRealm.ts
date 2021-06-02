@@ -1,7 +1,7 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
 
-import { Realm } from '../models/governance';
+import { Realm } from '../models/accounts';
 
 import { withCreateRealm } from '../models/withCreateRealm';
 
