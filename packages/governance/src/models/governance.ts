@@ -34,6 +34,7 @@ export const GOVERNANCE_PROGRAM_SEED = 'governance';
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
+  DepositGoverningTokens = 1,
   CreateAccountGovernance = 4,
 
   InitProposal = 1,
@@ -67,6 +68,11 @@ export class CreateRealmArgs {
   constructor(args: { name: string }) {
     this.name = args.name;
   }
+}
+
+export class DepositGoverningTokensArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.DepositGoverningTokens;
 }
 
 export class GovernanceConfig {
@@ -168,6 +174,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
+    },
+  ],
+  [
+    DepositGoverningTokensArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
     },
   ],
   [

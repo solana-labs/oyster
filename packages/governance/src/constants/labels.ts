@@ -163,4 +163,8 @@ export const LABELS = {
   LARGEST_VOTERS_TABLE: 'Top Voters',
   PERCENTAGE: 'Percentage',
   TIME_LIMIT: 'time limit',
+
+  DEPOSIT_TOKENS: 'Deposit Tokens',
+  DEPOSIT_TOKENS_QUESTION: 'Deposit your tokens?',
+  DEPOSIT: 'Deposit',
 };

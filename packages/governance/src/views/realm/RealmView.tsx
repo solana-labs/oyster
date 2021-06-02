@@ -7,7 +7,8 @@ import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { RegisterGovernance } from './registerGovernance';
+import { RegisterGovernance } from './RegisterGovernance';
+import { DepositGoverningTokens } from './DepositGoverningTokens';
 
 export const RealmView = () => {
   const history = useHistory();
@@ -38,8 +39,12 @@ export const RealmView = () => {
           <div className="governance-title">
             <TokenIcon mintAddress={realm?.info.communityMint} size={40} />
             <h1>{realm?.info.name}</h1>
+            <DepositGoverningTokens
+              buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
+              realm={realm}
+            ></DepositGoverningTokens>
             <RegisterGovernance
-              style={{ marginLeft: 'auto', marginRight: 0 }}
+              style={{ marginLeft: 10, marginRight: 0 }}
               disabled={!connected}
             />
           </div>
