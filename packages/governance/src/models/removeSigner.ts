@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { GovernanceInstruction } from './governance';
+import { GovernanceInstruction } from './instructions';
 
 /// [Requires Admin token]
 /// Removes a signer from the set.

@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { GovernanceInstruction } from './governance';
+import { GovernanceInstruction } from './instructions';
 
 /// [Requires Admin token]
 /// Adds a signatory to the Proposal which means that this Proposal can't leave Draft state until yet another signatory burns

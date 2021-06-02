@@ -5,14 +5,15 @@ import { Realm } from '../../models/governance';
 import { LABELS } from '../../constants';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { depositGoverningTokens } from '../../actions/depositGoverningTokens';
+
+import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
-export function DepositGoverningTokens({
+export function WithdrawGoverningTokens({
   realm,
   buttonProps,
 }: {
@@ -27,10 +28,7 @@ export function DepositGoverningTokens({
     return null;
   }
 
-  const isVisible =
-    realm != null &&
-    governingTokenAccount &&
-    governingTokenAccount.info.amount.toNumber() > 0;
+  const isVisible = realm != null && governingTokenAccount;
 
   const governingTokenMint = realm!.info.communityMint;
 
@@ -40,20 +38,20 @@ export function DepositGoverningTokens({
       type="primary"
       onClick={() =>
         confirm({
-          title: LABELS.DEPOSIT_TOKENS,
+          title: LABELS.WITHDRAW_TOKENS,
           icon: <ExclamationCircleOutlined />,
           content: (
             <Row>
               <Col span={24}>
-                <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
+                <p>{LABELS.WITHDRAW_TOKENS_QUESTION}</p>
               </Col>
             </Row>
           ),
-          okText: LABELS.DEPOSIT,
+          okText: LABELS.WITHDRAW,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (governingTokenAccount) {
-              await depositGoverningTokens(
+              await withdrawGoverningTokens(
                 connection,
                 realm!.pubkey,
                 governingTokenAccount,
@@ -65,7 +63,7 @@ export function DepositGoverningTokens({
         })
       }
     >
-      {LABELS.DEPOSIT_TOKENS}
+      {LABELS.WITHDRAW_TOKENS}
     </Button>
   ) : null;
 }

@@ -9,6 +9,7 @@ import { useHistory } from 'react-router-dom';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { RegisterGovernance } from './RegisterGovernance';
 import { DepositGoverningTokens } from './DepositGoverningTokens';
+import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
 
 export const RealmView = () => {
   const history = useHistory();
@@ -43,6 +44,10 @@ export const RealmView = () => {
               buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
               realm={realm}
             ></DepositGoverningTokens>
+            <WithdrawGoverningTokens
+              buttonProps={{ style: { marginLeft: 10, marginRight: 0 } }}
+              realm={realm}
+            ></WithdrawGoverningTokens>
             <RegisterGovernance
               style={{ marginLeft: 10, marginRight: 0 }}
               disabled={!connected}

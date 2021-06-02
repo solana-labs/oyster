@@ -5,6 +5,7 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
+import { GovernanceInstruction } from './instructions';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
@@ -31,24 +32,6 @@ export const GOVERNANCE_PROGRAM_SEED = 'governance';
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
 };
-
-export enum GovernanceInstruction {
-  CreateRealm = 0,
-  DepositGoverningTokens = 1,
-  CreateAccountGovernance = 4,
-
-  InitProposal = 1,
-  AddSigner = 2,
-  RemoveSigner = 3,
-  AddCustomSingleSignerTransaction = 15,
-  Sign = 8,
-  Vote = 9,
-  CreateGovernance = 10,
-  Execute = 11,
-  DepositGovernanceTokens = 12,
-  WithdrawVotingTokens = 13,
-  CreateGovernanceVotingRecord = 14,
-}
 
 export enum GovernanceAccountType {
   Uninitialized = 0,

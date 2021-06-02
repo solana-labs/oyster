@@ -3,7 +3,7 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import { GovernanceInstruction } from './governance';
+import { GovernanceInstruction } from './instructions';
 import BN from 'bn.js';
 
 /// [Requires voting tokens]

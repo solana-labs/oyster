@@ -3,12 +3,9 @@ import { utils } from '@oyster/common';
 import * as Layout from '../utils/layout';
 
 import * as BufferLayout from 'buffer-layout';
-import {
-  INSTRUCTION_LIMIT,
-  GovernanceInstruction,
-  MAX_TRANSACTIONS,
-} from './governance';
+import { INSTRUCTION_LIMIT, MAX_TRANSACTIONS } from './governance';
 import BN from 'bn.js';
+import { GovernanceInstruction } from './instructions';
 
 /// [Requires Signatory token]
 /// Adds a Transaction to the Proposal. Max of 10 of any Transaction type. More than 10 will throw error.

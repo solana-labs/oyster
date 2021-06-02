@@ -1,9 +1,11 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils } from '@oyster/common';
 import * as BufferLayout from 'buffer-layout';
-import { MAX_REALM_NAME_LENGTH, GovernanceInstruction } from './governance';
+import { MAX_REALM_NAME_LENGTH } from './governance';
 import BN from 'bn.js';
 import * as Layout from '../utils/layout';
+
+import { GovernanceInstruction } from './instructions';
 
 ///   0. `[writable]` Governance account. The account pubkey needs to be set to PDA with the following seeds:
 ///           1) 'governance' const prefix, 2) Governed Program account key

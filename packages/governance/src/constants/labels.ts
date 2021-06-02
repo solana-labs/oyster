@@ -167,4 +167,7 @@ export const LABELS = {
   DEPOSIT_TOKENS: 'Deposit Tokens',
   DEPOSIT_TOKENS_QUESTION: 'Deposit your tokens?',
   DEPOSIT: 'Deposit',
+
+  WITHDRAW_TOKENS: 'Withdraw Tokens',
+  WITHDRAW_TOKENS_QUESTION: 'Withdraw your tokens?',
 };
