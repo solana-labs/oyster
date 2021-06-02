@@ -74,7 +74,7 @@ const columns = [
   },
 ];
 
-export const GovernanceDashboard = () => {
+export const DiagnosticView = () => {
   const context = useGovernanceAccounts();
   const connection = useConnection();
   const wallet = useWallet();

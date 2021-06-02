@@ -6,7 +6,7 @@ import ProposalsProvider from './contexts/proposals';
 import { HomeView } from './views';
 import { ProposalView } from './views/proposal';
 import { GovernanceView } from './views/governance/GovernanceView';
-import { GovernanceDashboard } from './views/governanceDashboard/GovernanceDashboard';
+import { DiagnosticView } from './views/diagnostic/Diagnostic';
 import { RealmView } from './views/realm/RealmView';
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -32,8 +32,8 @@ export function Routes() {
 
                     <Route
                       exact
-                      path="/dashboard"
-                      children={<GovernanceDashboard />}
+                      path="/diagnostic"
+                      children={<DiagnosticView />}
                     />
                   </Switch>
                 </AppLayout>
