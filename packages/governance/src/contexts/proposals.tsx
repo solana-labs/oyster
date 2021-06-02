@@ -304,6 +304,11 @@ export const useConfig = (id: string) => {
   return context.configs[id];
 };
 
+export const useRealms = () => {
+  const ctx = useGovernanceAccounts();
+  return Object.values(ctx.realms);
+};
+
 export const useRealmGovernances = (realm: PublicKey) => {
   const ctx = useGovernanceAccounts();
   const governances: ParsedAccount<Governance>[] = [];

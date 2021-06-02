@@ -1,9 +1,9 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
-import { useGovernanceAccounts } from '../../contexts/proposals';
+import { useRealms } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { TokenIcon, useWallet } from '@oyster/common';
-import { Background } from './../../components/Background';
+import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { RegisterRealm } from './registerRealm';
@@ -11,25 +11,16 @@ import { LABELS } from '../../constants';
 
 export const HomeView = () => {
   const history = useHistory();
-  const { realms } = useGovernanceAccounts();
+  const realms = useRealms();
   const { connected } = useWallet();
 
-  const listData = useMemo(() => {
-    const newListData: any[] = [];
-
-    Object.keys(realms).forEach(realmAddress => {
-      const realm = realms[realmAddress];
-      const communityMint = realm.info.communityMint.toBase58();
-
-      newListData.push({
-        href: '/realm/' + realmAddress,
-        title: realm.info.name,
-        badge: <TokenIcon mintAddress={communityMint} size={40} />,
-        realmKey: realmAddress,
-        realm,
-      });
-    });
-    return newListData;
+  const realmItems = useMemo(() => {
+    return realms.map(r => ({
+      href: '/realm/' + r.pubkey.toBase58(),
+      title: r.info.name,
+      badge: <TokenIcon mintAddress={r.info.communityMint} size={40} />,
+      key: r.pubkey.toBase58(),
+    }));
   }, [realms]);
 
   return (
@@ -47,12 +38,12 @@ export const HomeView = () => {
           <List
             itemLayout="vertical"
             size="large"
-            loading={listData.length === 0}
+            loading={realmItems.length === 0}
             pagination={false}
-            dataSource={listData}
+            dataSource={realmItems}
             renderItem={item => (
               <List.Item
-                key={item.realmKey}
+                key={item.key}
                 className="governance-item"
                 onClick={() => history.push(item.href)}
               >
