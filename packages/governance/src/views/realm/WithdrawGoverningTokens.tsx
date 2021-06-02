@@ -16,10 +16,8 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function WithdrawGoverningTokens({
   realm,
-  buttonProps,
 }: {
   realm: ParsedAccount<Realm> | null;
-  buttonProps: ButtonProps;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
@@ -37,7 +35,6 @@ export function WithdrawGoverningTokens({
 
   return isVisible ? (
     <Button
-      {...buttonProps}
       type="primary"
       onClick={() =>
         confirm({

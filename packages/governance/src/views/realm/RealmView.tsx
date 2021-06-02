@@ -37,22 +37,32 @@ export const RealmView = () => {
       <Background />
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
-          <div className="governance-title">
-            <TokenIcon mintAddress={realm?.info.communityMint} size={40} />
-            <h1>{realm?.info.name}</h1>
-            <DepositGoverningTokens
-              buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
-              realm={realm}
-            ></DepositGoverningTokens>
-            <WithdrawGoverningTokens
-              buttonProps={{ style: { marginLeft: 10, marginRight: 0 } }}
-              realm={realm}
-            ></WithdrawGoverningTokens>
-            <RegisterGovernance
-              style={{ marginLeft: 10, marginRight: 0 }}
-              disabled={!connected}
-            />
-          </div>
+          <Row justify="start" align="middle" className="governance-container">
+            <Col md={12} xs={24}>
+              <Row>
+                <TokenIcon mintAddress={realm?.info.communityMint} size={60} />
+                <Col>
+                  <h1>{realm?.info.name}</h1>
+                </Col>
+              </Row>
+            </Col>
+            <Col md={12} xs={24}>
+              <div className="realm-actions">
+                <DepositGoverningTokens realm={realm}></DepositGoverningTokens>
+                <WithdrawGoverningTokens
+                  realm={realm}
+                ></WithdrawGoverningTokens>
+                <RegisterGovernance
+                  disabled={!connected}
+                  className="governance-action"
+                />
+              </div>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+      <Row>
+        <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <List
             itemLayout="vertical"
             size="large"
