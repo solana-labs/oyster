@@ -5,7 +5,7 @@ import { AppLayout } from './components/Layout';
 import ProposalsProvider from './contexts/proposals';
 import { HomeView } from './views';
 import { ProposalView } from './views/proposal';
-import { ProposalsView } from './views/proposals';
+import { GovernanceView } from './views/governance/GovernanceView';
 import { GovernanceDashboard } from './views/governanceDashboard/GovernanceDashboard';
 import { RealmView } from './views/realm/RealmView';
 const { WalletProvider } = contexts.Wallet;
@@ -26,7 +26,7 @@ export function Routes() {
                     <Route path="/proposal/:id" children={<ProposalView />} />
                     <Route
                       path="/governance/:key"
-                      children={<ProposalsView />}
+                      children={<GovernanceView />}
                     />
                     <Route path="/realm/:key" children={<RealmView />} />
 

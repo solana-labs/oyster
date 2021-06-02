@@ -13,7 +13,7 @@ import { NewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 const PAGE_SIZE = 10;
 
-export const ProposalsView = () => {
+export const GovernanceView = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const { proposals, states } = useGovernanceAccounts();
