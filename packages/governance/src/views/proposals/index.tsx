@@ -1,6 +1,6 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { useConfig, useProposals } from '../../contexts/proposals';
+import { useConfig, useGovernanceAccounts } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { useHistory, useParams } from 'react-router-dom';
@@ -11,7 +11,7 @@ const PAGE_SIZE = 10;
 export const ProposalsView = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const { proposals, states } = useProposals();
+  const { proposals, states } = useGovernanceAccounts();
   const config = useConfig(id);
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();

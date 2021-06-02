@@ -7,7 +7,7 @@ import { LABELS } from '../../constants';
 import { contexts, utils } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
-import { useProposals } from '../../contexts/proposals';
+import { useGovernanceAccounts } from '../../contexts/proposals';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -67,7 +67,7 @@ export function NewForm({
   const [form] = Form.useForm();
   const wallet = useWallet();
   const connection = useConnection();
-  const context = useProposals();
+  const context = useGovernanceAccounts();
   const configs = Object.values(context.configs);
 
   const onFinish = async (values: {

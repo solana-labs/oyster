@@ -41,7 +41,7 @@ export interface ProposalsContextState {
   states: Record<string, ParsedAccount<ProposalState>>;
   configs: Record<string, ParsedAccount<GovernanceOld>>;
   realms: Record<string, ParsedAccount<Realm>>;
-  governances: Record<string, ParsedAccount<Governance>>;
+  governances: Map<string, ParsedAccount<Governance>>;
 }
 
 export const ProposalsContext =
@@ -59,7 +59,9 @@ export default function ProposalsProvider({ children = null as any }) {
   const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
   const [realms, setRealms] = useState({});
-  const [governances, setGovernances] = useState({});
+  const [governances, setGovernances] = useState(
+    new Map<string, ParsedAccount<Governance>>(),
+  );
 
   useSetupProposalsCache({
     connection,
@@ -95,7 +97,9 @@ function useSetupProposalsCache({
   setStates: React.Dispatch<React.SetStateAction<{}>>;
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
-  setGovernances: React.Dispatch<React.SetStateAction<{}>>;
+  setGovernances: React.Dispatch<
+    React.SetStateAction<Map<string, ParsedAccount<Governance>>>
+  >;
 }) {
   useEffect(() => {
     const PROGRAM_IDS = utils.programIds();
@@ -115,7 +119,7 @@ function useSetupProposalsCache({
       const newStates: Record<string, ParsedAccount<ProposalState>> = {};
       const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
       const newRealms: Record<string, ParsedAccount<Realm>> = {};
-      const newGovernances: Record<string, ParsedAccount<Governance>> = {};
+      const newGovernances = new Map<string, ParsedAccount<Governance>>();
 
       all[0].forEach(a => {
         let cached;
@@ -129,7 +133,7 @@ function useSetupProposalsCache({
         ) {
           cache.add(a.pubkey, a.account, GovernanceParser);
           cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
-          newGovernances[a.pubkey.toBase58()] = cached;
+          newGovernances.set(a.pubkey.toBase58(), cached);
         }
 
         switch (a.account.data.length) {
@@ -187,10 +191,10 @@ function useSetupProposalsCache({
           cache.add(info.accountId, info.accountInfo, GovernanceParser);
           let cached = cache.get(info.accountId) as ParsedAccount<Governance>;
 
-          setGovernances((objs: any) => ({
-            ...objs,
-            [pubkey.toBase58()]: cached,
-          }));
+          setGovernances(map => {
+            map.set(pubkey.toBase58(), cached);
+            return map;
+          });
         }
 
         [
@@ -241,7 +245,7 @@ function useSetupProposalsCache({
     };
   }, [connection]); //eslint-disable-line
 }
-export const useProposals = () => {
+export const useGovernanceAccounts = () => {
   const context = useContext(ProposalsContext);
   return context as ProposalsContextState;
 };
@@ -253,4 +257,17 @@ export const useConfig = (id: string) => {
   }
 
   return context.configs[id];
+};
+
+export const useRealmGovernances = (realm: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  const governances: ParsedAccount<Governance>[] = [];
+
+  ctx.governances.forEach(g => {
+    if (g.info.config.realm.toBase58() === realm.toBase58()) {
+      governances.push(g);
+    }
+  });
+
+  return governances;
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import { GUTTER } from '../../constants';
 import { contexts, hooks, ParsedAccount } from '@oyster/common';
 import './style.less';
-import { useProposals } from '../../contexts/proposals';
+import { useGovernanceAccounts } from '../../contexts/proposals';
 import { Proposal } from '../../models/governance';
 import { Connection } from '@solana/web3.js';
 import { WalletAdapter } from '@solana/wallet-base';
@@ -14,7 +14,7 @@ const { useAccountByMint } = hooks;
 export const DashboardView = () => {
   const wallet = useWallet();
   const connection = useConnection();
-  const context = useProposals();
+  const context = useGovernanceAccounts();
   const proposal = Object.keys(context.proposals).length
     ? context.proposals[Object.keys(context.proposals)[0]]
     : null;

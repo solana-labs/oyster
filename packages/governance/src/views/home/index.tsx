@@ -1,6 +1,6 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
-import { useProposals } from '../../contexts/proposals';
+import { useGovernanceAccounts } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from './../../components/Background';
@@ -11,7 +11,7 @@ import { LABELS } from '../../constants';
 
 export const HomeView = () => {
   const history = useHistory();
-  const { realms } = useProposals();
+  const { realms } = useGovernanceAccounts();
   const { connected } = useWallet();
 
   const listData = useMemo(() => {

@@ -28,7 +28,7 @@ export function Routes() {
                       path="/governance/:id"
                       children={<ProposalsView />}
                     />
-                    <Route path="/realm/:id" children={<RealmView />} />
+                    <Route path="/realm/:key" children={<RealmView />} />
 
                     <Route
                       exact

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useProposals } from '../../contexts/proposals';
+import { useGovernanceAccounts } from '../../contexts/proposals';
 import { LABELS } from '../../constants';
 
 import {
@@ -75,7 +75,7 @@ const columns = [
 ];
 
 export const GovernanceDashboard = () => {
-  const context = useProposals();
+  const context = useGovernanceAccounts();
   const connection = useConnection();
   const wallet = useWallet();
   const configs = Object.values(context.configs);

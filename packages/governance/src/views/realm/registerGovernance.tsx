@@ -12,6 +12,8 @@ import { registerGovernance } from '../../actions/registerGovernance';
 import { GovernanceConfig } from '../../models/governance';
 import BN from 'bn.js';
 
+import { useKeyParam } from '../../hooks/useKeyParam';
+
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { notify } = utils;
@@ -19,6 +21,7 @@ const { notify } = utils;
 export function RegisterGovernance(props: ButtonProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
+
   const handleOk = (a: PublicKey) => {
     setIsModalVisible(false);
     setRedirect(a.toBase58());
@@ -56,6 +59,7 @@ export function NewGovernanceForm({
   isModalVisible: boolean;
 }) {
   const [form] = Form.useForm();
+  const realmKey = useKeyParam();
 
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
 
@@ -79,10 +83,8 @@ export function NewGovernanceForm({
       return;
     }
 
-    const realm = new PublicKey('7AseJVKuWkNJb9VHwbW2J5j5F6HjkBYrQjGCf1MegoXf');
-
     const config = new GovernanceConfig({
-      realm: realm,
+      realm: realmKey,
       governedAccount: new PublicKey(values.governedAccountAddress),
       yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
       minTokensToCreateProposal: values.minTokensToCreateProposal,
@@ -93,8 +95,8 @@ export function NewGovernanceForm({
     const governanceAddress = await registerGovernance(
       connection,
       wallet.wallet,
-      values.governanceType,
-      realm,
+      values.governanceType ?? GovernanceType.Account,
+      realmKey,
       config,
     );
 
@@ -123,11 +125,7 @@ export function NewGovernanceForm({
         name="control-hooks"
         onFinish={onFinish}
       >
-        <Form.Item
-          label={LABELS.GOVERNANCE_OVER}
-          name="governanceType"
-          rules={[{ required: true }]}
-        >
+        <Form.Item label={LABELS.GOVERNANCE_OVER} name="governanceType">
           <Radio.Group
             defaultValue={GovernanceType.Account}
             onChange={e => setGovernanceType(e.target.value)}

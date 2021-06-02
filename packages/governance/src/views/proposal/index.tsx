@@ -12,7 +12,7 @@ import {
 } from '../../models/governance';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { useProposals } from '../../contexts/proposals';
+import { useGovernanceAccounts } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -45,7 +45,7 @@ export enum VoteType {
 }
 
 export const ProposalView = () => {
-  const context = useProposals();
+  const context = useGovernanceAccounts();
   const { id } = useParams<{ id: string }>();
   const proposal = context.proposals[id];
   const governance = context.configs[proposal?.info.config.toBase58()];
