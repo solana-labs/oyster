@@ -20,11 +20,17 @@ export const RealmView = () => {
   const governances = useRealmGovernances(realmKey);
 
   const governanceItems = useMemo(() => {
-    return governances.map(g => ({
-      key: g.pubkey.toBase58(),
-      href: '/governance/' + g.pubkey,
-      title: g.info.config.governedAccount.toBase58(),
-    }));
+    return governances
+      .sort((g1, g2) =>
+        g1.info.config.governedAccount
+          .toBase58()
+          .localeCompare(g2.info.config.governedAccount.toBase58()),
+      )
+      .map(g => ({
+        key: g.pubkey.toBase58(),
+        href: '/governance/' + g.pubkey,
+        title: g.info.config.governedAccount.toBase58(),
+      }));
   }, [governances]);
 
   return (

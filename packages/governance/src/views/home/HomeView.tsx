@@ -15,12 +15,14 @@ export const HomeView = () => {
   const { connected } = useWallet();
 
   const realmItems = useMemo(() => {
-    return realms.map(r => ({
-      href: '/realm/' + r.pubkey.toBase58(),
-      title: r.info.name,
-      badge: <TokenIcon mintAddress={r.info.communityMint} size={40} />,
-      key: r.pubkey.toBase58(),
-    }));
+    return realms
+      .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
+      .map(r => ({
+        href: '/realm/' + r.pubkey.toBase58(),
+        title: r.info.name,
+        badge: <TokenIcon mintAddress={r.info.communityMint} size={40} />,
+        key: r.pubkey.toBase58(),
+      }));
   }, [realms]);
 
   return (
