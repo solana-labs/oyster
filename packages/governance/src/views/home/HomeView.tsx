@@ -6,7 +6,7 @@ import { TokenIcon, useWallet } from '@oyster/common';
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
-import { RegisterRealm } from './registerRealm';
+import { RegisterRealm } from './RegisterRealm';
 import { LABELS } from '../../constants';
 
 export const HomeView = () => {
