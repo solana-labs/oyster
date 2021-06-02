@@ -7,6 +7,7 @@ export const GOVERNANCE_PROGRAM_SEED = 'governance';
 export enum GovernanceAccountType {
   Uninitialized = 0,
   Realm = 1,
+  TokenOwnerRecord = 2,
   AccountGovernance = 3,
 
   Proposal = 7,
@@ -16,7 +17,7 @@ export enum GovernanceAccountType {
 }
 
 export class Realm {
-  accountType: GovernanceAccountType;
+  accountType = GovernanceAccountType.Realm;
 
   communityMint: PublicKey;
 
@@ -25,13 +26,10 @@ export class Realm {
   name: string;
 
   constructor(args: {
-    accountType: number;
     communityMint: PublicKey;
     councilMint?: string;
     name: string;
   }) {
-    this.accountType = args.accountType;
-
     this.communityMint = args.communityMint;
 
     this.councilMint = args.councilMint
@@ -80,5 +78,39 @@ export class Governance {
     this.accountType = args.accountType;
     this.config = args.config;
     this.proposalCount = args.proposalCount;
+  }
+}
+
+export class TokenOwnerRecord {
+  accountType = GovernanceAccountType.TokenOwnerRecord;
+
+  realm: PublicKey;
+
+  governingTokenMint: PublicKey;
+
+  governingTokenOwner: PublicKey;
+
+  governingTokenDepositAmount: BN;
+
+  governanceDelegate?: PublicKey;
+
+  unrelinquishedVotesCount: number;
+
+  totalVotesCount: number;
+
+  constructor(args: {
+    realm: PublicKey;
+    governingTokenMint: PublicKey;
+    governingTokenOwner: PublicKey;
+    governingTokenDepositAmount: BN;
+    unrelinquishedVotesCount: number;
+    totalVotesCount: number;
+  }) {
+    this.realm = args.realm;
+    this.governingTokenMint = args.governingTokenMint;
+    this.governingTokenOwner = args.governingTokenOwner;
+    this.governingTokenDepositAmount = args.governingTokenDepositAmount;
+    this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
+    this.totalVotesCount = args.totalVotesCount;
   }
 }

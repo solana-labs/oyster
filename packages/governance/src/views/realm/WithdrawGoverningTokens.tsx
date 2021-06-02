@@ -7,6 +7,7 @@ import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
+import { useTokenOwnerRecord } from '../../contexts/proposals';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -23,12 +24,14 @@ export function WithdrawGoverningTokens({
   const wallet = useWallet();
   const connection = useConnection();
   const governingTokenAccount = useAccountByMint(realm?.info.communityMint);
+  const tokenOwnerRecord = useTokenOwnerRecord(realm?.pubkey);
 
-  if (!realm) {
+  if (!realm || !tokenOwnerRecord) {
     return null;
   }
 
-  const isVisible = realm != null && governingTokenAccount;
+  const isVisible =
+    tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0;
 
   const governingTokenMint = realm!.info.communityMint;
 

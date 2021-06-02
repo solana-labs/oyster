@@ -16,6 +16,7 @@ import {
   GovernanceAccountType,
   GovernanceConfig,
   Realm,
+  TokenOwnerRecord,
 } from './accounts';
 
 export const DESC_SIZE = 200;
@@ -113,6 +114,22 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
+  [
+    TokenOwnerRecord,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['realm', 'pubkey'],
+        ['governingTokenMint', 'pubkey'],
+        ['governingTokenOwner', 'pubkey'],
+        ['governingTokenDepositAmount', 'u64'],
+        ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
+        ['unrelinquishedVotesCount', 'u32'],
+        ['totalVotesCount', 'u32'],
+      ],
+    },
+  ],
 ]);
 
 export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
@@ -138,6 +155,26 @@ export const GovernanceParser = (
     Governance,
     buffer,
   ) as Governance;
+
+  return {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: data,
+  } as ParsedAccountBase;
+};
+
+export const TokenOwnerRecordParser = (
+  pubKey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const buffer = Buffer.from(info.data);
+  const data = deserializeBorsh(
+    GOVERNANCE_SCHEMA,
+    TokenOwnerRecord,
+    buffer,
+  ) as TokenOwnerRecord;
 
   return {
     pubkey: pubKey,
