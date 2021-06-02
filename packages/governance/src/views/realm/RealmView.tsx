@@ -19,26 +19,21 @@ export const RealmView = () => {
   const realm = useRealm(realmKey);
   const governances = useRealmGovernances(realmKey);
 
-  const listData = useMemo(() => {
-    const newListData: any[] = [];
-
-    governances.forEach(g => {
-      newListData.push({
-        key: g.pubkey,
-        href: '/governance/' + g.pubkey,
-        title: g.info.config.governedAccount.toBase58(),
-      });
-    });
-    return newListData;
+  const governanceItems = useMemo(() => {
+    return governances.map(g => ({
+      key: g.pubkey.toBase58(),
+      href: '/governance/' + g.pubkey,
+      title: g.info.config.governedAccount.toBase58(),
+    }));
   }, [governances]);
 
   return (
     <>
       <Background />
       <Row>
-        <Col flex="auto" xxl={15} xs={24} className="governance-container">
-          <Row justify="start" align="middle" className="governance-container">
-            <Col md={12} xs={24}>
+        <Col flex="auto" xxl={15} xs={24} className="realm-container">
+          <Row>
+            <Col md={12} xs={24} className="realm-title">
               <Row>
                 <TokenIcon mintAddress={realm?.info.communityMint} size={60} />
                 <Col>
@@ -62,17 +57,17 @@ export const RealmView = () => {
         </Col>
       </Row>
       <Row>
-        <Col flex="auto" xxl={15} xs={24} className="governance-container">
+        <Col flex="auto" xxl={15} xs={24} className="realm-container">
           <List
             itemLayout="vertical"
             size="large"
-            loading={listData.length === 0}
+            loading={governanceItems.length === 0}
             pagination={false}
-            dataSource={listData}
+            dataSource={governanceItems}
             renderItem={item => (
               <List.Item
                 key={item.key}
-                className="governance-item"
+                className="realm-item"
                 onClick={() => history.push(item.href)}
               >
                 <List.Item.Meta title={item.title}></List.Item.Meta>

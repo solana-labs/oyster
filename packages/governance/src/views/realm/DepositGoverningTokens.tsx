@@ -1,5 +1,5 @@
 import { ParsedAccount } from '@oyster/common';
-import { Button, ButtonProps, Col, Modal, Row } from 'antd';
+import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { Realm } from '../../models/accounts';
 import { LABELS } from '../../constants';
