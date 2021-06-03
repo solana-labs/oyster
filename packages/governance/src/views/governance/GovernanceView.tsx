@@ -16,7 +16,7 @@ const PAGE_SIZE = 10;
 export const GovernanceView = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const { proposals, states } = useGovernanceAccounts();
+  const { proposalsOld: proposals, states } = useGovernanceAccounts();
   const config = useConfig(id);
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();

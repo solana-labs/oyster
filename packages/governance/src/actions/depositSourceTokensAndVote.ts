@@ -14,7 +14,7 @@ import {
 
 import {
   GovernanceOld,
-  Proposal,
+  ProposalOld,
   ProposalState,
 } from '../models/serialisation';
 
@@ -35,7 +35,7 @@ const { approve } = models;
 export const depositSourceTokensAndVote = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ParsedAccount<ProposalOld>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,

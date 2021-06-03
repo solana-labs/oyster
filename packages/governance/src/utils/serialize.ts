@@ -7,7 +7,7 @@ import {
   Message,
 } from '@solana/web3.js';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
-import { Proposal } from '../models/serialisation';
+import { ProposalOld } from '../models/serialisation';
 export async function serializeInstruction({
   connection,
   instr,
@@ -15,7 +15,7 @@ export async function serializeInstruction({
 }: {
   connection: Connection;
   instr: TransactionInstruction;
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
 }): Promise<{ base64: string; byteArray: Uint8Array }> {
   const PROGRAM_IDS = utils.programIds();
   let instructionTransaction = new Transaction();

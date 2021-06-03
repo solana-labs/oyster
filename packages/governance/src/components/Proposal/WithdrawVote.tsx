@@ -2,7 +2,7 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
-  Proposal,
+  ProposalOld,
   ProposalState,
   ProposalStateStatus,
 } from '../../models/serialisation';
@@ -20,7 +20,7 @@ export function WithdrawVote({
   proposal,
   state,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   state: ParsedAccount<ProposalState>;
 }) {
   const wallet = useWallet();

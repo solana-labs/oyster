@@ -3,7 +3,7 @@ import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
   GovernanceOld,
-  Proposal,
+  ProposalOld,
   ProposalState,
   ProposalStateStatus,
 } from '../../models/serialisation';
@@ -25,7 +25,7 @@ export function Vote({
   governance,
   yeahVote,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   state: ParsedAccount<ProposalState>;
   governance: ParsedAccount<GovernanceOld>;
   yeahVote: boolean;

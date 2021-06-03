@@ -4,7 +4,7 @@ import { Form, Input } from 'antd';
 import {
   INSTRUCTION_LIMIT,
   GovernanceOld,
-  Proposal,
+  ProposalOld,
   ProposalState,
 } from '../../models/serialisation';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
@@ -28,7 +28,7 @@ export function NewInstructionCard({
   position,
   config,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   state: ParsedAccount<ProposalState>;
   config: ParsedAccount<GovernanceOld>;
   position: number;

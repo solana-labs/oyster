@@ -7,7 +7,7 @@ import {
 import { utils, ParsedAccount, sendTransactionWithRetry } from '@oyster/common';
 
 import {
-  Proposal,
+  ProposalOld,
   ProposalState,
   GovernanceTransaction,
 } from '../models/serialisation';
@@ -19,7 +19,7 @@ const { notify } = utils;
 export const execute = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ParsedAccount<ProposalOld>,
   state: ParsedAccount<ProposalState>,
   transaction: ParsedAccount<GovernanceTransaction>,
 ) => {

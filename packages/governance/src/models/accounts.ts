@@ -9,8 +9,10 @@ export enum GovernanceAccountType {
   Realm = 1,
   TokenOwnerRecord = 2,
   AccountGovernance = 3,
+  ProgramGovernance = 4,
+  Proposal = 5,
 
-  Proposal = 7,
+  ProposalOld = 10,
   ProposalState = 4,
   VoteRecord = 5,
   CustomSingleSignerTransaction = 6,
@@ -112,5 +114,107 @@ export class TokenOwnerRecord {
     this.governingTokenDepositAmount = args.governingTokenDepositAmount;
     this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
     this.totalVotesCount = args.totalVotesCount;
+  }
+}
+
+export enum ProposalState {
+  Draft,
+
+  SigningOff,
+
+  Voting,
+
+  Succeeded,
+
+  Executing,
+
+  Completed,
+
+  Cancelled,
+
+  Defeated,
+}
+
+export class Proposal {
+  accountType = GovernanceAccountType.Proposal;
+
+  governance: PublicKey;
+
+  governingTokenMint: PublicKey;
+
+  state: ProposalState;
+
+  tokenOwnerRecord: PublicKey;
+
+  signatoriesCount: number;
+
+  signatoriesSignedOffCount: number;
+
+  descriptionLink: string;
+
+  name: string;
+
+  yesVotesCount: BN;
+
+  noVotesCount: BN;
+
+  draftAt: BN;
+
+  signingOffAt: BN | null;
+
+  votingAt: BN | null;
+
+  votingCompletedAt: BN | null;
+
+  executingAt: BN | null;
+
+  closedAt: BN | null;
+
+  instructionsExecutedCount: number;
+
+  instructionsCount: number;
+
+  instructionsNextIndex: number;
+
+  constructor(args: {
+    governance: PublicKey;
+    governingTokenMint: PublicKey;
+    state: ProposalState;
+    tokenOwnerRecord: PublicKey;
+    signatoriesCount: number;
+    signatoriesSignedOffCount: number;
+    descriptionLink: string;
+    name: string;
+    yesVotesCount: BN;
+    noVotesCount: BN;
+    draftAt: BN;
+    signingOffAt: BN | null;
+    votingAt: BN | null;
+    votingCompletedAt: BN | null;
+    executingAt: BN | null;
+    closedAt: BN | null;
+    instructionsExecutedCount: number;
+    instructionsCount: number;
+    instructionsNextIndex: number;
+  }) {
+    this.governance = args.governance;
+    this.governingTokenMint = args.governingTokenMint;
+    this.state = args.state;
+    this.tokenOwnerRecord = args.tokenOwnerRecord;
+    this.signatoriesCount = args.signatoriesCount;
+    this.signatoriesSignedOffCount = args.signatoriesSignedOffCount;
+    this.descriptionLink = args.descriptionLink;
+    this.name = args.name;
+    this.yesVotesCount = args.yesVotesCount;
+    this.noVotesCount = args.noVotesCount;
+    this.draftAt = args.draftAt;
+    this.signingOffAt = args.signingOffAt;
+    this.votingAt = args.votingAt;
+    this.votingCompletedAt = args.votingCompletedAt;
+    this.executingAt = args.executingAt;
+    this.closedAt = args.closedAt;
+    this.instructionsExecutedCount = args.instructionsExecutedCount;
+    this.instructionsCount = args.instructionsCount;
+    this.instructionsNextIndex = args.instructionsNextIndex;
   }
 }

@@ -8,7 +8,7 @@ import {
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
   CustomSingleSignerTransactionLayout,
-  Proposal,
+  ProposalOld,
   ProposalState,
 } from '../models/serialisation';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
@@ -21,7 +21,7 @@ const { approve } = models;
 export const addCustomSingleSignerTransaction = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ParsedAccount<ProposalOld>,
   state: ParsedAccount<ProposalState>,
   sigAccount: PublicKey,
   slot: string,

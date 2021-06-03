@@ -5,7 +5,7 @@ import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   INSTRUCTION_LIMIT,
   GovernanceOld,
-  Proposal,
+  ProposalOld,
   ProposalState,
   ProposalStateStatus,
   GovernanceTransaction,
@@ -47,7 +47,7 @@ export enum VoteType {
 export const ProposalView = () => {
   const context = useGovernanceAccounts();
   const { id } = useParams<{ id: string }>();
-  const proposal = context.proposals[id];
+  const proposal = context.proposalsOld[id];
   const governance = context.configs[proposal?.info.config.toBase58()];
   const proposalState = context.states[proposal?.info.state.toBase58()];
   const { endpoint } = useConnectionConfig();
@@ -218,7 +218,7 @@ function InnerProposalView({
   votingDisplayData,
   endpoint,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   governance: ParsedAccount<GovernanceOld>;
   proposalState: ParsedAccount<ProposalState>;
   sigMint: MintInfo;

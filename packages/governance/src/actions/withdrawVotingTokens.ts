@@ -13,7 +13,7 @@ import {
 } from '@oyster/common';
 
 import {
-  Proposal,
+  ProposalOld,
   ProposalState,
   ProposalStateStatus,
 } from '../models/serialisation';
@@ -29,7 +29,7 @@ const { approve } = models;
 export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ParsedAccount<ProposalOld>,
   state: ParsedAccount<ProposalState>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,

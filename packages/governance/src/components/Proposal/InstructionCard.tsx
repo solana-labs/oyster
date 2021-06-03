@@ -14,7 +14,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
-  Proposal,
+  ProposalOld,
   ProposalState,
   ProposalStateStatus,
   GovernanceTransaction,
@@ -38,7 +38,7 @@ export function InstructionCard({
   position,
 }: {
   instruction: ParsedAccount<GovernanceTransaction>;
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   state: ParsedAccount<ProposalState>;
   position: number;
 }) {
@@ -106,7 +106,7 @@ function PlayStatusButton({
   setPlaying,
   instruction,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<ProposalOld>;
   state: ParsedAccount<ProposalState>;
   instruction: ParsedAccount<GovernanceTransaction>;
   playing: Playstate;

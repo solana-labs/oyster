@@ -16,6 +16,7 @@ import {
   Governance,
   GovernanceAccountType,
   GovernanceConfig,
+  Proposal,
   Realm,
   TokenOwnerRecord,
 } from './accounts';
@@ -127,7 +128,6 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
-
   [
     TokenOwnerRecord,
     {
@@ -144,60 +144,54 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
+  [
+    Proposal,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['governance', 'pubkey'],
+        ['governingTokenMint', 'pubkey'],
+        ['state', 'u8'],
+        ['tokenOwnerRecord', 'pubkey'],
+        ['signatoriesCount', 'u8'],
+        ['signatoriesSignedOffCount', 'u8'],
+        ['descriptionLink', 'string'],
+        ['name', 'string'],
+        ['yesVotesCount', 'u64'],
+        ['noVotesCount', 'u64'],
+        ['draftAt', 'u64'],
+        ['signingOffAt', { kind: 'option', type: 'u64' }],
+        ['votingAt', { kind: 'option', type: 'u64' }],
+        ['votingCompletedAt', { kind: 'option', type: 'u64' }],
+        ['executingAt', { kind: 'option', type: 'u64' }],
+        ['closedAt', { kind: 'option', type: 'u64' }],
+        ['instructionsExecutedCount', 'u16'],
+        ['instructionsCount', 'u16'],
+        ['instructionsNextIndex', 'u16'],
+      ],
+    },
+  ],
 ]);
 
-export const RealmParser = (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
-  const buffer = Buffer.from(info.data);
-  const data = deserializeBorsh(GOVERNANCE_SCHEMA, Realm, buffer) as Realm;
+export function BorshAccountParser(
+  classType: any,
+): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ParsedAccountBase {
+  return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
+    const buffer = Buffer.from(info.data);
+    const data = deserializeBorsh(GOVERNANCE_SCHEMA, classType, buffer);
 
-  return {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: data,
-  } as ParsedAccountBase;
-};
+    return {
+      pubkey: pubKey,
+      account: {
+        ...info,
+      },
+      info: data,
+    } as ParsedAccountBase;
+  };
+}
 
-export const GovernanceParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = deserializeBorsh(
-    GOVERNANCE_SCHEMA,
-    Governance,
-    buffer,
-  ) as Governance;
-
-  return {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: data,
-  } as ParsedAccountBase;
-};
-
-export const TokenOwnerRecordParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = deserializeBorsh(
-    GOVERNANCE_SCHEMA,
-    TokenOwnerRecord,
-    buffer,
-  ) as TokenOwnerRecord;
-
-  return {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: data,
-  } as ParsedAccountBase;
-};
+// ----------------- Old structures
 
 export interface GovernanceVotingRecord {
   /// Account type
@@ -356,7 +350,7 @@ export const ProposalStateLayout: typeof BufferLayout.Structure = BufferLayout.s
   ],
 );
 
-export interface Proposal {
+export interface ProposalOld {
   /// Account type
   accountType: GovernanceAccountType;
 
@@ -424,7 +418,7 @@ export interface GovernanceTransaction {
 }
 export interface CustomSingleSignerTransaction extends GovernanceTransaction {}
 
-export const ProposalParser = (
+export const ProposalOldParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
 ) => {
