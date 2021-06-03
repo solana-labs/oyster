@@ -5,7 +5,7 @@ import {
   INSTRUCTION_LIMIT,
   GovernanceOld,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
 } from '../../models/serialisation';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
@@ -29,7 +29,7 @@ export function NewInstructionCard({
   config,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
   config: ParsedAccount<GovernanceOld>;
   position: number;
 }) {

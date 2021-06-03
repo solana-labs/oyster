@@ -3,7 +3,7 @@ import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import {
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
 } from '../../models/serialisation';
 import { LABELS } from '../../constants';
@@ -21,7 +21,7 @@ export function WithdrawVote({
   state,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();

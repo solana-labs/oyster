@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
-import { ProposalOld, ProposalState } from '../models/serialisation';
+import { ProposalOld, ProposalStateOld } from '../models/serialisation';
 import { signInstruction } from '../models/sign';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
@@ -18,7 +18,7 @@ export const sign = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<ProposalOld>,
-  state: ParsedAccount<ProposalState>,
+  state: ParsedAccount<ProposalStateOld>,
   sigAccount: PublicKey,
 ) => {
   const PROGRAM_IDS = utils.programIds();

@@ -6,7 +6,7 @@ import {
   INSTRUCTION_LIMIT,
   GovernanceOld,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
   GovernanceTransaction,
 } from '../../models/serialisation';
@@ -28,6 +28,7 @@ import { useVotingRecords } from '../../hooks/useVotingRecords';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
+import { ProposalState } from '../../models/accounts';
 const { TabPane } = Tabs;
 
 export const urlRegex =
@@ -103,7 +104,7 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  proposalState: ParsedAccount<ProposalState>;
+  proposalState: ParsedAccount<ProposalStateOld>;
 }) {
   useMemo(() => {
     if (loading) {
@@ -220,7 +221,7 @@ function InnerProposalView({
 }: {
   proposal: ParsedAccount<ProposalOld>;
   governance: ParsedAccount<GovernanceOld>;
-  proposalState: ParsedAccount<ProposalState>;
+  proposalState: ParsedAccount<ProposalStateOld>;
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
@@ -271,7 +272,7 @@ function InnerProposalView({
               />
               <Col>
                 <h1>{proposalState.info.name}</h1>
-                <StateBadge state={proposalState} />
+                <StateBadge state={ProposalState.Draft} />
               </Col>
             </Row>
           </Col>

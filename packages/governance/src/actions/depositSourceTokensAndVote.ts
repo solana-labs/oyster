@@ -15,7 +15,7 @@ import {
 import {
   GovernanceOld,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
 } from '../models/serialisation';
 
 import { AccountLayout } from '@solana/spl-token';
@@ -41,7 +41,7 @@ export const depositSourceTokensAndVote = async (
   existingNoVoteAccount: PublicKey | undefined,
   sourceAccount: PublicKey,
   governance: ParsedAccount<GovernanceOld>,
-  state: ParsedAccount<ProposalState>,
+  state: ParsedAccount<ProposalStateOld>,
   yesVotingTokenAmount: number,
   noVotingTokenAmount: number,
 ) => {

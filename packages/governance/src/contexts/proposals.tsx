@@ -22,7 +22,7 @@ import {
   GovernanceLayout,
   GovernanceOldParser,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalLayout,
   ProposalOldParser,
   GovernanceTransaction,
@@ -42,7 +42,7 @@ import {
 export interface ProposalsContextState {
   proposalsOld: Record<string, ParsedAccount<ProposalOld>>;
   transactions: Record<string, ParsedAccount<GovernanceTransaction>>;
-  states: Record<string, ParsedAccount<ProposalState>>;
+  states: Record<string, ParsedAccount<ProposalStateOld>>;
   configs: Record<string, ParsedAccount<GovernanceOld>>;
   realms: Record<string, ParsedAccount<Realm>>;
   governances: Map<string, ParsedAccount<Governance>>;
@@ -148,7 +148,7 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<GovernanceTransaction>
       > = {};
-      const newStates: Record<string, ParsedAccount<ProposalState>> = {};
+      const newStates: Record<string, ParsedAccount<ProposalStateOld>> = {};
       const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
       const newRealms: Record<string, ParsedAccount<Realm>> = {};
       const newGovernances = new Map<string, ParsedAccount<Governance>>();
@@ -203,7 +203,7 @@ function useSetupProposalsCache({
             break;
           case ProposalStateLayout.span:
             cache.add(a.pubkey, a.account, ProposalStateParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<ProposalState>;
+            cached = cache.get(a.pubkey) as ParsedAccount<ProposalStateOld>;
             newStates[a.pubkey.toBase58()] = cached;
             break;
         }
@@ -319,7 +319,7 @@ function useSetupProposalsCache({
               case ProposalStateLayout.span:
                 cached = cache.get(
                   info.accountId,
-                ) as ParsedAccount<ProposalState>;
+                ) as ParsedAccount<ProposalStateOld>;
                 break;
             }
             setter((obj: any) => ({
@@ -368,8 +368,12 @@ export const useRealmGovernances = (realm: PublicKey) => {
   return governances;
 };
 
-export const useRealm = (realm: PublicKey) => {
+export const useRealm = (realm: PublicKey | undefined) => {
   const ctx = useGovernanceAccounts();
+  if (!realm) {
+    return null;
+  }
+
   return ctx.realms[realm.toBase58()];
 };
 
@@ -397,4 +401,17 @@ export const useTokenOwnerRecord = (realm?: PublicKey) => {
   }
 
   return null;
+};
+
+export const useProposals = (governance: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  const proposals: ParsedAccount<Proposal>[] = [];
+
+  ctx.proposals.forEach(p => {
+    if (p.info.governance.toBase58() === governance.toBase58()) {
+      proposals.push(p);
+    }
+  });
+
+  return proposals;
 };

@@ -17,6 +17,7 @@ import {
   GovernanceAccountType,
   GovernanceConfig,
   Proposal,
+  ProposalState,
   Realm,
   TokenOwnerRecord,
 } from './accounts';
@@ -279,15 +280,15 @@ export enum ProposalStateStatus {
 }
 
 export const STATE_COLOR: Record<string, string> = {
-  [ProposalStateStatus.Draft]: 'orange',
-  [ProposalStateStatus.Voting]: 'blue',
-  [ProposalStateStatus.Executing]: 'green',
-  [ProposalStateStatus.Completed]: 'purple',
-  [ProposalStateStatus.Deleted]: 'gray',
-  [ProposalStateStatus.Defeated]: 'red',
+  [ProposalState.Draft]: 'orange',
+  [ProposalState.Voting]: 'blue',
+  [ProposalState.Executing]: 'green',
+  [ProposalState.Completed]: 'purple',
+  [ProposalState.Cancelled]: 'gray',
+  [ProposalState.Defeated]: 'red',
 };
 
-export interface ProposalState {
+export interface ProposalStateOld {
   /// Account type
   accountType: GovernanceAccountType;
   proposal: PublicKey;

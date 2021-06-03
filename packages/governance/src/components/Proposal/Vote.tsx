@@ -4,7 +4,7 @@ import React from 'react';
 import {
   GovernanceOld,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
 } from '../../models/serialisation';
 import { LABELS } from '../../constants';
@@ -26,7 +26,7 @@ export function Vote({
   yeahVote,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
   governance: ParsedAccount<GovernanceOld>;
   yeahVote: boolean;
 }) {

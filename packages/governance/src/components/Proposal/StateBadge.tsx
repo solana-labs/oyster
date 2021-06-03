@@ -1,9 +1,10 @@
 import { ParsedAccount } from '@oyster/common';
 import { Badge, Tag } from 'antd';
 import React from 'react';
+import { ProposalState } from '../../models/accounts';
 import {
   STATE_COLOR,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
 } from '../../models/serialisation';
 
@@ -11,7 +12,7 @@ export function StateBadgeRibbon({
   state,
   children,
 }: {
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
   children?: any;
 }) {
   const status = state.info.status;
@@ -26,12 +27,11 @@ export function StateBadgeRibbon({
   );
 }
 
-export function StateBadge({ state }: { state: ParsedAccount<ProposalState> }) {
-  const status = state.info.status;
-  let color = STATE_COLOR[status];
+export function StateBadge({ state }: { state: ProposalState }) {
+  let color = STATE_COLOR[state];
   return (
     <Tag color={color} style={{ borderWidth: 0 }}>
-      {ProposalStateStatus[status]}
+      {ProposalState[state]}
     </Tag>
   );
 }

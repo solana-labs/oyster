@@ -15,7 +15,7 @@ import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import {
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
   GovernanceTransaction,
 } from '../../models/serialisation';
@@ -39,7 +39,7 @@ export function InstructionCard({
 }: {
   instruction: ParsedAccount<GovernanceTransaction>;
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
@@ -107,7 +107,7 @@ function PlayStatusButton({
   instruction,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
   instruction: ParsedAccount<GovernanceTransaction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;

@@ -9,7 +9,7 @@ import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 import {
   CustomSingleSignerTransactionLayout,
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
 } from '../models/serialisation';
 import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
@@ -22,7 +22,7 @@ export const addCustomSingleSignerTransaction = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<ProposalOld>,
-  state: ParsedAccount<ProposalState>,
+  state: ParsedAccount<ProposalStateOld>,
   sigAccount: PublicKey,
   slot: string,
   instruction: string,

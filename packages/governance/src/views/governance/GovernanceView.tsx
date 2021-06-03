@@ -2,8 +2,9 @@ import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import {
   useConfig,
-  useGovernanceAccounts,
   useGovernance,
+  useProposals,
+  useRealm,
 } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../../components/Proposal/StateBadge';
@@ -16,7 +17,6 @@ const PAGE_SIZE = 10;
 export const GovernanceView = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const { proposalsOld: proposals, states } = useGovernanceAccounts();
   const config = useConfig(id);
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
@@ -30,30 +30,20 @@ export const GovernanceView = () => {
 
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
+  const realm = useRealm(governance?.info.config.realm);
+  const proposals = useProposals(governanceKey);
 
   const mint = config?.info.governanceMint.toBase58() || '';
 
-  const listData = useMemo(() => {
-    const newListData: any[] = [];
-
-    Object.keys(proposals).forEach(key => {
-      const proposal = proposals[key];
-      const state = states[proposal.info.state.toBase58()];
-      if (proposal.info.config.toBase58() !== id || !state) {
-        return;
-      }
-
-      newListData.push({
-        href: '/proposal/' + key,
-        title: state.info.name,
-        badge: <TokenIcon mintAddress={mint} size={30} />,
-        status: state.info.status,
-        state,
-        key,
-      });
-    });
-    return newListData;
-  }, [proposals, id, mint, states]);
+  const proposalItems = useMemo(() => {
+    return proposals.map(p => ({
+      key: p.pubkey.toBase58(),
+      href: '/proposal/' + p.pubkey,
+      title: p.info.name,
+      badge: <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />,
+      state: p.info.state,
+    }));
+  }, [proposals]);
 
   return (
     <Row
@@ -67,12 +57,13 @@ export const GovernanceView = () => {
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
           <TokenIcon
-            mintAddress={config?.info.governanceMint}
+            mintAddress={realm?.info.communityMint}
             size={60}
             style={{ marginRight: 20 }}
           />
           <div>
-            <h1>{config?.info.name}</h1>
+            <h1>{realm?.info.name}</h1>
+            <h2>{governance?.info.config.governedAccount.toBase58()}</h2>
             <a
               href={tokenMap.get(mint)?.extensions?.website}
               target="_blank"
@@ -98,7 +89,7 @@ export const GovernanceView = () => {
             },
             pageSize: PAGE_SIZE,
           }}
-          dataSource={listData}
+          dataSource={proposalItems}
           renderItem={item => (
             <List.Item
               key={item.key}

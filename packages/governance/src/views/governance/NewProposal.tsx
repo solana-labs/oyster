@@ -78,7 +78,7 @@ export function NewProposalForm({
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
   }) => {
-    const governingTokenMint = realm.info.communityMint;
+    const governingTokenMint = realm!.info.communityMint;
     const proposalIndex = governance.info.proposalCount;
 
     const proposalAddress = await createProposal(

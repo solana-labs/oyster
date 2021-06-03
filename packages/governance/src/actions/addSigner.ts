@@ -12,7 +12,7 @@ import {
   actions,
 } from '@oyster/common';
 
-import { ProposalOld, ProposalState } from '../models/serialisation';
+import { ProposalOld, ProposalStateOld } from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
 import { addSignerInstruction } from '../models/addSigner';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
@@ -25,7 +25,7 @@ export const addSigner = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<ProposalOld>,
-  state: ParsedAccount<ProposalState>,
+  state: ParsedAccount<ProposalStateOld>,
   adminAccount: PublicKey,
   newSignatoryAccountOwner: PublicKey,
 ) => {

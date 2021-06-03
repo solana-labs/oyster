@@ -3,7 +3,7 @@ import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { sign } from '../../actions/sign';
-import { ProposalOld, ProposalState } from '../../models/serialisation';
+import { ProposalOld, ProposalStateOld } from '../../models/serialisation';
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
@@ -16,7 +16,7 @@ export default function SignButton({
   state,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();

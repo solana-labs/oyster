@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
-import { ProposalOld, ProposalState } from '../../models/serialisation';
+import { ProposalOld, ProposalStateOld } from '../../models/serialisation';
 import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
@@ -23,7 +23,7 @@ export default function AddSigners({
   state,
 }: {
   proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalState>;
+  state: ParsedAccount<ProposalStateOld>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();

@@ -14,7 +14,7 @@ import {
 
 import {
   ProposalOld,
-  ProposalState,
+  ProposalStateOld,
   ProposalStateStatus,
 } from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
@@ -30,7 +30,7 @@ export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<ProposalOld>,
-  state: ParsedAccount<ProposalState>,
+  state: ParsedAccount<ProposalStateOld>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
