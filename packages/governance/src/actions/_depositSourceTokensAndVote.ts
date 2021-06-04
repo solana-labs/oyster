@@ -22,9 +22,9 @@ import { AccountLayout } from '@solana/spl-token';
 
 import { LABELS } from '../constants';
 
-import { depositSourceTokensInstruction } from '../models/depositSourceTokens';
-import { createEmptyGovernanceVotingRecordInstruction } from '../models/createEmptyGovernanceVotingRecord';
-import { voteInstruction } from '../models/vote';
+import { depositSourceTokensInstruction } from '../models/_depositSourceTokens';
+import { createEmptyGovernanceVotingRecordInstruction } from '../models/_createEmptyGovernanceVotingRecord';
+import { voteInstruction } from '../models/_vote';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { createTokenAccount } = actions;

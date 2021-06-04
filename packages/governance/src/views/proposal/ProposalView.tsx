@@ -23,7 +23,7 @@ import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard
 import SignOffButton from '../../components/Proposal/SignOffButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 
-import { Vote } from '../../components/Proposal/Vote';
+import { CastVote } from '../../components/Proposal/CastVote';
 import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
 import { useVotingRecords } from '../../hooks/useVotingRecords';
@@ -32,6 +32,7 @@ import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
 import { Governance, Proposal, ProposalState } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
+import { Vote } from '../../models/instructions';
 const { TabPane } = Tabs;
 
 export const urlRegex =
@@ -283,16 +284,16 @@ function InnerProposalView({
               <WithdrawVote proposal={proposal} />
               {tokenOwnerRecord && (
                 <>
-                  <Vote
+                  <CastVote
                     governance={governance}
                     proposal={proposal}
                     tokenOwnerRecord={tokenOwnerRecord}
-                    yeahVote={true}
+                    vote={Vote.Yes}
                   />
-                  <Vote
+                  <CastVote
                     governance={governance}
                     proposal={proposal}
-                    yeahVote={false}
+                    vote={Vote.No}
                     tokenOwnerRecord={tokenOwnerRecord}
                   />
                 </>

@@ -6,8 +6,9 @@ import {
 } from '@solana/web3.js';
 import { contexts, utils, ParsedAccount } from '@oyster/common';
 
-import { SignatoryRecord } from '../models/accounts';
-import { withSignOffProposal } from '../models/withSignOffProposal';
+import { Proposal } from '../models/accounts';
+import { withCastVote } from '../models/withCastVote';
+import { Vote } from '../models/instructions';
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -15,21 +16,29 @@ const { notify } = utils;
 export const castVote = async (
   connection: Connection,
   wallet: any,
-  signatoryRecord: ParsedAccount<SignatoryRecord>,
-  signatory: PublicKey,
+  proposal: ParsedAccount<Proposal>,
+  tokeOwnerRecord: PublicKey,
+  vote: Vote,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  withSignOffProposal(
+  let governanceAuthority = wallet.publicKey;
+  let payer = wallet.publicKey;
+
+  await withCastVote(
     instructions,
-    signatoryRecord.info.proposal,
-    signatoryRecord.pubkey,
-    signatory,
+    proposal.info.governance,
+    proposal.pubkey,
+    tokeOwnerRecord,
+    governanceAuthority,
+    proposal.info.governingTokenMint,
+    vote,
+    payer,
   );
 
   notify({
-    message: 'Signing off proposal...',
+    message: 'Voting on proposal...',
     description: 'Please wait...',
     type: 'warn',
   });
@@ -44,7 +53,7 @@ export const castVote = async (
     );
 
     notify({
-      message: 'Proposal signed off.',
+      message: 'Proposal voted on.',
       type: 'success',
       description: `Transaction - ${tx}`,
     });

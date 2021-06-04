@@ -4,10 +4,11 @@ import React from 'react';
 
 import { LABELS } from '../../constants';
 
-import { contexts, hooks } from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './style.less';
+
 import {
   Governance,
   Proposal,
@@ -15,44 +16,46 @@ import {
   TokenOwnerRecord,
 } from '../../models/accounts';
 
+import { Vote } from '../../models/instructions';
+
+import { castVote } from '../../actions/castVote';
+
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
-const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
-export function Vote({
+export function CastVote({
   proposal,
   governance,
   tokenOwnerRecord,
-  yeahVote,
+  vote,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
-  yeahVote: boolean;
+  vote: Vote;
 }) {
-  const wallet = useWallet();
+  const { wallet } = useWallet();
   const connection = useConnection();
-
-  const userTokenAccount = useAccountByMint(proposal.info.governingTokenMint);
 
   const eligibleToView =
     tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0 &&
     proposal.info.state === ProposalState.Voting;
 
-  const [btnLabel, title, msg, icon] = yeahVote
-    ? [
-        LABELS.VOTE_YEAH,
-        LABELS.VOTE_YEAH_QUESTION,
-        LABELS.VOTE_YEAH_MSG,
-        <CheckOutlined />,
-      ]
-    : [
-        LABELS.VOTE_NAY,
-        LABELS.VOTE_NAY_QUESTION,
-        LABELS.VOTE_NAY_MSG,
-        <CloseOutlined />,
-      ];
+  const [btnLabel, title, msg, icon] =
+    vote === Vote.Yes
+      ? [
+          LABELS.VOTE_YEAH,
+          LABELS.VOTE_YEAH_QUESTION,
+          LABELS.VOTE_YEAH_MSG,
+          <CheckOutlined />,
+        ]
+      : [
+          LABELS.VOTE_NAY,
+          LABELS.VOTE_NAY_QUESTION,
+          LABELS.VOTE_NAY_MSG,
+          <CloseOutlined />,
+        ];
 
   return eligibleToView ? (
     <Button
@@ -72,24 +75,13 @@ export function Vote({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (userTokenAccount) {
-              const voteAmount = userTokenAccount.info.amount.toNumber();
-
-              console.log('TODO:', { wallet, connection, voteAmount });
-              // await depositSourceTokensAndVote(
-              //   connection,
-              //   wallet.wallet,
-              //   null,
-              //   voteAccount?.pubkey,
-              //   yesVoteAccount?.pubkey,
-              //   noVoteAccount?.pubkey,
-              //   userTokenAccount.pubkey,
-              //   governance,
-              //   state,
-              //   yesTokenAmount,
-              //   noTokenAmount,
-              // );
-            }
+            castVote(
+              connection,
+              wallet,
+              proposal,
+              tokenOwnerRecord.pubkey,
+              vote,
+            );
           },
         })
       }
