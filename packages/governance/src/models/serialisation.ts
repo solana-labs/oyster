@@ -30,7 +30,7 @@ export const INSTRUCTION_LIMIT = 450;
 export const MAX_TRANSACTIONS = 5;
 export const TEMP_FILE_TXN_SIZE = 1000;
 
-// Temp workaround to support u16.
+// Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader;
   const value = reader.buf.readUInt16LE(reader.offset);
@@ -38,7 +38,7 @@ export const TEMP_FILE_TXN_SIZE = 1000;
   return value;
 };
 
-// Temp workaround to support u16.
+// Temp. workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
   const reader = (this as unknown) as BinaryWriter;
   reader.maybeResize();
