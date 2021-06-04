@@ -20,7 +20,7 @@ export function NewProposal({
   governance,
 }: {
   props: ButtonProps;
-  governance: ParsedAccount<Governance> | null;
+  governance?: ParsedAccount<Governance>;
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
@@ -38,7 +38,6 @@ export function NewProposal({
   };
 
   if (redirect) {
-    setTimeout(() => setRedirect(''), 100);
     return <Redirect push to={'/proposal/' + redirect} />;
   }
 

@@ -11,11 +11,15 @@ export enum GovernanceAccountType {
   AccountGovernance = 3,
   ProgramGovernance = 4,
   Proposal = 5,
+  SignatoryRecord = 6,
+  VoteRecord = 7,
+  ProposalInstruction = 8,
+
+  // --- OLD
 
   ProposalOld = 10,
-  ProposalState = 4,
-  VoteRecord = 5,
-  CustomSingleSignerTransaction = 6,
+  ProposalState = 11,
+  CustomSingleSignerTransaction = 12,
 }
 
 export class Realm {
@@ -216,5 +220,22 @@ export class Proposal {
     this.instructionsExecutedCount = args.instructionsExecutedCount;
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
+  }
+}
+
+export class SignatoryRecord {
+  accountType: GovernanceAccountType = GovernanceAccountType.SignatoryRecord;
+  proposal: PublicKey;
+  signatory: PublicKey;
+  signedOff: boolean;
+
+  constructor(args: {
+    proposal: PublicKey;
+    signatory: PublicKey;
+    signedOff: boolean;
+  }) {
+    this.proposal = args.proposal;
+    this.signatory = args.signatory;
+    this.signedOff = !!args.signedOff;
   }
 }

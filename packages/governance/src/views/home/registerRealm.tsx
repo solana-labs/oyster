@@ -31,7 +31,6 @@ export function RegisterRealm(props: ButtonProps) {
   };
 
   if (redirect) {
-    setTimeout(() => setRedirect(''), 100);
     return <Redirect push to={'/realm/' + redirect} />;
   }
 

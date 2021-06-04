@@ -12,13 +12,14 @@ import {
   useGovernance,
   useGovernanceAccounts,
   useProposal,
+  useSignatoryRecord,
 } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
-import SignButton from '../../components/Proposal/SignButton';
+import SignOffButton from '../../components/Proposal/SignOffButton';
 import AddSigners from '../../components/Proposal/AddSigners';
 
 import { Vote } from '../../components/Proposal/Vote';
@@ -55,42 +56,29 @@ export const ProposalView = () => {
 
   let proposalKey = useKeyParam();
   let proposal = useProposal(proposalKey);
+
   let governance = useGovernance(proposal?.info.governance);
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
-  const votingMint = useMint(proposal?.info.governingTokenMint);
-
-  const sourceMint = useMint(proposal?.info.governingTokenMint);
-  const yesVotingMint = useMint(proposal?.info.governingTokenMint);
-  const noVotingMint = useMint(proposal?.info.governingTokenMint);
-
   const votingRecords = useVotingRecords(proposalOld?.pubkey);
 
   return (
-    <div className="flexColumn">
-      {proposal &&
-      governance &&
-      governingTokenMint &&
-      votingMint &&
-      sourceMint &&
-      yesVotingMint &&
-      noVotingMint ? (
-        <InnerProposalView
-          proposal={proposal}
-          governance={governance}
-          sourceMint={sourceMint}
-          votingMint={votingMint}
-          yesVotingMint={yesVotingMint}
-          noVotingMint={noVotingMint}
-          votingDisplayData={voterDisplayData(votingRecords)}
-          governingTokenMint={governingTokenMint}
-          instructions={context.transactions}
-          endpoint={endpoint}
-        />
-      ) : (
-        <Spin />
-      )}
-    </div>
+    <>
+      <div className="flexColumn">
+        {proposal && governance && governingTokenMint ? (
+          <InnerProposalView
+            proposal={proposal}
+            governance={governance}
+            votingDisplayData={voterDisplayData(votingRecords)}
+            governingTokenMint={governingTokenMint}
+            instructions={context.transactions}
+            endpoint={endpoint}
+          />
+        ) : (
+          <Spin />
+        )}
+      </div>
+    </>
   );
 };
 
@@ -214,12 +202,10 @@ function voterDisplayData(
 function InnerProposalView({
   proposal,
   governingTokenMint,
-  votingMint,
-  yesVotingMint,
-  noVotingMint,
+
   instructions,
   governance,
-  sourceMint,
+
   votingDisplayData,
   endpoint,
 }: {
@@ -227,16 +213,13 @@ function InnerProposalView({
   governance: ParsedAccount<Governance>;
 
   governingTokenMint: MintInfo;
-  votingMint: MintInfo;
-  yesVotingMint: MintInfo;
-  noVotingMint: MintInfo;
-  sourceMint: MintInfo;
+
   instructions: Record<string, ParsedAccount<GovernanceTransaction>>;
   votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
-  const sigAccount = useAccountByMint(proposal.info.governingTokenMint);
   const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
+  let signatoryRecord = useSignatoryRecord(proposal.pubkey);
 
   const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = [];
   // proposalState.info.proposalTransactions
@@ -277,7 +260,7 @@ function InnerProposalView({
               />
               <Col>
                 <h1>{proposal.info.name}</h1>
-                <StateBadge state={ProposalState.Draft} />
+                <StateBadge state={proposal.info.state} />
               </Col>
             </Row>
           </Col>
@@ -288,10 +271,11 @@ function InnerProposalView({
                 proposal.info.state === ProposalState.Draft && (
                   <AddSigners proposal={proposal} />
                 )}
-              {sigAccount &&
-                sigAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state === ProposalState.Draft && (
-                  <SignButton proposal={proposal} />
+
+              {signatoryRecord &&
+                (proposal.info.state === ProposalState.Draft ||
+                  proposal.info.state === ProposalState.SigningOff) && (
+                  <SignOffButton signatoryRecord={signatoryRecord} />
                 )}
               {/* <MintSourceTokens
                 governance={governance}
@@ -353,11 +337,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={
-                      votingMint.supply.toNumber() +
-                      yesVotingMint.supply.toNumber() +
-                      noVotingMint.supply.toNumber()
-                    }
+                    total={governingTokenMint.supply.toNumber()}
                     data={votingDisplayData}
                   />
                 </div>
@@ -390,7 +370,7 @@ function InnerProposalView({
               <Statistic
                 valueStyle={{ color: 'green' }}
                 title={LABELS.VOTES_REQUIRED}
-                value={getMinRequiredYesVotes(governance, sourceMint)}
+                value={getMinRequiredYesVotes(governance, governingTokenMint)}
               />
             </Card>
           </Col>

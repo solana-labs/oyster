@@ -11,6 +11,7 @@ import {
   CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
+  SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
 import {
@@ -20,6 +21,7 @@ import {
   Proposal,
   ProposalState,
   Realm,
+  SignatoryRecord,
   TokenOwnerRecord,
 } from './accounts';
 
@@ -104,6 +106,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    SignOffProposalArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
     Realm,
     {
       kind: 'struct',
@@ -181,6 +190,18 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['instructionsExecutedCount', 'u16'],
         ['instructionsCount', 'u16'],
         ['instructionsNextIndex', 'u16'],
+      ],
+    },
+  ],
+  [
+    SignatoryRecord,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['proposal', 'pubkey'],
+        ['signatory', 'pubkey'],
+        ['signedOff', 'u8'],
       ],
     },
   ],

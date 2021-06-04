@@ -31,7 +31,6 @@ export function RegisterGovernance(props: ButtonProps) {
   };
 
   if (redirect) {
-    setTimeout(() => setRedirect(''), 100);
     return <Redirect push to={'/governance/' + redirect} />;
   }
 
@@ -95,7 +94,7 @@ export function NewGovernanceForm({
     const governanceAddress = await registerGovernance(
       connection,
       wallet.wallet,
-      values.governanceType ?? GovernanceType.Account,
+      values.governanceType,
       realmKey,
       config,
     );
@@ -124,12 +123,10 @@ export function NewGovernanceForm({
         form={form}
         name="control-hooks"
         onFinish={onFinish}
+        initialValues={{ governanceType: GovernanceType.Account }}
       >
         <Form.Item label={LABELS.GOVERNANCE_OVER} name="governanceType">
-          <Radio.Group
-            defaultValue={GovernanceType.Account}
-            onChange={e => setGovernanceType(e.target.value)}
-          >
+          <Radio.Group onChange={e => setGovernanceType(e.target.value)}>
             <Radio.Button value={GovernanceType.Account}>
               {LABELS.ACCOUNT}
             </Radio.Button>

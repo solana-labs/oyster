@@ -91,3 +91,7 @@ export class AddSignatoryArgs {
     this.signatory = args.signatory;
   }
 }
+
+export class SignOffProposalArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.SignOffProposal;
+}

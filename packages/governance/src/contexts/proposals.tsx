@@ -36,6 +36,7 @@ import {
   GovernanceAccountType,
   Proposal,
   Realm,
+  SignatoryRecord,
   TokenOwnerRecord,
 } from '../models/accounts';
 
@@ -45,9 +46,10 @@ export interface ProposalsContextState {
   states: Record<string, ParsedAccount<ProposalStateOld>>;
   configs: Record<string, ParsedAccount<GovernanceOld>>;
   realms: Record<string, ParsedAccount<Realm>>;
-  governances: Map<string, ParsedAccount<Governance>>;
+  governances: Record<string, ParsedAccount<Governance>>;
   tokenOwnerRecords: Map<string, ParsedAccount<TokenOwnerRecord>>;
-  proposals: Map<string, ParsedAccount<Proposal>>;
+  proposals: Record<string, ParsedAccount<Proposal>>;
+  signatoryRecords: Map<string, ParsedAccount<SignatoryRecord>>;
 }
 
 export const ProposalsContext =
@@ -66,14 +68,13 @@ export default function ProposalsProvider({ children = null as any }) {
   const [states, setStates] = useState({});
   const [configs, setConfigs] = useState({});
   const [realms, setRealms] = useState({});
-  const [governances, setGovernances] = useState(
-    new Map<string, ParsedAccount<Governance>>(),
-  );
+  const [governances, setGovernances] = useState({});
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState(
     new Map<string, ParsedAccount<TokenOwnerRecord>>(),
   );
-  const [proposals, setProposals] = useState(
-    new Map<string, ParsedAccount<Proposal>>(),
+  const [proposals, setProposals] = useState({});
+  const [signatoryRecords, setSignatoryRecords] = useState(
+    new Map<string, ParsedAccount<SignatoryRecord>>(),
   );
 
   useSetupProposalsCache({
@@ -86,6 +87,7 @@ export default function ProposalsProvider({ children = null as any }) {
     setGovernances,
     setTokenOwnerRecords,
     setProposals,
+    setSignatoryRecords,
   });
 
   return (
@@ -99,6 +101,7 @@ export default function ProposalsProvider({ children = null as any }) {
         governances,
         tokenOwnerRecords,
         proposals,
+        signatoryRecords,
       }}
     >
       {children}
@@ -116,6 +119,7 @@ function useSetupProposalsCache({
   setGovernances,
   setTokenOwnerRecords,
   setProposals,
+  setSignatoryRecords,
 }: {
   connection: Connection;
   setProposalsOld: React.Dispatch<React.SetStateAction<{}>>;
@@ -124,13 +128,16 @@ function useSetupProposalsCache({
   setConfigs: React.Dispatch<React.SetStateAction<{}>>;
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
   setGovernances: React.Dispatch<
-    React.SetStateAction<Map<string, ParsedAccount<Governance>>>
+    React.SetStateAction<Record<string, ParsedAccount<Governance>>>
   >;
   setTokenOwnerRecords: React.Dispatch<
     React.SetStateAction<Map<string, ParsedAccount<TokenOwnerRecord>>>
   >;
   setProposals: React.Dispatch<
-    React.SetStateAction<Map<string, ParsedAccount<Proposal>>>
+    React.SetStateAction<Record<string, ParsedAccount<Proposal>>>
+  >;
+  setSignatoryRecords: React.Dispatch<
+    React.SetStateAction<Map<string, ParsedAccount<SignatoryRecord>>>
   >;
 }) {
   useEffect(() => {
@@ -151,61 +158,56 @@ function useSetupProposalsCache({
       const newStates: Record<string, ParsedAccount<ProposalStateOld>> = {};
       const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
       const newRealms: Record<string, ParsedAccount<Realm>> = {};
-      const newGovernances = new Map<string, ParsedAccount<Governance>>();
+      const newGovernances: Record<string, ParsedAccount<Governance>> = {};
       const newTokenOwnerRecords = new Map<
         string,
         ParsedAccount<TokenOwnerRecord>
       >();
-      const newProposals = new Map<string, ParsedAccount<Proposal>>();
+      const newProposals: Record<string, ParsedAccount<Proposal>> = {};
+      const signatoryRecords = new Map<
+        string,
+        ParsedAccount<SignatoryRecord>
+      >();
 
       all[0].forEach(a => {
         let cached;
 
-        if (a.account.data[0] === GovernanceAccountType.Realm) {
-          cache.add(a.pubkey, a.account, BorshAccountParser(Realm));
-          cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
-          newRealms[a.pubkey.toBase58()] = cached;
-        } else if (
-          a.account.data[0] === GovernanceAccountType.AccountGovernance
-        ) {
-          cache.add(a.pubkey, a.account, BorshAccountParser(Governance));
-          cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
-          newGovernances.set(a.pubkey.toBase58(), cached);
-        } else if (
-          a.account.data[0] === GovernanceAccountType.TokenOwnerRecord
-        ) {
-          cache.add(a.pubkey, a.account, BorshAccountParser(TokenOwnerRecord));
-          cached = cache.get(a.pubkey) as ParsedAccount<TokenOwnerRecord>;
-          newTokenOwnerRecords.set(a.pubkey.toBase58(), cached);
-        } else if (a.account.data[0] === GovernanceAccountType.Proposal) {
-          cache.add(a.pubkey, a.account, BorshAccountParser(Proposal));
-          cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
-          newProposals.set(a.pubkey.toBase58(), cached);
-        }
-
-        switch (a.account.data.length) {
-          case ProposalLayout.span:
-            cache.add(a.pubkey, a.account, ProposalOldParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<ProposalOld>;
-            newProposalsOld[a.pubkey.toBase58()] = cached;
+        switch (a.account.data[0]) {
+          case GovernanceAccountType.Realm:
+            cache.add(a.pubkey, a.account, BorshAccountParser(Realm));
+            cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
+            newRealms[a.pubkey.toBase58()] = cached;
             break;
-          case CustomSingleSignerTransactionLayout.span:
-            cache.add(a.pubkey, a.account, CustomSingleSignerTransactionParser);
-            cached = cache.get(
+          case GovernanceAccountType.AccountGovernance: {
+            cache.add(a.pubkey, a.account, BorshAccountParser(Governance));
+            cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
+            newGovernances[a.pubkey.toBase58()] = cached;
+            break;
+          }
+          case GovernanceAccountType.TokenOwnerRecord: {
+            cache.add(
               a.pubkey,
-            ) as ParsedAccount<GovernanceTransaction>;
-            newTransactions[a.pubkey.toBase58()] = cached;
+              a.account,
+              BorshAccountParser(TokenOwnerRecord),
+            );
+            cached = cache.get(a.pubkey) as ParsedAccount<TokenOwnerRecord>;
+            newTokenOwnerRecords.set(a.pubkey.toBase58(), cached);
             break;
-          case GovernanceLayout.span:
-            cache.add(a.pubkey, a.account, GovernanceOldParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<GovernanceOld>;
-            newConfigs[a.pubkey.toBase58()] = cached;
+          }
+          case GovernanceAccountType.Proposal: {
+            cache.add(a.pubkey, a.account, BorshAccountParser(Proposal));
+            cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
+            newProposals[a.pubkey.toBase58()] = cached;
             break;
-          case ProposalStateLayout.span:
-            cache.add(a.pubkey, a.account, ProposalStateParser);
-            cached = cache.get(a.pubkey) as ParsedAccount<ProposalStateOld>;
-            newStates[a.pubkey.toBase58()] = cached;
+          }
+          case GovernanceAccountType.SignatoryRecord: {
+            const account = BorshAccountParser(SignatoryRecord)(
+              a.pubkey,
+              a.account,
+            ) as ParsedAccount<SignatoryRecord>;
+            signatoryRecords.set(a.pubkey.toBase58(), account);
             break;
+          }
         }
       });
 
@@ -217,6 +219,7 @@ function useSetupProposalsCache({
       setGovernances(newGovernances);
       setTokenOwnerRecords(newTokenOwnerRecords);
       setProposals(newProposals);
+      setSignatoryRecords(signatoryRecords);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
@@ -226,64 +229,84 @@ function useSetupProposalsCache({
             ? new PublicKey(info.accountId as unknown as string)
             : info.accountId;
 
-        if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
-          cache.add(
-            info.accountId,
-            info.accountInfo,
-            BorshAccountParser(Realm),
-          );
-          let cached = cache.get(info.accountId) as ParsedAccount<Realm>;
+        //     return;
 
-          setRealms((objs: any) => ({
-            ...objs,
-            [pubkey.toBase58()]: cached,
-          }));
-        } else if (
-          info.accountInfo.data[0] === GovernanceAccountType.AccountGovernance
-        ) {
-          cache.add(
-            info.accountId,
-            info.accountInfo,
-            BorshAccountParser(Governance),
-          );
-          let cached = cache.get(info.accountId) as ParsedAccount<Governance>;
+        switch (info.accountInfo.data[0]) {
+          case GovernanceAccountType.Realm:
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(Realm),
+            );
+            setRealms((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<Realm>,
+            }));
+            break;
+          case GovernanceAccountType.AccountGovernance:
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(Governance),
+            );
 
-          setGovernances(map => {
-            map.set(pubkey.toBase58(), cached);
-            return map;
-          });
-        } else if (
-          info.accountInfo.data[0] === GovernanceAccountType.TokenOwnerRecord
-        ) {
-          cache.add(
-            info.accountId,
-            info.accountInfo,
-            BorshAccountParser(TokenOwnerRecord),
-          );
-          let cached = cache.get(
-            info.accountId,
-          ) as ParsedAccount<TokenOwnerRecord>;
+            setGovernances((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<Governance>,
+            }));
+            break;
 
-          setTokenOwnerRecords(map => {
-            map.set(pubkey.toBase58(), cached);
-            return map;
-          });
-        } else if (
-          info.accountInfo.data[0] === GovernanceAccountType.Proposal
-        ) {
-          cache.add(
-            info.accountId,
-            info.accountInfo,
-            BorshAccountParser(Proposal),
-          );
-          let cached = cache.get(info.accountId) as ParsedAccount<Proposal>;
+          case GovernanceAccountType.TokenOwnerRecord:
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(TokenOwnerRecord),
+            );
 
-          setProposals(map => {
-            map.set(pubkey.toBase58(), cached);
-            return map;
-          });
+            setTokenOwnerRecords(map => {
+              map.set(
+                pubkey.toBase58(),
+                cache.get(info.accountId) as ParsedAccount<TokenOwnerRecord>,
+              );
+              return map;
+            });
+            break;
+          case GovernanceAccountType.Proposal: {
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(Proposal),
+            );
 
-          console.log('PROPOSAL RECEIVED', cached);
+            setProposals((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<Proposal>,
+            }));
+
+            break;
+          }
+          case GovernanceAccountType.SignatoryRecord: {
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(SignatoryRecord),
+            );
+
+            setSignatoryRecords(map => {
+              map.set(
+                pubkey.toBase58(),
+                cache.get(info.accountId) as ParsedAccount<SignatoryRecord>,
+              );
+              return map;
+            });
+            break;
+          }
         }
 
         [
@@ -352,6 +375,7 @@ export const useConfig = (id: string) => {
 
 export const useRealms = () => {
   const ctx = useGovernanceAccounts();
+
   return Object.values(ctx.realms);
 };
 
@@ -359,7 +383,7 @@ export const useRealmGovernances = (realm: PublicKey) => {
   const ctx = useGovernanceAccounts();
   const governances: ParsedAccount<Governance>[] = [];
 
-  ctx.governances.forEach(g => {
+  Object.values(ctx.governances).forEach(g => {
     if (g.info.config.realm.toBase58() === realm.toBase58()) {
       governances.push(g);
     }
@@ -380,7 +404,7 @@ export const useRealm = (realm: PublicKey | undefined) => {
 export const useGovernance = (governance?: PublicKey) => {
   const ctx = useGovernanceAccounts();
 
-  return (governance && ctx.governances.get(governance.toBase58())) || null;
+  return governance && ctx.governances[governance.toBase58()];
 };
 
 export const useTokenOwnerRecord = (realm?: PublicKey) => {
@@ -408,7 +432,7 @@ export const useProposals = (governance: PublicKey) => {
   const ctx = useGovernanceAccounts();
   const proposals: ParsedAccount<Proposal>[] = [];
 
-  ctx.proposals.forEach(p => {
+  Object.values(ctx.proposals).forEach(p => {
     if (p.info.governance.toBase58() === governance.toBase58()) {
       proposals.push(p);
     }
@@ -417,7 +441,24 @@ export const useProposals = (governance: PublicKey) => {
   return proposals;
 };
 
-export const useProposal = (proposal: PublicKey) => {
+export const useProposal = (proposalKey: PublicKey) => {
   const ctx = useGovernanceAccounts();
-  return ctx.proposals.get(proposal.toBase58());
+
+  return ctx.proposals[proposalKey.toBase58()];
+};
+
+export const useSignatoryRecord = (proposal: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  const { wallet } = useWallet();
+
+  for (let record of ctx.signatoryRecords.values()) {
+    if (
+      record.info.signatory.toBase58() === wallet?.publicKey?.toBase58() &&
+      record.info.proposal.toBase58() === proposal.toBase58()
+    ) {
+      return record;
+    }
+  }
+
+  return null;
 };
