@@ -21,7 +21,7 @@ const { approve } = models;
 export const addCustomSingleSignerTransaction = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   state: ParsedAccount<ProposalStateOld>,
   sigAccount: PublicKey,
   slot: string,
@@ -48,7 +48,7 @@ export const addCustomSingleSignerTransaction = async (
   });
 
   const [authority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal!.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 
@@ -90,9 +90,9 @@ export const addCustomSingleSignerTransaction = async (
       txnKey.publicKey,
       state.pubkey,
       sigAccount,
-      proposal.info.signatoryValidation,
-      proposal.pubkey,
-      proposal.info.config,
+      proposal!.info.signatoryValidation,
+      proposal!.pubkey,
+      proposal!.info.config,
       transferAuthority.publicKey,
       authority,
       slot,

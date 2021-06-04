@@ -4,7 +4,7 @@ import { contexts } from '@oyster/common';
 import { AppLayout } from './components/Layout';
 import ProposalsProvider from './contexts/proposals';
 import { HomeView } from './views';
-import { ProposalView } from './views/proposal';
+import { ProposalView } from './views/proposal/ProposalView';
 import { GovernanceView } from './views/governance/GovernanceView';
 import { DiagnosticView } from './views/diagnostic/Diagnostic';
 import { RealmView } from './views/realm/RealmView';
@@ -23,7 +23,7 @@ export function Routes() {
                 <AppLayout>
                   <Switch>
                     <Route exact path="/" component={() => <HomeView />} />
-                    <Route path="/proposal/:id" children={<ProposalView />} />
+                    <Route path="/proposal/:key" children={<ProposalView />} />
                     <Route
                       path="/governance/:key"
                       children={<GovernanceView />}

@@ -29,7 +29,7 @@ const { approve } = models;
 export const withdrawVotingTokens = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   state: ParsedAccount<ProposalStateOld>,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
@@ -51,7 +51,7 @@ export const withdrawVotingTokens = async (
       instructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.votingMint,
+      proposal!.info.votingMint,
       wallet.publicKey,
       signers,
     );
@@ -62,7 +62,7 @@ export const withdrawVotingTokens = async (
       instructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.yesVotingMint,
+      proposal!.info.yesVotingMint,
       wallet.publicKey,
       signers,
     );
@@ -73,14 +73,14 @@ export const withdrawVotingTokens = async (
       instructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.noVotingMint,
+      proposal!.info.noVotingMint,
       wallet.publicKey,
       signers,
     );
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal!.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 
@@ -120,7 +120,7 @@ export const withdrawVotingTokens = async (
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
       PROGRAM_IDS.governance.programId.toBuffer(),
-      proposal.pubkey.toBuffer(),
+      proposal!.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
     ],
     PROGRAM_IDS.governance.programId,
@@ -135,12 +135,12 @@ export const withdrawVotingTokens = async (
       existingYesVoteAccount,
       existingNoVoteAccount,
       destinationAccount,
-      proposal.info.sourceHolding,
-      proposal.info.votingMint,
-      proposal.info.yesVotingMint,
-      proposal.info.noVotingMint,
+      proposal!.info.sourceHolding,
+      proposal!.info.votingMint,
+      proposal!.info.yesVotingMint,
+      proposal!.info.noVotingMint,
       state.pubkey,
-      proposal.pubkey,
+      proposal!.pubkey,
       transferAuthority.publicKey,
       mintAuthority,
       votingTokenAmount,

@@ -12,7 +12,7 @@ import {
 } from '../../models/serialisation';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { useGovernanceAccounts } from '../../contexts/proposals';
+import { useGovernanceAccounts, useProposal } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -28,7 +28,8 @@ import { useVotingRecords } from '../../hooks/useVotingRecords';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
-import { ProposalState } from '../../models/accounts';
+import { Proposal, ProposalState } from '../../models/accounts';
+import { useKeyParam } from '../../hooks/useKeyParam';
 const { TabPane } = Tabs;
 
 export const urlRegex =
@@ -48,18 +49,22 @@ export enum VoteType {
 export const ProposalView = () => {
   const context = useGovernanceAccounts();
   const { id } = useParams<{ id: string }>();
-  const proposal = context.proposalsOld[id];
-  const governance = context.configs[proposal?.info.config.toBase58()];
-  const proposalState = context.states[proposal?.info.state.toBase58()];
+  const proposalOld = context.proposalsOld[id];
+  const governance = context.configs[proposalOld?.info.config.toBase58()];
+
   const { endpoint } = useConnectionConfig();
-  const sigMint = useMint(proposal?.info.signatoryMint);
-  const votingMint = useMint(proposal?.info.votingMint);
 
-  const sourceMint = useMint(proposal?.info.sourceMint);
-  const yesVotingMint = useMint(proposal?.info.yesVotingMint);
-  const noVotingMint = useMint(proposal?.info.noVotingMint);
+  let proposalKey = useKeyParam();
+  let proposal = useProposal(proposalKey);
 
-  const votingRecords = useVotingRecords(proposal?.pubkey);
+  const sigMint = useMint(proposal?.info.governingTokenMint);
+  const votingMint = useMint(proposal?.info.governingTokenMint);
+
+  const sourceMint = useMint(proposal?.info.governingTokenMint);
+  const yesVotingMint = useMint(proposal?.info.governingTokenMint);
+  const noVotingMint = useMint(proposal?.info.governingTokenMint);
+
+  const votingRecords = useVotingRecords(proposalOld?.pubkey);
 
   return (
     <div className="flexColumn">
@@ -71,7 +76,6 @@ export const ProposalView = () => {
       noVotingMint ? (
         <InnerProposalView
           proposal={proposal}
-          proposalState={proposalState}
           governance={governance}
           sourceMint={sourceMint}
           votingMint={votingMint}
@@ -96,7 +100,7 @@ function useLoadGist({
   setMsg,
   setContent,
   isGist,
-  proposalState,
+  proposalState: proposal,
 }: {
   loading: boolean;
   setLoading: (b: boolean) => void;
@@ -104,11 +108,11 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  proposalState: ParsedAccount<ProposalStateOld>;
+  proposalState: ParsedAccount<Proposal>;
 }) {
   useMemo(() => {
     if (loading) {
-      let toFetch = proposalState.info.descLink;
+      let toFetch = proposal.info.descriptionLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -208,7 +212,6 @@ function voterDisplayData(
 
 function InnerProposalView({
   proposal,
-  proposalState,
   sigMint,
   votingMint,
   yesVotingMint,
@@ -219,9 +222,9 @@ function InnerProposalView({
   votingDisplayData,
   endpoint,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
+  proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<GovernanceOld>;
-  proposalState: ParsedAccount<ProposalStateOld>;
+
   sigMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
@@ -231,18 +234,19 @@ function InnerProposalView({
   votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
-  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
-  const adminAccount = useAccountByMint(proposal.info.adminMint);
+  const sigAccount = useAccountByMint(proposal.info.governingTokenMint);
+  const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
 
-  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] =
-    proposalState.info.proposalTransactions
-      .map(k => instructions[k.toBase58()])
-      .filter(k => k);
-  const isUrl = !!proposalState.info.descLink.match(urlRegex);
+  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = [];
+  // proposalState.info.proposalTransactions
+  //   .map(k => instructions[k.toBase58()])
+  //   .filter(k => k);
+
+  const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
   const isGist =
-    !!proposalState.info.descLink.match(/gist/i) &&
-    !!proposalState.info.descLink.match(/github/i);
-  const [content, setContent] = useState(proposalState.info.descLink);
+    !!proposal.info.descriptionLink.match(/gist/i) &&
+    !!proposal.info.descriptionLink.match(/github/i);
+  const [content, setContent] = useState(proposal.info.descriptionLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -257,7 +261,7 @@ function InnerProposalView({
     setMsg,
     setContent,
     isGist,
-    proposalState: proposalState,
+    proposalState: proposal,
   });
 
   return (
@@ -267,11 +271,11 @@ function InnerProposalView({
           <Col md={12} xs={24}>
             <Row>
               <TokenIcon
-                mintAddress={proposal?.info.sourceMint.toBase58()}
+                mintAddress={proposal?.info.governingTokenMint.toBase58()}
                 size={60}
               />
               <Col>
-                <h1>{proposalState.info.name}</h1>
+                <h1>{proposal.info.name}</h1>
                 <StateBadge state={ProposalState.Draft} />
               </Col>
             </Row>
@@ -280,32 +284,30 @@ function InnerProposalView({
             <div className="proposal-actions">
               {adminAccount &&
                 adminAccount.info.amount.toNumber() === 1 &&
-                proposalState.info.status === ProposalStateStatus.Draft && (
-                  <AddSigners proposal={proposal} state={proposalState} />
+                proposal.info.state === ProposalState.Draft && (
+                  <AddSigners proposal={proposal} />
                 )}
               {sigAccount &&
                 sigAccount.info.amount.toNumber() === 1 &&
-                proposalState.info.status === ProposalStateStatus.Draft && (
-                  <SignButton proposal={proposal} state={proposalState} />
+                proposal.info.state === ProposalState.Draft && (
+                  <SignButton proposal={proposal} />
                 )}
-              <MintSourceTokens
+              {/* <MintSourceTokens
                 governance={governance}
                 useGovernance={
-                  proposal.info.sourceMint.toBase58() ===
+                  proposal.info.governingTokenMint.toBase58() ===
                   governance.info.governanceMint.toBase58()
                 }
-              />
-              <WithdrawVote proposal={proposal} state={proposalState} />
+              /> */}
+              <WithdrawVote proposal={proposal} />
               <Vote
                 governance={governance}
                 proposal={proposal}
-                state={proposalState}
                 yeahVote={true}
               />
               <Vote
                 governance={governance}
                 proposal={proposal}
-                state={proposalState}
                 yeahVote={false}
               />
             </div>
@@ -369,10 +371,9 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.SIG_GIVEN}
                 value={
-                  proposalState.info.totalSigningTokensMinted.toNumber() -
-                  sigMint.supply.toNumber()
+                  proposal.info.signatoriesCount - sigMint.supply.toNumber()
                 }
-                suffix={`/ ${proposalState.info.totalSigningTokensMinted.toNumber()}`}
+                suffix={`/ ${proposal.info.signatoriesCount}`}
               />
             </Card>
           </Col>
@@ -411,7 +412,7 @@ function InnerProposalView({
                     <p>
                       {LABELS.DESCRIPTION}:{' '}
                       <a
-                        href={proposalState.info.descLink}
+                        href={proposal.info.descriptionLink}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -438,16 +439,14 @@ function InnerProposalView({
                         proposal={proposal}
                         position={position + 1}
                         instruction={instruction}
-                        state={proposalState}
                       />
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    proposalState.info.status === ProposalStateStatus.Draft && (
+                    proposal.info.state === ProposalState.Draft && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
-                          state={proposalState}
                           config={governance}
                           position={instructionsForProposal.length}
                         />
@@ -467,6 +466,8 @@ function getVotesRequired(
   governance: ParsedAccount<GovernanceOld>,
   sourceMint: MintInfo,
 ): number {
+  return 10;
+
   return governance.info.voteThreshold === 100
     ? sourceMint.supply.toNumber()
     : Math.ceil(

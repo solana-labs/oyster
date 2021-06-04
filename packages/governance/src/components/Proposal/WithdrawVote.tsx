@@ -10,6 +10,7 @@ import { LABELS } from '../../constants';
 import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Proposal, ProposalState } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -18,18 +19,16 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function WithdrawVote({
   proposal,
-  state,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const voteAccount = useAccountByMint(proposal.info.votingMint);
-  const yesVoteAccount = useAccountByMint(proposal.info.yesVotingMint);
-  const noVoteAccount = useAccountByMint(proposal.info.noVotingMint);
+  const voteAccount = useAccountByMint(proposal.info.governingTokenMint);
+  const yesVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
+  const noVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
 
-  const userAccount = useAccountByMint(proposal.info.sourceMint);
+  const userAccount = useAccountByMint(proposal.info.governingTokenMint);
 
   const votingTokens =
     (voteAccount && voteAccount.info.amount.toNumber()) ||
@@ -39,13 +38,13 @@ export function WithdrawVote({
 
   const eligibleToView =
     votingTokens > 0 &&
-    (state.info.status === ProposalStateStatus.Voting ||
-      state.info.status === ProposalStateStatus.Completed ||
-      state.info.status === ProposalStateStatus.Executing ||
-      state.info.status === ProposalStateStatus.Defeated);
+    (proposal.info.state === ProposalState.Voting ||
+      proposal.info.state === ProposalState.Completed ||
+      proposal.info.state === ProposalState.Executing ||
+      proposal.info.state === ProposalState.Defeated);
 
   const [btnLabel, title, msg, action] =
-    state.info.status === ProposalStateStatus.Voting
+    proposal.info.state === ProposalState.Voting
       ? [
           LABELS.WITHDRAW_VOTE,
           LABELS.WITHDRAW_YOUR_VOTE_QUESTION,
@@ -77,17 +76,17 @@ export function WithdrawVote({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (userAccount) {
-              await withdrawVotingTokens(
-                connection,
-                wallet.wallet,
-                proposal,
-                state,
-                voteAccount?.pubkey,
-                yesVoteAccount?.pubkey,
-                noVoteAccount?.pubkey,
-                userAccount.pubkey,
-                votingTokens,
-              );
+              // await withdrawVotingTokens(
+              //   connection,
+              //   wallet.wallet,
+              //   null,
+              //   state,
+              //   voteAccount?.pubkey,
+              //   yesVoteAccount?.pubkey,
+              //   noVoteAccount?.pubkey,
+              //   userAccount.pubkey,
+              //   votingTokens,
+              // );
             }
           },
         })

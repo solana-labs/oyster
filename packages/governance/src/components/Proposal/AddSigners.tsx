@@ -6,6 +6,7 @@ import { utils, contexts, hooks } from '@oyster/common';
 import { addSigner } from '../../actions/addSigner';
 import { PublicKey } from '@solana/web3.js';
 import { LABELS } from '../../constants';
+import { Proposal } from '../../models/accounts';
 
 const { notify } = utils;
 const { TextArea } = Input;
@@ -20,14 +21,12 @@ const layout = {
 
 export default function AddSigners({
   proposal,
-  state,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const adminAccount = useAccountByMint(proposal.info.adminMint);
+  const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
   const [saving, setSaving] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -61,14 +60,14 @@ export default function AddSigners({
 
     for (let i = 0; i < signers.length; i++) {
       try {
-        await addSigner(
-          connection,
-          wallet.wallet,
-          proposal,
-          state,
-          adminAccount.pubkey,
-          new PublicKey(signers[i]),
-        );
+        // await addSigner(
+        //   connection,
+        //   wallet.wallet,
+        //   null,
+        //   state,
+        //   adminAccount.pubkey,
+        //   new PublicKey(signers[i]),
+        // );
         setSavePerc(Math.round(100 * ((i + 1) / signers.length)));
       } catch (e) {
         console.error(e);

@@ -415,3 +415,8 @@ export const useProposals = (governance: PublicKey) => {
 
   return proposals;
 };
+
+export const useProposal = (proposal: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  return ctx.proposals.get(proposal.toBase58());
+};

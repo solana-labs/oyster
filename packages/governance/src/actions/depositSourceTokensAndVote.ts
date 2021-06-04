@@ -35,7 +35,7 @@ const { approve } = models;
 export const depositSourceTokensAndVote = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   existingVoteAccount: PublicKey | undefined,
   existingYesVoteAccount: PublicKey | undefined,
   existingNoVoteAccount: PublicKey | undefined,
@@ -63,7 +63,7 @@ export const depositSourceTokensAndVote = async (
       depositInstructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.votingMint,
+      proposal!.info.votingMint,
       wallet.publicKey,
       depositSigners,
     );
@@ -73,7 +73,7 @@ export const depositSourceTokensAndVote = async (
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
       PROGRAM_IDS.governance.programId.toBuffer(),
-      proposal.pubkey.toBuffer(),
+      proposal!.pubkey.toBuffer(),
       existingVoteAccount.toBuffer(),
     ],
     PROGRAM_IDS.governance.programId,
@@ -83,7 +83,7 @@ export const depositSourceTokensAndVote = async (
     depositInstructions.push(
       createEmptyGovernanceVotingRecordInstruction(
         governanceVotingRecord,
-        proposal.pubkey,
+        proposal!.pubkey,
         existingVoteAccount,
         wallet.publicKey,
       ),
@@ -95,7 +95,7 @@ export const depositSourceTokensAndVote = async (
       depositInstructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.yesVotingMint,
+      proposal!.info.yesVotingMint,
       wallet.publicKey,
       depositSigners,
     );
@@ -106,14 +106,14 @@ export const depositSourceTokensAndVote = async (
       depositInstructions,
       wallet.publicKey,
       accountRentExempt,
-      proposal.info.noVotingMint,
+      proposal!.info.noVotingMint,
       wallet.publicKey,
       depositSigners,
     );
   }
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal!.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 
@@ -132,9 +132,9 @@ export const depositSourceTokensAndVote = async (
       governanceVotingRecord,
       existingVoteAccount,
       sourceAccount,
-      proposal.info.sourceHolding,
-      proposal.info.votingMint,
-      proposal.pubkey,
+      proposal!.info.sourceHolding,
+      proposal!.info.votingMint,
+      proposal!.pubkey,
       depositAuthority.publicKey,
       mintAuthority,
       votingTokenAmount,
@@ -161,11 +161,11 @@ export const depositSourceTokensAndVote = async (
       existingVoteAccount,
       existingYesVoteAccount,
       existingNoVoteAccount,
-      proposal.info.votingMint,
-      proposal.info.yesVotingMint,
-      proposal.info.noVotingMint,
-      proposal.info.sourceMint,
-      proposal.pubkey,
+      proposal!.info.votingMint,
+      proposal!.info.yesVotingMint,
+      proposal!.info.noVotingMint,
+      proposal!.info.sourceMint,
+      proposal!.pubkey,
       governance.pubkey,
       voteAuthority.publicKey,
       mintAuthority,

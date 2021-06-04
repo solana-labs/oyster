@@ -24,7 +24,7 @@ const { approve } = models;
 export const addSigner = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   state: ParsedAccount<ProposalStateOld>,
   adminAccount: PublicKey,
   newSignatoryAccountOwner: PublicKey,
@@ -42,13 +42,13 @@ export const addSigner = async (
     instructions,
     wallet.publicKey,
     accountRentExempt,
-    proposal.info.signatoryMint,
+    proposal!.info.signatoryMint,
     newSignatoryAccountOwner,
     signers,
   );
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal!.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 
@@ -64,11 +64,11 @@ export const addSigner = async (
   instructions.push(
     addSignerInstruction(
       newSignerAccount,
-      proposal.info.signatoryMint,
+      proposal!.info.signatoryMint,
       adminAccount,
-      proposal.info.adminValidation,
+      proposal!.info.adminValidation,
       state.pubkey,
-      proposal.pubkey,
+      proposal!.pubkey,
       transferAuthority.publicKey,
       mintAuthority,
     ),

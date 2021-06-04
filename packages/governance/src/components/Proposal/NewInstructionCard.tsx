@@ -11,6 +11,7 @@ import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../constants';
+import { Proposal } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -24,19 +25,17 @@ const layout = {
 
 export function NewInstructionCard({
   proposal,
-  state,
   position,
   config,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
   config: ParsedAccount<GovernanceOld>;
   position: number;
 }) {
   const [form] = Form.useForm();
   const wallet = useWallet();
   const connection = useConnection();
-  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
+  const sigAccount = useAccountByMint(proposal.info.governingTokenMint);
 
   const onFinish = async (values: {
     slot: string;
@@ -66,16 +65,16 @@ export function NewInstructionCard({
     let instruction = values.instruction;
 
     if (sigAccount) {
-      await addCustomSingleSignerTransaction(
-        connection,
-        wallet.wallet,
-        proposal,
-        state,
-        sigAccount.pubkey,
-        values.slot,
-        instruction,
-        position,
-      );
+      // await addCustomSingleSignerTransaction(
+      //   connection,
+      //   wallet.wallet,
+      //   null,
+      //   state,
+      //   sigAccount.pubkey,
+      //   values.slot,
+      //   instruction,
+      //   position,
+      // );
       form.resetFields();
     }
   };

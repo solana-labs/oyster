@@ -17,7 +17,7 @@ const { approve } = models;
 export const sign = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   state: ParsedAccount<ProposalStateOld>,
   sigAccount: PublicKey,
 ) => {
@@ -27,7 +27,7 @@ export const sign = async (
   let instructions: TransactionInstruction[] = [];
 
   const [mintAuthority] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal.pubkey.toBuffer()],
+    [Buffer.from(GOVERNANCE_PROGRAM_SEED), proposal!.pubkey.toBuffer()],
     PROGRAM_IDS.governance.programId,
   );
 
@@ -44,8 +44,8 @@ export const sign = async (
     signInstruction(
       state.pubkey,
       sigAccount,
-      proposal.info.signatoryMint,
-      proposal.pubkey,
+      proposal!.info.signatoryMint,
+      proposal!.pubkey,
       transferAuthority.publicKey,
       mintAuthority,
     ),

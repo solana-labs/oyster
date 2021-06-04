@@ -13,6 +13,7 @@ import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useMemo, useState } from 'react';
 import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
+import { Proposal, ProposalState } from '../../models/accounts';
 import {
   ProposalOld,
   ProposalStateOld,
@@ -34,12 +35,11 @@ enum Playstate {
 export function InstructionCard({
   instruction,
   proposal,
-  state,
   position,
 }: {
   instruction: ParsedAccount<GovernanceTransaction>;
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
+
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
@@ -81,7 +81,6 @@ export function InstructionCard({
           playing={playing}
           setPlaying={setPlaying}
           proposal={proposal}
-          state={state}
           instruction={instruction}
         />
       }
@@ -101,13 +100,12 @@ export function InstructionCard({
 
 function PlayStatusButton({
   proposal,
-  state,
   playing,
   setPlaying,
   instruction,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
+
   instruction: ParsedAccount<GovernanceTransaction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
@@ -116,7 +114,7 @@ function PlayStatusButton({
   const connection = useConnection();
   const [currSlot, setCurrSlot] = useState(0);
 
-  const elapsedTime = currSlot - state.info.votingEndedAt.toNumber();
+  const elapsedTime = currSlot - proposal.info.votingCompletedAt!.toNumber();
   const ineligibleToSee = elapsedTime < instruction.info.slot.toNumber();
 
   useEffect(() => {
@@ -134,7 +132,7 @@ function PlayStatusButton({
   const run = async () => {
     setPlaying(Playstate.Playing);
     try {
-      await execute(connection, wallet.wallet, proposal, state, instruction);
+      //await execute(connection, wallet.wallet, null, state, instruction);
     } catch (e) {
       console.error(e);
       setPlaying(Playstate.Error);
@@ -144,8 +142,8 @@ function PlayStatusButton({
   };
 
   if (
-    state.info.status !== ProposalStateStatus.Executing &&
-    state.info.status !== ProposalStateStatus.Completed
+    proposal.info.state !== ProposalState.Executing &&
+    proposal.info.state !== ProposalState.Completed
   )
     return null;
   if (ineligibleToSee) return null;

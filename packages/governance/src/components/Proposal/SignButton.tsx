@@ -3,6 +3,7 @@ import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { sign } from '../../actions/sign';
+import { Proposal } from '../../models/accounts';
 import { ProposalOld, ProposalStateOld } from '../../models/serialisation';
 const { confirm } = Modal;
 
@@ -13,14 +14,12 @@ const { notify } = utils;
 
 export default function SignButton({
   proposal,
-  state,
 }: {
-  proposal: ParsedAccount<ProposalOld>;
-  state: ParsedAccount<ProposalStateOld>;
+  proposal: ParsedAccount<Proposal>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const sigAccount = useAccountByMint(proposal.info.signatoryMint);
+  const sigAccount = useAccountByMint(proposal.info.governingTokenMint);
   return (
     <>
       {sigAccount && sigAccount.info.amount.toNumber() === 0 && (
@@ -42,13 +41,13 @@ export default function SignButton({
                   return;
                 }
 
-                return sign(
-                  connection,
-                  wallet.wallet,
-                  proposal,
-                  state,
-                  sigAccount.pubkey,
-                );
+                // return sign(
+                //   connection,
+                //   wallet.wallet,
+                //   null,
+                //   state,
+                //   sigAccount.pubkey,
+                // );
               },
               onCancel() {
                 // no-op

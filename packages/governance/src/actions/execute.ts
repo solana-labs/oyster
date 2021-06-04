@@ -19,7 +19,7 @@ const { notify } = utils;
 export const execute = async (
   connection: Connection,
   wallet: any,
-  proposal: ParsedAccount<ProposalOld>,
+  proposal: ParsedAccount<ProposalOld> | null,
   state: ParsedAccount<ProposalStateOld>,
   transaction: ParsedAccount<GovernanceTransaction>,
 ) => {
@@ -32,9 +32,9 @@ export const execute = async (
     executeInstruction(
       transaction.pubkey,
       state.pubkey,
-      proposal.pubkey,
+      proposal!.pubkey,
       actualMessage.accountKeys[actualMessage.instructions[0].programIdIndex],
-      proposal.info.config,
+      proposal!.info.config,
       accountInfos,
     ),
   );

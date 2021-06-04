@@ -2,7 +2,7 @@ import React from 'react';
 import { LABELS } from '../../constants';
 
 import { Table, Grid } from 'antd';
-import { VoterDisplayData, VoteType } from '../../views/proposal';
+import { VoterDisplayData, VoteType } from '../../views/proposal/ProposalView';
 
 function shortNumber(num: number) {
   if (Math.abs(num) < 1000) {
