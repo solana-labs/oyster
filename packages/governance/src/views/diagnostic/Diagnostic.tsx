@@ -78,7 +78,7 @@ export const DiagnosticView = () => {
   const context = useGovernanceAccounts();
   const connection = useConnection();
   const wallet = useWallet();
-  const configs = Object.values(context.configs);
+  const configs: ParsedAccount<GovernanceOld>[] = [];
   const [data, setData] = useState<any>([]);
   const myTokenAccts = useUserAccounts()?.userAccounts?.map(a =>
     a.info.mint.toBase58(),

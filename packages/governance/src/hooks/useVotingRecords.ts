@@ -14,7 +14,7 @@ import {
 } from '../models/serialisation';
 import { getGovernanceVotingRecords } from '../utils/lookups';
 
-export function useVotingRecords(proposal: PublicKey) {
+export function useVotingRecords(proposal?: PublicKey) {
   const [votingRecords, setVotingRecords] = useState<
     Record<string, ParsedAccount<GovernanceVotingRecord>>
   >({});

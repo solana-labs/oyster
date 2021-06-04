@@ -12,6 +12,7 @@ import {
   CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
+  RelinquishVoteArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
@@ -24,6 +25,8 @@ import {
   Realm,
   SignatoryRecord,
   TokenOwnerRecord,
+  VoteRecord,
+  VoteWeight,
 } from './accounts';
 
 export const DESC_SIZE = 200;
@@ -108,6 +111,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
   [
     SignOffProposalArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    RelinquishVoteArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],
@@ -213,6 +223,29 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['proposal', 'pubkey'],
         ['signatory', 'pubkey'],
         ['signedOff', 'u8'],
+      ],
+    },
+  ],
+  [
+    VoteWeight,
+    {
+      kind: 'enum',
+      values: [
+        ['yes', 'u64'],
+        ['no', 'u64'],
+      ],
+    },
+  ],
+  [
+    VoteRecord,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['proposal', 'pubkey'],
+        ['governingTokenOwner', 'pubkey'],
+        ['isRelinquished', 'u8'],
+        ['voteWeight', VoteWeight],
       ],
     },
   ],

@@ -239,3 +239,33 @@ export class SignatoryRecord {
     this.signedOff = !!args.signedOff;
   }
 }
+
+export class VoteWeight {
+  yes: BN;
+  no: BN;
+
+  constructor(args: { yes: BN; no: BN }) {
+    this.yes = args.yes;
+    this.no = args.no;
+  }
+}
+
+export class VoteRecord {
+  accountType = GovernanceAccountType.VoteRecord;
+  proposal: PublicKey;
+  governingTokenOwner: PublicKey;
+  isRelinquished: boolean;
+  voteWeight: VoteWeight;
+
+  constructor(args: {
+    proposal: PublicKey;
+    governingTokenOwner: PublicKey;
+    isRelinquished: boolean;
+    voteWeight: VoteWeight;
+  }) {
+    this.proposal = args.proposal;
+    this.governingTokenOwner = args.governingTokenOwner;
+    this.isRelinquished = !!args.isRelinquished;
+    this.voteWeight = args.voteWeight;
+  }
+}

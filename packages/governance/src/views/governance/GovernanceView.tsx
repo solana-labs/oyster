@@ -1,7 +1,6 @@
 import { Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import {
-  useConfig,
   useGovernance,
   useProposals,
   useRealm,
@@ -15,25 +14,25 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 const PAGE_SIZE = 10;
 
 export const GovernanceView = () => {
-  const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const config = useConfig(id);
+
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
   const { connected } = useWallet();
-  const token = tokenMap.get(
-    config?.info.governanceMint.toBase58() || '',
-  ) as any;
-  const tokenBackground =
-    token?.extensions?.background ||
-    'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
 
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
   const realm = useRealm(governance?.info.config.realm);
   const proposals = useProposals(governanceKey);
 
-  const mint = config?.info.governanceMint.toBase58() || '';
+  const communityTokenMint = realm?.info.communityMint;
+
+  const token = tokenMap.get(communityTokenMint?.toBase58() || '') as any;
+  const tokenBackground =
+    token?.extensions?.background ||
+    'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
+
+  const mint = communityTokenMint?.toBase58() || '';
 
   const proposalItems = useMemo(() => {
     return proposals.map(p => ({

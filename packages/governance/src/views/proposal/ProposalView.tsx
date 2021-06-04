@@ -5,6 +5,7 @@ import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   INSTRUCTION_LIMIT,
   GovernanceTransaction,
+  ProposalOld,
 } from '../../models/serialisation';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -49,10 +50,15 @@ export enum VoteType {
   No = 'Nay',
 }
 
+const getDefaultProposalOld = (): ParsedAccount<ProposalOld> | null => {
+  return null;
+};
+
 export const ProposalView = () => {
   const context = useGovernanceAccounts();
   const { id } = useParams<{ id: string }>();
-  const proposalOld = context.proposalsOld[id];
+
+  const proposalOld = getDefaultProposalOld();
 
   const { endpoint } = useConnectionConfig();
 
@@ -73,7 +79,6 @@ export const ProposalView = () => {
             governance={governance}
             votingDisplayData={voterDisplayData(votingRecords)}
             governingTokenMint={governingTokenMint}
-            instructions={context.transactions}
             endpoint={endpoint}
           />
         ) : (
@@ -205,7 +210,6 @@ function InnerProposalView({
   proposal,
   governingTokenMint,
 
-  instructions,
   governance,
 
   votingDisplayData,
@@ -216,7 +220,6 @@ function InnerProposalView({
 
   governingTokenMint: MintInfo;
 
-  instructions: Record<string, ParsedAccount<GovernanceTransaction>>;
   votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {

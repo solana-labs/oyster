@@ -109,3 +109,7 @@ export class CastVoteArgs {
     this.vote = args.vote;
   }
 }
+
+export class RelinquishVoteArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.RelinquishVote;
+}

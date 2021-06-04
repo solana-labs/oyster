@@ -38,18 +38,16 @@ import {
   Realm,
   SignatoryRecord,
   TokenOwnerRecord,
+  VoteRecord,
 } from '../models/accounts';
 
 export interface ProposalsContextState {
-  proposalsOld: Record<string, ParsedAccount<ProposalOld>>;
-  transactions: Record<string, ParsedAccount<GovernanceTransaction>>;
-  states: Record<string, ParsedAccount<ProposalStateOld>>;
-  configs: Record<string, ParsedAccount<GovernanceOld>>;
   realms: Record<string, ParsedAccount<Realm>>;
   governances: Record<string, ParsedAccount<Governance>>;
   tokenOwnerRecords: Map<string, ParsedAccount<TokenOwnerRecord>>;
   proposals: Record<string, ParsedAccount<Proposal>>;
   signatoryRecords: Map<string, ParsedAccount<SignatoryRecord>>;
+  voteRecords: Record<string, ParsedAccount<VoteRecord>>;
 }
 
 export const ProposalsContext =
@@ -63,10 +61,6 @@ export default function ProposalsProvider({ children = null as any }) {
     [endpoint],
   );
 
-  const [proposalsOld, setProposalsOld] = useState({});
-  const [transactions, setTransactions] = useState({});
-  const [states, setStates] = useState({});
-  const [configs, setConfigs] = useState({});
   const [realms, setRealms] = useState({});
   const [governances, setGovernances] = useState({});
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState(
@@ -76,32 +70,27 @@ export default function ProposalsProvider({ children = null as any }) {
   const [signatoryRecords, setSignatoryRecords] = useState(
     new Map<string, ParsedAccount<SignatoryRecord>>(),
   );
+  const [voteRecords, setVoteRecords] = useState({});
 
   useSetupProposalsCache({
     connection,
-    setProposalsOld,
-    setTransactions,
-    setStates,
-    setConfigs,
     setRealms,
     setGovernances,
     setTokenOwnerRecords,
     setProposals,
     setSignatoryRecords,
+    setVoteRecords,
   });
 
   return (
     <ProposalsContext.Provider
       value={{
-        proposalsOld: proposalsOld,
-        transactions,
-        configs,
-        states,
         realms,
         governances,
         tokenOwnerRecords,
         proposals,
         signatoryRecords,
+        voteRecords,
       }}
     >
       {children}
@@ -111,21 +100,15 @@ export default function ProposalsProvider({ children = null as any }) {
 
 function useSetupProposalsCache({
   connection,
-  setProposalsOld,
-  setTransactions,
-  setStates,
-  setConfigs,
   setRealms,
   setGovernances,
   setTokenOwnerRecords,
   setProposals,
   setSignatoryRecords,
+  setVoteRecords,
 }: {
   connection: Connection;
-  setProposalsOld: React.Dispatch<React.SetStateAction<{}>>;
-  setTransactions: React.Dispatch<React.SetStateAction<{}>>;
-  setStates: React.Dispatch<React.SetStateAction<{}>>;
-  setConfigs: React.Dispatch<React.SetStateAction<{}>>;
+
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
   setGovernances: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<Governance>>>
@@ -139,6 +122,9 @@ function useSetupProposalsCache({
   setSignatoryRecords: React.Dispatch<
     React.SetStateAction<Map<string, ParsedAccount<SignatoryRecord>>>
   >;
+  setVoteRecords: React.Dispatch<
+    React.SetStateAction<Record<string, ParsedAccount<VoteRecord>>>
+  >;
 }) {
   useEffect(() => {
     const PROGRAM_IDS = utils.programIds();
@@ -150,12 +136,6 @@ function useSetupProposalsCache({
       return programAccounts;
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      const newProposalsOld: Record<string, ParsedAccount<ProposalOld>> = {};
-      const newTransactions: Record<
-        string,
-        ParsedAccount<GovernanceTransaction>
-      > = {};
-      const newStates: Record<string, ParsedAccount<ProposalStateOld>> = {};
       const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
       const newRealms: Record<string, ParsedAccount<Realm>> = {};
       const newGovernances: Record<string, ParsedAccount<Governance>> = {};
@@ -168,6 +148,7 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<SignatoryRecord>
       >();
+      const voteRecords: Record<string, ParsedAccount<VoteRecord>> = {};
 
       all[0].forEach(a => {
         let cached;
@@ -208,18 +189,24 @@ function useSetupProposalsCache({
             signatoryRecords.set(a.pubkey.toBase58(), account);
             break;
           }
+          case GovernanceAccountType.VoteRecord: {
+            const account = BorshAccountParser(VoteRecord)(
+              a.pubkey,
+              a.account,
+            ) as ParsedAccount<VoteRecord>;
+            voteRecords[a.pubkey.toBase58()] = account;
+
+            break;
+          }
         }
       });
 
-      setProposalsOld(newProposalsOld);
-      setTransactions(newTransactions);
-      setStates(newStates);
-      setConfigs(newConfigs);
       setRealms(newRealms);
       setGovernances(newGovernances);
       setTokenOwnerRecords(newTokenOwnerRecords);
       setProposals(proposals);
       setSignatoryRecords(signatoryRecords);
+      setVoteRecords(voteRecords);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
@@ -307,50 +294,23 @@ function useSetupProposalsCache({
             });
             break;
           }
-        }
+          case GovernanceAccountType.VoteRecord: {
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(VoteRecord),
+            );
 
-        [
-          [ProposalLayout.span, ProposalOldParser, setProposals],
-          [
-            CustomSingleSignerTransactionLayout.span,
-            CustomSingleSignerTransactionParser,
-            setTransactions,
-          ],
-          [ProposalStateLayout.span, ProposalStateParser, setStates],
-          [GovernanceLayout.span, GovernanceOldParser, setConfigs],
-        ].forEach(arr => {
-          const [span, parser, setter] = arr;
-          if (info.accountInfo.data.length === span) {
-            cache.add(info.accountId, info.accountInfo, parser);
-            let cached: any;
-            switch (info.accountInfo.data.length) {
-              case ProposalLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<ProposalOld>;
-                break;
-              case CustomSingleSignerTransactionLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<CustomSingleSignerTransaction>;
-                break;
-              case GovernanceLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<GovernanceOld>;
-                break;
-              case ProposalStateLayout.span:
-                cached = cache.get(
-                  info.accountId,
-                ) as ParsedAccount<ProposalStateOld>;
-                break;
-            }
-            setter((obj: any) => ({
-              ...obj,
-              [pubkey.toBase58()]: cached,
+            setVoteRecords((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<VoteRecord>,
             }));
+
+            break;
           }
-        });
+        }
       },
       'singleGossip',
     );
@@ -362,15 +322,6 @@ function useSetupProposalsCache({
 export const useGovernanceAccounts = () => {
   const context = useContext(ProposalsContext);
   return context as ProposalsContextState;
-};
-
-export const useConfig = (id: string) => {
-  const context = useContext(ProposalsContext);
-  if (!context?.configs) {
-    return;
-  }
-
-  return context.configs[id];
 };
 
 export const useRealms = () => {
