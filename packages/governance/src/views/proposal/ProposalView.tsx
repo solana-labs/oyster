@@ -7,11 +7,10 @@ import {
   GovernanceTransaction,
   ProposalOld,
 } from '../../models/serialisation';
-import { useParams } from 'react-router-dom';
+
 import ReactMarkdown from 'react-markdown';
 import {
   useGovernance,
-  useGovernanceAccounts,
   useProposal,
   useSignatoryRecord,
   useTokenOwnerRecord,
@@ -55,9 +54,6 @@ const getDefaultProposalOld = (): ParsedAccount<ProposalOld> | null => {
 };
 
 export const ProposalView = () => {
-  const context = useGovernanceAccounts();
-  const { id } = useParams<{ id: string }>();
-
   const proposalOld = getDefaultProposalOld();
 
   const { endpoint } = useConnectionConfig();

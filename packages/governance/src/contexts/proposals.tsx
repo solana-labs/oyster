@@ -15,22 +15,7 @@ import {
   cache,
   useWallet,
 } from '@oyster/common';
-import {
-  CustomSingleSignerTransactionLayout,
-  CustomSingleSignerTransactionParser,
-  GovernanceOld,
-  GovernanceLayout,
-  GovernanceOldParser,
-  ProposalOld,
-  ProposalStateOld,
-  ProposalLayout,
-  ProposalOldParser,
-  GovernanceTransaction,
-  ProposalStateParser,
-  ProposalStateLayout,
-  CustomSingleSignerTransaction,
-  BorshAccountParser,
-} from '../models/serialisation';
+import { BorshAccountParser } from '../models/serialisation';
 import {
   Governance,
   GovernanceAccountType,
@@ -136,10 +121,9 @@ function useSetupProposalsCache({
       return programAccounts;
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      const newConfigs: Record<string, ParsedAccount<GovernanceOld>> = {};
-      const newRealms: Record<string, ParsedAccount<Realm>> = {};
-      const newGovernances: Record<string, ParsedAccount<Governance>> = {};
-      const newTokenOwnerRecords = new Map<
+      const realms: Record<string, ParsedAccount<Realm>> = {};
+      const governances: Record<string, ParsedAccount<Governance>> = {};
+      const tokenOwnerRecords = new Map<
         string,
         ParsedAccount<TokenOwnerRecord>
       >();
@@ -157,12 +141,12 @@ function useSetupProposalsCache({
           case GovernanceAccountType.Realm:
             cache.add(a.pubkey, a.account, BorshAccountParser(Realm));
             cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
-            newRealms[a.pubkey.toBase58()] = cached;
+            realms[a.pubkey.toBase58()] = cached;
             break;
           case GovernanceAccountType.AccountGovernance: {
             cache.add(a.pubkey, a.account, BorshAccountParser(Governance));
             cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
-            newGovernances[a.pubkey.toBase58()] = cached;
+            governances[a.pubkey.toBase58()] = cached;
             break;
           }
           case GovernanceAccountType.TokenOwnerRecord: {
@@ -172,7 +156,7 @@ function useSetupProposalsCache({
               BorshAccountParser(TokenOwnerRecord),
             );
             cached = cache.get(a.pubkey) as ParsedAccount<TokenOwnerRecord>;
-            newTokenOwnerRecords.set(a.pubkey.toBase58(), cached);
+            tokenOwnerRecords.set(a.pubkey.toBase58(), cached);
             break;
           }
           case GovernanceAccountType.Proposal: {
@@ -201,9 +185,9 @@ function useSetupProposalsCache({
         }
       });
 
-      setRealms(newRealms);
-      setGovernances(newGovernances);
-      setTokenOwnerRecords(newTokenOwnerRecords);
+      setRealms(realms);
+      setGovernances(governances);
+      setTokenOwnerRecords(tokenOwnerRecords);
       setProposals(proposals);
       setSignatoryRecords(signatoryRecords);
       setVoteRecords(voteRecords);

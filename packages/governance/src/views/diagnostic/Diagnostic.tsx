@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useGovernanceAccounts } from '../../contexts/proposals';
+
 import { LABELS } from '../../constants';
 
 import {
@@ -75,7 +75,6 @@ const columns = [
 ];
 
 export const DiagnosticView = () => {
-  const context = useGovernanceAccounts();
   const connection = useConnection();
   const wallet = useWallet();
   const configs: ParsedAccount<GovernanceOld>[] = [];

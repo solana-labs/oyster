@@ -7,7 +7,7 @@ import {
 } from '../../contexts/proposals';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../../components/Proposal/StateBadge';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
 import { NewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
