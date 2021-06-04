@@ -8,7 +8,7 @@ import { LABELS } from '../../constants';
 import {
   SourceEntryInterface,
   mintSourceTokens,
-} from '../../actions/mintSourceTokens';
+} from '../../actions/_mintSourceTokens';
 
 const { notify } = utils;
 const { TextArea } = Input;
