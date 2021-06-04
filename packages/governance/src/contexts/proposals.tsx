@@ -397,3 +397,20 @@ export const useSignatoryRecord = (proposal: PublicKey) => {
 
   return null;
 };
+
+export const useVoteRecord = (proposal: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  const { wallet } = useWallet();
+
+  for (let record of Object.values(ctx.voteRecords)) {
+    if (
+      record.info.governingTokenOwner.toBase58() ===
+        wallet?.publicKey?.toBase58() &&
+      record.info.proposal.toBase58() === proposal.toBase58()
+    ) {
+      return record;
+    }
+  }
+
+  return null;
+};

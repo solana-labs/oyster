@@ -4,13 +4,14 @@ import React from 'react';
 
 import { LABELS } from '../../constants';
 
-import { contexts, hooks } from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Proposal, ProposalState } from '../../models/accounts';
+import { useVoteRecord } from '../../contexts/proposals';
+import { relinquishVote } from '../../actions/relinquishVote';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
-const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
 export function WithdrawVote({
@@ -18,24 +19,18 @@ export function WithdrawVote({
 }: {
   proposal: ParsedAccount<Proposal>;
 }) {
-  const wallet = useWallet();
+  const { wallet, connected } = useWallet();
   const connection = useConnection();
-  const voteAccount = useAccountByMint(proposal.info.governingTokenMint);
-  const yesVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
-  const noVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
 
-  const userAccount = useAccountByMint(proposal.info.governingTokenMint);
-
-  const votingTokens =
-    (voteAccount && voteAccount.info.amount.toNumber()) ||
-    0 +
-      ((yesVoteAccount && yesVoteAccount.info.amount.toNumber()) || 0) +
-      ((noVoteAccount && noVoteAccount.info.amount.toNumber()) || 0);
+  const voteRecord = useVoteRecord(proposal.pubkey);
 
   const eligibleToView =
-    votingTokens > 0 &&
+    connected &&
+    voteRecord &&
+    !voteRecord?.info.isRelinquished &&
     (proposal.info.state === ProposalState.Voting ||
       proposal.info.state === ProposalState.Completed ||
+      proposal.info.state === ProposalState.Succeeded ||
       proposal.info.state === ProposalState.Executing ||
       proposal.info.state === ProposalState.Defeated);
 
@@ -71,20 +66,12 @@ export function WithdrawVote({
           okText: action,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            if (userAccount) {
-              console.log('TODO:', { wallet, connection });
-              // await withdrawVotingTokens(
-              //   connection,
-              //   wallet.wallet,
-              //   null,
-              //   state,
-              //   voteAccount?.pubkey,
-              //   yesVoteAccount?.pubkey,
-              //   noVoteAccount?.pubkey,
-              //   userAccount.pubkey,
-              //   votingTokens,
-              // );
-            }
+            await relinquishVote(
+              connection,
+              wallet,
+              proposal,
+              voteRecord!.pubkey,
+            );
           },
         })
       }
