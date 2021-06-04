@@ -2,6 +2,7 @@ import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
 
 import { withCreateProposal } from '../models/withCreateProposal';
+import { withAddSignatory } from '../models/withAddSignatory';
 
 const { notify } = utils;
 
@@ -17,7 +18,11 @@ export const createProposal = async (
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
-  const { proposalAddress } = await withCreateProposal(
+  let governanceAuthority = wallet.publicKey;
+  let signatory = wallet.publicKey;
+  let payer = wallet.publicKey;
+
+  const { proposalAddress, tokenOwnerRecordAddress } = await withCreateProposal(
     instructions,
     realm,
     governance,
@@ -25,8 +30,19 @@ export const createProposal = async (
     descriptionLink,
     governingTokenMint,
     wallet.publicKey,
+    governanceAuthority,
     proposalIndex,
-    wallet.publicKey,
+    payer,
+  );
+
+  // Add the proposal creator as the default signatory
+  await withAddSignatory(
+    instructions,
+    proposalAddress,
+    tokenOwnerRecordAddress,
+    governanceAuthority,
+    signatory,
+    payer,
   );
 
   notify({

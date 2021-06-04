@@ -1,10 +1,8 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
-import { ProposalOld, ProposalStateOld } from '../../models/serialisation';
 import { utils, contexts, hooks } from '@oyster/common';
-import { addSigner } from '../../actions/addSigner';
-import { PublicKey } from '@solana/web3.js';
+
 import { LABELS } from '../../constants';
 import { Proposal } from '../../models/accounts';
 
@@ -60,6 +58,7 @@ export default function AddSigners({
 
     for (let i = 0; i < signers.length; i++) {
       try {
+        console.log('TODO:', { wallet, connection });
         // await addSigner(
         //   connection,
         //   wallet.wallet,

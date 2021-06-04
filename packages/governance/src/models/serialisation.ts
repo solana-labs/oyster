@@ -6,6 +6,7 @@ import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
+  AddSignatoryArgs,
   CreateAccountGovernanceArgs,
   CreateProposalArgs,
   CreateRealmArgs,
@@ -89,6 +90,16 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['name', 'string'],
         ['descriptionLink', 'string'],
         ['governingTokenMint', 'pubkey'],
+      ],
+    },
+  ],
+  [
+    AddSignatoryArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['signatory', 'pubkey'],
       ],
     },
   ],

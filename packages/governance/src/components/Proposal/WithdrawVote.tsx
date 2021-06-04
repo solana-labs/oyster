@@ -1,13 +1,9 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
-import {
-  ProposalOld,
-  ProposalStateOld,
-  ProposalStateStatus,
-} from '../../models/serialisation';
+
 import { LABELS } from '../../constants';
-import { withdrawVotingTokens } from '../../actions/withdrawVotingTokens';
+
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Proposal, ProposalState } from '../../models/accounts';
@@ -76,6 +72,7 @@ export function WithdrawVote({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (userAccount) {
+              console.log('TODO:', { wallet, connection });
               // await withdrawVotingTokens(
               //   connection,
               //   wallet.wallet,

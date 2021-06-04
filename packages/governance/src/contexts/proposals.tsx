@@ -283,7 +283,7 @@ function useSetupProposalsCache({
             return map;
           });
 
-          console.log('PROPOSAL', cached);
+          console.log('PROPOSAL RECEIVED', cached);
         }
 
         [

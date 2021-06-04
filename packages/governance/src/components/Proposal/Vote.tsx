@@ -1,14 +1,9 @@
 import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
-import {
-  GovernanceOld,
-  ProposalOld,
-  ProposalStateOld,
-  ProposalStateStatus,
-} from '../../models/serialisation';
+
 import { LABELS } from '../../constants';
-import { depositSourceTokensAndVote } from '../../actions/depositSourceTokensAndVote';
+
 import { contexts, hooks } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
@@ -33,10 +28,6 @@ export function Vote({
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-
-  const voteAccount = useAccountByMint(proposal.info.governingTokenMint);
-  const yesVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
-  const noVoteAccount = useAccountByMint(proposal.info.governingTokenMint);
 
   const userTokenAccount = useAccountByMint(proposal.info.governingTokenMint);
 
@@ -80,9 +71,7 @@ export function Vote({
             if (userTokenAccount) {
               const voteAmount = userTokenAccount.info.amount.toNumber();
 
-              const yesTokenAmount = yeahVote ? voteAmount : 0;
-              const noTokenAmount = !yeahVote ? voteAmount : 0;
-
+              console.log('TODO:', { wallet, connection, voteAmount });
               // await depositSourceTokensAndVote(
               //   connection,
               //   wallet.wallet,

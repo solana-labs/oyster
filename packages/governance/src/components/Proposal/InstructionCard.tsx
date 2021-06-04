@@ -11,15 +11,9 @@ import { Message } from '@solana/web3.js';
 import { Card, Button } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useMemo, useState } from 'react';
-import { execute } from '../../actions/execute';
 import { LABELS } from '../../constants';
 import { Proposal, ProposalState } from '../../models/accounts';
-import {
-  ProposalOld,
-  ProposalStateOld,
-  ProposalStateStatus,
-  GovernanceTransaction,
-} from '../../models/serialisation';
+import { GovernanceTransaction } from '../../models/serialisation';
 
 import './style.less';
 
@@ -111,6 +105,7 @@ function PlayStatusButton({
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
 }) {
   const wallet = useWallet();
+
   const connection = useConnection();
   const [currSlot, setCurrSlot] = useState(0);
 
@@ -132,6 +127,7 @@ function PlayStatusButton({
   const run = async () => {
     setPlaying(Playstate.Playing);
     try {
+      console.log('TODO:', wallet);
       //await execute(connection, wallet.wallet, null, state, instruction);
     } catch (e) {
       console.error(e);

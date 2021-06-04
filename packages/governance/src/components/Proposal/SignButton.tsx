@@ -2,9 +2,9 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ParsedAccount, hooks, contexts, utils } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
-import { sign } from '../../actions/sign';
+
 import { Proposal } from '../../models/accounts';
-import { ProposalOld, ProposalStateOld } from '../../models/serialisation';
+
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
@@ -41,6 +41,7 @@ export default function SignButton({
                   return;
                 }
 
+                console.log('TODO:', { wallet, connection });
                 // return sign(
                 //   connection,
                 //   wallet.wallet,

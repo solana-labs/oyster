@@ -18,9 +18,13 @@ export const withCreateProposal = async (
   descriptionLink: string,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
+  governanceAuthority: PublicKey,
   proposalIndex: number,
   payer: PublicKey,
-): Promise<{ proposalAddress: PublicKey }> => {
+): Promise<{
+  proposalAddress: PublicKey;
+  tokenOwnerRecordAddress: PublicKey;
+}> => {
   const PROGRAM_IDS = utils.programIds();
 
   const args = new CreateProposalArgs({
@@ -70,7 +74,7 @@ export const withCreateProposal = async (
       isSigner: false,
     },
     {
-      pubkey: governingTokenOwner,
+      pubkey: governanceAuthority,
       isWritable: false,
       isSigner: true,
     },
@@ -104,5 +108,5 @@ export const withCreateProposal = async (
     }),
   );
 
-  return { proposalAddress };
+  return { proposalAddress, tokenOwnerRecordAddress };
 };

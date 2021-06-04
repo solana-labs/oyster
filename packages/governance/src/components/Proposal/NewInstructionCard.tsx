@@ -1,14 +1,9 @@
 import React from 'react';
 import { Card } from 'antd';
 import { Form, Input } from 'antd';
-import {
-  INSTRUCTION_LIMIT,
-  GovernanceOld,
-  ProposalOld,
-  ProposalStateOld,
-} from '../../models/serialisation';
+import { INSTRUCTION_LIMIT } from '../../models/serialisation';
 import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
-import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
+
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../constants';
 import { Governance, Proposal } from '../../models/accounts';
@@ -26,7 +21,7 @@ const layout = {
 export function NewInstructionCard({
   proposal,
   position,
-  governance: governance,
+  governance,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
@@ -66,6 +61,7 @@ export function NewInstructionCard({
     let instruction = values.instruction;
 
     if (sigAccount) {
+      console.log('TODO:', { wallet, connection, position, instruction });
       // await addCustomSingleSignerTransaction(
       //   connection,
       //   wallet.wallet,

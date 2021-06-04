@@ -9,11 +9,10 @@ export enum GovernanceInstruction {
   SetGovernanceDelegate = 3, // --
   CreateAccountGovernance = 4, // done
   CreateProgramGovernance = 5,
+  CreateProposal = 6, // done
+  AddSignatory = 7, // done
+  RemoveSignatory = 8, // --
 
-  CreateProposal = 6,
-
-  AddSignatory = 7,
-  RemoveSignatory = 8,
   InsertInstruction = 9,
   RemoveInstruction = 10,
   CancelProposal = 11,
@@ -22,6 +21,8 @@ export enum GovernanceInstruction {
   FinalizeVote = 14,
   RelinquishVote = 15,
   ExecuteInstruction = 16,
+
+  // --- OLD ----
 
   InitProposal = 17,
   AddSigner = 18,
@@ -79,5 +80,14 @@ export class CreateProposalArgs {
     this.name = args.name;
     this.descriptionLink = args.descriptionLink;
     this.governingTokenMint = args.governingTokenMint;
+  }
+}
+
+export class AddSignatoryArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.AddSignatory;
+  signatory: PublicKey;
+
+  constructor(args: { signatory: PublicKey }) {
+    this.signatory = args.signatory;
   }
 }

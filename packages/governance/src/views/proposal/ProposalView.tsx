@@ -4,10 +4,6 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 import {
   INSTRUCTION_LIMIT,
-  GovernanceOld,
-  ProposalOld,
-  ProposalStateOld,
-  ProposalStateStatus,
   GovernanceTransaction,
 } from '../../models/serialisation';
 import { useParams } from 'react-router-dom';
@@ -24,7 +20,7 @@ import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignButton from '../../components/Proposal/SignButton';
 import AddSigners from '../../components/Proposal/AddSigners';
-import MintSourceTokens from '../../components/Proposal/MintSourceTokens';
+
 import { Vote } from '../../components/Proposal/Vote';
 import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
