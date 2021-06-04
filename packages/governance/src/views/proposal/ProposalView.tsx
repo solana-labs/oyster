@@ -13,6 +13,7 @@ import {
   useGovernanceAccounts,
   useProposal,
   useSignatoryRecord,
+  useTokenOwnerRecord,
 } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
@@ -220,6 +221,7 @@ function InnerProposalView({
 }) {
   const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
   let signatoryRecord = useSignatoryRecord(proposal.pubkey);
+  const tokenOwnerRecord = useTokenOwnerRecord(governance.info.config.realm);
 
   const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = [];
   // proposalState.info.proposalTransactions
@@ -277,24 +279,24 @@ function InnerProposalView({
                   proposal.info.state === ProposalState.SigningOff) && (
                   <SignOffButton signatoryRecord={signatoryRecord} />
                 )}
-              {/* <MintSourceTokens
-                governance={governance}
-                useGovernance={
-                  proposal.info.governingTokenMint.toBase58() ===
-                  governance.info.governanceMint.toBase58()
-                }
-              /> */}
+
               <WithdrawVote proposal={proposal} />
-              <Vote
-                governance={governance}
-                proposal={proposal}
-                yeahVote={true}
-              />
-              <Vote
-                governance={governance}
-                proposal={proposal}
-                yeahVote={false}
-              />
+              {tokenOwnerRecord && (
+                <>
+                  <Vote
+                    governance={governance}
+                    proposal={proposal}
+                    tokenOwnerRecord={tokenOwnerRecord}
+                    yeahVote={true}
+                  />
+                  <Vote
+                    governance={governance}
+                    proposal={proposal}
+                    yeahVote={false}
+                    tokenOwnerRecord={tokenOwnerRecord}
+                  />
+                </>
+              )}
             </div>
           </Col>
         </Row>

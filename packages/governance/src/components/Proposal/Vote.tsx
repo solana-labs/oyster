@@ -8,7 +8,12 @@ import { contexts, hooks } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './style.less';
-import { Governance, Proposal, ProposalState } from '../../models/accounts';
+import {
+  Governance,
+  Proposal,
+  ProposalState,
+  TokenOwnerRecord,
+} from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -17,13 +22,13 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function Vote({
   proposal,
-
   governance,
+  tokenOwnerRecord,
   yeahVote,
 }: {
   proposal: ParsedAccount<Proposal>;
-
   governance: ParsedAccount<Governance>;
+  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
   yeahVote: boolean;
 }) {
   const wallet = useWallet();
@@ -32,8 +37,7 @@ export function Vote({
   const userTokenAccount = useAccountByMint(proposal.info.governingTokenMint);
 
   const eligibleToView =
-    userTokenAccount &&
-    userTokenAccount.info.amount.toNumber() > 0 &&
+    tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0 &&
     proposal.info.state === ProposalState.Voting;
 
   const [btnLabel, title, msg, icon] = yeahVote

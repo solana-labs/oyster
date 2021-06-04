@@ -15,8 +15,8 @@ export enum GovernanceInstruction {
 
   InsertInstruction = 9,
   RemoveInstruction = 10,
-  CancelProposal = 11,
-  SignOffProposal = 12,
+  CancelProposal = 11, // *
+  SignOffProposal = 12, // done
   CastVote = 13,
   FinalizeVote = 14,
   RelinquishVote = 15,

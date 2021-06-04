@@ -31,6 +31,7 @@ export default function SignOffButton({
             confirm({
               title: 'Do you want to sign off this proposal?',
               icon: <ExclamationCircleOutlined />,
+              okText: 'Sign off',
 
               onOk() {
                 return signOffProposal(

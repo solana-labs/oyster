@@ -163,7 +163,7 @@ function useSetupProposalsCache({
         string,
         ParsedAccount<TokenOwnerRecord>
       >();
-      const newProposals: Record<string, ParsedAccount<Proposal>> = {};
+      const proposals: Record<string, ParsedAccount<Proposal>> = {};
       const signatoryRecords = new Map<
         string,
         ParsedAccount<SignatoryRecord>
@@ -197,7 +197,7 @@ function useSetupProposalsCache({
           case GovernanceAccountType.Proposal: {
             cache.add(a.pubkey, a.account, BorshAccountParser(Proposal));
             cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
-            newProposals[a.pubkey.toBase58()] = cached;
+            proposals[a.pubkey.toBase58()] = cached;
             break;
           }
           case GovernanceAccountType.SignatoryRecord: {
@@ -218,7 +218,7 @@ function useSetupProposalsCache({
       setRealms(newRealms);
       setGovernances(newGovernances);
       setTokenOwnerRecords(newTokenOwnerRecords);
-      setProposals(newProposals);
+      setProposals(proposals);
       setSignatoryRecords(signatoryRecords);
     });
     const subID = connection.onProgramAccountChange(
