@@ -11,7 +11,7 @@ import { contexts, ParsedAccount, hooks, utils } from '@oyster/common';
 import { addCustomSingleSignerTransaction } from '../../actions/addCustomSingleSignerTransaction';
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../constants';
-import { Proposal } from '../../models/accounts';
+import { Governance, Proposal } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -26,10 +26,10 @@ const layout = {
 export function NewInstructionCard({
   proposal,
   position,
-  config,
+  governance: governance,
 }: {
   proposal: ParsedAccount<Proposal>;
-  config: ParsedAccount<GovernanceOld>;
+  governance: ParsedAccount<Governance>;
   position: number;
 }) {
   const [form] = Form.useForm();
@@ -51,12 +51,13 @@ export function NewInstructionCard({
     }
 
     if (
-      parseInt(values.slot) < config.info.minimumSlotWaitingPeriod.toNumber()
+      parseInt(values.slot) <
+      governance.info.config.minInstructionHoldUpTime.toNumber()
     ) {
       notify({
         message:
           LABELS.SLOT_MUST_BE_GREATER_THAN +
-          config.info.minimumSlotWaitingPeriod.toString(),
+          governance.info.config.minInstructionHoldUpTime.toString(),
         type: 'error',
       });
       return;

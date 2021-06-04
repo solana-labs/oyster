@@ -377,9 +377,10 @@ export const useRealm = (realm: PublicKey | undefined) => {
   return ctx.realms[realm.toBase58()];
 };
 
-export const useGovernance = (governance: PublicKey) => {
+export const useGovernance = (governance?: PublicKey) => {
   const ctx = useGovernanceAccounts();
-  return ctx.governances.get(governance.toBase58());
+
+  return (governance && ctx.governances.get(governance.toBase58())) || null;
 };
 
 export const useTokenOwnerRecord = (realm?: PublicKey) => {

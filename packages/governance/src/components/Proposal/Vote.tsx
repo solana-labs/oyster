@@ -13,7 +13,7 @@ import { contexts, hooks } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './style.less';
-import { Proposal, ProposalState } from '../../models/accounts';
+import { Governance, Proposal, ProposalState } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -28,7 +28,7 @@ export function Vote({
 }: {
   proposal: ParsedAccount<Proposal>;
 
-  governance: ParsedAccount<GovernanceOld>;
+  governance: ParsedAccount<Governance>;
   yeahVote: boolean;
 }) {
   const wallet = useWallet();

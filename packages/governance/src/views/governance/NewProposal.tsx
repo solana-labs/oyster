@@ -20,7 +20,7 @@ export function NewProposal({
   governance,
 }: {
   props: ButtonProps;
-  governance: ParsedAccount<Governance> | undefined;
+  governance: ParsedAccount<Governance> | null;
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');

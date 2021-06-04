@@ -12,7 +12,11 @@ import {
 } from '../../models/serialisation';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { useGovernanceAccounts, useProposal } from '../../contexts/proposals';
+import {
+  useGovernance,
+  useGovernanceAccounts,
+  useProposal,
+} from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -28,7 +32,7 @@ import { useVotingRecords } from '../../hooks/useVotingRecords';
 import BN from 'bn.js';
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
-import { Proposal, ProposalState } from '../../models/accounts';
+import { Governance, Proposal, ProposalState } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 const { TabPane } = Tabs;
 
@@ -50,14 +54,14 @@ export const ProposalView = () => {
   const context = useGovernanceAccounts();
   const { id } = useParams<{ id: string }>();
   const proposalOld = context.proposalsOld[id];
-  const governance = context.configs[proposalOld?.info.config.toBase58()];
 
   const { endpoint } = useConnectionConfig();
 
   let proposalKey = useKeyParam();
   let proposal = useProposal(proposalKey);
+  let governance = useGovernance(proposal?.info.governance);
 
-  const sigMint = useMint(proposal?.info.governingTokenMint);
+  const governingTokenMint = useMint(proposal?.info.governingTokenMint);
   const votingMint = useMint(proposal?.info.governingTokenMint);
 
   const sourceMint = useMint(proposal?.info.governingTokenMint);
@@ -69,7 +73,8 @@ export const ProposalView = () => {
   return (
     <div className="flexColumn">
       {proposal &&
-      sigMint &&
+      governance &&
+      governingTokenMint &&
       votingMint &&
       sourceMint &&
       yesVotingMint &&
@@ -82,7 +87,7 @@ export const ProposalView = () => {
           yesVotingMint={yesVotingMint}
           noVotingMint={noVotingMint}
           votingDisplayData={voterDisplayData(votingRecords)}
-          sigMint={sigMint}
+          governingTokenMint={governingTokenMint}
           instructions={context.transactions}
           endpoint={endpoint}
         />
@@ -212,7 +217,7 @@ function voterDisplayData(
 
 function InnerProposalView({
   proposal,
-  sigMint,
+  governingTokenMint,
   votingMint,
   yesVotingMint,
   noVotingMint,
@@ -223,9 +228,9 @@ function InnerProposalView({
   endpoint,
 }: {
   proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<GovernanceOld>;
+  governance: ParsedAccount<Governance>;
 
-  sigMint: MintInfo;
+  governingTokenMint: MintInfo;
   votingMint: MintInfo;
   yesVotingMint: MintInfo;
   noVotingMint: MintInfo;
@@ -369,20 +374,18 @@ function InnerProposalView({
           <Col md={7} xs={24}>
             <Card>
               <Statistic
-                title={LABELS.SIG_GIVEN}
-                value={
-                  proposal.info.signatoriesCount - sigMint.supply.toNumber()
-                }
-                suffix={`/ ${proposal.info.signatoriesCount}`}
+                title={LABELS.SIGNATORIES}
+                value={proposal.info.signatoriesCount}
+                suffix={`/ ${proposal.info.signatoriesSignedOffCount}`}
               />
             </Card>
           </Col>
           <Col md={7} xs={24}>
             <Card>
               <Statistic
-                title={LABELS.VOTES_CAST}
-                value={yesVotingMint.supply.toNumber()}
-                suffix={`/ ${sourceMint.supply.toNumber()}`}
+                title={LABELS.VOTES_IN_FAVOUR}
+                value={proposal.info.yesVotesCount.toNumber()}
+                suffix={`/ ${governingTokenMint.supply.toNumber()}`}
               />
             </Card>
           </Col>
@@ -391,7 +394,7 @@ function InnerProposalView({
               <Statistic
                 valueStyle={{ color: 'green' }}
                 title={LABELS.VOTES_REQUIRED}
-                value={getVotesRequired(governance, sourceMint)}
+                value={getMinRequiredYesVotes(governance, sourceMint)}
               />
             </Card>
           </Col>
@@ -447,7 +450,7 @@ function InnerProposalView({
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}
-                          config={governance}
+                          governance={governance}
                           position={instructionsForProposal.length}
                         />
                       </Col>
@@ -462,15 +465,14 @@ function InnerProposalView({
   );
 }
 
-function getVotesRequired(
-  governance: ParsedAccount<GovernanceOld>,
-  sourceMint: MintInfo,
+function getMinRequiredYesVotes(
+  governance: ParsedAccount<Governance>,
+  governingTokenMint: MintInfo,
 ): number {
-  return 10;
-
-  return governance.info.voteThreshold === 100
-    ? sourceMint.supply.toNumber()
+  return governance.info.config.yesVoteThresholdPercentage === 100
+    ? governingTokenMint.supply.toNumber()
     : Math.ceil(
-        (governance.info.voteThreshold / 100) * sourceMint.supply.toNumber(),
+        (governance.info.config.yesVoteThresholdPercentage / 100) *
+          governingTokenMint.supply.toNumber(),
       );
 }
