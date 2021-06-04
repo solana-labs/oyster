@@ -11,7 +11,7 @@ import {
   ProposalOld,
   ProposalStateOld,
 } from '../models/serialisation';
-import { addCustomSingleSignerTransactionInstruction } from '../models/addCustomSingleSignerTransaction';
+import { addCustomSingleSignerTransactionInstruction } from '../models/_addCustomSingleSignerTransaction';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 
 const { sendTransaction } = contexts.Connection;

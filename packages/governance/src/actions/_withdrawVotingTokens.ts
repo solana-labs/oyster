@@ -18,7 +18,7 @@ import {
   ProposalStateStatus,
 } from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
-import { withdrawVotingTokensInstruction } from '../models/withdrawVotingTokens';
+import { withdrawVotingTokensInstruction } from '../models/_withdrawVotingTokens';
 import { LABELS } from '../constants';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 const { createTokenAccount } = actions;

@@ -7,7 +7,7 @@ import {
 import { contexts, utils, models, ParsedAccount } from '@oyster/common';
 
 import { ProposalOld } from '../models/serialisation';
-import { removeSignerInstruction } from '../models/removeSigner';
+import { removeSignerInstruction } from '../models/_removeSigner';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;

@@ -8,7 +8,7 @@ import { contexts, utils, actions, SequenceType } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import { GovernanceOld } from '../models/serialisation';
-import { createGovernanceInstruction } from '../models/createGovernanceOld';
+import { createGovernanceInstruction } from '../models/_createGovernance';
 import BN from 'bn.js';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 

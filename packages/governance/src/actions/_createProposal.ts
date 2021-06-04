@@ -8,7 +8,7 @@ import {
 import { contexts, utils, actions, ParsedAccount } from '@oyster/common';
 
 import { AccountLayout, MintLayout } from '@solana/spl-token';
-import { initProposalInstruction } from '../models/initProposal';
+import { initProposalInstruction } from '../models/_initProposal';
 import {
   GovernanceOld,
   ProposalLayout,

@@ -14,7 +14,7 @@ import {
 
 import { ProposalOld, ProposalStateOld } from '../models/serialisation';
 import { AccountLayout } from '@solana/spl-token';
-import { addSignerInstruction } from '../models/addSigner';
+import { addSignerInstruction } from '../models/_addSigner';
 import { GOVERNANCE_PROGRAM_SEED } from '../models/accounts';
 const { createTokenAccount } = actions;
 const { sendTransaction } = contexts.Connection;

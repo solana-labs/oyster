@@ -11,7 +11,7 @@ import {
   ProposalStateOld,
   GovernanceTransaction,
 } from '../models/serialisation';
-import { executeInstruction } from '../models/execute';
+import { executeInstruction } from '../models/_execute';
 import { LABELS } from '../constants';
 import { getMessageAccountInfos } from '../utils/transactions';
 const { notify } = utils;
