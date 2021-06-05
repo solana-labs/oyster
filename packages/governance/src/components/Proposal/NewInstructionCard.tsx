@@ -10,6 +10,7 @@ import { Governance, Proposal } from '../../models/accounts';
 
 import { useProposalAuthority } from '../../contexts/proposals';
 import { insertInstruction } from '../../actions/insertInstruction';
+import { executeInstruction } from '../../actions/executeInstruction';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -67,12 +68,15 @@ export function NewInstructionCard({
     //let instruction = values.instruction;
 
     try {
-      await insertInstruction(
-        connection,
-        wallet,
-        proposal,
-        proposalAuthority!.pubkey,
-      );
+      // await insertInstruction(
+      //   connection,
+      //   wallet,
+      //   proposal,
+      //   proposalAuthority!.pubkey,
+      // );
+
+      await executeInstruction(connection, wallet, proposal);
+
       form.resetFields();
     } catch (ex) {
       console.log('ERROR', ex);

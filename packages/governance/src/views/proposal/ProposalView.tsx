@@ -425,7 +425,8 @@ function InnerProposalView({
                     </Col>
                   ))}
                   {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    proposal.info.state === ProposalState.Draft && (
+                    (proposal.info.state === ProposalState.Draft ||
+                      proposal.info.state === ProposalState.Succeeded) && (
                       <Col xs={24} sm={24} md={12} lg={8}>
                         <NewInstructionCard
                           proposal={proposal}

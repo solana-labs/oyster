@@ -13,6 +13,7 @@ import {
   CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
+  ExecuteInstructionArgs,
   InsertInstructionArgs,
   RelinquishVoteArgs,
   SignOffProposalArgs,
@@ -158,6 +159,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['holdUpTime', 'u64'],
         ['instructionData', InstructionData],
       ],
+    },
+  ],
+  [
+    ExecuteInstructionArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
     },
   ],
   [

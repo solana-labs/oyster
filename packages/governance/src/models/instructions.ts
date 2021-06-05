@@ -145,3 +145,7 @@ export class InsertInstructionArgs {
     this.instructionData = args.instructionData;
   }
 }
+
+export class ExecuteInstructionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.ExecuteInstruction;
+}

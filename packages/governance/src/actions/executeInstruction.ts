@@ -10,21 +10,18 @@ import { contexts, utils, ParsedAccount } from '@oyster/common';
 import { AccountMetaData, InstructionData, Proposal } from '../models/accounts';
 
 import { withInsertInstruction } from '../models/withInsertInstruction';
+import { withExecuteInstruction } from '../models/withExecuteInstruction';
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
 
-export const insertInstruction = async (
+export const executeInstruction = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<Proposal>,
-  tokeOwnerRecord: PublicKey,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
-
-  let governanceAuthority = wallet.publicKey;
-  let payer = wallet.publicKey;
 
   const index = 0;
   const holdUpTime = 10;
@@ -54,16 +51,16 @@ export const insertInstruction = async (
     data: Uint8Array.from([1, 2, 3]),
   });
 
-  await withInsertInstruction(
+  const instructionAddress = new PublicKey(
+    '12ubuoZxf8YUirCdfja1whLpeomaKGob67out1gSoGP1',
+  );
+
+  await withExecuteInstruction(
     instructions,
     proposal.info.governance,
     proposal.pubkey,
-    tokeOwnerRecord,
-    governanceAuthority,
-    index,
-    holdUpTime,
-    instructionData,
-    payer,
+    instructionAddress,
+    programId,
   );
 
   notify({
