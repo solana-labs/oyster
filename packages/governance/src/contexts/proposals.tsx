@@ -365,6 +365,36 @@ export const useTokenOwnerRecord = (realm?: PublicKey) => {
   return null;
 };
 
+export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+
+  if (!proposalOwner) {
+    return null;
+  }
+
+  return ctx.tokenOwnerRecords.get(proposalOwner.toBase58());
+};
+
+export const useProposalAuthority = (proposalOwner?: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+  const { wallet, connected } = useWallet();
+
+  if (!proposalOwner) {
+    return null;
+  }
+
+  const tokenOwnerRecord = ctx.tokenOwnerRecords.get(proposalOwner.toBase58());
+
+  return connected &&
+    tokenOwnerRecord &&
+    (tokenOwnerRecord.info.governingTokenOwner.toBase58() ===
+      wallet?.publicKey?.toBase58() ||
+      tokenOwnerRecord.info.governanceDelegate?.toBase58() ===
+        wallet?.publicKey?.toBase58())
+    ? tokenOwnerRecord
+    : null;
+};
+
 export const useProposals = (governance: PublicKey) => {
   const ctx = useGovernanceAccounts();
   const proposals: ParsedAccount<Proposal>[] = [];

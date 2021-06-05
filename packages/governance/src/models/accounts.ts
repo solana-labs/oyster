@@ -269,3 +269,55 @@ export class VoteRecord {
     this.voteWeight = args.voteWeight;
   }
 }
+
+export class AccountMetaData {
+  pubkey: PublicKey;
+  isSigner: boolean;
+  isWritable: boolean;
+
+  constructor(args: {
+    pubkey: PublicKey;
+    isSigner: boolean;
+    isWritable: boolean;
+  }) {
+    this.pubkey = args.pubkey;
+    this.isSigner = !!args.isSigner;
+    this.isWritable = !!args.isWritable;
+  }
+}
+
+export class InstructionData {
+  programId: PublicKey;
+  accounts: AccountMetaData[];
+  data: Uint8Array;
+
+  constructor(args: {
+    programId: PublicKey;
+    accounts: AccountMetaData[];
+    data: Uint8Array;
+  }) {
+    this.programId = args.programId;
+    this.accounts = args.accounts;
+    this.data = args.data;
+  }
+}
+
+export class ProposalInstruction {
+  accountType = GovernanceAccountType.ProposalInstruction;
+  proposal: PublicKey;
+  holdUpTime: BN;
+  instruction: InstructionData;
+  executedAt: BN | null;
+
+  constructor(args: {
+    proposal: PublicKey;
+    holdUpTime: BN;
+    instruction: InstructionData;
+    executedAt: BN | null;
+  }) {
+    this.proposal = args.proposal;
+    this.holdUpTime = args.holdUpTime;
+    this.instruction = args.instruction;
+    this.executedAt = args.executedAt;
+  }
+}

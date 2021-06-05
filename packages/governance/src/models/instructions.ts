@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
-import { GovernanceConfig } from './accounts';
+import { GovernanceConfig, InstructionData } from './accounts';
 
 export enum GovernanceInstruction {
   CreateRealm = 0, // done
@@ -127,4 +127,21 @@ export class CastVoteArgs {
 
 export class RelinquishVoteArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.RelinquishVote;
+}
+
+export class InsertInstructionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.InsertInstruction;
+  index: number;
+  holdUpTime: number;
+  instructionData: InstructionData;
+
+  constructor(args: {
+    index: number;
+    holdUpTime: number;
+    instructionData: InstructionData;
+  }) {
+    this.index = args.index;
+    this.holdUpTime = args.holdUpTime;
+    this.instructionData = args.instructionData;
+  }
 }

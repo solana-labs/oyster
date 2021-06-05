@@ -146,7 +146,7 @@ export const LABELS = {
     ' Please note that during voting, if you withdraw your tokens, your vote will not count towards the voting total. You must wait for the vote to complete in order for your withdrawal to not affect the voting.',
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
-  DELAY: 'Slot Delay',
+  HOLD_UP_TIME: 'hold up time',
 
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',

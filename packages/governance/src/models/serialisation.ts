@@ -13,14 +13,17 @@ import {
   CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
+  InsertInstructionArgs,
   RelinquishVoteArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
 import {
+  AccountMetaData,
   Governance,
   GovernanceAccountType,
   GovernanceConfig,
+  InstructionData,
   Proposal,
   ProposalState,
   Realm,
@@ -142,6 +145,40 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['vote', 'u8'],
+      ],
+    },
+  ],
+  [
+    InsertInstructionArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['index', 'u16'],
+        ['holdUpTime', 'u64'],
+        ['instructionData', InstructionData],
+      ],
+    },
+  ],
+  [
+    InstructionData,
+    {
+      kind: 'struct',
+      fields: [
+        ['programId', 'pubkey'],
+        ['accounts', [AccountMetaData]],
+        ['data', ['u8']],
+      ],
+    },
+  ],
+  [
+    AccountMetaData,
+    {
+      kind: 'struct',
+      fields: [
+        ['pubkey', 'pubkey'],
+        ['isSigner', 'u8'],
+        ['isWritable', 'u8'],
       ],
     },
   ],

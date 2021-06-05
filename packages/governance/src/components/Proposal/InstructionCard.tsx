@@ -59,7 +59,7 @@ export function InstructionCard({
           <>
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.instructionData}`}</p>
             <p>
-              {LABELS.DELAY}: {instruction.info.slot.toNumber()}
+              {LABELS.HOLD_UP_TIME}: {instruction.info.slot.toNumber()}
             </p>
           </>
         }

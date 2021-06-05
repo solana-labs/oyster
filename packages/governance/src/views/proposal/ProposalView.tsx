@@ -33,6 +33,7 @@ import { VoterTable } from '../../components/Proposal/VoterTable';
 import { Governance, Proposal, ProposalState } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
+
 const { TabPane } = Tabs;
 
 export const urlRegex =
