@@ -3,6 +3,7 @@ import { utils, sendTransaction } from '@oyster/common';
 import { withCreateAccountGovernance } from '../models/withCreateAccountGovernance';
 import { GovernanceType } from '../models/enums';
 import { GovernanceConfig } from '../models/accounts';
+import { withCreateProgramGovernance } from '../models/withCreateProgramGovernance';
 
 const { notify } = utils;
 
@@ -12,6 +13,7 @@ export const registerGovernance = async (
   governanceType: GovernanceType,
   realm: PublicKey,
   config: GovernanceConfig,
+  transferUpgradeAuthority?: boolean,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
@@ -29,6 +31,17 @@ export const registerGovernance = async (
         instructions,
         realm,
         config,
+        wallet.publicKey,
+      )
+    ).governanceAddress;
+  } else if (governanceType === GovernanceType.Program) {
+    governanceAddress = (
+      await withCreateProgramGovernance(
+        instructions,
+        realm,
+        config,
+        transferUpgradeAuthority!,
+        wallet.publicKey,
         wallet.publicKey,
       )
     ).governanceAddress;

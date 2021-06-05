@@ -8,7 +8,7 @@ export enum GovernanceInstruction {
   WithdrawGoverningTokens = 2, // done
   SetGovernanceDelegate = 3, // --
   CreateAccountGovernance = 4, // done
-  CreateProgramGovernance = 5,
+  CreateProgramGovernance = 5, // done
   CreateProposal = 6, // done
   AddSignatory = 7, // done
   RemoveSignatory = 8, // --
@@ -19,7 +19,7 @@ export enum GovernanceInstruction {
   SignOffProposal = 12, // done
   CastVote = 13, // done
   FinalizeVote = 14, // *
-  RelinquishVote = 15,
+  RelinquishVote = 15, // +/- done
   ExecuteInstruction = 16,
 
   // --- OLD ----
@@ -63,6 +63,21 @@ export class CreateAccountGovernanceArgs {
 
   constructor(args: { config: GovernanceConfig }) {
     this.config = args.config;
+  }
+}
+
+export class CreateProgramGovernanceArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.CreateProgramGovernance;
+  config: GovernanceConfig;
+  transferUpgradeAuthority: boolean;
+
+  constructor(args: {
+    config: GovernanceConfig;
+    transferUpgradeAuthority: boolean;
+  }) {
+    this.config = args.config;
+    this.transferUpgradeAuthority = !!args.transferUpgradeAuthority;
   }
 }
 

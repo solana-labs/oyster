@@ -143,7 +143,8 @@ function useSetupProposalsCache({
             cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
             realms[a.pubkey.toBase58()] = cached;
             break;
-          case GovernanceAccountType.AccountGovernance: {
+          case GovernanceAccountType.AccountGovernance:
+          case GovernanceAccountType.ProgramGovernance: {
             cache.add(a.pubkey, a.account, BorshAccountParser(Governance));
             cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
             governances[a.pubkey.toBase58()] = cached;
@@ -217,6 +218,7 @@ function useSetupProposalsCache({
             }));
             break;
           case GovernanceAccountType.AccountGovernance:
+          case GovernanceAccountType.ProgramGovernance: {
             cache.add(
               info.accountId,
               info.accountInfo,
@@ -230,7 +232,7 @@ function useSetupProposalsCache({
               ) as ParsedAccount<Governance>,
             }));
             break;
-
+          }
           case GovernanceAccountType.TokenOwnerRecord:
             cache.add(
               info.accountId,

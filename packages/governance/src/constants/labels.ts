@@ -114,6 +114,8 @@ export const LABELS = {
   MIN_INSTRUCTION_HOLD_UP_TIME: 'min instruction hold up time (slots)',
   MAX_VOTING_TIME: 'max voting time (slots)',
 
+  TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
+
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
 

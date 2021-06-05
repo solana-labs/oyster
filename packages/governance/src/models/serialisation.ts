@@ -9,6 +9,7 @@ import {
   AddSignatoryArgs,
   CastVoteArgs,
   CreateAccountGovernanceArgs,
+  CreateProgramGovernanceArgs,
   CreateProposalArgs,
   CreateRealmArgs,
   DepositGoverningTokensArgs,
@@ -84,6 +85,17 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['config', GovernanceConfig],
+      ],
+    },
+  ],
+  [
+    CreateProgramGovernanceArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
+        ['transferUpgradeAuthority', 'u8'],
       ],
     },
   ],

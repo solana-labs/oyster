@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, InputNumber, Modal, Radio } from 'antd';
+import { Button, ButtonProps, InputNumber, Modal, Radio, Checkbox } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
@@ -71,6 +71,7 @@ export function NewGovernanceForm({
     maxVotingTime: number;
     yesVoteThresholdPercentage: number;
     governedAccountAddress: string;
+    transferUpgradeAuthority: boolean;
   }) => {
     if (!tryParseKey(values.governedAccountAddress)) {
       notify({
@@ -97,6 +98,7 @@ export function NewGovernanceForm({
       values.governanceType,
       realmKey,
       config,
+      values.transferUpgradeAuthority,
     );
 
     handleOk(governanceAddress);
@@ -123,7 +125,10 @@ export function NewGovernanceForm({
         form={form}
         name="control-hooks"
         onFinish={onFinish}
-        initialValues={{ governanceType: GovernanceType.Account }}
+        initialValues={{
+          governanceType: GovernanceType.Account,
+          transferUpgradeAuthority: true,
+        }}
       >
         <Form.Item label={LABELS.GOVERNANCE_OVER} name="governanceType">
           <Radio.Group onChange={e => setGovernanceType(e.target.value)}>
@@ -147,6 +152,16 @@ export function NewGovernanceForm({
         >
           <Input />
         </Form.Item>
+
+        {governanceType === GovernanceType.Program && (
+          <Form.Item
+            name="transferUpgradeAuthority"
+            label={LABELS.TRANSFER_UPGRADE_AUTHORITY}
+            valuePropName="checked"
+          >
+            <Checkbox></Checkbox>
+          </Form.Item>
+        )}
 
         <Form.Item
           name="minTokensToCreateProposal"
