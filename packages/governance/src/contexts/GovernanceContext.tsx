@@ -32,7 +32,7 @@ export interface GovernanceContextState {
   governances: Record<string, ParsedAccount<Governance>>;
   tokenOwnerRecords: Map<string, ParsedAccount<TokenOwnerRecord>>;
   proposals: Record<string, ParsedAccount<Proposal>>;
-  signatoryRecords: Map<string, ParsedAccount<SignatoryRecord>>;
+  signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
   instructions: Record<string, ParsedAccount<ProposalInstruction>>;
 }
@@ -54,9 +54,7 @@ export default function GovernanceProvider({ children = null as any }) {
     new Map<string, ParsedAccount<TokenOwnerRecord>>(),
   );
   const [proposals, setProposals] = useState({});
-  const [signatoryRecords, setSignatoryRecords] = useState(
-    new Map<string, ParsedAccount<SignatoryRecord>>(),
-  );
+  const [signatoryRecords, setSignatoryRecords] = useState({});
   const [voteRecords, setVoteRecords] = useState({});
   const [instructions, setInstructions] = useState({});
 
@@ -111,7 +109,7 @@ function useSetupGovernanceContext({
     React.SetStateAction<Record<string, ParsedAccount<Proposal>>>
   >;
   setSignatoryRecords: React.Dispatch<
-    React.SetStateAction<Map<string, ParsedAccount<SignatoryRecord>>>
+    React.SetStateAction<Record<string, ParsedAccount<SignatoryRecord>>>
   >;
   setVoteRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<VoteRecord>>>
@@ -137,10 +135,8 @@ function useSetupGovernanceContext({
         ParsedAccount<TokenOwnerRecord>
       >();
       const proposals: Record<string, ParsedAccount<Proposal>> = {};
-      const signatoryRecords = new Map<
-        string,
-        ParsedAccount<SignatoryRecord>
-      >();
+      const signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>> =
+        {};
       const voteRecords: Record<string, ParsedAccount<VoteRecord>> = {};
       const instructions: Record<string, ParsedAccount<ProposalInstruction>> =
         {};
@@ -182,7 +178,7 @@ function useSetupGovernanceContext({
               a.pubkey,
               a.account,
             ) as ParsedAccount<SignatoryRecord>;
-            signatoryRecords.set(a.pubkey.toBase58(), account);
+            signatoryRecords[a.pubkey.toBase58()] = account;
             break;
           }
           case GovernanceAccountType.VoteRecord: {
@@ -292,13 +288,13 @@ function useSetupGovernanceContext({
               BorshAccountParser(SignatoryRecord),
             );
 
-            setSignatoryRecords(map => {
-              map.set(
-                pubkey.toBase58(),
-                cache.get(info.accountId) as ParsedAccount<SignatoryRecord>,
-              );
-              return map;
-            });
+            setSignatoryRecords((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<SignatoryRecord>,
+            }));
+
             break;
           }
           case GovernanceAccountType.VoteRecord: {
@@ -456,7 +452,7 @@ export const useSignatoryRecord = (proposal: PublicKey) => {
   const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
-  for (let record of ctx.signatoryRecords.values()) {
+  for (let record of Object.values(ctx.signatoryRecords)) {
     if (
       record.info.signatory.toBase58() === wallet?.publicKey?.toBase58() &&
       record.info.proposal.toBase58() === proposal.toBase58()
