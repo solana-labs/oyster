@@ -30,7 +30,7 @@ import {
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
   governances: Record<string, ParsedAccount<Governance>>;
-  tokenOwnerRecords: Map<string, ParsedAccount<TokenOwnerRecord>>;
+  tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>>;
   proposals: Record<string, ParsedAccount<Proposal>>;
   signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
@@ -50,9 +50,7 @@ export default function GovernanceProvider({ children = null as any }) {
 
   const [realms, setRealms] = useState({});
   const [governances, setGovernances] = useState({});
-  const [tokenOwnerRecords, setTokenOwnerRecords] = useState(
-    new Map<string, ParsedAccount<TokenOwnerRecord>>(),
-  );
+  const [tokenOwnerRecords, setTokenOwnerRecords] = useState({});
   const [proposals, setProposals] = useState({});
   const [signatoryRecords, setSignatoryRecords] = useState({});
   const [voteRecords, setVoteRecords] = useState({});
@@ -103,7 +101,7 @@ function useSetupGovernanceContext({
     React.SetStateAction<Record<string, ParsedAccount<Governance>>>
   >;
   setTokenOwnerRecords: React.Dispatch<
-    React.SetStateAction<Map<string, ParsedAccount<TokenOwnerRecord>>>
+    React.SetStateAction<Record<string, ParsedAccount<TokenOwnerRecord>>>
   >;
   setProposals: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<Proposal>>>
@@ -130,10 +128,8 @@ function useSetupGovernanceContext({
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
       const realms: Record<string, ParsedAccount<Realm>> = {};
       const governances: Record<string, ParsedAccount<Governance>> = {};
-      const tokenOwnerRecords = new Map<
-        string,
-        ParsedAccount<TokenOwnerRecord>
-      >();
+      const tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>> =
+        {};
       const proposals: Record<string, ParsedAccount<Proposal>> = {};
       const signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>> =
         {};
@@ -164,7 +160,7 @@ function useSetupGovernanceContext({
               BorshAccountParser(TokenOwnerRecord),
             );
             cached = cache.get(a.pubkey) as ParsedAccount<TokenOwnerRecord>;
-            tokenOwnerRecords.set(a.pubkey.toBase58(), cached);
+            tokenOwnerRecords[a.pubkey.toBase58()] = cached;
             break;
           }
           case GovernanceAccountType.Proposal: {
@@ -250,21 +246,22 @@ function useSetupGovernanceContext({
             }));
             break;
           }
-          case GovernanceAccountType.TokenOwnerRecord:
+          case GovernanceAccountType.TokenOwnerRecord: {
             cache.add(
               info.accountId,
               info.accountInfo,
               BorshAccountParser(TokenOwnerRecord),
             );
 
-            setTokenOwnerRecords(map => {
-              map.set(
-                pubkey.toBase58(),
-                cache.get(info.accountId) as ParsedAccount<TokenOwnerRecord>,
-              );
-              return map;
-            });
+            setTokenOwnerRecords((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<TokenOwnerRecord>,
+            }));
+
             break;
+          }
           case GovernanceAccountType.Proposal: {
             cache.add(
               info.accountId,
@@ -386,7 +383,7 @@ export const useTokenOwnerRecord = (realm?: PublicKey) => {
     return null;
   }
 
-  for (let record of ctx.tokenOwnerRecords.values()) {
+  for (let record of Object.values(ctx.tokenOwnerRecords)) {
     if (
       record.info.governingTokenOwner.toBase58() ===
         wallet?.publicKey?.toBase58() &&
@@ -406,7 +403,7 @@ export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
     return null;
   }
 
-  return ctx.tokenOwnerRecords.get(proposalOwner.toBase58());
+  return ctx.tokenOwnerRecords[proposalOwner.toBase58()];
 };
 
 export const useProposalAuthority = (proposalOwner?: PublicKey) => {
@@ -417,7 +414,7 @@ export const useProposalAuthority = (proposalOwner?: PublicKey) => {
     return null;
   }
 
-  const tokenOwnerRecord = ctx.tokenOwnerRecords.get(proposalOwner.toBase58());
+  const tokenOwnerRecord = ctx.tokenOwnerRecords[proposalOwner.toBase58()];
 
   return connected &&
     tokenOwnerRecord &&
