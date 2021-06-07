@@ -27,7 +27,7 @@ import {
   VoteRecord,
 } from '../models/accounts';
 
-export interface ProposalsContextState {
+export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
   governances: Record<string, ParsedAccount<Governance>>;
   tokenOwnerRecords: Map<string, ParsedAccount<TokenOwnerRecord>>;
@@ -37,10 +37,10 @@ export interface ProposalsContextState {
   instructions: Record<string, ParsedAccount<ProposalInstruction>>;
 }
 
-export const ProposalsContext =
-  React.createContext<ProposalsContextState | null>(null);
+export const GovernanceContext =
+  React.createContext<GovernanceContextState | null>(null);
 
-export default function ProposalsProvider({ children = null as any }) {
+export default function GovernanceProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
 
   const connection = useMemo(
@@ -60,7 +60,7 @@ export default function ProposalsProvider({ children = null as any }) {
   const [voteRecords, setVoteRecords] = useState({});
   const [instructions, setInstructions] = useState({});
 
-  useSetupProposalsCache({
+  useSetupGovernanceContext({
     connection,
     setRealms,
     setGovernances,
@@ -72,7 +72,7 @@ export default function ProposalsProvider({ children = null as any }) {
   });
 
   return (
-    <ProposalsContext.Provider
+    <GovernanceContext.Provider
       value={{
         realms,
         governances,
@@ -84,11 +84,11 @@ export default function ProposalsProvider({ children = null as any }) {
       }}
     >
       {children}
-    </ProposalsContext.Provider>
+    </GovernanceContext.Provider>
   );
 }
 
-function useSetupProposalsCache({
+function useSetupGovernanceContext({
   connection,
   setRealms,
   setGovernances,
@@ -342,19 +342,20 @@ function useSetupProposalsCache({
     };
   }, [connection]); //eslint-disable-line
 }
-export const useGovernanceAccounts = () => {
-  const context = useContext(ProposalsContext);
-  return context as ProposalsContextState;
+
+export const useGovernanceContext = () => {
+  const context = useContext(GovernanceContext);
+  return context as GovernanceContextState;
 };
 
 export const useRealms = () => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
 
   return Object.values(ctx.realms);
 };
 
 export const useRealmGovernances = (realm: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const governances: ParsedAccount<Governance>[] = [];
 
   Object.values(ctx.governances).forEach(g => {
@@ -367,7 +368,7 @@ export const useRealmGovernances = (realm: PublicKey) => {
 };
 
 export const useRealm = (realm: PublicKey | undefined) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   if (!realm) {
     return null;
   }
@@ -376,13 +377,13 @@ export const useRealm = (realm: PublicKey | undefined) => {
 };
 
 export const useGovernance = (governance?: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
 
   return governance && ctx.governances[governance.toBase58()];
 };
 
 export const useTokenOwnerRecord = (realm?: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
   if (!realm) {
@@ -403,7 +404,7 @@ export const useTokenOwnerRecord = (realm?: PublicKey) => {
 };
 
 export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
 
   if (!proposalOwner) {
     return null;
@@ -413,7 +414,7 @@ export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
 };
 
 export const useProposalAuthority = (proposalOwner?: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const { wallet, connected } = useWallet();
 
   if (!proposalOwner) {
@@ -433,7 +434,7 @@ export const useProposalAuthority = (proposalOwner?: PublicKey) => {
 };
 
 export const useProposals = (governance: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const proposals: ParsedAccount<Proposal>[] = [];
 
   Object.values(ctx.proposals).forEach(p => {
@@ -446,13 +447,13 @@ export const useProposals = (governance: PublicKey) => {
 };
 
 export const useProposal = (proposalKey: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
 
   return ctx.proposals[proposalKey.toBase58()];
 };
 
 export const useSignatoryRecord = (proposal: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
   for (let record of ctx.signatoryRecords.values()) {
@@ -468,7 +469,7 @@ export const useSignatoryRecord = (proposal: PublicKey) => {
 };
 
 export const useVoteRecord = (proposal: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
   for (let record of Object.values(ctx.voteRecords)) {
@@ -485,7 +486,7 @@ export const useVoteRecord = (proposal: PublicKey) => {
 };
 
 export const useInstructions = (proposal: PublicKey) => {
-  const ctx = useGovernanceAccounts();
+  const ctx = useGovernanceContext();
 
   const instructions: ParsedAccount<ProposalInstruction>[] = [];
 

@@ -8,7 +8,7 @@ import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../constants';
 import { Governance, Proposal } from '../../models/accounts';
 
-import { useProposalAuthority } from '../../contexts/proposals';
+import { useProposalAuthority } from '../../contexts/GovernanceContext';
 import { insertInstruction } from '../../actions/insertInstruction';
 
 const { useWallet } = contexts.Wallet;

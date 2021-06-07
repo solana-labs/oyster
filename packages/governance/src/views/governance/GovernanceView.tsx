@@ -4,7 +4,7 @@ import {
   useGovernance,
   useProposals,
   useRealm,
-} from '../../contexts/proposals';
+} from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { useHistory } from 'react-router-dom';

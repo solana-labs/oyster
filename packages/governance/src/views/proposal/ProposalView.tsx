@@ -11,7 +11,7 @@ import {
   useSignatoryRecord,
   useTokenOwnerRecord,
   useInstructions,
-} from '../../contexts/proposals';
+} from '../../contexts/GovernanceContext';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';

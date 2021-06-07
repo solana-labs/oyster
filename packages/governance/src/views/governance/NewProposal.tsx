@@ -10,7 +10,7 @@ import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
 import { Governance } from '../../models/accounts';
-import { useRealm } from '../../contexts/proposals';
+import { useRealm } from '../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

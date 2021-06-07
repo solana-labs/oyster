@@ -7,7 +7,7 @@ import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
-import { useTokenOwnerRecord } from '../../contexts/proposals';
+import { useTokenOwnerRecord } from '../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

@@ -2,7 +2,7 @@ import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
 import { AppLayout } from './components/Layout';
-import ProposalsProvider from './contexts/proposals';
+import GovernanceProvider from './contexts/GovernanceContext';
 import { HomeView } from './views';
 import { ProposalView } from './views/proposal/ProposalView';
 import { GovernanceView } from './views/governance/GovernanceView';
@@ -19,7 +19,7 @@ export function Routes() {
         <ConnectionProvider>
           <WalletProvider>
             <AccountsProvider>
-              <ProposalsProvider>
+              <GovernanceProvider>
                 <AppLayout>
                   <Switch>
                     <Route exact path="/" component={() => <HomeView />} />
@@ -37,7 +37,7 @@ export function Routes() {
                     />
                   </Switch>
                 </AppLayout>
-              </ProposalsProvider>
+              </GovernanceProvider>
             </AccountsProvider>
           </WalletProvider>
         </ConnectionProvider>

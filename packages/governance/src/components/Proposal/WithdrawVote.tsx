@@ -7,7 +7,7 @@ import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Proposal, ProposalState } from '../../models/accounts';
-import { useVoteRecord } from '../../contexts/proposals';
+import { useVoteRecord } from '../../contexts/GovernanceContext';
 import { relinquishVote } from '../../actions/relinquishVote';
 
 const { useWallet } = contexts.Wallet;
