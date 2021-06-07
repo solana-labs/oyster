@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from 'antd';
 import { Form, Input } from 'antd';
 import { INSTRUCTION_LIMIT } from '../../models/serialisation';
-import { contexts, ParsedAccount, utils } from '@oyster/common';
+import { contexts, ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../constants';
@@ -10,12 +10,9 @@ import { Governance, Proposal } from '../../models/accounts';
 
 import { useProposalAuthority } from '../../contexts/proposals';
 import { insertInstruction } from '../../actions/insertInstruction';
-import { executeInstruction } from '../../actions/executeInstruction';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
-
-const { notify } = utils;
 
 const layout = {
   labelCol: { span: 24 },
@@ -42,7 +39,7 @@ export function NewInstructionCard({
   const onFinish = async (values: {
     slot: string;
     instruction: string;
-    destination?: string;
+    holdUpTime: number;
   }) => {
     // if (!values.slot.match(/^\d*$/)) {
     //   notify({
@@ -65,17 +62,20 @@ export function NewInstructionCard({
     //   return;
     // }
 
-    //let instruction = values.instruction;
+    let index = 1;
 
     try {
-      // await insertInstruction(
-      //   connection,
-      //   wallet,
-      //   proposal,
-      //   proposalAuthority!.pubkey,
-      // );
+      await insertInstruction(
+        connection,
+        wallet,
+        proposal,
+        proposalAuthority!.pubkey,
+        index,
+        values.holdUpTime,
+        values.instruction,
+      );
 
-      await executeInstruction(connection, wallet, proposal);
+      //    await executeInstruction(connection, wallet, proposal);
 
       form.resetFields();
     } catch (ex) {
@@ -88,22 +88,34 @@ export function NewInstructionCard({
       title="New Instruction"
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
     >
-      <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+      <Form
+        {...layout}
+        form={form}
+        name="control-hooks"
+        onFinish={onFinish}
+        initialValues={{
+          holdUpTime:
+            governance.info.config.minInstructionHoldUpTime.toNumber(),
+        }}
+      >
         <Form.Item
-          name="slot"
+          name="holdUpTime"
           label={LABELS.HOLD_UP_TIME}
-          // rules={[{ required: true }]}
+          rules={[{ required: true }]}
         >
-          <Input maxLength={64} />
+          <Input
+            maxLength={64}
+            min={governance.info.config.minInstructionHoldUpTime.toNumber()}
+          />
         </Form.Item>
         <Form.Item
           name="instruction"
           label="Instruction"
-          // rules={[{ required: true }]}
+          rules={[{ required: true }]}
         >
           <Input.TextArea
             maxLength={INSTRUCTION_LIMIT}
-            placeholder={`Base64 encoded Solana Message object with single instruction (call message.serialize().toString('base64')) no more than ${INSTRUCTION_LIMIT} characters`}
+            placeholder={`base64 encoded serialized Solana Instruction`}
           />
         </Form.Item>
       </Form>

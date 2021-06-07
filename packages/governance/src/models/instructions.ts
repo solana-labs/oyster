@@ -13,14 +13,14 @@ export enum GovernanceInstruction {
   AddSignatory = 7, // done
   RemoveSignatory = 8, // --
 
-  InsertInstruction = 9,
+  InsertInstruction = 9, // +/- done
   RemoveInstruction = 10,
   CancelProposal = 11, // *
   SignOffProposal = 12, // done
   CastVote = 13, // done
   FinalizeVote = 14, // *
   RelinquishVote = 15, // +/- done
-  ExecuteInstruction = 16,
+  ExecuteInstruction = 16, // +/- done
 
   // --- OLD ----
 

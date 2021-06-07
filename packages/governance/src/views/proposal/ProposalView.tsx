@@ -408,7 +408,7 @@ function InnerProposalView({
                   content
                 )}
               </TabPane>
-              <TabPane tab="Executable" key="2">
+              <TabPane tab={LABELS.INSTRUCTIONS} key="2">
                 <Row
                   gutter={[
                     { xs: 8, sm: 16, md: 24, lg: 32 },

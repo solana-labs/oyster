@@ -1,7 +1,6 @@
-import { deserializeBorsh, utils } from '@oyster/common';
+import { utils } from '@oyster/common';
 import {
   PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
@@ -26,18 +25,9 @@ export const withInsertInstruction = async (
   const args = new InsertInstructionArgs({
     index,
     holdUpTime,
-    instructionData,
+    instructionData: instructionData,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
-
-  // console.log('DATA', data.toString('hex'));
-
-  // const datad = deserializeBorsh(
-  //   GOVERNANCE_SCHEMA,
-  //   InsertInstructionArgs,
-  //   data,
-  // );
-  // console.log('DATA', datad);
 
   let instructionIndexBuffer = Buffer.alloc(2);
   instructionIndexBuffer.writeInt16LE(index, 0);

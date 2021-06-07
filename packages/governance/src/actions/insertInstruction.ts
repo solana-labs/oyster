@@ -2,14 +2,19 @@ import {
   Account,
   Connection,
   PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import {
+  contexts,
+  utils,
+  ParsedAccount,
+  deserializeBorsh,
+} from '@oyster/common';
 
-import { AccountMetaData, InstructionData, Proposal } from '../models/accounts';
+import { InstructionData, Proposal } from '../models/accounts';
 
 import { withInsertInstruction } from '../models/withInsertInstruction';
+import { GOVERNANCE_SCHEMA } from '../models/serialisation';
 
 const { sendTransaction } = contexts.Connection;
 const { notify } = utils;
@@ -19,6 +24,9 @@ export const insertInstruction = async (
   wallet: any,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
+  index: number,
+  holdUpTime: number,
+  instructionDataBase64: string,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -26,33 +34,12 @@ export const insertInstruction = async (
   let governanceAuthority = wallet.publicKey;
   let payer = wallet.publicKey;
 
-  const index = 0;
-  const holdUpTime = 10;
-  const programId = new PublicKey(
-    '4x59EZfiJqQdF4sxuH7ppKcuaHksoQsADrjQ7VUHgdJJ',
+  const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
+  const instructionData = deserializeBorsh(
+    GOVERNANCE_SCHEMA,
+    InstructionData,
+    instructionDataBin,
   );
-
-  const instructionData = new InstructionData({
-    programId: programId,
-    accounts: [
-      new AccountMetaData({
-        pubkey: programId,
-        isWritable: true,
-        isSigner: false,
-      }),
-      new AccountMetaData({
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isWritable: false,
-        isSigner: false,
-      }),
-      new AccountMetaData({
-        pubkey: new PublicKey('SysvarFees111111111111111111111111111111111'),
-        isWritable: false,
-        isSigner: false,
-      }),
-    ],
-    data: Uint8Array.from([1, 2, 3]),
-  });
 
   await withInsertInstruction(
     instructions,

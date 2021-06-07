@@ -1,7 +1,12 @@
 import * as Layout from '../utils/layout';
 import * as BufferLayout from 'buffer-layout';
 import BN from 'bn.js';
-import { AccountInfo, PublicKey } from '@solana/web3.js';
+import {
+  AccountInfo,
+  PublicKey,
+  TransactionInstruction,
+  AccountMeta,
+} from '@solana/web3.js';
 import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
@@ -33,6 +38,7 @@ import {
   VoteRecord,
   VoteWeight,
 } from './accounts';
+import { serialize } from 'borsh';
 
 export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
@@ -56,6 +62,32 @@ export const TEMP_FILE_TXN_SIZE = 1000;
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
 };
+
+(BinaryWriter.prototype as any).writeAccountMeta = function (
+  value: AccountMeta,
+) {
+  const writer = (this as unknown) as BinaryWriter;
+  writer.writeFixedArray(value.pubkey.toBuffer());
+  writer.writeU8(value.isSigner ? 1 : 0);
+  writer.writeU8(value.isWritable ? 1 : 0);
+};
+
+export const SOLANA_SDK_SCHEMA = new Map<any, any>([
+  [
+    TransactionInstruction,
+    {
+      kind: 'struct',
+      fields: [
+        ['programId', 'pubkey'],
+        ['keys', ['AccountMeta']],
+        ['data', ['u8']],
+      ],
+    },
+  ],
+]);
+
+export const serializeInstruction = (instruction: TransactionInstruction) =>
+  Buffer.from(serialize(SOLANA_SDK_SCHEMA, instruction)).toString('base64');
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
