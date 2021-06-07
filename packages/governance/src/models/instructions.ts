@@ -21,20 +21,6 @@ export enum GovernanceInstruction {
   FinalizeVote = 14, // *
   RelinquishVote = 15, // +/- done
   ExecuteInstruction = 16, // +/- done
-
-  // --- OLD ----
-
-  InitProposal = 17,
-  AddSigner = 18,
-  RemoveSigner = 19,
-  AddCustomSingleSignerTransaction = 20,
-  Sign = 21,
-  Vote = 22,
-  CreateGovernance = 23,
-  Execute = 24,
-  DepositGovernanceTokens = 25,
-  WithdrawVotingTokens = 26,
-  CreateGovernanceVotingRecord = 27,
 }
 
 export class CreateRealmArgs {

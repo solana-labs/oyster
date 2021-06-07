@@ -7,7 +7,7 @@ import {
   TransactionInstruction,
   AccountMeta,
 } from '@solana/web3.js';
-import { deserializeBorsh, ParsedAccountBase, utils } from '@oyster/common';
+import { deserializeBorsh, ParsedAccountBase } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
@@ -45,8 +45,6 @@ export const DESC_SIZE = 200;
 export const NAME_SIZE = 32;
 export const MAX_REALM_NAME_LENGTH = 32;
 export const INSTRUCTION_LIMIT = 450;
-export const MAX_TRANSACTIONS = 5;
-export const TEMP_FILE_TXN_SIZE = 1000;
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -423,22 +421,6 @@ export interface GovernanceOld {
   count: number;
 }
 
-export const GovernanceLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('accountType'),
-    BufferLayout.u8('voteThreshold'),
-    Layout.uint64('minimumSlotWaitingPeriod'),
-    Layout.publicKey('governanceMint'),
-    BufferLayout.u8('councilMintOption'),
-    Layout.publicKey('councilMint'),
-    Layout.publicKey('program'),
-    Layout.uint64('timeLimit'),
-    BufferLayout.seq(BufferLayout.u8(), MAX_REALM_NAME_LENGTH, 'name'),
-    BufferLayout.u32('count'),
-    BufferLayout.seq(BufferLayout.u8(), 295, 'padding'),
-  ],
-);
-
 export enum ProposalStateStatus {
   /// Draft
   Draft = 0,
@@ -485,51 +467,6 @@ export interface ProposalStateOld {
   usedTxnSlots: number;
 }
 
-const proposalTxns = [];
-for (let i = 0; i < MAX_TRANSACTIONS; i++) {
-  proposalTxns.push(Layout.publicKey('proposalTxn' + i.toString()));
-}
-
-export const ProposalLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('accountType'),
-    Layout.publicKey('config'),
-    Layout.publicKey('state'),
-    Layout.publicKey('signatoryMint'),
-    Layout.publicKey('adminMint'),
-    Layout.publicKey('votingMint'),
-    Layout.publicKey('yesVotingMint'),
-    Layout.publicKey('noVotingMint'),
-    Layout.publicKey('sourceMint'),
-    Layout.publicKey('signatoryValidation'),
-    Layout.publicKey('adminValidation'),
-    Layout.publicKey('votingValidation'),
-    Layout.publicKey('sourceHolding'),
-
-    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
-  ],
-);
-
-export const ProposalStateLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('accountType'),
-    Layout.publicKey('proposal'),
-    BufferLayout.u8('proposalStateStatus'),
-    Layout.uint64('totalSigningTokensMinted'),
-    BufferLayout.seq(BufferLayout.u8(), DESC_SIZE, 'descLink'),
-    BufferLayout.seq(BufferLayout.u8(), NAME_SIZE, 'name'),
-    Layout.uint64('votingEndedAt'),
-    Layout.uint64('votingBeganAt'),
-    Layout.uint64('createdAt'),
-    Layout.uint64('completedAt'),
-    Layout.uint64('deletedAt'),
-    BufferLayout.u8('executions'),
-    BufferLayout.u8('usedTxnSlots'),
-    ...proposalTxns,
-    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
-  ],
-);
-
 export interface ProposalOld {
   /// Account type
   accountType: GovernanceAccountType;
@@ -573,62 +510,6 @@ export interface ProposalOld {
   sourceHolding: PublicKey;
 }
 
-export const CustomSingleSignerTransactionLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('accountType'),
-    Layout.uint64('slot'),
-    BufferLayout.seq(BufferLayout.u8(), INSTRUCTION_LIMIT, 'instruction'),
-    BufferLayout.u8('executed'),
-    BufferLayout.u16('instructionEndIndex'),
-    BufferLayout.seq(BufferLayout.u8(), 300, 'padding'),
-  ],
-);
-
-export interface GovernanceTransaction {
-  /// Account type
-  accountType: GovernanceAccountType;
-
-  slot: BN;
-
-  instruction: number[];
-
-  executed: number;
-
-  instructionEndIndex: number;
-}
-export interface CustomSingleSignerTransaction extends GovernanceTransaction {}
-
-export const ProposalOldParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = ProposalLayout.decode(buffer);
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: {
-      accountType: data.accountType,
-      config: data.config,
-      state: data.state,
-      signatoryMint: data.signatoryMint,
-      adminMint: data.adminMint,
-      votingMint: data.votingMint,
-      yesVotingMint: data.yesVotingMint,
-      noVotingMint: data.noVotingMint,
-      sourceMint: data.sourceMint,
-      signatoryValidation: data.signatoryValidation,
-      adminValidation: data.adminValidation,
-      votingValidation: data.votingValidation,
-      sourceHolding: data.sourceHolding,
-    },
-  };
-
-  return details;
-};
-
 export const GovernanceVotingRecordParser = (
   pubKey: PublicKey,
   info: AccountInfo<Buffer>,
@@ -647,98 +528,6 @@ export const GovernanceVotingRecordParser = (
       undecidedCount: data.undecidedCount,
       yesCount: data.yesCount,
       noCount: data.noCount,
-    },
-  };
-
-  return details;
-};
-
-export const ProposalStateParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = ProposalStateLayout.decode(buffer);
-
-  const proposalTxns = [];
-  for (let i = 0; i < MAX_TRANSACTIONS; i++) {
-    proposalTxns.push(data['proposalTxn' + i.toString()]);
-  }
-
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: {
-      accountType: data.accountType,
-      proposal: data.proposal,
-      status: data.proposalStateStatus,
-      totalSigningTokensMinted: data.totalSigningTokensMinted,
-      descLink: utils.fromUTF8Array(data.descLink).replaceAll('\u0000', ''),
-      name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-      proposalTransactions: proposalTxns,
-      votingEndedAt: data.votingEndedAt,
-      votingBeganAt: data.votingBeganAt,
-      createdAt: data.createdAt,
-      completedAt: data.completedAt,
-      deletedAt: data.deletedAt,
-      executions: data.executions,
-      usedTxnSlots: data.usedTxnSlots,
-    },
-  };
-
-  return details;
-};
-
-export const CustomSingleSignerTransactionParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = CustomSingleSignerTransactionLayout.decode(buffer);
-
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: {
-      accountType: data.accountType,
-      slot: data.slot,
-      instruction: data.instruction.slice(0, data.instructionEndIndex + 1),
-
-      executed: data.executed,
-      instructionEndIndex: data.instructionEndIndex,
-    },
-  };
-
-  return details;
-};
-
-export const GovernanceOldParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const buffer = Buffer.from(info.data);
-  const data = GovernanceLayout.decode(buffer);
-
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: {
-      accountType: data.accountType,
-      voteThreshold: data.voteThreshold,
-
-      minimumSlotWaitingPeriod: data.minimumSlotWaitingPeriod,
-      governanceMint: data.governanceMint,
-      councilMint: data.councilMintOption === 1 ? data.councilMint : null,
-      program: data.program,
-      timeLimit: data.timeLimit,
-      name: utils.fromUTF8Array(data.name).replaceAll('\u0000', ''),
-      count: data.count,
     },
   };
 

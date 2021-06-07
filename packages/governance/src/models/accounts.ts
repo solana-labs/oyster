@@ -14,12 +14,6 @@ export enum GovernanceAccountType {
   SignatoryRecord = 6,
   VoteRecord = 7,
   ProposalInstruction = 8,
-
-  // --- OLD
-
-  ProposalOld = 10,
-  ProposalState = 11,
-  CustomSingleSignerTransaction = 12,
 }
 
 export class Realm {

@@ -37,11 +37,7 @@ export const withWithdrawGoverningTokens = async (
   );
 
   const keys = [
-    {
-      pubkey: realm,
-      isWritable: false,
-      isSigner: false,
-    },
+    { pubkey: realm, isWritable: false, isSigner: false },
     {
       pubkey: governingTokenHoldingAddress,
       isWritable: true,

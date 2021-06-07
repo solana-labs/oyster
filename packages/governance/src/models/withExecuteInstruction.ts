@@ -47,15 +47,8 @@ export const withExecuteInstruction = async (
       isWritable: false,
       isSigner: false,
     },
+    ...instruction.accounts,
   ];
-
-  for (let accountMeta of instruction.accounts) {
-    keys.push({
-      pubkey: accountMeta.pubkey,
-      isWritable: accountMeta.isWritable,
-      isSigner: accountMeta.isSigner,
-    });
-  }
 
   instructions.push(
     new TransactionInstruction({
