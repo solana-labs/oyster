@@ -2,11 +2,7 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
-import {
-  INSTRUCTION_LIMIT,
-  GovernanceTransaction,
-  ProposalOld,
-} from '../../models/serialisation';
+import { ProposalOld } from '../../models/serialisation';
 
 import ReactMarkdown from 'react-markdown';
 import {
@@ -14,6 +10,7 @@ import {
   useProposal,
   useSignatoryRecord,
   useTokenOwnerRecord,
+  useInstructions,
 } from '../../contexts/proposals';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts, hooks } from '@oyster/common';
@@ -223,11 +220,7 @@ function InnerProposalView({
   const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
   let signatoryRecord = useSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useTokenOwnerRecord(governance.info.config.realm);
-
-  const instructionsForProposal: ParsedAccount<GovernanceTransaction>[] = [];
-  // proposalState.info.proposalTransactions
-  //   .map(k => instructions[k.toBase58()])
-  //   .filter(k => k);
+  const instructions = useInstructions(proposal.pubkey);
 
   const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
   const isGist =
@@ -415,7 +408,7 @@ function InnerProposalView({
                     { xs: 8, sm: 16, md: 24, lg: 32 },
                   ]}
                 >
-                  {instructionsForProposal.map((instruction, position) => (
+                  {instructions.map((instruction, position) => (
                     <Col xs={24} sm={24} md={12} lg={8} key={position}>
                       <InstructionCard
                         proposal={proposal}
@@ -424,17 +417,14 @@ function InnerProposalView({
                       />
                     </Col>
                   ))}
-                  {instructionsForProposal.length < INSTRUCTION_LIMIT &&
-                    (proposal.info.state === ProposalState.Draft ||
-                      proposal.info.state === ProposalState.Succeeded) && (
-                      <Col xs={24} sm={24} md={12} lg={8}>
-                        <NewInstructionCard
-                          proposal={proposal}
-                          governance={governance}
-                          position={instructionsForProposal.length}
-                        />
-                      </Col>
-                    )}
+                  {proposal.info.state === ProposalState.Draft && (
+                    <Col xs={24} sm={24} md={12} lg={8}>
+                      <NewInstructionCard
+                        proposal={proposal}
+                        governance={governance}
+                      />
+                    </Col>
+                  )}
                 </Row>
               </TabPane>
             </Tabs>

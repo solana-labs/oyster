@@ -20,6 +20,7 @@ import {
   Governance,
   GovernanceAccountType,
   Proposal,
+  ProposalInstruction,
   Realm,
   SignatoryRecord,
   TokenOwnerRecord,
@@ -33,6 +34,7 @@ export interface ProposalsContextState {
   proposals: Record<string, ParsedAccount<Proposal>>;
   signatoryRecords: Map<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
+  instructions: Record<string, ParsedAccount<ProposalInstruction>>;
 }
 
 export const ProposalsContext =
@@ -56,6 +58,7 @@ export default function ProposalsProvider({ children = null as any }) {
     new Map<string, ParsedAccount<SignatoryRecord>>(),
   );
   const [voteRecords, setVoteRecords] = useState({});
+  const [instructions, setInstructions] = useState({});
 
   useSetupProposalsCache({
     connection,
@@ -65,6 +68,7 @@ export default function ProposalsProvider({ children = null as any }) {
     setProposals,
     setSignatoryRecords,
     setVoteRecords,
+    setInstructions,
   });
 
   return (
@@ -76,6 +80,7 @@ export default function ProposalsProvider({ children = null as any }) {
         proposals,
         signatoryRecords,
         voteRecords,
+        instructions,
       }}
     >
       {children}
@@ -91,6 +96,7 @@ function useSetupProposalsCache({
   setProposals,
   setSignatoryRecords,
   setVoteRecords,
+  setInstructions,
 }: {
   connection: Connection;
 
@@ -109,6 +115,9 @@ function useSetupProposalsCache({
   >;
   setVoteRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<VoteRecord>>>
+  >;
+  setInstructions: React.Dispatch<
+    React.SetStateAction<Record<string, ParsedAccount<ProposalInstruction>>>
   >;
 }) {
   useEffect(() => {
@@ -133,6 +142,8 @@ function useSetupProposalsCache({
         ParsedAccount<SignatoryRecord>
       >();
       const voteRecords: Record<string, ParsedAccount<VoteRecord>> = {};
+      const instructions: Record<string, ParsedAccount<ProposalInstruction>> =
+        {};
 
       all[0].forEach(a => {
         let cached;
@@ -183,6 +194,15 @@ function useSetupProposalsCache({
 
             break;
           }
+          case GovernanceAccountType.ProposalInstruction: {
+            const account = BorshAccountParser(ProposalInstruction)(
+              a.pubkey,
+              a.account,
+            ) as ParsedAccount<ProposalInstruction>;
+            instructions[a.pubkey.toBase58()] = account;
+
+            break;
+          }
         }
       });
 
@@ -192,6 +212,7 @@ function useSetupProposalsCache({
       setProposals(proposals);
       setSignatoryRecords(signatoryRecords);
       setVoteRecords(voteRecords);
+      setInstructions(instructions);
     });
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
@@ -292,6 +313,22 @@ function useSetupProposalsCache({
               [pubkey.toBase58()]: cache.get(
                 info.accountId,
               ) as ParsedAccount<VoteRecord>,
+            }));
+
+            break;
+          }
+          case GovernanceAccountType.ProposalInstruction: {
+            cache.add(
+              info.accountId,
+              info.accountInfo,
+              BorshAccountParser(ProposalInstruction),
+            );
+
+            setInstructions((objs: any) => ({
+              ...objs,
+              [pubkey.toBase58()]: cache.get(
+                info.accountId,
+              ) as ParsedAccount<ProposalInstruction>,
             }));
 
             break;
@@ -445,4 +482,18 @@ export const useVoteRecord = (proposal: PublicKey) => {
   }
 
   return null;
+};
+
+export const useInstructions = (proposal: PublicKey) => {
+  const ctx = useGovernanceAccounts();
+
+  const instructions: ParsedAccount<ProposalInstruction>[] = [];
+
+  Object.values(ctx.instructions).forEach(p => {
+    if (p.info.proposal.toBase58() === proposal.toBase58()) {
+      instructions.push(p);
+    }
+  });
+
+  return instructions;
 };

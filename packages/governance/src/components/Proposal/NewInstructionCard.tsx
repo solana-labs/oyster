@@ -21,12 +21,10 @@ const layout = {
 
 export function NewInstructionCard({
   proposal,
-  position,
   governance,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
-  position: number;
 }) {
   const [form] = Form.useForm();
   const { wallet } = useWallet();
@@ -62,7 +60,7 @@ export function NewInstructionCard({
     //   return;
     // }
 
-    let index = 1;
+    let index = proposal.info.instructionsNextIndex;
 
     try {
       await insertInstruction(

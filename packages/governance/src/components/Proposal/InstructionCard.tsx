@@ -7,15 +7,21 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { ParsedAccount, contexts } from '@oyster/common';
-import { Message } from '@solana/web3.js';
+
 import { Card, Button } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { Proposal, ProposalState } from '../../models/accounts';
-import { GovernanceTransaction } from '../../models/serialisation';
+import {
+  Proposal,
+  ProposalInstruction,
+  ProposalState,
+} from '../../models/accounts';
+import { GOVERNANCE_SCHEMA } from '../../models/serialisation';
+import { serialize } from 'borsh';
 
 import './style.less';
+import { executeInstruction } from '../../actions/executeInstruction';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -31,23 +37,24 @@ export function InstructionCard({
   proposal,
   position,
 }: {
-  instruction: ParsedAccount<GovernanceTransaction>;
+  instruction: ParsedAccount<ProposalInstruction>;
   proposal: ParsedAccount<Proposal>;
 
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
-    instruction.info.executed === 1 ? Playstate.Played : Playstate.Unplayed,
+    instruction.info.executedAt ? Playstate.Played : Playstate.Unplayed,
   );
 
   const instructionDetails = useMemo(() => {
-    const message = Message.from(instruction.info.instruction);
+    const dataBase64 = Buffer.from(
+      serialize(GOVERNANCE_SCHEMA, instruction.info.instruction),
+    ).toString('base64');
 
     return {
-      instructionProgramID:
-        message.accountKeys[message.instructions[0].programIdIndex],
-      instructionData: message.instructions[0].data,
+      instructionProgramID: instruction.info.instruction.programId,
+      instructionData: dataBase64,
     };
   }, [instruction]);
 
@@ -59,7 +66,7 @@ export function InstructionCard({
           <>
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.instructionData}`}</p>
             <p>
-              {LABELS.HOLD_UP_TIME}: {instruction.info.slot.toNumber()}
+              {LABELS.HOLD_UP_TIME}: {instruction.info.holdUpTime.toNumber()}
             </p>
           </>
         }
@@ -100,17 +107,22 @@ function PlayStatusButton({
 }: {
   proposal: ParsedAccount<Proposal>;
 
-  instruction: ParsedAccount<GovernanceTransaction>;
+  instruction: ParsedAccount<ProposalInstruction>;
   playing: Playstate;
   setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
 }) {
-  const wallet = useWallet();
+  const { wallet } = useWallet();
 
   const connection = useConnection();
   const [currSlot, setCurrSlot] = useState(0);
 
-  const elapsedTime = currSlot - proposal.info.votingCompletedAt!.toNumber();
-  const ineligibleToSee = elapsedTime < instruction.info.slot.toNumber();
+  let canExecuteAt = 0;
+
+  if (proposal.info.votingCompletedAt) {
+    canExecuteAt = proposal.info.votingCompletedAt.toNumber() + 1;
+  }
+
+  const ineligibleToSee = currSlot - canExecuteAt >= 0;
 
   useEffect(() => {
     if (ineligibleToSee) {
@@ -127,8 +139,7 @@ function PlayStatusButton({
   const run = async () => {
     setPlaying(Playstate.Playing);
     try {
-      console.log('TODO:', wallet);
-      //await execute(connection, wallet.wallet, null, state, instruction);
+      await executeInstruction(connection, wallet, proposal, instruction);
     } catch (e) {
       console.error(e);
       setPlaying(Playstate.Error);
@@ -139,7 +150,7 @@ function PlayStatusButton({
 
   if (
     proposal.info.state !== ProposalState.Executing &&
-    proposal.info.state !== ProposalState.Completed
+    proposal.info.state !== ProposalState.Succeeded
   )
     return null;
   if (ineligibleToSee) return null;

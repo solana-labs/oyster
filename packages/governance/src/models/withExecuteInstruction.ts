@@ -7,20 +7,21 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { ExecuteInstructionArgs } from './instructions';
+import { InstructionData } from './accounts';
 
 export const withExecuteInstruction = async (
   instructions: TransactionInstruction[],
   governance: PublicKey,
   proposal: PublicKey,
-  proposalInstruction: PublicKey,
-  instructionProgram: PublicKey,
+  instructionAddress: PublicKey,
+  instruction: InstructionData,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
   const args = new ExecuteInstructionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const keys = [
+  let keys = [
     {
       pubkey: governance,
       isWritable: false,
@@ -32,7 +33,7 @@ export const withExecuteInstruction = async (
       isSigner: false,
     },
     {
-      pubkey: proposalInstruction,
+      pubkey: instructionAddress,
       isWritable: true,
       isSigner: false,
     },
@@ -42,26 +43,19 @@ export const withExecuteInstruction = async (
       isWritable: false,
     },
     {
-      pubkey: instructionProgram,
+      pubkey: instruction.programId,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: new PublicKey('4x59EZfiJqQdF4sxuH7ppKcuaHksoQsADrjQ7VUHgdJJ'),
-      isSigner: false,
-      isWritable: true,
-    },
-    {
-      pubkey: SYSVAR_CLOCK_PUBKEY,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: new PublicKey('SysvarFees111111111111111111111111111111111'),
-      isSigner: false,
-      isWritable: false,
     },
   ];
+
+  for (let accountMeta of instruction.accounts) {
+    keys.push({
+      pubkey: accountMeta.pubkey,
+      isWritable: accountMeta.isWritable,
+      isSigner: accountMeta.isSigner,
+    });
+  }
 
   instructions.push(
     new TransactionInstruction({

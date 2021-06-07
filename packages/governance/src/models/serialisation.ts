@@ -31,6 +31,7 @@ import {
   GovernanceConfig,
   InstructionData,
   Proposal,
+  ProposalInstruction,
   ProposalState,
   Realm,
   SignatoryRecord,
@@ -335,6 +336,19 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['governingTokenOwner', 'pubkey'],
         ['isRelinquished', 'u8'],
         ['voteWeight', VoteWeight],
+      ],
+    },
+  ],
+  [
+    ProposalInstruction,
+    {
+      kind: 'struct',
+      fields: [
+        ['accountType', 'u8'],
+        ['proposal', 'pubkey'],
+        ['holdUpTime', 'u64'],
+        ['instruction', InstructionData],
+        ['executedAt', { kind: 'option', type: 'u64' }],
       ],
     },
   ],

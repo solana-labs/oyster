@@ -1,15 +1,8 @@
-import {
-  Account,
-  Connection,
-  PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Account, Connection, TransactionInstruction } from '@solana/web3.js';
 import { contexts, utils, ParsedAccount } from '@oyster/common';
 
-import { AccountMetaData, InstructionData, Proposal } from '../models/accounts';
+import { Proposal, ProposalInstruction } from '../models/accounts';
 
-import { withInsertInstruction } from '../models/withInsertInstruction';
 import { withExecuteInstruction } from '../models/withExecuteInstruction';
 
 const { sendTransaction } = contexts.Connection;
@@ -19,52 +12,21 @@ export const executeInstruction = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<Proposal>,
+  instruction: ParsedAccount<ProposalInstruction>,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
-
-  const index = 0;
-  const holdUpTime = 10;
-  const programId = new PublicKey(
-    '4x59EZfiJqQdF4sxuH7ppKcuaHksoQsADrjQ7VUHgdJJ',
-  );
-
-  const instructionData = new InstructionData({
-    programId: programId,
-    accounts: [
-      new AccountMetaData({
-        pubkey: programId,
-        isWritable: true,
-        isSigner: false,
-      }),
-      new AccountMetaData({
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isWritable: false,
-        isSigner: false,
-      }),
-      new AccountMetaData({
-        pubkey: new PublicKey('SysvarFees111111111111111111111111111111111'),
-        isWritable: false,
-        isSigner: false,
-      }),
-    ],
-    data: Uint8Array.from([1, 2, 3]),
-  });
-
-  const instructionAddress = new PublicKey(
-    '12ubuoZxf8YUirCdfja1whLpeomaKGob67out1gSoGP1',
-  );
 
   await withExecuteInstruction(
     instructions,
     proposal.info.governance,
     proposal.pubkey,
-    instructionAddress,
-    programId,
+    instruction.pubkey,
+    instruction.info.instruction,
   );
 
   notify({
-    message: 'Adding instruction...',
+    message: 'Executing instruction...',
     description: 'Please wait...',
     type: 'warn',
   });
@@ -79,7 +41,7 @@ export const executeInstruction = async (
     );
 
     notify({
-      message: 'Instruction added.',
+      message: 'Instruction executed.',
       type: 'success',
       description: `Transaction - ${tx}`,
     });
