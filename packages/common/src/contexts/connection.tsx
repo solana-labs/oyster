@@ -107,12 +107,14 @@ export function ConnectionProvider({ children = undefined as any }) {
     DEFAULT_SLIPPAGE.toString(),
   );
 
-  const connection = useMemo(() => new Connection(endpoint, 'recent'), [
-    endpoint,
-  ]);
-  const sendConnection = useMemo(() => new Connection(endpoint, 'recent'), [
-    endpoint,
-  ]);
+  const connection = useMemo(
+    () => new Connection(endpoint, 'recent'),
+    [endpoint],
+  );
+  const sendConnection = useMemo(
+    () => new Connection(endpoint, 'recent'),
+    [endpoint],
+  );
 
   const env =
     ENDPOINTS.find(end => end.endpoint === endpoint)?.name || ENDPOINTS[0].name;
@@ -224,6 +226,7 @@ export const getErrorForTransaction = async (
   txid: string,
 ) => {
   // wait for all confirmation before geting transaction
+
   await connection.confirmTransaction(txid, 'max');
 
   const tx = await connection.getParsedConfirmedTransaction(txid);
@@ -388,7 +391,13 @@ export const sendTransaction = async (
     slot = confirmation?.slot || 0;
 
     if (confirmation?.err) {
-      const errors = await getErrorForTransaction(connection, txid);
+      let errors: string[] = [];
+      try {
+        errors = await getErrorForTransaction(connection, txid);
+      } catch (ex) {
+        console.error('getErrorForTransaction() error', ex);
+      }
+
       notify({
         message: 'Transaction failed...',
         description: (

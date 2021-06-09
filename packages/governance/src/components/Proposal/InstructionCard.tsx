@@ -1,7 +1,6 @@
 import {
   CheckCircleOutlined,
   DeleteOutlined,
-  EditOutlined,
   LoadingOutlined,
   PlayCircleOutlined,
   RedoOutlined,
@@ -26,7 +25,7 @@ import { executeInstruction } from '../../actions/executeInstruction';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 
-enum Playstate {
+enum PlayState {
   Played,
   Unplayed,
   Playing,
@@ -39,12 +38,11 @@ export function InstructionCard({
 }: {
   instruction: ParsedAccount<ProposalInstruction>;
   proposal: ParsedAccount<Proposal>;
-
   position: number;
 }) {
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
-    instruction.info.executedAt ? Playstate.Played : Playstate.Unplayed,
+    instruction.info.executedAt ? PlayState.Played : PlayState.Unplayed,
   );
 
   const instructionDetails = useMemo(() => {
@@ -53,18 +51,18 @@ export function InstructionCard({
     ).toString('base64');
 
     return {
-      instructionProgramID: instruction.info.instruction.programId,
-      instructionData: dataBase64,
+      programId: instruction.info.instruction.programId,
+      dataBase64: dataBase64,
     };
   }, [instruction]);
 
   const contentList: Record<string, JSX.Element> = {
     info: (
       <Meta
-        title={`${LABELS.PROGRAM_ID}: ${instructionDetails.instructionProgramID}`}
+        title={`${LABELS.PROGRAM_ID}: ${instructionDetails.programId}`}
         description={
           <>
-            <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.instructionData}`}</p>
+            <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.dataBase64}`}</p>
             <p>
               {LABELS.HOLD_UP_TIME}: {instruction.info.holdUpTime.toNumber()}
             </p>
@@ -72,7 +70,7 @@ export function InstructionCard({
         }
       />
     ),
-    data: <p className="wordwrap">{instruction.info.instruction}</p>,
+    data: <p className="wordwrap">{instructionDetails.dataBase64}</p>,
   };
 
   return (
@@ -92,7 +90,7 @@ export function InstructionCard({
       title={'Instruction #' + position}
       activeTabKey={tabKey}
       onTabChange={setTabKey}
-      actions={[<EditOutlined key="edit" />, <DeleteOutlined key="delete" />]}
+      actions={[<DeleteOutlined key="delete" />]}
     >
       {contentList[tabKey]}
     </Card>
@@ -106,46 +104,42 @@ function PlayStatusButton({
   instruction,
 }: {
   proposal: ParsedAccount<Proposal>;
-
   instruction: ParsedAccount<ProposalInstruction>;
-  playing: Playstate;
-  setPlaying: React.Dispatch<React.SetStateAction<Playstate>>;
+  playing: PlayState;
+  setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
-  const { wallet } = useWallet();
+  const { wallet, connected } = useWallet();
 
   const connection = useConnection();
-  const [currSlot, setCurrSlot] = useState(0);
+  const [currentSlot, setCurrentSlot] = useState(0);
 
-  let canExecuteAt = 0;
+  let canExecuteAt = proposal.info.votingCompletedAt
+    ? proposal.info.votingCompletedAt.toNumber() + 1
+    : 0;
 
-  if (proposal.info.votingCompletedAt) {
-    canExecuteAt = proposal.info.votingCompletedAt.toNumber() + 1;
-  }
-
-  const ineligibleToSee = currSlot - canExecuteAt >= 0;
+  const ineligibleToSee = currentSlot - canExecuteAt >= 0;
 
   useEffect(() => {
     if (ineligibleToSee) {
       const timer = setTimeout(() => {
-        connection.getSlot().then(setCurrSlot);
+        connection.getSlot().then(setCurrentSlot);
       }, 5000);
 
       return () => {
         clearTimeout(timer);
       };
     }
-  }, [ineligibleToSee, connection, currSlot]);
+  }, [ineligibleToSee, connection, currentSlot]);
 
-  const run = async () => {
-    setPlaying(Playstate.Playing);
+  const onExecuteInstruction = async () => {
+    setPlaying(PlayState.Playing);
     try {
       await executeInstruction(connection, wallet, proposal, instruction);
     } catch (e) {
-      console.error(e);
-      setPlaying(Playstate.Error);
+      setPlaying(PlayState.Error);
       return;
     }
-    setPlaying(Playstate.Played);
+    setPlaying(PlayState.Played);
   };
 
   if (
@@ -155,17 +149,17 @@ function PlayStatusButton({
     return null;
   if (ineligibleToSee) return null;
 
-  if (playing === Playstate.Unplayed)
+  if (playing === PlayState.Unplayed)
     return (
-      <Button onClick={run}>
+      <Button onClick={onExecuteInstruction} disabled={!connected}>
         <PlayCircleOutlined style={{ color: 'green' }} key="play" />
       </Button>
     );
-  else if (playing === Playstate.Playing)
+  else if (playing === PlayState.Playing)
     return <LoadingOutlined style={{ color: 'orange' }} key="loading" />;
-  else if (playing === Playstate.Error)
+  else if (playing === PlayState.Error)
     return (
-      <Button onClick={run}>
+      <Button onClick={onExecuteInstruction} disabled={!connected}>
         <RedoOutlined style={{ color: 'orange' }} key="play" />
       </Button>
     );
