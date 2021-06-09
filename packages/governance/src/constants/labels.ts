@@ -91,7 +91,7 @@ export const LABELS = {
   WITHDRAWING_YOUR_VOTE: 'Withdrawing your vote',
   VOTE_WITHDRAWN: 'Your vote has been withdrawn',
 
-  REFUND_TOKENS: 'Refund My Tokens',
+  RELEASE_MY_TOKENS: 'Release My Tokens',
   REFUND_YOUR_TOKENS_QUESTION: 'Refund your tokens?',
   REFUND_YOUR_TOKENS_MSG:
     'The proposal has been voted. Refunding your tokens won’t change the outcome.',

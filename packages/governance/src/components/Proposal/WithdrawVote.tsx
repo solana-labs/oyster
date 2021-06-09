@@ -7,7 +7,10 @@ import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Proposal, ProposalState } from '../../models/accounts';
-import { useVoteRecord } from '../../contexts/GovernanceContext';
+import {
+  useGovernanceContext,
+  useVoteRecord,
+} from '../../contexts/GovernanceContext';
 import { relinquishVote } from '../../actions/relinquishVote';
 
 const { useWallet } = contexts.Wallet;
@@ -23,8 +26,9 @@ export function WithdrawVote({
   const connection = useConnection();
 
   const voteRecord = useVoteRecord(proposal.pubkey);
+  const { removeVoteRecord } = useGovernanceContext();
 
-  const eligibleToView =
+  const isVisible =
     connected &&
     voteRecord &&
     !voteRecord?.info.isRelinquished &&
@@ -34,36 +38,33 @@ export function WithdrawVote({
       proposal.info.state === ProposalState.Executing ||
       proposal.info.state === ProposalState.Defeated);
 
-  const [btnLabel, title, msg, action] =
-    proposal.info.state === ProposalState.Voting
-      ? [
-          LABELS.WITHDRAW_VOTE,
-          LABELS.WITHDRAW_YOUR_VOTE_QUESTION,
-          LABELS.WITHDRAW_YOUR_VOTE_MSG,
-          LABELS.WITHDRAW,
-        ]
-      : [
-          LABELS.REFUND_TOKENS,
-          LABELS.REFUND_YOUR_TOKENS_QUESTION,
-          LABELS.REFUND_YOUR_TOKENS_MSG,
-          LABELS.REFUND,
-        ];
-
-  return eligibleToView ? (
+  return isVisible ? (
     <Button
       type="primary"
-      onClick={() =>
+      onClick={async () => {
+        if (proposal.info.state !== ProposalState.Voting) {
+          await relinquishVote(
+            connection,
+            wallet,
+            proposal,
+            voteRecord!.pubkey,
+            false,
+          );
+          removeVoteRecord(voteRecord!.pubkey.toBase58());
+          return;
+        }
+
         confirm({
-          title: title,
+          title: LABELS.WITHDRAW_VOTE,
           icon: <ExclamationCircleOutlined />,
           content: (
             <Row>
               <Col span={24}>
-                <p>{msg}</p>
+                <p>{LABELS.WITHDRAW_YOUR_VOTE_MSG}</p>
               </Col>
             </Row>
           ),
-          okText: action,
+          okText: LABELS.WITHDRAW,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             await relinquishVote(
@@ -71,12 +72,16 @@ export function WithdrawVote({
               wallet,
               proposal,
               voteRecord!.pubkey,
+              true,
             );
+            removeVoteRecord(voteRecord!.pubkey.toBase58());
           },
-        })
-      }
+        });
+      }}
     >
-      {btnLabel}
+      {proposal.info.state === ProposalState.Voting
+        ? LABELS.WITHDRAW_VOTE
+        : LABELS.RELEASE_MY_TOKENS}
     </Button>
   ) : null;
 }

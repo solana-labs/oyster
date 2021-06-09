@@ -36,7 +36,23 @@ export interface GovernanceContextState {
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
   instructions: Record<string, ParsedAccount<ProposalInstruction>>;
   removeInstruction: (key: string) => void;
+  removeVoteRecord: (key: string) => void;
 }
+
+const removeCtxItem = (setAction: React.Dispatch<React.SetStateAction<{}>>) => {
+  return (key: string) => {
+    setAction((objs: any) => {
+      return {
+        ...Object.keys(objs)
+          .filter(k => k !== key)
+          .reduce((res, key) => {
+            res[key] = objs[key];
+            return res;
+          }, {} as any),
+      };
+    });
+  };
+};
 
 export const GovernanceContext =
   React.createContext<GovernanceContextState | null>(null);
@@ -68,19 +84,6 @@ export default function GovernanceProvider({ children = null as any }) {
     setInstructions,
   });
 
-  const removeInstruction = (key: string) => {
-    setInstructions((objs: any) => {
-      return {
-        ...Object.keys(objs)
-          .filter(k => k !== key)
-          .reduce((res, key) => {
-            res[key] = objs[key];
-            return res;
-          }, {} as any),
-      };
-    });
-  };
-
   return (
     <GovernanceContext.Provider
       value={{
@@ -91,7 +94,8 @@ export default function GovernanceProvider({ children = null as any }) {
         signatoryRecords,
         voteRecords,
         instructions,
-        removeInstruction,
+        removeInstruction: removeCtxItem(setInstructions),
+        removeVoteRecord: removeCtxItem(setVoteRecords),
       }}
     >
       {children}

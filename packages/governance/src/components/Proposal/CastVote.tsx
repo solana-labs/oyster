@@ -6,6 +6,7 @@ import { LABELS } from '../../constants';
 
 import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { useVoteRecord as useWalletVoteRecord } from '../../contexts/GovernanceContext';
 
 import './style.less';
 
@@ -37,8 +38,10 @@ export function CastVote({
 }) {
   const { wallet } = useWallet();
   const connection = useConnection();
+  const voteRecord = useWalletVoteRecord(proposal.pubkey);
 
   const eligibleToView =
+    !voteRecord &&
     tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0 &&
     proposal.info.state === ProposalState.Voting;
 

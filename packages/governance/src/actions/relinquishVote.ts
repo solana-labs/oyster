@@ -17,12 +17,13 @@ export const relinquishVote = async (
   wallet: any,
   proposal: ParsedAccount<Proposal>,
   voteRecord: PublicKey,
+  IsWithdrawal: boolean,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  // let governanceAuthority = wallet.publicKey;
-  // let payer = wallet.publicKey;
+  let governanceAuthority = wallet.publicKey;
+  let beneficiary = wallet.publicKey;
 
   withRelinquishVote(
     instructions,
@@ -31,10 +32,14 @@ export const relinquishVote = async (
     proposal.info.tokenOwnerRecord,
     proposal.info.governingTokenMint,
     voteRecord,
+    governanceAuthority,
+    beneficiary,
   );
 
   notify({
-    message: 'Relinquishing vote on proposal...',
+    message: IsWithdrawal
+      ? 'Withdrawing vote from proposal...'
+      : 'Releasing voting tokens...',
     description: 'Please wait...',
     type: 'warn',
   });
@@ -49,7 +54,7 @@ export const relinquishVote = async (
     );
 
     notify({
-      message: 'Vote relinquished.',
+      message: IsWithdrawal ? 'Vote withdrawn' : 'Tokens released',
       type: 'success',
       description: `Transaction - ${tx}`,
     });

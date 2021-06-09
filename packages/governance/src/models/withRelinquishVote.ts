@@ -11,13 +11,15 @@ export const withRelinquishVote = async (
   tokenOwnerRecord: PublicKey,
   governingTokenMint: PublicKey,
   voteRecord: PublicKey,
+  governanceAuthority?: PublicKey,
+  beneficiary?: PublicKey,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
   const args = new RelinquishVoteArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const keys = [
+  let keys = [
     {
       pubkey: governance,
       isWritable: false,
@@ -45,9 +47,25 @@ export const withRelinquishVote = async (
     },
   ];
 
+  const existingVoteKeys =
+    governanceAuthority && beneficiary
+      ? [
+          {
+            pubkey: governanceAuthority,
+            isWritable: false,
+            isSigner: true,
+          },
+          {
+            pubkey: beneficiary,
+            isWritable: true,
+            isSigner: false,
+          },
+        ]
+      : [];
+
   instructions.push(
     new TransactionInstruction({
-      keys,
+      keys: [...keys, ...existingVoteKeys],
       programId: PROGRAM_IDS.governance.programId,
       data,
     }),
