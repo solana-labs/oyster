@@ -31,11 +31,11 @@ export const insertInstruction = async (
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  let governanceAuthority = wallet.publicKey;
-  let payer = wallet.publicKey;
+  const governanceAuthority = wallet.publicKey;
+  const payer = wallet.publicKey;
 
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
-  const instructionData = deserializeBorsh(
+  const instructionData: InstructionData = deserializeBorsh(
     GOVERNANCE_SCHEMA,
     InstructionData,
     instructionDataBin,

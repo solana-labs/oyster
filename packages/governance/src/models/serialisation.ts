@@ -5,7 +5,6 @@ import {
   AccountInfo,
   PublicKey,
   TransactionInstruction,
-  AccountMeta,
 } from '@solana/web3.js';
 import { deserializeBorsh, ParsedAccountBase } from '@oyster/common';
 
@@ -62,31 +61,24 @@ export const INSTRUCTION_LIMIT = 450;
   reader.length += 2;
 };
 
-(BinaryWriter.prototype as any).writeAccountMeta = function (
-  value: AccountMeta,
-) {
-  const writer = (this as unknown) as BinaryWriter;
-  writer.writeFixedArray(value.pubkey.toBuffer());
-  writer.writeU8(value.isSigner ? 1 : 0);
-  writer.writeU8(value.isWritable ? 1 : 0);
+export const serializeInstructionToBase64 = (
+  instruction: TransactionInstruction,
+) => {
+  let data = new InstructionData({
+    programId: instruction.programId,
+    data: instruction.data,
+    accounts: instruction.keys.map(
+      k =>
+        new AccountMetaData({
+          pubkey: k.pubkey,
+          isSigner: k.isSigner,
+          isWritable: k.isWritable,
+        }),
+    ),
+  });
+
+  return Buffer.from(serialize(GOVERNANCE_SCHEMA, data)).toString('base64');
 };
-
-export const SOLANA_SDK_SCHEMA = new Map<any, any>([
-  [
-    TransactionInstruction,
-    {
-      kind: 'struct',
-      fields: [
-        ['programId', 'pubkey'],
-        ['keys', ['AccountMeta']],
-        ['data', ['u8']],
-      ],
-    },
-  ],
-]);
-
-export const serializeInstruction = (instruction: TransactionInstruction) =>
-  Buffer.from(serialize(SOLANA_SDK_SCHEMA, instruction)).toString('base64');
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
@@ -442,6 +434,7 @@ export enum ProposalStateStatus {
 
 export const STATE_COLOR: Record<string, string> = {
   [ProposalState.Draft]: 'orange',
+  [ProposalState.SigningOff]: 'orange',
   [ProposalState.Voting]: 'blue',
   [ProposalState.Executing]: 'green',
   [ProposalState.Completed]: 'purple',
