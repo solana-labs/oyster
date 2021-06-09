@@ -63,6 +63,6 @@ export const createProposal = async (
     return proposalAddress;
   } catch (ex) {
     console.error(ex);
-    throw new Error();
+    throw ex;
   }
 };

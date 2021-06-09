@@ -59,6 +59,5 @@ export const castVote = async (
     });
   } catch (ex) {
     console.error(ex);
-    throw new Error();
   }
 };

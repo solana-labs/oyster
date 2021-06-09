@@ -10,7 +10,10 @@ import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
 import { Governance } from '../../models/accounts';
-import { useRealm } from '../../contexts/GovernanceContext';
+import {
+  useRealm,
+  useTokenOwnerRecord,
+} from '../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -24,10 +27,15 @@ export function NewProposal({
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
+  const tokenOwnerRecord = useTokenOwnerRecord(governance?.info.config.realm);
 
   if (!governance) {
     return null;
   }
+
+  const isDisabled =
+    (tokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ?? 0) <
+    governance.info.config.minTokensToCreateProposal;
 
   const handleOk = (a: PublicKey) => {
     setIsModalVisible(false);
@@ -43,7 +51,11 @@ export function NewProposal({
 
   return (
     <>
-      <Button onClick={() => setIsModalVisible(true)} {...props}>
+      <Button
+        onClick={() => setIsModalVisible(true)}
+        {...props}
+        disabled={isDisabled}
+      >
         {LABELS.NEW_PROPOSAL}
       </Button>
       <NewProposalForm
@@ -80,17 +92,21 @@ export function NewProposalForm({
     const governingTokenMint = realm!.info.communityMint;
     const proposalIndex = governance.info.proposalCount;
 
-    const proposalAddress = await createProposal(
-      connection,
-      wallet.wallet,
-      governance.info.config.realm,
-      governance.pubkey,
-      values.name,
-      values.descriptionLink,
-      governingTokenMint,
-      proposalIndex,
-    );
-    handleOk(proposalAddress);
+    try {
+      const proposalAddress = await createProposal(
+        connection,
+        wallet.wallet,
+        governance.info.config.realm,
+        governance.pubkey,
+        values.name,
+        values.descriptionLink,
+        governingTokenMint,
+        proposalIndex,
+      );
+      handleOk(proposalAddress);
+    } catch {
+      handleCancel();
+    }
   };
 
   const layout = {
