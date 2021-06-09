@@ -35,6 +35,7 @@ export interface GovernanceContextState {
   signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
   instructions: Record<string, ParsedAccount<ProposalInstruction>>;
+  removeInstruction: (key: string) => void;
 }
 
 export const GovernanceContext =
@@ -67,6 +68,19 @@ export default function GovernanceProvider({ children = null as any }) {
     setInstructions,
   });
 
+  const removeInstruction = (key: string) => {
+    setInstructions((objs: any) => {
+      return {
+        ...Object.keys(objs)
+          .filter(k => k !== key)
+          .reduce((res, key) => {
+            res[key] = objs[key];
+            return res;
+          }, {} as any),
+      };
+    });
+  };
+
   return (
     <GovernanceContext.Provider
       value={{
@@ -77,6 +91,7 @@ export default function GovernanceProvider({ children = null as any }) {
         signatoryRecords,
         voteRecords,
         instructions,
+        removeInstruction,
       }}
     >
       {children}
@@ -206,6 +221,7 @@ function useSetupGovernanceContext({
       setVoteRecords(voteRecords);
       setInstructions(instructions);
     });
+
     const subID = connection.onProgramAccountChange(
       PROGRAM_IDS.governance.programId,
       async (info: KeyedAccountInfo) => {
@@ -213,8 +229,6 @@ function useSetupGovernanceContext({
           typeof info.accountId === 'string'
             ? new PublicKey(info.accountId as unknown as string)
             : info.accountId;
-
-        //     return;
 
         switch (info.accountInfo.data[0]) {
           case GovernanceAccountType.Realm:

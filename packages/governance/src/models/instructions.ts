@@ -11,16 +11,16 @@ export enum GovernanceInstruction {
   CreateProgramGovernance = 5, // done
   CreateProposal = 6, // done
   AddSignatory = 7, // done
-  RemoveSignatory = 8, // --
+  RemoveSignatory = 8, // done
 
-  InsertInstruction = 9, // +/- done
+  InsertInstruction = 9, // done
   RemoveInstruction = 10,
   CancelProposal = 11, // *
   SignOffProposal = 12, // done
   CastVote = 13, // done
   FinalizeVote = 14, // *
-  RelinquishVote = 15, // +/- done
-  ExecuteInstruction = 16, // +/- done
+  RelinquishVote = 15, // done
+  ExecuteInstruction = 16, // done
 }
 
 export class CreateRealmArgs {
@@ -130,6 +130,10 @@ export class InsertInstructionArgs {
     this.holdUpTime = args.holdUpTime;
     this.instructionData = args.instructionData;
   }
+}
+
+export class RemoveInstructionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.RemoveInstruction;
 }
 
 export class ExecuteInstructionArgs {

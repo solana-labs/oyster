@@ -20,6 +20,7 @@ import {
   ExecuteInstructionArgs,
   InsertInstructionArgs,
   RelinquishVoteArgs,
+  RemoveInstructionArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
@@ -182,6 +183,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['holdUpTime', 'u64'],
         ['instructionData', InstructionData],
       ],
+    },
+  ],
+  [
+    RemoveInstructionArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
     },
   ],
   [

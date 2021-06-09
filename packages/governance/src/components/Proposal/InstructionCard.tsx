@@ -21,6 +21,11 @@ import { serialize } from 'borsh';
 
 import './style.less';
 import { executeInstruction } from '../../actions/executeInstruction';
+import { removeInstruction } from '../../actions/removeInstruction';
+import {
+  useGovernanceContext,
+  useProposalAuthority,
+} from '../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -40,6 +45,14 @@ export function InstructionCard({
   proposal: ParsedAccount<Proposal>;
   position: number;
 }) {
+  const { wallet, connected } = useWallet();
+  const connection = useConnection();
+  const { removeInstruction: removeFromCtx } = useGovernanceContext();
+
+  const proposalAuthority = useProposalAuthority(
+    proposal.info.tokenOwnerRecord,
+  );
+
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
     instruction.info.executedAt ? PlayState.Played : PlayState.Unplayed,
@@ -73,6 +86,22 @@ export function InstructionCard({
     data: <p className="wordwrap">{instructionDetails.dataBase64}</p>,
   };
 
+  const isEditable =
+    proposal.info.state === ProposalState.Draft && proposalAuthority;
+
+  const deleteAction = () => {
+    const onDelete = async () => {
+      await removeInstruction(connection, wallet, proposal, instruction.pubkey);
+      removeFromCtx(instruction.pubkey.toBase58());
+    };
+
+    return (
+      <Button onClick={onDelete} disabled={!connected} key="delete">
+        <DeleteOutlined />
+      </Button>
+    );
+  };
+
   return (
     <Card
       extra={
@@ -90,7 +119,7 @@ export function InstructionCard({
       title={'Instruction #' + position}
       activeTabKey={tabKey}
       onTabChange={setTabKey}
-      actions={[<DeleteOutlined key="delete" />]}
+      actions={isEditable ? [deleteAction()] : undefined}
     >
       {contentList[tabKey]}
     </Card>
