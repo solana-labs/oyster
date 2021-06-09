@@ -14,8 +14,8 @@ export enum GovernanceInstruction {
   RemoveSignatory = 8, // done
 
   InsertInstruction = 9, // done
-  RemoveInstruction = 10,
-  CancelProposal = 11, // *
+  RemoveInstruction = 10, // done
+  CancelProposal = 11, // done
   SignOffProposal = 12, // done
   CastVote = 13, // done
   FinalizeVote = 14, // *
@@ -95,6 +95,10 @@ export class AddSignatoryArgs {
 
 export class SignOffProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.SignOffProposal;
+}
+
+export class CancelProposalArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.CancelProposal;
 }
 
 export enum Vote {

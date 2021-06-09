@@ -11,6 +11,7 @@ import { deserializeBorsh, ParsedAccountBase } from '@oyster/common';
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
   AddSignatoryArgs,
+  CancelProposalArgs,
   CastVoteArgs,
   CreateAccountGovernanceArgs,
   CreateProgramGovernanceArgs,
@@ -151,6 +152,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
   [
     SignOffProposalArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    CancelProposalArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],

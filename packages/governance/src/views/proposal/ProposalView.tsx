@@ -30,6 +30,7 @@ import { VoterTable } from '../../components/Proposal/VoterTable';
 import { Governance, Proposal, ProposalState } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
+import CancelButton from '../../components/Proposal/CancelButton';
 
 const { TabPane } = Tabs;
 
@@ -267,6 +268,8 @@ function InnerProposalView({
                 proposal.info.state === ProposalState.Draft && (
                   <AddSigners proposal={proposal} />
                 )}
+
+              <CancelButton proposal={proposal}></CancelButton>
 
               {signatoryRecord &&
                 (proposal.info.state === ProposalState.Draft ||
