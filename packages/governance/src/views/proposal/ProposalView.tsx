@@ -2,7 +2,6 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
-import { ProposalOld } from '../../models/serialisation';
 
 import ReactMarkdown from 'react-markdown';
 import {
@@ -11,6 +10,7 @@ import {
   useSignatoryRecord,
   useWalletTokenOwnerRecord,
   useInstructions,
+  useVoteRecords,
 } from '../../contexts/GovernanceContext';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts } from '@oyster/common';
@@ -22,11 +22,15 @@ import SignOffButton from '../../components/Proposal/SignOffButton';
 import { CastVote } from '../../components/Proposal/CastVote';
 import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
 import './style.less';
-import { useVotingRecords } from '../../hooks/useVotingRecords';
-import BN from 'bn.js';
+
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
 import { VoterTable } from '../../components/Proposal/VoterTable';
-import { Governance, Proposal, ProposalState } from '../../models/accounts';
+import {
+  Governance,
+  Proposal,
+  ProposalState,
+  VoteRecord,
+} from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
 import CancelButton from '../../components/Proposal/CancelButton';
@@ -45,13 +49,7 @@ export enum VoteType {
   No = 'Nay',
 }
 
-const getDefaultProposalOld = (): ParsedAccount<ProposalOld> | null => {
-  return null;
-};
-
 export const ProposalView = () => {
-  const proposalOld = getDefaultProposalOld();
-
   const { endpoint } = useConnectionConfig();
 
   let proposalKey = useKeyParam();
@@ -60,7 +58,7 @@ export const ProposalView = () => {
   let governance = useGovernance(proposal?.info.governance);
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
-  const votingRecords = useVotingRecords(proposalOld?.pubkey);
+  const voteRecords = useVoteRecords(proposal?.pubkey);
 
   return (
     <>
@@ -69,7 +67,7 @@ export const ProposalView = () => {
           <InnerProposalView
             proposal={proposal}
             governance={governance}
-            votingDisplayData={voterDisplayData(votingRecords)}
+            voterDisplayData={mapVoterDisplayData(voteRecords)}
             governingTokenMint={governingTokenMint}
             endpoint={endpoint}
           />
@@ -131,9 +129,6 @@ function useLoadGist({
     }
   }, [loading]); //eslint-disable-line
 }
-interface PartialGovernanceRecord {
-  info: { yesCount: BN; noCount: BN; undecidedCount: BN };
-}
 
 export interface VoterDisplayData {
   name: string;
@@ -142,8 +137,8 @@ export interface VoterDisplayData {
   value: number;
 }
 
-function voterDisplayData(
-  governanceVotingRecords: Record<string, PartialGovernanceRecord>,
+function mapVoterDisplayData(
+  voteRecords: ParsedAccount<VoteRecord>[],
 ): Array<VoterDisplayData> {
   const mapper = (key: string, amount: number, label: string) => ({
     name: key,
@@ -153,45 +148,37 @@ function voterDisplayData(
     key: key,
   });
 
-  const undecidedData = [
-    ...Object.keys(governanceVotingRecords)
-      .filter(
-        key => governanceVotingRecords[key].info.undecidedCount.toNumber() > 0,
-      )
-      .map(key =>
-        mapper(
-          key,
-          governanceVotingRecords[key].info.undecidedCount.toNumber(),
-          VoteType.Undecided,
-        ),
-      ),
-  ];
+  // const undecidedData = [
+  //   ...voteRecords
+  //     .filter(vr => vr.info.voteWeight.no?.toNumber() > 0)
+  //     .map(vr => mapper('others', 55, VoteType.Undecided)),
+  // ];
 
-  const noData = [
-    ...Object.keys(governanceVotingRecords)
-      .filter(key => governanceVotingRecords[key].info.noCount.toNumber() > 0)
-      .map(key =>
+  const noVoteData = [
+    ...voteRecords
+      .filter(vr => vr.info.voteWeight.no?.toNumber() > 0)
+      .map(vr =>
         mapper(
-          key,
-          governanceVotingRecords[key].info.noCount.toNumber(),
+          vr.info.governingTokenOwner.toBase58(),
+          vr.info.voteWeight.no.toNumber(),
           VoteType.No,
         ),
       ),
   ];
 
-  const yesData = [
-    ...Object.keys(governanceVotingRecords)
-      .filter(key => governanceVotingRecords[key].info.yesCount.toNumber() > 0)
-      .map(key =>
+  const yesVoteData = [
+    ...voteRecords
+      .filter(vr => vr.info.voteWeight.yes?.toNumber() > 0)
+      .map(vr =>
         mapper(
-          key,
-          governanceVotingRecords[key].info.yesCount.toNumber(),
+          vr.info.governingTokenOwner.toBase58(),
+          vr.info.voteWeight.yes.toNumber(),
           VoteType.Yes,
         ),
       ),
   ];
 
-  const data = [...undecidedData, ...yesData, ...noData].sort(
+  const data = [...yesVoteData, ...noVoteData].sort(
     (a, b) => b.value - a.value,
   );
 
@@ -201,18 +188,14 @@ function voterDisplayData(
 function InnerProposalView({
   proposal,
   governingTokenMint,
-
   governance,
-
-  votingDisplayData,
+  voterDisplayData,
   endpoint,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
-
   governingTokenMint: MintInfo;
-
-  votingDisplayData: Array<VoterDisplayData>;
+  voterDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
   let signatoryRecord = useSignatoryRecord(proposal.pubkey);
@@ -291,7 +274,7 @@ function InnerProposalView({
           </Col>
         </Row>
 
-        {votingDisplayData.length > 0 && (
+        {voterDisplayData.length > 0 && (
           <Row
             gutter={[
               { xs: 8, sm: 16, md: 24, lg: 32 },
@@ -309,7 +292,7 @@ function InnerProposalView({
                     endpoint={endpoint}
                     width={width}
                     height={height}
-                    data={votingDisplayData}
+                    data={voterDisplayData}
                   />
                 )}
               </Card>
@@ -330,7 +313,7 @@ function InnerProposalView({
                   <VoterTable
                     endpoint={endpoint}
                     total={governingTokenMint.supply.toNumber()}
-                    data={votingDisplayData}
+                    data={voterDisplayData}
                   />
                 </div>
               </Card>

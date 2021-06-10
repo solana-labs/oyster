@@ -498,6 +498,20 @@ export const useVoteRecord = (proposal: PublicKey) => {
   return null;
 };
 
+export const useVoteRecords = (proposal: PublicKey) => {
+  const ctx = useGovernanceContext();
+
+  const voteRecords: ParsedAccount<VoteRecord>[] = [];
+
+  Object.values(ctx.voteRecords).forEach(vr => {
+    if (vr.info.proposal.toBase58() === proposal.toBase58()) {
+      voteRecords.push(vr);
+    }
+  });
+
+  return voteRecords;
+};
+
 export const useInstructions = (proposal: PublicKey) => {
   const ctx = useGovernanceContext();
 
