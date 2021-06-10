@@ -9,10 +9,10 @@ import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
-import { Governance } from '../../models/accounts';
+import { Governance, Realm } from '../../models/accounts';
 import {
   useRealm,
-  useTokenOwnerRecord,
+  useWalletTokenOwnerRecord,
 } from '../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
@@ -20,22 +20,37 @@ const { useConnection } = contexts.Connection;
 
 export function NewProposal({
   props,
+  realm,
   governance,
 }: {
   props: ButtonProps;
+  realm: ParsedAccount<Realm> | undefined;
   governance?: ParsedAccount<Governance>;
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirect, setRedirect] = useState('');
-  const tokenOwnerRecord = useTokenOwnerRecord(governance?.info.config.realm);
+  const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
+    governance?.info.config.realm,
+    realm?.info.communityMint,
+  );
+  const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
+    governance?.info.config.realm,
+    realm?.info.councilMint,
+  );
 
   if (!governance) {
     return null;
   }
 
-  const isDisabled =
-    (tokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ?? 0) <
-    governance.info.config.minTokensToCreateProposal;
+  const canCreateCommunityProposal =
+    (communityTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
+      0) >= governance.info.config.minTokensToCreateProposal;
+
+  const canCreateCouncilProposal =
+    (councilTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
+      0) >= governance.info.config.minTokensToCreateProposal;
+
+  const isEnabled = canCreateCommunityProposal || canCreateCouncilProposal;
 
   const handleOk = (a: PublicKey) => {
     setIsModalVisible(false);
@@ -54,7 +69,7 @@ export function NewProposal({
       <Button
         onClick={() => setIsModalVisible(true)}
         {...props}
-        disabled={isDisabled}
+        disabled={!isEnabled}
       >
         {LABELS.NEW_PROPOSAL}
       </Button>
@@ -63,6 +78,8 @@ export function NewProposal({
         handleCancel={handleCancel}
         isModalVisible={isModalVisible}
         governance={governance!}
+        canCreateCommunityProposal={canCreateCommunityProposal}
+        canCreateCouncilProposal={canCreateCouncilProposal}
       />
     </>
   );
@@ -73,11 +90,15 @@ export function NewProposalForm({
   handleCancel,
   isModalVisible,
   governance,
+  canCreateCommunityProposal,
+  canCreateCouncilProposal,
 }: {
   handleOk: (a: PublicKey) => void;
   handleCancel: () => void;
   isModalVisible: boolean;
   governance: ParsedAccount<Governance>;
+  canCreateCommunityProposal: boolean;
+  canCreateCouncilProposal: boolean;
 }) {
   const [form] = Form.useForm();
   const wallet = useWallet();
@@ -89,7 +110,10 @@ export function NewProposalForm({
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
   }) => {
-    const governingTokenMint = realm!.info.communityMint;
+    const governingTokenMint =
+      values.governingTokenType === GoverningTokenType.Community
+        ? realm!.info.communityMint
+        : realm!.info.councilMint!;
     const proposalIndex = governance.info.proposalCount;
 
     try {
@@ -121,21 +145,38 @@ export function NewProposalForm({
       onOk={form.submit}
       onCancel={handleCancel}
     >
-      <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item
-          label={LABELS.WHO_VOTES_QUESTION}
-          name="governingTokenType"
-          rules={[{ required: true }]}
-        >
-          <Radio.Group>
-            <Radio.Button value={GoverningTokenType.Community}>
-              {LABELS.COMMUNITY_TOKEN_HOLDERS}
-            </Radio.Button>
-            <Radio.Button value={GoverningTokenType.Council}>
-              {LABELS.COUNCIL}
-            </Radio.Button>
-          </Radio.Group>
-        </Form.Item>
+      <Form
+        {...layout}
+        form={form}
+        name="control-hooks"
+        onFinish={onFinish}
+        initialValues={{
+          governingTokenType: canCreateCommunityProposal
+            ? GoverningTokenType.Community
+            : GoverningTokenType.Council,
+        }}
+      >
+        {realm?.info.councilMint && (
+          <Form.Item
+            label={LABELS.WHO_VOTES_QUESTION}
+            name="governingTokenType"
+            rules={[{ required: true }]}
+          >
+            <Radio.Group>
+              {canCreateCommunityProposal && (
+                <Radio.Button value={GoverningTokenType.Community}>
+                  {LABELS.COMMUNITY_TOKEN_HOLDERS}
+                </Radio.Button>
+              )}
+              {canCreateCouncilProposal && (
+                <Radio.Button value={GoverningTokenType.Council}>
+                  {LABELS.COUNCIL}
+                </Radio.Button>
+              )}
+            </Radio.Group>
+          </Form.Item>
+        )}
+
         <Form.Item
           name="name"
           label={LABELS.NAME_LABEL}

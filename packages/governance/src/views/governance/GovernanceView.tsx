@@ -75,6 +75,7 @@ export const GovernanceView = () => {
           <NewProposal
             props={{ className: 'proposals-new-btn', disabled: !connected }}
             governance={governance}
+            realm={realm}
             // disabled={!connected}
           />
         </div>

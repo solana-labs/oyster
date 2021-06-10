@@ -53,8 +53,8 @@ export const generateGovernanceArtifacts = async (
     councilMinSigners,
     connection,
     wallet,
-    40,
-    100,
+    20,
+    55,
   );
 
   // Setup Realm, Governance and Proposal instruction

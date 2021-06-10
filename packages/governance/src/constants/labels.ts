@@ -168,11 +168,11 @@ export const LABELS = {
   PERCENTAGE: 'Percentage',
   TIME_LIMIT: 'time limit',
 
-  DEPOSIT_TOKENS: 'Deposit Tokens',
+  DEPOSIT_TOKENS: (tokenName?: string) => `Deposit ${tokenName ?? ''} Tokens`,
   DEPOSIT_TOKENS_QUESTION: 'Deposit your tokens?',
   DEPOSIT: 'Deposit',
 
-  WITHDRAW_TOKENS: 'Withdraw Tokens',
+  WITHDRAW_TOKENS: (tokenName?: string) => `Withdraw ${tokenName ?? ''} Tokens`,
   WITHDRAW_TOKENS_QUESTION: 'Withdraw your tokens?',
 
   INSTRUCTIONS: 'Instructions',

@@ -9,16 +9,15 @@ import {
   useGovernance,
   useProposal,
   useSignatoryRecord,
-  useTokenOwnerRecord,
+  useWalletTokenOwnerRecord,
   useInstructions,
 } from '../../contexts/GovernanceContext';
 import { StateBadge } from '../../components/Proposal/StateBadge';
-import { contexts, hooks } from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from '../../components/Proposal/InstructionCard';
 import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
 import SignOffButton from '../../components/Proposal/SignOffButton';
-import AddSigners from '../../components/Proposal/AddSigners';
 
 import { CastVote } from '../../components/Proposal/CastVote';
 import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
@@ -39,8 +38,6 @@ export const urlRegex =
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
-const { useAccountByMint } = hooks;
-//const { useBreakpoint } = Grid;
 
 export enum VoteType {
   Undecided = 'Undecided',
@@ -218,9 +215,11 @@ function InnerProposalView({
   votingDisplayData: Array<VoterDisplayData>;
   endpoint: string;
 }) {
-  const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
   let signatoryRecord = useSignatoryRecord(proposal.pubkey);
-  const tokenOwnerRecord = useTokenOwnerRecord(governance.info.config.realm);
+  const tokenOwnerRecord = useWalletTokenOwnerRecord(
+    governance.info.config.realm,
+    proposal.info.governingTokenMint,
+  );
   const instructions = useInstructions(proposal.pubkey);
 
   const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
@@ -263,12 +262,6 @@ function InnerProposalView({
           </Col>
           <Col md={12} xs={24}>
             <div className="proposal-actions">
-              {adminAccount &&
-                adminAccount.info.amount.toNumber() === 1 &&
-                proposal.info.state === ProposalState.Draft && (
-                  <AddSigners proposal={proposal} />
-                )}
-
               <CancelButton proposal={proposal}></CancelButton>
 
               {signatoryRecord &&

@@ -21,21 +21,17 @@ export class Realm {
 
   communityMint: PublicKey;
 
-  councilMint?: PublicKey | null;
+  councilMint: PublicKey | undefined;
 
   name: string;
 
   constructor(args: {
     communityMint: PublicKey;
-    councilMint?: string;
+    councilMint: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
-
-    this.councilMint = args.councilMint
-      ? new PublicKey(args.councilMint)
-      : null;
-
+    this.councilMint = args.councilMint;
     this.name = args.name;
   }
 }

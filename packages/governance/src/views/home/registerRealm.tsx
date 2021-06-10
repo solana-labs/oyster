@@ -8,7 +8,6 @@ import { contexts, utils, tryParseKey } from '@oyster/common';
 import { Redirect } from 'react-router';
 
 import { registerRealm } from '../../actions/registerRealm';
-import { Realm } from '../../models/accounts';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -86,18 +85,18 @@ export function NewRealmForm({
       return;
     }
 
-    const realm: Realm = {
-      accountType: 0,
-      name: values.name,
-      communityMint: new PublicKey(values.communityMint),
-      councilMint: values.useCouncilMint
-        ? new PublicKey(values.councilMint)
-        : null,
-    };
-
-    const realmPubkey = await registerRealm(connection, wallet.wallet, realm);
-
-    handleOk(realmPubkey);
+    try {
+      const realmPubkey = await registerRealm(
+        connection,
+        wallet.wallet,
+        values.name,
+        new PublicKey(values.communityMint),
+        values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
+      );
+      handleOk(realmPubkey);
+    } catch {
+      handleCancel();
+    }
   };
   return (
     <Modal

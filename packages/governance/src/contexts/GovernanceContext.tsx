@@ -378,13 +378,10 @@ export const useRealmGovernances = (realm: PublicKey) => {
   return governances;
 };
 
-export const useRealm = (realm: PublicKey | undefined) => {
+export const useRealm = (realm?: PublicKey) => {
   const ctx = useGovernanceContext();
-  if (!realm) {
-    return null;
-  }
 
-  return ctx.realms[realm.toBase58()];
+  return realm && ctx.realms[realm.toBase58()];
 };
 
 export const useGovernance = (governance?: PublicKey) => {
@@ -393,11 +390,14 @@ export const useGovernance = (governance?: PublicKey) => {
   return governance && ctx.governances[governance.toBase58()];
 };
 
-export const useTokenOwnerRecord = (realm?: PublicKey) => {
+export const useWalletTokenOwnerRecord = (
+  realm: PublicKey | undefined,
+  governingTokenMint: PublicKey | undefined,
+) => {
   const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
-  if (!realm) {
+  if (!(realm && governingTokenMint)) {
     return null;
   }
 
@@ -405,7 +405,9 @@ export const useTokenOwnerRecord = (realm?: PublicKey) => {
     if (
       record.info.governingTokenOwner.toBase58() ===
         wallet?.publicKey?.toBase58() &&
-      record.info.realm.toBase58() === realm.toBase58()
+      record.info.realm.toBase58() === realm.toBase58() &&
+      record.info.governingTokenMint.toBase58() ===
+        governingTokenMint?.toBase58()
     ) {
       return record;
     }

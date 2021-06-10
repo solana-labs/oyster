@@ -92,16 +92,20 @@ export function NewGovernanceForm({
       maxVotingTime: new BN(values.maxVotingTime),
     });
 
-    const governanceAddress = await registerGovernance(
-      connection,
-      wallet.wallet,
-      values.governanceType,
-      realmKey,
-      config,
-      values.transferUpgradeAuthority,
-    );
+    try {
+      const governanceAddress = await registerGovernance(
+        connection,
+        wallet.wallet,
+        values.governanceType,
+        realmKey,
+        config,
+        values.transferUpgradeAuthority,
+      );
 
-    handleOk(governanceAddress);
+      handleOk(governanceAddress);
+    } catch (ex) {
+      handleCancel();
+    }
   };
 
   const formLayout = {

@@ -42,7 +42,7 @@ export default function CancelButton({
         confirm({
           title: 'Do you want to cancel this proposal?',
           icon: <ExclamationCircleOutlined />,
-          okText: 'Cancel',
+          okText: 'Yes, Cancel',
           cancelText: 'No',
 
           onOk() {
@@ -55,7 +55,7 @@ export default function CancelButton({
       }}
       disabled={!connected}
     >
-      Cancel
+      Cancel Proposal
     </Button>
   );
 }

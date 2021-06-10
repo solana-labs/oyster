@@ -7,7 +7,8 @@ import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
-import { useTokenOwnerRecord } from '../../contexts/GovernanceContext';
+import { useWalletTokenOwnerRecord } from '../../contexts/GovernanceContext';
+import { PublicKey } from '@solana/web3.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -16,22 +17,27 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function WithdrawGoverningTokens({
   realm,
+  governingTokenMint,
+  tokenName,
 }: {
-  realm: ParsedAccount<Realm> | null;
+  realm?: ParsedAccount<Realm>;
+  governingTokenMint?: PublicKey;
+  tokenName?: string;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const governingTokenAccount = useAccountByMint(realm?.info.communityMint);
-  const tokenOwnerRecord = useTokenOwnerRecord(realm?.pubkey);
+  const governingTokenAccount = useAccountByMint(governingTokenMint);
+  const tokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    governingTokenMint,
+  );
 
-  if (!realm || !tokenOwnerRecord) {
+  if (!realm || !tokenOwnerRecord || !governingTokenMint) {
     return null;
   }
 
   const isVisible =
     tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0;
-
-  const governingTokenMint = realm!.info.communityMint;
 
   return isVisible ? (
     <Button
@@ -63,7 +69,7 @@ export function WithdrawGoverningTokens({
         })
       }
     >
-      {LABELS.WITHDRAW_TOKENS}
+      {LABELS.WITHDRAW_TOKENS(tokenName)}
     </Button>
   ) : null;
 }

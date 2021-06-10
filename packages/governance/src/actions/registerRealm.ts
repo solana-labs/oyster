@@ -1,8 +1,6 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { utils, sendTransaction } from '@oyster/common';
 
-import { Realm } from '../models/accounts';
-
 import { withCreateRealm } from '../models/withCreateRealm';
 
 const { notify } = utils;
@@ -10,15 +8,18 @@ const { notify } = utils;
 export const registerRealm = async (
   connection: Connection,
   wallet: any,
-  realm: Realm,
+  name: string,
+  communityMint: PublicKey,
+  councilMint?: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
   const { realmAddress } = await withCreateRealm(
     instructions,
-    realm.name,
-    realm.communityMint,
+    name,
+    communityMint,
     wallet.publicKey,
+    councilMint,
   );
 
   notify({

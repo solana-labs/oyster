@@ -52,9 +52,23 @@ export const RealmView = () => {
             </Col>
             <Col md={12} xs={24}>
               <div className="realm-actions">
-                <DepositGoverningTokens realm={realm}></DepositGoverningTokens>
+                <DepositGoverningTokens
+                  realm={realm}
+                  governingTokenMint={realm?.info.communityMint}
+                ></DepositGoverningTokens>
                 <WithdrawGoverningTokens
                   realm={realm}
+                  governingTokenMint={realm?.info.communityMint}
+                ></WithdrawGoverningTokens>
+                <DepositGoverningTokens
+                  realm={realm}
+                  governingTokenMint={realm?.info.councilMint}
+                  tokenName="Council"
+                ></DepositGoverningTokens>
+                <WithdrawGoverningTokens
+                  realm={realm}
+                  governingTokenMint={realm?.info.councilMint}
+                  tokenName="Council"
                 ></WithdrawGoverningTokens>
                 <RegisterGovernance
                   disabled={!connected}

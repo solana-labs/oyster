@@ -6,6 +6,7 @@ import { LABELS } from '../../constants';
 import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { depositGoverningTokens } from '../../actions/depositGoverningTokens';
+import { PublicKey } from '@solana/web3.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -14,12 +15,16 @@ const { useAccountByMint } = hooks;
 const { confirm } = Modal;
 export function DepositGoverningTokens({
   realm,
+  governingTokenMint,
+  tokenName,
 }: {
-  realm: ParsedAccount<Realm> | null;
+  realm: ParsedAccount<Realm> | undefined;
+  governingTokenMint: PublicKey | undefined;
+  tokenName?: string;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const governingTokenAccount = useAccountByMint(realm?.info.communityMint);
+  const governingTokenAccount = useAccountByMint(governingTokenMint);
 
   if (!realm) {
     return null;
@@ -29,8 +34,6 @@ export function DepositGoverningTokens({
     realm != null &&
     governingTokenAccount &&
     governingTokenAccount.info.amount.toNumber() > 0;
-
-  const governingTokenMint = realm!.info.communityMint;
 
   return isVisible ? (
     <Button
@@ -54,7 +57,7 @@ export function DepositGoverningTokens({
                 connection,
                 realm!.pubkey,
                 governingTokenAccount,
-                governingTokenMint,
+                governingTokenMint!,
                 wallet.wallet,
               );
             }
@@ -62,7 +65,7 @@ export function DepositGoverningTokens({
         })
       }
     >
-      {LABELS.DEPOSIT_TOKENS}
+      {LABELS.DEPOSIT_TOKENS(tokenName)}
     </Button>
   ) : null;
 }

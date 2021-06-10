@@ -14,6 +14,7 @@ export const withCreateRealm = async (
   name: string,
   communityMint: PublicKey,
   payer: PublicKey,
+  councilMint?: PublicKey,
 ): Promise<{ realmAddress: PublicKey }> => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -34,7 +35,7 @@ export const withCreateRealm = async (
     PROGRAM_IDS.governance.programId,
   );
 
-  const keys = [
+  let keys = [
     {
       pubkey: realmAddress,
       isSigner: false,
@@ -71,6 +72,31 @@ export const withCreateRealm = async (
       isWritable: false,
     },
   ];
+
+  if (councilMint) {
+    const [councilTokenHoldingAddress] = await PublicKey.findProgramAddress(
+      [
+        Buffer.from(GOVERNANCE_PROGRAM_SEED),
+        realmAddress.toBuffer(),
+        councilMint.toBuffer(),
+      ],
+      PROGRAM_IDS.governance.programId,
+    );
+
+    keys = [
+      ...keys,
+      {
+        pubkey: councilMint,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: councilTokenHoldingAddress,
+        isSigner: false,
+        isWritable: true,
+      },
+    ];
+  }
 
   instructions.push(
     new TransactionInstruction({
