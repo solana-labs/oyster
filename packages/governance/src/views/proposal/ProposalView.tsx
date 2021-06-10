@@ -11,6 +11,7 @@ import {
   useWalletTokenOwnerRecord,
   useInstructions,
   useVoteRecords,
+  useTokenOwnerRecords,
 } from '../../contexts/GovernanceContext';
 import { StateBadge } from '../../components/Proposal/StateBadge';
 import { contexts } from '@oyster/common';
@@ -29,6 +30,7 @@ import {
   Governance,
   Proposal,
   ProposalState,
+  TokenOwnerRecord,
   VoteRecord,
 } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
@@ -58,7 +60,12 @@ export const ProposalView = () => {
   let governance = useGovernance(proposal?.info.governance);
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
+
   const voteRecords = useVoteRecords(proposal?.pubkey);
+  const tokenOwnerRecords = useTokenOwnerRecords(
+    governance?.info.config.realm,
+    proposal?.info.governingTokenMint,
+  );
 
   return (
     <>
@@ -67,9 +74,13 @@ export const ProposalView = () => {
           <InnerProposalView
             proposal={proposal}
             governance={governance}
-            voterDisplayData={mapVoterDisplayData(voteRecords)}
+            voterDisplayData={mapVoterDisplayData(
+              voteRecords,
+              tokenOwnerRecords,
+            )}
             governingTokenMint={governingTokenMint}
             endpoint={endpoint}
+            hasVotes={voteRecords.length > 0}
           />
         ) : (
           <Spin />
@@ -139,6 +150,7 @@ export interface VoterDisplayData {
 
 function mapVoterDisplayData(
   voteRecords: ParsedAccount<VoteRecord>[],
+  tokenOwnerRecords: ParsedAccount<TokenOwnerRecord>[],
 ): Array<VoterDisplayData> {
   const mapper = (key: string, amount: number, label: string) => ({
     name: key,
@@ -148,11 +160,25 @@ function mapVoterDisplayData(
     key: key,
   });
 
-  // const undecidedData = [
-  //   ...voteRecords
-  //     .filter(vr => vr.info.voteWeight.no?.toNumber() > 0)
-  //     .map(vr => mapper('others', 55, VoteType.Undecided)),
-  // ];
+  const undecidedData = [
+    ...tokenOwnerRecords
+      .filter(
+        tor =>
+          tor.info.governingTokenDepositAmount.toNumber() > 0 &&
+          !voteRecords.some(
+            vt =>
+              vt.info.governingTokenOwner.toBase58() ===
+              tor.info.governingTokenOwner.toBase58(),
+          ),
+      )
+      .map(tor =>
+        mapper(
+          tor.info.governingTokenOwner.toBase58(),
+          tor.info.governingTokenDepositAmount.toNumber(),
+          VoteType.Undecided,
+        ),
+      ),
+  ];
 
   const noVoteData = [
     ...voteRecords
@@ -178,7 +204,7 @@ function mapVoterDisplayData(
       ),
   ];
 
-  const data = [...yesVoteData, ...noVoteData].sort(
+  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort(
     (a, b) => b.value - a.value,
   );
 
@@ -191,12 +217,14 @@ function InnerProposalView({
   governance,
   voterDisplayData,
   endpoint,
+  hasVotes,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
   governingTokenMint: MintInfo;
   voterDisplayData: Array<VoterDisplayData>;
   endpoint: string;
+  hasVotes: boolean;
 }) {
   let signatoryRecord = useSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
@@ -253,9 +281,12 @@ function InnerProposalView({
                   <SignOffButton signatoryRecord={signatoryRecord} />
                 )}
 
-              <WithdrawVote proposal={proposal} />
               {tokenOwnerRecord && (
                 <>
+                  <WithdrawVote
+                    proposal={proposal}
+                    tokenOwnerRecord={tokenOwnerRecord}
+                  />
                   <CastVote
                     governance={governance}
                     proposal={proposal}
@@ -274,7 +305,7 @@ function InnerProposalView({
           </Col>
         </Row>
 
-        {voterDisplayData.length > 0 && (
+        {hasVotes && (
           <Row
             gutter={[
               { xs: 8, sm: 16, md: 24, lg: 32 },

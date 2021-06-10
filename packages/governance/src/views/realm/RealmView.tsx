@@ -81,10 +81,10 @@ export const RealmView = () => {
       </Row>
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="realm-container">
+          <h1 className="governances-list-title">Governances</h1>
           <List
             itemLayout="vertical"
             size="large"
-            loading={governanceItems.length === 0}
             pagination={false}
             dataSource={governanceItems}
             renderItem={item => (

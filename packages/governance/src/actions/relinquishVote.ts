@@ -16,6 +16,7 @@ export const relinquishVote = async (
   connection: Connection,
   wallet: any,
   proposal: ParsedAccount<Proposal>,
+  tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
   IsWithdrawal: boolean,
 ) => {
@@ -29,7 +30,7 @@ export const relinquishVote = async (
     instructions,
     proposal.info.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    tokenOwnerRecord,
     proposal.info.governingTokenMint,
     voteRecord,
     governanceAuthority,

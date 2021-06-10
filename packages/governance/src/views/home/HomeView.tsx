@@ -40,7 +40,6 @@ export const HomeView = () => {
           <List
             itemLayout="vertical"
             size="large"
-            loading={realmItems.length === 0}
             pagination={false}
             dataSource={realmItems}
             renderItem={item => (

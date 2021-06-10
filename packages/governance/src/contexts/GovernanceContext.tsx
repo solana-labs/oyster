@@ -416,6 +416,25 @@ export const useWalletTokenOwnerRecord = (
   return null;
 };
 
+export const useTokenOwnerRecords = (
+  realm: PublicKey | undefined,
+  governingTokenMint: PublicKey | undefined,
+) => {
+  const ctx = useGovernanceContext();
+  const tokeOwnerRecords: ParsedAccount<TokenOwnerRecord>[] = [];
+
+  Object.values(ctx.tokenOwnerRecords).forEach(tor => {
+    if (
+      tor.info.realm.toBase58() === realm?.toBase58() &&
+      tor.info.governingTokenMint.toBase58() === governingTokenMint?.toBase58()
+    ) {
+      tokeOwnerRecords.push(tor);
+    }
+  });
+
+  return tokeOwnerRecords;
+};
+
 export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
   const ctx = useGovernanceContext();
 
@@ -481,7 +500,7 @@ export const useSignatoryRecord = (proposal: PublicKey) => {
   return null;
 };
 
-export const useVoteRecord = (proposal: PublicKey) => {
+export const useWalletVoteRecord = (proposal: PublicKey) => {
   const ctx = useGovernanceContext();
   const { wallet } = useWallet();
 
@@ -498,13 +517,17 @@ export const useVoteRecord = (proposal: PublicKey) => {
   return null;
 };
 
-export const useVoteRecords = (proposal: PublicKey) => {
+export const useVoteRecords = (proposal: PublicKey | undefined) => {
   const ctx = useGovernanceContext();
 
   const voteRecords: ParsedAccount<VoteRecord>[] = [];
 
+  if (!ctx.voteRecords) {
+    return voteRecords;
+  }
+
   Object.values(ctx.voteRecords).forEach(vr => {
-    if (vr.info.proposal.toBase58() === proposal.toBase58()) {
+    if (vr.info.proposal.toBase58() === proposal?.toBase58()) {
       voteRecords.push(vr);
     }
   });

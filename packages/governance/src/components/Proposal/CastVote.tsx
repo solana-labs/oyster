@@ -6,7 +6,7 @@ import { LABELS } from '../../constants';
 
 import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useVoteRecord as useWalletVoteRecord } from '../../contexts/GovernanceContext';
+import { useWalletVoteRecord } from '../../contexts/GovernanceContext';
 
 import './style.less';
 

@@ -6,10 +6,14 @@ import { LABELS } from '../../constants';
 
 import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Proposal, ProposalState } from '../../models/accounts';
+import {
+  Proposal,
+  ProposalState,
+  TokenOwnerRecord,
+} from '../../models/accounts';
 import {
   useGovernanceContext,
-  useVoteRecord,
+  useWalletVoteRecord,
 } from '../../contexts/GovernanceContext';
 import { relinquishVote } from '../../actions/relinquishVote';
 
@@ -19,13 +23,16 @@ const { useConnection } = contexts.Connection;
 const { confirm } = Modal;
 export function WithdrawVote({
   proposal,
+  tokenOwnerRecord,
 }: {
   proposal: ParsedAccount<Proposal>;
+  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
 }) {
   const { wallet, connected } = useWallet();
   const connection = useConnection();
 
-  const voteRecord = useVoteRecord(proposal.pubkey);
+  const voteRecord = useWalletVoteRecord(proposal.pubkey);
+
   const { removeVoteRecord } = useGovernanceContext();
 
   const isVisible =
@@ -43,14 +50,19 @@ export function WithdrawVote({
       type="primary"
       onClick={async () => {
         if (proposal.info.state !== ProposalState.Voting) {
-          await relinquishVote(
-            connection,
-            wallet,
-            proposal,
-            voteRecord!.pubkey,
-            false,
-          );
-          removeVoteRecord(voteRecord!.pubkey.toBase58());
+          try {
+            await relinquishVote(
+              connection,
+              wallet,
+              proposal,
+              tokenOwnerRecord.pubkey,
+              voteRecord!.pubkey,
+              false,
+            );
+          } catch (ex) {
+            console.error(ex);
+          }
+
           return;
         }
 
@@ -67,14 +79,20 @@ export function WithdrawVote({
           okText: LABELS.WITHDRAW,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            await relinquishVote(
-              connection,
-              wallet,
-              proposal,
-              voteRecord!.pubkey,
-              true,
-            );
-            removeVoteRecord(voteRecord!.pubkey.toBase58());
+            try {
+              await relinquishVote(
+                connection,
+                wallet,
+                proposal,
+                tokenOwnerRecord.pubkey,
+                voteRecord!.pubkey,
+                true,
+              );
+
+              removeVoteRecord(voteRecord!.pubkey.toBase58());
+            } catch (ex) {
+              console.error(ex);
+            }
           },
         });
       }}
