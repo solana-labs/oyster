@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from 'antd';
 import { Form, Input } from 'antd';
-import { INSTRUCTION_LIMIT } from '../../models/serialisation';
+import { MAX_INSTRUCTION_BASE64_LENGTH } from '../../models/serialisation';
 import { contexts, ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
@@ -112,7 +112,7 @@ export function NewInstructionCard({
           rules={[{ required: true }]}
         >
           <Input.TextArea
-            maxLength={INSTRUCTION_LIMIT}
+            maxLength={MAX_INSTRUCTION_BASE64_LENGTH}
             placeholder={`base64 encoded serialized Solana Instruction`}
           />
         </Form.Item>

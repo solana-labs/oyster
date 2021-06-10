@@ -21,7 +21,7 @@ import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard
 import SignOffButton from '../../components/Proposal/SignOffButton';
 
 import { CastVote } from '../../components/Proposal/CastVote';
-import { WithdrawVote } from '../../components/Proposal/WithdrawVote';
+import { RelinquishVote } from '../../components/Proposal/RelinquishVote';
 import './style.less';
 
 import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
@@ -283,7 +283,7 @@ function InnerProposalView({
 
               {tokenOwnerRecord && (
                 <>
-                  <WithdrawVote
+                  <RelinquishVote
                     proposal={proposal}
                     tokenOwnerRecord={tokenOwnerRecord}
                   />

@@ -18,7 +18,6 @@ import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import { setAuthority } from '@project-serum/serum/lib/token-instructions';
 import { GOVERNANCE_PROGRAM_SEED } from '../../models/accounts';
 import { serializeInstructionToBase64 } from '../../models/serialisation';
-import { createUpgradeInstruction } from '../../models/sdkInstructions';
 
 const { notify } = utils;
 export interface SourceEntryInterface {

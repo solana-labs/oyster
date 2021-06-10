@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Button, ButtonProps, Modal, Radio } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import { DESC_SIZE, NAME_SIZE } from '../../models/serialisation';
+import {
+  MAX_PROPOSAL_DESCRIPTION_LENGTH,
+  MAX_PROPOSAL_NAME_LENGTH,
+} from '../../models/serialisation';
 import { LABELS } from '../../constants';
 import { contexts, ParsedAccount } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
@@ -184,14 +187,17 @@ export function NewProposalForm({
           label={LABELS.NAME_LABEL}
           rules={[{ required: true }]}
         >
-          <Input maxLength={NAME_SIZE} />
+          <Input maxLength={MAX_PROPOSAL_NAME_LENGTH} />
         </Form.Item>
         <Form.Item
           name="descriptionLink"
           label={LABELS.DESCRIPTION_LABEL}
           rules={[{ required: true }]}
         >
-          <Input maxLength={DESC_SIZE} placeholder={LABELS.GIST_PLACEHOLDER} />
+          <Input
+            maxLength={MAX_PROPOSAL_DESCRIPTION_LENGTH}
+            placeholder={LABELS.GIST_PLACEHOLDER}
+          />
         </Form.Item>
       </Form>
     </Modal>

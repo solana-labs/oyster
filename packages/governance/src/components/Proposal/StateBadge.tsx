@@ -1,26 +1,29 @@
-import { ParsedAccount } from '@oyster/common';
 import { Badge, Tag } from 'antd';
 import React from 'react';
 import { ProposalState } from '../../models/accounts';
-import {
-  STATE_COLOR,
-  ProposalStateOld,
-  ProposalStateStatus,
-} from '../../models/serialisation';
+
+const STATE_COLOR: Record<string, string> = {
+  [ProposalState.Draft]: 'orange',
+  [ProposalState.SigningOff]: 'orange',
+  [ProposalState.Voting]: 'blue',
+  [ProposalState.Executing]: 'green',
+  [ProposalState.Completed]: 'purple',
+  [ProposalState.Cancelled]: 'gray',
+  [ProposalState.Defeated]: 'red',
+};
 
 export function StateBadgeRibbon({
   state,
   children,
 }: {
-  state: ParsedAccount<ProposalStateOld>;
+  state: ProposalState;
   children?: any;
 }) {
-  const status = state.info.status;
-  let color = STATE_COLOR[status];
+  let color = STATE_COLOR[state];
   return (
     <Badge.Ribbon
       style={{ backgroundColor: color }}
-      text={ProposalStateStatus[status]}
+      text={ProposalState[state]}
     >
       {children}
     </Badge.Ribbon>

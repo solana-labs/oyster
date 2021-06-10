@@ -1,4 +1,3 @@
-import * as Layout from '../utils/layout';
 import * as BufferLayout from 'buffer-layout';
 import BN from 'bn.js';
 import {
@@ -33,7 +32,6 @@ import {
   InstructionData,
   Proposal,
   ProposalInstruction,
-  ProposalState,
   Realm,
   SignatoryRecord,
   TokenOwnerRecord,
@@ -42,10 +40,11 @@ import {
 } from './accounts';
 import { serialize } from 'borsh';
 
-export const DESC_SIZE = 200;
-export const NAME_SIZE = 32;
+// TODO: Review the limits. Most likely they are leftovers from the legacy version
+export const MAX_PROPOSAL_DESCRIPTION_LENGTH = 200;
+export const MAX_PROPOSAL_NAME_LENGTH = 32;
 export const MAX_REALM_NAME_LENGTH = 32;
-export const INSTRUCTION_LIMIT = 450;
+export const MAX_INSTRUCTION_BASE64_LENGTH = 450;
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -396,128 +395,8 @@ export interface GovernanceVotingRecord {
 }
 
 export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [
-    BufferLayout.u8('accountType'),
-    Layout.publicKey('proposal'),
-    Layout.publicKey('owner'),
-    Layout.uint64('undecidedCount'),
-    Layout.uint64('yesCount'),
-    Layout.uint64('noCount'),
-    BufferLayout.seq(BufferLayout.u8(), 100, 'padding'),
-  ],
+  [],
 );
-
-export interface GovernanceOld {
-  /// Account type
-  accountType: GovernanceAccountType;
-  /// Vote threshold
-  voteThreshold: number;
-
-  /// Minimum slot time-distance from creation of proposal for an instruction to be placed
-  minimumSlotWaitingPeriod: BN;
-  /// Governance mint
-  governanceMint: PublicKey;
-  /// Council mint (Optional)
-  councilMint?: PublicKey;
-  /// Program ID that is tied to this config (optional)
-  program: PublicKey;
-  /// Time limit in slots for proposal to be open to voting
-  timeLimit: BN;
-  /// Optional name
-  name: string;
-  /// Running count of proposals
-  count: number;
-}
-
-export enum ProposalStateStatus {
-  /// Draft
-  Draft = 0,
-  /// Taking votes
-  Voting = 1,
-
-  /// Votes complete, in execution phase
-  Executing = 2,
-
-  /// Completed, can be rebooted
-  Completed = 3,
-
-  /// Deleted
-  Deleted = 4,
-
-  /// Defeated
-  Defeated = 5,
-}
-
-export const STATE_COLOR: Record<string, string> = {
-  [ProposalState.Draft]: 'orange',
-  [ProposalState.SigningOff]: 'orange',
-  [ProposalState.Voting]: 'blue',
-  [ProposalState.Executing]: 'green',
-  [ProposalState.Completed]: 'purple',
-  [ProposalState.Cancelled]: 'gray',
-  [ProposalState.Defeated]: 'red',
-};
-
-export interface ProposalStateOld {
-  /// Account type
-  accountType: GovernanceAccountType;
-  proposal: PublicKey;
-  status: ProposalStateStatus;
-  totalSigningTokensMinted: BN;
-  proposalTransactions: PublicKey[];
-  name: string;
-  descLink: string;
-  votingEndedAt: BN;
-  votingBeganAt: BN;
-  createdAt: BN;
-  completedAt: BN;
-  deletedAt: BN;
-  executions: number;
-  usedTxnSlots: number;
-}
-
-export interface ProposalOld {
-  /// Account type
-  accountType: GovernanceAccountType;
-
-  /// configuration values
-  config: PublicKey;
-
-  /// state values
-  state: PublicKey;
-
-  /// Mint that creates signatory tokens of this instruction
-  /// If there are outstanding signatory tokens, then cannot leave draft state. Signatories must burn tokens (ie agree
-  /// to move instruction to voting state) and bring mint to net 0 tokens outstanding. Each signatory gets 1 (serves as flag)
-  signatoryMint: PublicKey;
-
-  /// Admin ownership mint. One token is minted, can be used to grant admin status to a new person.
-  adminMint: PublicKey;
-
-  /// Mint that creates voting tokens of this instruction
-  votingMint: PublicKey;
-
-  /// Mint that creates evidence of voting YES via token creation
-  yesVotingMint: PublicKey;
-
-  /// Mint that creates evidence of voting NO via token creation
-  noVotingMint: PublicKey;
-
-  /// Source mint - either governance or council mint from config
-  sourceMint: PublicKey;
-
-  /// Used to validate signatory tokens in a round trip transfer
-  signatoryValidation: PublicKey;
-
-  /// Used to validate admin tokens in a round trip transfer
-  adminValidation: PublicKey;
-
-  /// Used to validate voting tokens in a round trip transfer
-  votingValidation: PublicKey;
-
-  /// Governance holding account
-  sourceHolding: PublicKey;
-}
 
 export const GovernanceVotingRecordParser = (
   pubKey: PublicKey,

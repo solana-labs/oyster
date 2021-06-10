@@ -21,7 +21,7 @@ const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 
 const { confirm } = Modal;
-export function WithdrawVote({
+export function RelinquishVote({
   proposal,
   tokenOwnerRecord,
 }: {
