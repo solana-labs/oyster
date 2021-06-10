@@ -1,0 +1,4 @@
+gcloud functions deploy uploadFile --runtime nodejs12 --trigger-http --allow-unauthenticated
+
+To deploy to prod, change function name to uploadFileProd in index.js, and CLUSTER url to mainnet, then
+run above with uploadFileProd

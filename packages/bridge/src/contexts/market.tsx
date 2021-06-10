@@ -4,22 +4,16 @@ import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
 
-import {
-  contexts,
-  utils,
-  ParsedAccount,
-  KnownTokenMap,
-  EventEmitter,
-} from '@oyster/common';
+import { contexts, utils, EventEmitter } from '@oyster/common';
 
 import { DexMarketParser } from './../models/dex';
 import { MINT_TO_MARKET } from '../models/marketOverrides';
 const { useConnectionConfig } = contexts.Connection;
-const { convert, fromLamports, getTokenName, STABLE_COINS } = utils;
+const { STABLE_COINS } = utils;
 const { cache, getMultipleAccounts } = contexts.Accounts;
 
-const INITAL_LIQUIDITY_DATE = new Date('2020-10-27');
-export const BONFIDA_POOL_INTERVAL = 30 * 60_000; // 30 min
+//const INITAL_LIQUIDITY_DATE = new Date('2020-10-27');
+//export const BONFIDA_POOL_INTERVAL = 30 * 60_000; // 30 min
 
 interface RecentPoolData {
   pool_identifier: string;

@@ -153,13 +153,18 @@ export const usePools = () => {
     const subID = connection.onProgramAccountChange(
       programIds().swap,
       async info => {
-        const id = (info.accountId as unknown) as string;
+        const pubkey =
+          typeof info.accountId === 'string'
+            ? new PublicKey((info.accountId as unknown) as string)
+            : info.accountId;
+        const id = pubkey.toBase58();
+
         if (info.accountInfo.data.length === programIds().swapLayout.span) {
           const account = info.accountInfo;
           const updated = {
             data: programIds().swapLayout.decode(account.data),
             account: account,
-            pubkey: new PublicKey(id),
+            pubkey,
           };
 
           const index =

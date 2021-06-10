@@ -1,5 +1,5 @@
 import React, { createContext, FunctionComponent, useContext } from 'react';
-import { SolanaBridge } from '../core';
+import { SolanaBridge } from '@solana/bridge-sdk';
 import {
   useConnection,
   useConnectionConfig,
@@ -13,12 +13,15 @@ export const BridgeProvider: FunctionComponent = ({ children }) => {
   const connection = useConnection();
   const programs = utils.programIds();
 
-  ///   let bridge = new SolanaBridge(endpoint, connection, programs.wormhole.pubkey, programs.token);
+  let bridge = new SolanaBridge(
+    endpoint,
+    connection,
+    programs.wormhole.pubkey,
+    programs.token,
+  );
 
   return (
-    <BridgeContext.Provider value={undefined}>
-      {children}
-    </BridgeContext.Provider>
+    <BridgeContext.Provider value={bridge}>{children}</BridgeContext.Provider>
   );
 };
 

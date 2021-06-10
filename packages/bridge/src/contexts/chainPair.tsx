@@ -14,16 +14,24 @@ import {
   useUserAccounts,
 } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
-import { ASSET_CHAIN, filterModalSolTokens } from '../utils/assets';
+import {
+  ASSET_CHAIN,
+  filterModalEthTokens,
+  filterModalSolTokens,
+} from '../utils/assets';
 import { useEthereum } from './ethereum';
-import { BigNumber } from 'ethers/utils';
-import { WrappedAssetFactory } from '../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../contracts/WormholeFactory';
+import { BigNumber } from 'bignumber.js';
+import { AssetMeta, WrappedAssetFactory } from '@solana/bridge-sdk';
+import { WormholeFactory } from '@solana/bridge-sdk';
 import {
   bridgeAuthorityKey,
   TransferRequestInfo,
   wrappedAssetMintKey,
-} from '../models/bridge';
+} from '@solana/bridge-sdk';
+import { useBridge } from './bridge';
+import { PublicKey } from '@solana/web3.js';
+import { ethers } from 'ethers';
+
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
 
@@ -91,11 +99,22 @@ export const useCurrencyLeg = (mintAddress: string) => {
   const [chain, setChain] = useState(ASSET_CHAIN.Ethereum);
   const [info, setInfo] = useState<TransferRequestInfo>();
   const { userAccounts } = useUserAccounts();
+  const bridge = useBridge();
 
   const { provider, tokens: ethTokens } = useEthereum();
   const { tokens: solTokens } = useConnectionConfig();
   const connection = useConnection();
-
+  const defaultCoinInfo = {
+    address: '',
+    name: '',
+    balance: new BigNumber(0),
+    decimals: 0,
+    allowance: new ethers.utils.BigNumber(0),
+    isWrapped: false,
+    chainID: 0,
+    assetAddress: new Buffer(0),
+    mint: '',
+  };
   useEffect(() => {
     if (!provider || !connection) {
       return;
@@ -103,31 +122,78 @@ export const useCurrencyLeg = (mintAddress: string) => {
 
     (async () => {
       const ethToken = ethTokens.find(t => t.address === mintAddress);
-      const solToken = solTokens.find(t => t.address === mintAddress);
+      let solToken = solTokens.find(t => t.address === mintAddress);
+      let mintKeyAddress = '';
+      let symbol = '';
+      let decimals = 0;
 
-      // eth assets on eth chain
-      // eth asset on sol chain
-      // sol asset on eth chain
-      // sol asset on sol chain
+      //console.log({ chain, solToken, ethToken });
+      if (chain === ASSET_CHAIN.Solana) {
+        if (!solToken && ethToken) {
+          try {
+            const bridgeId = programIds().wormhole.pubkey;
+            const authority = await bridgeAuthorityKey(bridgeId);
+            const assetAddress = Buffer.from(ethToken.address.slice(2), 'hex');
+            const meta: AssetMeta = {
+              decimals: Math.min(ethToken.decimals, 9),
+              address: assetAddress,
+              chain: ASSET_CHAIN.Ethereum,
+            };
+            const mintKey = await wrappedAssetMintKey(
+              bridgeId,
+              authority,
+              meta,
+            );
+            if (mintKey) {
+              mintKeyAddress = mintKey.toBase58();
+              solToken = solTokens.find(t => t.address === mintKeyAddress);
+              if (!solToken) {
+                symbol = ethToken.symbol;
+                decimals = ethToken.decimals;
+              }
+            } else {
+              setInfo(defaultCoinInfo);
+              return;
+            }
+          } catch {
+            setInfo(defaultCoinInfo);
+            return;
+          }
+        }
+        if (!solToken && (!symbol || !mintKeyAddress || !decimals)) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
+        const currentAccount = userAccounts?.find(
+          a => a.info.mint.toBase58() === (solToken?.address || mintKeyAddress),
+        );
+        const assetMeta = await bridge?.fetchAssetMeta(
+          new PublicKey(solToken?.address || mintKeyAddress),
+        );
 
-      let ethAddress: string = '';
-      if (solToken) {
-        // let signer = provider.getSigner();
-        // let e = WrappedAssetFactory.connect(asset, provider);
-        // let addr = await signer.getAddress();
-        // let decimals = await e.decimals();
-        // let symbol = await e.symbol();
-
-        // TODO: checked if mint is wrapped mint from eth...
-
-        const accounts = userAccounts
-          .filter(a => a.info.mint.toBase58() === solToken.address)
-          .sort((a, b) => a.info.amount.toNumber() - b.info.amount.toNumber());
-
-        console.log(accounts);
+        if (!assetMeta || !currentAccount) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
+        let info = {
+          address: currentAccount.pubkey.toBase58(),
+          name: solToken?.symbol || symbol,
+          balance: new BigNumber(currentAccount?.info.amount.toNumber() || 0),
+          allowance: new ethers.utils.BigNumber(0),
+          decimals: solToken?.decimals || decimals,
+          isWrapped: assetMeta.chain != ASSET_CHAIN.Solana,
+          chainID: assetMeta.chain,
+          assetAddress: assetMeta.address,
+          mint: solToken?.address || mintKeyAddress,
+        };
+        setInfo(info);
       }
 
-      if (ethToken) {
+      if (chain === ASSET_CHAIN.Ethereum) {
+        if (!ethToken) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
         let signer = provider.getSigner();
         let e = WrappedAssetFactory.connect(mintAddress, provider);
         let addr = await signer.getAddress();
@@ -158,7 +224,9 @@ export const useCurrencyLeg = (mintAddress: string) => {
         }
 
         if (chain === ASSET_CHAIN.Ethereum) {
-          info.balance = await e.balanceOf(addr);
+          info.balance = new BigNumber(
+            new ethers.utils.BigNumber(await e.balanceOf(addr)).toString(),
+          );
         } else {
           // TODO: get balance on other chains for assets that came from eth
 
@@ -170,12 +238,9 @@ export const useCurrencyLeg = (mintAddress: string) => {
             address: info.assetAddress,
             chain: info.chainID,
           });
-
-          console.log(mint.toBase58());
         }
 
-        console.log(info);
-
+        //console.log({ info });
         setInfo(info);
       }
     })();
@@ -190,16 +255,13 @@ export const useCurrencyLeg = (mintAddress: string) => {
     userAccounts,
   ]);
 
-  return useMemo(
-    () => ({
-      amount: amount,
-      setAmount: setAmount,
-      chain: chain,
-      setChain: setChain,
-      info,
-    }),
-    [amount, setAmount, chain, setChain],
-  );
+  return {
+    amount: amount,
+    setAmount: setAmount,
+    chain: chain,
+    setChain: setChain,
+    info,
+  };
 };
 
 export function TokenChainPairProvider({ children = null as any }) {
@@ -223,7 +285,10 @@ export function TokenChainPairProvider({ children = null as any }) {
   const setChainB = quote.setChain;
 
   const tokens = useMemo(
-    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    () => [
+      ...filterModalEthTokens(ethTokens),
+      ...filterModalSolTokens(solTokens),
+    ],
     [ethTokens, solTokens],
   );
 
@@ -249,7 +314,7 @@ export function TokenChainPairProvider({ children = null as any }) {
       return;
     }
     let { defaultChain, defaultToken } = getDefaultTokens(
-      ethTokens,
+      tokens,
       location.search,
     );
     if (!defaultToken || !defaultChain) {
@@ -269,15 +334,7 @@ export function TokenChainPairProvider({ children = null as any }) {
     );
     // mintAddressA and mintAddressB are not included here to prevent infinite loop
     // eslint-disable-next-line
-  }, [
-    location,
-    location.search,
-    location.pathname,
-    setMintAddress,
-    tokens,
-    setChainA,
-    setChainB,
-  ]);
+  }, [location, location.search, location.pathname, tokens]);
 
   const calculateDependent = useCallback(async () => {
     if (mintAddress) {

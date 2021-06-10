@@ -6,9 +6,9 @@ import './style.less';
 import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { ASSET_CHAIN } from '../../models/bridge/constants';
+import { ASSET_CHAIN } from '../../utils/assets';
 import { useConnectionConfig } from '@oyster/common';
-import { filterModalSolTokens } from '../../utils/assets';
+import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
 
 export const TokenSelectModal = (props: {
   onSelectToken: (token: string) => void;
@@ -24,7 +24,10 @@ export const TokenSelectModal = (props: {
 
   const inputRef = useRef<Input>(null);
   const tokens = useMemo(
-    () => [...ethTokens, ...filterModalSolTokens(solTokens)],
+    () => [
+      ...filterModalEthTokens(ethTokens),
+      ...filterModalSolTokens(solTokens),
+    ],
     [ethTokens, solTokens],
   );
 
@@ -33,7 +36,8 @@ export const TokenSelectModal = (props: {
       return tokens.filter(token => {
         return (
           (token.tags?.indexOf('longList') || -1) < 0 &&
-          token.symbol.includes(search.toUpperCase())
+          (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+            token.name.toLowerCase().includes(search.toLowerCase()))
         );
       });
     }

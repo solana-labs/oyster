@@ -22,11 +22,33 @@
 
 .exchange-card {
   position: relative;
-  max-width: calc(100% - 460px);
+  max-width: 900px;
   width: 100%;
   margin: 167px auto 150px auto;
   display: flex;
   justify-content: space-between;
+}
+
+.action-button{
+  width: 240px;
+  height: 64px;
+
+  border-radius: 12px;
+  border: none;
+  background-color: @surge-20 !important;
+  color: white !important;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 23px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-feature-settings: 'ss02' on;
+
+}
+
+.action-button:hover {
+  background-color: @surge-30 !important;
 }
 
 .transfer-button{

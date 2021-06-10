@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter3';
 import { PublicKey, Transaction } from '@solana/web3.js';
-import { notify } from '@oyster/common';
 import { WalletAdapter } from '@solana/wallet-base';
 import { ethers } from 'ethers';
 import WalletConnectProvider from '@walletconnect/web3-provider';

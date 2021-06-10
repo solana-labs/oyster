@@ -1,36 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { notification, Spin, Button } from 'antd';
-import {
-  contexts,
-  ConnectButton,
-  programIds,
-  notify,
-  cache,
-  useUserAccounts,
-} from '@oyster/common';
+import { contexts, TokenAccount, useUserAccounts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import {
-  bridgeAuthorityKey,
   displayBalance,
   fromSolana,
   ProgressUpdate,
   toSolana,
   TransferRequest,
-  wrappedAssetMintKey,
-} from '../../models/bridge';
+} from '@solana/bridge-sdk';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { WrappedAssetFactory } from '../../contracts/WrappedAssetFactory';
-import { WormholeFactory } from '../../contracts/WormholeFactory';
-import BN from 'bn.js';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import { BigNumber } from 'ethers/utils';
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
+import { useBridge } from '../../contexts/bridge';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -53,8 +41,10 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 
 export const Transfer = () => {
   const connection = useConnection();
+  const bridge = useBridge();
   const { wallet, connected } = useWallet();
   const { provider, tokenMap } = useEthereum();
+  const { userAccounts } = useUserAccounts();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
     A,
@@ -63,6 +53,7 @@ export const Transfer = () => {
     setMintAddress,
     setLastTypedAccount,
   } = useTokenChainPairState();
+
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
     to: ASSET_CHAIN.Solana,
@@ -90,7 +81,13 @@ export const Transfer = () => {
       to: B.chain,
       info: A.info,
     });
-  }, [A, B, mintAddress]);
+  }, [A, B, mintAddress, A.info]);
+
+  const tokenAccounts = useMemo(
+    () =>
+      userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint),
+    [request.info?.mint],
+  );
 
   return (
     <>
@@ -105,7 +102,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const from = A.chain;
             A.setChain(chain);
-            B.setChain(from);
+            if (B.chain === chain) {
+              B.setChain(from);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(A.chain);
@@ -139,7 +138,9 @@ export const Transfer = () => {
           onChain={(chain: ASSET_CHAIN) => {
             const to = B.chain;
             B.setChain(chain);
-            A.setChain(to);
+            if (A.chain === chain) {
+              A.setChain(to);
+            }
           }}
           onInputChange={amount => {
             setLastTypedAccount(B.chain);
@@ -184,6 +185,7 @@ export const Transfer = () => {
 
                         setActiveSteps(steps);
                       },
+                      bridge,
                     );
                   }
 
@@ -293,7 +295,7 @@ export const Transfer = () => {
             : LABELS.TRANSFER
           : LABELS.SET_CORRECT_WALLET_NETWORK}
       </Button>
-      <RecentTransactionsTable />
+      <RecentTransactionsTable tokenAccounts={tokenAccounts} />
     </>
   );
 };

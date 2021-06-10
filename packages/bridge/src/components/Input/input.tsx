@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ConnectButton,
-  CurrentUserWalletBadge,
+  CurrentUserBadge,
   NumericInput,
+  useMint,
+  useUserAccounts,
   useWallet,
 } from '@oyster/common';
 import './style.less';
-import { ASSET_CHAIN } from '../../models/bridge/constants';
 import { TokenSelectModal } from '../TokenSelectModal';
-import { chainToName } from '../../utils/assets';
+import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import { TokenChain } from '../TokenDisplay/tokenChain';
 import { EthereumConnect } from '../EthereumConnect';
+import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';
 
 export function Input(props: {
   title: string;
@@ -32,16 +34,14 @@ export function Input(props: {
       <div className="input-chain">
         <TokenChain chain={props.chain} className={'input-icon'} />
         {chainToName(props.chain)}
-        {typeof props.balance === 'number' && (
-          <div
-            className="balance"
-            onClick={() =>
-              props.onInputChange && props.onInputChange(props.balance)
-            }
-          >
-            {props.balance.toFixed(6)}
-          </div>
-        )}
+        <div
+          className="balance"
+          onClick={() =>
+            props.onInputChange && props.onInputChange(props.balance)
+          }
+        >
+          {props.balance?.toFixed(6)}
+        </div>
       </div>
       <div className="input-container">
         <NumericInput

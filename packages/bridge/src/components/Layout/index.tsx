@@ -1,34 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './../../App.less';
 import './index.less';
-import { Layout, Button, Popover } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Layout } from 'antd';
+import { useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import { AppBar } from '../AppBar';
-import Wormhole from '../Wormhole';
-import { Footer as AppFooter } from './../Footer';
-import { EthereumConnect } from '../EthereumConnect';
-import { useEthereum } from '../../contexts';
-import { Settings } from '@oyster/common';
-import { SettingOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 
 export const AppLayout = React.memo((props: any) => {
-  const { connected, disconnect } = useEthereum();
   const location = useLocation();
-  const [wormholeReady, setWormholeReady] = useState(false);
-
-  const paths: { [key: string]: string } = {
-    '/faucet': '7',
-  };
-
   const isRoot = location.pathname === '/';
 
-  const current =
-    [...Object.keys(paths)].find(key => location.pathname.startsWith(key)) ||
-    '';
   return (
     <>
       <div className={`App`}>
@@ -40,9 +24,10 @@ export const AppLayout = React.memo((props: any) => {
             {props.children}
           </Content>
           <Footer>
-            <div className={'description-text'} style={{ color: '#2F506F' }}>
-              © Solana Foundation
-            </div>
+            <div
+              className={'description-text'}
+              style={{ color: '#2F506F' }}
+            ></div>
           </Footer>
         </Layout>
       </div>

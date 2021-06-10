@@ -2,7 +2,6 @@ import { Col, Row } from 'antd';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ReserveStatus } from '../../components/ReserveStatus';
-
 import { UserLendingCard } from '../../components/UserLendingCard';
 import { GUTTER } from '../../constants';
 import { useLendingReserve } from '../../hooks';

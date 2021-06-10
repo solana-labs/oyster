@@ -43,15 +43,17 @@ export const AppBar = (props: { isRoot?: boolean }) => {
       <div className={`app-bar-inner ${showMobileMenu ? 'mobile-active' : ''}`}>
         {!props.isRoot && (
           <div className={`app-bar-item logo root-mobile`}>
-            <img alt="logo-bar" src={'/appbar/logo.svg'} />
+            <Link to="/">
+              <img alt="logo-bar" src={'/appbar/logo.svg'} />
+            </Link>
           </div>
         )}
         <div className={`app-bar-item ${isActiveClass('move')}`}>
           <Link to="/move">Bridge</Link>
         </div>
-        <div className={`app-bar-item ${isActiveClass('faq')}`}>
-          <Link to="/faq">FAQ</Link>
-        </div>
+        {/*<div className={`app-bar-item ${isActiveClass('faq')}`}>*/}
+        {/*  <Link to="/faq">FAQ</Link>*/}
+        {/*</div>*/}
         <div className={`app-bar-item ${isActiveClass('proof-of-assets')}`}>
           <Link to="/proof-of-assets">Proof-of-Assets</Link>
         </div>

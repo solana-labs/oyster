@@ -1,11 +1,7 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
-import {
-  MarketProvider,
-  TokenPairProvider,
-  EthereumProvider,
-} from './contexts';
+import { MarketProvider, EthereumProvider } from './contexts';
 import { AppLayout } from './components/Layout';
 
 import {
@@ -45,7 +41,7 @@ export function Routes() {
                                 component={() => <HomeView />}
                               />
                               <Route path="/move" children={<TransferView />} />
-                              <Route path="/faq" children={<FaqView />} />
+                              {/*<Route path="/faq" children={<FaqView />} />*/}
                               <Route
                                 path="/proof-of-assets"
                                 children={<ProofOfAssetsView />}
