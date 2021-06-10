@@ -111,6 +111,7 @@ export function NewProposalForm({
     governingTokenType: GoverningTokenType;
   }) => {
     const governingTokenMint =
+      values.governingTokenType === undefined ||
       values.governingTokenType === GoverningTokenType.Community
         ? realm!.info.communityMint
         : realm!.info.councilMint!;
@@ -128,7 +129,8 @@ export function NewProposalForm({
         proposalIndex,
       );
       handleOk(proposalAddress);
-    } catch {
+    } catch (ex) {
+      console.error(ex);
       handleCancel();
     }
   };
