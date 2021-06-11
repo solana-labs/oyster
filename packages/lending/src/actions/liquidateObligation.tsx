@@ -102,19 +102,6 @@ export const liquidateObligation = async (
     withdrawReserve.info.lendingMarket,
   ) as ParsedAccount<LendingMarket>;
 
-  const dexOrderBookSide = market.info.quoteTokenMint.equals(
-    repayReserve.info.liquidity.mintPubkey,
-  )
-    ? oracle?.info.asks
-    : oracle?.info.bids;
-
-  const memory = createTempMemoryAccount(
-    instructions,
-    wallet.publicKey,
-    signers,
-    LENDING_PROGRAM_ID,
-  );
-
   instructions.push(
     // @FIXME: oracle needed
     refreshReserveInstruction(repayReserve.pubkey),

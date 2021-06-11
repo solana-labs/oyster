@@ -51,11 +51,6 @@ export const CollateralSelector = (props: {
   ) as ParsedAccount<LendingMarket>;
   if (!market) return null;
 
-  const quoteTokenMintAddress = market?.info?.quoteTokenMint?.toBase58();
-
-  const onlyQuoteAllowed =
-    props.reserve?.liquidity.mintPubkey?.toBase58() !== quoteTokenMintAddress;
-
   return (
     <Select
       size="large"
@@ -76,13 +71,6 @@ export const CollateralSelector = (props: {
     >
       {reserveAccounts
         .filter(reserve => reserve.info !== props.reserve)
-        .filter(
-          reserve =>
-            !onlyQuoteAllowed ||
-            reserve.info.liquidity.mintPubkey.equals(
-              market.info.quoteTokenMint,
-            ),
-        )
         .map(reserve => {
           const mint = reserve.info.liquidity.mintPubkey.toBase58();
           const address = reserve.pubkey.toBase58();

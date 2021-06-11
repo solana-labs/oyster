@@ -72,17 +72,8 @@ export default function CollateralInput(props: {
   ) as ParsedAccount<LendingMarket>;
   if (!market) return null;
 
-  const onlyQuoteAllowed = !props.reserve?.liquidity.mintPubkey?.equals(
-    market?.info?.quoteTokenMint,
-  );
-
   const filteredReserveAccounts = reserveAccounts
-    .filter(reserve => reserve.info !== props.reserve)
-    .filter(
-      reserve =>
-        !onlyQuoteAllowed ||
-        reserve.info.liquidity.mintPubkey.equals(market.info.quoteTokenMint),
-    );
+    .filter(reserve => reserve.info !== props.reserve);
 
   if (
     !depositReserve &&
