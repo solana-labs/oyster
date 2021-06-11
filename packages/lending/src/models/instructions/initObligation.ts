@@ -8,6 +8,7 @@ import {
 import * as BufferLayout from 'buffer-layout';
 import { LendingInstruction } from './instruction';
 
+/// 6
 /// Initializes a new lending market obligation.
 ///
 /// Accounts expected by this instruction:

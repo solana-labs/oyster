@@ -10,6 +10,7 @@ import * as Layout from '../../utils/layout';
 import { calculateUtilizationRatio, Reserve } from '../state/reserve';
 import { LendingInstruction } from './instruction';
 
+/// 10
 /// Borrow liquidity from a reserve by depositing collateral tokens. Requires a refreshed
 /// obligation and reserve.
 ///
@@ -28,6 +29,11 @@ import { LendingInstruction } from './instruction';
 ///   8. `[]` Clock sysvar.
 ///   9. `[]` Token program id.
 ///   10 `[optional, writable]` Host fee receiver account.
+///
+/// BorrowObligationLiquidity {
+///     /// Amount of liquidity to borrow - u64::MAX for 100% of borrowing power
+///     liquidity_amount: u64,
+/// },
 export const borrowObligationLiquidityInstruction = (
   liquidityAmount: number | BN,
   sourceLiquidity: PublicKey,

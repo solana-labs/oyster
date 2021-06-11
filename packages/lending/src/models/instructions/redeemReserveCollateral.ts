@@ -9,6 +9,7 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 5
 /// Redeem collateral from a reserve in exchange for liquidity.
 ///
 /// Accounts expected by this instruction:
@@ -24,6 +25,11 @@ import { LendingInstruction } from './instruction';
 ///   7. `[signer]` User transfer authority ($authority).
 ///   8. `[]` Clock sysvar.
 ///   9. `[]` Token program id.
+///
+/// RedeemReserveCollateral {
+///     /// Amount of collateral tokens to redeem in exchange for liquidity
+///     collateral_amount: u64,
+/// },
 export const redeemReserveCollateralInstruction = (
   collateralAmount: number | BN,
   sourceCollateral: PublicKey,

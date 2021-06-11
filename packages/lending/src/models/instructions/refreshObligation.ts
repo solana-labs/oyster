@@ -7,6 +7,7 @@ import {
 import BufferLayout from 'buffer-layout';
 import { LendingInstruction } from './instruction';
 
+/// 7
 /// Refresh an obligation's accrued interest and collateral and liquidity prices. Requires
 /// refreshed reserves, as all obligation collateral deposit reserves in order, followed by all
 /// liquidity borrow reserves in order.

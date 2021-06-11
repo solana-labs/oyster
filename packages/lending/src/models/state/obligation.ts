@@ -55,7 +55,7 @@ export const ObligationCollateralLayout: typeof BufferLayout.Structure = BufferL
   [
     Layout.publicKey('depositReserve'),
     Layout.uint64('depositedAmount'),
-    Layout.uint64('marketValue'),
+    Layout.uint128('marketValue'),
   ],
 );
 
@@ -64,7 +64,7 @@ export const ObligationLiquidityLayout: typeof BufferLayout.Structure = BufferLa
     Layout.publicKey('borrowReserve'),
     Layout.uint128('cumulativeBorrowRateWads'),
     Layout.uint128('borrowedAmountWads'),
-    Layout.uint64('marketValue'),
+    Layout.uint128('marketValue'),
   ],
 );
 
@@ -109,19 +109,16 @@ export const ObligationParser = (
     return;
   }
 
-  const depositsBuffer = dataFlat.slice(
-    0,
-    depositsLen * ObligationCollateralLayout.span,
-  );
+  const depositsSpan = depositsLen * ObligationCollateralLayout.span;
+  const borrowsSpan = borrowsLen * ObligationLiquidityLayout.span;
+
+  const depositsBuffer = dataFlat.slice(0, depositsSpan);
   const deposits = BufferLayout.seq(
     ObligationCollateralLayout,
     depositsLen,
   ).decode(depositsBuffer) as ObligationCollateral[];
 
-  const borrowsBuffer = dataFlat.slice(
-    depositsBuffer.length,
-    borrowsLen * ObligationLiquidityLayout.span,
-  );
+  const borrowsBuffer = dataFlat.slice(depositsSpan, depositsSpan + borrowsSpan);
   const borrows = BufferLayout.seq(
     ObligationLiquidityLayout,
     borrowsLen,

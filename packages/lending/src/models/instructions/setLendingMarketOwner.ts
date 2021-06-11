@@ -4,16 +4,18 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 1
 /// Sets the new owner of a lending market.
 ///
 /// Accounts expected by this instruction:
 ///
 ///   0. `[writable]` Lending market account.
 ///   1. `[signer]` Current owner.
-// SetLendingMarketOwner {
-//   /// The new owner
-//   new_owner: Pubkey,
-// },
+///
+/// SetLendingMarketOwner {
+///   /// The new owner
+///   new_owner: Pubkey,
+/// },
 export const setLendingMarketOwnerInstruction = (
   newOwner: PublicKey,
   lendingMarket: PublicKey,

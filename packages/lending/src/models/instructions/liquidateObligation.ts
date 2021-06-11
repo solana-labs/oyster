@@ -9,6 +9,7 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 12
 /// Repay borrowed liquidity to a reserve to receive collateral at a discount from an unhealthy
 /// obligation. Requires a refreshed obligation and reserves.
 ///
@@ -29,6 +30,11 @@ import { LendingInstruction } from './instruction';
 ///   9. `[signer]` User transfer authority ($authority).
 ///   10 `[]` Clock sysvar.
 ///   11 `[]` Token program id.
+///
+/// LiquidateObligation {
+///     /// Amount of liquidity to repay - u64::MAX for up to 100% of borrowed amount
+///     liquidity_amount: u64,
+/// },
 export const liquidateObligationInstruction = (
   liquidityAmount: number | BN,
   sourceLiquidity: PublicKey,

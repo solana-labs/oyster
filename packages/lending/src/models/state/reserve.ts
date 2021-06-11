@@ -23,9 +23,9 @@ export interface ReserveLiquidity {
   oracleOption: number;
   oraclePubkey: PublicKey;
   availableAmount: BN;
-  borrowedAmountWads: BN;
-  cumulativeBorrowRateWads: BN;
-  marketPrice: BN;
+  borrowedAmountWads: BN; // decimals
+  cumulativeBorrowRateWads: BN; // decimals
+  marketPrice: BN; // decimals
 }
 
 export interface ReserveCollateral {
@@ -62,14 +62,11 @@ export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
         BufferLayout.u8('mintDecimals'),
         Layout.publicKey('supplyPubkey'),
         Layout.publicKey('feeReceiver'),
-        // @FIXME: oracle option
-        // TODO: replace u32 option with generic equivalent
-        BufferLayout.u32('oracleOption'),
-        Layout.publicKey('oracle'),
+        Layout.publicKey('oraclePubkey'),
         Layout.uint64('availableAmount'),
         Layout.uint128('borrowedAmountWads'),
         Layout.uint128('cumulativeBorrowRateWads'),
-        Layout.uint64('marketPrice'),
+        Layout.uint128('marketPrice'),
       ],
       'liquidity',
     ),
@@ -93,14 +90,18 @@ export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
         BufferLayout.u8('optimalBorrowRate'),
         BufferLayout.u8('maxBorrowRate'),
         BufferLayout.struct(
-          [Layout.uint64('borrowFeeWad'), BufferLayout.u8('hostFeePercentage')],
+          [
+            Layout.uint64('borrowFeeWad'),
+            Layout.uint64('flashLoanFeeWad'),
+            BufferLayout.u8('hostFeePercentage')
+          ],
           'fees',
         ),
       ],
       'config'
     ),
 
-    BufferLayout.blob(256, 'padding'),
+    BufferLayout.blob(248, 'padding'),
   ],
 );
 
@@ -146,7 +147,6 @@ export const reserveMarketCap = (reserve?: Reserve) => {
     reserve?.liquidity.borrowedAmountWads,
   ).toNumber();
   const total = available + borrowed;
-
   return total;
 };
 

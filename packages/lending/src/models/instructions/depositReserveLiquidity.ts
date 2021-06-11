@@ -11,6 +11,7 @@ import { calculateUtilizationRatio, Reserve } from '../state/reserve';
 import { calculateBorrowAPY } from './borrowObligationLiquidity';
 import { LendingInstruction } from './instruction';
 
+/// 4
 /// Deposit liquidity into a reserve in exchange for collateral. Collateral represents a share
 /// of the reserve liquidity pool.
 ///
@@ -27,6 +28,11 @@ import { LendingInstruction } from './instruction';
 ///   7. `[signer]` User transfer authority ($authority).
 ///   8. `[]` Clock sysvar.
 ///   9. `[]` Token program id.
+///
+/// DepositReserveLiquidity {
+///     /// Amount of liquidity to deposit in exchange for collateral tokens
+///     liquidity_amount: u64,
+/// },
 export const depositReserveLiquidityInstruction = (
   liquidityAmount: number | BN,
   sourceLiquidity: PublicKey,

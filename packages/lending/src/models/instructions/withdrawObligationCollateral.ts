@@ -9,6 +9,7 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 9
 /// Withdraw collateral from an obligation. Requires a refreshed obligation and reserve.
 ///
 /// Accounts expected by this instruction:
@@ -23,6 +24,11 @@ import { LendingInstruction } from './instruction';
 ///   6. `[signer]` Obligation owner.
 ///   7. `[]` Clock sysvar.
 ///   8. `[]` Token program id.
+///
+/// WithdrawObligationCollateral {
+///     /// Amount of collateral tokens to withdraw - u64::MAX for up to 100% of deposited amount
+///     collateral_amount: u64,
+/// },
 export const withdrawObligationCollateralInstruction = (
   collateralAmount: number | BN,
   sourceCollateral: PublicKey,

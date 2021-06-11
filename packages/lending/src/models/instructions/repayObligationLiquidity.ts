@@ -9,6 +9,7 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from '../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 11
 /// Repay borrowed liquidity to a reserve. Requires a refreshed obligation and reserve.
 ///
 /// Accounts expected by this instruction:
@@ -20,10 +21,14 @@ import { LendingInstruction } from './instruction';
 ///   2. `[writable]` Repay reserve account - refreshed.
 ///   3. `[writable]` Obligation account - refreshed.
 ///   4. `[]` Lending market account.
-///   5. `[]` Derived lending market authority.
-///   6. `[signer]` User transfer authority ($authority).
-///   7. `[]` Clock sysvar.
-///   8. `[]` Token program id.
+///   5. `[signer]` User transfer authority ($authority).
+///   6. `[]` Clock sysvar.
+///   7. `[]` Token program id.
+///
+/// RepayObligationLiquidity {
+///   /// Amount of liquidity to repay - u64::MAX for 100% of borrowed amount
+///   liquidity_amount: u64,
+/// },
 export const repayObligationLiquidityInstruction = (
   liquidityAmount: number | BN,
   sourceLiquidity: PublicKey,
@@ -31,7 +36,6 @@ export const repayObligationLiquidityInstruction = (
   repayReserve: PublicKey,
   obligation: PublicKey,
   lendingMarket: PublicKey,
-  lendingMarketAuthority: PublicKey,
   transferAuthority: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
@@ -54,7 +58,6 @@ export const repayObligationLiquidityInstruction = (
     { pubkey: repayReserve, isSigner: false, isWritable: true },
     { pubkey: obligation, isSigner: false, isWritable: true },
     { pubkey: lendingMarket, isSigner: false, isWritable: false },
-    { pubkey: lendingMarketAuthority, isSigner: false, isWritable: false },
     { pubkey: transferAuthority, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },

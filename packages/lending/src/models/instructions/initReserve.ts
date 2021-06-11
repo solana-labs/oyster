@@ -11,6 +11,7 @@ import * as Layout from '../../utils/layout';
 import { ReserveConfig } from '../state';
 import { LendingInstruction } from './instruction';
 
+/// 2
 /// Initializes a new lending market reserve.
 ///
 /// Accounts expected by this instruction:
@@ -22,25 +23,25 @@ import { LendingInstruction } from './instruction';
 ///   3. `[]` Reserve liquidity SPL Token mint.
 ///   4. `[writable]` Reserve liquidity supply SPL Token account - uninitialized.
 ///   5. `[writable]` Reserve liquidity fee receiver - uninitialized.
-///   6. `[writable]` Reserve collateral SPL Token mint - uninitialized.
-///   7. `[writable]` Reserve collateral token supply - uninitialized.
-///   8. `[]` Quote currency SPL Token mint.
-///   9. `[]` Lending market account.
-///   10 `[]` Derived lending market authority.
-///   11 `[signer]` Lending market owner.
-///   12 `[signer]` User transfer authority ($authority).
-///   13 `[]` Clock sysvar.
-///   13 `[]` Rent sysvar.
-///   14 `[]` Token program id.
-///   15 `[optional]` Reserve liquidity oracle account.
-///                     Not required for quote currency reserves.
-///                     Must match base and quote currency mint, and quote currency decimals.
-// InitReserve {
-//     /// Initial amount of liquidity to deposit into the new reserve
-//     liquidity_amount: u64,
-//     /// Reserve configuration values
-//     config: ReserveConfig,
-// },
+///   6. `[]` Pyth product account.
+///   7. `[]` Pyth price account.
+///             This will be used as the reserve liquidity oracle account.
+///   8. `[writable]` Reserve collateral SPL Token mint - uninitialized.
+///   9. `[writable]` Reserve collateral token supply - uninitialized.
+///   10 `[]` Lending market account.
+///   11 `[]` Derived lending market authority.
+///   12 `[signer]` Lending market owner.
+///   13 `[signer]` User transfer authority ($authority).
+///   14 `[]` Clock sysvar.
+///   15 `[]` Rent sysvar.
+///   16 `[]` Token program id.
+///
+/// InitReserve {
+///     /// Initial amount of liquidity to deposit into the new reserve
+///     liquidity_amount: u64,
+///     /// Reserve configuration values
+///     config: ReserveConfig,
+/// },
 export const initReserveInstruction = (
   liquidityAmount: number | BN,
   config: ReserveConfig,
@@ -50,13 +51,14 @@ export const initReserveInstruction = (
   liquidityMint: PublicKey,
   liquiditySupply: PublicKey,
   liquidityFeeReceiver: PublicKey,
+  pythProduct: PublicKey,
+  pythPrice: PublicKey,
   collateralMint: PublicKey,
   collateralSupply: PublicKey,
   lendingMarket: PublicKey,
   lendingMarketAuthority: PublicKey,
   lendingMarketOwner: PublicKey,
   transferAuthority: PublicKey,
-  oracle?: PublicKey,
 ): TransactionInstruction => {
   const dataLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
@@ -97,6 +99,8 @@ export const initReserveInstruction = (
     { pubkey: liquidityMint, isSigner: false, isWritable: false },
     { pubkey: liquiditySupply, isSigner: false, isWritable: true },
     { pubkey: liquidityFeeReceiver, isSigner: false, isWritable: true },
+    { pubkey: pythProduct, isSigner: false, isWritable: false },
+    { pubkey: pythPrice, isSigner: false, isWritable: false },
     { pubkey: collateralMint, isSigner: false, isWritable: true },
     { pubkey: collateralSupply, isSigner: false, isWritable: true },
     { pubkey: lendingMarket, isSigner: false, isWritable: true },
@@ -106,10 +110,6 @@ export const initReserveInstruction = (
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
-
-  if (oracle) {
-    keys.push({ pubkey: oracle, isSigner: false, isWritable: false });
-  }
 
   return new TransactionInstruction({
     keys,

@@ -9,6 +9,7 @@ import * as BufferLayout from 'buffer-layout';
 import * as Layout from './../../utils/layout';
 import { LendingInstruction } from './instruction';
 
+/// 8
 /// Deposit collateral to an obligation. Requires a refreshed reserve.
 ///
 /// Accounts expected by this instruction:
@@ -25,6 +26,11 @@ import { LendingInstruction } from './instruction';
 ///   7. `[signer]` User transfer authority ($authority).
 ///   8. `[]` Clock sysvar.
 ///   9. `[]` Token program id.
+///
+/// DepositObligationCollateral {
+///     /// Amount of collateral tokens to deposit
+///     collateral_amount: u64,
+/// },
 export const depositObligationCollateralInstruction = (
   collateralAmount: number | BN,
   sourceCollateral: PublicKey,

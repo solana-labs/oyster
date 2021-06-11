@@ -5,7 +5,7 @@ import * as Layout from '../../utils/layout';
 export interface LendingMarket {
   version: number;
   isInitialized: boolean;
-  quoteTokenMint: PublicKey;
+  quoteCurrency: Buffer;
   tokenProgramId: PublicKey;
 }
 
@@ -14,9 +14,9 @@ export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.s
     BufferLayout.u8('version'),
     BufferLayout.u8('bumpSeed'),
     Layout.publicKey('owner'),
-    Layout.publicKey('quoteTokenMint'),
+    BufferLayout.blob(32, 'quoteCurrency'),
     Layout.publicKey('tokenProgramId'),
-
+    Layout.publicKey('oracleProgramId'),
     BufferLayout.blob(128, 'padding'),
   ],
 );
