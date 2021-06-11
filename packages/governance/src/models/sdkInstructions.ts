@@ -7,14 +7,14 @@ import {
 } from '@solana/web3.js';
 
 export async function createUpgradeInstruction(
-  programAddress: PublicKey,
+  programId: PublicKey,
   bufferAddress: PublicKey,
   governance: PublicKey,
 ) {
   const PROGRAM_IDS = utils.programIds();
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
-    [programAddress.toBuffer()],
+    [programId.toBuffer()],
     PROGRAM_IDS.bpf_upgrade_loader,
   );
 
@@ -25,7 +25,7 @@ export async function createUpgradeInstruction(
       isSigner: false,
     },
     {
-      pubkey: programAddress,
+      pubkey: programId,
       isWritable: true,
       isSigner: false,
     },

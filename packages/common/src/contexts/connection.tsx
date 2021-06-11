@@ -405,7 +405,7 @@ export const sendTransaction = async (
             {errors.map(err => (
               <div>{err}</div>
             ))}
-            <ExplorerLink address={txid} type="transaction" />
+            <ExplorerLink address={txid} type="transaction" short />
           </>
         ),
         type: 'error',
