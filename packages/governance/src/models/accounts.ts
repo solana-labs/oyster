@@ -66,6 +66,10 @@ export class Governance {
   config: GovernanceConfig;
   proposalCount: number;
 
+  isProgramGovernance() {
+    return this.accountType === GovernanceAccountType.ProgramGovernance;
+  }
+
   constructor(args: {
     accountType: number;
     config: GovernanceConfig;
