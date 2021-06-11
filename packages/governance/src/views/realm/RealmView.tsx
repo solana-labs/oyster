@@ -44,7 +44,23 @@ export const RealmView = () => {
           <Row>
             <Col md={12} xs={24} className="realm-title">
               <Row>
-                <TokenIcon mintAddress={realm?.info.communityMint} size={60} />
+                <div style={{ position: 'relative' }}>
+                  <TokenIcon
+                    mintAddress={realm?.info.communityMint}
+                    size={60}
+                  />
+                  {realm?.info.councilMint && (
+                    <TokenIcon
+                      style={{
+                        position: 'absolute',
+                        top: 30,
+                        left: 45,
+                      }}
+                      mintAddress={realm.info.councilMint}
+                      size={30}
+                    />
+                  )}
+                </div>
                 <Col>
                   <h1>{realm?.info.name}</h1>
                 </Col>

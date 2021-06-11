@@ -20,7 +20,22 @@ export const HomeView = () => {
       .map(r => ({
         href: '/realm/' + r.pubkey.toBase58(),
         title: r.info.name,
-        badge: <TokenIcon mintAddress={r.info.communityMint} size={40} />,
+        badge: (
+          <div style={{ position: 'relative' }}>
+            <TokenIcon mintAddress={r.info.communityMint} size={40} />
+            {r.info.councilMint && (
+              <TokenIcon
+                style={{
+                  position: 'absolute',
+                  top: 20,
+                  left: 30,
+                }}
+                mintAddress={r.info.councilMint}
+                size={20}
+              />
+            )}
+          </div>
+        ),
         key: r.pubkey.toBase58(),
       }));
   }, [realms]);
