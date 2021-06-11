@@ -2,11 +2,11 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 
 import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useWalletVoteRecord } from '../../contexts/GovernanceContext';
+import { useWalletVoteRecord } from '../../../contexts/GovernanceContext';
 
 import './style.less';
 
@@ -15,11 +15,11 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
-} from '../../models/accounts';
+} from '../../../models/accounts';
 
-import { Vote } from '../../models/instructions';
+import { Vote } from '../../../models/instructions';
 
-import { castVote } from '../../actions/castVote';
+import { castVote } from '../../../actions/castVote';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

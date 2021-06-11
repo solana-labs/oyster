@@ -2,7 +2,7 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 
 import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -10,12 +10,12 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
-} from '../../models/accounts';
+} from '../../../models/accounts';
 import {
   useGovernanceContext,
   useWalletVoteRecord,
-} from '../../contexts/GovernanceContext';
-import { relinquishVote } from '../../actions/relinquishVote';
+} from '../../../contexts/GovernanceContext';
+import { relinquishVote } from '../../../actions/relinquishVote';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

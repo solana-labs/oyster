@@ -6,7 +6,7 @@ import {
   useRealm,
 } from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { StateBadge } from '../../components/Proposal/StateBadge';
+import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
 import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
 import { NewProposal } from './NewProposal';

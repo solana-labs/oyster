@@ -1,15 +1,15 @@
 import React from 'react';
 import { Card } from 'antd';
 import { Form, Input } from 'antd';
-import { MAX_INSTRUCTION_BASE64_LENGTH } from '../../models/serialisation';
+import { MAX_INSTRUCTION_BASE64_LENGTH } from '../../../models/serialisation';
 import { contexts, ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { LABELS } from '../../constants';
-import { Governance, Proposal } from '../../models/accounts';
+import { LABELS } from '../../../constants';
+import { Governance, Proposal } from '../../../models/accounts';
 
-import { useProposalAuthority } from '../../contexts/GovernanceContext';
-import { insertInstruction } from '../../actions/insertInstruction';
+import { useProposalAuthority } from '../../../contexts/GovernanceContext';
+import { insertInstruction } from '../../../actions/insertInstruction';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

@@ -10,22 +10,22 @@ import { ParsedAccount, contexts } from '@oyster/common';
 import { Card, Button } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useMemo, useState } from 'react';
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '../../models/accounts';
-import { GOVERNANCE_SCHEMA } from '../../models/serialisation';
+} from '../../../models/accounts';
+import { GOVERNANCE_SCHEMA } from '../../../models/serialisation';
 import { serialize } from 'borsh';
 
 import './style.less';
-import { executeInstruction } from '../../actions/executeInstruction';
-import { removeInstruction } from '../../actions/removeInstruction';
+import { executeInstruction } from '../../../actions/executeInstruction';
+import { removeInstruction } from '../../../actions/removeInstruction';
 import {
   useGovernanceContext,
   useProposalAuthority,
-} from '../../contexts/GovernanceContext';
+} from '../../../contexts/GovernanceContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

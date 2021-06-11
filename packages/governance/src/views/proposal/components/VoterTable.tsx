@@ -1,8 +1,8 @@
 import React from 'react';
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 
 import { Table, Grid } from 'antd';
-import { VoterDisplayData, VoteType } from '../../views/proposal/ProposalView';
+import { VoterDisplayData, VoteType } from '../ProposalView';
 
 function shortNumber(num: number) {
   if (Math.abs(num) < 1000) {

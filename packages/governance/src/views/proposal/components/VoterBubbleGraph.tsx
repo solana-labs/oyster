@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import React, { useEffect, useState } from 'react';
-import { VoterDisplayData, VoteType } from '../../views/proposal/ProposalView';
+import { VoterDisplayData, VoteType } from '../ProposalView';
 //https://observablehq.com/d/86d91b23534992ff
 
 interface IVoterBubbleGraph {

@@ -13,19 +13,19 @@ import {
   useVoteRecords,
   useTokenOwnerRecords,
 } from '../../contexts/GovernanceContext';
-import { StateBadge } from '../../components/Proposal/StateBadge';
+import { StateBadge } from './components/StateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
-import { InstructionCard } from '../../components/Proposal/InstructionCard';
-import { NewInstructionCard } from '../../components/Proposal/NewInstructionCard';
-import SignOffButton from '../../components/Proposal/SignOffButton';
+import { InstructionCard } from './components/InstructionCard';
+import { NewInstructionCard } from './components/NewInstructionCard';
+import SignOffButton from './components/SignOffButton';
 
-import { CastVote } from '../../components/Proposal/CastVote';
-import { RelinquishVote } from '../../components/Proposal/RelinquishVote';
+import { CastVote } from './components/CastVote';
+import { RelinquishVote } from './components/RelinquishVote';
 import './style.less';
 
-import { VoterBubbleGraph } from '../../components/Proposal/VoterBubbleGraph';
-import { VoterTable } from '../../components/Proposal/VoterTable';
+import { VoterBubbleGraph } from './components/VoterBubbleGraph';
+import { VoterTable } from './components/VoterTable';
 import {
   Governance,
   Proposal,
@@ -35,7 +35,7 @@ import {
 } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
-import CancelButton from '../../components/Proposal/CancelButton';
+import CancelButton from './components/CancelButton';
 
 const { TabPane } = Tabs;
 
