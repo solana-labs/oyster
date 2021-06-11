@@ -70,6 +70,7 @@ export function NewProposal({
   return (
     <>
       <Button
+        type="primary"
         onClick={() => setIsModalVisible(true)}
         {...props}
         disabled={!isEnabled}

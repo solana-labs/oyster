@@ -27,6 +27,7 @@ export default function SignOffButton({
       )}
       {!signatoryRecord.info.signedOff && (
         <Button
+          type="primary"
           onClick={() => {
             confirm({
               title: 'Do you want to sign off this proposal?',

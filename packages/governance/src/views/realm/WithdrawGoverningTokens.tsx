@@ -41,7 +41,7 @@ export function WithdrawGoverningTokens({
 
   return isVisible ? (
     <Button
-      type="primary"
+      type="ghost"
       onClick={() =>
         confirm({
           title: LABELS.WITHDRAW_TOKENS,
