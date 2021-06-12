@@ -14,7 +14,7 @@ const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 
-const { confirm } = Modal;
+const { confirm, error } = Modal;
 export function WithdrawGoverningTokens({
   realm,
   governingTokenMint,
@@ -42,7 +42,15 @@ export function WithdrawGoverningTokens({
   return isVisible ? (
     <Button
       type="ghost"
-      onClick={() =>
+      onClick={() => {
+        if (tokenOwnerRecord.info.unrelinquishedVotesCount > 0) {
+          error({
+            title: "Can't withdraw tokens",
+            content: `You have tokens staked in ${tokenOwnerRecord.info.unrelinquishedVotesCount} proposal(s). Please release your tokens from the proposals before withdrawing the tokens from the realm.`,
+          });
+          return;
+        }
+
         confirm({
           title: LABELS.WITHDRAW_TOKENS,
           icon: <ExclamationCircleOutlined />,
@@ -66,8 +74,8 @@ export function WithdrawGoverningTokens({
               );
             }
           },
-        })
-      }
+        });
+      }}
     >
       {LABELS.WITHDRAW_TOKENS(tokenName)}
     </Button>

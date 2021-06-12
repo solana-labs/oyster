@@ -159,6 +159,9 @@ function useSetupGovernanceContext({
       all[0].forEach(a => {
         let cached;
 
+        // TODO: This is done only for MVP to get it working end to end
+        // All accounts should not be cached in the context and there is no need to update the global cache either
+
         switch (a.account.data[0]) {
           case GovernanceAccountType.Realm:
             cache.add(a.pubkey, a.account, BorshAccountParser(Realm));

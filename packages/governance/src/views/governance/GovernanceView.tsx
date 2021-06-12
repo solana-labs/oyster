@@ -18,7 +18,7 @@ import {
 import { NewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
-import { size } from 'lodash';
+
 const PAGE_SIZE = 10;
 
 export const GovernanceView = () => {
