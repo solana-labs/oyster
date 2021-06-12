@@ -1,4 +1,4 @@
-import { Col, List, Row } from 'antd';
+import { Avatar, Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import {
   useGovernance,
@@ -8,9 +8,17 @@ import {
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
-import { TokenIcon, useConnectionConfig, useWallet } from '@oyster/common';
+import {
+  ExplorerLink,
+  TokenIcon,
+  useConnectionConfig,
+  useMint,
+  useWallet,
+} from '@oyster/common';
 import { NewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
+import { Proposal, ProposalState } from '../../models/accounts';
+import { size } from 'lodash';
 const PAGE_SIZE = 10;
 
 export const GovernanceView = () => {
@@ -34,14 +42,25 @@ export const GovernanceView = () => {
 
   const mint = communityTokenMint?.toBase58() || '';
 
+  // We don't support MintGovernance account yet, but we can check the governed account type here
+  const governedMint = useMint(governance?.info.config.governedAccount);
+  const color = governance?.info.isProgramGovernance() ? 'green' : 'gray';
+
   const proposalItems = useMemo(() => {
-    return proposals.map(p => ({
-      key: p.pubkey.toBase58(),
-      href: '/proposal/' + p.pubkey,
-      title: p.info.name,
-      badge: <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />,
-      state: p.info.state,
-    }));
+    const getCompareKey = (p: Proposal) =>
+      `${p.state === ProposalState.Voting ? 0 : 1}${p.name}`;
+
+    return proposals
+      .sort((p1, p2) =>
+        getCompareKey(p1.info).localeCompare(getCompareKey(p2.info)),
+      )
+      .map(p => ({
+        key: p.pubkey.toBase58(),
+        href: '/proposal/' + p.pubkey,
+        title: p.info.name,
+        badge: <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />,
+        state: p.info.state,
+      }));
   }, [proposals]);
 
   return (
@@ -55,14 +74,26 @@ export const GovernanceView = () => {
     >
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          <TokenIcon
-            mintAddress={realm?.info.communityMint}
-            size={60}
-            style={{ marginRight: 20 }}
-          />
+          {governedMint ? (
+            <TokenIcon
+              mintAddress={governance?.info.config.governedAccount}
+              size={60}
+            />
+          ) : (
+            <Avatar style={{ background: color, marginRight: 5 }} size={60}>
+              {governance?.info.config.governedAccount.toBase58().slice(0, 5)}
+            </Avatar>
+          )}
           <div>
             <h1>{realm?.info.name}</h1>
-            <h2>{governance?.info.config.governedAccount.toBase58()}</h2>
+            <h2>
+              {governance && (
+                <ExplorerLink
+                  address={governance.info.config.governedAccount}
+                  type="address"
+                />
+              )}
+            </h2>
             <a
               href={tokenMap.get(mint)?.extensions?.website}
               target="_blank"

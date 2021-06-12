@@ -1,11 +1,12 @@
-import { Col, List, Row } from 'antd';
+import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import {
   useRealmGovernances,
   useRealm,
+  useProposals,
 } from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { TokenIcon, useWallet } from '@oyster/common';
+import { ParsedAccount, TokenIcon, useWallet, useMint } from '@oyster/common';
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
@@ -13,6 +14,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { RegisterGovernance } from './RegisterGovernance';
 import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
+import { Governance, ProposalState } from '../../models/accounts';
 
 export const RealmView = () => {
   const history = useHistory();
@@ -33,6 +35,7 @@ export const RealmView = () => {
         key: g.pubkey.toBase58(),
         href: '/governance/' + g.pubkey,
         title: g.info.config.governedAccount.toBase58(),
+        badge: <GovernanceBadge governance={g}></GovernanceBadge>,
       }));
   }, [governances]);
 
@@ -109,7 +112,10 @@ export const RealmView = () => {
                 className="realm-item"
                 onClick={() => history.push(item.href)}
               >
-                <List.Item.Meta title={item.title}></List.Item.Meta>
+                <List.Item.Meta
+                  title={item.title}
+                  avatar={item.badge}
+                ></List.Item.Meta>
               </List.Item>
             )}
           />
@@ -118,3 +124,35 @@ export const RealmView = () => {
     </>
   );
 };
+
+export function GovernanceBadge({
+  governance,
+}: {
+  governance: ParsedAccount<Governance>;
+}) {
+  // We don't support MintGovernance account yet, but we can check the governed account type here
+  const governedMint = useMint(governance.info.config.governedAccount);
+  const proposals = useProposals(governance?.pubkey);
+  const color = governance.info.isProgramGovernance() ? 'green' : 'gray';
+
+  return (
+    <Badge
+      count={
+        proposals.filter(p => p.info.state === ProposalState.Voting).length
+      }
+    >
+      <div style={{ width: 55, height: 45 }}>
+        {governedMint ? (
+          <TokenIcon
+            mintAddress={governance.info.config.governedAccount}
+            size={40}
+          />
+        ) : (
+          <Avatar size="large" gap={2} style={{ background: color }}>
+            {governance.info.config.governedAccount.toBase58().slice(0, 5)}
+          </Avatar>
+        )}
+      </div>
+    </Badge>
+  );
+}
