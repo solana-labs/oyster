@@ -1,4 +1,4 @@
-import { Avatar, Col, List, Row } from 'antd';
+import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import {
   useGovernance,
@@ -18,6 +18,7 @@ import {
 import { NewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
+import { ClockCircleOutlined } from '@ant-design/icons';
 
 const PAGE_SIZE = 10;
 
@@ -58,7 +59,14 @@ export const GovernanceView = () => {
         key: p.pubkey.toBase58(),
         href: '/proposal/' + p.pubkey,
         title: p.info.name,
-        badge: <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />,
+        badge:
+          p.info.state === ProposalState.Voting ? (
+            <Badge count={<ClockCircleOutlined style={{ color: '#f5222d' }} />}>
+              <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />
+            </Badge>
+          ) : (
+            <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />
+          ),
         state: p.info.state,
       }));
   }, [proposals]);
