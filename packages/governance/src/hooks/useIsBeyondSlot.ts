@@ -18,6 +18,8 @@ export const useIsBeyondSlot = (slot: number | undefined) => {
         return;
       }
 
+      setIsBeyondSlot(false);
+
       const id = setInterval(() => {
         connection.getSlot().then(currentSlot => {
           if (currentSlot > slot) {
