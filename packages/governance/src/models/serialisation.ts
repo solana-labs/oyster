@@ -18,6 +18,7 @@ import {
   CreateRealmArgs,
   DepositGoverningTokensArgs,
   ExecuteInstructionArgs,
+  FinalizeVoteArgs,
   InsertInstructionArgs,
   RelinquishVoteArgs,
   RemoveInstructionArgs,
@@ -165,6 +166,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
   [
     RelinquishVoteArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    FinalizeVoteArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],

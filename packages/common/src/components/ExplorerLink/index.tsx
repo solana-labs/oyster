@@ -47,7 +47,7 @@ export const ExplorerLink = (props: {
       }
     }
 
-    return cluster && `?cluster=${cluster}`;
+    return cluster ? `?cluster=${cluster}` : '';
   };
 
   return (

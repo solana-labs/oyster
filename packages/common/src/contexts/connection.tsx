@@ -393,7 +393,9 @@ export const sendTransaction = async (
     if (confirmation?.err) {
       let errors: string[] = [];
       try {
-        errors = await getErrorForTransaction(connection, txid);
+        // TODO: This call always throws errors and delays error feedback
+        //       It needs to be investigated but for now I'm commenting it out
+        // errors = await getErrorForTransaction(connection, txid);
       } catch (ex) {
         console.error('getErrorForTransaction() error', ex);
       }

@@ -3,24 +3,24 @@ import { PublicKey } from '@solana/web3.js';
 import { GovernanceConfig, InstructionData } from './accounts';
 
 export enum GovernanceInstruction {
-  CreateRealm = 0, // done
-  DepositGoverningTokens = 1, // done
-  WithdrawGoverningTokens = 2, // done
+  CreateRealm = 0,
+  DepositGoverningTokens = 1,
+  WithdrawGoverningTokens = 2,
   SetGovernanceDelegate = 3, // --
-  CreateAccountGovernance = 4, // done
-  CreateProgramGovernance = 5, // done
-  CreateProposal = 6, // done
-  AddSignatory = 7, // done
-  RemoveSignatory = 8, // done
+  CreateAccountGovernance = 4,
+  CreateProgramGovernance = 5,
+  CreateProposal = 6,
+  AddSignatory = 7,
+  RemoveSignatory = 8,
 
-  InsertInstruction = 9, // done
-  RemoveInstruction = 10, // done
-  CancelProposal = 11, // done
-  SignOffProposal = 12, // done
-  CastVote = 13, // done
-  FinalizeVote = 14, // *
-  RelinquishVote = 15, // done
-  ExecuteInstruction = 16, // done
+  InsertInstruction = 9,
+  RemoveInstruction = 10,
+  CancelProposal = 11,
+  SignOffProposal = 12,
+  CastVote = 13,
+  FinalizeVote = 14,
+  RelinquishVote = 15,
+  ExecuteInstruction = 16,
 }
 
 export class CreateRealmArgs {
@@ -117,6 +117,10 @@ export class CastVoteArgs {
 
 export class RelinquishVoteArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.RelinquishVote;
+}
+
+export class FinalizeVoteArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.FinalizeVote;
 }
 
 export class InsertInstructionArgs {

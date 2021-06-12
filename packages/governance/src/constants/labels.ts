@@ -176,4 +176,6 @@ export const LABELS = {
   WITHDRAW_TOKENS_QUESTION: 'Withdraw your tokens?',
 
   INSTRUCTIONS: 'Instructions',
+
+  FINALIZE_VOTE: 'Finalize Vote',
 };

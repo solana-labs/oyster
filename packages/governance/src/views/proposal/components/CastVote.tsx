@@ -20,6 +20,7 @@ import {
 import { Vote } from '../../../models/instructions';
 
 import { castVote } from '../../../actions/castVote';
+import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -39,8 +40,10 @@ export function CastVote({
   const { wallet } = useWallet();
   const connection = useConnection();
   const voteRecord = useWalletVoteRecord(proposal.pubkey);
+  const hasVotingTimeExpired = useHasVotingTimeExpired(governance, proposal);
 
-  const eligibleToView =
+  const isVisible =
+    hasVotingTimeExpired === false &&
     !voteRecord &&
     tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0 &&
     proposal.info.state === ProposalState.Voting;
@@ -60,7 +63,7 @@ export function CastVote({
           <CloseOutlined />,
         ];
 
-  return eligibleToView ? (
+  return isVisible ? (
     <Button
       type="primary"
       icon={icon}

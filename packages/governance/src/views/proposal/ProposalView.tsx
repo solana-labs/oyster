@@ -36,6 +36,7 @@ import {
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
 import CancelButton from './components/CancelButton';
+import { FinalizeVote } from './components/FinalizeVote';
 
 const { TabPane } = Tabs;
 
@@ -280,6 +281,10 @@ function InnerProposalView({
                   proposal.info.state === ProposalState.SigningOff) && (
                   <SignOffButton signatoryRecord={signatoryRecord} />
                 )}
+              <FinalizeVote
+                proposal={proposal}
+                governance={governance}
+              ></FinalizeVote>
 
               {tokenOwnerRecord && (
                 <>
