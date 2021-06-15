@@ -107,6 +107,7 @@ export async function getGovernanceAccounts<TAccount>(
         PROGRAM_IDS.governance.programId.toBase58(),
         {
           commitment: 'single',
+          encoding: 'base64',
           filters: [
             {
               memcmp: {
@@ -148,7 +149,7 @@ export async function getGovernanceAccounts<TAccount>(
       info: deserializeBorsh(
         GOVERNANCE_SCHEMA,
         classType,
-        bs58.decode(rawAccount.account.data),
+        Buffer.from(rawAccount.account.data[0], 'base64'),
       ),
     };
 
