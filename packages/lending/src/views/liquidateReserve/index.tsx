@@ -19,10 +19,11 @@ export const LiquidateReserveView = () => {
 
   const obligation = useEnrichedLendingObligation(id);
 
-  const repayReserve = useLendingReserve(obligation?.info.borrowReserve);
-  const withdrawReserve = useLendingReserve(obligation?.info.depositReserve);
+  // @FIXME: handle multiple deposits / borrows
+  const repayReserve = useLendingReserve(obligation?.info.borrows[0].borrowReserve);
+  const withdrawReserve = useLendingReserve(obligation?.info.deposits[0].depositReserve);
 
-  if (!obligation || !repayReserve) {
+  if (!obligation || !repayReserve || !withdrawReserve) {
     return null;
   }
 

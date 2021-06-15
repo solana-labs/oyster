@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLendingReserve } from './useLendingReserves';
 import { useUserObligationByReserve } from './useUserObligationByReserve';
 
-const { cache, getMultipleAccounts, MintParser, useMint } = contexts.Accounts;
+const { useMint } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
 
 export function useBorrowedAmount(address?: string | PublicKey) {
@@ -30,21 +30,6 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     });
 
     (async () => {
-      // precache obligation mints
-      const { keys, array } = await getMultipleAccounts(
-        connection,
-        // @FIXME: obligation tokens
-        userObligationsByReserve.map(item =>
-          item.obligation.info.tokenMint.toBase58(),
-        ),
-        'single',
-      );
-
-      array.forEach((item, index) => {
-        const address = keys[index];
-        cache.add(new PublicKey(address), item, MintParser);
-      });
-
       const result = {
         borrowedLamports: 0,
         borrowedInUSD: 0,
@@ -56,18 +41,13 @@ export function useBorrowedAmount(address?: string | PublicKey) {
       let liquidationThreshold = 0;
 
       userObligationsByReserve.forEach(item => {
-        const borrowed = wadToLamports(
+        // @FIXME: support multiple borrows, and decimals may be different than lamports
+        const borrowedLamports = wadToLamports(
           item.obligation.info.borrows[0].borrowedAmountWads,
         ).toNumber();
 
-        const owned = item.userAccounts.reduce(
-          (amount, acc) => (amount += acc.info.amount.toNumber()),
-          0,
-        );
-
         // @FIXME: obligation tokens
-        result.borrowedLamports +=
-          borrowed * (owned / obligationMint?.info.supply.toNumber());
+        result.borrowedLamports += borrowedLamports;
         result.borrowedInUSD += item.obligation.info.borrowedInQuote;
         result.colateralInUSD += item.obligation.info.collateralInQuote;
         // @FIXME: BigNumber

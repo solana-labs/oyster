@@ -25,11 +25,13 @@ export const RepayReserveView = () => {
   }>();
 
   const lendingObligation = useEnrichedLendingObligation(obligationId);
-  const id = obligationId ? lendingObligation?.info.borrowReserve : reserveId;
+  // @FIXME: obligation can have no borrows
+  const id = obligationId ? lendingObligation?.info.borrows[0].borrowReserve : reserveId;
   const lendingReserve = useLendingReserve(id);
 
+  // @FIXME: obligation can have no deposits
   const repayReserve = useLendingReserve(
-    obligationId ? lendingObligation?.info.depositReserve : reserveId,
+    obligationId ? lendingObligation?.info.deposits[0].depositReserve : reserveId,
   );
 
   const { userObligations, totalInQuote: loansValue } = useUserObligations();

@@ -3,7 +3,6 @@ import {
   ConnectButton,
   contexts,
   fromLamports,
-  hooks,
   notify,
   ParsedAccount,
   wadToLamports,
@@ -26,7 +25,6 @@ import './style.less';
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useMint } = contexts.Accounts;
-const { useAccountByMint } = hooks;
 
 export const RepayInput = (props: {
   className?: string;

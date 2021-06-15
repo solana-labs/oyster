@@ -164,7 +164,6 @@ export const BorrowInput = (props: {
     setValue,
     depositReserve,
     borrowReserve,
-    sourceAccounts,
     userObligationsByReserve,
     setPendingTx,
     setShowConfirmation,

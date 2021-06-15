@@ -90,5 +90,7 @@ export function useLeverage({
     enrichedPools,
     collValue,
     collateralDeposit,
+    newPosition,
+    setNewPosition
   ]);
 }

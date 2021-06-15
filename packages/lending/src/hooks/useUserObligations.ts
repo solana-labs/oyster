@@ -8,6 +8,7 @@ export function useUserObligations() {
   const { userAccounts } = useUserAccounts();
   const { obligations } = useEnrichedLendingObligations();
 
+  // @FIXME: obligation tokens were removed, simplify this
   const accountsByMint = useMemo(() => {
     return userAccounts.reduce((res, acc) => {
       const id = acc.info.mint.toBase58();
@@ -21,17 +22,12 @@ export function useUserObligations() {
       return [];
     }
 
-    // @FIXME: obligation tokens
+    // @FIXME: obligation tokens were removed, simplify this
     return obligations
-      .filter(
-        acc => accountsByMint.get(acc.info.tokenMint.toBase58()) !== undefined,
-      )
       .map(ob => {
         return {
           obligation: ob,
-          userAccounts: [
-            ...(accountsByMint.get(ob.info.tokenMint.toBase58()) || []),
-          ],
+          userAccounts: [],
         };
       })
       .sort(

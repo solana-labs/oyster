@@ -10,21 +10,22 @@ const { useWallet } = contexts.Wallet;
 export const FaucetView = () => {
   const connection = useConnection();
   const { wallet } = useWallet();
+  const publicKey = wallet?.publicKey;
 
   const airdrop = useCallback(() => {
-    if (!wallet?.publicKey) {
+    if (!publicKey) {
       return;
     }
 
     connection
-      .requestAirdrop(wallet.publicKey, 2 * LAMPORTS_PER_SOL)
+      .requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL)
       .then(() => {
         notify({
           message: LABELS.ACCOUNT_FUNDED,
           type: 'success',
         });
       });
-  }, [wallet, wallet?.publicKey, connection]);
+  }, [publicKey, connection]);
 
   const bodyStyle: React.CSSProperties = {
     display: 'flex',

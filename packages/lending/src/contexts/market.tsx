@@ -5,7 +5,6 @@ import {
   fromLamports,
   getTokenName,
   KnownTokenMap,
-  ParsedAccount,
   STABLE_COINS,
 } from '@oyster/common';
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
@@ -17,7 +16,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { LendingMarket, PoolInfo, Reserve } from '../models';
+import { PoolInfo, Reserve } from '../models';
 import { LIQUIDITY_PROVIDER_FEE, SERUM_FEE } from '../utils/pools';
 import { getPoolName } from '../utils/utils';
 import { POOLS_WITH_AIRDROP } from './../models/airdrops';
@@ -57,7 +56,8 @@ export function MarketProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
   const accountsToObserve = useMemo(() => new Map<string, number>(), []);
   const [marketMints, setMarketMints] = useState<string[]>([]);
-  const [dailyVolume, setDailyVolume] = useState<Map<string, RecentPoolData>>(
+  // @TODO: remove this, it never changes
+  const [dailyVolume] = useState<Map<string, RecentPoolData>>(
     new Map(),
   );
 
@@ -536,10 +536,6 @@ export const simulateMarketOrderFill = (
   const quoteTokenMintDecimals =
     cache.get(decodedMarket.quoteTokenMint)?.info.decimals || 0;
 
-  const lendingMarket = cache.get(
-    reserve.lendingMarket,
-  ) as ParsedAccount<LendingMarket>;
-
   const market = new Market(
     decodedMarket,
     baseMintDecimals,
@@ -557,11 +553,8 @@ export const simulateMarketOrderFill = (
   const bids = new Orderbook(market, bidInfo.accountFlags, bidInfo.slab);
   const asks = new Orderbook(market, askInfo.accountFlags, askInfo.slab);
 
-  const book = lendingMarket.info.quoteTokenMint.equals(
-    reserve.liquidity.mintPubkey,
-  )
-    ? bids
-    : asks;
+  // @FIXME: removed quote token mint
+  const book = asks;
 
   let cost = 0;
   let remaining = fromLamports(amount, liquidityMint.info);

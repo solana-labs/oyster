@@ -7,9 +7,8 @@ import {
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
-import BN from 'bn.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { simulateMarketOrderFill, useMarkets } from '../contexts/market';
+import { useMarkets } from '../contexts/market';
 import { collateralToLiquidity, Obligation, Reserve } from '../models';
 import { useLendingObligations } from './useLendingObligations';
 import { useLendingReserves } from './useLendingReserves';
@@ -17,13 +16,12 @@ import { useLendingReserves } from './useLendingReserves';
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
-// @FIXME: BigNumber
 interface EnrichedLendingObligationInfo extends Obligation {
   ltv: number;
   health: number;
   borrowedInQuote: number;
   collateralInQuote: number;
-  liquidationThreshold: BN;
+  liquidationThreshold: number;
   repayName: string;
   collateralName: string;
 }

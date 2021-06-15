@@ -3,12 +3,11 @@ import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { PoolInfo } from '../models';
+import * as BufferLayout from 'buffer-layout';
 
-const {
-  TokenSwapLayout,
-  TokenSwapLayoutLegacyV0: TokenSwapLayoutV0,
-  TokenSwapLayoutV1,
-} = models;
+const TokenSwapLayout = models.TokenSwapLayout as any as BufferLayout.Structure;
+const TokenSwapLayoutV0 = models.TokenSwapLayoutLegacyV0 as any as BufferLayout.Structure;
+const TokenSwapLayoutV1 = models.TokenSwapLayoutV1 as any as BufferLayout.Structure;
 const { useConnection } = contexts.Connection;
 const { cache, getMultipleAccounts, TokenAccountParser } = contexts.Accounts;
 

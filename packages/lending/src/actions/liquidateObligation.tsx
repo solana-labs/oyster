@@ -16,7 +16,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
-  LendingMarket,
   liquidateObligationInstruction,
   Obligation,
   refreshObligationInstruction,

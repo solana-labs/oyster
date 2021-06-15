@@ -1,8 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
 import { useMidPriceInUSD } from '../contexts/market';
-import { useLendingMarket } from './useLendingMarket';
-import { getLendingReserves, useLendingReserve } from './useLendingReserves';
+import { useLendingReserve } from './useLendingReserves';
 import { useUserDeposits } from './useUserDeposits';
 import { useUserObligations } from './useUserObligations';
 
