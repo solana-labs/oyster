@@ -26,6 +26,7 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
+import { getGovernances, getRealms } from '../utils/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
@@ -75,6 +76,7 @@ export default function GovernanceProvider({ children = null as any }) {
 
   useSetupGovernanceContext({
     connection,
+    endpoint,
     setRealms,
     setGovernances,
     setTokenOwnerRecords,
@@ -105,6 +107,7 @@ export default function GovernanceProvider({ children = null as any }) {
 
 function useSetupGovernanceContext({
   connection,
+  endpoint,
   setRealms,
   setGovernances,
   setTokenOwnerRecords,
@@ -114,6 +117,7 @@ function useSetupGovernanceContext({
   setInstructions,
 }: {
   connection: Connection;
+  endpoint: string;
 
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
   setGovernances: React.Dispatch<
@@ -145,8 +149,6 @@ function useSetupGovernanceContext({
       return programAccounts;
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      const realms: Record<string, ParsedAccount<Realm>> = {};
-      const governances: Record<string, ParsedAccount<Governance>> = {};
       const tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>> =
         {};
       const proposals: Record<string, ParsedAccount<Proposal>> = {};
@@ -163,18 +165,6 @@ function useSetupGovernanceContext({
         // All accounts should not be cached in the context and there is no need to update the global cache either
 
         switch (a.account.data[0]) {
-          case GovernanceAccountType.Realm:
-            cache.add(a.pubkey, a.account, BorshAccountParser(Realm));
-            cached = cache.get(a.pubkey) as ParsedAccount<Realm>;
-            realms[a.pubkey.toBase58()] = cached;
-            break;
-          case GovernanceAccountType.AccountGovernance:
-          case GovernanceAccountType.ProgramGovernance: {
-            cache.add(a.pubkey, a.account, BorshAccountParser(Governance));
-            cached = cache.get(a.pubkey) as ParsedAccount<Governance>;
-            governances[a.pubkey.toBase58()] = cached;
-            break;
-          }
           case GovernanceAccountType.TokenOwnerRecord: {
             cache.add(
               a.pubkey,
@@ -220,8 +210,9 @@ function useSetupGovernanceContext({
         }
       });
 
-      setRealms(realms);
-      setGovernances(governances);
+      getRealms(endpoint).then(realms => setRealms(realms));
+      getGovernances(endpoint).then(governances => setGovernances(governances));
+
       setTokenOwnerRecords(tokenOwnerRecords);
       setProposals(proposals);
       setSignatoryRecords(signatoryRecords);

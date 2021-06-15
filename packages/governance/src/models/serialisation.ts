@@ -39,7 +39,7 @@ import {
   VoteRecord,
   VoteWeight,
 } from './accounts';
-import { serialize } from 'borsh';
+import { serialize, Schema } from 'borsh';
 
 // TODO: Review the limits. Most likely they are leftovers from the legacy version
 export const MAX_PROPOSAL_DESCRIPTION_LENGTH = 200;
@@ -382,6 +382,14 @@ export function BorshAccountParser(
       info: data,
     } as ParsedAccountBase;
   };
+}
+
+export function deserializeBorshAs<T>(
+  schema: Schema,
+  classType: any,
+  buffer: Buffer,
+) {
+  return deserializeBorsh(schema, classType, buffer) as T;
 }
 
 // ----------------- Old structures

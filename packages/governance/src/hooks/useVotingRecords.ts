@@ -12,7 +12,7 @@ import {
   GovernanceVotingRecordLayout,
   GovernanceVotingRecordParser,
 } from '../models/serialisation';
-import { getGovernanceVotingRecords } from '../utils/lookups';
+import { getGovernanceVotingRecords } from '../utils/api';
 
 export function useVotingRecords(proposal?: PublicKey) {
   const [voteRecords, setVotingRecords] = useState<
