@@ -49,7 +49,7 @@ export const ENDPOINTS = [
   },
   {
     name: 'devnet' as ENV,
-    endpoint: clusterApiUrl('devnet'),
+    endpoint: 'https://api.devnet.solana.com',
     ChainId: ChainId.Devnet,
   },
   {
@@ -107,12 +107,14 @@ export function ConnectionProvider({ children = undefined as any }) {
     DEFAULT_SLIPPAGE.toString(),
   );
 
-  const connection = useMemo(() => new Connection(endpoint, 'recent'), [
-    endpoint,
-  ]);
-  const sendConnection = useMemo(() => new Connection(endpoint, 'recent'), [
-    endpoint,
-  ]);
+  const connection = useMemo(
+    () => new Connection(endpoint, 'recent'),
+    [endpoint],
+  );
+  const sendConnection = useMemo(
+    () => new Connection(endpoint, 'recent'),
+    [endpoint],
+  );
 
   const env =
     ENDPOINTS.find(end => end.endpoint === endpoint)?.name || ENDPOINTS[0].name;
@@ -224,6 +226,7 @@ export const getErrorForTransaction = async (
   txid: string,
 ) => {
   // wait for all confirmation before geting transaction
+
   await connection.confirmTransaction(txid, 'max');
 
   const tx = await connection.getParsedConfirmedTransaction(txid);
@@ -388,7 +391,15 @@ export const sendTransaction = async (
     slot = confirmation?.slot || 0;
 
     if (confirmation?.err) {
-      const errors = await getErrorForTransaction(connection, txid);
+      let errors: string[] = [];
+      try {
+        // TODO: This call always throws errors and delays error feedback
+        //       It needs to be investigated but for now I'm commenting it out
+        // errors = await getErrorForTransaction(connection, txid);
+      } catch (ex) {
+        console.error('getErrorForTransaction() error', ex);
+      }
+
       notify({
         message: 'Transaction failed...',
         description: (
@@ -396,7 +407,7 @@ export const sendTransaction = async (
             {errors.map(err => (
               <div>{err}</div>
             ))}
-            <ExplorerLink address={txid} type="transaction" />
+            <ExplorerLink address={txid} type="transaction" short />
           </>
         ),
         type: 'error',

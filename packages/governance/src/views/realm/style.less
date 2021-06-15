@@ -1,12 +1,12 @@
 @import '~antd/dist/antd.dark.less';
 
-.governance-container {
+.realm-container {
   margin-left: auto;
   margin-right: auto;
   position: relative;
 }
 
-.governance-title {
+.realm-title {
   font-family: 'FF Oxide Solid';
   font-style: normal;
   font-weight: 300;
@@ -25,7 +25,13 @@
   }
 }
 
-.governance-item {
+.governances-list-title {
+  padding: 10px 0px;
+  margin-left: 10px;
+  text-align: left;
+}
+
+.realm-item {
   margin: 10px;
   background-color: #202020;
   padding: 0px !important;
@@ -73,8 +79,23 @@
   }
 }
 
-.governance-item:hover {
+.realm-item:hover {
   cursor: pointer;
   background-color: #252425;
   border-radius: 15px;
+}
+
+.realm-actions {
+  text-align: right;
+
+  .ant-btn {
+    margin: 0px 5px;
+  }
+}
+
+.governance-action {
+  font-family: 'FF Oxide Solid';
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
 }

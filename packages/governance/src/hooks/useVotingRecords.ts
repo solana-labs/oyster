@@ -11,11 +11,11 @@ import {
   GovernanceVotingRecord,
   GovernanceVotingRecordLayout,
   GovernanceVotingRecordParser,
-} from '../models/governance';
+} from '../models/serialisation';
 import { getGovernanceVotingRecords } from '../utils/lookups';
 
-export function useVotingRecords(proposal: PublicKey) {
-  const [votingRecords, setVotingRecords] = useState<
+export function useVotingRecords(proposal?: PublicKey) {
+  const [voteRecords, setVotingRecords] = useState<
     Record<string, ParsedAccount<GovernanceVotingRecord>>
   >({});
 
@@ -59,5 +59,5 @@ export function useVotingRecords(proposal: PublicKey) {
     };
   }, [proposal, connection, endpoint]);
 
-  return votingRecords;
+  return voteRecords;
 }
