@@ -32,7 +32,21 @@ export interface ObligationLiquidity {
   marketValue: BN; // decimals
 }
 
-export const ObligationLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export interface ProtoObligation {
+  version: number;
+  lastUpdate: LastUpdate;
+  lendingMarket: PublicKey;
+  owner: PublicKey;
+  depositedValue: BN; // decimals
+  borrowedValue: BN; // decimals
+  allowedBorrowValue: BN; // decimals
+  unhealthyBorrowValue: BN; // decimals
+  depositsLen: number;
+  borrowsLen: number;
+  dataFlat: Buffer;
+}
+
+export const ObligationLayout = BufferLayout.struct<ProtoObligation>(
   [
     BufferLayout.u8('version'),
 
@@ -51,7 +65,7 @@ export const ObligationLayout: typeof BufferLayout.Structure = BufferLayout.stru
   ],
 );
 
-export const ObligationCollateralLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const ObligationCollateralLayout = BufferLayout.struct<ObligationCollateral>(
   [
     Layout.publicKey('depositReserve'),
     Layout.uint64('depositedAmount'),
@@ -59,7 +73,7 @@ export const ObligationCollateralLayout: typeof BufferLayout.Structure = BufferL
   ],
 );
 
-export const ObligationLiquidityLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const ObligationLiquidityLayout = BufferLayout.struct<ObligationLiquidity>(
   [
     Layout.publicKey('borrowReserve'),
     Layout.uint128('cumulativeBorrowRateWads'),
@@ -71,20 +85,6 @@ export const ObligationLiquidityLayout: typeof BufferLayout.Structure = BufferLa
 export const isObligation = (info: AccountInfo<Buffer>) => {
   return info.data.length === ObligationLayout.span;
 };
-
-export interface ProtoObligation {
-  version: number;
-  lastUpdate: LastUpdate;
-  lendingMarket: PublicKey;
-  owner: PublicKey;
-  depositedValue: BN; // decimals
-  borrowedValue: BN; // decimals
-  allowedBorrowValue: BN; // decimals
-  unhealthyBorrowValue: BN; // decimals
-  depositsLen: number;
-  borrowsLen: number;
-  dataFlat: Buffer;
-}
 
 export const ObligationParser = (
   pubkey: PublicKey,
@@ -103,7 +103,7 @@ export const ObligationParser = (
     depositsLen,
     borrowsLen,
     dataFlat,
-  } = ObligationLayout.decode(buffer) as ProtoObligation;
+  } = ObligationLayout.decode(buffer);
 
   if (lastUpdate.slot.isZero()) {
     return;
@@ -116,13 +116,13 @@ export const ObligationParser = (
   const deposits = BufferLayout.seq(
     ObligationCollateralLayout,
     depositsLen,
-  ).decode(depositsBuffer) as ObligationCollateral[];
+  ).decode(depositsBuffer);
 
   const borrowsBuffer = dataFlat.slice(depositsSpan, depositsSpan + borrowsSpan);
   const borrows = BufferLayout.seq(
     ObligationLiquidityLayout,
     borrowsLen,
-  ).decode(borrowsBuffer) as ObligationLiquidity[];
+  ).decode(borrowsBuffer);
 
   const obligation = {
     version,

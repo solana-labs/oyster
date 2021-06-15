@@ -46,7 +46,7 @@ export interface ReserveConfig {
   };
 }
 
-export const ReserveLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const ReserveLayout = BufferLayout.struct<Reserve>(
   [
     BufferLayout.u8('version'),
 
@@ -109,7 +109,7 @@ export const isReserve = (info: AccountInfo<Buffer>) => {
 
 export const ReserveParser = (pubkey: PublicKey, info: AccountInfo<Buffer>) => {
   const buffer = Buffer.from(info.data);
-  const reserve = ReserveLayout.decode(buffer) as Reserve;
+  const reserve = ReserveLayout.decode(buffer);
 
   if (reserve.lastUpdate.slot.isZero()) {
     return;

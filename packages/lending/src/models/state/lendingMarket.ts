@@ -4,12 +4,14 @@ import * as Layout from '../../utils/layout';
 
 export interface LendingMarket {
   version: number;
-  isInitialized: boolean;
+  bumpSeed: number;
+  owner: PublicKey;
   quoteCurrency: Buffer;
   tokenProgramId: PublicKey;
+  oracleProgramId: PublicKey;
 }
 
-export const LendingMarketLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+export const LendingMarketLayout = BufferLayout.struct<LendingMarket>(
   [
     BufferLayout.u8('version'),
     BufferLayout.u8('bumpSeed'),
@@ -30,7 +32,7 @@ export const LendingMarketParser = (
   info: AccountInfo<Buffer>,
 ) => {
   const buffer = Buffer.from(info.data);
-  const lendingMarket = LendingMarketLayout.decode(buffer) as LendingMarket;
+  const lendingMarket = LendingMarketLayout.decode(buffer);
 
   const details = {
     pubkey,
