@@ -10,8 +10,7 @@ import { LendingInstruction } from './instruction';
 
 // @TODO: move to @oyster/common
 export const ORACLE_PROGRAM_ID = new PublicKey(
-// @FIXME: replace with Pyth
-  'XXX',
+  '5mkqGkkWSaSk2NL9p4XptwEQu4d5jFTJiurbbzdqYexF',
 );
 
 /// 0
