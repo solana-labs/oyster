@@ -19,8 +19,6 @@ export interface ReserveLiquidity {
   mintDecimals: number;
   supplyPubkey: PublicKey;
   feeReceiver: PublicKey;
-  // @FIXME: oracle option
-  oracleOption: number;
   oraclePubkey: PublicKey;
   availableAmount: BN;
   borrowedAmountWads: BN; // decimals

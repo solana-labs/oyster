@@ -480,6 +480,7 @@ function calculateAirdropYield(
   return airdropYield;
 }
 
+// @FIXME: replace with market price
 export const useMidPriceInUSD = (mint: string) => {
   const { midPriceInUSD, subscribeToMarket, marketEmitter } = useContext(
     MarketsContext,

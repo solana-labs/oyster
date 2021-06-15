@@ -106,10 +106,9 @@ export const useLending = () => {
               MintParser,
             ),
             // ignore dex if its not set
+            // @FIXME: not a dex market
             cache.registerParser(
-              acc?.info.liquidity.oracleOption
-                ? acc?.info.liquidity.oraclePubkey.toBase58()
-                : '',
+              acc?.info.liquidity.oraclePubkey.toBase58(),
               DexMarketParser,
             ),
           ].filter(_ => _);

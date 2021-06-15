@@ -101,15 +101,8 @@ export function useEnrichedLendingObligations() {
               obligation.info.borrows[0].borrowedAmountWads,
             ).toNumber();
 
-            const borrowedAmount = simulateMarketOrderFill(
-              borrowed,
-              item.reserve.info,
-              // @FIXME: oracle
-              item.reserve.info.liquidity.oracleOption
-                ? item.reserve.info.liquidity.oraclePubkey
-                : item.depositReserve.info.liquidity.oraclePubkey,
-              true,
-            );
+            // @FIXME: remove dex market
+            const borrowedAmount = borrowed;
 
             const liquidityMintAddress = item.reserve.info.liquidity.mintPubkey.toBase58();
             const liquidityMint = cache.get(
