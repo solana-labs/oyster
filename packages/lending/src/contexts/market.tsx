@@ -242,6 +242,7 @@ export function MarketProvider({ children = null as any }) {
   );
 }
 
+// @TODO: find all uses, use market price from reserve
 export const useMarkets = () => {
   const context = useContext(MarketsContext);
   return context as MarketsContextState;

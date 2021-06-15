@@ -17,6 +17,7 @@ export function useUserObligationByReserve(
       typeof depositReserve === 'string'
         ? depositReserve
         : depositReserve?.toBase58();
+    // @FIXME: support multiple deposits/borrows
     return userObligations.filter(item => {
       // @FIXME: borrows and deposits may be empty
       if (borrowReservePubkey && depositReservePubkey) {
