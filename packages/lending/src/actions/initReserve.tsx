@@ -1,6 +1,7 @@
 import {
-  actions,
-  contexts,
+  createUninitializedAccount,
+  ensureSplAccount,
+  sendTransaction,
   LENDING_PROGRAM_ID,
   models,
   notify,
@@ -15,21 +16,16 @@ import {
 } from '@solana/web3.js';
 import { initReserveInstruction, Reserve } from '../models';
 
-const { sendTransaction } = contexts.Connection;
-const {
-  createUninitializedAccount,
-  ensureSplAccount,
-} = actions;
 const { approve } = models;
 
 export const initReserve = async (
   connection: Connection,
-  // @FIXME: wallet must be lending market owner
   wallet: any,
   liquidityAmount: number,
   source: TokenAccount,
   reserve: Reserve,
   reserveAddress: PublicKey,
+  pythProduct: PublicKey,
 ) => {
   notify({
     message: 'Initializing reserve...',
@@ -88,16 +84,15 @@ export const initReserve = async (
       reserve.liquidity.mintPubkey,
       reserve.liquidity.supplyPubkey,
       reserve.liquidity.feeReceiver,
+      pythProduct,
+      reserve.liquidity.oraclePubkey,
       reserve.collateral.mintPubkey,
       reserve.collateral.supplyPubkey,
       reserve.lendingMarket,
       lendingMarketAuthority,
-      // @FIXME: need to sign with wallet as lending market owner
+      // @TODO: must provide owner as arg if wallet isn't lending market owner
       wallet.publicKey,
       transferAuthority.publicKey,
-      reserve.liquidity.oracleOption
-        ? reserve.liquidity.oraclePubkey
-        : undefined,
     ),
   );
 

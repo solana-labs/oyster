@@ -1,12 +1,11 @@
 import {
-  contexts,
-  createTempMemoryAccount,
   ensureSplAccount,
   findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
   models,
   notify,
   ParsedAccount,
+  sendTransaction,
   TokenAccount,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
@@ -20,15 +19,13 @@ import {
   LendingMarket,
   liquidateObligationInstruction,
   Obligation,
+  refreshObligationInstruction,
   refreshReserveInstruction,
-  Reserve,
+  Reserve
 } from '../models';
 
-const { cache } = contexts.Accounts;
 const { approve } = models;
-const { sendTransaction } = contexts.Connection;
 
-// @FIXME
 export const liquidateObligation = async (
   connection: Connection,
   wallet: any,
@@ -88,27 +85,21 @@ export const liquidateObligation = async (
     signers,
   );
 
-  // @FIXME: oracle
-  const oracleAddress = repayReserve.info.liquidity.oracleOption
-    ? repayReserve.info.liquidity.oraclePubkey
-    : withdrawReserve.info.liquidity.oraclePubkey;
-  const oracle = cache.get(oracleAddress);
-
-  if (!oracle) {
-    throw new Error(`Dex market doesn't exist.`);
-  }
-
-  const market = cache.get(
-    withdrawReserve.info.lendingMarket,
-  ) as ParsedAccount<LendingMarket>;
-
   instructions.push(
-    // @FIXME: oracle needed
-    refreshReserveInstruction(repayReserve.pubkey),
-    refreshReserveInstruction(withdrawReserve.pubkey),
-  );
-
-  instructions.push(
+    // @TODO: refresh all obligation reserves
+    refreshReserveInstruction(
+      repayReserve.pubkey,
+      repayReserve.info.liquidity.oraclePubkey,
+    ),
+    refreshReserveInstruction(
+      withdrawReserve.pubkey,
+      withdrawReserve.info.liquidity.oraclePubkey,
+    ),
+    refreshObligationInstruction(
+      obligation.pubkey,
+      obligation.info.deposits.map(collateral => collateral.depositReserve),
+      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
+    ),
     liquidateObligationInstruction(
       liquidityAmount,
       sourceAccount,

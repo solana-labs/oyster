@@ -1,10 +1,9 @@
 import {
-  contexts,
   findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
-  models,
-  notify,
-  TokenAccount,
+  notify, ParsedAccount,
+  sendTransaction,
+  TokenAccount
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import {
@@ -16,13 +15,9 @@ import {
 import {
   withdrawObligationCollateralInstruction,
   refreshReserveInstruction,
-  Reserve,
+  Reserve, refreshObligationInstruction, Obligation
 } from '../models';
 
-const { approve } = models;
-const { sendTransaction } = contexts.Connection;
-
-// @FIXME
 export const withdrawObligationCollateral = async (
   connection: Connection,
   wallet: any,
@@ -30,7 +25,7 @@ export const withdrawObligationCollateral = async (
   source: TokenAccount,
   reserve: Reserve,
   reserveAddress: PublicKey,
-  obligationAddress: PublicKey,
+  obligation: ParsedAccount<Obligation>,
 ) => {
   notify({
     message: 'Withdrawing collateral...',
@@ -52,7 +47,6 @@ export const withdrawObligationCollateral = async (
     LENDING_PROGRAM_ID,
   );
 
-  // @FIXME: wallet must sign as obligation owner
   signers.push(wallet.info.account);
 
   // get destination account
@@ -67,21 +61,24 @@ export const withdrawObligationCollateral = async (
   );
 
   instructions.push(
+    // @TODO: refresh all obligation reserves
     refreshReserveInstruction(
       reserveAddress,
-      reserve.liquidity.oracleOption
-        ? reserve.liquidity.oraclePubkey
-        : undefined,
+      reserve.liquidity.oraclePubkey,
+    ),
+    refreshObligationInstruction(
+      obligation.pubkey,
+      obligation.info.deposits.map(collateral => collateral.depositReserve),
+      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
     ),
     withdrawObligationCollateralInstruction(
       collateralAmount,
       reserve.collateral.supplyPubkey,
       destinationCollateral,
       reserveAddress,
-      obligationAddress,
+      obligation.pubkey,
       reserve.lendingMarket,
       lendingMarketAuthority,
-      // @FIXME: wallet must sign
       wallet.publicKey
     ),
   );

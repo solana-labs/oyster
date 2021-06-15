@@ -25,7 +25,6 @@ import {
 const { cache, MintParser } = contexts.Accounts;
 const { sendTransaction } = contexts.Connection;
 
-// @FIXME
 export const borrowObligationLiquidity = async (
   connection: Connection,
   wallet: any,
@@ -105,17 +104,15 @@ export const borrowObligationLiquidity = async (
     type: 'warn',
   });
 
-  // @FIXME: signers
   signers = [];
   instructions = [];
   cleanupInstructions = [...finalCleanupInstructions];
 
   instructions.push(
+    // @TODO: refresh all obligation reserves
     refreshReserveInstruction(
       borrowReserve.pubkey,
-      borrowReserve.info.liquidity.oracleOption
-        ? borrowReserve.info.liquidity.oraclePubkey
-        : undefined,
+      borrowReserve.info.liquidity.oraclePubkey,
     ),
     refreshObligationInstruction(
       obligation.pubkey,

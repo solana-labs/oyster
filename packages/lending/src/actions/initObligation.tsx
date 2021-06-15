@@ -1,4 +1,4 @@
-import { contexts, notify } from '@oyster/common';
+import { sendTransaction, notify } from '@oyster/common';
 import {
   Account,
   Connection,
@@ -6,8 +6,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import { initObligationInstruction, Obligation } from '../models';
-
-const { sendTransaction } = contexts.Connection;
 
 export const initObligation = async (
   connection: Connection,
@@ -26,14 +24,12 @@ export const initObligation = async (
   const instructions: TransactionInstruction[] = [];
   const cleanupInstructions: TransactionInstruction[] = [];
 
-  // @FIXME: obligation owner must sign
   signers.push(wallet.info.account);
 
   instructions.push(
     initObligationInstruction(
       obligationAddress,
       obligation.lendingMarket,
-      // @FIXME: need to sign with wallet
       wallet.publicKey
     ),
   );

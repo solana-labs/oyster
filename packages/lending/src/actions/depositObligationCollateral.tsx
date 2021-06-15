@@ -1,5 +1,5 @@
 import {
-  contexts,
+  sendTransaction,
   LENDING_PROGRAM_ID,
   models,
   notify,
@@ -13,14 +13,11 @@ import {
 } from '@solana/web3.js';
 import {
   depositObligationCollateralInstruction,
-  refreshReserveInstruction,
   Reserve,
 } from '../models';
 
 const { approve } = models;
-const { sendTransaction } = contexts.Connection;
 
-// @FIXME
 export const depositObligationCollateral = async (
   connection: Connection,
   wallet: any,
@@ -60,12 +57,6 @@ export const depositObligationCollateral = async (
   signers.push(transferAuthority);
 
   instructions.push(
-    refreshReserveInstruction(
-      reserveAddress,
-      reserve.liquidity.oracleOption
-        ? reserve.liquidity.oraclePubkey
-        : undefined,
-    ),
     depositObligationCollateralInstruction(
       collateralAmount,
       sourceCollateral,
@@ -74,7 +65,6 @@ export const depositObligationCollateral = async (
       obligationAddress,
       reserve.lendingMarket,
       lendingMarketAuthority,
-      // @FIXME: wallet must sign
       wallet.publicKey,
       transferAuthority.publicKey,
     ),

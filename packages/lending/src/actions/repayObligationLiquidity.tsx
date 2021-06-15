@@ -1,10 +1,9 @@
 import {
-  contexts,
   createTokenAccount,
-  LENDING_PROGRAM_ID,
   models,
   notify,
   ParsedAccount,
+  sendTransaction,
   TOKEN_PROGRAM_ID,
   TokenAccount,
 } from '@oyster/common';
@@ -12,20 +11,17 @@ import { AccountLayout, NATIVE_MINT, Token } from '@solana/spl-token';
 import {
   Account,
   Connection,
-  PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
-  Obligation,
+  Obligation, refreshObligationInstruction,
   refreshReserveInstruction,
   repayObligationLiquidityInstruction,
-  Reserve,
+  Reserve
 } from '../models';
 
 const { approve } = models;
-const { sendTransaction } = contexts.Connection;
 
-// @FIXME
 export const repayObligationLiquidity = async (
   connection: Connection,
   wallet: any,
@@ -47,11 +43,6 @@ export const repayObligationLiquidity = async (
 
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
     AccountLayout.span,
-  );
-
-  const [lendingMarketAuthority] = await PublicKey.findProgramAddress(
-    [repayReserve.info.lendingMarket.toBuffer()],
-    LENDING_PROGRAM_ID,
   );
 
   let sourceLiquidity = source.pubkey;
@@ -90,11 +81,15 @@ export const repayObligationLiquidity = async (
   signers.push(transferAuthority);
 
   instructions.push(
+    // @TODO: remove after refresh of obligation + reserves on repay is no longer required
     refreshReserveInstruction(
       repayReserve.pubkey,
-      repayReserve.info.liquidity.oracleOption
-        ? repayReserve.info.liquidity.oraclePubkey
-        : undefined,
+      repayReserve.info.liquidity.oraclePubkey,
+    ),
+    refreshObligationInstruction(
+      obligation.pubkey,
+      obligation.info.deposits.map(collateral => collateral.depositReserve),
+      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
     ),
     repayObligationLiquidityInstruction(
       liquidityAmount,
@@ -103,7 +98,6 @@ export const repayObligationLiquidity = async (
       repayReserve.pubkey,
       obligation.pubkey,
       repayReserve.info.lendingMarket,
-      lendingMarketAuthority,
       transferAuthority.publicKey,
     ),
   );

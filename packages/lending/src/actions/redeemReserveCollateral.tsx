@@ -1,9 +1,9 @@
 import {
-  contexts,
   findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
   models,
   notify,
+  sendTransaction,
   TokenAccount,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
@@ -20,9 +20,7 @@ import {
 } from '../models';
 
 const { approve } = models;
-const { sendTransaction } = contexts.Connection;
 
-// @FIXME
 export const redeemReserveCollateral = async (
   connection: Connection,
   wallet: any,
@@ -78,9 +76,7 @@ export const redeemReserveCollateral = async (
   instructions.push(
     refreshReserveInstruction(
       reserveAddress,
-      reserve.liquidity.oracleOption
-        ? reserve.liquidity.oraclePubkey
-        : undefined,
+      reserve.liquidity.oraclePubkey,
     ),
     redeemReserveCollateralInstruction(
       collateralAmount,

@@ -1,9 +1,10 @@
 import {
-  actions,
-  contexts,
+  ensureSplAccount,
+  findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
   models,
   notify,
+  sendTransaction,
   TokenAccount,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
@@ -19,8 +20,6 @@ import {
   Reserve,
 } from '../models';
 
-const { sendTransaction } = contexts.Connection;
-const { ensureSplAccount, findOrCreateAccountByMint } = actions;
 const { approve } = models;
 
 export const depositReserveLiquidity = async (
@@ -84,9 +83,7 @@ export const depositReserveLiquidity = async (
   instructions.push(
     refreshReserveInstruction(
       reserveAddress,
-      reserve.liquidity.oracleOption
-        ? reserve.liquidity.oraclePubkey
-        : undefined,
+      reserve.liquidity.oraclePubkey,
     ),
     depositReserveLiquidityInstruction(
       liquidityAmount,
