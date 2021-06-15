@@ -315,3 +315,15 @@ export class ProposalInstruction {
     this.executedAt = args.executedAt;
   }
 }
+
+// export function getAccountTypes(accountClass: any) {
+//   switch (accountClass) {
+//     case Governance:
+//       return [
+//         GovernanceAccountType.AccountGovernance,
+//         GovernanceAccountType.ProgramGovernance,
+//       ];
+//     default:
+//       return [GovernanceAccountType[accountClass.toString()]];
+//   }
+// }

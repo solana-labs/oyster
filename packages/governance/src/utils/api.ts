@@ -61,6 +61,21 @@ export async function getGovernanceVotingRecords(
   return accounts;
 }
 
+export interface MemcmpFilter {
+  memcmp: { offset: number; bytes: string };
+}
+
+export type AccountQueryFilter = MemcmpFilter;
+
+export const pubkeyFilter = (offset: number, pubkey: PublicKey | string) => {
+  return {
+    memcmp: {
+      offset,
+      bytes: pubkey instanceof PublicKey ? pubkey.toBase58() : pubkey,
+    },
+  };
+};
+
 export async function getRealms(endpoint: string) {
   return getGovernanceAccounts<Realm>(
     endpoint,
@@ -69,16 +84,26 @@ export async function getRealms(endpoint: string) {
   );
 }
 
-export async function getGovernances(endpoint: string) {
+export const getGovernancesByRealm = (
+  endpoint: string,
+  realmKey: PublicKey | string,
+) => getGovernances(endpoint, [pubkeyFilter(1, realmKey)]);
+
+export async function getGovernances(
+  endpoint: string,
+  filters: AccountQueryFilter[] = [],
+) {
   const accountGovernances = getGovernanceAccounts<Governance>(
     endpoint,
     Governance,
     GovernanceAccountType.AccountGovernance,
+    filters,
   );
   const programGovernances = getGovernanceAccounts<Governance>(
     endpoint,
     Governance,
     GovernanceAccountType.ProgramGovernance,
+    filters,
   );
 
   const all = await Promise.all([accountGovernances, programGovernances]);
@@ -90,6 +115,7 @@ export async function getGovernanceAccounts<TAccount>(
   endpoint: string,
   classType: any,
   accountType: GovernanceAccountType,
+  filters: AccountQueryFilter[] = [],
 ) {
   const PROGRAM_IDS = utils.programIds();
   PROGRAM_IDS.governance.programId.toBase58();
@@ -115,23 +141,8 @@ export async function getGovernanceAccounts<TAccount>(
                 bytes: bs58.encode([accountType]),
               },
             },
+            ...filters,
           ],
-
-          // {
-          //   memcmp: {
-          //     offset: 0,
-          //     bytes: bs58.encode([accountType]),
-          //   },
-          // },
-          // {
-          //   memcmp: {
-          //     offset: 1,
-          //     bytes: new PublicKey(
-          //       'FamZrk6843udYEUMWbkrhttBEDUDyu63sSBUKJbZmHL9',
-          //     ).toBase58(),
-          //   },
-          // },
-          //],
         },
       ],
     }),

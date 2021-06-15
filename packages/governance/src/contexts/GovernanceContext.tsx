@@ -14,6 +14,7 @@ import {
   useConnectionConfig,
   cache,
   useWallet,
+  useConnection,
 } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import {
@@ -26,7 +27,7 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
-import { getGovernances, getRealms } from '../utils/api';
+import { getGovernances, getGovernancesByRealm, getRealms } from '../utils/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
@@ -359,18 +360,65 @@ export const useRealms = () => {
   return Object.values(ctx.realms);
 };
 
-export const useRealmGovernances = (realm: PublicKey) => {
-  const ctx = useGovernanceContext();
-  const governances: ParsedAccount<Governance>[] = [];
+export function useRealmGovernances(realm: PublicKey | undefined) {
+  return useAccountsBy(realm, getGovernancesByRealm, Governance, [
+    GovernanceAccountType.AccountGovernance,
+    GovernanceAccountType.ProgramGovernance,
+  ]);
+}
 
-  Object.values(ctx.governances).forEach(g => {
-    if (g.info.config.realm.toBase58() === realm.toBase58()) {
-      governances.push(g);
+export function useAccountsBy<TAccount, TGetBy>(
+  getBy: TGetBy | undefined,
+  getAccountsBy: (
+    endpoint: string,
+    getBy: TGetBy,
+  ) => Promise<Record<string, ParsedAccount<TAccount>>>,
+  accountClass: any,
+  accountTypes: GovernanceAccountType[],
+) {
+  const [accounts, setAccounts] = useState<
+    Record<string, ParsedAccount<TAccount>>
+  >({});
+
+  const { endpoint } = useConnectionConfig();
+  const connection = useConnection();
+
+  const getByKey = getBy instanceof PublicKey ? getBy.toBase58() : getBy;
+
+  useEffect(() => {
+    if (!getBy) {
+      return;
     }
-  });
 
-  return governances;
-};
+    const sub = (async () => {
+      const loadedAccounts = await getAccountsBy(endpoint, getBy);
+      setAccounts(loadedAccounts);
+
+      const { governance } = utils.programIds();
+
+      return connection.onProgramAccountChange(governance.programId, info => {
+        if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
+          const account = BorshAccountParser(accountClass)(
+            info.accountId,
+            info.accountInfo,
+          ) as ParsedAccount<TAccount>;
+
+          setAccounts((acts: any) => ({
+            ...acts,
+            [info.accountId.toBase58()]: account,
+          }));
+        }
+      });
+    })();
+
+    return () => {
+      sub.then(id => connection.removeProgramAccountChangeListener(id));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getByKey, connection, endpoint]);
+
+  return Object.values(accounts);
+}
 
 export const useRealm = (realm?: PublicKey) => {
   const ctx = useGovernanceContext();
