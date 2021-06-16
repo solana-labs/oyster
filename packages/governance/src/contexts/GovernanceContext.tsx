@@ -339,35 +339,6 @@ export const useWalletTokenOwnerRecord = (
   return null;
 };
 
-export const useTokenOwnerRecords = (
-  realm: PublicKey | undefined,
-  governingTokenMint: PublicKey | undefined,
-) => {
-  const ctx = useGovernanceContext();
-  const tokeOwnerRecords: ParsedAccount<TokenOwnerRecord>[] = [];
-
-  Object.values(ctx.tokenOwnerRecords).forEach(tor => {
-    if (
-      tor.info.realm.toBase58() === realm?.toBase58() &&
-      tor.info.governingTokenMint.toBase58() === governingTokenMint?.toBase58()
-    ) {
-      tokeOwnerRecords.push(tor);
-    }
-  });
-
-  return tokeOwnerRecords;
-};
-
-export const useProposalOwnerRecord = (proposalOwner?: PublicKey) => {
-  const ctx = useGovernanceContext();
-
-  if (!proposalOwner) {
-    return null;
-  }
-
-  return ctx.tokenOwnerRecords[proposalOwner.toBase58()];
-};
-
 export const useProposalAuthority = (proposalOwner?: PublicKey) => {
   const ctx = useGovernanceContext();
   const { wallet, connected } = useWallet();

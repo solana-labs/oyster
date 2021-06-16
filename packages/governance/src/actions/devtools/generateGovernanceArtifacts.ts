@@ -213,12 +213,18 @@ const withMint = async (
 
   signers.push(otherOwner);
 
+  // TODO: Make the other owner an input in devtools
+  let otherOwnerPubKey = otherOwner.publicKey;
+  otherOwnerPubKey = new PublicKey(
+    'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
+  );
+
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
     wallet.publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    otherOwner.publicKey,
+    otherOwnerPubKey,
     signers,
   );
 

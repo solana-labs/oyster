@@ -9,7 +9,6 @@ import {
   useWalletTokenOwnerRecord,
   useInstructions,
   useVoteRecords,
-  useTokenOwnerRecords,
 } from '../../contexts/GovernanceContext';
 import { StateBadge } from './components/StateBadge';
 import { contexts } from '@oyster/common';
@@ -36,7 +35,11 @@ import { Vote } from '../../models/instructions';
 import CancelButton from './components/CancelButton';
 import { FinalizeVote } from './components/FinalizeVote';
 
-import { useGovernance, useProposal } from '../../hooks/apiHooks';
+import {
+  useGovernance,
+  useProposal,
+  useTokenOwnerRecords,
+} from '../../hooks/apiHooks';
 
 const { TabPane } = Tabs;
 
