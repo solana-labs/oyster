@@ -1,10 +1,8 @@
 import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
-import {
-  useGovernance,
-  useProposals,
-  useRealm,
-} from '../../contexts/GovernanceContext';
+import { useProposals, useRealm } from '../../contexts/GovernanceContext';
+
+import { useGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';

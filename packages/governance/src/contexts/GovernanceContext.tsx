@@ -17,7 +17,6 @@ import {
 } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import {
-  Governance,
   GovernanceAccountType,
   Proposal,
   ProposalInstruction,
@@ -26,12 +25,10 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
-import { getGovernances, getGovernancesByRealm, getRealms } from '../utils/api';
-import { useGovernanceAccountsBy } from '../hooks/useGovernanceAccountsBy';
+import { getRealms } from '../utils/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
-  governances: Record<string, ParsedAccount<Governance>>;
   tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>>;
   proposals: Record<string, ParsedAccount<Proposal>>;
   signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
@@ -68,7 +65,6 @@ export default function GovernanceProvider({ children = null as any }) {
   );
 
   const [realms, setRealms] = useState({});
-  const [governances, setGovernances] = useState({});
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState({});
   const [proposals, setProposals] = useState({});
   const [signatoryRecords, setSignatoryRecords] = useState({});
@@ -79,7 +75,6 @@ export default function GovernanceProvider({ children = null as any }) {
     connection,
     endpoint,
     setRealms,
-    setGovernances,
     setTokenOwnerRecords,
     setProposals,
     setSignatoryRecords,
@@ -91,7 +86,6 @@ export default function GovernanceProvider({ children = null as any }) {
     <GovernanceContext.Provider
       value={{
         realms,
-        governances,
         tokenOwnerRecords,
         proposals,
         signatoryRecords,
@@ -110,7 +104,6 @@ function useSetupGovernanceContext({
   connection,
   endpoint,
   setRealms,
-  setGovernances,
   setTokenOwnerRecords,
   setProposals,
   setSignatoryRecords,
@@ -121,9 +114,7 @@ function useSetupGovernanceContext({
   endpoint: string;
 
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
-  setGovernances: React.Dispatch<
-    React.SetStateAction<Record<string, ParsedAccount<Governance>>>
-  >;
+
   setTokenOwnerRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<TokenOwnerRecord>>>
   >;
@@ -212,7 +203,6 @@ function useSetupGovernanceContext({
       });
 
       getRealms(endpoint).then(realms => setRealms(realms));
-      getGovernances(endpoint).then(governances => setGovernances(governances));
 
       setTokenOwnerRecords(tokenOwnerRecords);
       setProposals(proposals);
@@ -243,22 +233,7 @@ function useSetupGovernanceContext({
               ) as ParsedAccount<Realm>,
             }));
             break;
-          case GovernanceAccountType.AccountGovernance:
-          case GovernanceAccountType.ProgramGovernance: {
-            cache.add(
-              info.accountId,
-              info.accountInfo,
-              BorshAccountParser(Governance),
-            );
 
-            setGovernances((objs: any) => ({
-              ...objs,
-              [pubkey.toBase58()]: cache.get(
-                info.accountId,
-              ) as ParsedAccount<Governance>,
-            }));
-            break;
-          }
           case GovernanceAccountType.TokenOwnerRecord: {
             cache.add(
               info.accountId,
@@ -360,23 +335,10 @@ export const useRealms = () => {
   return Object.values(ctx.realms);
 };
 
-export function useRealmGovernances(realm: PublicKey | undefined) {
-  return useGovernanceAccountsBy(realm, getGovernancesByRealm, Governance, [
-    GovernanceAccountType.AccountGovernance,
-    GovernanceAccountType.ProgramGovernance,
-  ]);
-}
-
 export const useRealm = (realm?: PublicKey) => {
   const ctx = useGovernanceContext();
 
   return realm && ctx.realms[realm.toBase58()];
-};
-
-export const useGovernance = (governance?: PublicKey) => {
-  const ctx = useGovernanceContext();
-
-  return governance && ctx.governances[governance.toBase58()];
 };
 
 export const useWalletTokenOwnerRecord = (

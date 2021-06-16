@@ -1,10 +1,8 @@
 import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
-import {
-  useRealmGovernances,
-  useRealm,
-  useProposals,
-} from '../../contexts/GovernanceContext';
+import { useRealm, useProposals } from '../../contexts/GovernanceContext';
+
+import { useRealmGovernances } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { ParsedAccount, TokenIcon, useWallet, useMint } from '@oyster/common';
 import { Background } from '../../components/Background';

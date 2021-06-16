@@ -6,21 +6,17 @@ import {
 } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
-import {
-  GovernanceAccountClass,
-  GovernanceAccountType,
-} from '../models/accounts';
+import { getAccountTypes, GovernanceAccountClass } from '../models/accounts';
 import { BorshAccountParser } from '../models/serialisation';
 
 // Fetches Governance program accounts of the given type and subscribes to updates
 export function useGovernanceAccountsBy<TAccount, TGetBy>(
-  getBy: TGetBy | undefined,
+  accountClass: GovernanceAccountClass,
   getAccountsBy: (
     endpoint: string,
     getBy: TGetBy,
   ) => Promise<Record<string, ParsedAccount<TAccount>>>,
-  accountClass: GovernanceAccountClass,
-  accountTypes: GovernanceAccountType[],
+  getBy: TGetBy | undefined,
 ) {
   const [accounts, setAccounts] = useState<
     Record<string, ParsedAccount<TAccount>>
@@ -37,10 +33,12 @@ export function useGovernanceAccountsBy<TAccount, TGetBy>(
     }
 
     const sub = (async () => {
+      // TODO: add retries
       const loadedAccounts = await getAccountsBy(endpoint, getBy);
       setAccounts(loadedAccounts);
 
       const { governance } = utils.programIds();
+      const accountTypes = getAccountTypes(accountClass);
 
       return connection.onProgramAccountChange(governance.programId, info => {
         if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
