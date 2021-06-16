@@ -1,8 +1,11 @@
 import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
-import { useRealm, useProposals } from '../../contexts/GovernanceContext';
+import { useRealm } from '../../contexts/GovernanceContext';
 
-import { useRealmGovernances } from '../../hooks/apiHooks';
+import {
+  useGovernancesByRealm,
+  useProposalsByGovernance,
+} from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { ParsedAccount, TokenIcon, useWallet, useMint } from '@oyster/common';
 import { Background } from '../../components/Background';
@@ -20,7 +23,7 @@ export const RealmView = () => {
   let realmKey = useKeyParam();
 
   const realm = useRealm(realmKey);
-  const governances = useRealmGovernances(realmKey);
+  const governances = useGovernancesByRealm(realmKey);
 
   const governanceItems = useMemo(() => {
     return governances
@@ -130,7 +133,7 @@ export function GovernanceBadge({
 }) {
   // We don't support MintGovernance account yet, but we can check the governed account type here
   const governedMint = useMint(governance.info.config.governedAccount);
-  const proposals = useProposals(governance?.pubkey);
+  const proposals = useProposalsByGovernance(governance?.pubkey);
   const color = governance.info.isProgramGovernance() ? 'green' : 'gray';
 
   return (

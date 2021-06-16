@@ -1,8 +1,8 @@
 import { Avatar, Badge, Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { useProposals, useRealm } from '../../contexts/GovernanceContext';
+import { useRealm } from '../../contexts/GovernanceContext';
 
-import { useGovernance } from '../../hooks/apiHooks';
+import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
@@ -30,7 +30,7 @@ export const GovernanceView = () => {
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
   const realm = useRealm(governance?.info.config.realm);
-  const proposals = useProposals(governanceKey);
+  const proposals = useProposalsByGovernance(governanceKey);
 
   const communityTokenMint = realm?.info.communityMint;
 

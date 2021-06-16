@@ -6,6 +6,7 @@ import {
   Governance,
   GovernanceAccountClass,
   GovernanceAccountType,
+  Proposal,
   Realm,
 } from '../models/accounts';
 
@@ -57,6 +58,18 @@ export async function getGovernances(
   const all = await Promise.all([accountGovernances, programGovernances]);
 
   return { ...all[0], ...all[1] } as Record<string, ParsedAccount<Governance>>;
+}
+
+export async function getProposalsByGovernance(
+  endpoint: string,
+  governanceKey: PublicKey,
+) {
+  return getGovernanceAccounts<Proposal>(
+    endpoint,
+    Proposal,
+    GovernanceAccountType.Proposal,
+    [pubkeyFilter(1, governanceKey)],
+  );
 }
 
 export async function getGovernanceAccounts<TAccount>(

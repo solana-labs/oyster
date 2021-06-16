@@ -18,7 +18,6 @@ import {
 import { BorshAccountParser } from '../models/serialisation';
 import {
   GovernanceAccountType,
-  Proposal,
   ProposalInstruction,
   Realm,
   SignatoryRecord,
@@ -30,7 +29,6 @@ import { getRealms } from '../utils/api';
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
   tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>>;
-  proposals: Record<string, ParsedAccount<Proposal>>;
   signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
   instructions: Record<string, ParsedAccount<ProposalInstruction>>;
@@ -66,7 +64,6 @@ export default function GovernanceProvider({ children = null as any }) {
 
   const [realms, setRealms] = useState({});
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState({});
-  const [proposals, setProposals] = useState({});
   const [signatoryRecords, setSignatoryRecords] = useState({});
   const [voteRecords, setVoteRecords] = useState({});
   const [instructions, setInstructions] = useState({});
@@ -76,7 +73,6 @@ export default function GovernanceProvider({ children = null as any }) {
     endpoint,
     setRealms,
     setTokenOwnerRecords,
-    setProposals,
     setSignatoryRecords,
     setVoteRecords,
     setInstructions,
@@ -87,7 +83,6 @@ export default function GovernanceProvider({ children = null as any }) {
       value={{
         realms,
         tokenOwnerRecords,
-        proposals,
         signatoryRecords,
         voteRecords,
         instructions,
@@ -105,7 +100,6 @@ function useSetupGovernanceContext({
   endpoint,
   setRealms,
   setTokenOwnerRecords,
-  setProposals,
   setSignatoryRecords,
   setVoteRecords,
   setInstructions,
@@ -118,9 +112,7 @@ function useSetupGovernanceContext({
   setTokenOwnerRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<TokenOwnerRecord>>>
   >;
-  setProposals: React.Dispatch<
-    React.SetStateAction<Record<string, ParsedAccount<Proposal>>>
-  >;
+
   setSignatoryRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<SignatoryRecord>>>
   >;
@@ -143,7 +135,7 @@ function useSetupGovernanceContext({
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
       const tokenOwnerRecords: Record<string, ParsedAccount<TokenOwnerRecord>> =
         {};
-      const proposals: Record<string, ParsedAccount<Proposal>> = {};
+
       const signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>> =
         {};
       const voteRecords: Record<string, ParsedAccount<VoteRecord>> = {};
@@ -167,12 +159,7 @@ function useSetupGovernanceContext({
             tokenOwnerRecords[a.pubkey.toBase58()] = cached;
             break;
           }
-          case GovernanceAccountType.Proposal: {
-            cache.add(a.pubkey, a.account, BorshAccountParser(Proposal));
-            cached = cache.get(a.pubkey) as ParsedAccount<Proposal>;
-            proposals[a.pubkey.toBase58()] = cached;
-            break;
-          }
+
           case GovernanceAccountType.SignatoryRecord: {
             const account = BorshAccountParser(SignatoryRecord)(
               a.pubkey,
@@ -205,7 +192,7 @@ function useSetupGovernanceContext({
       getRealms(endpoint).then(realms => setRealms(realms));
 
       setTokenOwnerRecords(tokenOwnerRecords);
-      setProposals(proposals);
+
       setSignatoryRecords(signatoryRecords);
       setVoteRecords(voteRecords);
       setInstructions(instructions);
@@ -250,22 +237,7 @@ function useSetupGovernanceContext({
 
             break;
           }
-          case GovernanceAccountType.Proposal: {
-            cache.add(
-              info.accountId,
-              info.accountInfo,
-              BorshAccountParser(Proposal),
-            );
 
-            setProposals((objs: any) => ({
-              ...objs,
-              [pubkey.toBase58()]: cache.get(
-                info.accountId,
-              ) as ParsedAccount<Proposal>,
-            }));
-
-            break;
-          }
           case GovernanceAccountType.SignatoryRecord: {
             cache.add(
               info.accountId,
@@ -414,25 +386,6 @@ export const useProposalAuthority = (proposalOwner?: PublicKey) => {
         wallet?.publicKey?.toBase58())
     ? tokenOwnerRecord
     : null;
-};
-
-export const useProposals = (governance: PublicKey) => {
-  const ctx = useGovernanceContext();
-  const proposals: ParsedAccount<Proposal>[] = [];
-
-  Object.values(ctx.proposals).forEach(p => {
-    if (p.info.governance.toBase58() === governance.toBase58()) {
-      proposals.push(p);
-    }
-  });
-
-  return proposals;
-};
-
-export const useProposal = (proposalKey: PublicKey) => {
-  const ctx = useGovernanceContext();
-
-  return ctx.proposals[proposalKey.toBase58()];
 };
 
 export const useSignatoryRecord = (proposal: PublicKey) => {

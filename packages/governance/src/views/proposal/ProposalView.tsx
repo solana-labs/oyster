@@ -5,7 +5,6 @@ import { ParsedAccount, TokenIcon } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
 import {
-  useProposal,
   useSignatoryRecord,
   useWalletTokenOwnerRecord,
   useInstructions,
@@ -37,7 +36,7 @@ import { Vote } from '../../models/instructions';
 import CancelButton from './components/CancelButton';
 import { FinalizeVote } from './components/FinalizeVote';
 
-import { useGovernance } from '../../hooks/apiHooks';
+import { useGovernance, useProposal } from '../../hooks/apiHooks';
 
 const { TabPane } = Tabs;
 
