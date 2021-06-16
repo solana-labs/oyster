@@ -3,10 +3,8 @@ import * as bs58 from 'bs58';
 import { deserializeBorsh, ParsedAccount, utils } from '@oyster/common';
 import { GOVERNANCE_SCHEMA } from '../models/serialisation';
 import {
-  Governance,
   GovernanceAccountClass,
   GovernanceAccountType,
-  Proposal,
   Realm,
 } from '../models/accounts';
 
@@ -32,55 +30,45 @@ export class MemcmpFilter {
   }
 }
 
-export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
-  new MemcmpFilter(offset, pubkey.toBuffer());
+export const pubkeyFilter = (offset: number, pubkey: PublicKey | undefined) =>
+  pubkey && new MemcmpFilter(offset, pubkey.toBuffer());
 
 export async function getRealms(endpoint: string) {
-  return getGovernanceAccounts<Realm>(
+  return getGovernanceAccountsImpl<Realm>(
     endpoint,
     Realm,
     GovernanceAccountType.Realm,
   );
 }
 
-export const getGovernancesByRealm = (endpoint: string, realmKey: PublicKey) =>
-  getGovernances(endpoint, [pubkeyFilter(1, realmKey)]);
-
-export async function getGovernances(
+export async function getGovernanceAccounts<TAccount>(
   endpoint: string,
+  accountClass: GovernanceAccountClass,
+  accountTypes: GovernanceAccountType[],
   filters: MemcmpFilter[] = [],
 ) {
-  const accountGovernances = getGovernanceAccounts<Governance>(
-    endpoint,
-    Governance,
-    GovernanceAccountType.AccountGovernance,
-    filters,
-  );
-  const programGovernances = getGovernanceAccounts<Governance>(
-    endpoint,
-    Governance,
-    GovernanceAccountType.ProgramGovernance,
-    filters,
+  if (accountTypes.length === 1) {
+    return getGovernanceAccountsImpl<TAccount>(
+      endpoint,
+      accountClass,
+      accountTypes[0],
+      filters,
+    );
+  }
+
+  const all = await Promise.all(
+    accountTypes.map(at =>
+      getGovernanceAccountsImpl<TAccount>(endpoint, accountClass, at, filters),
+    ),
   );
 
-  const all = await Promise.all([accountGovernances, programGovernances]);
-
-  return { ...all[0], ...all[1] } as Record<string, ParsedAccount<Governance>>;
+  return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
+    string,
+    ParsedAccount<TAccount>
+  >;
 }
 
-export async function getProposalsByGovernance(
-  endpoint: string,
-  governanceKey: PublicKey,
-) {
-  return getGovernanceAccounts<Proposal>(
-    endpoint,
-    Proposal,
-    GovernanceAccountType.Proposal,
-    [pubkeyFilter(1, governanceKey)],
-  );
-}
-
-export async function getGovernanceAccounts<TAccount>(
+async function getGovernanceAccountsImpl<TAccount>(
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountType: GovernanceAccountType,
