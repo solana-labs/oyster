@@ -33,11 +33,13 @@ export function useGovernanceAccountByPubkey<TAccount>(
       // TODO: Add retries
 
       const accountInfo = await connection.getAccountInfo(pubkey);
-      const loadedAccount = BorshAccountParser(accountClass)(
-        pubkey,
-        accountInfo!,
-      );
-      setAccount(loadedAccount);
+      if (accountInfo) {
+        const loadedAccount = BorshAccountParser(accountClass)(
+          pubkey,
+          accountInfo!,
+        );
+        setAccount(loadedAccount);
+      }
 
       const { governance } = utils.programIds();
       const accountTypes = getAccountTypes(accountClass);
@@ -128,6 +130,7 @@ export function useGovernanceAccountsByFilter<TAccount>(
           const isMatch = !queryFilters.some(
             f => !f.isMatch(info.accountInfo.data),
           );
+
           const base58Key = info.accountId.toBase58();
 
           const account = BorshAccountParser(accountClass)(

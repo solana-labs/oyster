@@ -1,19 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import {
-  Connection,
-  KeyedAccountInfo,
-  PublicKey,
-  PublicKeyAndAccount,
-} from '@solana/web3.js';
+import { Connection, KeyedAccountInfo, PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
 
-import {
-  utils,
-  ParsedAccount,
-  useConnectionConfig,
-  cache,
-} from '@oyster/common';
+import { utils, ParsedAccount, useConnectionConfig } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
 import { getRealms } from '../utils/api';
@@ -52,17 +42,39 @@ export default function GovernanceProvider({ children = null as any }) {
 
   const [realms, setRealms] = useState({});
 
-  useSetupGovernanceContext({
-    connection,
-    endpoint,
-    setRealms,
-  });
+  useEffect(() => {
+    const sub = (async () => {
+      const realms = await getRealms(endpoint);
+      setRealms(realms);
+
+      const PROGRAM_IDS = utils.programIds();
+
+      return connection.onProgramAccountChange(
+        PROGRAM_IDS.governance.programId,
+        async (info: KeyedAccountInfo) => {
+          if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
+            const realm = BorshAccountParser(Realm)(
+              info.accountId,
+              info.accountInfo,
+            );
+            setRealms((objs: any) => ({
+              ...objs,
+              [info.accountId.toBase58()]: realm,
+            }));
+          }
+        },
+      );
+    })();
+
+    return () => {
+      sub.then(id => connection.removeProgramAccountChangeListener(id));
+    };
+  }, [connection]); //eslint-disable-line
 
   return (
     <GovernanceContext.Provider
       value={{
         realms,
-
         removeInstruction: () => {},
         removeVoteRecord: () => {},
       }}
@@ -70,61 +82,6 @@ export default function GovernanceProvider({ children = null as any }) {
       {children}
     </GovernanceContext.Provider>
   );
-}
-
-function useSetupGovernanceContext({
-  connection,
-  endpoint,
-  setRealms,
-}: {
-  connection: Connection;
-  endpoint: string;
-
-  setRealms: React.Dispatch<React.SetStateAction<{}>>;
-}) {
-  useEffect(() => {
-    const PROGRAM_IDS = utils.programIds();
-
-    const query = async () => {
-      const programAccounts = await connection.getProgramAccounts(
-        PROGRAM_IDS.governance.programId,
-      );
-      return programAccounts;
-    };
-    Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      getRealms(endpoint).then(realms => setRealms(realms));
-    });
-
-    const subID = connection.onProgramAccountChange(
-      PROGRAM_IDS.governance.programId,
-      async (info: KeyedAccountInfo) => {
-        const pubkey =
-          typeof info.accountId === 'string'
-            ? new PublicKey(info.accountId as unknown as string)
-            : info.accountId;
-
-        switch (info.accountInfo.data[0]) {
-          case GovernanceAccountType.Realm:
-            cache.add(
-              info.accountId,
-              info.accountInfo,
-              BorshAccountParser(Realm),
-            );
-            setRealms((objs: any) => ({
-              ...objs,
-              [pubkey.toBase58()]: cache.get(
-                info.accountId,
-              ) as ParsedAccount<Realm>,
-            }));
-            break;
-        }
-      },
-      'singleGossip',
-    );
-    return () => {
-      connection.removeProgramAccountChangeListener(subID);
-    };
-  }, [connection]); //eslint-disable-line
 }
 
 export const useGovernanceContext = () => {
@@ -138,7 +95,7 @@ export const useRealms = () => {
   return Object.values(ctx.realms);
 };
 
-export const useRealm = (realm?: PublicKey) => {
+export const useRealm = (realm: PublicKey | undefined) => {
   const ctx = useGovernanceContext();
 
   return realm && ctx.realms[realm.toBase58()];
