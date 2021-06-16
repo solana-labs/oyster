@@ -287,6 +287,24 @@ export class SignatoryRecord {
   }
 }
 
+export async function getSignatoryRecordAddress(
+  proposal: PublicKey,
+  signatory: PublicKey,
+) {
+  const PROGRAM_IDS = utils.programIds();
+
+  const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      proposal.toBuffer(),
+      signatory.toBuffer(),
+    ],
+    PROGRAM_IDS.governance.programId,
+  );
+
+  return signatoryRecordAddress;
+}
+
 export class VoteWeight {
   yes: BN;
   no: BN;

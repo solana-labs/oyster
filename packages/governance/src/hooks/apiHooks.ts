@@ -1,9 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
+import { EventEmitter } from 'eventemitter3';
 
 import {
+  getSignatoryRecordAddress,
   getTokenOwnerAddress,
   Governance,
   Proposal,
+  ProposalInstruction,
+  SignatoryRecord,
   TokenOwnerRecord,
 } from '../models/accounts';
 import { pubkeyFilter } from '../utils/api';
@@ -14,6 +18,33 @@ import {
 } from './accountHooks';
 
 import { useWallet } from '@oyster/common';
+
+class AccountRemovedEvent {
+  pubkey: PublicKey;
+
+  constructor(pubkey: PublicKey) {
+    this.pubkey = pubkey;
+  }
+}
+
+class AccountChangeEmitter {
+  private emitter = new EventEmitter();
+
+  onAccountRemoved(callback: (args: AccountRemovedEvent) => void) {
+    this.emitter.on(AccountRemovedEvent.name, callback);
+    return () =>
+      this.emitter.removeListener(AccountRemovedEvent.name, callback);
+  }
+
+  emitAccountRemoved(pubkey: PublicKey) {
+    this.emitter.emit(
+      AccountRemovedEvent.name,
+      new AccountRemovedEvent(pubkey),
+    );
+  }
+}
+
+export const accountChangeEmitter = new AccountChangeEmitter();
 
 // ----- Governance -----
 
@@ -93,4 +124,31 @@ export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
         wallet?.publicKey?.toBase58())
     ? tokenOwnerRecord
     : undefined;
+}
+
+// ----- Signatory Record -----
+
+export function useWalletSignatoryRecord(proposal: PublicKey) {
+  const { wallet } = useWallet();
+
+  return useGovernanceAccountByPda<SignatoryRecord>(
+    SignatoryRecord,
+    async () => {
+      if (!proposal || !wallet?.publicKey) {
+        return;
+      }
+
+      return await getSignatoryRecordAddress(proposal, wallet.publicKey);
+    },
+    [wallet?.publicKey, proposal],
+  );
+}
+
+// ----- Proposal Instruction -----
+
+export function useInstructionsByProposal(proposal: PublicKey | undefined) {
+  return useGovernanceAccountsByFilter<ProposalInstruction>(
+    ProposalInstruction,
+    [pubkeyFilter(1, proposal)],
+  );
 }

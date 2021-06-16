@@ -4,11 +4,7 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
-import {
-  useSignatoryRecord,
-  useInstructions,
-  useVoteRecords,
-} from '../../contexts/GovernanceContext';
+import { useVoteRecords } from '../../contexts/GovernanceContext';
 import { StateBadge } from './components/StateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -39,6 +35,8 @@ import {
   useProposal,
   useTokenOwnerRecords,
   useWalletTokenOwnerRecord,
+  useWalletSignatoryRecord,
+  useInstructionsByProposal,
 } from '../../hooks/apiHooks';
 
 const { TabPane } = Tabs;
@@ -230,12 +228,12 @@ function InnerProposalView({
   endpoint: string;
   hasVotes: boolean;
 }) {
-  let signatoryRecord = useSignatoryRecord(proposal.pubkey);
+  let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
     governance.info.config.realm,
     proposal.info.governingTokenMint,
   );
-  const instructions = useInstructions(proposal.pubkey);
+  const instructions = useInstructionsByProposal(proposal.pubkey);
 
   const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
   const isGist =

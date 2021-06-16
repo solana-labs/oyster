@@ -16,20 +16,12 @@ import {
   useWallet,
 } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
-import {
-  GovernanceAccountType,
-  ProposalInstruction,
-  Realm,
-  SignatoryRecord,
-  VoteRecord,
-} from '../models/accounts';
+import { GovernanceAccountType, Realm, VoteRecord } from '../models/accounts';
 import { getRealms } from '../utils/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
-  signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>>;
   voteRecords: Record<string, ParsedAccount<VoteRecord>>;
-  instructions: Record<string, ParsedAccount<ProposalInstruction>>;
   removeInstruction: (key: string) => void;
   removeVoteRecord: (key: string) => void;
 }
@@ -61,27 +53,22 @@ export default function GovernanceProvider({ children = null as any }) {
   );
 
   const [realms, setRealms] = useState({});
-  const [signatoryRecords, setSignatoryRecords] = useState({});
   const [voteRecords, setVoteRecords] = useState({});
-  const [instructions, setInstructions] = useState({});
 
   useSetupGovernanceContext({
     connection,
     endpoint,
     setRealms,
-    setSignatoryRecords,
     setVoteRecords,
-    setInstructions,
   });
 
   return (
     <GovernanceContext.Provider
       value={{
         realms,
-        signatoryRecords,
         voteRecords,
-        instructions,
-        removeInstruction: removeCtxItem(setInstructions),
+
+        removeInstruction: () => {},
         removeVoteRecord: removeCtxItem(setVoteRecords),
       }}
     >
@@ -94,23 +81,15 @@ function useSetupGovernanceContext({
   connection,
   endpoint,
   setRealms,
-  setSignatoryRecords,
   setVoteRecords,
-  setInstructions,
 }: {
   connection: Connection;
   endpoint: string;
 
   setRealms: React.Dispatch<React.SetStateAction<{}>>;
 
-  setSignatoryRecords: React.Dispatch<
-    React.SetStateAction<Record<string, ParsedAccount<SignatoryRecord>>>
-  >;
   setVoteRecords: React.Dispatch<
     React.SetStateAction<Record<string, ParsedAccount<VoteRecord>>>
-  >;
-  setInstructions: React.Dispatch<
-    React.SetStateAction<Record<string, ParsedAccount<ProposalInstruction>>>
   >;
 }) {
   useEffect(() => {
@@ -123,25 +102,13 @@ function useSetupGovernanceContext({
       return programAccounts;
     };
     Promise.all([query()]).then((all: PublicKeyAndAccount<Buffer>[][]) => {
-      const signatoryRecords: Record<string, ParsedAccount<SignatoryRecord>> =
-        {};
       const voteRecords: Record<string, ParsedAccount<VoteRecord>> = {};
-      const instructions: Record<string, ParsedAccount<ProposalInstruction>> =
-        {};
 
       all[0].forEach(a => {
         // TODO: This is done only for MVP to get it working end to end
         // All accounts should not be cached in the context and there is no need to update the global cache either
 
         switch (a.account.data[0]) {
-          case GovernanceAccountType.SignatoryRecord: {
-            const account = BorshAccountParser(SignatoryRecord)(
-              a.pubkey,
-              a.account,
-            ) as ParsedAccount<SignatoryRecord>;
-            signatoryRecords[a.pubkey.toBase58()] = account;
-            break;
-          }
           case GovernanceAccountType.VoteRecord: {
             const account = BorshAccountParser(VoteRecord)(
               a.pubkey,
@@ -151,23 +118,12 @@ function useSetupGovernanceContext({
 
             break;
           }
-          case GovernanceAccountType.ProposalInstruction: {
-            const account = BorshAccountParser(ProposalInstruction)(
-              a.pubkey,
-              a.account,
-            ) as ParsedAccount<ProposalInstruction>;
-            instructions[a.pubkey.toBase58()] = account;
-
-            break;
-          }
         }
       });
 
       getRealms(endpoint).then(realms => setRealms(realms));
 
-      setSignatoryRecords(signatoryRecords);
       setVoteRecords(voteRecords);
-      setInstructions(instructions);
     });
 
     const subID = connection.onProgramAccountChange(
@@ -193,22 +149,6 @@ function useSetupGovernanceContext({
             }));
             break;
 
-          case GovernanceAccountType.SignatoryRecord: {
-            cache.add(
-              info.accountId,
-              info.accountInfo,
-              BorshAccountParser(SignatoryRecord),
-            );
-
-            setSignatoryRecords((objs: any) => ({
-              ...objs,
-              [pubkey.toBase58()]: cache.get(
-                info.accountId,
-              ) as ParsedAccount<SignatoryRecord>,
-            }));
-
-            break;
-          }
           case GovernanceAccountType.VoteRecord: {
             cache.add(
               info.accountId,
@@ -221,22 +161,6 @@ function useSetupGovernanceContext({
               [pubkey.toBase58()]: cache.get(
                 info.accountId,
               ) as ParsedAccount<VoteRecord>,
-            }));
-
-            break;
-          }
-          case GovernanceAccountType.ProposalInstruction: {
-            cache.add(
-              info.accountId,
-              info.accountInfo,
-              BorshAccountParser(ProposalInstruction),
-            );
-
-            setInstructions((objs: any) => ({
-              ...objs,
-              [pubkey.toBase58()]: cache.get(
-                info.accountId,
-              ) as ParsedAccount<ProposalInstruction>,
             }));
 
             break;
@@ -266,22 +190,6 @@ export const useRealm = (realm?: PublicKey) => {
   const ctx = useGovernanceContext();
 
   return realm && ctx.realms[realm.toBase58()];
-};
-
-export const useSignatoryRecord = (proposal: PublicKey) => {
-  const ctx = useGovernanceContext();
-  const { wallet } = useWallet();
-
-  for (let record of Object.values(ctx.signatoryRecords)) {
-    if (
-      record.info.signatory.toBase58() === wallet?.publicKey?.toBase58() &&
-      record.info.proposal.toBase58() === proposal.toBase58()
-    ) {
-      return record;
-    }
-  }
-
-  return null;
 };
 
 export const useWalletVoteRecord = (proposal: PublicKey) => {
@@ -317,18 +225,4 @@ export const useVoteRecords = (proposal: PublicKey | undefined) => {
   });
 
   return voteRecords;
-};
-
-export const useInstructions = (proposal: PublicKey) => {
-  const ctx = useGovernanceContext();
-
-  const instructions: ParsedAccount<ProposalInstruction>[] = [];
-
-  Object.values(ctx.instructions).forEach(p => {
-    if (p.info.proposal.toBase58() === proposal.toBase58()) {
-      instructions.push(p);
-    }
-  });
-
-  return instructions;
 };
