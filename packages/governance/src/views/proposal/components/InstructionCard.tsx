@@ -12,6 +12,7 @@ import Meta from 'antd/lib/card/Meta';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LABELS } from '../../../constants';
 import {
+  GovernanceAccountType,
   Proposal,
   ProposalInstruction,
   ProposalState,
@@ -22,7 +23,7 @@ import { serialize } from 'borsh';
 import './style.less';
 import { executeInstruction } from '../../../actions/executeInstruction';
 import { removeInstruction } from '../../../actions/removeInstruction';
-import { useGovernanceContext } from '../../../contexts/GovernanceContext';
+import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
 import { useProposalAuthority } from '../../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
@@ -45,7 +46,7 @@ export function InstructionCard({
 }) {
   const { wallet, connected } = useWallet();
   const connection = useConnection();
-  const { removeInstruction: removeFromCtx } = useGovernanceContext();
+  const changeTracker = useAccountChangeTracker();
 
   const proposalAuthority = useProposalAuthority(
     proposal.info.tokenOwnerRecord,
@@ -90,7 +91,10 @@ export function InstructionCard({
   const deleteAction = () => {
     const onDelete = async () => {
       await removeInstruction(connection, wallet, proposal, instruction.pubkey);
-      removeFromCtx(instruction.pubkey.toBase58());
+      changeTracker.notifyAccountRemoved(
+        instruction.pubkey.toBase58(),
+        GovernanceAccountType.ProposalInstruction,
+      );
     };
 
     return (

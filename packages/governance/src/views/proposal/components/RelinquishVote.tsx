@@ -7,11 +7,12 @@ import { LABELS } from '../../../constants';
 import { contexts } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import {
+  GovernanceAccountType,
   Proposal,
   ProposalState,
   TokenOwnerRecord,
 } from '../../../models/accounts';
-import { useGovernanceContext } from '../../../contexts/GovernanceContext';
+import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../actions/relinquishVote';
 import { useWalletVoteRecord } from '../../../hooks/apiHooks';
 
@@ -31,7 +32,7 @@ export function RelinquishVote({
 
   const voteRecord = useWalletVoteRecord(proposal.pubkey);
 
-  const { removeVoteRecord } = useGovernanceContext();
+  const accountChangeTracker = useAccountChangeTracker();
 
   const isVisible =
     connected &&
@@ -87,7 +88,10 @@ export function RelinquishVote({
                 true,
               );
 
-              removeVoteRecord(voteRecord!.pubkey.toBase58());
+              accountChangeTracker.notifyAccountRemoved(
+                voteRecord!.pubkey.toBase58(),
+                GovernanceAccountType.VoteRecord,
+              );
             } catch (ex) {
               console.error(ex);
             }

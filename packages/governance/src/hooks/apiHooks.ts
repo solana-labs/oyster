@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js';
-import { EventEmitter } from 'eventemitter3';
 
 import {
   getSignatoryRecordAddress,
@@ -20,33 +19,6 @@ import {
 } from './accountHooks';
 
 import { useWallet } from '@oyster/common';
-
-class AccountRemovedEvent {
-  pubkey: PublicKey;
-
-  constructor(pubkey: PublicKey) {
-    this.pubkey = pubkey;
-  }
-}
-
-class AccountChangeEmitter {
-  private emitter = new EventEmitter();
-
-  onAccountRemoved(callback: (args: AccountRemovedEvent) => void) {
-    this.emitter.on(AccountRemovedEvent.name, callback);
-    return () =>
-      this.emitter.removeListener(AccountRemovedEvent.name, callback);
-  }
-
-  emitAccountRemoved(pubkey: PublicKey) {
-    this.emitter.emit(
-      AccountRemovedEvent.name,
-      new AccountRemovedEvent(pubkey),
-    );
-  }
-}
-
-export const accountChangeEmitter = new AccountChangeEmitter();
 
 // ----- Governance -----
 
