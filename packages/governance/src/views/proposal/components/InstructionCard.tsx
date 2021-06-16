@@ -22,10 +22,8 @@ import { serialize } from 'borsh';
 import './style.less';
 import { executeInstruction } from '../../../actions/executeInstruction';
 import { removeInstruction } from '../../../actions/removeInstruction';
-import {
-  useGovernanceContext,
-  useProposalAuthority,
-} from '../../../contexts/GovernanceContext';
+import { useGovernanceContext } from '../../../contexts/GovernanceContext';
+import { useProposalAuthority } from '../../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

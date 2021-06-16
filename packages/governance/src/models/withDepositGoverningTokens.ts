@@ -7,7 +7,7 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { DepositGoverningTokensArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED } from './accounts';
+import { getTokenOwnerAddress, GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
@@ -23,14 +23,10 @@ export const withDepositGoverningTokens = async (
   const args = new DepositGoverningTokensArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      realm.toBuffer(),
-      governingTokenMint.toBuffer(),
-      governingTokenOwner.toBuffer(),
-    ],
-    PROGRAM_IDS.governance.programId,
+  const tokenOwnerRecordAddress = await getTokenOwnerAddress(
+    realm,
+    governingTokenMint,
+    governingTokenOwner,
   );
 
   const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(

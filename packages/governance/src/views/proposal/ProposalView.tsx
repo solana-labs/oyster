@@ -6,7 +6,6 @@ import { ParsedAccount, TokenIcon } from '@oyster/common';
 import ReactMarkdown from 'react-markdown';
 import {
   useSignatoryRecord,
-  useWalletTokenOwnerRecord,
   useInstructions,
   useVoteRecords,
 } from '../../contexts/GovernanceContext';
@@ -39,6 +38,7 @@ import {
   useGovernance,
   useProposal,
   useTokenOwnerRecords,
+  useWalletTokenOwnerRecord,
 } from '../../hooks/apiHooks';
 
 const { TabPane } = Tabs;

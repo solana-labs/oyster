@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+import { utils } from '@oyster/common';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -145,6 +146,26 @@ export class TokenOwnerRecord {
     this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
     this.totalVotesCount = args.totalVotesCount;
   }
+}
+
+export async function getTokenOwnerAddress(
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+  governingTokenOwner: PublicKey,
+) {
+  const PROGRAM_IDS = utils.programIds();
+
+  const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+      governingTokenOwner.toBuffer(),
+    ],
+    PROGRAM_IDS.governance.programId,
+  );
+
+  return tokenOwnerRecordAddress;
 }
 
 export enum ProposalState {

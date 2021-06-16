@@ -5,7 +5,7 @@ import { Button, Modal } from 'antd';
 
 import React from 'react';
 import { cancelProposal } from '../../../actions/cancelProposal';
-import { useProposalAuthority } from '../../../contexts/GovernanceContext';
+import { useProposalAuthority } from '../../../hooks/apiHooks';
 
 import { Proposal, ProposalState } from '../../../models/accounts';
 
