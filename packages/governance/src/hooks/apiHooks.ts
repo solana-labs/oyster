@@ -9,9 +9,11 @@ import {
   ProposalInstruction,
   SignatoryRecord,
   TokenOwnerRecord,
+  VoteRecord,
 } from '../models/accounts';
 import { pubkeyFilter } from '../utils/api';
 import {
+  useGovernanceAccountByFilter,
   useGovernanceAccountByPda,
   useGovernanceAccountByPubkey,
   useGovernanceAccountsByFilter,
@@ -152,3 +154,20 @@ export function useInstructionsByProposal(proposal: PublicKey | undefined) {
     [pubkeyFilter(1, proposal)],
   );
 }
+
+// ----- VoteRecord -----
+
+export const useVoteRecordsByProposal = (proposal: PublicKey | undefined) => {
+  return useGovernanceAccountsByFilter<VoteRecord>(VoteRecord, [
+    pubkeyFilter(1, proposal),
+  ]);
+};
+
+export const useWalletVoteRecord = (proposal: PublicKey) => {
+  const { wallet } = useWallet();
+
+  return useGovernanceAccountByFilter<VoteRecord>(VoteRecord, [
+    pubkeyFilter(1, proposal),
+    pubkeyFilter(1 + 32, wallet?.publicKey),
+  ]);
+};

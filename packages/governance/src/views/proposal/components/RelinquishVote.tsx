@@ -11,11 +11,9 @@ import {
   ProposalState,
   TokenOwnerRecord,
 } from '../../../models/accounts';
-import {
-  useGovernanceContext,
-  useWalletVoteRecord,
-} from '../../../contexts/GovernanceContext';
+import { useGovernanceContext } from '../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../actions/relinquishVote';
+import { useWalletVoteRecord } from '../../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

@@ -166,3 +166,25 @@ export function useGovernanceAccountsByFilter<TAccount>(
 
   return Object.values(accounts);
 }
+
+export function useGovernanceAccountByFilter<TAccount>(
+  accountClass: GovernanceAccountClass,
+  filters: (MemcmpFilter | undefined)[],
+) {
+  const accounts = useGovernanceAccountsByFilter<TAccount>(
+    accountClass,
+    filters,
+  );
+
+  if (accounts.length === 0) {
+    return undefined;
+  }
+
+  if (accounts.length === 1) {
+    return accounts[0];
+  }
+
+  throw new Error(
+    `Filters ${filters} returned multiple accounts ${accounts} for ${accountClass} while a single result was expected`,
+  );
+}

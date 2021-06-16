@@ -4,7 +4,7 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
-import { useVoteRecords } from '../../contexts/GovernanceContext';
+
 import { StateBadge } from './components/StateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -37,6 +37,7 @@ import {
   useWalletTokenOwnerRecord,
   useWalletSignatoryRecord,
   useInstructionsByProposal,
+  useVoteRecordsByProposal,
 } from '../../hooks/apiHooks';
 
 const { TabPane } = Tabs;
@@ -63,7 +64,7 @@ export const ProposalView = () => {
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
 
-  const voteRecords = useVoteRecords(proposal?.pubkey);
+  const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.config.realm,
     proposal?.info.governingTokenMint,

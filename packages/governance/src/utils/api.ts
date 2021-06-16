@@ -30,8 +30,10 @@ export class MemcmpFilter {
   }
 }
 
-export const pubkeyFilter = (offset: number, pubkey: PublicKey | undefined) =>
-  pubkey && new MemcmpFilter(offset, pubkey.toBuffer());
+export const pubkeyFilter = (
+  offset: number,
+  pubkey: PublicKey | undefined | null,
+) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
 export async function getRealms(endpoint: string) {
   return getGovernanceAccountsImpl<Realm>(
