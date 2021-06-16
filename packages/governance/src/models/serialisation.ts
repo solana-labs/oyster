@@ -1,5 +1,3 @@
-import * as BufferLayout from 'buffer-layout';
-import BN from 'bn.js';
 import {
   AccountInfo,
   PublicKey,
@@ -28,7 +26,6 @@ import {
 import {
   AccountMetaData,
   Governance,
-  GovernanceAccountType,
   GovernanceConfig,
   InstructionData,
   Proposal,
@@ -39,7 +36,7 @@ import {
   VoteRecord,
   VoteWeight,
 } from './accounts';
-import { serialize, Schema } from 'borsh';
+import { serialize } from 'borsh';
 
 // TODO: Review the limits. Most likely they are leftovers from the legacy version
 export const MAX_PROPOSAL_DESCRIPTION_LENGTH = 200;
@@ -63,6 +60,7 @@ export const MAX_INSTRUCTION_BASE64_LENGTH = 450;
   reader.length += 2;
 };
 
+// Serializes sdk instruction into InstructionData and encodes it as base64 which then can be entered into the UI form
 export const serializeInstructionToBase64 = (
   instruction: TransactionInstruction,
 ) => {
@@ -383,57 +381,3 @@ export function BorshAccountParser(
     } as ParsedAccountBase;
   };
 }
-
-export function deserializeBorshAs<T>(
-  schema: Schema,
-  classType: any,
-  buffer: Buffer,
-) {
-  return deserializeBorsh(schema, classType, buffer) as T;
-}
-
-// ----------------- Old structures
-
-export interface GovernanceVotingRecord {
-  /// Account type
-  accountType: GovernanceAccountType;
-  /// proposal
-  proposal: PublicKey;
-  /// owner
-  owner: PublicKey;
-
-  /// How many votes were unspent
-  undecidedCount: BN;
-  /// How many votes were spent yes
-  yesCount: BN;
-  /// How many votes were spent no
-  noCount: BN;
-}
-
-export const GovernanceVotingRecordLayout: typeof BufferLayout.Structure = BufferLayout.struct(
-  [],
-);
-
-export const GovernanceVotingRecordParser = (
-  pubKey: PublicKey,
-  info: AccountInfo<Buffer>,
-) => {
-  const data = GovernanceVotingRecordLayout.decode(info.data);
-
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: {
-      accountType: data.accountType,
-      proposal: data.proposal,
-      owner: data.owner,
-      undecidedCount: data.undecidedCount,
-      yesCount: data.yesCount,
-      noCount: data.noCount,
-    },
-  };
-
-  return details;
-};

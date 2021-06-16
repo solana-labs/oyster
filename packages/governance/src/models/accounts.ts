@@ -15,6 +15,38 @@ export enum GovernanceAccountType {
   VoteRecord = 7,
   ProposalInstruction = 8,
 }
+export type GovernanceAccountClass =
+  | typeof Realm
+  | typeof TokenOwnerRecord
+  | typeof Governance
+  | typeof Proposal
+  | typeof SignatoryRecord
+  | typeof VoteRecord
+  | typeof ProposalInstruction;
+
+export function getAccountTypes(accountClass: GovernanceAccountClass) {
+  switch (accountClass) {
+    case Realm:
+      return [GovernanceAccountType.Realm];
+    case TokenOwnerRecord:
+      return [GovernanceAccountType.TokenOwnerRecord];
+    case Proposal:
+      return [GovernanceAccountType.Proposal];
+    case SignatoryRecord:
+      return [GovernanceAccountType.SignatoryRecord];
+    case VoteRecord:
+      return [GovernanceAccountType.VoteRecord];
+    case ProposalInstruction:
+      return [GovernanceAccountType.ProposalInstruction];
+    case Governance:
+      return [
+        GovernanceAccountType.AccountGovernance,
+        GovernanceAccountType.ProgramGovernance,
+      ];
+    default:
+      throw Error(`${accountClass} account is not supported`);
+  }
+}
 
 export class Realm {
   accountType = GovernanceAccountType.Realm;
@@ -315,15 +347,3 @@ export class ProposalInstruction {
     this.executedAt = args.executedAt;
   }
 }
-
-// export function getAccountTypes(accountClass: any) {
-//   switch (accountClass) {
-//     case Governance:
-//       return [
-//         GovernanceAccountType.AccountGovernance,
-//         GovernanceAccountType.ProgramGovernance,
-//       ];
-//     default:
-//       return [GovernanceAccountType[accountClass.toString()]];
-//   }
-// }

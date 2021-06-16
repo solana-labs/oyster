@@ -1,65 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import { deserializeBorsh, ParsedAccount, utils } from '@oyster/common';
+import { GOVERNANCE_SCHEMA } from '../models/serialisation';
 import {
-  GovernanceVotingRecord,
-  GovernanceVotingRecordLayout,
-  GovernanceVotingRecordParser,
-  GOVERNANCE_SCHEMA,
-} from '../models/serialisation';
-import { Governance, GovernanceAccountType, Realm } from '../models/accounts';
-
-const MAX_LOOKUPS = 5000;
-export async function getGovernanceVotingRecords(
-  proposal?: PublicKey,
-  endpoint?: string,
-): Promise<Record<string, ParsedAccount<GovernanceVotingRecord>>> {
-  const PROGRAM_IDS = utils.programIds();
-  if (!proposal || !endpoint) return {};
-
-  let accountRes = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'getProgramAccounts',
-      params: [
-        PROGRAM_IDS.governance.programId.toBase58(),
-        {
-          commitment: 'single',
-          filters: [
-            { dataSize: GovernanceVotingRecordLayout.span },
-            {
-              memcmp: {
-                // Proposal key is second thing in the account data
-                offset: 1,
-                bytes: proposal.toString(),
-              },
-            },
-          ],
-        },
-      ],
-    }),
-  });
-  let raw = (await accountRes.json())['result'];
-  if (!raw) return {};
-  let accounts: Record<string, ParsedAccount<GovernanceVotingRecord>> = {};
-  let i = 0;
-  for (let acc of raw) {
-    const account = GovernanceVotingRecordParser(acc.pubkey, {
-      ...acc.account,
-      data: bs58.decode(acc.account.data),
-    }) as ParsedAccount<GovernanceVotingRecord>;
-    if (i > MAX_LOOKUPS) break;
-    accounts[account.info.owner.toBase58()] = account;
-    i++;
-  }
-
-  return accounts;
-}
+  Governance,
+  GovernanceAccountClass,
+  GovernanceAccountType,
+  Realm,
+} from '../models/accounts';
 
 export interface MemcmpFilter {
   memcmp: { offset: number; bytes: string };
@@ -113,7 +61,7 @@ export async function getGovernances(
 
 export async function getGovernanceAccounts<TAccount>(
   endpoint: string,
-  classType: any,
+  accountClass: GovernanceAccountClass,
   accountType: GovernanceAccountType,
   filters: AccountQueryFilter[] = [],
 ) {
@@ -159,7 +107,7 @@ export async function getGovernanceAccounts<TAccount>(
       },
       info: deserializeBorsh(
         GOVERNANCE_SCHEMA,
-        classType,
+        accountClass,
         Buffer.from(rawAccount.account.data[0], 'base64'),
       ),
     };
