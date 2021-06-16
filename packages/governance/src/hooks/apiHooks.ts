@@ -1,9 +1,12 @@
 import { PublicKey } from '@solana/web3.js';
 
 import { Governance, Proposal } from '../models/accounts';
-import { getGovernancesByRealm, getProposalsByGovernance } from '../utils/api';
+import { getGovernancesByRealm, pubkeyFilter } from '../utils/api';
 import { useGovernanceAccountByPubkey } from './useGovernanceAccountByPubkey';
-import { useGovernanceAccountsBy } from './useGovernanceAccountsBy';
+import {
+  useGovernanceAccountsBy,
+  useGovernanceAccountsByFilter,
+} from './useGovernanceAccountsBy';
 
 export function useGovernance(governance?: PublicKey) {
   return useGovernanceAccountByPubkey<Governance>(Governance, governance);
@@ -18,9 +21,7 @@ export const useProposal = (proposal: PublicKey) => {
 };
 
 export const useProposalsByGovernance = (governance: PublicKey) => {
-  return useGovernanceAccountsBy(
-    Proposal,
-    getProposalsByGovernance,
-    governance,
-  );
+  return useGovernanceAccountsByFilter<Proposal>(Proposal, [
+    pubkeyFilter(1, governance),
+  ]);
 };

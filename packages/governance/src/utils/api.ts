@@ -10,20 +10,30 @@ import {
   Realm,
 } from '../models/accounts';
 
-export interface MemcmpFilter {
-  memcmp: { offset: number; bytes: string };
+export class MemcmpFilter {
+  offset: number;
+  bytes: Buffer;
+
+  constructor(offset: number, bytes: Buffer) {
+    this.offset = offset;
+    this.bytes = bytes;
+  }
+
+  isMatch(buffer: Buffer) {
+    if (this.offset + this.bytes.length > buffer.length) {
+      return false;
+    }
+
+    for (let i = 0; i < this.bytes.length; i++) {
+      if (this.bytes[i] !== buffer[this.offset + i]) return false;
+    }
+
+    return true;
+  }
 }
 
-export type AccountQueryFilter = MemcmpFilter;
-
-export const pubkeyFilter = (offset: number, pubkey: PublicKey | string) => {
-  return {
-    memcmp: {
-      offset,
-      bytes: pubkey instanceof PublicKey ? pubkey.toBase58() : pubkey,
-    },
-  };
-};
+export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
+  new MemcmpFilter(offset, pubkey.toBuffer());
 
 export async function getRealms(endpoint: string) {
   return getGovernanceAccounts<Realm>(
@@ -33,14 +43,12 @@ export async function getRealms(endpoint: string) {
   );
 }
 
-export const getGovernancesByRealm = (
-  endpoint: string,
-  realmKey: PublicKey | string,
-) => getGovernances(endpoint, [pubkeyFilter(1, realmKey)]);
+export const getGovernancesByRealm = (endpoint: string, realmKey: PublicKey) =>
+  getGovernances(endpoint, [pubkeyFilter(1, realmKey)]);
 
 export async function getGovernances(
   endpoint: string,
-  filters: AccountQueryFilter[] = [],
+  filters: MemcmpFilter[] = [],
 ) {
   const accountGovernances = getGovernanceAccounts<Governance>(
     endpoint,
@@ -76,7 +84,7 @@ export async function getGovernanceAccounts<TAccount>(
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountType: GovernanceAccountType,
-  filters: AccountQueryFilter[] = [],
+  filters: MemcmpFilter[] = [],
 ) {
   const PROGRAM_IDS = utils.programIds();
   PROGRAM_IDS.governance.programId.toBase58();
@@ -102,7 +110,9 @@ export async function getGovernanceAccounts<TAccount>(
                 bytes: bs58.encode([accountType]),
               },
             },
-            ...filters,
+            ...filters.map(f => ({
+              memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
+            })),
           ],
         },
       ],

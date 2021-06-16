@@ -20,7 +20,7 @@ export function useGovernanceAccountByPubkey<TAccount>(
   const { endpoint } = useConnectionConfig();
   const connection = useConnection();
 
-  const getByKey = pubkey?.toBase58();
+  const getByPubkey = pubkey?.toBase58();
 
   useEffect(() => {
     if (!pubkey) {
@@ -40,13 +40,14 @@ export function useGovernanceAccountByPubkey<TAccount>(
       const accountTypes = getAccountTypes(accountClass);
 
       return connection.onProgramAccountChange(governance.programId, info => {
-        if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
+        if (
+          info.accountId.toBase58() === getByPubkey &&
+          accountTypes.some(at => info.accountInfo.data[0] === at)
+        ) {
           const account = BorshAccountParser(accountClass)(
             info.accountId,
             info.accountInfo,
           ) as ParsedAccount<TAccount>;
-
-          console.log('UPDATED account');
 
           setAccount(account);
         }
@@ -57,7 +58,7 @@ export function useGovernanceAccountByPubkey<TAccount>(
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getByKey, connection, endpoint]);
+  }, [getByPubkey, connection, endpoint]);
 
   return account;
 }
