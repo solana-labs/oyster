@@ -95,6 +95,7 @@ export function useEnrichedLendingObligations() {
               collateralMint?.info,
             );
 
+            // @FIXME: support multiple borrows
             const borrowed = wadToLamports(
               obligation.info.borrows[0].borrowedAmountWads,
             ).toNumber();
@@ -128,7 +129,6 @@ export function useEnrichedLendingObligations() {
               health,
               borrowedInQuote,
               collateralInQuote,
-              // @FIXME: BigNumber
               liquidationThreshold:
                 item.reserve.info.config.liquidationThreshold,
               repayName: getTokenName(tokenMap, reserve.liquidity.mintPubkey),

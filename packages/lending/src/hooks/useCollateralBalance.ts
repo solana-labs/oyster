@@ -64,7 +64,6 @@ export function calculateCollateralBalance(
   reserve: Reserve,
   balanceLamports: number,
 ) {
-  // @FIXME: use BigNumber
   return (
     reserveMarketCap(reserve) *
     (balanceLamports / (reserve?.collateral.mintTotalSupply.toNumber() || 1))

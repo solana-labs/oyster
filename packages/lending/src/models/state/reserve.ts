@@ -127,7 +127,6 @@ export const ReserveParser = (pubkey: PublicKey, info: AccountInfo<Buffer>) => {
 };
 
 export const calculateUtilizationRatio = (reserve: Reserve) => {
-  // @FIXME: use BigNumber
   const totalBorrows = wadToLamports(
     reserve.liquidity.borrowedAmountWads,
   ).toNumber();
@@ -139,7 +138,6 @@ export const calculateUtilizationRatio = (reserve: Reserve) => {
 };
 
 export const reserveMarketCap = (reserve?: Reserve) => {
-  // @FIXME: use BigNumber
   const available = reserve?.liquidity.availableAmount.toNumber() || 0;
   const borrowed = wadToLamports(
     reserve?.liquidity.borrowedAmountWads,
@@ -149,7 +147,6 @@ export const reserveMarketCap = (reserve?: Reserve) => {
 };
 
 export const collateralExchangeRate = (reserve?: Reserve) => {
-  // @FIXME: use BigNumber
   return (
     (reserve?.collateral.mintTotalSupply.toNumber() || 1) /
     reserveMarketCap(reserve)
@@ -160,7 +157,6 @@ export const collateralToLiquidity = (
   collateralAmount: BN | number,
   reserve?: Reserve,
 ) => {
-  // @FIXME: use BigNumber
   const amount =
     typeof collateralAmount === 'number'
       ? collateralAmount
@@ -172,7 +168,6 @@ export const liquidityToCollateral = (
   liquidityAmount: BN | number,
   reserve?: Reserve,
 ) => {
-  // @FIXME: use BigNumber
   const amount =
     typeof liquidityAmount === 'number'
       ? liquidityAmount
