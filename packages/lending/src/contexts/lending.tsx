@@ -105,12 +105,6 @@ export const useLending = () => {
               acc?.info.liquidity.mintPubkey.toBase58(),
               MintParser,
             ),
-            // ignore dex if its not set
-            // @FIXME: not a dex market
-            cache.registerParser(
-              acc?.info.liquidity.oraclePubkey.toBase58(),
-              DexMarketParser,
-            ),
           ].filter(_ => _);
           return result;
         }),
