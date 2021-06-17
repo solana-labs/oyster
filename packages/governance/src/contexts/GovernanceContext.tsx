@@ -14,21 +14,6 @@ export interface GovernanceContextState {
   changeTracker: AccountChangeTracker;
 }
 
-// const removeCtxItem = (setAction: React.Dispatch<React.SetStateAction<{}>>) => {
-//   return (key: string) => {
-//     setAction((objs: any) => {
-//       return {
-//         ...Object.keys(objs)
-//           .filter(k => k !== key)
-//           .reduce((res, key) => {
-//             res[key] = objs[key];
-//             return res;
-//           }, {} as any),
-//       };
-//     });
-//   };
-// };
-
 class AccountRemovedEventArgs {
   pubkey: string;
   accountType: GovernanceAccountType;

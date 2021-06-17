@@ -32,7 +32,6 @@ export function useGovernanceAccountByPubkey<TAccount>(
 
     const sub = (async () => {
       // TODO: Add retries
-
       const accountInfo = await connection.getAccountInfo(pubkey);
       if (accountInfo) {
         const loadedAccount = BorshAccountParser(accountClass)(
@@ -43,13 +42,9 @@ export function useGovernanceAccountByPubkey<TAccount>(
       }
 
       const { governance } = utils.programIds();
-      const accountTypes = getAccountTypes(accountClass);
 
       return connection.onProgramAccountChange(governance.programId, info => {
-        if (
-          info.accountId.toBase58() === getByPubkey &&
-          accountTypes.some(at => info.accountInfo.data[0] === at)
-        ) {
+        if (info.accountId.toBase58() === getByPubkey) {
           const account = BorshAccountParser(accountClass)(
             info.accountId,
             info.accountInfo,
