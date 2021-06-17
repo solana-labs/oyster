@@ -16,6 +16,7 @@ import { RegisterGovernance } from './RegisterGovernance';
 import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
 import { Governance, ProposalState } from '../../models/accounts';
+import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 
 export const RealmView = () => {
   const history = useHistory();
@@ -48,23 +49,12 @@ export const RealmView = () => {
           <Row>
             <Col md={12} xs={24} className="realm-title">
               <Row>
-                <div style={{ position: 'relative' }}>
-                  <TokenIcon
-                    mintAddress={realm?.info.communityMint}
-                    size={60}
-                  />
-                  {realm?.info.councilMint && (
-                    <TokenIcon
-                      style={{
-                        position: 'absolute',
-                        top: 30,
-                        left: 45,
-                      }}
-                      mintAddress={realm.info.councilMint}
-                      size={30}
-                    />
-                  )}
-                </div>
+                <RealmBadge
+                  size={60}
+                  communityMint={realm?.info.communityMint}
+                  councilMint={realm?.info.councilMint}
+                ></RealmBadge>
+
                 <Col>
                   <h1>{realm?.info.name}</h1>
                 </Col>
