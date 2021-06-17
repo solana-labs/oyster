@@ -34,7 +34,7 @@ export function useUserCollateralBalance(
     const updateBalance = () => {
       setBalanceInUSD(
         balance *
-          midPriceInUSD(reserve?.liquidity.mintPubkey?.toBase58() || ''),
+          midPriceInUSD(reserve?.liquidity.mintPubkey.toBase58() || ''),
       );
     };
 
