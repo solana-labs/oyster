@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { useMidPriceInUSD } from '../contexts/market';
+import { usePrice } from '../contexts/pyth';
 import { useLendingReserve } from './useLendingReserves';
 import { useUserDeposits } from './useUserDeposits';
 import { useUserObligations } from './useUserObligations';
@@ -30,7 +30,7 @@ export function useBorrowingPower(
 
   const { totalInQuote } = useUserDeposits(exclude, inlcude);
 
-  const price = useMidPriceInUSD(liquidityMintAddress).price;
+  const price = usePrice(liquidityMintAddress);
 
   const { totalInQuote: loansValue } = useUserObligations();
 

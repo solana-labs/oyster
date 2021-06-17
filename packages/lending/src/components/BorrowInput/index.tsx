@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { borrowObligationLiquidity } from '../../actions';
 import { LABELS } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import { usePrice } from '../../contexts/pyth';
 import {
   useSliderInput,
   useUserBalance,
@@ -48,12 +48,12 @@ export const BorrowInput = (props: {
 
     return cache.get(id) as ParsedAccount<Reserve>;
   }, [depositReserveKey]);
-  const borrowPrice = useMidPriceInUSD(
+  const borrowPrice = usePrice(
     borrowReserve.info.liquidity.mintPubkey.toBase58(),
-  ).price;
-  const collateralPrice = useMidPriceInUSD(
+  );
+  const collateralPrice = usePrice(
     depositReserve?.info.liquidity.mintPubkey.toBase58(),
-  )?.price;
+  );
 
   const include = useMemo(() => new Set([depositReserve?.pubkey.toBase58()]), [
     depositReserve,

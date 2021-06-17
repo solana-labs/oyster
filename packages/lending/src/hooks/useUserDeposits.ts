@@ -8,7 +8,7 @@ import {
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
+import { usePyth } from '../contexts/pyth';
 import { calculateDepositAPY, Reserve } from '../models';
 import { calculateCollateralBalance } from './useCollateralBalance';
 import { useLendingReserves } from './useLendingReserves';
@@ -32,7 +32,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   const { userAccounts } = useUserAccounts();
   const { reserveAccounts } = useLendingReserves();
   const [userDeposits, setUserDeposits] = useState<UserDeposit[]>([]);
-  const { marketEmitter, midPriceInUSD } = useMarkets();
+  const { getPrice } = usePyth();
   const { tokenMap } = useConnectionConfig();
 
   const reservesByCollateralMint = useMemo(() => {
@@ -51,10 +51,6 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   }, [reserveAccounts, exclude, include]);
 
   useEffect(() => {
-    const activeMarkets = new Set(
-      reserveAccounts.map(r => r.info.liquidity.oraclePubkey.toBase58()),
-    );
-
     const userDepositsFactory = () => {
       return userAccounts
         .filter(acc => reservesByCollateralMint.has(acc?.info.mint.toBase58()))
@@ -72,9 +68,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
             item?.info.amount.toNumber(),
           );
           const amount = fromLamports(amountLamports, collateralMint?.info);
-          const price = midPriceInUSD(
-            reserve.info.liquidity.mintPubkey.toBase58(),
-          );
+          const price = getPrice(reserve.info.liquidity.mintPubkey.toBase58());
           const amountInQuote = price * amount;
 
           return {
@@ -91,27 +85,13 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
         .sort((a, b) => b.info.amountInQuote - a.info.amountInQuote);
     };
 
-    const dispose = marketEmitter.onMarket(args => {
-      // ignore if none of the markets is used by the reserve
-      if ([...args.ids.values()].every(id => !activeMarkets.has(id))) {
-        return;
-      }
-
-      setUserDeposits(userDepositsFactory());
-    });
-
     setUserDeposits(userDepositsFactory());
-
-    return () => {
-      dispose();
-    };
   }, [
     userAccounts,
     reserveAccounts,
     reservesByCollateralMint,
     tokenMap,
-    midPriceInUSD,
-    marketEmitter,
+    getPrice,
   ]);
 
   return {

@@ -8,7 +8,7 @@ import {
 import { MintInfo } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
+import { usePyth } from '../contexts/pyth';
 import { collateralToLiquidity, Obligation, Reserve } from '../models';
 import { useLendingObligations } from './useLendingObligations';
 import { useLendingReserves } from './useLendingReserves';
@@ -36,7 +36,7 @@ export function useEnrichedLendingObligations() {
   const { obligations } = useLendingObligations();
   const { reserveAccounts } = useLendingReserves();
   const { tokenMap } = useConnectionConfig();
-  const { marketEmitter, midPriceInUSD } = useMarkets();
+  const { getPrice } = usePyth();
 
   const availableReserves = useMemo(() => {
     return reserveAccounts.reduce((map, reserve) => {
@@ -109,10 +109,10 @@ export function useEnrichedLendingObligations() {
             ) as ParsedAccount<MintInfo>;
             borrowedInQuote =
               fromLamports(borrowed, liquidityMint.info) *
-              midPriceInUSD(liquidityMintAddress);
+              getPrice(liquidityMintAddress);
+            // @FIXME: collateral can't be priced by pyth
             collateralInQuote =
-              collateral *
-              midPriceInUSD(collateralMint?.pubkey.toBase58() || '');
+              collateral * getPrice(collateralMint?.pubkey.toBase58() || '');
 
             ltv = (100 * borrowedAmount) / collateral;
 
@@ -141,21 +141,15 @@ export function useEnrichedLendingObligations() {
         })
         .sort((a, b) => a.info.health - b.info.health)
     );
-  }, [obligations, availableReserves, midPriceInUSD, tokenMap]);
+  }, [obligations, availableReserves, getPrice, tokenMap]);
 
   const [enriched, setEnriched] = useState<EnrichedLendingObligation[]>(
     enrichedFactory(),
   );
 
   useEffect(() => {
-    const dispose = marketEmitter.onMarket(() => {
-      setEnriched(enrichedFactory());
-    });
-
-    return () => {
-      dispose();
-    };
-  }, [enrichedFactory, setEnriched, marketEmitter, midPriceInUSD]);
+    setEnriched(enrichedFactory());
+  }, [enrichedFactory, setEnriched]);
 
   return {
     obligations: enriched,

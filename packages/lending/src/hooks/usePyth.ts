@@ -17,7 +17,8 @@ const PYTH_PROGRAM_ID = new PublicKey(
 type Products = Record<string, Product>;
 type Prices = Record<string, Price>;
 
-const usePythProducts = () => {
+// @TODO: subscribe to changes
+export const usePythProducts = () => {
   const connection = useConnection();
   const [products, setProducts] = useState<Products>({});
 
@@ -52,7 +53,7 @@ const usePythProducts = () => {
 };
 
 // @TODO: aggregate subscriptions by mint
-const usePythPriceByMint = (mint: string) => {
+export const usePythPriceByMint = (mint: string) => {
   const { tokenMap } = useConnectionConfig();
   const products = usePythProducts();
   const connection = useConnection();
@@ -98,13 +99,9 @@ const usePythPriceByMint = (mint: string) => {
   return price;
 };
 
-const useMidPriceInUSD = (mint: string) => {
+export const useMidPriceInUSD = (mint: string) => {
   const price = usePythPriceByMint(mint);
   return price ? price.price * Math.pow(10, price.exponent) : 0;
-}
-
-interface ProductAttributes {
-  [index: string]: string;
 }
 
 interface Product {
@@ -114,6 +111,10 @@ interface Product {
   size: number;
   priceAccountKey: PublicKey;
   product: ProductAttributes;
+}
+
+interface ProductAttributes {
+  [index: string]: string;
 }
 
 interface Price {

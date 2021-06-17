@@ -9,7 +9,7 @@ import { PublicKey } from '@solana/web3.js';
 import { Card, Col, Row, Statistic } from 'antd';
 import React, { useMemo } from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import { usePrice } from '../../contexts/pyth';
 import { calculateDepositAPY, Reserve } from '../../models';
 import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
 import './style.less';
@@ -28,7 +28,7 @@ export const ReserveStatus = (props: {
 
   const mintAddress = props.reserve.liquidity.mintPubkey?.toBase58();
   const liquidityMint = useMint(mintAddress);
-  const { price } = useMidPriceInUSD(mintAddress);
+  const price = usePrice(mintAddress);
   const availableAmount = fromLamports(
     props.reserve.liquidity.availableAmount,
     liquidityMint,

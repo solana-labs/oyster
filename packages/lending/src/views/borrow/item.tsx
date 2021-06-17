@@ -9,14 +9,13 @@ import { Button } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import { usePrice } from '../../contexts/pyth';
 import { useBorrowingPower } from '../../hooks';
 import { calculateBorrowAPY, Reserve } from '../../models';
 
 export const BorrowItem = (props: { reserve: Reserve; address: PublicKey }) => {
   const name = useTokenName(props.reserve.liquidity.mintPubkey);
-  const price = useMidPriceInUSD(props.reserve.liquidity.mintPubkey.toBase58())
-    .price;
+  const price = usePrice(props.reserve.liquidity.mintPubkey.toBase58());
 
   const { borrowingPower, totalInQuote } = useBorrowingPower(props.address);
 

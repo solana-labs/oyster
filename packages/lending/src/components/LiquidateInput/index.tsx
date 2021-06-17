@@ -12,7 +12,7 @@ import Card from 'antd/lib/card';
 import React, { useCallback, useEffect, useState } from 'react';
 import { liquidateObligation } from '../../actions';
 import { LABELS, marks } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import { usePrice } from '../../contexts/pyth';
 import {
   EnrichedLendingObligation,
   InputType,
@@ -123,9 +123,9 @@ export const LiquidateInput = (props: {
     type,
   ]);
 
-  const collateralPrice = useMidPriceInUSD(
+  const collateralPrice = usePrice(
     withdrawReserve?.info.liquidity.mintPubkey.toBase58(),
-  )?.price;
+  );
 
   useEffect(() => {
     if (withdrawReserve && lastTyped === 'liquidate') {

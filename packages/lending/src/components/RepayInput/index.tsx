@@ -11,7 +11,7 @@ import { Card, Slider } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 import { repayObligationLiquidity } from '../../actions';
 import { LABELS, marks } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
+import { usePrice } from '../../contexts/pyth';
 import {
   EnrichedLendingObligation,
   InputType,
@@ -124,9 +124,9 @@ export const RepayInput = (props: {
     wallet,
   ]);
 
-  const collateralPrice = useMidPriceInUSD(
+  const collateralPrice = usePrice(
     depositReserve?.info.liquidity.mintPubkey.toBase58(),
-  )?.price;
+  );
 
   useEffect(() => {
     if (depositReserve && lastTyped === 'repay') {

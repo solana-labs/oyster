@@ -1,8 +1,8 @@
 import { contexts, fromLamports } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
 import { Reserve, reserveMarketCap } from '../models';
+import { usePrice } from '../contexts/pyth';
 import { useUserBalance } from './useUserBalance';
 
 const { useMint } = contexts.Accounts;
@@ -18,7 +18,6 @@ export function useUserCollateralBalance(
   );
 
   const [balanceInUSD, setBalanceInUSD] = useState(0);
-  const { marketEmitter, midPriceInUSD } = useMarkets();
 
   const balanceLamports = useMemo(
     () => reserve && calculateCollateralBalance(reserve, userBalance),
@@ -30,26 +29,11 @@ export function useUserCollateralBalance(
     mint,
   ]);
 
+  const price = usePrice(reserve?.liquidity.mintPubkey.toBase58() || '');
+
   useEffect(() => {
-    const updateBalance = () => {
-      setBalanceInUSD(
-        balance *
-          midPriceInUSD(reserve?.liquidity.mintPubkey.toBase58() || ''),
-      );
-    };
-
-    const dispose = marketEmitter.onMarket(args => {
-      if (args.ids.has(reserve?.liquidity.oraclePubkey.toBase58() || '')) {
-        updateBalance();
-      }
-    });
-
-    updateBalance();
-
-    return () => {
-      dispose();
-    };
-  }, [balance, midPriceInUSD, marketEmitter, mint, setBalanceInUSD, reserve]);
+    setBalanceInUSD(balance * price);
+  }, [setBalanceInUSD, balance, price]);
 
   return {
     balance,
