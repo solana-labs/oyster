@@ -6,7 +6,6 @@ import { LABELS } from '../../../constants';
 
 import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useWalletVoteRecord } from '../../../contexts/GovernanceContext';
 
 import './style.less';
 
@@ -21,6 +20,7 @@ import { Vote } from '../../../models/instructions';
 
 import { castVote } from '../../../actions/castVote';
 import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
+import { useWalletVoteRecord } from '../../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

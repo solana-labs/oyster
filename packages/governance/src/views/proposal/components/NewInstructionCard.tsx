@@ -8,7 +8,7 @@ import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../../constants';
 import { Governance, Proposal } from '../../../models/accounts';
 
-import { useProposalAuthority } from '../../../contexts/GovernanceContext';
+import { useProposalAuthority } from '../../../hooks/apiHooks';
 import { insertInstruction } from '../../../actions/insertInstruction';
 import '../style.less';
 

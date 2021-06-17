@@ -4,15 +4,7 @@ import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
-import {
-  useGovernance,
-  useProposal,
-  useSignatoryRecord,
-  useWalletTokenOwnerRecord,
-  useInstructions,
-  useVoteRecords,
-  useTokenOwnerRecords,
-} from '../../contexts/GovernanceContext';
+
 import { StateBadge } from './components/StateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
@@ -38,6 +30,16 @@ import { Vote } from '../../models/instructions';
 import CancelButton from './components/CancelButton';
 import { FinalizeVote } from './components/FinalizeVote';
 
+import {
+  useGovernance,
+  useProposal,
+  useTokenOwnerRecords,
+  useWalletTokenOwnerRecord,
+  useWalletSignatoryRecord,
+  useInstructionsByProposal,
+  useVoteRecordsByProposal,
+} from '../../hooks/apiHooks';
+
 const { TabPane } = Tabs;
 
 export const urlRegex =
@@ -62,7 +64,7 @@ export const ProposalView = () => {
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
 
-  const voteRecords = useVoteRecords(proposal?.pubkey);
+  const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.config.realm,
     proposal?.info.governingTokenMint,
@@ -227,12 +229,12 @@ function InnerProposalView({
   endpoint: string;
   hasVotes: boolean;
 }) {
-  let signatoryRecord = useSignatoryRecord(proposal.pubkey);
+  let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
     governance.info.config.realm,
     proposal.info.governingTokenMint,
   );
-  const instructions = useInstructions(proposal.pubkey);
+  const instructions = useInstructionsByProposal(proposal.pubkey);
 
   const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
   const isGist =

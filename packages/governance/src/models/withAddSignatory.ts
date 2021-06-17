@@ -7,7 +7,7 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { AddSignatoryArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED } from './accounts';
+import { getSignatoryRecordAddress } from './accounts';
 
 export const withAddSignatory = async (
   instructions: TransactionInstruction[],
@@ -22,13 +22,9 @@ export const withAddSignatory = async (
   const args = new AddSignatoryArgs({ signatory });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      proposal.toBuffer(),
-      signatory.toBuffer(),
-    ],
-    PROGRAM_IDS.governance.programId,
+  const signatoryRecordAddress = await getSignatoryRecordAddress(
+    proposal,
+    signatory,
   );
 
   const keys = [

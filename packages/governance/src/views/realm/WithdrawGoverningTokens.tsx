@@ -7,8 +7,9 @@ import { contexts, hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
-import { useWalletTokenOwnerRecord } from '../../contexts/GovernanceContext';
+
 import { PublicKey } from '@solana/web3.js';
+import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

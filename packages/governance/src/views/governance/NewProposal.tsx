@@ -13,10 +13,9 @@ import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
 import { Governance, Realm } from '../../models/accounts';
-import {
-  useRealm,
-  useWalletTokenOwnerRecord,
-} from '../../contexts/GovernanceContext';
+import { useRealm } from '../../contexts/GovernanceContext';
+
+import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;

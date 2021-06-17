@@ -213,12 +213,14 @@ const withMint = async (
 
   signers.push(otherOwner);
 
+  const otherOwnerPubKey = otherOwner.publicKey;
+
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
     wallet.publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    otherOwner.publicKey,
+    otherOwnerPubKey,
     signers,
   );
 

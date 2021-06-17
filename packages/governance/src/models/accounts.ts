@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+import { utils } from '@oyster/common';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -14,6 +15,38 @@ export enum GovernanceAccountType {
   SignatoryRecord = 6,
   VoteRecord = 7,
   ProposalInstruction = 8,
+}
+export type GovernanceAccountClass =
+  | typeof Realm
+  | typeof TokenOwnerRecord
+  | typeof Governance
+  | typeof Proposal
+  | typeof SignatoryRecord
+  | typeof VoteRecord
+  | typeof ProposalInstruction;
+
+export function getAccountTypes(accountClass: GovernanceAccountClass) {
+  switch (accountClass) {
+    case Realm:
+      return [GovernanceAccountType.Realm];
+    case TokenOwnerRecord:
+      return [GovernanceAccountType.TokenOwnerRecord];
+    case Proposal:
+      return [GovernanceAccountType.Proposal];
+    case SignatoryRecord:
+      return [GovernanceAccountType.SignatoryRecord];
+    case VoteRecord:
+      return [GovernanceAccountType.VoteRecord];
+    case ProposalInstruction:
+      return [GovernanceAccountType.ProposalInstruction];
+    case Governance:
+      return [
+        GovernanceAccountType.AccountGovernance,
+        GovernanceAccountType.ProgramGovernance,
+      ];
+    default:
+      throw Error(`${accountClass} account is not supported`);
+  }
 }
 
 export class Realm {
@@ -113,6 +146,26 @@ export class TokenOwnerRecord {
     this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
     this.totalVotesCount = args.totalVotesCount;
   }
+}
+
+export async function getTokenOwnerAddress(
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+  governingTokenOwner: PublicKey,
+) {
+  const PROGRAM_IDS = utils.programIds();
+
+  const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+      governingTokenOwner.toBuffer(),
+    ],
+    PROGRAM_IDS.governance.programId,
+  );
+
+  return tokenOwnerRecordAddress;
 }
 
 export enum ProposalState {
@@ -232,6 +285,24 @@ export class SignatoryRecord {
     this.signatory = args.signatory;
     this.signedOff = !!args.signedOff;
   }
+}
+
+export async function getSignatoryRecordAddress(
+  proposal: PublicKey,
+  signatory: PublicKey,
+) {
+  const PROGRAM_IDS = utils.programIds();
+
+  const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      proposal.toBuffer(),
+      signatory.toBuffer(),
+    ],
+    PROGRAM_IDS.governance.programId,
+  );
+
+  return signatoryRecordAddress;
 }
 
 export class VoteWeight {
