@@ -11,7 +11,6 @@ import {
   Reserve,
   ReserveParser,
 } from '../models';
-import { DexMarketParser } from '../models/dex';
 import { usePrecacheMarket } from './market';
 
 const { useConnection } = contexts.Connection;
