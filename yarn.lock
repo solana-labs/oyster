@@ -2953,6 +2953,15 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
+"@project-serum/serum@^0.13.38":
+  version "0.13.38"
+  resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.38.tgz#ef50a0f50bd69fd7b51309fbb44ad995a1e6e210"
+  integrity sha512-TOph1Hxoi5kOUg72tWbbNGviqBw29SrP4BH70gXtqUDiFTQJLrE2yfS5HC7p0JaU8p9WdrYGnxcFKCddZJ3ing==
+  dependencies:
+    "@solana/web3.js" "^0.90.0"
+    bn.js "^5.1.2"
+    buffer-layout "^1.2.0"
+
 "@project-serum/sol-wallet-adapter@^0.1.4":
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.1.8.tgz#90c6c1da793d32ed4ba3c67c5702a5bc804ef197"
@@ -6491,6 +6500,11 @@ buffer-layout@1.2.0, buffer-layout@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/buffer-layout/-/buffer-layout-1.2.0.tgz#ee1f5ef05a8afd5db6b3a8fe2056c111bc69c737"
   integrity sha512-iiyRoho/ERzBUv6kFvfsrLNgTlVwOkqQcSQN7WrO3Y+c5SeuEhCn6+y1KwhM0V3ndptF5mI/RI44zkw0qcR5Jg==
+
+buffer-layout@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/buffer-layout/-/buffer-layout-1.2.1.tgz#17b6db7abea303cab35eebd77919b89de026297d"
+  integrity sha512-RUTGEYG1vX0Zp1dStQFl8yeU/LEBPXVtHwzzDbPWkE5zq+Prt9fkFLKNiwmaeHg6BBiRMcQAgj4cynazO6eekw==
 
 buffer-to-arraybuffer@^0.0.5:
   version "0.0.5"
