@@ -22,6 +22,14 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   async signAllTransactions(transactions: Transaction[]) {
+    const solong = (window as any).solong;
+
+    // Temp. workaround to ensure requests to sign multiple transactions at once don't fail when Solong wallet is used
+    // Signing transactions one by one as a fallback works but the UX is not great because user is asked to sign multiple times
+    for (let t of transactions) {
+      await solong.signTransaction(t);
+    }
+
     return transactions;
   }
 

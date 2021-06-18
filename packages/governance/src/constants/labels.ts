@@ -14,11 +14,12 @@ export const LABELS = {
   SETTINGS_TOOLTIP: 'Settings',
   DASHBOARD_INFO: 'Connect to a wallet to view proposals.',
   DESCRIPTION: 'Description',
+  DESCRIPTION_LABEL: 'description',
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
-  SIG_GIVEN: 'Signatories',
+  SIGNATORIES: 'Signatories',
   VOTES_REQUIRED: 'Votes Required',
-  VOTES_CAST: 'Votes In Favor',
+  VOTES_IN_FAVOUR: 'Votes In Favor',
   ADMIN_PANEL: 'Admin Panel',
   COPY_FAILED_ADDRESSES_TO_INPUT: 'Copy failed addresses to the input',
   COPY_FAILED_ADDRESSES_TO_CLIPBOARD: 'Copy failed addresses to clipboard',
@@ -45,7 +46,7 @@ export const LABELS = {
   GOVERNANCE_TOKENS_ADDED: 'Governance tokens added.',
   NEW_VOTED_ACCOUNT_ADDED: 'New vote account added.',
   ADDING_NEW_VOTE_ACCOUNT: 'Adding new vote account...',
-  PROPOSAL_MINT_TYPE: 'Who votes?',
+  WHO_VOTES_QUESTION: 'who votes?',
   TRANSACTION: 'Transaction - ',
   CANT_GIVE_ZERO_TOKENS: "Can't give zero tokens to a user!",
   BULK_TOKENS: 'Token Holders',
@@ -90,7 +91,7 @@ export const LABELS = {
   WITHDRAWING_YOUR_VOTE: 'Withdrawing your vote',
   VOTE_WITHDRAWN: 'Your vote has been withdrawn',
 
-  REFUND_TOKENS: 'Refund My Tokens',
+  RELEASE_MY_TOKENS: 'Release My Tokens',
   REFUND_YOUR_TOKENS_QUESTION: 'Refund your tokens?',
   REFUND_YOUR_TOKENS_MSG:
     'The proposal has been voted. Refunding your tokens won’t change the outcome.',
@@ -98,18 +99,34 @@ export const LABELS = {
   REFUNDING_YOUR_TOKENS: 'Refunding your tokens',
   TOKENS_REFUNDED: 'Your voting tokens have been refunded',
 
-  REGISTER_GOVERNANCE: 'Register',
+  REGISTER_REALM: 'Register Realm',
+  REALMS: 'Realms',
+  REALM: 'Realm',
+
+  REGISTER_GOVERNANCE: 'Register Governance',
+  GOVERNANCE_OVER: 'governance over',
+  PROGRAM: 'Program',
+
+  PROGRAM_ID_LABEL: 'program id',
+  ACCOUNT_ADDRESS: 'account address',
+
+  MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
+  MIN_INSTRUCTION_HOLD_UP_TIME: 'min instruction hold up time (slots)',
+  MAX_VOTING_TIME: 'max voting time (slots)',
+
+  TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
 
-  GOVERNANCE: 'Governance Token Holders',
+  COMMUNITY_TOKEN_HOLDERS: 'Community Token Holders',
   COUNCIL: 'The Council',
-  GOVERNANCE_MINT: 'Governance Mint ID',
-  USE_COUNCIL_MINT: 'Allow Council Mint?',
-  COUNCIL_MINT: 'Council Mint ID',
+  COMMUNITY_TOKEN_MINT: 'community token mint',
+  USE_COUNCIL_TOKEN: 'use council token',
+  COUNCIL_TOKEN_MINT: 'council token mint',
+  NAME_LABEL: 'name',
 
-  VOTE_PERCENT_THRESHOLD: 'Vote Threshold (%)',
+  YES_VOTE_THRESHOLD_PERCENTAGE: 'yes vote threshold (%)',
 
   SELECT_PROPOSAL_TYPE: 'Select the type of proposals this app will generate',
   SELECT_EXECUTION_TYPE: 'Select how transactions will be executed',
@@ -121,6 +138,7 @@ export const LABELS = {
   CONFIG: 'Governed Program',
   GIST_PLACEHOLDER: 'Github Gist link',
   NAME: 'Name',
+
   PUBLIC_KEY: 'Public Key',
   MENU_GOVERNANCE: 'My Governed Programs',
   LEAVE_BLANK_IF_YOU_WANT_ONE: 'Leave blank if you want one made for you',
@@ -128,18 +146,17 @@ export const LABELS = {
     ' Please note that during voting, if you withdraw your tokens, your vote will not count towards the voting total. You must wait for the vote to complete in order for your withdrawal to not affect the voting.',
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
-  DELAY: 'Slot Delay',
+  HOLD_UP_TIME: 'hold up time',
 
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',
-  PROGRAM_ID_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
-    `Program ID: '${programId}' is not a valid public key`,
+  ACCOUNT_ADDRESS_IS_NOT_A_VALID_PUBLIC_KEY: (accountAddress: string) =>
+    `Account address: '${accountAddress}' is not a valid public key`,
   GOVERNANCE_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
     `Governance Mint ID: '${programId}' is not a valid public key`,
   COUNCIL_MINT_IS_NOT_A_VALID_PUBLIC_KEY: (programId: string) =>
     `Council Mint ID: '${programId}' is not a valid public key`,
 
-  TIME_LIMIT: 'Voting Time Limit',
   THIS_CONFIG_LACKS_COUNCIL: 'This program does not have a council.',
   GIT_CONTENT_EXCEEDED:
     'Gist Github API limit exceeded. Click to view on Github directly.',
@@ -149,4 +166,16 @@ export const LABELS = {
   LARGEST_VOTERS_BUBBLE: 'Top Voters Visualization',
   LARGEST_VOTERS_TABLE: 'Top Voters',
   PERCENTAGE: 'Percentage',
+  TIME_LIMIT: 'time limit',
+
+  DEPOSIT_TOKENS: (tokenName?: string) => `Deposit ${tokenName ?? ''} Tokens`,
+  DEPOSIT_TOKENS_QUESTION: 'Deposit your tokens?',
+  DEPOSIT: 'Deposit',
+
+  WITHDRAW_TOKENS: (tokenName?: string) => `Withdraw ${tokenName ?? ''} Tokens`,
+  WITHDRAW_TOKENS_QUESTION: 'Withdraw your tokens?',
+
+  INSTRUCTIONS: 'Instructions',
+
+  FINALIZE_VOTE: 'Finalize Vote',
 };

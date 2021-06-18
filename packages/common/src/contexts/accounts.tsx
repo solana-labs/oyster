@@ -134,7 +134,7 @@ export const cache = {
     // TODO: refactor to use multiple accounts query with flush like behavior
     query = connection.getAccountInfo(id).then(data => {
       if (!data) {
-        throw new Error('Account not found');
+        throw new Error(`Account ${id.toBase58()} not found`);
       }
 
       return cache.add(id, data, parser);
@@ -437,7 +437,7 @@ export function AccountsProvider({ children = null as any }) {
         programIds().token,
         info => {
           // TODO: fix type in web3.js
-          const id = (info.accountId as unknown) as string;
+          const id = info.accountId as unknown as string;
           // TODO: do we need a better way to identify layout (maybe a enum identifing type?)
           if (info.accountInfo.data.length === AccountLayout.span) {
             const data = deserializeAccount(info.accountInfo.data);
