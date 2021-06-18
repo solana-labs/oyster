@@ -80,6 +80,7 @@ export const PROGRAM_IDS = [
         // new PublicKey("9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL"),
       ],
     }),
+    lending: () => new PublicKey('LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi'),
   },
   {
     name: 'testnet',
@@ -98,8 +99,8 @@ export const PROGRAM_IDS = [
       },
       legacy: [],
     }),
+    lending: () => new PublicKey('LendXXX'),
   },
-
   {
     name: 'devnet',
     governance: () => ({
@@ -117,6 +118,7 @@ export const PROGRAM_IDS = [
       },
       legacy: [new PublicKey('BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ')],
     }),
+    lending: () => new PublicKey('LendXXX'),
   },
   {
     name: 'localnet',
@@ -135,6 +137,7 @@ export const PROGRAM_IDS = [
       },
       legacy: [],
     }),
+    lending: () => new PublicKey('LendXXX'),
   },
 ];
 
@@ -154,11 +157,7 @@ export const setProgramIds = (envName: string) => {
 
   GOVERNANCE = instance.governance();
 
-  if (envName === 'mainnet-beta') {
-    LENDING_PROGRAM_ID = new PublicKey(
-      'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
-    );
-  }
+  LENDING_PROGRAM_ID = instance.lending();
 };
 
 export const programIds = () => {
