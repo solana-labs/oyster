@@ -1,17 +1,16 @@
 import { PublicKey } from '@solana/web3.js';
 import { TokenSwapLayout, TokenSwapLayoutV1 } from '../models/tokenSwap';
 
+export let SYSTEM = new PublicKey('11111111111111111111111111111111');
 export const WRAPPED_SOL_MINT = new PublicKey(
   'So11111111111111111111111111111111111111112',
 );
 export let TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
 );
-
 export let LENDING_PROGRAM_ID = new PublicKey(
   'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
 );
-
 export let SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
 );
@@ -21,24 +20,21 @@ export let BPF_UPGRADE_LOADER_ID = new PublicKey(
 export let METADATA_PROGRAM_ID = new PublicKey(
   'metaTA73sFPqA8whreUbBsbn3SLJH2vhrW9fP5dmfdC',
 );
-
 export const MEMO_ID = new PublicKey(
   'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
 );
-
 export const VAULT_ID = new PublicKey(
   '94wRaYAQdC2gYF76AUTYSugNJ3rAC4EimjAMPwM7uYry',
 );
-
 export const AUCTION_ID = new PublicKey(
   'C9nHkL6BfGx9M9MyYrJqAD5hPsGJd1fHpp1uAJA6vTCn',
 );
-
 export const METAPLEX_ID = new PublicKey(
   'EPtpKdKW8qciGVd1UFyGjgbBHTbSAyvbY61h9uQGVgeu',
 );
-
-export let SYSTEM = new PublicKey('11111111111111111111111111111111');
+export const PYTH_PROGRAM_ID = new PublicKey(
+  'BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2',
+);
 
 let WORMHOLE_BRIDGE: {
   pubkey: PublicKey;

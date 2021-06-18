@@ -1,4 +1,4 @@
-import { contexts, useConnectionConfig } from '@oyster/common';
+import { contexts, PYTH_PROGRAM_ID, useConnectionConfig } from '@oyster/common';
 import {
   parseMappingData,
   parsePriceData,
@@ -9,10 +9,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 const { useConnection } = contexts.Connection;
 const { getMultipleAccounts } = contexts.Accounts;
-
-const PYTH_PROGRAM_ID = new PublicKey(
-  'BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2',
-);
 
 type Products = Record<string, Product>;
 type Prices = Record<string, Price>;
