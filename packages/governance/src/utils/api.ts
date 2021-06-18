@@ -3,6 +3,7 @@ import * as bs58 from 'bs58';
 import { deserializeBorsh, ParsedAccount, utils } from '@oyster/common';
 import { GOVERNANCE_SCHEMA } from '../models/serialisation';
 import {
+  GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
@@ -43,7 +44,7 @@ export async function getRealms(endpoint: string) {
   );
 }
 
-export async function getGovernanceAccounts<TAccount>(
+export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountTypes: GovernanceAccountType[],
@@ -70,7 +71,7 @@ export async function getGovernanceAccounts<TAccount>(
   >;
 }
 
-async function getGovernanceAccountsImpl<TAccount>(
+async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountType: GovernanceAccountType,

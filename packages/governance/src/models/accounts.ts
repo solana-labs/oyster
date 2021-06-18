@@ -16,6 +16,11 @@ export enum GovernanceAccountType {
   VoteRecord = 7,
   ProposalInstruction = 8,
 }
+
+export interface GovernanceAccount {
+  accountType: GovernanceAccountType;
+}
+
 export type GovernanceAccountClass =
   | typeof Realm
   | typeof TokenOwnerRecord

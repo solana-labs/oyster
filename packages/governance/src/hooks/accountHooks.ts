@@ -1,7 +1,11 @@
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 
-import { getAccountTypes, GovernanceAccountClass } from '../models/accounts';
+import {
+  getAccountTypes,
+  GovernanceAccount,
+  GovernanceAccountClass,
+} from '../models/accounts';
 import { BorshAccountParser } from '../models/serialisation';
 
 import {
@@ -14,10 +18,9 @@ import { MemcmpFilter, getGovernanceAccounts } from '../utils/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 
 // Fetches Governance program account using the given key and subscribes to updates
-export function useGovernanceAccountByPubkey<TAccount>(
-  accountClass: GovernanceAccountClass,
-  pubkey: PublicKey | undefined,
-) {
+export function useGovernanceAccountByPubkey<
+  TAccount extends GovernanceAccount
+>(accountClass: GovernanceAccountClass, pubkey: PublicKey | undefined) {
   const [account, setAccount] = useState<ParsedAccount<TAccount>>();
 
   const { endpoint } = useConnectionConfig();
@@ -65,7 +68,7 @@ export function useGovernanceAccountByPubkey<TAccount>(
 }
 
 // Fetches Governance program account using the given PDA args and subscribes to updates
-export function useGovernanceAccountByPda<TAccount>(
+export function useGovernanceAccountByPda<TAccount extends GovernanceAccount>(
   accountClass: GovernanceAccountClass,
   getPda: () => Promise<PublicKey | undefined>,
   pdaArgs: any[],
@@ -86,10 +89,9 @@ export function useGovernanceAccountByPda<TAccount>(
 }
 
 // Fetches Governance program accounts using the given filter and subscribes to updates
-export function useGovernanceAccountsByFilter<TAccount>(
-  accountClass: GovernanceAccountClass,
-  filters: (MemcmpFilter | undefined)[],
-) {
+export function useGovernanceAccountsByFilter<
+  TAccount extends GovernanceAccount
+>(accountClass: GovernanceAccountClass, filters: (MemcmpFilter | undefined)[]) {
   const [accounts, setAccounts] = useState<
     Record<string, ParsedAccount<TAccount>>
   >({});
@@ -194,10 +196,9 @@ export function useGovernanceAccountsByFilter<TAccount>(
   return Object.values(accounts);
 }
 
-export function useGovernanceAccountByFilter<TAccount>(
-  accountClass: GovernanceAccountClass,
-  filters: (MemcmpFilter | undefined)[],
-) {
+export function useGovernanceAccountByFilter<
+  TAccount extends GovernanceAccount
+>(accountClass: GovernanceAccountClass, filters: (MemcmpFilter | undefined)[]) {
   const accounts = useGovernanceAccountsByFilter<TAccount>(
     accountClass,
     filters,
