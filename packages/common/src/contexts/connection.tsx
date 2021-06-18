@@ -25,11 +25,9 @@ import {
 export type ENV =
   | 'mainnet-beta (Serum)'
   | 'mainnet-beta'
-  | 'mainnet-beta (Serum)'
   | 'testnet'
   | 'devnet'
-  | 'localnet'
-  | 'lending';
+  | 'localnet';
 
 export const ENDPOINTS = [
   {
@@ -55,16 +53,6 @@ export const ENDPOINTS = [
   {
     name: 'localnet' as ENV,
     endpoint: 'http://127.0.0.1:8899',
-    ChainId: ChainId.Devnet,
-  },
-  {
-    name: 'Oyster Dev' as ENV,
-    endpoint: 'http://oyster-dev.solana.com/',
-    ChainId: ChainId.Devnet,
-  },
-  {
-    name: 'Lending' as ENV,
-    endpoint: 'https://tln.solana.com/',
     ChainId: ChainId.Devnet,
   },
 ];
