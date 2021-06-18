@@ -1,13 +1,13 @@
 import { PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import { deserializeBorsh, ParsedAccount, utils } from '@oyster/common';
-import { GOVERNANCE_SCHEMA } from '../models/serialisation';
+import { GOVERNANCE_SCHEMA } from './serialisation';
 import {
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from '../models/accounts';
+} from './accounts';
 
 export class MemcmpFilter {
   offset: number;

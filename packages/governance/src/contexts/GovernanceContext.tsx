@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { utils, ParsedAccount, useConnectionConfig } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
-import { getRealms } from '../utils/api';
+import { getRealms } from '../models/api';
 import { EventEmitter } from 'eventemitter3';
 
 export interface GovernanceContextState {

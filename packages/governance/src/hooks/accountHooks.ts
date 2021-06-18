@@ -14,7 +14,7 @@ import {
   useConnectionConfig,
   useConnection,
 } from '@oyster/common';
-import { MemcmpFilter, getGovernanceAccounts } from '../utils/api';
+import { MemcmpFilter, getGovernanceAccounts } from '../models/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 
 // Fetches Governance program account using the given key and subscribes to updates

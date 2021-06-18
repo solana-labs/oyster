@@ -2,11 +2,11 @@ import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealms } from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { useWallet } from '@oyster/common';
+
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
-import { RegisterRealm } from './RegisterRealm';
+import { RegisterRealm } from './registerRealm';
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
@@ -14,7 +14,6 @@ import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
-  const { connected } = useWallet();
 
   const realmItems = useMemo(() => {
     return realms
@@ -39,10 +38,7 @@ export const HomeView = () => {
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
             <h1>{LABELS.REALMS}</h1>
-            <RegisterRealm
-              style={{ marginLeft: 'auto', marginRight: 0 }}
-              disabled={!connected}
-            />
+            <RegisterRealm style={{ marginLeft: 'auto', marginRight: 0 }} />
           </div>
           <List
             itemLayout="vertical"

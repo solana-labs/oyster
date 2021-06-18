@@ -20,7 +20,7 @@ import {
   MAX_INSTRUCTION_BASE64_LENGTH,
   serializeInstructionToBase64,
 } from '../../../models/serialisation';
-import { verticalFormLayout } from '../../../utils/forms';
+import { formVerticalLayout } from '../../../tools/forms';
 
 const InstructionInput = ({
   governance,
@@ -117,7 +117,7 @@ const UpgradeProgramForm = ({
   };
 
   return (
-    <Form {...verticalFormLayout} form={form} onFinish={onCreate}>
+    <Form {...formVerticalLayout} form={form} onFinish={onCreate}>
       <Form.Item label="program id">
         <ExplorerLink
           address={governance.info.config.governedAccount}
@@ -170,7 +170,7 @@ const MintToForm = ({
 
   return (
     <Form
-      {...verticalFormLayout}
+      {...formVerticalLayout}
       form={form}
       onFinish={onCreate}
       initialValues={{ amount: 1 }}

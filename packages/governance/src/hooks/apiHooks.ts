@@ -10,7 +10,7 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
-import { pubkeyFilter } from '../utils/api';
+import { pubkeyFilter } from '../models/api';
 import {
   useGovernanceAccountByFilter,
   useGovernanceAccountByPda,
