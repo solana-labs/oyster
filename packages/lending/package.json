@@ -6,7 +6,7 @@
     "@ant-design/pro-layout": "^6.7.0",
     "@babel/preset-typescript": "^7.12.13",
     "@craco/craco": "^5.7.0",
-    "@oyster/common": "0.0.1",
+    "@oyster/common": "file:../common/src",
     "@project-serum/serum": "^0.13.11",
     "@project-serum/sol-wallet-adapter": "^0.1.4",
     "@pythnetwork/client": "^2.0.0",
