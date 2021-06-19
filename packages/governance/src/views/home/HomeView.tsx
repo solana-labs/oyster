@@ -10,10 +10,6 @@ import { RegisterRealm } from './registerRealm';
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
-import {
-  ModalFormAction,
-  RegisterRealmAction,
-} from '../../components/ModalFormAction/modalFormAction';
 
 export const HomeView = () => {
   const history = useHistory();
@@ -42,15 +38,8 @@ export const HomeView = () => {
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
             <h1>{LABELS.REALMS}</h1>
-            <RegisterRealm style={{ marginLeft: 'auto', marginRight: 0 }} />
-            <RegisterRealmAction
-              buttonProps={{
-                style: {
-                  marginLeft: '10px',
-                  borderRadius: '5%',
-                },
-                type: 'primary',
-              }}
+            <RegisterRealm
+              buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
             />
           </div>
           <List
