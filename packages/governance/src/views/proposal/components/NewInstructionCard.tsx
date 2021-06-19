@@ -12,7 +12,7 @@ import { useProposalAuthority } from '../../../hooks/apiHooks';
 import { insertInstruction } from '../../../actions/insertInstruction';
 import '../style.less';
 
-import { verticalFormLayout } from '../../../utils/forms';
+import { formVerticalLayout } from '../../../tools/forms';
 import InstructionInput from './InstructionInput';
 
 const { useWallet } = contexts.Wallet;
@@ -63,7 +63,7 @@ export function NewInstructionCard({
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
     >
       <Form
-        {...verticalFormLayout}
+        {...formVerticalLayout}
         form={form}
         name="control-hooks"
         onFinish={onFinish}

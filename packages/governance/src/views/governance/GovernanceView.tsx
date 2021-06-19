@@ -11,9 +11,8 @@ import {
   TokenIcon,
   useConnectionConfig,
   useMint,
-  useWallet,
 } from '@oyster/common';
-import { NewProposal } from './NewProposal';
+import { AddNewProposal } from './newProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -25,7 +24,6 @@ export const GovernanceView = () => {
 
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
-  const { connected } = useWallet();
 
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
@@ -109,11 +107,10 @@ export const GovernanceView = () => {
             </a>
           </div>
 
-          <NewProposal
-            props={{ className: 'proposals-new-btn', disabled: !connected }}
+          <AddNewProposal
+            buttonProps={{ className: 'proposals-new-btn' }}
             governance={governance}
             realm={realm}
-            // disabled={!connected}
           />
         </div>
         <h1 className="proposals-list-title">Proposals</h1>

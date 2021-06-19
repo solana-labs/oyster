@@ -19,12 +19,6 @@ export const registerGovernance = async (
 
   let governanceAddress;
 
-  notify({
-    message: 'Registering governance...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
   if (governanceType === GovernanceType.Account) {
     governanceAddress = (
       await withCreateAccountGovernance(
@@ -49,6 +43,12 @@ export const registerGovernance = async (
     throw new Error(`Governance type ${governanceType} is not supported yet.`);
   }
 
+  notify({
+    message: 'Registering governance...',
+    description: 'Please wait...',
+    type: 'warn',
+  });
+
   try {
     let tx = await sendTransaction(connection, wallet, instructions, []);
 
@@ -61,6 +61,6 @@ export const registerGovernance = async (
     return governanceAddress;
   } catch (ex) {
     console.error(ex);
-    throw new Error();
+    throw ex;
   }
 };

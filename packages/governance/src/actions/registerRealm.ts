@@ -40,6 +40,6 @@ export const registerRealm = async (
     return realmAddress;
   } catch (ex) {
     console.error(ex);
-    throw new Error();
+    throw ex;
   }
 };
