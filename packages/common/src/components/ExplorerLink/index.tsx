@@ -5,6 +5,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { ENDPOINTS, useConnectionConfig } from '../../contexts';
 
 import { ENV as ChainId } from '@solana/spl-token-registry';
+import { isPropertyAccessOrQualifiedName } from 'typescript';
 
 export const ExplorerLink = (props: {
   address: string | PublicKey;
@@ -27,9 +28,10 @@ export const ExplorerLink = (props: {
     return null;
   }
 
-  const displayAddress = short
-    ? shortenAddress(address, props.length ?? 9)
-    : address;
+  const displayAddress =
+    short || props.length
+      ? shortenAddress(address, props.length ?? 9)
+      : address;
 
   const getClusterUrlParam = () => {
     // If ExplorerLink is used outside of ConnectionContext, ex. in notifications, then useConnectionConfig() won't return the current endpoint

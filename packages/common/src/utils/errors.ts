@@ -11,8 +11,20 @@ export class SendTransactionError extends Error {
   }
 }
 
+export function isSendTransactionError(
+  error: any,
+): error is SendTransactionError {
+  return error instanceof SendTransactionError;
+}
+
 export class SignTransactionError extends Error {
   constructor(message: string) {
     super(message);
   }
+}
+
+export function isSignTransactionError(
+  error: any,
+): error is SignTransactionError {
+  return error instanceof SignTransactionError;
 }

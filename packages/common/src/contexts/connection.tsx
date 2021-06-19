@@ -373,7 +373,7 @@ export const sendTransaction = async (
     try {
       transaction = await wallet.signTransaction(transaction);
     } catch (ex) {
-      throw SignTransactionError(ex);
+      throw new SignTransactionError(ex);
     }
   }
 
