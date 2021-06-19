@@ -15,7 +15,7 @@ import BN from 'bn.js';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import { formSlotInputStyle } from '../../tools/forms';
-import { AccountFormItem } from '../../components/AccountFormItem/mintFormItem';
+import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
