@@ -14,3 +14,7 @@ export const formDefaults = {
   ...formVerticalLayout,
   validateMessages: formValidateMessages,
 };
+
+export const formSlotInputStyle = {
+  width: 250,
+};

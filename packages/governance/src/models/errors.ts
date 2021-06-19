@@ -58,9 +58,13 @@ export const GovernanceError: Record<number, string> = [
 
 export function getTransactionErrorMsg(error: SendTransactionError) {
   try {
-    const customErrorId = (error.txError as any).InstructionError[1]
-      ?.Custom as number;
-    return GovernanceError[customErrorId];
+    const instructionError = (error.txError as any).InstructionError[1];
+
+    return (
+      (instructionError.Custom !== undefined
+        ? GovernanceError[instructionError.Custom]
+        : instructionError) ?? ''
+    );
   } catch {
     return JSON.stringify(error);
   }

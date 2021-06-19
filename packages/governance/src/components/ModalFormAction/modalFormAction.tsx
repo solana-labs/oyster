@@ -32,7 +32,7 @@ export function ModalFormAction<TResult>({
   onSubmit: (values: any) => Promise<TResult>;
   onComplete?: (result: TResult) => void;
   onReset?: () => void;
-  children: any;
+  children?: any;
   initialValues?: any;
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -98,7 +98,7 @@ function ActionForm<TResult>({
   const [loading, setLoading] = useState(false);
   const [error, setError] =
     useState<{
-      txError?: string;
+      message?: string;
       txId?: string;
       recoveryAction: string;
       header?: string;
@@ -129,8 +129,9 @@ function ActionForm<TResult>({
       if (isSendTransactionError(ex)) {
         setError({
           txId: ex.txId,
-          txError: `${getTransactionErrorMsg(ex)}.`,
-          recoveryAction: 'Please try to submit the transaction again.',
+          message: `${getTransactionErrorMsg(ex).toString()}.`,
+          recoveryAction:
+            'Please try to amend the inputs and submit the transaction again.',
         });
       } else if (isSignTransactionError(ex)) {
         setError({
@@ -140,8 +141,10 @@ function ActionForm<TResult>({
         });
       } else {
         setError({
-          header: "Couldn't send the transaction",
-          recoveryAction: 'Please try to submit the transaction again.',
+          header: "Can't submit the transaction",
+          message: ex.toString(),
+          recoveryAction:
+            'Please try to amend the inputs and submit the transaction again.',
         });
       }
 
@@ -172,7 +175,7 @@ function ActionForm<TResult>({
           }
           description={
             <>
-              {error.txError && <div>{error.txError}</div>}
+              {error.message && <div>{error.message}</div>}
               <div>{error.recoveryAction}</div>
             </>
           }

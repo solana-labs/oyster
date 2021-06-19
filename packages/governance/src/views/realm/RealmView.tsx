@@ -1,26 +1,23 @@
-import { Avatar, Badge, Col, List, Row } from 'antd';
+import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
-import {
-  useGovernancesByRealm,
-  useProposalsByGovernance,
-} from '../../hooks/apiHooks';
+import { useGovernancesByRealm } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { ParsedAccount, TokenIcon, useWallet, useMint } from '@oyster/common';
+
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { RegisterGovernance } from './RegisterGovernance';
+import { RegisterGovernance } from './registerGovernance';
 import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
-import { Governance, ProposalState } from '../../models/accounts';
+
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
+import { GovernanceBadge } from './governanceBadge';
 
 export const RealmView = () => {
   const history = useHistory();
-  const { connected } = useWallet();
   let realmKey = useKeyParam();
 
   const realm = useRealm(realmKey);
@@ -81,9 +78,8 @@ export const RealmView = () => {
                   tokenName="Council"
                 ></WithdrawGoverningTokens>
                 <RegisterGovernance
-                  disabled={!connected}
-                  className="governance-action"
-                />
+                  buttonProps={{ className: 'governance-action' }}
+                ></RegisterGovernance>
               </div>
             </Col>
           </Row>
@@ -115,35 +111,3 @@ export const RealmView = () => {
     </>
   );
 };
-
-export function GovernanceBadge({
-  governance,
-}: {
-  governance: ParsedAccount<Governance>;
-}) {
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const governedMint = useMint(governance.info.config.governedAccount);
-  const proposals = useProposalsByGovernance(governance?.pubkey);
-  const color = governance.info.isProgramGovernance() ? 'green' : 'gray';
-
-  return (
-    <Badge
-      count={
-        proposals.filter(p => p.info.state === ProposalState.Voting).length
-      }
-    >
-      <div style={{ width: 55, height: 45 }}>
-        {governedMint ? (
-          <TokenIcon
-            mintAddress={governance.info.config.governedAccount}
-            size={40}
-          />
-        ) : (
-          <Avatar size="large" gap={2} style={{ background: color }}>
-            {governance.info.config.governedAccount.toBase58().slice(0, 5)}
-          </Avatar>
-        )}
-      </div>
-    </Badge>
-  );
-}

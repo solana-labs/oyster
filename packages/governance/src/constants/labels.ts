@@ -107,6 +107,9 @@ export const LABELS = {
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
 
+  REGISTER: 'Register',
+  REGISTERING: 'Registering',
+
   PROGRAM_ID_LABEL: 'program id',
   ACCOUNT_ADDRESS: 'account address',
 
