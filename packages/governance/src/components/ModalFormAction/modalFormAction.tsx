@@ -10,6 +10,8 @@ import { getTransactionErrorMsg } from '../../models/errors';
 
 const { useWallet } = contexts.Wallet;
 
+/// ModalFormAction is a control displayed as a Button action which opens a Modal from
+/// The ModalForm captures common form use cases: 1) Progress indicator, 2) Close/Cancel state management, 3) Submission errors
 export function ModalFormAction<TResult>({
   label,
   formTitle,
@@ -28,7 +30,7 @@ export function ModalFormAction<TResult>({
   formAction: string;
   formPendingAction: string;
   isWalletRequired?: boolean;
-  buttonProps: ButtonProps;
+  buttonProps?: ButtonProps;
   onSubmit: (values: any) => Promise<TResult>;
   onComplete?: (result: TResult) => void;
   onReset?: () => void;
@@ -147,7 +149,7 @@ function ActionForm<TResult>({
             'Please try to amend the inputs and submit the transaction again.',
         });
       }
-
+    } finally {
       setLoading(false);
     }
   };
