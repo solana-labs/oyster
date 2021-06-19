@@ -6,7 +6,7 @@ import { MAX_REALM_NAME_LENGTH } from '../../models/serialisation';
 import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
 import { Redirect } from 'react-router';
-import { MintFormItem } from '../../components/MintInput/mintFormItem';
+import { MintFormItem } from '../../components/MintFormItem/mintFormItem';
 
 import { registerRealm } from '../../actions/registerRealm';
 

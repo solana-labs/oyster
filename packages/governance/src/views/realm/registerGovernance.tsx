@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ButtonProps, InputNumber, Radio, Checkbox } from 'antd';
-import { Form, Input } from 'antd';
+import { Form } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../constants';
@@ -15,6 +15,7 @@ import BN from 'bn.js';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import { formSlotInputStyle } from '../../tools/forms';
+import { AccountFormItem } from '../../components/AccountFormItem/mintFormItem';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -90,17 +91,14 @@ export function RegisterGovernance({
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item
+      <AccountFormItem
         name="governedAccountAddress"
         label={
           governanceType === GovernanceType.Account
             ? LABELS.ACCOUNT_ADDRESS
             : LABELS.PROGRAM_ID_LABEL
         }
-        rules={[{ required: true }]}
-      >
-        <Input />
-      </Form.Item>
+      ></AccountFormItem>
 
       {governanceType === GovernanceType.Program && (
         <Form.Item
