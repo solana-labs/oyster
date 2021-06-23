@@ -2885,9 +2885,6 @@
   dependencies:
     "@octokit/openapi-types" "^6.0.0"
 
-"@oyster/common@file:packages/common/src":
-  version "0.0.0"
-
 "@pedrouid/iso-crypto@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@pedrouid/iso-crypto/-/iso-crypto-1.1.0.tgz#3fb4050ea99f2f8ee41ba8661193c0989c815c95"

@@ -6,7 +6,7 @@
     "@ant-design/pro-layout": "^6.7.0",
     "@babel/preset-typescript": "^7.12.13",
     "@craco/craco": "^5.7.0",
-    "@oyster/common": "file:../common/src",
+    "@oyster/common": "0.0.1",
     "@project-serum/serum": "^0.13.38",
     "@project-serum/sol-wallet-adapter": "^0.1.4",
     "@pythnetwork/client": "^2.0.0",
@@ -47,7 +47,6 @@
   "scripts": {
     "prestart": "npm-link-shared ../common/node_modules/ . react",
     "start": "craco start --verbose",
-    "start:lending": "craco start --verbose",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
@@ -97,6 +96,7 @@
   },
   "resolutions": {
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "@oyster/common": "file:../common/dist/lib"
   }
 }
