@@ -99,7 +99,7 @@ export const PROGRAM_IDS = [
       },
       legacy: [],
     }),
-    lending: () => new PublicKey('LendXXX'),
+    lending: () => new PublicKey('6TvznH3B2e3p2mbhufNBpgSrLx6UkgvxtVQvopEZ2kuH'),
   },
   {
     name: 'devnet',
@@ -118,7 +118,7 @@ export const PROGRAM_IDS = [
       },
       legacy: [new PublicKey('BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ')],
     }),
-    lending: () => new PublicKey('LendXXX'),
+    lending: () => new PublicKey('6TvznH3B2e3p2mbhufNBpgSrLx6UkgvxtVQvopEZ2kuH'),
   },
   {
     name: 'localnet',
@@ -137,7 +137,7 @@ export const PROGRAM_IDS = [
       },
       legacy: [],
     }),
-    lending: () => new PublicKey('LendXXX'),
+    lending: () => new PublicKey('6TvznH3B2e3p2mbhufNBpgSrLx6UkgvxtVQvopEZ2kuH'),
   },
 ];
 
