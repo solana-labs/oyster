@@ -99,7 +99,7 @@ export function MarketProvider({ children = null as any }) {
       timer = window.setTimeout(() => updateData(), REFRESH_INTERVAL);
     };
 
-    const initalQuery = async () => {
+    const initialQuery = async () => {
       const reverseSerumMarketCache = new Map<string, string>();
       [...marketByMint.keys()].forEach(mint => {
         const m = marketByMint.get(mint);
@@ -112,28 +112,27 @@ export function MarketProvider({ children = null as any }) {
         return m.marketInfo.address.toBase58();
       });
 
-      await getMultipleAccounts(
+      const accounts = await getMultipleAccounts(
         connection,
-        // only query for markets that are not in cahce
+        // only query for markets that are not in cache
         allMarkets.filter(a => cache.get(a) === undefined),
         'single',
-      ).then(({ keys, array }) => {
-        allMarkets.forEach(() => {});
+      );
 
-        return array.map((item, index) => {
-          const marketAddress = keys[index];
-          const mintAddress = reverseSerumMarketCache.get(marketAddress);
-          if (mintAddress) {
-            const market = marketByMint.get(mintAddress);
+      const { keys, array } = accounts;
+      array.forEach((item, index) => {
+        const marketAddress = keys[index];
+        const mintAddress = reverseSerumMarketCache.get(marketAddress);
+        if (mintAddress) {
+          const market = marketByMint.get(mintAddress);
 
-            if (market) {
-              const id = market.marketInfo.address;
-              cache.add(id, item, DexMarketParser);
-            }
+          if (market) {
+            const id = market.marketInfo.address;
+            cache.add(id, item, DexMarketParser);
           }
+        }
 
-          return item;
-        });
+        return item;
       });
 
       const toQuery = new Set<string>();
@@ -165,7 +164,7 @@ export function MarketProvider({ children = null as any }) {
       updateData();
     };
 
-    initalQuery();
+    initialQuery();
 
     return () => {
       window.clearTimeout(timer);
