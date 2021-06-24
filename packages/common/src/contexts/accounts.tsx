@@ -126,6 +126,9 @@ export const cache = {
       return account;
     }
 
+    // Note: If the request to get the account fails the error is captured as a rejected Promise and would stay in pendingCalls forever
+    // It means if the first request fails for a transient reason it would never recover from the state and account would never be returned
+    // TODO: add logic to detect transient errors and remove the Promises from  pendingCalls
     let query = pendingCalls.get(address);
     if (query) {
       return query;
@@ -231,6 +234,9 @@ export const cache = {
       return mint;
     }
 
+    // Note: If the request to get the mint  fails the error is captured as a rejected Promise and would stay in pendingMintCalls forever
+    // It means if the first request fails for a transient reason it would never recover from the state and mint would never be returned
+    // TODO: add logic to detect transient errors and remove the Promises from  pendingMintCalls
     let query = pendingMintCalls.get(address);
     if (query) {
       return query;
