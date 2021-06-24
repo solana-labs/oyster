@@ -16,7 +16,6 @@ export function AccountFormItem({
   required?: boolean;
 }) {
   const connection = useConnection();
-  const { cache } = contexts.Accounts;
 
   const accountValidator = async (rule: any, value: string) => {
     if (rule.required && !value) {

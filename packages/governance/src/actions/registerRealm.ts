@@ -32,7 +32,7 @@ export const registerRealm = async (
     let tx = await sendTransaction(connection, wallet, instructions, []);
 
     notify({
-      message: 'Realm has been crated.',
+      message: 'Realm has been registered.',
       type: 'success',
       description: `Transaction - ${tx}`,
     });

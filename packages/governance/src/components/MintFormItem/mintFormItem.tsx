@@ -15,7 +15,6 @@ export function MintFormItem({
   required?: boolean;
 }) {
   const connection = useConnection();
-  const { cache } = contexts.Accounts;
 
   const mintValidator = async (rule: any, value: string) => {
     if (rule.required && !value) {

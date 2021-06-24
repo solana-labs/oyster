@@ -1,8 +1,7 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, sendTransaction } from '@oyster/common';
-import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
 
-const { notify } = utils;
+import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const withdrawGoverningTokens = async (
   connection: Connection,
@@ -21,22 +20,12 @@ export const withdrawGoverningTokens = async (
     wallet.publicKey,
   );
 
-  notify({
-    message: 'Depositing governing tokens...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(connection, wallet, instructions, []);
-
-    notify({
-      message: 'Tokens have been deposited.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    [],
+    'Withdrawing governing tokens',
+    'Tokens have been withdrawn.',
+  );
 };

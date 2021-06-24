@@ -53,7 +53,7 @@ export const registerGovernance = async (
     let tx = await sendTransaction(connection, wallet, instructions, []);
 
     notify({
-      message: 'Governance has been crated.',
+      message: 'Governance has been registered.',
       type: 'success',
       description: `Transaction - ${tx}`,
     });

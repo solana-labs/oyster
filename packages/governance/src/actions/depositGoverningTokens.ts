@@ -4,12 +4,11 @@ import {
   TransactionInstruction,
   Account,
 } from '@solana/web3.js';
-import { utils, models, sendTransaction, TokenAccount } from '@oyster/common';
+import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens';
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 const { approve } = models;
-
-const { notify } = utils;
 
 export const depositGoverningTokens = async (
   connection: Connection,
@@ -41,22 +40,12 @@ export const depositGoverningTokens = async (
     wallet.publicKey,
   );
 
-  notify({
-    message: 'Depositing governing tokens...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(connection, wallet, instructions, signers);
-
-    notify({
-      message: 'Tokens have been deposited.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Depositing governing tokens',
+    'Tokens have been deposited',
+  );
 };
