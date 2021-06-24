@@ -2,7 +2,7 @@ import { Form, Input } from 'antd';
 
 import React from 'react';
 
-import { contexts, tryParseKey } from '@oyster/common';
+import { contexts, tryParseKey, GenericAccountParser } from '@oyster/common';
 const { useConnection } = contexts.Connection;
 
 export function AccountFormItem({
@@ -23,7 +23,7 @@ export function AccountFormItem({
     } else if (!tryParseKey(value)) {
       throw new Error('Provided value is not a valid account address');
     } else {
-      await cache.query(connection, value);
+      await cache.query(connection, value, GenericAccountParser);
     }
   };
 
