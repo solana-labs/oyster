@@ -12,7 +12,7 @@ import {
   useConnectionConfig,
   useMint,
 } from '@oyster/common';
-import { AddNewProposal } from './newProposal';
+import { AddNewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
