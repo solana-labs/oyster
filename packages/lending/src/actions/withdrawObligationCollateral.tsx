@@ -1,9 +1,10 @@
 import {
   findOrCreateAccountByMint,
   LENDING_PROGRAM_ID,
-  notify, ParsedAccount,
+  notify,
+  ParsedAccount,
   sendTransaction,
-  TokenAccount
+  TokenAccount,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import {
@@ -13,10 +14,11 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import {
+  Obligation,
+  Reserve,
   withdrawObligationCollateralInstruction,
-  refreshReserveInstruction,
-  Reserve, refreshObligationInstruction, Obligation
 } from '../models';
+import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
 
 export const withdrawObligationCollateral = async (
   connection: Connection,
@@ -61,16 +63,7 @@ export const withdrawObligationCollateral = async (
   );
 
   instructions.push(
-    // @TODO: refresh all obligation reserves
-    refreshReserveInstruction(
-      reserveAddress,
-      reserve.liquidity.oraclePubkey,
-    ),
-    refreshObligationInstruction(
-      obligation.pubkey,
-      obligation.info.deposits.map(collateral => collateral.depositReserve),
-      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
-    ),
+    ...(await refreshObligationAndReserves(connection, obligation)),
     withdrawObligationCollateralInstruction(
       collateralAmount,
       reserve.collateral.supplyPubkey,
@@ -79,7 +72,7 @@ export const withdrawObligationCollateral = async (
       obligation.pubkey,
       reserve.lendingMarket,
       lendingMarketAuthority,
-      wallet.publicKey
+      wallet.publicKey,
     ),
   );
 

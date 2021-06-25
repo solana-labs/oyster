@@ -8,17 +8,13 @@ import {
   TokenAccount,
 } from '@oyster/common';
 import { AccountLayout, NATIVE_MINT, Token } from '@solana/spl-token';
+import { Account, Connection, TransactionInstruction } from '@solana/web3.js';
 import {
-  Account,
-  Connection,
-  TransactionInstruction,
-} from '@solana/web3.js';
-import {
-  Obligation, refreshObligationInstruction,
-  refreshReserveInstruction,
+  Obligation,
   repayObligationLiquidityInstruction,
-  Reserve
+  Reserve,
 } from '../models';
+import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
 
 const { approve } = models;
 
@@ -81,16 +77,7 @@ export const repayObligationLiquidity = async (
   signers.push(transferAuthority);
 
   instructions.push(
-    // @TODO: remove after refresh of obligation + reserves on repay is no longer required
-    refreshReserveInstruction(
-      repayReserve.pubkey,
-      repayReserve.info.liquidity.oraclePubkey,
-    ),
-    refreshObligationInstruction(
-      obligation.pubkey,
-      obligation.info.deposits.map(collateral => collateral.depositReserve),
-      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
-    ),
+    ...await refreshObligationAndReserves(connection, obligation),
     repayObligationLiquidityInstruction(
       liquidityAmount,
       sourceLiquidity,

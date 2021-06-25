@@ -17,10 +17,9 @@ import {
 import {
   borrowObligationLiquidityInstruction,
   Obligation,
-  refreshObligationInstruction,
-  refreshReserveInstruction,
   Reserve,
 } from '../models';
+import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
 
 const { cache, MintParser } = contexts.Accounts;
 const { sendTransaction } = contexts.Connection;
@@ -109,16 +108,7 @@ export const borrowObligationLiquidity = async (
   cleanupInstructions = [...finalCleanupInstructions];
 
   instructions.push(
-    // @TODO: refresh all obligation reserves
-    refreshReserveInstruction(
-      borrowReserve.pubkey,
-      borrowReserve.info.liquidity.oraclePubkey,
-    ),
-    refreshObligationInstruction(
-      obligation.pubkey,
-      obligation.info.deposits.map(collateral => collateral.depositReserve),
-      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
-    ),
+    ...await refreshObligationAndReserves(connection, obligation),
     borrowObligationLiquidityInstruction(
       amountLamports,
       borrowReserve.info.liquidity.supplyPubkey,

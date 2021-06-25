@@ -15,13 +15,8 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  liquidateObligationInstruction,
-  Obligation,
-  refreshObligationInstruction,
-  refreshReserveInstruction,
-  Reserve
-} from '../models';
+import { liquidateObligationInstruction, Obligation, Reserve } from '../models';
+import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
 
 const { approve } = models;
 
@@ -85,20 +80,7 @@ export const liquidateObligation = async (
   );
 
   instructions.push(
-    // @TODO: refresh all obligation reserves
-    refreshReserveInstruction(
-      repayReserve.pubkey,
-      repayReserve.info.liquidity.oraclePubkey,
-    ),
-    refreshReserveInstruction(
-      withdrawReserve.pubkey,
-      withdrawReserve.info.liquidity.oraclePubkey,
-    ),
-    refreshObligationInstruction(
-      obligation.pubkey,
-      obligation.info.deposits.map(collateral => collateral.depositReserve),
-      obligation.info.borrows.map(liquidity => liquidity.borrowReserve),
-    ),
+    ...await refreshObligationAndReserves(connection, obligation),
     liquidateObligationInstruction(
       liquidityAmount,
       sourceAccount,
