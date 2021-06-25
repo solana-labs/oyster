@@ -1,5 +1,5 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { ExplorerLink, ParsedAccount, useMint, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Token } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
@@ -20,7 +20,7 @@ import {
   MAX_INSTRUCTION_BASE64_LENGTH,
   serializeInstructionToBase64,
 } from '../../../models/serialisation';
-import { verticalFormLayout } from '../../../utils/forms';
+import { formVerticalLayout } from '../../../tools/forms';
 
 const InstructionInput = ({
   governance,
@@ -33,9 +33,8 @@ const InstructionInput = ({
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
 
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const mint = useMint(governance.info.config.governedAccount);
-  const creatorsEnabled = mint || governance.info.isProgramGovernance();
+  const creatorsEnabled =
+    governance.info.isMintGovernance() || governance.info.isProgramGovernance();
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -86,7 +85,7 @@ const InstructionInput = ({
             governance={governance}
           ></UpgradeProgramForm>
         )}
-        {mint && (
+        {governance.info.isMintGovernance() && (
           <MintToForm
             form={form}
             onCreateInstruction={onCreateInstruction}
@@ -117,7 +116,7 @@ const UpgradeProgramForm = ({
   };
 
   return (
-    <Form {...verticalFormLayout} form={form} onFinish={onCreate}>
+    <Form {...formVerticalLayout} form={form} onFinish={onCreate}>
       <Form.Item label="program id">
         <ExplorerLink
           address={governance.info.config.governedAccount}
@@ -170,7 +169,7 @@ const MintToForm = ({
 
   return (
     <Form
-      {...verticalFormLayout}
+      {...formVerticalLayout}
       form={form}
       onFinish={onCreate}
       initialValues={{ amount: 1 }}

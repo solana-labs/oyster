@@ -5,7 +5,10 @@ export const LABELS = {
   FOOTER:
     'This page was produced by the Solana Foundation ("SF") for internal educational and inspiration purposes only. SF does not encourage, induce or sanction the deployment, integration or use of Oyster or any similar application (including its code) in violation of applicable laws or regulations and hereby prohibits any such deployment, integration or use. Anyone using this code or a derivation thereof must comply with applicable laws and regulations when releasing related software.',
   MENU_HOME: 'Proposals',
-  NEW_PROPOSAL: 'Add new proposal',
+  ADD_NEW_PROPOSAL: 'Add new proposal',
+  ADD_PROPOSAL: 'Add proposal',
+  ADDING_PROPOSAL: 'Adding proposal',
+
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Proposals',
   CONNECT_BUTTON: 'Connect',
@@ -18,8 +21,8 @@ export const LABELS = {
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
   SIGNATORIES: 'Signatories',
-  VOTES_REQUIRED: 'Votes Required',
-  VOTES_IN_FAVOUR: 'Votes In Favor',
+  VOTE_SCORE_REQUIRED: 'Vote Score Required',
+  VOTE_SCORE_IN_FAVOUR: 'Vote Score In Favor',
   ADMIN_PANEL: 'Admin Panel',
   COPY_FAILED_ADDRESSES_TO_INPUT: 'Copy failed addresses to the input',
   COPY_FAILED_ADDRESSES_TO_CLIPBOARD: 'Copy failed addresses to clipboard',
@@ -106,8 +109,13 @@ export const LABELS = {
   REGISTER_GOVERNANCE: 'Register Governance',
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
+  MINT: 'Mint',
+
+  REGISTER: 'Register',
+  REGISTERING: 'Registering',
 
   PROGRAM_ID_LABEL: 'program id',
+  MINT_ADDRESS_LABEL: 'mint address',
   ACCOUNT_ADDRESS: 'account address',
 
   MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
@@ -115,6 +123,7 @@ export const LABELS = {
   MAX_VOTING_TIME: 'max voting time (slots)',
 
   TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
+  TRANSFER_MINT_AUTHORITY: 'transfer mint authority',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
@@ -161,7 +170,7 @@ export const LABELS = {
   GIT_CONTENT_EXCEEDED:
     'Gist Github API limit exceeded. Click to view on Github directly.',
   ACCOUNT: 'Account',
-  COUNT: 'Count',
+  VOTE_WEIGHT: 'Vote Weight',
   VOTE_TYPE: 'Vote Type',
   LARGEST_VOTERS_BUBBLE: 'Top Voters Visualization',
   LARGEST_VOTERS_TABLE: 'Top Voters',

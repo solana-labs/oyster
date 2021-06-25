@@ -4,14 +4,12 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withRemoveInstruction } from '../models/withRemoveInstruction';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const removeInstruction = async (
   connection: Connection,
@@ -34,28 +32,12 @@ export const removeInstruction = async (
     beneficiary,
   );
 
-  notify({
-    message: 'Removing instruction...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Instruction removed',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Removing instruction',
+    'Instruction removed',
+  );
 };

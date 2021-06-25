@@ -1,3 +1,4 @@
+import { sleep, useLocalStorageState } from '../utils/utils';
 import {
   ENV as ChainId,
   TokenInfo,
@@ -20,7 +21,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ExplorerLink } from '../components/ExplorerLink';
 import { setProgramIds } from '../utils/ids';
 import { notify } from '../utils/notifications';
-import { sleep, useLocalStorageState } from '../utils/utils';
+import { SendTransactionError, SignTransactionError } from '../utils/errors';
 
 export type ENV =
   | 'mainnet-beta (Serum)'
@@ -385,8 +386,13 @@ export const sendTransaction = async (
   if (signers.length > 0) {
     transaction.partialSign(...signers);
   }
+
   if (!includesFeePayer) {
-    transaction = await wallet.signTransaction(transaction);
+    try {
+      transaction = await wallet.signTransaction(transaction);
+    } catch (ex) {
+      throw new SignTransactionError(ex);
+    }
   }
 
   const rawTransaction = transaction.serialize();
@@ -399,16 +405,16 @@ export const sendTransaction = async (
   let slot = 0;
 
   if (awaitConfirmation) {
-    const confirmation = await awaitTransactionSignatureConfirmation(
+    const confirmationStatus = await awaitTransactionSignatureConfirmation(
       txid,
       DEFAULT_TIMEOUT,
       connection,
       commitment,
     );
 
-    slot = confirmation?.slot || 0;
+    slot = confirmationStatus?.slot || 0;
 
-    if (confirmation?.err) {
+    if (confirmationStatus?.err) {
       let errors: string[] = [];
       try {
         // TODO: This call always throws errors and delays error feedback
@@ -419,20 +425,27 @@ export const sendTransaction = async (
       }
 
       notify({
-        message: 'Transaction failed...',
+        message: 'Transaction error',
         description: (
           <>
             {errors.map(err => (
               <div>{err}</div>
             ))}
-            <ExplorerLink address={txid} type="transaction" short />
+            <ExplorerLink
+              address={txid}
+              type="transaction"
+              short
+              connection={connection}
+            />
           </>
         ),
         type: 'error',
       });
 
-      throw new Error(
-        `Raw transaction ${txid} failed (${JSON.stringify(status)})`,
+      throw new SendTransactionError(
+        `Transaction ${txid} failed (${JSON.stringify(confirmationStatus)})`,
+        txid,
+        confirmationStatus.err,
       );
     }
   }

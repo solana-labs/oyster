@@ -45,7 +45,8 @@ export function CastVote({
   const isVisible =
     hasVotingTimeExpired === false &&
     !voteRecord &&
-    tokenOwnerRecord.info.governingTokenDepositAmount.toNumber() > 0 &&
+    tokenOwnerRecord &&
+    !tokenOwnerRecord.info.governingTokenDepositAmount.isZero() &&
     proposal.info.state === ProposalState.Voting;
 
   const [btnLabel, title, msg, icon] =

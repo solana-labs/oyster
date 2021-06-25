@@ -1,7 +1,8 @@
 import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenIcon } from '@oyster/common';
+import { ParsedAccount, TokenIcon, constants } from '@oyster/common';
+import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -39,8 +40,10 @@ import {
   useInstructionsByProposal,
   useVoteRecordsByProposal,
 } from '../../hooks/apiHooks';
+import BN from 'bn.js';
 
 const { TabPane } = Tabs;
+const { ZERO } = constants;
 
 export const urlRegex =
   // eslint-disable-next-line
@@ -148,14 +151,14 @@ export interface VoterDisplayData {
   name: string;
   title: string;
   group: string;
-  value: number;
+  value: BN;
 }
 
 function mapVoterDisplayData(
   voteRecords: ParsedAccount<VoteRecord>[],
   tokenOwnerRecords: ParsedAccount<TokenOwnerRecord>[],
 ): Array<VoterDisplayData> {
-  const mapper = (key: string, amount: number, label: string) => ({
+  const mapper = (key: string, amount: BN, label: string) => ({
     name: key,
     title: key,
     group: label,
@@ -167,7 +170,7 @@ function mapVoterDisplayData(
     ...tokenOwnerRecords
       .filter(
         tor =>
-          tor.info.governingTokenDepositAmount.toNumber() > 0 &&
+          !tor.info.governingTokenDepositAmount.isZero() &&
           !voteRecords.some(
             vt =>
               vt.info.governingTokenOwner.toBase58() ===
@@ -177,7 +180,7 @@ function mapVoterDisplayData(
       .map(tor =>
         mapper(
           tor.info.governingTokenOwner.toBase58(),
-          tor.info.governingTokenDepositAmount.toNumber(),
+          tor.info.governingTokenDepositAmount,
           VoteType.Undecided,
         ),
       ),
@@ -185,11 +188,11 @@ function mapVoterDisplayData(
 
   const noVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.no?.toNumber() > 0)
+      .filter(vr => vr.info.voteWeight.no?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.no.toNumber(),
+          vr.info.voteWeight.no,
           VoteType.No,
         ),
       ),
@@ -197,18 +200,18 @@ function mapVoterDisplayData(
 
   const yesVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.yes?.toNumber() > 0)
+      .filter(vr => vr.info.voteWeight.yes?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.yes.toNumber(),
+          vr.info.voteWeight.yes,
           VoteType.Yes,
         ),
       ),
   ];
 
-  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort(
-    (a, b) => b.value - a.value,
+  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort((a, b) =>
+    b.value.cmp(a.value),
   );
 
   return data;
@@ -350,8 +353,9 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={governingTokenMint.supply.toNumber()}
+                    total={governingTokenMint.supply}
                     data={voterDisplayData}
+                    decimals={governingTokenMint.decimals}
                   />
                 </div>
               </Card>
@@ -372,9 +376,9 @@ function InnerProposalView({
           <Col md={7} xs={24}>
             <Card>
               <Statistic
-                title={LABELS.VOTES_IN_FAVOUR}
-                value={proposal.info.yesVotesCount.toNumber()}
-                suffix={`/ ${governingTokenMint.supply.toNumber()}`}
+                title={LABELS.VOTE_SCORE_IN_FAVOUR}
+                value={getVoteInFavorScore(proposal, governingTokenMint)}
+                suffix={`/ ${getMaxVoteScore(governingTokenMint)}`}
               />
             </Card>
           </Col>
@@ -382,8 +386,11 @@ function InnerProposalView({
             <Card>
               <Statistic
                 valueStyle={{ color: 'green' }}
-                title={LABELS.VOTES_REQUIRED}
-                value={getMinRequiredYesVotes(governance, governingTokenMint)}
+                title={LABELS.VOTE_SCORE_REQUIRED}
+                value={getMinRequiredYesVoteScore(
+                  governance,
+                  governingTokenMint,
+                )}
               />
             </Card>
           </Col>
@@ -452,14 +459,33 @@ function InnerProposalView({
   );
 }
 
-function getMinRequiredYesVotes(
+function getMinRequiredYesVoteScore(
   governance: ParsedAccount<Governance>,
   governingTokenMint: MintInfo,
-): number {
-  return governance.info.config.yesVoteThresholdPercentage === 100
-    ? governingTokenMint.supply.toNumber()
-    : Math.ceil(
-        (governance.info.config.yesVoteThresholdPercentage / 100) *
-          governingTokenMint.supply.toNumber(),
-      );
+): string {
+  const minVotes =
+    governance.info.config.yesVoteThresholdPercentage === 100
+      ? governingTokenMint.supply
+      : governingTokenMint.supply
+          .mul(new BN(governance.info.config.yesVoteThresholdPercentage))
+          .div(new BN(100));
+
+  return new BigNumber(minVotes.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toString();
+}
+
+function getVoteInFavorScore(
+  proposal: ParsedAccount<Proposal>,
+  governingTokenMint: MintInfo,
+): string {
+  return new BigNumber(proposal.info.yesVotesCount.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toString();
+}
+
+function getMaxVoteScore(governingTokenMint: MintInfo) {
+  return new BigNumber(governingTokenMint.supply.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toFormat();
 }

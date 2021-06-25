@@ -1,11 +1,11 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, sendTransaction } from '@oyster/common';
+
 import { withCreateAccountGovernance } from '../models/withCreateAccountGovernance';
 import { GovernanceType } from '../models/enums';
 import { GovernanceConfig } from '../models/accounts';
 import { withCreateProgramGovernance } from '../models/withCreateProgramGovernance';
-
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
+import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
 
 export const registerGovernance = async (
   connection: Connection,
@@ -13,54 +13,65 @@ export const registerGovernance = async (
   governanceType: GovernanceType,
   realm: PublicKey,
   config: GovernanceConfig,
-  transferUpgradeAuthority?: boolean,
+  transferAuthority?: boolean,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
   let governanceAddress;
 
-  notify({
-    message: 'Registering governance...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  if (governanceType === GovernanceType.Account) {
-    governanceAddress = (
-      await withCreateAccountGovernance(
-        instructions,
-        realm,
-        config,
-        wallet.publicKey,
-      )
-    ).governanceAddress;
-  } else if (governanceType === GovernanceType.Program) {
-    governanceAddress = (
-      await withCreateProgramGovernance(
-        instructions,
-        realm,
-        config,
-        transferUpgradeAuthority!,
-        wallet.publicKey,
-        wallet.publicKey,
-      )
-    ).governanceAddress;
-  } else {
-    throw new Error(`Governance type ${governanceType} is not supported yet.`);
+  switch (governanceType) {
+    case GovernanceType.Account: {
+      governanceAddress = (
+        await withCreateAccountGovernance(
+          instructions,
+          realm,
+          config,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    case GovernanceType.Program: {
+      governanceAddress = (
+        await withCreateProgramGovernance(
+          instructions,
+          realm,
+          config,
+          transferAuthority!,
+          wallet.publicKey,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    case GovernanceType.Mint: {
+      governanceAddress = (
+        await withCreateMintGovernance(
+          instructions,
+          realm,
+          config,
+          transferAuthority!,
+          wallet.publicKey,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    default: {
+      throw new Error(
+        `Governance type ${governanceType} is not supported yet.`,
+      );
+    }
   }
 
-  try {
-    let tx = await sendTransaction(connection, wallet, instructions, []);
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    [],
+    'Registering governance',
+    'Governance has been registered',
+  );
 
-    notify({
-      message: 'Governance has been crated.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-
-    return governanceAddress;
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  return governanceAddress;
 };

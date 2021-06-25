@@ -4,20 +4,13 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  contexts,
-  utils,
-  ParsedAccount,
-  deserializeBorsh,
-} from '@oyster/common';
+import { ParsedAccount, deserializeBorsh } from '@oyster/common';
 
 import { InstructionData, Proposal } from '../models/accounts';
 
 import { withInsertInstruction } from '../models/withInsertInstruction';
 import { GOVERNANCE_SCHEMA } from '../models/serialisation';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const insertInstruction = async (
   connection: Connection,
@@ -53,28 +46,12 @@ export const insertInstruction = async (
     payer,
   );
 
-  notify({
-    message: 'Adding instruction...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Instruction added.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Adding instruction',
+    'Instruction added',
+  );
 };

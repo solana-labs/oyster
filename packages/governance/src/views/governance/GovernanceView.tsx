@@ -6,14 +6,8 @@ import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
-import {
-  ExplorerLink,
-  TokenIcon,
-  useConnectionConfig,
-  useMint,
-  useWallet,
-} from '@oyster/common';
-import { NewProposal } from './NewProposal';
+import { ExplorerLink, TokenIcon, useConnectionConfig } from '@oyster/common';
+import { AddNewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -25,7 +19,6 @@ export const GovernanceView = () => {
 
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
-  const { connected } = useWallet();
 
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
@@ -41,8 +34,6 @@ export const GovernanceView = () => {
 
   const mint = communityTokenMint?.toBase58() || '';
 
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const governedMint = useMint(governance?.info.config.governedAccount);
   const color = governance?.info.isProgramGovernance() ? 'green' : 'gray';
 
   const proposalItems = useMemo(() => {
@@ -80,7 +71,7 @@ export const GovernanceView = () => {
     >
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          {governedMint ? (
+          {governance?.info.isMintGovernance() ? (
             <TokenIcon
               mintAddress={governance?.info.config.governedAccount}
               size={60}
@@ -109,11 +100,10 @@ export const GovernanceView = () => {
             </a>
           </div>
 
-          <NewProposal
-            props={{ className: 'proposals-new-btn', disabled: !connected }}
+          <AddNewProposal
+            buttonProps={{ className: 'proposals-new-btn' }}
             governance={governance}
             realm={realm}
-            // disabled={!connected}
           />
         </div>
         <h1 className="proposals-list-title">Proposals</h1>

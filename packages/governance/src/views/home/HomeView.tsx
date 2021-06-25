@@ -2,17 +2,18 @@ import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealms } from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { TokenIcon, useWallet } from '@oyster/common';
+
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
-import { RegisterRealm } from './RegisterRealm';
+import { RegisterRealm } from './registerRealm';
 import { LABELS } from '../../constants';
+
+import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 
 export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
-  const { connected } = useWallet();
 
   const realmItems = useMemo(() => {
     return realms
@@ -21,20 +22,10 @@ export const HomeView = () => {
         href: '/realm/' + r.pubkey.toBase58(),
         title: r.info.name,
         badge: (
-          <div style={{ position: 'relative' }}>
-            <TokenIcon mintAddress={r.info.communityMint} size={40} />
-            {r.info.councilMint && (
-              <TokenIcon
-                style={{
-                  position: 'absolute',
-                  top: 20,
-                  left: 30,
-                }}
-                mintAddress={r.info.councilMint}
-                size={20}
-              />
-            )}
-          </div>
+          <RealmBadge
+            communityMint={r.info.communityMint}
+            councilMint={r.info.councilMint}
+          ></RealmBadge>
         ),
         key: r.pubkey.toBase58(),
       }));
@@ -48,8 +39,7 @@ export const HomeView = () => {
           <div className="governance-title">
             <h1>{LABELS.REALMS}</h1>
             <RegisterRealm
-              style={{ marginLeft: 'auto', marginRight: 0 }}
-              disabled={!connected}
+              buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
             />
           </div>
           <List

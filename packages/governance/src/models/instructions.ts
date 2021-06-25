@@ -9,6 +9,7 @@ export enum GovernanceInstruction {
   SetGovernanceDelegate = 3, // --
   CreateAccountGovernance = 4,
   CreateProgramGovernance = 5,
+
   CreateProposal = 6,
   AddSignatory = 7,
   RemoveSignatory = 8,
@@ -21,6 +22,8 @@ export enum GovernanceInstruction {
   FinalizeVote = 14,
   RelinquishVote = 15,
   ExecuteInstruction = 16,
+
+  CreateMintGovernance = 17,
 }
 
 export class CreateRealmArgs {
@@ -64,6 +67,21 @@ export class CreateProgramGovernanceArgs {
   }) {
     this.config = args.config;
     this.transferUpgradeAuthority = !!args.transferUpgradeAuthority;
+  }
+}
+
+export class CreateMintGovernanceArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.CreateMintGovernance;
+  config: GovernanceConfig;
+  transferMintAuthority: boolean;
+
+  constructor(args: {
+    config: GovernanceConfig;
+    transferMintAuthority: boolean;
+  }) {
+    this.config = args.config;
+    this.transferMintAuthority = !!args.transferMintAuthority;
   }
 }
 

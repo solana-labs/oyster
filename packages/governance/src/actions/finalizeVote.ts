@@ -1,12 +1,10 @@
 import { Account, Connection, TransactionInstruction } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withFinalizeVote } from '../models/withFinalizeVote';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const finalizeVote = async (
   connection: Connection,
@@ -23,28 +21,12 @@ export const finalizeVote = async (
     proposal.info.governingTokenMint,
   );
 
-  notify({
-    message: 'Finalizing vote...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Vote Finalized',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Finalizing vote',
+    'Vote finalized',
+  );
 };

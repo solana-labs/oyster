@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps, Modal, Radio } from 'antd';
+import { ButtonProps, Radio } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -12,25 +12,28 @@ import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
-import { Governance, Realm } from '../../models/accounts';
-import { useRealm } from '../../contexts/GovernanceContext';
+import { Governance, Realm, TokenOwnerRecord } from '../../models/accounts';
 
 import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
+import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
+import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 
-export function NewProposal({
-  props,
+export function AddNewProposal({
   realm,
   governance,
+  buttonProps,
 }: {
-  props: ButtonProps;
   realm: ParsedAccount<Realm> | undefined;
-  governance?: ParsedAccount<Governance>;
+  governance: ParsedAccount<Governance> | undefined;
+  buttonProps?: ButtonProps;
 }) {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [redirect, setRedirect] = useState('');
+  const [redirectTo, setRedirectTo] = useState('');
+  const connection = useConnection();
+  const { wallet } = useWallet();
+
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.info.config.realm,
     realm?.info.communityMint,
@@ -44,71 +47,23 @@ export function NewProposal({
     return null;
   }
 
-  const canCreateCommunityProposal =
-    (communityTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
-      0) >= governance.info.config.minTokensToCreateProposal;
+  const canCreateProposal = (
+    tokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined,
+  ) =>
+    tokenOwnerRecord &&
+    tokenOwnerRecord.info.governingTokenDepositAmount.cmp(
+      new BN(governance?.info.config.minTokensToCreateProposal),
+    ) >= 0;
 
-  const canCreateCouncilProposal =
-    (councilTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
-      0) >= governance.info.config.minTokensToCreateProposal;
+  const canCreateCommunityProposal = canCreateProposal(
+    communityTokenOwnerRecord,
+  );
+
+  const canCreateCouncilProposal = canCreateProposal(councilTokenOwnerRecord);
 
   const isEnabled = canCreateCommunityProposal || canCreateCouncilProposal;
 
-  const handleOk = (a: PublicKey) => {
-    setIsModalVisible(false);
-    setRedirect(a.toBase58());
-  };
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  if (redirect) {
-    return <Redirect push to={'/proposal/' + redirect} />;
-  }
-
-  return (
-    <>
-      <Button
-        type="primary"
-        onClick={() => setIsModalVisible(true)}
-        {...props}
-        disabled={!isEnabled}
-      >
-        {LABELS.NEW_PROPOSAL}
-      </Button>
-      <NewProposalForm
-        handleOk={handleOk}
-        handleCancel={handleCancel}
-        isModalVisible={isModalVisible}
-        governance={governance!}
-        canCreateCommunityProposal={canCreateCommunityProposal}
-        canCreateCouncilProposal={canCreateCouncilProposal}
-      />
-    </>
-  );
-}
-
-export function NewProposalForm({
-  handleOk,
-  handleCancel,
-  isModalVisible,
-  governance,
-  canCreateCommunityProposal,
-  canCreateCouncilProposal,
-}: {
-  handleOk: (a: PublicKey) => void;
-  handleCancel: () => void;
-  isModalVisible: boolean;
-  governance: ParsedAccount<Governance>;
-  canCreateCommunityProposal: boolean;
-  canCreateCouncilProposal: boolean;
-}) {
-  const [form] = Form.useForm();
-  const wallet = useWallet();
-  const connection = useConnection();
-  const realm = useRealm(governance.info.config.realm);
-
-  const onFinish = async (values: {
+  const onSubmit = async (values: {
     name: string;
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
@@ -120,86 +75,79 @@ export function NewProposalForm({
         : realm!.info.councilMint!;
     const proposalIndex = governance.info.proposalCount;
 
-    try {
-      const proposalAddress = await createProposal(
-        connection,
-        wallet.wallet,
-        governance.info.config.realm,
-        governance.pubkey,
-        values.name,
-        values.descriptionLink,
-        governingTokenMint,
-        proposalIndex,
-      );
-      handleOk(proposalAddress);
-    } catch (ex) {
-      console.error(ex);
-      handleCancel();
-    }
+    return await createProposal(
+      connection,
+      wallet,
+      governance.info.config.realm,
+      governance.pubkey,
+      values.name,
+      values.descriptionLink,
+      governingTokenMint,
+      proposalIndex,
+    );
   };
 
-  const layout = {
-    labelCol: { span: 24 },
-    wrapperCol: { span: 24 },
+  const onComplete = (pk: PublicKey) => {
+    setRedirectTo(pk.toBase58());
   };
+
+  if (redirectTo) {
+    return <Redirect push to={'/proposal/' + redirectTo} />;
+  }
 
   return (
-    <Modal
-      title={LABELS.NEW_PROPOSAL}
-      visible={isModalVisible}
-      onOk={form.submit}
-      onCancel={handleCancel}
+    <ModalFormAction<PublicKey>
+      label={LABELS.ADD_NEW_PROPOSAL}
+      buttonProps={{ ...buttonProps, disabled: !isEnabled, type: 'primary' }}
+      formTitle={LABELS.ADD_NEW_PROPOSAL}
+      formAction={LABELS.ADD_PROPOSAL}
+      formPendingAction={LABELS.ADDING_PROPOSAL}
+      onSubmit={onSubmit}
+      onComplete={onComplete}
+      initialValues={{
+        governingTokenType: canCreateCommunityProposal
+          ? GoverningTokenType.Community
+          : GoverningTokenType.Council,
+      }}
     >
-      <Form
-        {...layout}
-        form={form}
-        name="control-hooks"
-        onFinish={onFinish}
-        initialValues={{
-          governingTokenType: canCreateCommunityProposal
-            ? GoverningTokenType.Community
-            : GoverningTokenType.Council,
-        }}
-      >
-        {realm?.info.councilMint && (
-          <Form.Item
-            label={LABELS.WHO_VOTES_QUESTION}
-            name="governingTokenType"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group>
-              {canCreateCommunityProposal && (
-                <Radio.Button value={GoverningTokenType.Community}>
-                  {LABELS.COMMUNITY_TOKEN_HOLDERS}
-                </Radio.Button>
-              )}
-              {canCreateCouncilProposal && (
-                <Radio.Button value={GoverningTokenType.Council}>
-                  {LABELS.COUNCIL}
-                </Radio.Button>
-              )}
-            </Radio.Group>
-          </Form.Item>
-        )}
+      {realm?.info.councilMint && (
+        <Form.Item
+          label={LABELS.WHO_VOTES_QUESTION}
+          name="governingTokenType"
+          rules={[{ required: true }]}
+        >
+          <Radio.Group>
+            {canCreateCommunityProposal && (
+              <Radio.Button value={GoverningTokenType.Community}>
+                {LABELS.COMMUNITY_TOKEN_HOLDERS}
+              </Radio.Button>
+            )}
+            {canCreateCouncilProposal && (
+              <Radio.Button value={GoverningTokenType.Council}>
+                {LABELS.COUNCIL}
+              </Radio.Button>
+            )}
+          </Radio.Group>
+        </Form.Item>
+      )}
 
-        <Form.Item
-          name="name"
-          label={LABELS.NAME_LABEL}
-          rules={[{ required: true }]}
-        >
-          <Input maxLength={MAX_PROPOSAL_NAME_LENGTH} />
-        </Form.Item>
-        <Form.Item
-          name="descriptionLink"
-          label={LABELS.DESCRIPTION_LABEL}
-          rules={[{ required: true }]}
-        >
-          <Input
-            maxLength={MAX_PROPOSAL_DESCRIPTION_LENGTH}
-            placeholder={LABELS.GIST_PLACEHOLDER}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
+      <Form.Item
+        name="name"
+        label={LABELS.NAME_LABEL}
+        rules={[{ required: true }]}
+      >
+        <Input maxLength={MAX_PROPOSAL_NAME_LENGTH} />
+      </Form.Item>
+      <Form.Item
+        name="descriptionLink"
+        label={LABELS.DESCRIPTION_LABEL}
+        rules={[{ required: true }]}
+      >
+        <Input
+          maxLength={MAX_PROPOSAL_DESCRIPTION_LENGTH}
+          placeholder={LABELS.GIST_PLACEHOLDER}
+        />
+      </Form.Item>
+    </ModalFormAction>
   );
 }
