@@ -1,7 +1,7 @@
 import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenIcon } from '@oyster/common';
+import { ParsedAccount, TokenIcon, constants } from '@oyster/common';
 import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
@@ -43,6 +43,7 @@ import {
 import BN from 'bn.js';
 
 const { TabPane } = Tabs;
+const { ZERO } = constants;
 
 export const urlRegex =
   // eslint-disable-next-line
@@ -150,14 +151,14 @@ export interface VoterDisplayData {
   name: string;
   title: string;
   group: string;
-  value: number;
+  value: BN;
 }
 
 function mapVoterDisplayData(
   voteRecords: ParsedAccount<VoteRecord>[],
   tokenOwnerRecords: ParsedAccount<TokenOwnerRecord>[],
 ): Array<VoterDisplayData> {
-  const mapper = (key: string, amount: number, label: string) => ({
+  const mapper = (key: string, amount: BN, label: string) => ({
     name: key,
     title: key,
     group: label,
@@ -169,7 +170,7 @@ function mapVoterDisplayData(
     ...tokenOwnerRecords
       .filter(
         tor =>
-          tor.info.governingTokenDepositAmount.toNumber() > 0 &&
+          !tor.info.governingTokenDepositAmount.isZero() &&
           !voteRecords.some(
             vt =>
               vt.info.governingTokenOwner.toBase58() ===
@@ -179,7 +180,7 @@ function mapVoterDisplayData(
       .map(tor =>
         mapper(
           tor.info.governingTokenOwner.toBase58(),
-          tor.info.governingTokenDepositAmount.toNumber(),
+          tor.info.governingTokenDepositAmount,
           VoteType.Undecided,
         ),
       ),
@@ -187,11 +188,11 @@ function mapVoterDisplayData(
 
   const noVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.no?.toNumber() > 0)
+      .filter(vr => vr.info.voteWeight.no?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.no.toNumber(),
+          vr.info.voteWeight.no,
           VoteType.No,
         ),
       ),
@@ -199,18 +200,18 @@ function mapVoterDisplayData(
 
   const yesVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.yes?.toNumber() > 0)
+      .filter(vr => vr.info.voteWeight.yes?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.yes.toNumber(),
+          vr.info.voteWeight.yes,
           VoteType.Yes,
         ),
       ),
   ];
 
-  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort(
-    (a, b) => b.value - a.value,
+  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort((a, b) =>
+    b.value.cmp(a.value),
   );
 
   return data;
@@ -352,7 +353,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={governingTokenMint.supply.toNumber()}
+                    total={governingTokenMint.supply}
                     data={voterDisplayData}
                   />
                 </div>

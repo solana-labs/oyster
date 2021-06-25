@@ -34,14 +34,21 @@ export function useGovernanceAccountByPubkey<
     }
 
     const sub = (async () => {
-      // TODO: Add retries
-      const accountInfo = await connection.getAccountInfo(pubkey);
-      if (accountInfo) {
-        const loadedAccount = BorshAccountParser(accountClass)(
-          pubkey,
-          accountInfo!,
-        );
-        setAccount(loadedAccount);
+      // TODO: Add retries for transient errors
+      try {
+        const accountInfo = await connection.getAccountInfo(pubkey);
+        if (accountInfo) {
+          const loadedAccount = BorshAccountParser(accountClass)(
+            pubkey,
+            accountInfo!,
+          );
+          setAccount(loadedAccount);
+        } else {
+          setAccount(undefined);
+        }
+      } catch (ex) {
+        console.error(`Can't load ${pubkey.toBase58()} account`, ex);
+        setAccount(undefined);
       }
 
       const { governance } = utils.programIds();
@@ -113,7 +120,7 @@ export function useGovernanceAccountsByFilter<
     const accountTypes = getAccountTypes(accountClass);
 
     const sub = (async () => {
-      // TODO: add retries
+      // TODO: add retries for transient errors
       const loadedAccounts = await getGovernanceAccounts<TAccount>(
         endpoint,
         accountClass,

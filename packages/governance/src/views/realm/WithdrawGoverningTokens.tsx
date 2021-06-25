@@ -37,7 +37,9 @@ export function WithdrawGoverningTokens({
     return null;
   }
 
-  const isVisible = !tokenOwnerRecord.info.governingTokenDepositAmount.isZero();
+  const isVisible =
+    tokenOwnerRecord &&
+    !tokenOwnerRecord.info.governingTokenDepositAmount.isZero();
 
   return isVisible ? (
     <Button

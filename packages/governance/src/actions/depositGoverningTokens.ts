@@ -7,7 +7,6 @@ import {
 import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { u64 } from '@solana/spl-token';
 
 const { approve } = models;
 

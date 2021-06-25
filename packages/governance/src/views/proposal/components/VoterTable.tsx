@@ -3,6 +3,7 @@ import { LABELS } from '../../../constants';
 
 import { Table, Grid } from 'antd';
 import { VoterDisplayData, VoteType } from '../ProposalView';
+import BN from 'bn.js';
 
 function shortNumber(num: number) {
   if (Math.abs(num) < 1000) {
@@ -39,7 +40,7 @@ function shortNumber(num: number) {
 const { useBreakpoint } = Grid;
 interface IVoterTable {
   data: Array<VoterDisplayData>;
-  total: number;
+  total: BN;
   endpoint: string;
 }
 
@@ -112,7 +113,7 @@ export const VoterTable = (props: IVoterTable) => {
               : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
         >
-          {Math.round((count * 100) / total)}%
+          {new BN(count).mul(new BN(100)).div(total).toString()}%
         </span>
       ),
     },
