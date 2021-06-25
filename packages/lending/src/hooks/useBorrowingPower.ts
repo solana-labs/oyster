@@ -25,10 +25,7 @@ export function useBorrowingPower(
   const liquidityMint = reserve?.info.liquidity.mintPubkey;
   const liquidityMintAddress = liquidityMint?.toBase58();
 
-  const exclude = useMemo(() => new Set([key]), [key]);
-  const inlcude = undefined;
-
-  const { totalInQuote } = useUserDeposits(exclude, inlcude);
+  const { totalInQuote } = useUserDeposits();
 
   const price = usePrice(liquidityMintAddress);
 

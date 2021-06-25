@@ -15,7 +15,7 @@ import {
   useSliderInput,
   useUserBalance,
   useUserDeposits,
-  useUserObligationByReserve,
+  useUserObligationByReserve, useUserObligations
 } from '../../hooks';
 import { Reserve, ReserveParser } from '../../models';
 import CollateralInput from '../CollateralInput';
@@ -32,22 +32,15 @@ export const BorrowInput = (props: {
 }) => {
   const connection = useConnection();
   const { wallet } = useWallet();
-  const [collateralValue, setCollateralValue] = useState('');
-  const [lastTyped, setLastTyped] = useState('collateral');
+  const { userDeposits } = useUserDeposits();
+  const { userObligations } = useUserObligations();
+
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const borrowReserve = props.reserve;
+  const depositReserves = [];
 
-  const [depositReserveKey, setCollateralReserveKey] = useState<string>();
-
-  const depositReserve = useMemo(() => {
-    const id: string =
-      cache.byParser(ReserveParser).find(acc => acc === depositReserveKey) ||
-      '';
-
-    return cache.get(id) as ParsedAccount<Reserve>;
-  }, [depositReserveKey]);
   const borrowPrice = usePrice(
     borrowReserve.info.liquidity.mintPubkey.toBase58(),
   );
@@ -55,14 +48,7 @@ export const BorrowInput = (props: {
     depositReserve?.info.liquidity.mintPubkey.toBase58(),
   );
 
-  const include = useMemo(() => new Set([depositReserve?.pubkey.toBase58()]), [
-    depositReserve,
-  ]);
-
-  const exclude = useMemo(() => new Set([]), []);
-
-  const { userDeposits: accountBalance } = useUserDeposits(exclude, include);
-  const tokenBalance = accountBalance[0]?.info.amount || 0;
+  const tokenBalance = userDeposits[0]?.info.amount || 0;
 
   const convert = useCallback(
     (val: string | number) => {
@@ -79,44 +65,18 @@ export const BorrowInput = (props: {
   const { value, setValue, pct } = useSliderInput(convert);
 
   useEffect(() => {
-    if (depositReserve && lastTyped === 'collateral') {
-      const ltv = borrowReserve.info.config.loanToValueRatio / 100;
+    const ltv = borrowReserve.info.config.loanToValueRatio / 100;
 
-      if (collateralValue) {
-        const nCollateralValue = parseFloat(collateralValue);
-        const borrowInUSD = nCollateralValue * collateralPrice * ltv;
-        const borrowAmount = borrowInUSD / borrowPrice;
-        setValue(borrowAmount.toString());
-      } else {
-        setValue('');
-      }
+    if (value) {
+      const nValue = parseFloat(value);
+      const borrowInUSD = nValue * borrowPrice;
+      const collateralAmount = borrowInUSD / ltv / collateralPrice;
+      // @FIXME
+      setCollateralValue(collateralAmount.toString());
+    } else {
+      setCollateralValue('');
     }
   }, [
-    lastTyped,
-    depositReserve,
-    collateralPrice,
-    borrowPrice,
-    borrowReserve,
-    collateralValue,
-    setValue,
-  ]);
-
-  useEffect(() => {
-    if (depositReserve && lastTyped === 'borrow') {
-      const ltv = borrowReserve.info.config.loanToValueRatio / 100;
-
-      if (value) {
-        const nValue = parseFloat(value);
-        const borrowInUSD = nValue * borrowPrice;
-        const collateralAmount = borrowInUSD / ltv / collateralPrice;
-        setCollateralValue(collateralAmount.toString());
-      } else {
-        setCollateralValue('');
-      }
-    }
-  }, [
-    lastTyped,
-    depositReserve,
     collateralPrice,
     borrowPrice,
     borrowReserve,
@@ -198,19 +158,6 @@ export const BorrowInput = (props: {
               alignItems: 'center',
             }}
           >
-            <CollateralInput
-              title="Collateral (estimated)"
-              reserve={borrowReserve.info}
-              amount={parseFloat(collateralValue) || 0}
-              onInputChange={(val: number | null) => {
-                setCollateralValue(val?.toString() || '');
-                setLastTyped('collateral');
-              }}
-              onCollateralReserve={key => {
-                setCollateralReserveKey(key);
-              }}
-              useFirstReserve={true}
-            />
           </div>
           <RiskSlider value={pct} />
           <div
@@ -228,7 +175,6 @@ export const BorrowInput = (props: {
               amount={parseFloat(value) || 0}
               onInputChange={(val: number | null) => {
                 setValue(val?.toString() || '');
-                setLastTyped('borrow');
               }}
               disabled={true}
               hideBalance={true}
