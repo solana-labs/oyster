@@ -11,7 +11,7 @@ const { useConnection } = contexts.Connection;
 const { getMultipleAccounts } = contexts.Accounts;
 
 type Products = Record<string, Product>;
-type Prices = Record<string, Price>;
+type Prices = Record<string, number>;
 
 type Subscription = { id: number; count: number } | undefined;
 type Subscriptions = Record<string, Subscription>;
@@ -20,14 +20,12 @@ export interface PythContextState {
   products: Products;
   prices: Prices;
   getPrice: (mint: string) => number;
-  subscribeToPrice: (mint: string) => () => void;
 }
 
 const PythContext = React.createContext<PythContextState>({
   products: {},
   prices: {},
   getPrice: (mint: string) => 0,
-  subscribeToPrice: (mint: string) => () => undefined,
 });
 
 export function PythProvider({ children = null as any }) {
@@ -64,72 +62,40 @@ export function PythProvider({ children = null as any }) {
     })();
   }, [connection, setProducts]);
 
-  const getPrice = useCallback(
-    (mint: string) => {
-      const symbol = tokenMap.get(mint)?.symbol;
-      if (!symbol) return 0;
-
-      const price = prices[symbol];
-      if (!price) return 0;
-
-      return price.price * Math.pow(10, price.exponent);
-    },
-    [tokenMap, prices],
-  );
-
   const subscribeToPrice = useCallback(
     (mint: string) => {
-      const tokenSymbol = tokenMap.get(mint)?.symbol;
-      if (tokenSymbol) {
-        const symbol = `${tokenSymbol}/USD`;
-        const product = products[symbol];
-        if (product) {
-          let subscription: Subscription;
-          (async () => {
-            try {
-              const accountInfo = await connection.getAccountInfo(
-                product.priceAccountKey,
-              );
-              if (!accountInfo || !accountInfo.data) return;
+      let subscription = subscriptions[mint];
+      if (subscription) return;
 
-              const price = parsePriceData(accountInfo.data);
-              setPrices({ ...prices, [symbol]: price });
+      let symbol = tokenMap.get(mint)?.symbol;
+      if (!symbol) return;
 
-              subscription = subscriptions[symbol];
-              if (subscription) {
-                subscription.count++;
-              } else {
-                subscription = {
-                  id: connection.onAccountChange(
-                    product.priceAccountKey,
-                    accountInfo => {
-                      const price = parsePriceData(accountInfo.data);
-                      setPrices({ ...prices, [symbol]: price });
-                    },
-                  ),
-                  count: 1,
-                };
-              }
-              setSubscriptions({ ...subscriptions, [symbol]: subscription });
-            } catch (e) {
-              console.error(e);
-            }
-          })();
-          return () => {
-            if (subscription) {
-              subscription.count--;
-              if (!subscription.count) {
-                connection.removeAccountChangeListener(subscription.id);
-                subscription = undefined;
-              }
-              setSubscriptions({ ...subscriptions, [symbol]: subscription });
-            }
-          };
+      const product = products[`${ symbol }/USD`];
+      if (!product) return;
+
+      const id = connection.onAccountChange(product.priceAccountKey, function (accountInfo) {
+        try {
+          const price = parsePriceData(accountInfo.data);
+          setPrices({ ...prices, [mint]: price.price });
         }
-      }
-      return () => undefined;
+        catch (e) {
+          console.error(e);
+        }
+      });
+
+      // @TODO: add subscription counting / removal
+      subscription = { id, count: 1 };
+      setSubscriptions({ ...subscriptions, [mint]: subscription });
     },
-    [tokenMap, products, connection, prices, setPrices, subscriptions, setSubscriptions],
+    [subscriptions, tokenMap, products, connection, prices, setPrices, setSubscriptions],
+  );
+
+  const getPrice = useCallback(
+    (mint: string) => {
+      subscribeToPrice(mint);
+      return prices[mint] || 0;
+    },
+    [subscribeToPrice, prices],
   );
 
   return (
@@ -138,7 +104,6 @@ export function PythProvider({ children = null as any }) {
         products,
         prices,
         getPrice,
-        subscribeToPrice,
       }}
     >
       {children}
@@ -151,13 +116,12 @@ export const usePyth = () => {
 };
 
 export const usePrice = (mint: string) => {
-  const { getPrice, subscribeToPrice } = useContext(PythContext);
+  const { getPrice } = useContext(PythContext);
   const [price, setPrice] = useState(0);
 
   useEffect(() => {
     setPrice(getPrice(mint));
-    return subscribeToPrice(mint);
-  }, [setPrice, getPrice, mint, subscribeToPrice]);
+  }, [setPrice, getPrice, mint]);
 
   return price;
 };
