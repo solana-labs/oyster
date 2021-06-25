@@ -5,9 +5,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 
-import { AccountInfo as TokenAccountInfo, Token } from '@solana/spl-token';
+import { AccountInfo as TokenAccountInfo, Token, u64 } from '@solana/spl-token';
 import { TOKEN_PROGRAM_ID } from '../utils/ids';
 import BufferLayout from 'buffer-layout';
+import BN from 'bn.js';
 
 export interface TokenAccount {
   pubkey: PublicKey;
@@ -53,7 +54,7 @@ export function approve(
   cleanupInstructions: TransactionInstruction[],
   account: PublicKey,
   owner: PublicKey,
-  amount: number,
+  amount: number | u64,
   autoRevoke = true,
 
   // if delegate is not passed ephemeral transfer authority is used
@@ -64,6 +65,12 @@ export function approve(
 
   const transferAuthority = existingTransferAuthority || new Account();
   const delegateKey = delegate ?? transferAuthority.publicKey;
+
+  // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
+  // Without the coercion createApproveInstruction would fail because it won't be able to serialize it
+  if (amount instanceof BN) {
+    amount = new u64(amount.toBuffer());
+  }
 
   instructions.push(
     Token.createApproveInstruction(
