@@ -68,8 +68,8 @@ export function approve(
 
   // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
   // Without the coercion createApproveInstruction would fail because it won't be able to serialize it
-  if (amount instanceof BN) {
-    amount = new u64(amount.toBuffer());
+  if (typeof amount !== 'number') {
+    amount = new u64(amount.toArray());
   }
 
   instructions.push(
