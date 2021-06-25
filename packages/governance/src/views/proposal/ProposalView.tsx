@@ -355,6 +355,7 @@ function InnerProposalView({
                     endpoint={endpoint}
                     total={governingTokenMint.supply}
                     data={voterDisplayData}
+                    decimals={governingTokenMint.decimals}
                   />
                 </div>
               </Card>

@@ -167,7 +167,7 @@ export const LABELS = {
   GIT_CONTENT_EXCEEDED:
     'Gist Github API limit exceeded. Click to view on Github directly.',
   ACCOUNT: 'Account',
-  COUNT: 'Count',
+  VOTE_WEIGHT: 'Vote Weight',
   VOTE_TYPE: 'Vote Type',
   LARGEST_VOTERS_BUBBLE: 'Top Voters Visualization',
   LARGEST_VOTERS_TABLE: 'Top Voters',

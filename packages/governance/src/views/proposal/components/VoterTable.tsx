@@ -4,53 +4,22 @@ import { LABELS } from '../../../constants';
 import { Table, Grid } from 'antd';
 import { VoterDisplayData, VoteType } from '../ProposalView';
 import BN from 'bn.js';
+import { BigNumber } from 'bignumber.js';
+import { utils } from '@oyster/common';
 
-function shortNumber(num: number) {
-  if (Math.abs(num) < 1000) {
-    return num;
-  }
-
-  let shortNumber;
-  let exponent;
-  const sign = num < 0 ? '-' : '';
-  const suffixes: Record<string, number> = {
-    K: 6,
-    M: 9,
-    B: 12,
-    T: 16,
-  };
-
-  num = Math.abs(num);
-  const size = Math.floor(num).toString().length;
-
-  exponent = size % 3 === 0 ? size - 3 : size - (size % 3);
-  shortNumber = Math.round(10 * (num / Math.pow(10, exponent))) / 10;
-  let shortNumberAsString = '';
-
-  for (let suffix in suffixes) {
-    if (exponent < suffixes[suffix]) {
-      shortNumberAsString += `${shortNumber}${suffix}`;
-      break;
-    }
-  }
-
-  return sign + shortNumberAsString;
-}
+const { getExplorerUrl } = utils;
 
 const { useBreakpoint } = Grid;
-interface IVoterTable {
+interface VoterTableProps {
   data: Array<VoterDisplayData>;
   total: BN;
   endpoint: string;
+  decimals: number;
 }
 
-export const VoterTable = (props: IVoterTable) => {
-  const { data, total, endpoint } = props;
+export const VoterTable = (props: VoterTableProps) => {
+  const { data, total, endpoint, decimals } = props;
   const breakpoint = useBreakpoint();
-  const subdomain = endpoint
-    .replace('http://', '')
-    .replace('https://', '')
-    .split('.')[0];
 
   const columns = [
     {
@@ -60,7 +29,7 @@ export const VoterTable = (props: IVoterTable) => {
       align: 'center',
       render: (key: string) => (
         <a
-          href={`https://explorer.solana.com/address/${key}?cluster=${subdomain}`}
+          href={getExplorerUrl(key, endpoint)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -84,11 +53,11 @@ export const VoterTable = (props: IVoterTable) => {
       ),
     },
     {
-      title: LABELS.COUNT,
+      title: LABELS.VOTE_WEIGHT,
       dataIndex: 'value',
       key: 'value',
       align: 'center',
-      render: (count: number, record: VoterDisplayData) => (
+      render: (count: BN, record: VoterDisplayData) => (
         <span
           style={
             record.group === VoteType.Undecided
@@ -96,7 +65,7 @@ export const VoterTable = (props: IVoterTable) => {
               : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
         >
-          {shortNumber(count)}
+          {new BigNumber(count.toString()).shiftedBy(-decimals).toFormat()}
         </span>
       ),
     },
@@ -105,7 +74,7 @@ export const VoterTable = (props: IVoterTable) => {
       dataIndex: 'value',
       key: 'percentage',
       align: 'center',
-      render: (count: number, record: VoterDisplayData) => (
+      render: (count: BN, record: VoterDisplayData) => (
         <span
           style={
             record.group === VoteType.Undecided
@@ -113,7 +82,7 @@ export const VoterTable = (props: IVoterTable) => {
               : { color: record.group === VoteType.Yes ? 'green' : 'red' }
           }
         >
-          {new BN(count).mul(new BN(100)).div(total).toString()}%
+          {count.mul(new BN(100)).div(total).toString()}%
         </span>
       ),
     },
