@@ -26,7 +26,7 @@ import { MINT_TO_MARKET } from './../models/marketOverrides';
 const { useConnectionConfig } = contexts.Connection;
 const { cache, getMultipleAccounts } = contexts.Accounts;
 
-const INITAL_LIQUIDITY_DATE = new Date('2020-10-27');
+const INITIAL_LIQUIDITY_DATE = new Date('2021-06-21');
 export const BONFIDA_POOL_INTERVAL = 30 * 60_000; // 30 min
 
 interface RecentPoolData {
@@ -74,7 +74,7 @@ export function MarketProvider({ children = null as any }) {
       );
 
       const marketAddress = MINT_TO_MARKET[mintAddress];
-      const marketName = `${SERUM_TOKEN?.name}/USDC`;
+      const marketName = `${SERUM_TOKEN?.name}/USDT`;
       const marketInfo = MARKETS.find(
         m => m.name === marketName || m.address.toBase58() === marketAddress,
       );
@@ -383,7 +383,7 @@ function createEnrichedPools(
 
             // Aproximation not true for all pools we need to fine a better way
             const daysSinceInception = Math.floor(
-              (TODAY.getTime() - INITAL_LIQUIDITY_DATE.getTime()) /
+              (TODAY.getTime() - INITIAL_LIQUIDITY_DATE.getTime()) /
                 (24 * 3600 * 1000),
             );
             const apy0 =
