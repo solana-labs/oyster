@@ -75,7 +75,7 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
             account: item,
             info: {
               amount,
-              amountInQuote: amountInQuote,
+              amountInQuote,
               apy: calculateDepositAPY(reserve.info),
               name: getTokenName(tokenMap, reserve.info.liquidity.mintPubkey),
             },
