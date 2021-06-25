@@ -33,7 +33,7 @@ export function DepositGoverningTokens({
   const isVisible =
     realm != null &&
     governingTokenAccount &&
-    governingTokenAccount.info.amount.toNumber() > 0;
+    !governingTokenAccount.info.amount.isZero();
 
   return isVisible ? (
     <Button
