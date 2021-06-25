@@ -9,19 +9,21 @@ export enum GovernanceInstruction {
   SetGovernanceDelegate = 3, // --
   CreateAccountGovernance = 4,
   CreateProgramGovernance = 5,
-  CreateMintGovernance = 6,
-  CreateProposal = 7,
-  AddSignatory = 8,
-  RemoveSignatory = 9,
 
-  InsertInstruction = 10,
-  RemoveInstruction = 11,
-  CancelProposal = 12,
-  SignOffProposal = 13,
-  CastVote = 14,
-  FinalizeVote = 15,
-  RelinquishVote = 16,
-  ExecuteInstruction = 17,
+  CreateProposal = 6,
+  AddSignatory = 7,
+  RemoveSignatory = 8,
+
+  InsertInstruction = 9,
+  RemoveInstruction = 10,
+  CancelProposal = 11,
+  SignOffProposal = 12,
+  CastVote = 13,
+  FinalizeVote = 14,
+  RelinquishVote = 15,
+  ExecuteInstruction = 16,
+
+  CreateMintGovernance = 17,
 }
 
 export class CreateRealmArgs {

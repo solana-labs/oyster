@@ -11,11 +11,11 @@ export enum GovernanceAccountType {
   TokenOwnerRecord = 2,
   AccountGovernance = 3,
   ProgramGovernance = 4,
-  MintGovernance = 5,
-  Proposal = 6,
-  SignatoryRecord = 7,
-  VoteRecord = 8,
-  ProposalInstruction = 9,
+  Proposal = 5,
+  SignatoryRecord = 6,
+  VoteRecord = 7,
+  ProposalInstruction = 8,
+  MintGovernance = 9,
 }
 
 export interface GovernanceAccount {
