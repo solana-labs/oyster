@@ -43,6 +43,9 @@ export const GovernanceError: Record<number, string> = [
   'Invalid Account type', // InvalidAccountType
   'Proposal does not belong to the given Governance', // InvalidGovernanceForProposal
   'Proposal does not belong to given Governing Mint', // InvalidGoverningMintForProposal
+  'Current mint authority must sign transaction', // MintAuthorityMustSign
+  'Invalid mint authority', // InvalidMintAuthority
+  'Mint has no authority', // MintHasNoAuthority
   'Invalid Token account owner', // SplTokenAccountWithInvalidOwner
   'Invalid Mint account owner', // SplTokenMintWithInvalidOwner
   'Token Account is not initialized', // SplTokenAccountNotInitialized

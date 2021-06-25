@@ -109,11 +109,13 @@ export const LABELS = {
   REGISTER_GOVERNANCE: 'Register Governance',
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
+  MINT: 'Mint',
 
   REGISTER: 'Register',
   REGISTERING: 'Registering',
 
   PROGRAM_ID_LABEL: 'program id',
+  MINT_ADDRESS_LABEL: 'mint address',
   ACCOUNT_ADDRESS: 'account address',
 
   MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
@@ -121,6 +123,7 @@ export const LABELS = {
   MAX_VOTING_TIME: 'max voting time (slots)',
 
   TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
+  TRANSFER_MINT_AUTHORITY: 'transfer mint authority',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',

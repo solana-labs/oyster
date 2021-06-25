@@ -11,6 +11,7 @@ import {
   CancelProposalArgs,
   CastVoteArgs,
   CreateAccountGovernanceArgs,
+  CreateMintGovernanceArgs,
   CreateProgramGovernanceArgs,
   CreateProposalArgs,
   CreateRealmArgs,
@@ -123,6 +124,17 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['instruction', 'u8'],
         ['config', GovernanceConfig],
         ['transferUpgradeAuthority', 'u8'],
+      ],
+    },
+  ],
+  [
+    CreateMintGovernanceArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
+        ['transferMintAuthority', 'u8'],
       ],
     },
   ],

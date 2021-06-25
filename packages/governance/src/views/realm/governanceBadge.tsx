@@ -1,4 +1,4 @@
-import { ParsedAccount, TokenIcon, useMint } from '@oyster/common';
+import { ParsedAccount, TokenIcon } from '@oyster/common';
 import { Avatar, Badge } from 'antd';
 import React from 'react';
 import { Governance, ProposalState } from '../../models/accounts';
@@ -10,8 +10,6 @@ export function GovernanceBadge({
 }: {
   governance: ParsedAccount<Governance>;
 }) {
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const governedMint = useMint(governance.info.config.governedAccount);
   const proposals = useProposalsByGovernance(governance?.pubkey);
   const color = governance.info.isProgramGovernance() ? 'green' : 'gray';
 
@@ -22,7 +20,7 @@ export function GovernanceBadge({
       }
     >
       <div style={{ width: 55, height: 45 }}>
-        {governedMint ? (
+        {governance.info.isMintGovernance() ? (
           <TokenIcon
             mintAddress={governance.info.config.governedAccount}
             size={40}
