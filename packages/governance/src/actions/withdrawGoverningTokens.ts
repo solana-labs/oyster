@@ -26,6 +26,6 @@ export const withdrawGoverningTokens = async (
     instructions,
     [],
     'Withdrawing governing tokens',
-    'Tokens have been withdrawn.',
+    'Tokens have been withdrawn',
   );
 };

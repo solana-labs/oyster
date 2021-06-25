@@ -4,13 +4,11 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 import { withRelinquishVote } from '../models/withRelinquishVote';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const relinquishVote = async (
   connection: Connection,
@@ -37,30 +35,12 @@ export const relinquishVote = async (
     beneficiary,
   );
 
-  notify({
-    message: IsWithdrawal
-      ? 'Withdrawing vote from proposal...'
-      : 'Releasing voting tokens...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: IsWithdrawal ? 'Vote withdrawn' : 'Tokens released',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    IsWithdrawal ? 'Withdrawing vote from proposal' : 'Releasing voting tokens',
+    IsWithdrawal ? 'Vote withdrawn' : 'Tokens released',
+  );
 };

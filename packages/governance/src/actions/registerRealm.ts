@@ -1,9 +1,7 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, sendTransaction } from '@oyster/common';
 
 import { withCreateRealm } from '../models/withCreateRealm';
-
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const registerRealm = async (
   connection: Connection,
@@ -22,24 +20,14 @@ export const registerRealm = async (
     councilMint,
   );
 
-  notify({
-    message: 'Registering realm...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    [],
+    'Registering realm',
+    'Realm has been registered',
+  );
 
-  try {
-    let tx = await sendTransaction(connection, wallet, instructions, []);
-
-    notify({
-      message: 'Realm has been registered.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-
-    return realmAddress;
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
-  }
+  return realmAddress;
 };

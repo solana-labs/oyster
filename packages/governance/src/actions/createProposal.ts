@@ -1,10 +1,8 @@
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, sendTransaction } from '@oyster/common';
 
 import { withCreateProposal } from '../models/withCreateProposal';
 import { withAddSignatory } from '../models/withAddSignatory';
-
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const createProposal = async (
   connection: Connection,
@@ -45,24 +43,14 @@ export const createProposal = async (
     payer,
   );
 
-  notify({
-    message: 'Creating  Proposal...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    [],
+    'Creating proposal',
+    'Proposal has been created',
+  );
 
-  try {
-    let tx = await sendTransaction(connection, wallet, instructions, []);
-
-    notify({
-      message: 'Proposal has been crated.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-
-    return proposalAddress;
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
-  }
+  return proposalAddress;
 };
