@@ -2,6 +2,7 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon } from '@oyster/common';
+import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -39,6 +40,7 @@ import {
   useInstructionsByProposal,
   useVoteRecordsByProposal,
 } from '../../hooks/apiHooks';
+import BN from 'bn.js';
 
 const { TabPane } = Tabs;
 
@@ -372,9 +374,9 @@ function InnerProposalView({
           <Col md={7} xs={24}>
             <Card>
               <Statistic
-                title={LABELS.VOTES_IN_FAVOUR}
-                value={proposal.info.yesVotesCount.toNumber()}
-                suffix={`/ ${governingTokenMint.supply.toNumber()}`}
+                title={LABELS.VOTE_SCORE_IN_FAVOUR}
+                value={getVoteInFavorScore(proposal, governingTokenMint)}
+                suffix={`/ ${getMaxVoteScore(governingTokenMint)}`}
               />
             </Card>
           </Col>
@@ -382,8 +384,11 @@ function InnerProposalView({
             <Card>
               <Statistic
                 valueStyle={{ color: 'green' }}
-                title={LABELS.VOTES_REQUIRED}
-                value={getMinRequiredYesVotes(governance, governingTokenMint)}
+                title={LABELS.VOTE_SCORE_REQUIRED}
+                value={getMinRequiredYesVoteScore(
+                  governance,
+                  governingTokenMint,
+                )}
               />
             </Card>
           </Col>
@@ -452,14 +457,33 @@ function InnerProposalView({
   );
 }
 
-function getMinRequiredYesVotes(
+function getMinRequiredYesVoteScore(
   governance: ParsedAccount<Governance>,
   governingTokenMint: MintInfo,
-): number {
-  return governance.info.config.yesVoteThresholdPercentage === 100
-    ? governingTokenMint.supply.toNumber()
-    : Math.ceil(
-        (governance.info.config.yesVoteThresholdPercentage / 100) *
-          governingTokenMint.supply.toNumber(),
-      );
+): string {
+  const minVotes =
+    governance.info.config.yesVoteThresholdPercentage === 100
+      ? governingTokenMint.supply
+      : governingTokenMint.supply
+          .mul(new BN(governance.info.config.yesVoteThresholdPercentage))
+          .div(new BN(100));
+
+  return new BigNumber(minVotes.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toString();
+}
+
+function getVoteInFavorScore(
+  proposal: ParsedAccount<Proposal>,
+  governingTokenMint: MintInfo,
+): string {
+  return new BigNumber(proposal.info.yesVotesCount.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toString();
+}
+
+function getMaxVoteScore(governingTokenMint: MintInfo) {
+  return new BigNumber(governingTokenMint.supply.toString())
+    .shiftedBy(-governingTokenMint.decimals)
+    .toFormat();
 }
