@@ -1,4 +1,8 @@
-import { sleep, useLocalStorageState } from '../utils/utils';
+import {
+  ENV as ChainId,
+  TokenInfo,
+  TokenListProvider,
+} from '@solana/spl-token-registry';
 import {
   Account,
   BlockhashAndFeeCalculator,
@@ -13,14 +17,10 @@ import {
   TransactionSignature,
 } from '@solana/web3.js';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { notify } from '../utils/notifications';
 import { ExplorerLink } from '../components/ExplorerLink';
 import { setProgramIds } from '../utils/ids';
-import {
-  TokenInfo,
-  TokenListProvider,
-  ENV as ChainId,
-} from '@solana/spl-token-registry';
+import { notify } from '../utils/notifications';
+import { sleep, useLocalStorageState } from '../utils/utils';
 
 export type ENV =
   | 'mainnet-beta (Serum)'
@@ -95,14 +95,12 @@ export function ConnectionProvider({ children = undefined as any }) {
     DEFAULT_SLIPPAGE.toString(),
   );
 
-  const connection = useMemo(
-    () => new Connection(endpoint, 'recent'),
-    [endpoint],
-  );
-  const sendConnection = useMemo(
-    () => new Connection(endpoint, 'recent'),
-    [endpoint],
-  );
+  const connection = useMemo(() => new Connection(endpoint, 'recent'), [
+    endpoint,
+  ]);
+  const sendConnection = useMemo(() => new Connection(endpoint, 'recent'), [
+    endpoint,
+  ]);
 
   const env =
     ENDPOINTS.find(end => end.endpoint === endpoint)?.name || ENDPOINTS[0].name;
@@ -112,7 +110,7 @@ export function ConnectionProvider({ children = undefined as any }) {
   useEffect(() => {
     // fetch token files
     new TokenListProvider().resolve().then(container => {
-      const list = container
+      const tokens = container
         .excludeByTag('nft')
         .filterByChainId(
           ENDPOINTS.find(end => end.endpoint === endpoint)?.ChainId ||
@@ -120,13 +118,45 @@ export function ConnectionProvider({ children = undefined as any }) {
         )
         .getList();
 
-      const knownMints = [...list].reduce((map, item) => {
+      // @FIXME: remove hardcoded values
+      if (endpoint.ChainId === ChainId.Devnet) {
+        tokens.push(
+          {
+            chainId: 103,
+            address: '9FbAMDvXqNjPqZSYt4EWTguJuDrGkfvwr3gSFpiSbX9S',
+            symbol: 'SRM',
+            name: 'Serum',
+            decimals: 6,
+            logoURI:
+              'https://cdn.jsdelivr.net/gh/trustwallet/assets@master/blockchains/ethereum/assets/0x476c5E26a75bd202a9683ffD34359C0CC15be0fF/logo.png',
+            tags: [],
+            extensions: {
+              website: 'https://projectserum.com/',
+            },
+          },
+          {
+            chainId: 103,
+            address: '7KBVenLz5WNH4PA5MdGkJNpDDyNKnBQTwnz1UqJv9GUm',
+            symbol: 'USDT',
+            name: 'USDT',
+            decimals: 6,
+            logoURI:
+              'https://cdn.jsdelivr.net/gh/solana-labs/explorer/public/tokens/usdt.svg',
+            tags: ['stablecoin'],
+            extensions: {
+              website: 'https://tether.to/',
+            },
+          },
+        );
+      }
+
+      const tokenMap = tokens.reduce((map, item) => {
         map.set(item.address, item);
         return map;
       }, new Map<string, TokenInfo>());
 
-      setTokenMap(knownMints);
-      setTokens(list);
+      setTokenMap(tokenMap);
+      setTokens(tokens);
     });
   }, [env]);
 
