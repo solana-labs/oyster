@@ -12,10 +12,11 @@ import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
-import { Governance, Realm } from '../../models/accounts';
+import { Governance, Realm, TokenOwnerRecord } from '../../models/accounts';
 
 import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
+import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -46,13 +47,19 @@ export function AddNewProposal({
     return null;
   }
 
-  const canCreateCommunityProposal =
-    (communityTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
-      0) >= governance.info.config.minTokensToCreateProposal;
+  const canCreateProposal = (
+    tokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined,
+  ) =>
+    tokenOwnerRecord &&
+    tokenOwnerRecord.info.governingTokenDepositAmount.cmp(
+      new BN(governance?.info.config.minTokensToCreateProposal),
+    ) >= 0;
 
-  const canCreateCouncilProposal =
-    (councilTokenOwnerRecord?.info.governingTokenDepositAmount.toNumber() ??
-      0) >= governance.info.config.minTokensToCreateProposal;
+  const canCreateCommunityProposal = canCreateProposal(
+    communityTokenOwnerRecord,
+  );
+
+  const canCreateCouncilProposal = canCreateProposal(councilTokenOwnerRecord);
 
   const isEnabled = canCreateCommunityProposal || canCreateCouncilProposal;
 

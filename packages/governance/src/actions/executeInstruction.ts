@@ -1,12 +1,10 @@
 import { Account, Connection, TransactionInstruction } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { Proposal, ProposalInstruction } from '../models/accounts';
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const executeInstruction = async (
   connection: Connection,
@@ -25,28 +23,12 @@ export const executeInstruction = async (
     instruction.info.instruction,
   );
 
-  notify({
-    message: 'Executing instruction...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Instruction executed.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Executing instruction',
+    'Instruction executed',
+  );
 };

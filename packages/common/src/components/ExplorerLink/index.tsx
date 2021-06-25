@@ -5,7 +5,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { ENDPOINTS, useConnectionConfig } from '../../contexts';
 
 import { ENV as ChainId } from '@solana/spl-token-registry';
-import { isPropertyAccessOrQualifiedName } from 'typescript';
+import { getExplorerUrl } from '../../utils/explorer';
 
 export const ExplorerLink = (props: {
   address: string | PublicKey;
@@ -63,7 +63,7 @@ export const ExplorerLink = (props: {
 
   return (
     <a
-      href={`https://explorer.solana.com/${type}/${address}${getClusterUrlParam()}`}
+      href={getExplorerUrl(address, endpoint, type, props.connection)}
       // eslint-disable-next-line react/jsx-no-target-blank
       target="_blank"
       title={address}

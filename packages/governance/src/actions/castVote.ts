@@ -4,14 +4,12 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 import { withCastVote } from '../models/withCastVote';
 import { Vote } from '../models/instructions';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const castVote = async (
   connection: Connection,
@@ -37,27 +35,12 @@ export const castVote = async (
     payer,
   );
 
-  notify({
-    message: 'Voting on proposal...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Proposal voted on.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Voting on proposal',
+    'Proposal voted on',
+  );
 };

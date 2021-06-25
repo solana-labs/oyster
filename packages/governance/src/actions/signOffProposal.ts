@@ -4,13 +4,11 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { SignatoryRecord } from '../models/accounts';
 import { withSignOffProposal } from '../models/withSignOffProposal';
-
-const { sendTransaction } = contexts.Connection;
-const { notify } = utils;
+import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const signOffProposal = async (
   connection: Connection,
@@ -28,28 +26,12 @@ export const signOffProposal = async (
     signatory,
   );
 
-  notify({
-    message: 'Signing off proposal...',
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
-  try {
-    let tx = await sendTransaction(
-      connection,
-      wallet,
-      instructions,
-      signers,
-      true,
-    );
-
-    notify({
-      message: 'Proposal signed off.',
-      type: 'success',
-      description: `Transaction - ${tx}`,
-    });
-  } catch (ex) {
-    console.error(ex);
-    throw new Error();
-  }
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    instructions,
+    signers,
+    'Signing off proposal',
+    'Proposal signed off',
+  );
 };

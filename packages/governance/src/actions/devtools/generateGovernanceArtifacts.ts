@@ -14,7 +14,7 @@ import {
   SequenceType,
 } from '@oyster/common';
 
-import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
+import { AccountLayout, MintLayout, Token, u64 } from '@solana/spl-token';
 import { setAuthority } from '@project-serum/serum/lib/token-instructions';
 import { GOVERNANCE_PROGRAM_SEED } from '../../models/accounts';
 import { serializeInstructionToBase64 } from '../../models/serialisation';
@@ -40,8 +40,9 @@ export const generateGovernanceArtifacts = async (
     communityMintSigners,
     connection,
     wallet,
-    70,
-    100,
+    9,
+    new u64('4205522598596271000'),
+    new u64('6007889426566101064'),
   );
 
   let councilMinSigners: Account[] = [];
@@ -53,8 +54,9 @@ export const generateGovernanceArtifacts = async (
     councilMinSigners,
     connection,
     wallet,
-    20,
-    55,
+    0,
+    new u64(20),
+    new u64(55),
   );
 
   // Setup Realm, Governance and Proposal instruction
@@ -140,9 +142,8 @@ export const generateGovernanceArtifacts = async (
       instructionBase64,
     };
   } catch (ex) {
-    console.log('ERROR', ex);
     console.error(ex);
-    throw new Error();
+    throw ex;
   }
 };
 
@@ -151,8 +152,9 @@ const withMint = async (
   signers: Account[],
   connection: Connection,
   wallet: any,
-  amount: number,
-  supply: number,
+  decimals: number,
+  amount: u64,
+  supply: u64,
 ) => {
   const PROGRAM_IDS = utils.programIds();
 
@@ -172,7 +174,7 @@ const withMint = async (
     instructions,
     wallet.publicKey,
     mintRentExempt,
-    0,
+    decimals,
     wallet.publicKey,
     wallet.publicKey,
     signers,
@@ -195,7 +197,7 @@ const withMint = async (
         tokenAccountAddress,
         wallet.publicKey,
         [],
-        amount,
+        new u64(amount),
       ),
     );
   }
@@ -213,7 +215,10 @@ const withMint = async (
 
   signers.push(otherOwner);
 
-  const otherOwnerPubKey = otherOwner.publicKey;
+  let otherOwnerPubKey = otherOwner.publicKey;
+  otherOwnerPubKey = new PublicKey(
+    'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
+  );
 
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
@@ -231,7 +236,7 @@ const withMint = async (
       otherOwnerTokenAccount,
       wallet.publicKey,
       [],
-      supply - (amount ?? 0),
+      new u64(supply.sub(amount).toArray()),
     ),
   );
 
