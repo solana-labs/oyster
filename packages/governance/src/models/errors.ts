@@ -40,15 +40,21 @@ export const GovernanceError: Record<number, string> = [
   'Proposal voting time expired', // ProposalVotingTimeExpired
   'Invalid Signatory Mint', // InvalidSignatoryMint
   'Invalid account owner', // InvalidAccountOwner
+  "Account doesn't exist", // AccountDoesNotExist
   'Invalid Account type', // InvalidAccountType
   'Proposal does not belong to the given Governance', // InvalidGovernanceForProposal
   'Proposal does not belong to given Governing Mint', // InvalidGoverningMintForProposal
+  'Current mint authority must sign transaction', // MintAuthorityMustSign
+  'Invalid mint authority', // InvalidMintAuthority
+  'Mint has no authority', // MintHasNoAuthority
   'Invalid Token account owner', // SplTokenAccountWithInvalidOwner
   'Invalid Mint account owner', // SplTokenMintWithInvalidOwner
   'Token Account is not initialized', // SplTokenAccountNotInitialized
+  "Token Account doesn't exist", // SplTokenAccountDoesNotExist
   'Token account data is invalid', // SplTokenInvalidTokenAccountData
   'Token mint account data is invalid', // SplTokenInvalidMintAccountData
   'Token Mint account is not initialized', // SplTokenMintNotInitialized
+  "Token Mint account doesn't exist", // SplTokenMintDoesNotExist
   'Invalid ProgramData account address', // InvalidProgramDataAccountAddress
   'Invalid ProgramData account Data', // InvalidProgramDataAccountData
   "Provided upgrade authority doesn't match current program upgrade authority", // InvalidUpgradeAuthority

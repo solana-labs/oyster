@@ -6,12 +6,7 @@ import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
-import {
-  ExplorerLink,
-  TokenIcon,
-  useConnectionConfig,
-  useMint,
-} from '@oyster/common';
+import { ExplorerLink, TokenIcon, useConnectionConfig } from '@oyster/common';
 import { AddNewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
@@ -39,8 +34,6 @@ export const GovernanceView = () => {
 
   const mint = communityTokenMint?.toBase58() || '';
 
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const governedMint = useMint(governance?.info.config.governedAccount);
   const color = governance?.info.isProgramGovernance() ? 'green' : 'gray';
 
   const proposalItems = useMemo(() => {
@@ -78,7 +71,7 @@ export const GovernanceView = () => {
     >
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          {governedMint ? (
+          {governance?.info.isMintGovernance() ? (
             <TokenIcon
               mintAddress={governance?.info.config.governedAccount}
               size={60}

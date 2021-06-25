@@ -5,6 +5,7 @@ import { GovernanceType } from '../models/enums';
 import { GovernanceConfig } from '../models/accounts';
 import { withCreateProgramGovernance } from '../models/withCreateProgramGovernance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
 
 export const registerGovernance = async (
   connection: Connection,
@@ -12,34 +13,55 @@ export const registerGovernance = async (
   governanceType: GovernanceType,
   realm: PublicKey,
   config: GovernanceConfig,
-  transferUpgradeAuthority?: boolean,
+  transferAuthority?: boolean,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
   let governanceAddress;
 
-  if (governanceType === GovernanceType.Account) {
-    governanceAddress = (
-      await withCreateAccountGovernance(
-        instructions,
-        realm,
-        config,
-        wallet.publicKey,
-      )
-    ).governanceAddress;
-  } else if (governanceType === GovernanceType.Program) {
-    governanceAddress = (
-      await withCreateProgramGovernance(
-        instructions,
-        realm,
-        config,
-        transferUpgradeAuthority!,
-        wallet.publicKey,
-        wallet.publicKey,
-      )
-    ).governanceAddress;
-  } else {
-    throw new Error(`Governance type ${governanceType} is not supported yet.`);
+  switch (governanceType) {
+    case GovernanceType.Account: {
+      governanceAddress = (
+        await withCreateAccountGovernance(
+          instructions,
+          realm,
+          config,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    case GovernanceType.Program: {
+      governanceAddress = (
+        await withCreateProgramGovernance(
+          instructions,
+          realm,
+          config,
+          transferAuthority!,
+          wallet.publicKey,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    case GovernanceType.Mint: {
+      governanceAddress = (
+        await withCreateMintGovernance(
+          instructions,
+          realm,
+          config,
+          transferAuthority!,
+          wallet.publicKey,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    default: {
+      throw new Error(
+        `Governance type ${governanceType} is not supported yet.`,
+      );
+    }
   }
 
   await sendTransactionWithNotifications(

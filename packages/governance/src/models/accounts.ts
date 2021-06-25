@@ -15,6 +15,7 @@ export enum GovernanceAccountType {
   SignatoryRecord = 6,
   VoteRecord = 7,
   ProposalInstruction = 8,
+  MintGovernance = 9,
 }
 
 export interface GovernanceAccount {
@@ -48,6 +49,7 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
       return [
         GovernanceAccountType.AccountGovernance,
         GovernanceAccountType.ProgramGovernance,
+        GovernanceAccountType.MintGovernance,
       ];
     default:
       throw Error(`${accountClass} account is not supported`);
@@ -106,6 +108,10 @@ export class Governance {
 
   isProgramGovernance() {
     return this.accountType === GovernanceAccountType.ProgramGovernance;
+  }
+
+  isMintGovernance() {
+    return this.accountType === GovernanceAccountType.MintGovernance;
   }
 
   constructor(args: {

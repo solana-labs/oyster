@@ -38,7 +38,7 @@ export function RegisterGovernance({
     maxVotingTime: number;
     yesVoteThresholdPercentage: number;
     governedAccountAddress: string;
-    transferUpgradeAuthority: boolean;
+    transferAuthority: boolean;
   }) => {
     const config = new GovernanceConfig({
       realm: realmKey,
@@ -54,7 +54,7 @@ export function RegisterGovernance({
       values.governanceType,
       realmKey,
       config,
-      values.transferUpgradeAuthority,
+      values.transferAuthority,
     );
   };
 
@@ -77,7 +77,7 @@ export function RegisterGovernance({
       onComplete={onComplete}
       initialValues={{
         governanceType: GovernanceType.Account,
-        transferUpgradeAuthority: true,
+        transferAuthority: true,
       }}
     >
       <Form.Item label={LABELS.GOVERNANCE_OVER} name="governanceType">
@@ -88,22 +88,30 @@ export function RegisterGovernance({
           <Radio.Button value={GovernanceType.Program}>
             {LABELS.PROGRAM}
           </Radio.Button>
+          <Radio.Button value={GovernanceType.Mint}>{LABELS.MINT}</Radio.Button>
         </Radio.Group>
       </Form.Item>
 
       <AccountFormItem
         name="governedAccountAddress"
         label={
-          governanceType === GovernanceType.Account
-            ? LABELS.ACCOUNT_ADDRESS
-            : LABELS.PROGRAM_ID_LABEL
+          governanceType === GovernanceType.Program
+            ? LABELS.PROGRAM_ID_LABEL
+            : governanceType === GovernanceType.Mint
+            ? LABELS.MINT_ADDRESS_LABEL
+            : LABELS.ACCOUNT_ADDRESS
         }
       ></AccountFormItem>
 
-      {governanceType === GovernanceType.Program && (
+      {(governanceType === GovernanceType.Program ||
+        governanceType === GovernanceType.Mint) && (
         <Form.Item
-          name="transferUpgradeAuthority"
-          label={LABELS.TRANSFER_UPGRADE_AUTHORITY}
+          name="transferAuthority"
+          label={
+            governanceType === GovernanceType.Program
+              ? LABELS.TRANSFER_UPGRADE_AUTHORITY
+              : LABELS.TRANSFER_MINT_AUTHORITY
+          }
           valuePropName="checked"
         >
           <Checkbox></Checkbox>

@@ -1,5 +1,5 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { ExplorerLink, ParsedAccount, useMint, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Token } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
@@ -33,9 +33,8 @@ const InstructionInput = ({
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
 
-  // We don't support MintGovernance account yet, but we can check the governed account type here
-  const mint = useMint(governance.info.config.governedAccount);
-  const creatorsEnabled = mint || governance.info.isProgramGovernance();
+  const creatorsEnabled =
+    governance.info.isMintGovernance() || governance.info.isProgramGovernance();
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -86,7 +85,7 @@ const InstructionInput = ({
             governance={governance}
           ></UpgradeProgramForm>
         )}
-        {mint && (
+        {governance.info.isMintGovernance() && (
           <MintToForm
             form={form}
             onCreateInstruction={onCreateInstruction}
