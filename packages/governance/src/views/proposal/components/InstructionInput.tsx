@@ -14,27 +14,30 @@ import {
 } from 'antd';
 import React from 'react';
 import { useState } from 'react';
+import { AccountFormItem } from '../../../components/AccountFormItem/accountFormItem';
 import { Governance } from '../../../models/accounts';
 import { createUpgradeInstruction } from '../../../models/sdkInstructions';
 import {
   MAX_INSTRUCTION_BASE64_LENGTH,
   serializeInstructionToBase64,
 } from '../../../models/serialisation';
-import { formVerticalLayout } from '../../../tools/forms';
+import { formDefaults, formVerticalLayout } from '../../../tools/forms';
 
-const InstructionInput = ({
+export default function InstructionInput({
   governance,
   onChange,
 }: {
   governance: ParsedAccount<Governance>;
   onChange?: (v: any) => void;
-}) => {
+}) {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
 
   const creatorsEnabled =
-    governance.info.isMintGovernance() || governance.info.isProgramGovernance();
+    governance.info.isMintGovernance() ||
+    governance.info.isProgramGovernance() ||
+    governance.info.isTokenGovernance();
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -75,7 +78,11 @@ const InstructionInput = ({
         okText="Create"
         onCancel={() => setIsFormVisible(false)}
         title={`Create ${
-          governance.info.isProgramGovernance() ? 'Upgrade Program' : 'Mint To'
+          governance.info.isProgramGovernance()
+            ? 'Upgrade Program'
+            : governance.info.isMintGovernance()
+            ? 'Mint To'
+            : 'Transfer'
         } Instruction`}
       >
         {governance.info.isProgramGovernance() && (
@@ -92,10 +99,17 @@ const InstructionInput = ({
             governance={governance}
           ></MintToForm>
         )}
+        {governance.info.isTokenGovernance() && (
+          <TransferForm
+            form={form}
+            onCreateInstruction={onCreateInstruction}
+            governance={governance}
+          ></TransferForm>
+        )}
       </Modal>
     </>
   );
-};
+}
 
 const UpgradeProgramForm = ({
   form,
@@ -197,4 +211,59 @@ const MintToForm = ({
   );
 };
 
-export default InstructionInput;
+const TransferForm = ({
+  form,
+  governance,
+  onCreateInstruction,
+}: {
+  form: FormInstance;
+  governance: ParsedAccount<Governance>;
+  onCreateInstruction: (instruction: TransactionInstruction) => void;
+}) => {
+  const onCreate = async ({
+    destination,
+    amount,
+  }: {
+    destination: string;
+    amount: number;
+  }) => {
+    const { token: tokenProgramId } = utils.programIds();
+
+    const mintToIx = Token.createTransferInstruction(
+      tokenProgramId,
+      governance.info.config.governedAccount,
+      new PublicKey(destination),
+      governance.pubkey,
+      [],
+      amount,
+    );
+
+    onCreateInstruction(mintToIx);
+  };
+
+  return (
+    <Form
+      {...formDefaults}
+      form={form}
+      onFinish={onCreate}
+      initialValues={{ amount: 1 }}
+    >
+      <Form.Item label="source account">
+        <ExplorerLink
+          address={governance.info.config.governedAccount}
+          type="address"
+        />
+      </Form.Item>
+      <Form.Item label="account owner (governance account)">
+        <ExplorerLink address={governance.pubkey} type="address" />
+      </Form.Item>
+      <AccountFormItem
+        name="destination"
+        label="destination account"
+      ></AccountFormItem>
+      <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
+        <InputNumber min={1} />
+      </Form.Item>
+    </Form>
+  );
+};

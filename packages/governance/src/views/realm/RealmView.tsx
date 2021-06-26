@@ -14,7 +14,8 @@ import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
-import { GovernanceBadge } from './governanceBadge';
+import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
+import AccountDescription from './accountDescription';
 
 export const RealmView = () => {
   const history = useHistory();
@@ -35,6 +36,7 @@ export const RealmView = () => {
         href: '/governance/' + g.pubkey,
         title: g.info.config.governedAccount.toBase58(),
         badge: <GovernanceBadge governance={g}></GovernanceBadge>,
+        description: <AccountDescription governance={g}></AccountDescription>,
       }));
   }, [governances]);
 
@@ -102,6 +104,7 @@ export const RealmView = () => {
                 <List.Item.Meta
                   title={item.title}
                   avatar={item.badge}
+                  description={item.description}
                 ></List.Item.Meta>
               </List.Item>
             )}

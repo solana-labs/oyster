@@ -110,6 +110,7 @@ export const LABELS = {
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
   MINT: 'Mint',
+  TOKEN_ACCOUNT: 'Token Account',
 
   REGISTER: 'Register',
   REGISTERING: 'Registering',
@@ -117,13 +118,15 @@ export const LABELS = {
   PROGRAM_ID_LABEL: 'program id',
   MINT_ADDRESS_LABEL: 'mint address',
   ACCOUNT_ADDRESS: 'account address',
+  TOKEN_ACCOUNT_ADDRESS: 'token account address',
 
   MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
   MIN_INSTRUCTION_HOLD_UP_TIME: 'min instruction hold up time (slots)',
   MAX_VOTING_TIME: 'max voting time (slots)',
 
-  TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
-  TRANSFER_MINT_AUTHORITY: 'transfer mint authority',
+  UPGRADE_AUTHORITY: 'upgrade authority',
+  MINT_AUTHORITY: 'mint authority',
+  TOKEN_OWNER: 'token owner',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
