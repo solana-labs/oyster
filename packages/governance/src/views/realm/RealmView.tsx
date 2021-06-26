@@ -14,7 +14,7 @@ import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
-import { GovernanceBadge } from './governanceBadge';
+import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 
 export const RealmView = () => {
   const history = useHistory();

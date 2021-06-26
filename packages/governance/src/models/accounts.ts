@@ -112,6 +112,10 @@ export class Governance {
     return this.accountType === GovernanceAccountType.ProgramGovernance;
   }
 
+  isAccountGovernance() {
+    return this.accountType === GovernanceAccountType.AccountGovernance;
+  }
+
   isMintGovernance() {
     return this.accountType === GovernanceAccountType.MintGovernance;
   }
