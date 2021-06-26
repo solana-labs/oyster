@@ -20,7 +20,11 @@ const GovernanceArtifacts = () => {
   const [realmName, setRealmName] = useState('');
   const [communityMint, setCommunityMint] = useState('');
   const [councilMint, setCouncilMint] = useState('');
-  const [instruction, setInstruction] = useState('');
+  const [tokenGovernance, setTokenGovernance] = useState({
+    tokenAccountAddress: '',
+    beneficiaryTokenAccountAddress: '',
+  });
+
   const [generated, setGenerated] = useState(false);
 
   const onGenerateArtifacts = async () => {
@@ -30,13 +34,14 @@ const GovernanceArtifacts = () => {
       communityMintAddress,
       councilMintAddress,
       realmName,
-      instructionBase64,
+      tokenGovernance,
     } = await generateGovernanceArtifacts(connection, wallet);
 
     setCommunityMint(communityMintAddress.toBase58());
     setCouncilMint(councilMintAddress.toBase58());
     setRealmName(realmName);
-    setInstruction(instructionBase64);
+    setTokenGovernance(tokenGovernance);
+
     setGenerated(true);
   };
 
@@ -64,8 +69,16 @@ const GovernanceArtifacts = () => {
           </div>
 
           <div>
-            <h3>instruction: </h3>
-            <div className="test-data">{instruction}</div>
+            <h3>token governance - token account: </h3>
+            <div className="test-data">
+              {tokenGovernance.tokenAccountAddress}
+            </div>
+          </div>
+          <div>
+            <h3>token governance - beneficiary token account: </h3>
+            <div className="test-data">
+              {tokenGovernance.beneficiaryTokenAccountAddress}
+            </div>
           </div>
         </>
       )}

@@ -6,6 +6,7 @@ import { GovernanceConfig } from '../models/accounts';
 import { withCreateProgramGovernance } from '../models/withCreateProgramGovernance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
+import { withCreateTokenGovernance } from '../models/withCreateTokenGovernance';
 
 export const registerGovernance = async (
   connection: Connection,
@@ -47,6 +48,19 @@ export const registerGovernance = async (
     case GovernanceType.Mint: {
       governanceAddress = (
         await withCreateMintGovernance(
+          instructions,
+          realm,
+          config,
+          transferAuthority!,
+          wallet.publicKey,
+          wallet.publicKey,
+        )
+      ).governanceAddress;
+      break;
+    }
+    case GovernanceType.Token: {
+      governanceAddress = (
+        await withCreateTokenGovernance(
           instructions,
           realm,
           config,

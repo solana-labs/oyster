@@ -89,6 +89,9 @@ export function RegisterGovernance({
             {LABELS.PROGRAM}
           </Radio.Button>
           <Radio.Button value={GovernanceType.Mint}>{LABELS.MINT}</Radio.Button>
+          <Radio.Button value={GovernanceType.Token}>
+            {LABELS.TOKEN_ACCOUNT}
+          </Radio.Button>
         </Radio.Group>
       </Form.Item>
 
@@ -99,19 +102,24 @@ export function RegisterGovernance({
             ? LABELS.PROGRAM_ID_LABEL
             : governanceType === GovernanceType.Mint
             ? LABELS.MINT_ADDRESS_LABEL
+            : governanceType === GovernanceType.Token
+            ? LABELS.TOKEN_ACCOUNT_ADDRESS
             : LABELS.ACCOUNT_ADDRESS
         }
       ></AccountFormItem>
 
       {(governanceType === GovernanceType.Program ||
-        governanceType === GovernanceType.Mint) && (
+        governanceType === GovernanceType.Mint ||
+        governanceType === GovernanceType.Token) && (
         <Form.Item
           name="transferAuthority"
-          label={
+          label={`transfer ${
             governanceType === GovernanceType.Program
-              ? LABELS.TRANSFER_UPGRADE_AUTHORITY
-              : LABELS.TRANSFER_MINT_AUTHORITY
-          }
+              ? LABELS.UPGRADE_AUTHORITY
+              : governanceType === GovernanceType.Mint
+              ? LABELS.MINT_AUTHORITY
+              : LABELS.TOKEN_OWNER
+          } to governance`}
           valuePropName="checked"
         >
           <Checkbox></Checkbox>
