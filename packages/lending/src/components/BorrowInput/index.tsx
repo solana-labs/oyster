@@ -39,13 +39,9 @@ export const BorrowInput = (props: {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const borrowReserve = props.reserve;
-  const depositReserves = [];
 
   const borrowPrice = usePrice(
     borrowReserve.info.liquidity.mintPubkey.toBase58(),
-  );
-  const collateralPrice = usePrice(
-    depositReserve?.info.liquidity.mintPubkey.toBase58(),
   );
 
   const tokenBalance = userDeposits[0]?.info.amount || 0;
@@ -64,37 +60,14 @@ export const BorrowInput = (props: {
 
   const { value, setValue, pct } = useSliderInput(convert);
 
-  useEffect(() => {
-    const ltv = borrowReserve.info.config.loanToValueRatio / 100;
-
-    if (value) {
-      const nValue = parseFloat(value);
-      const borrowInUSD = nValue * borrowPrice;
-      const collateralAmount = borrowInUSD / ltv / collateralPrice;
-      // @FIXME
-      setCollateralValue(collateralAmount.toString());
-    } else {
-      setCollateralValue('');
-    }
-  }, [
-    collateralPrice,
-    borrowPrice,
-    borrowReserve,
-    value,
-  ]);
-
   const { userObligationsByReserve } = useUserObligationByReserve(
-    borrowReserve?.pubkey,
-    depositReserve?.pubkey,
+    borrowReserve?.pubkey
   );
   const { accounts: sourceAccounts } = useUserBalance(
-    depositReserve?.info.collateral.mintPubkey,
+    // @FIXME
+    // depositReserve?.info.collateral.mintPubkey,
   );
   const onBorrow = useCallback(() => {
-    if (!depositReserve) {
-      return;
-    }
-
     setPendingTx(true);
 
     (async () => {
@@ -109,7 +82,6 @@ export const BorrowInput = (props: {
         );
 
         setValue('');
-        setCollateralValue('');
         setShowConfirmation(true);
       } catch {
         // TODO:
@@ -122,7 +94,6 @@ export const BorrowInput = (props: {
     wallet,
     value,
     setValue,
-    depositReserve,
     borrowReserve,
     userObligationsByReserve,
     setPendingTx,
@@ -150,15 +121,6 @@ export const BorrowInput = (props: {
           }}
         >
           <div className="borrow-input-title">{LABELS.BORROW_QUESTION}</div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-            }}
-          >
-          </div>
           <RiskSlider value={pct} />
           <div
             style={{
