@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { ButtonProps, Radio } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import {
-  MAX_PROPOSAL_DESCRIPTION_LENGTH,
-  MAX_PROPOSAL_NAME_LENGTH,
-} from '../../models/serialisation';
+
 import { LABELS } from '../../constants';
 import { contexts, ParsedAccount } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
@@ -81,7 +78,7 @@ export function AddNewProposal({
       governance.info.config.realm,
       governance.pubkey,
       values.name,
-      values.descriptionLink,
+      values.descriptionLink ?? '',
       governingTokenMint,
       proposalIndex,
     );
@@ -136,17 +133,14 @@ export function AddNewProposal({
         label={LABELS.NAME_LABEL}
         rules={[{ required: true }]}
       >
-        <Input maxLength={MAX_PROPOSAL_NAME_LENGTH} />
+        <Input />
       </Form.Item>
       <Form.Item
         name="descriptionLink"
         label={LABELS.DESCRIPTION_LABEL}
-        rules={[{ required: true }]}
+        rules={[{ required: false }]}
       >
-        <Input
-          maxLength={MAX_PROPOSAL_DESCRIPTION_LENGTH}
-          placeholder={LABELS.GIST_PLACEHOLDER}
-        />
+        <Input placeholder={LABELS.GIST_PLACEHOLDER} />
       </Form.Item>
     </ModalFormAction>
   );

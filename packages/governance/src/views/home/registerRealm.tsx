@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ButtonProps, Switch } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
-import { MAX_REALM_NAME_LENGTH } from '../../models/serialisation';
+
 import { LABELS } from '../../constants';
 import { contexts } from '@oyster/common';
 import { Redirect } from 'react-router';
@@ -65,7 +65,7 @@ export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
         label={LABELS.NAME_LABEL}
         rules={[{ required: true }]}
       >
-        <Input maxLength={MAX_REALM_NAME_LENGTH} />
+        <Input />
       </Form.Item>
 
       <MintFormItem

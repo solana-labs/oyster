@@ -68,18 +68,17 @@ export function NewInstructionCard({
         name="control-hooks"
         onFinish={onFinish}
         initialValues={{
-          holdUpTime:
-            governance.info.config.minInstructionHoldUpTime.toNumber(),
+          holdUpTime: governance.info.config.minInstructionHoldUpTime,
         }}
       >
         <Form.Item
           name="holdUpTime"
-          label={LABELS.HOLD_UP_TIME}
+          label={LABELS.HOLD_UP_TIME_DAYS}
           rules={[{ required: true }]}
         >
           <InputNumber
             maxLength={64}
-            min={governance.info.config.minInstructionHoldUpTime.toNumber()}
+            min={governance.info.config.minInstructionHoldUpTime}
           />
         </Form.Item>
 
