@@ -11,3 +11,4 @@ export { RepayReserveView } from './repayReserve';
 export { LiquidateView } from './liquidate';
 export { LiquidateReserveView } from './liquidateReserve';
 export { MarginTrading } from './margin';
+export { ObligationsView } from './obligations';

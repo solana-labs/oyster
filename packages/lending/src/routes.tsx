@@ -20,6 +20,7 @@ import {
   RepayReserveView,
   ReserveView,
   WithdrawView,
+  ObligationsView,
 } from './views';
 import { NewPosition } from './views/margin/newPosition';
 
@@ -56,6 +57,7 @@ export function Routes() {
                           component={() => <DepositReserveView />}
                         />
                         <Route path="/withdraw/:id" component={() => <WithdrawView />} />
+                        <Route exact path="/obligations" component={() => <ObligationsView />} />
                         <Route exact path="/borrow" component={() => <BorrowView />} />
                         <Route
                           path="/borrow/:id"
