@@ -13,21 +13,21 @@ const getLendingMarkets = () => {
 };
 
 export function useLendingMarkets() {
-  const [lendingMarkets, setLendingMarket] = useState<
+  const [lendingMarkets, setLendingMarkets] = useState<
     ParsedAccount<LendingMarket>[]
   >(getLendingMarkets());
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.parser === LendingMarketParser) {
-        setLendingMarket(getLendingMarkets());
+        setLendingMarkets(getLendingMarkets());
       }
     });
 
     return () => {
       dispose();
     };
-  }, [setLendingMarket]);
+  }, [setLendingMarkets]);
 
   return {
     lendingMarkets,
