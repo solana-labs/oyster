@@ -55,10 +55,10 @@ export function useEnrichedLendingObligations() {
         .map(obligation => ({
           obligation,
           reserve: availableReserves.get(
-            obligation.info.borrows[0].borrowReserve.toBase58(),
+            obligation.info.borrows?.[0]?.borrowReserve.toBase58() || '',
           ) as ParsedAccount<Reserve>,
           depositReserve: availableReserves.get(
-            obligation.info.deposits[0].depositReserve.toBase58(),
+            obligation.info.deposits?.[0]?.depositReserve.toBase58() || '',
           ) as ParsedAccount<Reserve>,
         }))
         // use obligations with reserves available
