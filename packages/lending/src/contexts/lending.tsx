@@ -90,7 +90,7 @@ export const useLending = () => {
         .filter(item => item !== undefined);
 
       const lendingReserves = accounts
-        .filter(acc => (acc?.info as Reserve).lendingMarket !== undefined)
+        .filter(acc => acc?.account && isReserve(acc.account) && (acc.info as Reserve).lendingMarket !== undefined)
         .map(acc => acc as ParsedAccount<Reserve>);
 
       const toQuery = [
