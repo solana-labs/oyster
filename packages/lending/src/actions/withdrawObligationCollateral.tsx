@@ -49,8 +49,6 @@ export const withdrawObligationCollateral = async (
     LENDING_PROGRAM_ID,
   );
 
-  signers.push(wallet.info.account);
-
   // get destination account
   const destinationCollateral = await findOrCreateAccountByMint(
     wallet.publicKey,
