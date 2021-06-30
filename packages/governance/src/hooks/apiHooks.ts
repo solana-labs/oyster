@@ -86,6 +86,15 @@ export function useWalletTokenOwnerRecord(
   );
 }
 
+/// Returns all TokenOwnerRecords for the current wallet
+export function useWalletTokenOwnerRecords() {
+  const { wallet } = useWallet();
+
+  return useGovernanceAccountsByFilter<TokenOwnerRecord>(TokenOwnerRecord, [
+    pubkeyFilter(1 + 32 + 32, wallet?.publicKey),
+  ]);
+}
+
 export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
   const { wallet, connected } = useWallet();
   const tokenOwnerRecord = useTokenOwnerRecord(proposalOwner);

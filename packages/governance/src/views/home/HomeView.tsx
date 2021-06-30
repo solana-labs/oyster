@@ -10,26 +10,51 @@ import { RegisterRealm } from './registerRealm';
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
+import { useWalletTokenOwnerRecords } from '../../hooks/apiHooks';
+import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 
 export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
+  const tokenOwnerRecords = useWalletTokenOwnerRecords();
 
   const realmItems = useMemo(() => {
     return realms
       .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
-      .map(r => ({
-        href: '/realm/' + r.pubkey.toBase58(),
-        title: r.info.name,
-        badge: (
-          <RealmBadge
-            communityMint={r.info.communityMint}
-            councilMint={r.info.councilMint}
-          ></RealmBadge>
-        ),
-        key: r.pubkey.toBase58(),
-      }));
-  }, [realms]);
+      .map(r => {
+        const communityTokenOwnerRecord = tokenOwnerRecords.find(
+          tor =>
+            tor.info.governingTokenMint.toBase58() ===
+            r.info.communityMint.toBase58(),
+        );
+
+        const councilTokenOwnerRecord =
+          r.info.councilMint &&
+          tokenOwnerRecords.find(
+            tor =>
+              tor.info.governingTokenMint.toBase58() ===
+              r.info.councilMint!.toBase58(),
+          );
+
+        return {
+          href: '/realm/' + r.pubkey.toBase58(),
+          title: r.info.name,
+          badge: (
+            <RealmBadge
+              communityMint={r.info.communityMint}
+              councilMint={r.info.councilMint}
+            ></RealmBadge>
+          ),
+          key: r.pubkey.toBase58(),
+          description: (
+            <RealmDepositBadge
+              communityTokenOwnerRecord={communityTokenOwnerRecord}
+              councilTokenOwnerRecord={councilTokenOwnerRecord}
+            ></RealmDepositBadge>
+          ),
+        };
+      });
+  }, [realms, tokenOwnerRecords]);
 
   return (
     <>
@@ -56,6 +81,7 @@ export const HomeView = () => {
                 <List.Item.Meta
                   avatar={item.badge}
                   title={item.title}
+                  description={item.description}
                 ></List.Item.Meta>
               </List.Item>
             )}
