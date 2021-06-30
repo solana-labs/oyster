@@ -1,15 +1,14 @@
 import { ParsedAccount } from '@oyster/common';
 import { Governance, Proposal } from '../models/accounts';
-import { useIsBeyondSlot } from './useIsBeyondSlot';
+import { useIsBeyondTimestamp } from './useIsBeyondTimestamp';
 
 export const useHasVotingTimeExpired = (
   governance: ParsedAccount<Governance>,
   proposal: ParsedAccount<Proposal>,
 ) => {
-  return useIsBeyondSlot(
+  return useIsBeyondTimestamp(
     proposal.info.votingAt
-      ? proposal.info.votingAt.toNumber() +
-          governance.info.config.maxVotingTime.toNumber()
+      ? proposal.info.votingAt.toNumber() + governance.info.config.maxVotingTime
       : undefined,
   );
 };

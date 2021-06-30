@@ -83,16 +83,16 @@ export class GovernanceConfig {
   governedAccount: PublicKey;
   yesVoteThresholdPercentage: number;
   minTokensToCreateProposal: number;
-  minInstructionHoldUpTime: BN;
-  maxVotingTime: BN;
+  minInstructionHoldUpTime: number;
+  maxVotingTime: number;
 
   constructor(args: {
     realm: PublicKey;
     governedAccount: PublicKey;
     yesVoteThresholdPercentage: number;
     minTokensToCreateProposal: number;
-    minInstructionHoldUpTime: BN;
-    maxVotingTime: BN;
+    minInstructionHoldUpTime: number;
+    maxVotingTime: number;
   }) {
     this.realm = args.realm;
     this.governedAccount = args.governedAccount;
@@ -391,13 +391,13 @@ export class InstructionData {
 export class ProposalInstruction {
   accountType = GovernanceAccountType.ProposalInstruction;
   proposal: PublicKey;
-  holdUpTime: BN;
+  holdUpTime: number;
   instruction: InstructionData;
   executedAt: BN | null;
 
   constructor(args: {
     proposal: PublicKey;
-    holdUpTime: BN;
+    holdUpTime: number;
     instruction: InstructionData;
     executedAt: BN | null;
   }) {

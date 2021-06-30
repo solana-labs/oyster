@@ -10,11 +10,10 @@ import { Redirect } from 'react-router';
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
 import { GovernanceConfig } from '../../models/accounts';
-import BN from 'bn.js';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
-import { formSlotInputStyle } from '../../tools/forms';
+
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
 
 const { useWallet } = contexts.Wallet;
@@ -45,8 +44,8 @@ export function RegisterGovernance({
       governedAccount: new PublicKey(values.governedAccountAddress),
       yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
       minTokensToCreateProposal: values.minTokensToCreateProposal,
-      minInstructionHoldUpTime: new BN(values.minInstructionHoldUpTime),
-      maxVotingTime: new BN(values.maxVotingTime),
+      minInstructionHoldUpTime: values.minInstructionHoldUpTime * 86400,
+      maxVotingTime: values.maxVotingTime * 86400,
     });
     return await registerGovernance(
       connection,
@@ -137,20 +136,20 @@ export function RegisterGovernance({
 
       <Form.Item
         name="minInstructionHoldUpTime"
-        label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME}
+        label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME_DAYS}
         rules={[{ required: true }]}
         initialValue={1}
       >
-        <InputNumber min={1} style={formSlotInputStyle} />
+        <InputNumber min={0} />
       </Form.Item>
 
       <Form.Item
         name="maxVotingTime"
-        label={LABELS.MAX_VOTING_TIME}
+        label={LABELS.MAX_VOTING_TIME_DAYS}
         rules={[{ required: true }]}
-        initialValue={1000000}
+        initialValue={3}
       >
-        <InputNumber min={1} style={formSlotInputStyle} />
+        <InputNumber min={1} />
       </Form.Item>
       <Form.Item
         name="yesVoteThresholdPercentage"

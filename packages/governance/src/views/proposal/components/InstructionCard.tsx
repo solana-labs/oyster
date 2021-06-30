@@ -76,7 +76,7 @@ export function InstructionCard({
           <>
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.dataBase64}`}</p>
             <p>
-              {LABELS.HOLD_UP_TIME}: {instruction.info.holdUpTime.toNumber()}
+              {LABELS.HOLD_UP_TIME_DAYS}: {instruction.info.holdUpTime}
             </p>
           </>
         }

@@ -17,10 +17,7 @@ import { useState } from 'react';
 import { AccountFormItem } from '../../../components/AccountFormItem/accountFormItem';
 import { Governance } from '../../../models/accounts';
 import { createUpgradeInstruction } from '../../../models/sdkInstructions';
-import {
-  MAX_INSTRUCTION_BASE64_LENGTH,
-  serializeInstructionToBase64,
-} from '../../../models/serialisation';
+import { serializeInstructionToBase64 } from '../../../models/serialisation';
 import { formDefaults, formVerticalLayout } from '../../../tools/forms';
 
 export default function InstructionInput({
@@ -56,7 +53,6 @@ export default function InstructionInput({
           <Input.TextArea
             value={instruction}
             onChange={e => updateInstruction(e.target.value)}
-            maxLength={MAX_INSTRUCTION_BASE64_LENGTH}
             placeholder={`base64 encoded serialized Solana Instruction`}
           />
         </Col>

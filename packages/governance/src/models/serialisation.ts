@@ -40,12 +40,6 @@ import {
 } from './accounts';
 import { serialize } from 'borsh';
 
-// TODO: Review the limits. Most likely they are leftovers from the legacy version
-export const MAX_PROPOSAL_DESCRIPTION_LENGTH = 200;
-export const MAX_PROPOSAL_NAME_LENGTH = 32;
-export const MAX_REALM_NAME_LENGTH = 32;
-export const MAX_INSTRUCTION_BASE64_LENGTH = 450;
-
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader;
@@ -217,7 +211,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['index', 'u16'],
-        ['holdUpTime', 'u64'],
+        ['holdUpTime', 'u32'],
         ['instructionData', InstructionData],
       ],
     },
@@ -290,8 +284,8 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['governedAccount', 'pubkey'],
         ['yesVoteThresholdPercentage', 'u8'],
         ['minTokensToCreateProposal', 'u16'],
-        ['minInstructionHoldUpTime', 'u64'],
-        ['maxVotingTime', 'u64'],
+        ['minInstructionHoldUpTime', 'u32'],
+        ['maxVotingTime', 'u32'],
       ],
     },
   ],
@@ -381,7 +375,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['proposal', 'pubkey'],
-        ['holdUpTime', 'u64'],
+        ['holdUpTime', 'u32'],
         ['instruction', InstructionData],
         ['executedAt', { kind: 'option', type: 'u64' }],
       ],
