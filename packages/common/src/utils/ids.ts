@@ -67,7 +67,7 @@ export const PROGRAM_IDS = [
   {
     name: 'mainnet-beta',
     governance: () => ({
-      programId: new PublicKey('GovergMfhoNZePj4v86rLXZSN4DeFSLmvKEgWCch1Zuu'),
+      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -88,7 +88,7 @@ export const PROGRAM_IDS = [
   {
     name: 'testnet',
     governance: () => ({
-      programId: new PublicKey('GovergMfhoNZePj4v86rLXZSN4DeFSLmvKEgWCch1Zuu'),
+      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
@@ -107,7 +107,7 @@ export const PROGRAM_IDS = [
   {
     name: 'devnet',
     governance: () => ({
-      programId: new PublicKey('GovergMfhoNZePj4v86rLXZSN4DeFSLmvKEgWCch1Zuu'),
+      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
@@ -125,7 +125,7 @@ export const PROGRAM_IDS = [
   {
     name: 'localnet',
     governance: () => ({
-      programId: new PublicKey('GovergMfhoNZePj4v86rLXZSN4DeFSLmvKEgWCch1Zuu'),
+      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     }),
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
