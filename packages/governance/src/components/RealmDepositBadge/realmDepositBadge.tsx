@@ -33,7 +33,7 @@ export function RealmDepositBadge({
           )}`}
         </span>
       )}
-      {communityTokenOwnerRecord && councilTokenOwnerRecord && ', '}
+      {communityTokenOwnerRecord && councilTokenOwnerRecord && ' | '}
       {councilTokenOwnerRecord && (
         <span>
           {`council tokens: ${formatTokenAmount(

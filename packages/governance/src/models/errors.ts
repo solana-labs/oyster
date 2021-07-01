@@ -60,6 +60,11 @@ export const GovernanceError: Record<number, string> = [
   "Provided upgrade authority doesn't match current program upgrade authority", // InvalidUpgradeAuthority
   'Current program upgrade authority must sign transaction', // UpgradeAuthorityMustSign
   'Given program is not upgradable', //ProgramNotUpgradable
+  'Invalid token owner', //InvalidTokenOwner
+  'Current token owner must sign transaction', // TokenOwnerMustSign
+  'Given VoteThresholdPercentageType is not supported', //VoteThresholdPercentageTypeNotSupported
+  'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
+  'Proposal cool off time is not supported', // ProposalCoolOffTimeNotSupported
 ];
 
 export function getTransactionErrorMsg(error: SendTransactionError) {

@@ -1,5 +1,5 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils, contexts } from '@oyster/common';
 import { Token } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
@@ -18,7 +18,8 @@ import { AccountFormItem } from '../../../components/AccountFormItem/accountForm
 import { Governance } from '../../../models/accounts';
 import { createUpgradeInstruction } from '../../../models/sdkInstructions';
 import { serializeInstructionToBase64 } from '../../../models/serialisation';
-import { formDefaults, formVerticalLayout } from '../../../tools/forms';
+import { formDefaults } from '../../../tools/forms';
+const { useWallet } = contexts.Wallet;
 
 export default function InstructionInput({
   governance,
@@ -116,17 +117,24 @@ const UpgradeProgramForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const { wallet } = useWallet();
+
+  if (!wallet?.publicKey) {
+    return <div>Wallet not connected</div>;
+  }
+
   const onCreate = async ({ bufferAddress }: { bufferAddress: string }) => {
     const upgradeIx = await createUpgradeInstruction(
       governance.info.config.governedAccount,
       new PublicKey(bufferAddress),
       governance.pubkey,
+      wallet.publicKey!,
     );
     onCreateInstruction(upgradeIx);
   };
 
   return (
-    <Form {...formVerticalLayout} form={form} onFinish={onCreate}>
+    <Form {...formDefaults} form={form} onFinish={onCreate}>
       <Form.Item label="program id">
         <ExplorerLink
           address={governance.info.config.governedAccount}
@@ -135,6 +143,9 @@ const UpgradeProgramForm = ({
       </Form.Item>
       <Form.Item label="upgrade authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
+      </Form.Item>
+      <Form.Item label="spill account (wallet)">
+        <ExplorerLink address={wallet.publicKey} type="address" />
       </Form.Item>
       <Form.Item
         name="bufferAddress"
@@ -179,7 +190,7 @@ const MintToForm = ({
 
   return (
     <Form
-      {...formVerticalLayout}
+      {...formDefaults}
       form={form}
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
