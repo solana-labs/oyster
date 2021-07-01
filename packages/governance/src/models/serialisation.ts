@@ -381,9 +381,11 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['proposal', 'pubkey'],
+        ['instructionIndex', 'u16'],
         ['holdUpTime', 'u32'],
         ['instruction', InstructionData],
         ['executedAt', { kind: 'option', type: 'u64' }],
+        ['executionStatus', { kind: 'option', type: 'u8' }],
       ],
     },
   ],

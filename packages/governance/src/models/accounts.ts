@@ -434,19 +434,25 @@ export class InstructionData {
 export class ProposalInstruction {
   accountType = GovernanceAccountType.ProposalInstruction;
   proposal: PublicKey;
+  instructionIndex: number;
   holdUpTime: number;
   instruction: InstructionData;
   executedAt: BN | null;
+  executionStatus: InstructionExecutionStatus | null;
 
   constructor(args: {
     proposal: PublicKey;
+    instructionIndex: number;
     holdUpTime: number;
     instruction: InstructionData;
     executedAt: BN | null;
+    executionStatus: InstructionExecutionStatus | null;
   }) {
     this.proposal = args.proposal;
+    this.instructionIndex = args.instructionIndex;
     this.holdUpTime = args.holdUpTime;
     this.instruction = args.instruction;
     this.executedAt = args.executedAt;
+    this.executionStatus = args.executionStatus;
   }
 }
