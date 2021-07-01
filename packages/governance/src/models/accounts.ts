@@ -257,13 +257,15 @@ export class Proposal {
 
   signatoriesSignedOffCount: number;
 
-  descriptionLink: string;
-
-  name: string;
-
   yesVotesCount: BN;
 
   noVotesCount: BN;
+
+  instructionsExecutedCount: number;
+
+  instructionsCount: number;
+
+  instructionsNextIndex: number;
 
   draftAt: BN;
 
@@ -271,17 +273,19 @@ export class Proposal {
 
   votingAt: BN | null;
 
+  votingAtSlot: BN | null;
+
   votingCompletedAt: BN | null;
 
   executingAt: BN | null;
 
   closedAt: BN | null;
 
-  instructionsExecutedCount: number;
+  executionFlags: InstructionExecutionFlags | null;
 
-  instructionsCount: number;
+  name: string;
 
-  instructionsNextIndex: number;
+  descriptionLink: string;
 
   constructor(args: {
     governance: PublicKey;
@@ -297,12 +301,14 @@ export class Proposal {
     draftAt: BN;
     signingOffAt: BN | null;
     votingAt: BN | null;
+    votingAtSlot: BN | null;
     votingCompletedAt: BN | null;
     executingAt: BN | null;
     closedAt: BN | null;
     instructionsExecutedCount: number;
     instructionsCount: number;
     instructionsNextIndex: number;
+    executionFlags: InstructionExecutionFlags;
   }) {
     this.governance = args.governance;
     this.governingTokenMint = args.governingTokenMint;
@@ -317,12 +323,14 @@ export class Proposal {
     this.draftAt = args.draftAt;
     this.signingOffAt = args.signingOffAt;
     this.votingAt = args.votingAt;
+    this.votingAtSlot = args.votingAtSlot;
     this.votingCompletedAt = args.votingCompletedAt;
     this.executingAt = args.executingAt;
     this.closedAt = args.closedAt;
     this.instructionsExecutedCount = args.instructionsExecutedCount;
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
+    this.executionFlags = args.executionFlags;
   }
 }
 
