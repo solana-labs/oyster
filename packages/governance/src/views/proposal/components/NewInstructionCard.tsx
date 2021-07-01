@@ -12,7 +12,7 @@ import { useProposalAuthority } from '../../../hooks/apiHooks';
 import { insertInstruction } from '../../../actions/insertInstruction';
 import '../style.less';
 
-import { formVerticalLayout } from '../../../tools/forms';
+import { formDefaults } from '../../../tools/forms';
 import InstructionInput from './InstructionInput';
 
 const { useWallet } = contexts.Wallet;
@@ -47,7 +47,7 @@ export function NewInstructionCard({
         proposal,
         proposalAuthority!.pubkey,
         index,
-        values.holdUpTime,
+        values.holdUpTime * 86400,
         values.instruction,
       );
 
@@ -57,18 +57,20 @@ export function NewInstructionCard({
     }
   };
 
+  const minHoldUpTime = governance.info.config.minInstructionHoldUpTime / 86400;
+
   return !proposalAuthority ? null : (
     <Card
       title="New Instruction"
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
     >
       <Form
-        {...formVerticalLayout}
+        {...formDefaults}
         form={form}
         name="control-hooks"
         onFinish={onFinish}
         initialValues={{
-          holdUpTime: governance.info.config.minInstructionHoldUpTime,
+          holdUpTime: minHoldUpTime,
         }}
       >
         <Form.Item
@@ -76,15 +78,12 @@ export function NewInstructionCard({
           label={LABELS.HOLD_UP_TIME_DAYS}
           rules={[{ required: true }]}
         >
-          <InputNumber
-            maxLength={64}
-            min={governance.info.config.minInstructionHoldUpTime}
-          />
+          <InputNumber min={minHoldUpTime} />
         </Form.Item>
 
         <Form.Item
           name="instruction"
-          label="Instruction"
+          label="instruction"
           rules={[{ required: true }]}
         >
           <InstructionInput governance={governance}></InstructionInput>
