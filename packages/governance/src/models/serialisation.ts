@@ -271,6 +271,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['config', GovernanceConfig],
+        ['reserved', 'u64'],
         ['proposalCount', 'u32'],
       ],
     },
@@ -282,10 +283,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['realm', 'pubkey'],
         ['governedAccount', 'pubkey'],
-        ['yesVoteThresholdPercentage', 'u8'],
-        ['minTokensToCreateProposal', 'u16'],
+        ['voteThresholdPercentageType', 'u8'],
+        ['voteThresholdPercentage', 'u8'],
+        ['minTokensToCreateProposal', 'u64'],
         ['minInstructionHoldUpTime', 'u32'],
         ['maxVotingTime', 'u32'],
+        ['voteWeightSource', 'u8'],
+        ['proposalCoolOffTime', 'u32'],
       ],
     },
   ],

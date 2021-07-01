@@ -1,6 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { utils } from '@oyster/common';
+import { utils, constants } from '@oyster/common';
+
+const { ZERO } = constants;
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -58,6 +60,26 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
   }
 }
 
+export enum VoteThresholdPercentageType {
+  YesVote,
+  Quorum,
+}
+
+export enum VoteWeightSource {
+  Deposit,
+  Snapshot,
+}
+
+export enum InstructionExecutionStatus {
+  Success,
+  Error,
+}
+
+export enum InstructionExecutionFlags {
+  Ordered,
+  UseTransaction,
+}
+
 export class Realm {
   accountType = GovernanceAccountType.Realm;
 
@@ -81,31 +103,42 @@ export class Realm {
 export class GovernanceConfig {
   realm: PublicKey;
   governedAccount: PublicKey;
-  yesVoteThresholdPercentage: number;
-  minTokensToCreateProposal: number;
+  voteThresholdPercentageType: VoteThresholdPercentageType;
+  voteThresholdPercentage: number;
+  minTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
+  voteWeightSource: VoteWeightSource;
+  proposalCoolOffTime: number;
 
   constructor(args: {
     realm: PublicKey;
     governedAccount: PublicKey;
-    yesVoteThresholdPercentage: number;
-    minTokensToCreateProposal: number;
+    voteThresholdPercentageType?: VoteThresholdPercentageType;
+    voteThresholdPercentage: number;
+    minTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
+    voteWeightSource?: VoteWeightSource;
+    proposalCoolOffTime?: number;
   }) {
     this.realm = args.realm;
     this.governedAccount = args.governedAccount;
-    this.yesVoteThresholdPercentage = args.yesVoteThresholdPercentage;
+    this.voteThresholdPercentageType =
+      args.voteThresholdPercentageType ?? VoteThresholdPercentageType.YesVote;
+    this.voteThresholdPercentage = args.voteThresholdPercentage;
     this.minTokensToCreateProposal = args.minTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
+    this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
+    this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
   }
 }
 
 export class Governance {
   accountType: GovernanceAccountType;
   config: GovernanceConfig;
+  reserved: BN;
   proposalCount: number;
 
   isProgramGovernance() {
@@ -127,10 +160,12 @@ export class Governance {
   constructor(args: {
     accountType: number;
     config: GovernanceConfig;
+    reserved?: BN;
     proposalCount: number;
   }) {
     this.accountType = args.accountType;
     this.config = args.config;
+    this.reserved = args.reserved ?? ZERO;
     this.proposalCount = args.proposalCount;
   }
 }

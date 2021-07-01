@@ -466,10 +466,10 @@ function getMinRequiredYesVoteScore(
   governingTokenMint: MintInfo,
 ): string {
   const minVotes =
-    governance.info.config.yesVoteThresholdPercentage === 100
+    governance.info.config.voteThresholdPercentage === 100
       ? governingTokenMint.supply
       : governingTokenMint.supply
-          .mul(new BN(governance.info.config.yesVoteThresholdPercentage))
+          .mul(new BN(governance.info.config.voteThresholdPercentage))
           .div(new BN(100));
 
   return new BigNumber(minVotes.toString())

@@ -15,6 +15,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
+import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -42,8 +43,8 @@ export function RegisterGovernance({
     const config = new GovernanceConfig({
       realm: realmKey,
       governedAccount: new PublicKey(values.governedAccountAddress),
-      yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
-      minTokensToCreateProposal: values.minTokensToCreateProposal,
+      voteThresholdPercentage: values.yesVoteThresholdPercentage,
+      minTokensToCreateProposal: new BN(values.minTokensToCreateProposal),
       minInstructionHoldUpTime: values.minInstructionHoldUpTime * 86400,
       maxVotingTime: values.maxVotingTime * 86400,
     });
