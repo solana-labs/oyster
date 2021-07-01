@@ -10,6 +10,7 @@ export async function createUpgradeInstruction(
   programId: PublicKey,
   bufferAddress: PublicKey,
   governance: PublicKey,
+  spillAddress: PublicKey,
 ) {
   const PROGRAM_IDS = utils.programIds();
 
@@ -35,7 +36,7 @@ export async function createUpgradeInstruction(
       isSigner: false,
     },
     {
-      pubkey: governance,
+      pubkey: spillAddress,
       isWritable: true,
       isSigner: false,
     },
