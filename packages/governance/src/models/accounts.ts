@@ -85,16 +85,20 @@ export class Realm {
 
   communityMint: PublicKey;
 
+  reserved: BN;
+
   councilMint: PublicKey | undefined;
 
   name: string;
 
   constructor(args: {
     communityMint: PublicKey;
+    reserved: BN;
     councilMint: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
+    this.reserved = args.reserved;
     this.councilMint = args.councilMint;
     this.name = args.name;
   }

@@ -259,6 +259,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
+        ['reserved', 'u64'],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
