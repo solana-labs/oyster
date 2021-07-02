@@ -7,13 +7,11 @@ import { RpcContext } from '../models/api';
 const { approve } = models;
 
 export const depositGoverningTokens = async (
-  rpcContext: RpcContext,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
 ) => {
-  const { connection, wallet, programId, walletPubkey } = rpcContext;
-
   let instructions: TransactionInstruction[] = [];
   let signers: Account[] = [];
 

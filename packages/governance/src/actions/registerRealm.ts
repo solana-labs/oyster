@@ -5,13 +5,11 @@ import { withCreateRealm } from '../models/withCreateRealm';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export async function registerRealm(
-  rpcContext: RpcContext,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   name: string,
   communityMint: PublicKey,
   councilMint?: PublicKey,
 ) {
-  const { connection, wallet, programId, walletPubkey } = rpcContext;
-
   let instructions: TransactionInstruction[] = [];
 
   const realmAddress = await withCreateRealm(
