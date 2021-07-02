@@ -1,4 +1,4 @@
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { withCreateAccountGovernance } from '../models/withCreateAccountGovernance';
 import { GovernanceType } from '../models/enums';
@@ -7,10 +7,10 @@ import { withCreateProgramGovernance } from '../models/withCreateProgramGovernan
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
 import { withCreateTokenGovernance } from '../models/withCreateTokenGovernance';
+import { RpcContext } from '../models/api';
 
 export const registerGovernance = async (
-  connection: Connection,
-  wallet: any,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
   realm: PublicKey,
   config: GovernanceConfig,
@@ -25,9 +25,10 @@ export const registerGovernance = async (
       governanceAddress = (
         await withCreateAccountGovernance(
           instructions,
+          programId,
           realm,
           config,
-          wallet.publicKey,
+          walletPubkey,
         )
       ).governanceAddress;
       break;
@@ -36,11 +37,12 @@ export const registerGovernance = async (
       governanceAddress = (
         await withCreateProgramGovernance(
           instructions,
+          programId,
           realm,
           config,
           transferAuthority!,
-          wallet.publicKey,
-          wallet.publicKey,
+          walletPubkey,
+          walletPubkey,
         )
       ).governanceAddress;
       break;
@@ -49,11 +51,12 @@ export const registerGovernance = async (
       governanceAddress = (
         await withCreateMintGovernance(
           instructions,
+          programId,
           realm,
           config,
           transferAuthority!,
-          wallet.publicKey,
-          wallet.publicKey,
+          walletPubkey,
+          walletPubkey,
         )
       ).governanceAddress;
       break;
@@ -65,8 +68,8 @@ export const registerGovernance = async (
           realm,
           config,
           transferAuthority!,
-          wallet.publicKey,
-          wallet.publicKey,
+          walletPubkey,
+          walletPubkey,
         )
       ).governanceAddress;
       break;

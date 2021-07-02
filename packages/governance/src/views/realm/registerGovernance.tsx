@@ -4,7 +4,7 @@ import { Form } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
+
 import { Redirect } from 'react-router';
 
 import { GovernanceType } from '../../models/enums';
@@ -16,9 +16,7 @@ import { ModalFormAction } from '../../components/ModalFormAction/modalFormActio
 
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
 import BN from 'bn.js';
-
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
+import { useRpcContext } from '../../hooks/useRpcContext';
 
 export function RegisterGovernance({
   buttonProps,
@@ -26,8 +24,8 @@ export function RegisterGovernance({
   buttonProps: ButtonProps;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
-  const connection = useConnection();
-  const { wallet } = useWallet();
+  const rpcContext = useRpcContext();
+
   const realmKey = useKeyParam();
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
 
@@ -49,8 +47,7 @@ export function RegisterGovernance({
       maxVotingTime: values.maxVotingTime * 86400,
     });
     return await registerGovernance(
-      connection,
-      wallet,
+      rpcContext,
       values.governanceType,
       realmKey,
       config,

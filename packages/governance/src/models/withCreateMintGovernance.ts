@@ -11,13 +11,14 @@ import { CreateMintGovernanceArgs } from './instructions';
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   config: GovernanceConfig,
   transferMintAuthority: boolean,
   mintAuthority: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId, token: tokenId } = utils.programIds();
 
   const args = new CreateMintGovernanceArgs({
     config,
@@ -31,7 +32,7 @@ export const withCreateMintGovernance = async (
       realm.toBuffer(),
       config.governedAccount.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -61,12 +62,12 @@ export const withCreateMintGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.token,
+      pubkey: tokenId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
@@ -80,7 +81,7 @@ export const withCreateMintGovernance = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );
