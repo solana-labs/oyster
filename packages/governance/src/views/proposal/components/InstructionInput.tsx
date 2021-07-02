@@ -1,5 +1,5 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils, contexts } from '@oyster/common';
 import { Token } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
@@ -14,27 +14,28 @@ import {
 } from 'antd';
 import React from 'react';
 import { useState } from 'react';
+import { AccountFormItem } from '../../../components/AccountFormItem/accountFormItem';
 import { Governance } from '../../../models/accounts';
 import { createUpgradeInstruction } from '../../../models/sdkInstructions';
-import {
-  MAX_INSTRUCTION_BASE64_LENGTH,
-  serializeInstructionToBase64,
-} from '../../../models/serialisation';
-import { formVerticalLayout } from '../../../tools/forms';
+import { serializeInstructionToBase64 } from '../../../models/serialisation';
+import { formDefaults } from '../../../tools/forms';
+const { useWallet } = contexts.Wallet;
 
-const InstructionInput = ({
+export default function InstructionInput({
   governance,
   onChange,
 }: {
   governance: ParsedAccount<Governance>;
   onChange?: (v: any) => void;
-}) => {
+}) {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
 
   const creatorsEnabled =
-    governance.info.isMintGovernance() || governance.info.isProgramGovernance();
+    governance.info.isMintGovernance() ||
+    governance.info.isProgramGovernance() ||
+    governance.info.isTokenGovernance();
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -53,7 +54,6 @@ const InstructionInput = ({
           <Input.TextArea
             value={instruction}
             onChange={e => updateInstruction(e.target.value)}
-            maxLength={MAX_INSTRUCTION_BASE64_LENGTH}
             placeholder={`base64 encoded serialized Solana Instruction`}
           />
         </Col>
@@ -75,7 +75,11 @@ const InstructionInput = ({
         okText="Create"
         onCancel={() => setIsFormVisible(false)}
         title={`Create ${
-          governance.info.isProgramGovernance() ? 'Upgrade Program' : 'Mint To'
+          governance.info.isProgramGovernance()
+            ? 'Upgrade Program'
+            : governance.info.isMintGovernance()
+            ? 'Mint To'
+            : 'Transfer'
         } Instruction`}
       >
         {governance.info.isProgramGovernance() && (
@@ -92,10 +96,17 @@ const InstructionInput = ({
             governance={governance}
           ></MintToForm>
         )}
+        {governance.info.isTokenGovernance() && (
+          <TransferForm
+            form={form}
+            onCreateInstruction={onCreateInstruction}
+            governance={governance}
+          ></TransferForm>
+        )}
       </Modal>
     </>
   );
-};
+}
 
 const UpgradeProgramForm = ({
   form,
@@ -106,17 +117,24 @@ const UpgradeProgramForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const { wallet } = useWallet();
+
+  if (!wallet?.publicKey) {
+    return <div>Wallet not connected</div>;
+  }
+
   const onCreate = async ({ bufferAddress }: { bufferAddress: string }) => {
     const upgradeIx = await createUpgradeInstruction(
       governance.info.config.governedAccount,
       new PublicKey(bufferAddress),
       governance.pubkey,
+      wallet.publicKey!,
     );
     onCreateInstruction(upgradeIx);
   };
 
   return (
-    <Form {...formVerticalLayout} form={form} onFinish={onCreate}>
+    <Form {...formDefaults} form={form} onFinish={onCreate}>
       <Form.Item label="program id">
         <ExplorerLink
           address={governance.info.config.governedAccount}
@@ -125,6 +143,9 @@ const UpgradeProgramForm = ({
       </Form.Item>
       <Form.Item label="upgrade authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
+      </Form.Item>
+      <Form.Item label="spill account (wallet)">
+        <ExplorerLink address={wallet.publicKey} type="address" />
       </Form.Item>
       <Form.Item
         name="bufferAddress"
@@ -169,7 +190,7 @@ const MintToForm = ({
 
   return (
     <Form
-      {...formVerticalLayout}
+      {...formDefaults}
       form={form}
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
@@ -197,4 +218,59 @@ const MintToForm = ({
   );
 };
 
-export default InstructionInput;
+const TransferForm = ({
+  form,
+  governance,
+  onCreateInstruction,
+}: {
+  form: FormInstance;
+  governance: ParsedAccount<Governance>;
+  onCreateInstruction: (instruction: TransactionInstruction) => void;
+}) => {
+  const onCreate = async ({
+    destination,
+    amount,
+  }: {
+    destination: string;
+    amount: number;
+  }) => {
+    const { token: tokenProgramId } = utils.programIds();
+
+    const mintToIx = Token.createTransferInstruction(
+      tokenProgramId,
+      governance.info.config.governedAccount,
+      new PublicKey(destination),
+      governance.pubkey,
+      [],
+      amount,
+    );
+
+    onCreateInstruction(mintToIx);
+  };
+
+  return (
+    <Form
+      {...formDefaults}
+      form={form}
+      onFinish={onCreate}
+      initialValues={{ amount: 1 }}
+    >
+      <Form.Item label="source account">
+        <ExplorerLink
+          address={governance.info.config.governedAccount}
+          type="address"
+        />
+      </Form.Item>
+      <Form.Item label="account owner (governance account)">
+        <ExplorerLink address={governance.pubkey} type="address" />
+      </Form.Item>
+      <AccountFormItem
+        name="destination"
+        label="destination account"
+      ></AccountFormItem>
+      <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
+        <InputNumber min={1} />
+      </Form.Item>
+    </Form>
+  );
+};

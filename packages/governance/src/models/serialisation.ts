@@ -15,6 +15,7 @@ import {
   CreateProgramGovernanceArgs,
   CreateProposalArgs,
   CreateRealmArgs,
+  CreateTokenGovernanceArgs,
   DepositGoverningTokensArgs,
   ExecuteInstructionArgs,
   FinalizeVoteArgs,
@@ -38,12 +39,6 @@ import {
   VoteWeight,
 } from './accounts';
 import { serialize } from 'borsh';
-
-// TODO: Review the limits. Most likely they are leftovers from the legacy version
-export const MAX_PROPOSAL_DESCRIPTION_LENGTH = 200;
-export const MAX_PROPOSAL_NAME_LENGTH = 32;
-export const MAX_REALM_NAME_LENGTH = 32;
-export const MAX_INSTRUCTION_BASE64_LENGTH = 450;
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -139,6 +134,17 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    CreateTokenGovernanceArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
+        ['transferTokenOwner', 'u8'],
+      ],
+    },
+  ],
+  [
     CreateProposalArgs,
     {
       kind: 'struct',
@@ -205,7 +211,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['index', 'u16'],
-        ['holdUpTime', 'u64'],
+        ['holdUpTime', 'u32'],
         ['instructionData', InstructionData],
       ],
     },
@@ -253,6 +259,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
+        ['reserved', 'u64'],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
@@ -265,6 +272,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['config', GovernanceConfig],
+        ['reserved', 'u64'],
         ['proposalCount', 'u32'],
       ],
     },
@@ -276,10 +284,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['realm', 'pubkey'],
         ['governedAccount', 'pubkey'],
-        ['yesVoteThresholdPercentage', 'u8'],
-        ['minTokensToCreateProposal', 'u16'],
-        ['minInstructionHoldUpTime', 'u64'],
-        ['maxVotingTime', 'u64'],
+        ['voteThresholdPercentageType', 'u8'],
+        ['voteThresholdPercentage', 'u8'],
+        ['minTokensToCreateProposal', 'u64'],
+        ['minInstructionHoldUpTime', 'u32'],
+        ['maxVotingTime', 'u32'],
+        ['voteWeightSource', 'u8'],
+        ['proposalCoolOffTime', 'u32'],
       ],
     },
   ],
@@ -293,9 +304,10 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['governingTokenMint', 'pubkey'],
         ['governingTokenOwner', 'pubkey'],
         ['governingTokenDepositAmount', 'u64'],
-        ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
         ['unrelinquishedVotesCount', 'u32'],
         ['totalVotesCount', 'u32'],
+        ['reserved', 'u64'],
+        ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
       ],
     },
   ],
@@ -311,19 +323,21 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['tokenOwnerRecord', 'pubkey'],
         ['signatoriesCount', 'u8'],
         ['signatoriesSignedOffCount', 'u8'],
-        ['descriptionLink', 'string'],
-        ['name', 'string'],
         ['yesVotesCount', 'u64'],
         ['noVotesCount', 'u64'],
-        ['draftAt', 'u64'],
-        ['signingOffAt', { kind: 'option', type: 'u64' }],
-        ['votingAt', { kind: 'option', type: 'u64' }],
-        ['votingCompletedAt', { kind: 'option', type: 'u64' }],
-        ['executingAt', { kind: 'option', type: 'u64' }],
-        ['closedAt', { kind: 'option', type: 'u64' }],
         ['instructionsExecutedCount', 'u16'],
         ['instructionsCount', 'u16'],
         ['instructionsNextIndex', 'u16'],
+        ['draftAt', 'u64'],
+        ['signingOffAt', { kind: 'option', type: 'u64' }],
+        ['votingAt', { kind: 'option', type: 'u64' }],
+        ['votingAtSlot', { kind: 'option', type: 'u64' }],
+        ['votingCompletedAt', { kind: 'option', type: 'u64' }],
+        ['executingAt', { kind: 'option', type: 'u64' }],
+        ['closedAt', { kind: 'option', type: 'u64' }],
+        ['executionFlags', { kind: 'option', type: 'u8' }],
+        ['name', 'string'],
+        ['descriptionLink', 'string'],
       ],
     },
   ],
@@ -369,9 +383,11 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['proposal', 'pubkey'],
-        ['holdUpTime', 'u64'],
+        ['instructionIndex', 'u16'],
+        ['holdUpTime', 'u32'],
         ['instruction', InstructionData],
         ['executedAt', { kind: 'option', type: 'u64' }],
+        ['executionStatus', { kind: 'option', type: 'u8' }],
       ],
     },
   ],

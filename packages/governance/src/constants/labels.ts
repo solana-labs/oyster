@@ -110,6 +110,7 @@ export const LABELS = {
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
   MINT: 'Mint',
+  TOKEN_ACCOUNT: 'Token Account',
 
   REGISTER: 'Register',
   REGISTERING: 'Registering',
@@ -117,13 +118,15 @@ export const LABELS = {
   PROGRAM_ID_LABEL: 'program id',
   MINT_ADDRESS_LABEL: 'mint address',
   ACCOUNT_ADDRESS: 'account address',
+  TOKEN_ACCOUNT_ADDRESS: 'token account address',
 
   MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
-  MIN_INSTRUCTION_HOLD_UP_TIME: 'min instruction hold up time (slots)',
-  MAX_VOTING_TIME: 'max voting time (slots)',
+  MIN_INSTRUCTION_HOLD_UP_TIME_DAYS: 'min instruction hold up time (days)',
+  MAX_VOTING_TIME_DAYS: 'max voting time (days)',
 
-  TRANSFER_UPGRADE_AUTHORITY: 'transfer upgrade authority',
-  TRANSFER_MINT_AUTHORITY: 'transfer mint authority',
+  UPGRADE_AUTHORITY: 'upgrade authority',
+  MINT_AUTHORITY: 'mint authority',
+  TOKEN_OWNER: 'token owner',
 
   PROGRAM_ID: 'Program ID',
   INSTRUCTION: 'Instruction',
@@ -145,7 +148,7 @@ export const LABELS = {
   MINIMUM_SLOT_WAITING_PERIOD: 'Minimum slots between proposal and vote',
   SELECT_CONFIG: 'Select Governed Program',
   CONFIG: 'Governed Program',
-  GIST_PLACEHOLDER: 'Github Gist link',
+  GIST_PLACEHOLDER: 'Github Gist link (optional)',
   NAME: 'Name',
 
   PUBLIC_KEY: 'Public Key',
@@ -155,7 +158,7 @@ export const LABELS = {
     ' Please note that during voting, if you withdraw your tokens, your vote will not count towards the voting total. You must wait for the vote to complete in order for your withdrawal to not affect the voting.',
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
-  HOLD_UP_TIME: 'hold up time',
+  HOLD_UP_TIME_DAYS: 'hold up time (days)',
 
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',

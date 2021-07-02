@@ -15,9 +15,6 @@ import {
 } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token, u64 } from '@solana/spl-token';
-import { setAuthority } from '@project-serum/serum/lib/token-instructions';
-import { GOVERNANCE_PROGRAM_SEED } from '../../models/accounts';
-import { serializeInstructionToBase64 } from '../../models/serialisation';
 
 const { notify } = utils;
 export interface SourceEntryInterface {
@@ -29,27 +26,25 @@ export const generateGovernanceArtifacts = async (
   connection: Connection,
   wallet: any,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   let communityMintSigners: Account[] = [];
   let communityMintInstruction: TransactionInstruction[] = [];
 
   // Setup community mint
-  const [communityMintAddress, otherOwner] = await withMint(
+  const { mintAddress: communityMintAddress } = await withMint(
     communityMintInstruction,
     communityMintSigners,
     connection,
     wallet,
-    9,
-    new u64('4205522598596271000'),
-    new u64('6007889426566101064'),
+    0,
+    new u64('7000'),
+    new u64('10000'),
   );
 
   let councilMinSigners: Account[] = [];
   let councilMintInstructions: TransactionInstruction[] = [];
 
   // Setup council mint
-  const [councilMintAddress] = await withMint(
+  const { mintAddress: councilMintAddress } = await withMint(
     councilMintInstructions,
     councilMinSigners,
     connection,
@@ -63,52 +58,17 @@ export const generateGovernanceArtifacts = async (
   let governanceSigners: Account[] = [];
   let governanceInstructions: TransactionInstruction[] = [];
 
+  // Token governance artifacts
+  const tokenGovernance = await withTokenGovernance(
+    governanceInstructions,
+    governanceSigners,
+    connection,
+    wallet,
+    0,
+    new u64(200),
+  );
+
   let realmName = `Realm-${communityMintAddress.toBase58().substring(0, 5)}`;
-  let governedAccount = communityMintAddress;
-
-  const [realmAddress] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), Buffer.from(realmName)],
-    PROGRAM_IDS.governance.programId,
-  );
-
-  const [governanceAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('account-governance'),
-      realmAddress.toBuffer(),
-      governedAccount.toBuffer(),
-    ],
-    PROGRAM_IDS.governance.programId,
-  );
-
-  // Use setAuthority from Serum because I couldn't get Token.createSetAuthorityInstruction to work
-  // It looks like version mismatch because the function in the SDK takes authorityType params
-  // This step will be uneccesery once we have CreateMintAuthority instruction
-  let ix = setAuthority({
-    target: communityMintAddress,
-    currentAuthority: wallet.publicKey,
-    newAuthority: governanceAddress,
-    authorityType: 'MintTokens',
-  });
-
-  governanceInstructions.push(ix);
-
-  const mintToInstruction: TransactionInstruction = Token.createMintToInstruction(
-    PROGRAM_IDS.token,
-    communityMintAddress,
-    otherOwner,
-    governanceAddress,
-    [],
-    1,
-  );
-
-  const instructionBase64 = serializeInstructionToBase64(mintToInstruction);
-
-  // const upgrade = await createUpgradeInstruction(
-  //   new PublicKey('Hita5Lun87S4MADAF4vGoWEgFm5DyuVqxoWzzqYxS3AD'),
-  //   new PublicKey('EUn3VY7uiAVvi3X72Pfe8DcXbeLHMu5mVbavdQDKTViK'),
-  //   new PublicKey('FqSReK9R8QxvFZgdrAwGT3gsYp1ZGfiFjS8xrzyyadn3'),
-  // );
-  // const instructionBase64 = serializeInstructionToBase64(upgrade);
 
   notify({
     message: 'Creating Governance artifacts...',
@@ -139,12 +99,75 @@ export const generateGovernanceArtifacts = async (
       realmName,
       communityMintAddress,
       councilMintAddress,
-      instructionBase64,
+      tokenGovernance,
     };
   } catch (ex) {
     console.error(ex);
     throw ex;
   }
+};
+
+const withTokenGovernance = async (
+  instructions: TransactionInstruction[],
+  signers: Account[],
+  connection: Connection,
+  wallet: any,
+  decimals: number,
+  amount: u64,
+) => {
+  const PROGRAM_IDS = utils.programIds();
+
+  const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
+    MintLayout.span,
+  );
+
+  const tokenAccountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
+  );
+
+  const mintAddress = createMint(
+    instructions,
+    wallet.publicKey,
+    mintRentExempt,
+    decimals,
+    wallet.publicKey,
+    wallet.publicKey,
+    signers,
+  );
+
+  const tokenAccountAddress = createTokenAccount(
+    instructions,
+    wallet.publicKey,
+    tokenAccountRentExempt,
+    mintAddress,
+    wallet.publicKey,
+    signers,
+  );
+
+  instructions.push(
+    Token.createMintToInstruction(
+      PROGRAM_IDS.token,
+      mintAddress,
+      tokenAccountAddress,
+      wallet.publicKey,
+      [],
+      new u64(amount),
+    ),
+  );
+
+  const beneficiaryTokenAccountAddress = createTokenAccount(
+    instructions,
+    wallet.publicKey,
+    tokenAccountRentExempt,
+    mintAddress,
+    wallet.publicKey,
+    signers,
+  );
+
+  return {
+    tokenAccountAddress: tokenAccountAddress.toBase58(),
+    beneficiaryTokenAccountAddress: beneficiaryTokenAccountAddress.toBase58(),
+  };
 };
 
 const withMint = async (
@@ -189,18 +212,16 @@ const withMint = async (
     signers,
   );
 
-  if (amount) {
-    instructions.push(
-      Token.createMintToInstruction(
-        PROGRAM_IDS.token,
-        mintAddress,
-        tokenAccountAddress,
-        wallet.publicKey,
-        [],
-        new u64(amount),
-      ),
-    );
-  }
+  instructions.push(
+    Token.createMintToInstruction(
+      PROGRAM_IDS.token,
+      mintAddress,
+      tokenAccountAddress,
+      wallet.publicKey,
+      [],
+      new u64(amount),
+    ),
+  );
 
   const otherOwner = new Account();
   instructions.push(
@@ -240,5 +261,5 @@ const withMint = async (
     ),
   );
 
-  return [mintAddress, otherOwnerTokenAccount];
+  return { mintAddress, otherOwnerTokenAccount };
 };

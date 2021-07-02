@@ -7,4 +7,5 @@ export enum GovernanceType {
   Account,
   Program,
   Mint,
+  Token,
 }

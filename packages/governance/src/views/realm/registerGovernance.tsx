@@ -10,12 +10,12 @@ import { Redirect } from 'react-router';
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
 import { GovernanceConfig } from '../../models/accounts';
-import BN from 'bn.js';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
-import { formSlotInputStyle } from '../../tools/forms';
+
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
+import BN from 'bn.js';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -43,10 +43,10 @@ export function RegisterGovernance({
     const config = new GovernanceConfig({
       realm: realmKey,
       governedAccount: new PublicKey(values.governedAccountAddress),
-      yesVoteThresholdPercentage: values.yesVoteThresholdPercentage,
-      minTokensToCreateProposal: values.minTokensToCreateProposal,
-      minInstructionHoldUpTime: new BN(values.minInstructionHoldUpTime),
-      maxVotingTime: new BN(values.maxVotingTime),
+      voteThresholdPercentage: values.yesVoteThresholdPercentage,
+      minTokensToCreateProposal: new BN(values.minTokensToCreateProposal),
+      minInstructionHoldUpTime: values.minInstructionHoldUpTime * 86400,
+      maxVotingTime: values.maxVotingTime * 86400,
     });
     return await registerGovernance(
       connection,
@@ -89,6 +89,9 @@ export function RegisterGovernance({
             {LABELS.PROGRAM}
           </Radio.Button>
           <Radio.Button value={GovernanceType.Mint}>{LABELS.MINT}</Radio.Button>
+          <Radio.Button value={GovernanceType.Token}>
+            {LABELS.TOKEN_ACCOUNT}
+          </Radio.Button>
         </Radio.Group>
       </Form.Item>
 
@@ -99,19 +102,24 @@ export function RegisterGovernance({
             ? LABELS.PROGRAM_ID_LABEL
             : governanceType === GovernanceType.Mint
             ? LABELS.MINT_ADDRESS_LABEL
+            : governanceType === GovernanceType.Token
+            ? LABELS.TOKEN_ACCOUNT_ADDRESS
             : LABELS.ACCOUNT_ADDRESS
         }
       ></AccountFormItem>
 
       {(governanceType === GovernanceType.Program ||
-        governanceType === GovernanceType.Mint) && (
+        governanceType === GovernanceType.Mint ||
+        governanceType === GovernanceType.Token) && (
         <Form.Item
           name="transferAuthority"
-          label={
+          label={`transfer ${
             governanceType === GovernanceType.Program
-              ? LABELS.TRANSFER_UPGRADE_AUTHORITY
-              : LABELS.TRANSFER_MINT_AUTHORITY
-          }
+              ? LABELS.UPGRADE_AUTHORITY
+              : governanceType === GovernanceType.Mint
+              ? LABELS.MINT_AUTHORITY
+              : LABELS.TOKEN_OWNER
+          } to governance`}
           valuePropName="checked"
         >
           <Checkbox></Checkbox>
@@ -129,20 +137,20 @@ export function RegisterGovernance({
 
       <Form.Item
         name="minInstructionHoldUpTime"
-        label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME}
+        label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME_DAYS}
         rules={[{ required: true }]}
         initialValue={1}
       >
-        <InputNumber min={1} style={formSlotInputStyle} />
+        <InputNumber min={0} />
       </Form.Item>
 
       <Form.Item
         name="maxVotingTime"
-        label={LABELS.MAX_VOTING_TIME}
+        label={LABELS.MAX_VOTING_TIME_DAYS}
         rules={[{ required: true }]}
-        initialValue={1000000}
+        initialValue={3}
       >
-        <InputNumber min={1} style={formSlotInputStyle} />
+        <InputNumber min={1} />
       </Form.Item>
       <Form.Item
         name="yesVoteThresholdPercentage"

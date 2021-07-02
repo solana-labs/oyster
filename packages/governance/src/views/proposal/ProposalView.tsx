@@ -399,33 +399,35 @@ function InnerProposalView({
         <Row>
           <Col span={24}>
             <Tabs
-              defaultActiveKey="1"
+              defaultActiveKey="description"
               size="large"
               style={{ marginBottom: 32 }}
             >
-              <TabPane tab="Description" key="1">
-                {loading ? (
-                  <Spin />
-                ) : isUrl ? (
-                  failed ? (
-                    <p>
-                      {LABELS.DESCRIPTION}:{' '}
-                      <a
-                        href={proposal.info.descriptionLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {msg ? msg : LABELS.NO_LOAD}
-                      </a>
-                    </p>
+              {proposal.info.descriptionLink && (
+                <TabPane tab="Description" key="description">
+                  {loading ? (
+                    <Spin />
+                  ) : isUrl ? (
+                    failed ? (
+                      <p>
+                        {LABELS.DESCRIPTION}:{' '}
+                        <a
+                          href={proposal.info.descriptionLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {msg ? msg : LABELS.NO_LOAD}
+                        </a>
+                      </p>
+                    ) : (
+                      <ReactMarkdown children={content} />
+                    )
                   ) : (
-                    <ReactMarkdown children={content} />
-                  )
-                ) : (
-                  content
-                )}
-              </TabPane>
-              <TabPane tab={LABELS.INSTRUCTIONS} key="2">
+                    content
+                  )}
+                </TabPane>
+              )}
+              <TabPane tab={LABELS.INSTRUCTIONS} key="instructions">
                 <Row
                   gutter={[
                     { xs: 8, sm: 16, md: 24, lg: 32 },
@@ -464,10 +466,10 @@ function getMinRequiredYesVoteScore(
   governingTokenMint: MintInfo,
 ): string {
   const minVotes =
-    governance.info.config.yesVoteThresholdPercentage === 100
+    governance.info.config.voteThresholdPercentage === 100
       ? governingTokenMint.supply
       : governingTokenMint.supply
-          .mul(new BN(governance.info.config.yesVoteThresholdPercentage))
+          .mul(new BN(governance.info.config.voteThresholdPercentage))
           .div(new BN(100));
 
   return new BigNumber(minVotes.toString())

@@ -1,4 +1,4 @@
-import { Avatar, Badge, Col, List, Row } from 'antd';
+import { Badge, Col, List, Row } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -11,6 +11,7 @@ import { AddNewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
+import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 
 const PAGE_SIZE = 10;
 
@@ -33,8 +34,6 @@ export const GovernanceView = () => {
     'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
 
   const mint = communityTokenMint?.toBase58() || '';
-
-  const color = governance?.info.isProgramGovernance() ? 'green' : 'gray';
 
   const proposalItems = useMemo(() => {
     const getCompareKey = (p: Proposal) =>
@@ -71,16 +70,14 @@ export const GovernanceView = () => {
     >
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
         <div className="proposals-header">
-          {governance?.info.isMintGovernance() ? (
-            <TokenIcon
-              mintAddress={governance?.info.config.governedAccount}
+          {governance && (
+            <GovernanceBadge
               size={60}
-            />
-          ) : (
-            <Avatar style={{ background: color, marginRight: 5 }} size={60}>
-              {governance?.info.config.governedAccount.toBase58().slice(0, 5)}
-            </Avatar>
+              governance={governance}
+              showVotingCount={false}
+            ></GovernanceBadge>
           )}
+
           <div>
             <h1>{realm?.info.name}</h1>
             <h2>

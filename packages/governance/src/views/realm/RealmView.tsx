@@ -1,8 +1,11 @@
-import { Col, List, Row } from 'antd';
+import { Col, List, Row, Typography } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
-import { useGovernancesByRealm } from '../../hooks/apiHooks';
+import {
+  useGovernancesByRealm,
+  useWalletTokenOwnerRecord,
+} from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 
 import { Background } from '../../components/Background';
@@ -14,7 +17,11 @@ import { DepositGoverningTokens } from './DepositGoverningTokens';
 import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
-import { GovernanceBadge } from './governanceBadge';
+import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
+import AccountDescription from './accountDescription';
+import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
+
+const { Text } = Typography;
 
 export const RealmView = () => {
   const history = useHistory();
@@ -22,6 +29,16 @@ export const RealmView = () => {
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);
+
+  const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    realm?.info.communityMint,
+  );
+
+  const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    realm?.info.councilMint,
+  );
 
   const governanceItems = useMemo(() => {
     return governances
@@ -35,6 +52,7 @@ export const RealmView = () => {
         href: '/governance/' + g.pubkey,
         title: g.info.config.governedAccount.toBase58(),
         badge: <GovernanceBadge governance={g}></GovernanceBadge>,
+        description: <AccountDescription governance={g}></AccountDescription>,
       }));
   }, [governances]);
 
@@ -52,8 +70,14 @@ export const RealmView = () => {
                   councilMint={realm?.info.councilMint}
                 ></RealmBadge>
 
-                <Col>
+                <Col style={{ textAlign: 'left', marginLeft: 8 }}>
                   <h1>{realm?.info.name}</h1>
+                  <Text type="secondary">
+                    <RealmDepositBadge
+                      communityTokenOwnerRecord={communityTokenOwnerRecord}
+                      councilTokenOwnerRecord={councilTokenOwnerRecord}
+                    ></RealmDepositBadge>
+                  </Text>
                 </Col>
               </Row>
             </Col>
@@ -102,6 +126,7 @@ export const RealmView = () => {
                 <List.Item.Meta
                   title={item.title}
                   avatar={item.badge}
+                  description={item.description}
                 ></List.Item.Meta>
               </List.Item>
             )}
