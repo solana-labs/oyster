@@ -3082,6 +3082,15 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@solana/spl-token-lending@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-lending/-/spl-token-lending-0.3.3.tgz#efc5813d6c45fc51340d530e8c9f498dfa4e75e7"
+  integrity sha512-CDNiNIu+31jLUO2ZduM4oEDXyOUn1Wwgim3/pyA0aiL7kOcOeatstnJWMUT3bsyy42FiY9GR+PT0eloShV6abg==
+  dependencies:
+    bigint-buffer "^1.1.5"
+    bignumber.js "^9.0.1"
+    buffer-layout "^1.2.1"
+
 "@solana/spl-token-registry@^0.2.0":
   version "0.2.51"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.51.tgz#a263c146575f1dbab2d3e2e1f379068a8a63706f"
@@ -3089,7 +3098,7 @@
   dependencies:
     cross-fetch "3.0.6"
 
-"@solana/spl-token-swap@0.1.0":
+"@solana/spl-token-swap@0.1.0", "@solana/spl-token-swap@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-swap/-/spl-token-swap-0.1.0.tgz#a1bc2b0c96edae8b31bb2cc000ebacdc36e131c8"
   integrity sha512-h0ntp6xwRZBEKDd6oNhJTbPISjIfeGm0eqQqAccTkeluo1zHve4dnUChTKF4MQ+JqXjfqd6z6DJjfa0+dGA37w==
@@ -3113,6 +3122,18 @@
     buffer-layout "^1.2.0"
     dotenv "8.2.0"
     mkdirp "1.0.4"
+
+"@solana/spl-token@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.6.tgz#fa136b0a3db84f07a99bc0e54cf4e91f2d6da2e8"
+  integrity sha512-fYj+a3w1bqWN6Ibf85XF3h2JkuxevI3Spvqi+mjsNqVUEo2AgxxTZmujNLn/jIzQDNdWkBfF/wYzH5ikcGHmfw==
+  dependencies:
+    "@babel/runtime" "^7.10.5"
+    "@solana/web3.js" "^1.12.0"
+    bn.js "^5.1.0"
+    buffer "6.0.3"
+    buffer-layout "^1.2.0"
+    dotenv "10.0.0"
 
 "@solana/wallet-base@0.0.1", "@solana/wallet-base@^0.0.1":
   version "0.0.1"
@@ -3188,6 +3209,26 @@
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.18.0.tgz#f4c422a843aa57a1366d98b06cb6b45441644d59"
   integrity sha512-ijAoRd4Sje1QYoPAwDr7KYlDK40FE7tAUa2V3wT4PGKatWf4ETDXoyYlW89J6vrqOT+mV3GUuaVC76tOFlrXyA==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    bn.js "^5.0.0"
+    borsh "^0.4.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    buffer-layout "^1.2.0"
+    crypto-hash "^1.2.2"
+    jayson "^3.4.4"
+    js-sha3 "^0.8.0"
+    node-fetch "^2.6.1"
+    rpc-websockets "^7.4.2"
+    secp256k1 "^4.0.2"
+    superstruct "^0.14.2"
+    tweetnacl "^1.0.0"
+
+"@solana/web3.js@^1.12.0", "@solana/web3.js@^1.20.0":
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.20.0.tgz#9a1855a239c96c5b946bdbe4cc5e3768ee3b2a77"
+  integrity sha512-s/hmbeC7h0QeMKDHl5HTJbY4NSrT3IK1oGerNwdmFfnbs9ygtBbXo1MXaeYVDcNazsthKgiYE+unNd+cpVH8HA==
   dependencies:
     "@babel/runtime" "^7.12.5"
     bn.js "^5.0.0"
@@ -6150,6 +6191,13 @@ big.js@^5.2.2:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
 
+bigint-buffer@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/bigint-buffer/-/bigint-buffer-1.1.5.tgz#d038f31c8e4534c1f8d0015209bf34b4fa6dd442"
+  integrity sha512-trfYco6AoZ+rKhKnxA0hgX0HAbVP/s808/EuDSe2JDzUnCp/xAsli35Orvk67UrTEcwuxZqYZDmfA2RXJgxVvA==
+  dependencies:
+    bindings "^1.3.0"
+
 bignumber.js@^9.0.0, bignumber.js@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.1.tgz#8d7ba124c882bfd8e43260c67475518d0689e4e5"
@@ -6170,7 +6218,7 @@ bind-decorator@^1.0.11:
   resolved "https://registry.yarnpkg.com/bind-decorator/-/bind-decorator-1.0.11.tgz#e41bc06a1f65dd9cec476c91c5daf3978488252f"
   integrity sha1-5BvAah9l3ZzsR2yRxdrzl4SIJS8=
 
-bindings@^1.2.1, bindings@^1.5.0:
+bindings@^1.2.1, bindings@^1.3.0, bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -6219,7 +6267,7 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.10.0, bn.js@^4.11.0, bn.js@^4.11.1, bn.js@^
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-bn.js@^5.0.0, bn.js@^5.1.1, bn.js@^5.1.2, bn.js@^5.1.3:
+bn.js@^5.0.0, bn.js@^5.1.0, bn.js@^5.1.1, bn.js@^5.1.2, bn.js@^5.1.3:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.0.tgz#358860674396c6997771a9d051fcc1b57d4ae002"
   integrity sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==
@@ -6521,6 +6569,14 @@ buffer@6.0.1:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
+buffer@6.0.3, buffer@^6.0.1:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
+
 buffer@^4.3.0:
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.2.tgz#230ead344002988644841ab0244af8c44bbe3ef8"
@@ -6537,14 +6593,6 @@ buffer@^5.0.5, buffer@^5.2.1, buffer@^5.4.3, buffer@^5.5.0, buffer@^5.6.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.1:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 bufferutil@^4.0.1:
   version "4.0.3"
@@ -8828,6 +8876,11 @@ dotenv-expand@5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
+
+dotenv@10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
+  integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
 dotenv@8.2.0:
   version "8.2.0"
