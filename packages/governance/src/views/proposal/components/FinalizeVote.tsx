@@ -10,9 +10,9 @@ import { Governance, Proposal, ProposalState } from '../../../models/accounts';
 
 import { finalizeVote } from '../../../actions/finalizeVote';
 import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 
 export function FinalizeVote({
   governance,
@@ -21,8 +21,8 @@ export function FinalizeVote({
   governance: ParsedAccount<Governance>;
   proposal: ParsedAccount<Proposal>;
 }) {
-  const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connected } = useWallet();
+  const rpcContext = useRpcContext();
   const hasVotingTimeExpired = useHasVotingTimeExpired(governance, proposal);
 
   const isVisible =
@@ -35,7 +35,7 @@ export function FinalizeVote({
       type="primary"
       onClick={async () => {
         try {
-          await finalizeVote(connection, wallet, proposal);
+          await finalizeVote(rpcContext, proposal);
         } catch (ex) {
           console.error(ex);
         }
