@@ -6,21 +6,21 @@ import { Button, Modal } from 'antd';
 import React from 'react';
 import { cancelProposal } from '../../../actions/cancelProposal';
 import { useProposalAuthority } from '../../../hooks/apiHooks';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 import { Proposal, ProposalState } from '../../../models/accounts';
 
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 
 export default function CancelButton({
   proposal,
 }: {
   proposal: ParsedAccount<Proposal>;
 }) {
-  const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connected } = useWallet();
+  const rpcContext = useRpcContext();
   const proposalAuthority = useProposalAuthority(
     proposal.info.tokenOwnerRecord,
   );
@@ -46,7 +46,7 @@ export default function CancelButton({
           cancelText: 'No',
 
           onOk() {
-            return cancelProposal(connection, wallet, proposal);
+            return cancelProposal(rpcContext, proposal);
           },
           onCancel() {
             // no-op
