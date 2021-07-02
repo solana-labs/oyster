@@ -15,9 +15,9 @@ import {
 import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../actions/relinquishVote';
 import { useWalletVoteRecord } from '../../../hooks/apiHooks';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 
 const { confirm } = Modal;
 export function RelinquishVote({
@@ -27,8 +27,8 @@ export function RelinquishVote({
   proposal: ParsedAccount<Proposal>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
 }) {
-  const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connected } = useWallet();
+  const rpcContext = useRpcContext();
 
   const voteRecord = useWalletVoteRecord(proposal.pubkey);
 
@@ -51,8 +51,7 @@ export function RelinquishVote({
         if (proposal.info.state !== ProposalState.Voting) {
           try {
             await relinquishVote(
-              connection,
-              wallet,
+              rpcContext,
               proposal,
               tokenOwnerRecord.pubkey,
               voteRecord!.pubkey,
@@ -80,8 +79,7 @@ export function RelinquishVote({
           onOk: async () => {
             try {
               await relinquishVote(
-                connection,
-                wallet,
+                rpcContext,
                 proposal,
                 tokenOwnerRecord.pubkey,
                 voteRecord!.pubkey,
