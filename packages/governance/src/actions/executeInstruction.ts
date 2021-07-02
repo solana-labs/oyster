@@ -1,14 +1,14 @@
-import { Account, Connection, TransactionInstruction } from '@solana/web3.js';
+import { Account, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
 import { Proposal, ProposalInstruction } from '../models/accounts';
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { RpcContext } from '../models/api';
 
 export const executeInstruction = async (
-  connection: Connection,
-  wallet: any,
+  { connection, wallet, programId }: RpcContext,
   proposal: ParsedAccount<Proposal>,
   instruction: ParsedAccount<ProposalInstruction>,
 ) => {
@@ -17,6 +17,7 @@ export const executeInstruction = async (
 
   await withExecuteInstruction(
     instructions,
+    programId,
     proposal.info.governance,
     proposal.pubkey,
     instruction.pubkey,

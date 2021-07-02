@@ -28,7 +28,6 @@ import { useProposalAuthority } from '../../../hooks/apiHooks';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 
 enum PlayState {
   Played,
@@ -140,9 +139,10 @@ function PlayStatusButton({
   playing: PlayState;
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
-  const { wallet, connected } = useWallet();
+  const { connected } = useWallet();
 
-  const connection = useConnection();
+  const rpcContext = useRpcContext();
+  const { connection } = rpcContext;
   const [currentSlot, setCurrentSlot] = useState(0);
 
   let canExecuteAt = proposal.info.votingCompletedAt
@@ -166,7 +166,7 @@ function PlayStatusButton({
   const onExecuteInstruction = async () => {
     setPlaying(PlayState.Playing);
     try {
-      await executeInstruction(connection, wallet, proposal, instruction);
+      await executeInstruction(rpcContext, proposal, instruction);
     } catch (e) {
       setPlaying(PlayState.Error);
       return;

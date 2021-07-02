@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -11,18 +10,17 @@ import { AccountMetaData, InstructionData } from './accounts';
 
 export const withExecuteInstruction = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   instructionAddress: PublicKey,
   instruction: InstructionData,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   const args = new ExecuteInstructionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  // When an instruction needs to be signed by the Governance PDA then it has to be removed from AccountMeta
-  // because it'll be done during execution using invoke_signed() and not when we send ExecuteInstruction
+  // When an instruction needs to be signed by the Governance PDA then its isSigner flag has to be reset on AccountMeta
+  // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
   instruction.accounts = instruction.accounts.map(a =>
     a.pubkey.toBase58() === governance.toBase58() && a.isSigner
       ? new AccountMetaData({
@@ -65,7 +63,7 @@ export const withExecuteInstruction = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );
