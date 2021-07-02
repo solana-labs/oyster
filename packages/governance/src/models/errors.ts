@@ -72,7 +72,7 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
     const instructionError = (error.txError as any).InstructionError[1];
 
     return (
-      (instructionError.Custom !== undefined && instructionError.Custom >= 500
+      (instructionError.Custom !== undefined
         ? GovernanceError[instructionError.Custom]
         : instructionError) ?? ''
     );
