@@ -115,7 +115,7 @@ const withTokenGovernance = async (
   decimals: number,
   amount: u64,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
     MintLayout.span,
@@ -146,7 +146,7 @@ const withTokenGovernance = async (
 
   instructions.push(
     Token.createMintToInstruction(
-      PROGRAM_IDS.token,
+      tokenId,
       mintAddress,
       tokenAccountAddress,
       wallet.publicKey,
@@ -179,7 +179,7 @@ const withMint = async (
   amount: u64,
   supply: u64,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId, token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
     MintLayout.span,
@@ -214,7 +214,7 @@ const withMint = async (
 
   instructions.push(
     Token.createMintToInstruction(
-      PROGRAM_IDS.token,
+      tokenId,
       mintAddress,
       tokenAccountAddress,
       wallet.publicKey,
@@ -230,7 +230,7 @@ const withMint = async (
       newAccountPubkey: otherOwner.publicKey,
       lamports: accountRentExempt,
       space: 0,
-      programId: PROGRAM_IDS.system,
+      programId: systemId,
     }),
   );
 
@@ -252,7 +252,7 @@ const withMint = async (
 
   instructions.push(
     Token.createMintToInstruction(
-      PROGRAM_IDS.token,
+      tokenId,
       mintAddress,
       otherOwnerTokenAccount,
       wallet.publicKey,

@@ -20,7 +20,7 @@ export const withCreateProgramGovernance = async (
 ): Promise<{ governanceAddress: PublicKey }> => {
   const {
     system: systemId,
-    bpf_upgrade_loader: bpfUpgradeLoaderId,
+    bpf_upgrade_loader: bpfUpgradableLoaderId,
   } = utils.programIds();
 
   const args = new CreateProgramGovernanceArgs({
@@ -40,7 +40,7 @@ export const withCreateProgramGovernance = async (
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [config.governedAccount.toBuffer()],
-    bpfUpgradeLoaderId,
+    bpfUpgradableLoaderId,
   );
 
   const keys = [
@@ -70,7 +70,7 @@ export const withCreateProgramGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: bpfUpgradeLoaderId,
+      pubkey: bpfUpgradableLoaderId,
       isWritable: false,
       isSigner: false,
     },

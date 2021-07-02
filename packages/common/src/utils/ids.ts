@@ -66,9 +66,7 @@ export const ENABLE_FEES_INPUT = false;
 export const PROGRAM_IDS = [
   {
     name: 'mainnet-beta',
-    governance: () => ({
-      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -87,9 +85,7 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'testnet',
-    governance: () => ({
-      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
       bridge: '0x251bBCD91E84098509beaeAfF0B9951859af66D3',
@@ -106,9 +102,7 @@ export const PROGRAM_IDS = [
 
   {
     name: 'devnet',
-    governance: () => ({
-      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -124,9 +118,7 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'localnet',
-    governance: () => ({
-      programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',

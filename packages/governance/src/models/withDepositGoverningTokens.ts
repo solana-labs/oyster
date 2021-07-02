@@ -25,6 +25,7 @@ export const withDepositGoverningTokens = async (
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const tokenOwnerRecordAddress = await getTokenOwnerAddress(
+    programId,
     realm,
     governingTokenMint,
     governingTokenOwner,

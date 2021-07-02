@@ -12,11 +12,11 @@ export async function createUpgradeInstruction(
   governance: PublicKey,
   spillAddress: PublicKey,
 ) {
-  const PROGRAM_IDS = utils.programIds();
+  const { bpf_upgrade_loader: bpfUpgradableLoaderId } = utils.programIds();
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
-    PROGRAM_IDS.bpf_upgrade_loader,
+    bpfUpgradableLoaderId,
   );
 
   const keys = [
@@ -59,7 +59,7 @@ export async function createUpgradeInstruction(
 
   return new TransactionInstruction({
     keys,
-    programId: PROGRAM_IDS.bpf_upgrade_loader,
+    programId: bpfUpgradableLoaderId,
     data: Buffer.from([3, 0, 0, 0]), // Upgrade instruction bincode
   });
 }

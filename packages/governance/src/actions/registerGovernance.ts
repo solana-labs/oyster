@@ -65,6 +65,7 @@ export const registerGovernance = async (
       governanceAddress = (
         await withCreateTokenGovernance(
           instructions,
+          programId,
           realm,
           config,
           transferAuthority!,
