@@ -116,20 +116,21 @@ export function useGovernanceAccountsByFilter<
       return;
     }
 
+    const { governance } = utils.programIds();
+
     const queryFilters = filters.map(f => f!);
     const accountTypes = getAccountTypes(accountClass);
 
     const sub = (async () => {
       // TODO: add retries for transient errors
       const loadedAccounts = await getGovernanceAccounts<TAccount>(
+        governance.programId,
         endpoint,
         accountClass,
         accountTypes,
         queryFilters,
       );
       setAccounts(loadedAccounts);
-
-      const { governance } = utils.programIds();
 
       const connSubId = connection.onProgramAccountChange(
         governance.programId,

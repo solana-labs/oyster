@@ -1,6 +1,6 @@
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
-import { deserializeBorsh, ParsedAccount, utils } from '@oyster/common';
+import { deserializeBorsh, ParsedAccount } from '@oyster/common';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import {
   GovernanceAccount,
@@ -8,6 +8,26 @@ import {
   GovernanceAccountType,
   Realm,
 } from './accounts';
+
+// Context to make RPC calls for given clone programId, current connection, endpoint and wallet
+export class RpcContext {
+  programId: PublicKey;
+  wallet: PublicKey | undefined;
+  connection: Connection;
+  endpoint: string;
+
+  constructor(
+    programId: PublicKey,
+    wallet: PublicKey | undefined,
+    connection: Connection,
+    endpoint: string,
+  ) {
+    this.programId = programId;
+    this.wallet = wallet;
+    this.connection = connection;
+    this.endpoint = endpoint;
+  }
+}
 
 export class MemcmpFilter {
   offset: number;
@@ -36,15 +56,17 @@ export const pubkeyFilter = (
   pubkey: PublicKey | undefined | null,
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
-export async function getRealms(endpoint: string) {
+export async function getRealms(rpcContext: RpcContext) {
   return getGovernanceAccountsImpl<Realm>(
-    endpoint,
+    rpcContext.programId,
+    rpcContext.endpoint,
     Realm,
     GovernanceAccountType.Realm,
   );
 }
 
 export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
+  programId: PublicKey,
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountTypes: GovernanceAccountType[],
@@ -52,6 +74,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 ) {
   if (accountTypes.length === 1) {
     return getGovernanceAccountsImpl<TAccount>(
+      programId,
       endpoint,
       accountClass,
       accountTypes[0],
@@ -61,7 +84,13 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 
   const all = await Promise.all(
     accountTypes.map(at =>
-      getGovernanceAccountsImpl<TAccount>(endpoint, accountClass, at, filters),
+      getGovernanceAccountsImpl<TAccount>(
+        programId,
+        endpoint,
+        accountClass,
+        at,
+        filters,
+      ),
     ),
   );
 
@@ -72,14 +101,12 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 }
 
 async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
+  programId: PublicKey,
   endpoint: string,
   accountClass: GovernanceAccountClass,
   accountType: GovernanceAccountType,
   filters: MemcmpFilter[] = [],
 ) {
-  const PROGRAM_IDS = utils.programIds();
-  PROGRAM_IDS.governance.programId.toBase58();
-
   let getProgramAccounts = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -90,7 +117,7 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
       id: 1,
       method: 'getProgramAccounts',
       params: [
-        PROGRAM_IDS.governance.programId.toBase58(),
+        programId.toBase58(),
         {
           commitment: 'single',
           encoding: 'base64',
