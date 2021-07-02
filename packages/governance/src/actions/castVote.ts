@@ -1,19 +1,14 @@
-import {
-  Account,
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 import { withCastVote } from '../models/withCastVote';
 import { Vote } from '../models/instructions';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { RpcContext } from '../models/api';
 
 export const castVote = async (
-  connection: Connection,
-  wallet: any,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   vote: Vote,
@@ -21,11 +16,12 @@ export const castVote = async (
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  let governanceAuthority = wallet.publicKey;
-  let payer = wallet.publicKey;
+  let governanceAuthority = walletPubkey;
+  let payer = walletPubkey;
 
   await withCastVote(
     instructions,
+    programId,
     proposal.info.governance,
     proposal.pubkey,
     tokeOwnerRecord,

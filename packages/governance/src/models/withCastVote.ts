@@ -12,6 +12,7 @@ import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -20,7 +21,7 @@ export const withCastVote = async (
   vote: Vote,
   payer: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId } = utils.programIds();
 
   const args = new CastVoteArgs({ vote });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -31,7 +32,7 @@ export const withCastVote = async (
       proposal.toBuffer(),
       tokenOwnerRecord.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -71,7 +72,7 @@ export const withCastVote = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isSigner: false,
       isWritable: false,
     },
@@ -90,7 +91,7 @@ export const withCastVote = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );
