@@ -1,30 +1,26 @@
-import {
-  Account,
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withRemoveInstruction } from '../models/withRemoveInstruction';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { RpcContext } from '../models/api';
 
 export const removeInstruction = async (
-  connection: Connection,
-  wallet: any,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   proposal: ParsedAccount<Proposal>,
   proposalInstruction: PublicKey,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  const governanceAuthority = wallet.publicKey;
-  const beneficiary = wallet.publicKey;
+  const governanceAuthority = walletPubkey;
+  const beneficiary = walletPubkey;
 
   await withRemoveInstruction(
     instructions,
+    programId,
     proposal.pubkey,
     proposal.info.tokenOwnerRecord,
     governanceAuthority,

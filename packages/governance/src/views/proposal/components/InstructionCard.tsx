@@ -25,6 +25,7 @@ import { executeInstruction } from '../../../actions/executeInstruction';
 import { removeInstruction } from '../../../actions/removeInstruction';
 import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
 import { useProposalAuthority } from '../../../hooks/apiHooks';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
@@ -44,8 +45,8 @@ export function InstructionCard({
   proposal: ParsedAccount<Proposal>;
   position: number;
 }) {
-  const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connected } = useWallet();
+  const rpcContext = useRpcContext();
   const changeTracker = useAccountChangeTracker();
 
   const proposalAuthority = useProposalAuthority(
@@ -90,7 +91,7 @@ export function InstructionCard({
 
   const deleteAction = () => {
     const onDelete = async () => {
-      await removeInstruction(connection, wallet, proposal, instruction.pubkey);
+      await removeInstruction(rpcContext, proposal, instruction.pubkey);
       changeTracker.notifyAccountRemoved(
         instruction.pubkey.toBase58(),
         GovernanceAccountType.ProposalInstruction,
