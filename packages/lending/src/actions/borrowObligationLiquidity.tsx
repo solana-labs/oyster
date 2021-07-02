@@ -18,8 +18,8 @@ import {
   borrowObligationLiquidityInstruction,
   Obligation,
   Reserve,
-} from '../models';
-import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
+} from '@solana/spl-token-lending';
+import { refreshObligationAndReserves } from './refreshObligationAndReserves';
 
 const { cache, MintParser } = contexts.Accounts;
 const { sendTransaction } = contexts.Connection;

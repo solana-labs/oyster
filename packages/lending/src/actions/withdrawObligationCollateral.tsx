@@ -17,8 +17,8 @@ import {
   Obligation,
   Reserve,
   withdrawObligationCollateralInstruction,
-} from '../models';
-import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
+} from '@solana/spl-token-lending';
+import { refreshObligationAndReserves } from './refreshObligationAndReserves';
 
 export const withdrawObligationCollateral = async (
   connection: Connection,

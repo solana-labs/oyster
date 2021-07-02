@@ -1,5 +1,5 @@
+import { OBLIGATION_SIZE } from '@solana/spl-token-lending';
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ObligationLayout } from '../models';
 import { createAccount } from './createAccount';
 
 export function createObligation(
@@ -13,6 +13,6 @@ export function createObligation(
     payer,
     amount,
     signers,
-    ObligationLayout.span,
+    OBLIGATION_SIZE,
   );
 }

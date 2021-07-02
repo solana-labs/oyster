@@ -1,7 +1,8 @@
 import { contexts, ParsedAccount } from '@oyster/common';
+import { Obligation } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
-import { Obligation, ObligationParser } from '../models';
+import { ObligationParser } from '../models';
 
 const { cache } = contexts.Accounts;
 

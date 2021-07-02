@@ -8,6 +8,7 @@ import {
   STABLE_COINS,
 } from '@oyster/common';
 import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
+import { Reserve } from '@solana/spl-token-lending';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import React, {
   useCallback,
@@ -16,7 +17,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { PoolInfo, Reserve } from '../models';
+import { PoolInfo } from '../models';
 import { LIQUIDITY_PROVIDER_FEE, SERUM_FEE } from '../utils/pools';
 import { getPoolName } from '../utils/utils';
 import { POOLS_WITH_AIRDROP } from './../models/airdrops';

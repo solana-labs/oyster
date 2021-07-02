@@ -17,7 +17,7 @@ import {
   redeemReserveCollateralInstruction,
   refreshReserveInstruction,
   Reserve,
-} from '../models';
+} from '@solana/spl-token-lending';
 
 const { approve } = models;
 

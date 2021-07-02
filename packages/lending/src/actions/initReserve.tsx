@@ -14,7 +14,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { initReserveInstruction, Reserve } from '../models';
+import { initReserveInstruction, Reserve } from '@solana/spl-token-lending';
 
 const { approve } = models;
 

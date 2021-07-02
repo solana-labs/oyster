@@ -5,7 +5,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { initObligationInstruction, ObligationLayout } from '../models';
+import { initObligationInstruction, OBLIGATION_SIZE } from '@solana/spl-token-lending';
 import { createObligation } from './createObligation';
 
 export const initObligation = async (
@@ -24,7 +24,7 @@ export const initObligation = async (
   const cleanupInstructions: TransactionInstruction[] = [];
 
   const obligationRentExempt = await connection.getMinimumBalanceForRentExemption(
-    ObligationLayout.span,
+    OBLIGATION_SIZE,
   );
 
   const obligationAddress = createObligation(

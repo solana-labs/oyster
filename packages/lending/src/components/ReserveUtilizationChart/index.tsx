@@ -1,7 +1,7 @@
 import { contexts, fromLamports, wadToLamports } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { Statistic } from 'antd';
 import React, { useMemo } from 'react';
-import { Reserve } from '../../models';
 import { WaterWave } from './../WaterWave';
 
 const { useMint } = contexts.Accounts;

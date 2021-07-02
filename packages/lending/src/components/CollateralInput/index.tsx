@@ -6,6 +6,7 @@ import {
   TokenDisplay,
   TokenIcon,
 } from '@oyster/common';
+import { LendingMarket, Reserve } from '@solana/spl-token-lending';
 import { Card, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
@@ -13,7 +14,7 @@ import {
   useUserBalance,
   useUserDeposits,
 } from '../../hooks';
-import { LendingMarket, Reserve, ReserveParser } from '../../models';
+import { ReserveParser } from '../../models';
 import './style.less';
 
 const { cache } = contexts.Accounts;

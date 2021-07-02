@@ -15,8 +15,8 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { liquidateObligationInstruction, Obligation, Reserve } from '../models';
-import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
+import { liquidateObligationInstruction, Obligation, Reserve } from '@solana/spl-token-lending';
+import { refreshObligationAndReserves } from './refreshObligationAndReserves';
 
 const { approve } = models;
 

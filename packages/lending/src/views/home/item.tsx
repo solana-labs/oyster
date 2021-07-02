@@ -7,13 +7,13 @@ import {
   useTokenName,
   wadToLamports,
 } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   calculateBorrowAPY,
   calculateDepositAPY,
-  Reserve,
   TotalItem,
 } from '../../models';
 

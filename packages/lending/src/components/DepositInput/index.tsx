@@ -1,11 +1,11 @@
 import { ActionConfirmation, ConnectButton, contexts } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { Card, Slider } from 'antd';
 import React, { useCallback, useState } from 'react';
 import { depositReserveLiquidity } from '../../actions';
 import { LABELS, marks } from '../../constants';
 import { InputType, useSliderInput, useUserBalance } from '../../hooks';
-import { Reserve } from '../../models';
 import CollateralInput from '../CollateralInput';
 import './style.less';
 

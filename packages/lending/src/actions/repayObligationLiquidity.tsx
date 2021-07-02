@@ -13,8 +13,8 @@ import {
   Obligation,
   repayObligationLiquidityInstruction,
   Reserve,
-} from '../models';
-import { refreshObligationAndReserves } from './helpers/refreshObligationAndReserves';
+} from '@solana/spl-token-lending';
+import { refreshObligationAndReserves } from './refreshObligationAndReserves';
 
 const { approve } = models;
 

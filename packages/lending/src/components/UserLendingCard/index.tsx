@@ -1,10 +1,10 @@
 import { formatNumber, useTokenName } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { Button, Card, Typography } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
-import { Reserve } from '../../models';
 import {
   useBorrowedAmount,
   useBorrowingPower,

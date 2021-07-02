@@ -5,12 +5,13 @@ import {
   TokenIcon,
   wadToLamports,
 } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { Card, Col, Row, Statistic } from 'antd';
 import React, { useMemo } from 'react';
 import { GUTTER, LABELS } from '../../constants';
 import { usePrice } from '../../contexts/pyth';
-import { calculateDepositAPY, Reserve } from '../../models';
+import { calculateDepositAPY } from '../../models';
 import { ReserveUtilizationChart } from './../../components/ReserveUtilizationChart';
 import './style.less';
 

@@ -7,9 +7,10 @@ import {
   useUserAccounts,
 } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
+import { Reserve } from '@solana/spl-token-lending';
 import { useEffect, useMemo, useState } from 'react';
 import { usePyth } from '../contexts/pyth';
-import { calculateDepositAPY, Reserve } from '../models';
+import { calculateDepositAPY } from '../models';
 import { calculateCollateralBalance } from './useCollateralBalance';
 import { useLendingReserves } from './useLendingReserves';
 

@@ -1,14 +1,16 @@
 import { contexts, LENDING_PROGRAM_ID, ParsedAccount } from '@oyster/common';
-import { AccountInfo, PublicKey } from '@solana/web3.js';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useLendingReserves } from '../hooks';
 import {
   isLendingMarket,
   isObligation,
   isReserve,
+  Reserve,
+} from '@solana/spl-token-lending';
+import { AccountInfo, PublicKey } from '@solana/web3.js';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useLendingReserves } from '../hooks';
+import {
   LendingMarketParser,
   ObligationParser,
-  Reserve,
   ReserveParser,
 } from '../models';
 import { usePrecacheMarket } from './market';

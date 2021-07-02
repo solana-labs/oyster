@@ -5,10 +5,10 @@ import {
   ParsedAccount,
   TokenIcon,
 } from '@oyster/common';
+import { LendingMarket, Reserve } from '@solana/spl-token-lending';
 import { Select } from 'antd';
 import React from 'react';
 import { useLendingReserves, UserDeposit, useUserDeposits } from '../../hooks';
-import { LendingMarket, Reserve } from '../../models';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;

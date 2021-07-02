@@ -1,5 +1,5 @@
 import { ParsedAccount } from '@oyster/common';
-import { Reserve } from '../../../models';
+import { Reserve } from '@solana/spl-token-lending';
 
 export interface Token {
   mintAddress: string;

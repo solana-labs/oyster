@@ -1,9 +1,10 @@
 import { formatNumber, formatPct, useTokenName } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { Card, Col, Row, Statistic } from 'antd';
 import React, { useMemo } from 'react';
 import { GUTTER } from '../../constants';
-import { calculateDepositAPY, Reserve } from '../../models';
+import { calculateDepositAPY } from '../../models';
 import { useUserBalance, useUserCollateralBalance } from './../../hooks';
 import './style.less';
 

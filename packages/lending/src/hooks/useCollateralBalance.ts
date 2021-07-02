@@ -1,8 +1,9 @@
 import { contexts, fromLamports } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { Reserve, reserveMarketCap } from '../models';
 import { usePrice } from '../contexts/pyth';
+import { reserveMarketCap } from '../models';
 import { useUserBalance } from './useUserBalance';
 
 const { useMint } = contexts.Accounts;

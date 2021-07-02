@@ -1,5 +1,5 @@
+import { RESERVE_SIZE } from '@solana/spl-token-lending';
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ReserveLayout } from '../models';
 import { createAccount } from './createAccount';
 
 export function createReserve(
@@ -13,6 +13,6 @@ export function createReserve(
     payer,
     amount,
     signers,
-    ReserveLayout.span,
+    RESERVE_SIZE,
   );
 }

@@ -1,8 +1,9 @@
 import { contexts, getTokenByName, ParsedAccount } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { TokenInfo } from '@solana/spl-token-registry';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { Reserve, ReserveParser } from '../models';
+import { ReserveParser } from '../models';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
