@@ -8,12 +8,7 @@ import {
 } from '../models/accounts';
 import { BorshAccountParser } from '../models/serialisation';
 
-import {
-  utils,
-  ParsedAccount,
-  useConnectionConfig,
-  useConnection,
-} from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { MemcmpFilter, getGovernanceAccounts } from '../models/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
@@ -24,8 +19,7 @@ export function useGovernanceAccountByPubkey<
 >(accountClass: GovernanceAccountClass, pubkey: PublicKey | undefined) {
   const [account, setAccount] = useState<ParsedAccount<TAccount>>();
 
-  const { endpoint } = useConnectionConfig();
-  const connection = useConnection();
+  const { connection, endpoint, programId } = useRpcContext();
 
   const getByPubkey = pubkey?.toBase58();
 
@@ -52,9 +46,7 @@ export function useGovernanceAccountByPubkey<
         setAccount(undefined);
       }
 
-      const { governance } = utils.programIds();
-
-      return connection.onProgramAccountChange(governance.programId, info => {
+      return connection.onProgramAccountChange(programId, info => {
         if (info.accountId.toBase58() === getByPubkey) {
           const account = BorshAccountParser(accountClass)(
             info.accountId,

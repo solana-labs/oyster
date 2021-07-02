@@ -15,6 +15,7 @@ import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
 import { useRpcContext } from '../../hooks/useRpcContext';
+import { getProposalUrl } from '../../tools/routeTools';
 
 export function AddNewProposal({
   realm,
@@ -27,6 +28,7 @@ export function AddNewProposal({
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
+  const { programId } = rpcContext;
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.info.config.realm,
@@ -85,7 +87,7 @@ export function AddNewProposal({
   };
 
   if (redirectTo) {
-    return <Redirect push to={'/proposal/' + redirectTo} />;
+    return <Redirect push to={getProposalUrl(redirectTo, programId)} />;
   }
 
   return (

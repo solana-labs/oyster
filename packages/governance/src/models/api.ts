@@ -40,6 +40,10 @@ export class RpcContext {
 
     return this.wallet.publicKey;
   }
+
+  get programIdBase58() {
+    return this.programId.toBase58();
+  }
 }
 
 export class MemcmpFilter {

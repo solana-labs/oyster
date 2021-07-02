@@ -12,10 +12,12 @@ import { registerRealm } from '../../actions/registerRealm';
 
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import { useRpcContext } from '../../hooks/useRpcContext';
+import { getRealmUrl } from '../../tools/routeTools';
 
 export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
+  const { programId } = rpcContext;
 
   const [councilVisible, setCouncilVisible] = useState(false);
 
@@ -42,7 +44,7 @@ export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
   };
 
   if (redirectTo) {
-    return <Redirect push to={'/realm/' + redirectTo} />;
+    return <Redirect push to={getRealmUrl(redirectTo, programId)} />;
   }
 
   return (

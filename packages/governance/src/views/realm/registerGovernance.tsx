@@ -17,6 +17,7 @@ import { ModalFormAction } from '../../components/ModalFormAction/modalFormActio
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
 import BN from 'bn.js';
 import { useRpcContext } from '../../hooks/useRpcContext';
+import { getGovernanceUrl } from '../../tools/routeTools';
 
 export function RegisterGovernance({
   buttonProps,
@@ -25,6 +26,7 @@ export function RegisterGovernance({
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
+  const { programId } = rpcContext;
 
   const realmKey = useKeyParam();
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
@@ -60,7 +62,7 @@ export function RegisterGovernance({
   };
 
   if (redirectTo) {
-    return <Redirect push to={'/governance/' + redirectTo} />;
+    return <Redirect push to={getGovernanceUrl(redirectTo, programId)} />;
   }
 
   return (
