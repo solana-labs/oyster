@@ -46,7 +46,7 @@ export const AppLayout = React.memo((props: any) => {
       <Layout title={LABELS.APP_TITLE}>
         <Header className="App-Bar">
           <div className="app-title">
-            <HomeUrl></HomeUrl>
+            <HomeLink></HomeLink>
           </div>
           <AppBar useWalletBadge={true} />
         </Header>
@@ -59,7 +59,7 @@ export const AppLayout = React.memo((props: any) => {
   );
 });
 
-const HomeUrl = () => {
+const HomeLink = () => {
   const { programId } = useRpcContext();
 
   return (
