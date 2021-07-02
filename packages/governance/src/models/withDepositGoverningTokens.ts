@@ -11,6 +11,7 @@ import { getTokenOwnerAddress, GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   governingTokenSource: PublicKey,
   governingTokenMint: PublicKey,
@@ -18,7 +19,7 @@ export const withDepositGoverningTokens = async (
   transferAuthority: PublicKey,
   payer: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId, token: tokenId } = utils.programIds();
 
   const args = new DepositGoverningTokensArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -35,7 +36,7 @@ export const withDepositGoverningTokens = async (
       realm.toBuffer(),
       governingTokenMint.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -75,12 +76,12 @@ export const withDepositGoverningTokens = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: PROGRAM_IDS.token,
+      pubkey: tokenId,
       isWritable: false,
       isSigner: false,
     },
@@ -94,7 +95,7 @@ export const withDepositGoverningTokens = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

@@ -33,7 +33,7 @@ export class RpcContext {
     this.endpoint = endpoint;
   }
 
-  getWalletPubkey() {
+  get walletPubkey() {
     if (!this.wallet?.publicKey) {
       throw new WalletNotConnectedError();
     }

@@ -1,22 +1,19 @@
-import {
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-  Account,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction, Account } from '@solana/web3.js';
 import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { RpcContext } from '../models/api';
 
 const { approve } = models;
 
 export const depositGoverningTokens = async (
-  connection: Connection,
+  rpcContext: RpcContext,
   realm: PublicKey,
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
-  wallet: any,
 ) => {
+  const { connection, wallet, programId, walletPubkey } = rpcContext;
+
   let instructions: TransactionInstruction[] = [];
   let signers: Account[] = [];
 
@@ -24,7 +21,7 @@ export const depositGoverningTokens = async (
     instructions,
     [],
     governingTokenSource.pubkey,
-    wallet.publicKey,
+    walletPubkey,
     governingTokenSource.info.amount,
   );
 
@@ -32,12 +29,13 @@ export const depositGoverningTokens = async (
 
   await withDepositGoverningTokens(
     instructions,
+    programId,
     realm,
     governingTokenSource.pubkey,
     governingTokenMint,
-    wallet.publicKey,
+    walletPubkey,
     transferAuthority.publicKey,
-    wallet.publicKey,
+    walletPubkey,
   );
 
   await sendTransactionWithNotifications(

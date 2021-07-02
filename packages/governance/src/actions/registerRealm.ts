@@ -10,20 +10,22 @@ export async function registerRealm(
   communityMint: PublicKey,
   councilMint?: PublicKey,
 ) {
+  const { connection, wallet, programId, walletPubkey } = rpcContext;
+
   let instructions: TransactionInstruction[] = [];
 
   const realmAddress = await withCreateRealm(
     instructions,
-    rpcContext.programId,
+    programId,
     name,
     communityMint,
-    rpcContext.getWalletPubkey(),
+    walletPubkey,
     councilMint,
   );
 
   await sendTransactionWithNotifications(
-    rpcContext.connection,
-    rpcContext.wallet,
+    connection,
+    wallet,
     instructions,
     [],
     'Registering realm',
