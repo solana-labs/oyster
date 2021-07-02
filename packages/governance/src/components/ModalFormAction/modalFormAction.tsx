@@ -6,7 +6,10 @@ import { contexts, ExplorerLink } from '@oyster/common';
 
 import { formDefaults } from '../../tools/forms';
 import { isSendTransactionError, isSignTransactionError } from '@oyster/common';
-import { getTransactionErrorMsg } from '../../models/errors';
+import {
+  getTransactionErrorMsg,
+  isWalletNotConnectedError,
+} from '../../models/errors';
 
 const { useWallet } = contexts.Wallet;
 
@@ -98,13 +101,12 @@ function ActionForm<TResult>({
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [error, setError] =
-    useState<{
-      message?: string;
-      txId?: string;
-      recoveryAction: string;
-      header?: string;
-    } | null>();
+  const [error, setError] = useState<{
+    message?: string;
+    txId?: string;
+    recoveryAction: string;
+    header?: string;
+  } | null>();
 
   const resetForm = () => {
     form.resetFields();
@@ -140,6 +142,13 @@ function ActionForm<TResult>({
           header: "Couldn't sign the transaction",
           recoveryAction:
             'Please try to submit and sign the transaction with your wallet again.',
+        });
+      } else if (isWalletNotConnectedError(ex)) {
+        setError({
+          header: "Can't submit the transaction",
+          message: ex.message,
+          recoveryAction:
+            'Please ensure your wallet is connected and submit the transaction again.',
         });
       } else {
         setError({

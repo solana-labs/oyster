@@ -16,6 +16,7 @@ import {
 } from '@oyster/common';
 import { MemcmpFilter, getGovernanceAccounts } from '../models/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
+import { useRpcContext } from './useRpcContext';
 
 // Fetches Governance program account using the given key and subscribes to updates
 export function useGovernanceAccountByPubkey<
@@ -103,8 +104,8 @@ export function useGovernanceAccountsByFilter<
     Record<string, ParsedAccount<TAccount>>
   >({});
 
-  const { endpoint } = useConnectionConfig();
-  const connection = useConnection();
+  const { connection, endpoint, programId } = useRpcContext();
+
   const accountChangeTracker = useAccountChangeTracker();
 
   // Use stringify to get stable dependency for useEffect to  ensure we load the initial snapshot of accounts only once
@@ -116,15 +117,13 @@ export function useGovernanceAccountsByFilter<
       return;
     }
 
-    const { governance } = utils.programIds();
-
     const queryFilters = filters.map(f => f!);
     const accountTypes = getAccountTypes(accountClass);
 
     const sub = (async () => {
       // TODO: add retries for transient errors
       const loadedAccounts = await getGovernanceAccounts<TAccount>(
-        governance.programId,
+        programId,
         endpoint,
         accountClass,
         accountTypes,
@@ -132,43 +131,40 @@ export function useGovernanceAccountsByFilter<
       );
       setAccounts(loadedAccounts);
 
-      const connSubId = connection.onProgramAccountChange(
-        governance.programId,
-        info => {
-          if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
-            const isMatch = !queryFilters.some(
-              f => !f.isMatch(info.accountInfo.data),
-            );
+      const connSubId = connection.onProgramAccountChange(programId, info => {
+        if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
+          const isMatch = !queryFilters.some(
+            f => !f.isMatch(info.accountInfo.data),
+          );
 
-            const base58Key = info.accountId.toBase58();
+          const base58Key = info.accountId.toBase58();
 
-            const account = BorshAccountParser(accountClass)(
-              info.accountId,
-              info.accountInfo,
-            ) as ParsedAccount<TAccount>;
+          const account = BorshAccountParser(accountClass)(
+            info.accountId,
+            info.accountInfo,
+          ) as ParsedAccount<TAccount>;
 
-            setAccounts((acts: any) => {
-              if (isMatch) {
-                return {
-                  ...acts,
-                  [base58Key]: account,
-                };
-              } else if (acts[base58Key]) {
-                return {
-                  ...Object.keys(acts)
-                    .filter(k => k !== base58Key)
-                    .reduce((res, key) => {
-                      res[key] = acts[key];
-                      return res;
-                    }, {} as any),
-                };
-              } else {
-                return acts;
-              }
-            });
-          }
-        },
-      );
+          setAccounts((acts: any) => {
+            if (isMatch) {
+              return {
+                ...acts,
+                [base58Key]: account,
+              };
+            } else if (acts[base58Key]) {
+              return {
+                ...Object.keys(acts)
+                  .filter(k => k !== base58Key)
+                  .reduce((res, key) => {
+                    res[key] = acts[key];
+                    return res;
+                  }, {} as any),
+              };
+            } else {
+              return acts;
+            }
+          });
+        }
+      });
 
       const disposeChangeTracker = accountChangeTracker.onAccountRemoved(ar => {
         if (accountTypes.some(at => ar.accountType === at)) {

@@ -8,17 +8,22 @@ import {
   GovernanceAccountType,
   Realm,
 } from './accounts';
+import { WalletNotConnectedError } from './errors';
+
+export interface IWallet {
+  publicKey: PublicKey;
+}
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey;
-  wallet: PublicKey | undefined;
+  wallet: IWallet | undefined;
   connection: Connection;
   endpoint: string;
 
   constructor(
     programId: PublicKey,
-    wallet: PublicKey | undefined,
+    wallet: IWallet | undefined,
     connection: Connection,
     endpoint: string,
   ) {
@@ -26,6 +31,14 @@ export class RpcContext {
     this.wallet = wallet;
     this.connection = connection;
     this.endpoint = endpoint;
+  }
+
+  getWalletPubkey() {
+    if (!this.wallet?.publicKey) {
+      throw new WalletNotConnectedError();
+    }
+
+    return this.wallet.publicKey;
   }
 }
 

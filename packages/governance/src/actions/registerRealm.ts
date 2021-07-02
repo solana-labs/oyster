@@ -1,28 +1,29 @@
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { RpcContext } from '../models/api';
 
 import { withCreateRealm } from '../models/withCreateRealm';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
-export const registerRealm = async (
-  connection: Connection,
-  wallet: any,
+export async function registerRealm(
+  rpcContext: RpcContext,
   name: string,
   communityMint: PublicKey,
   councilMint?: PublicKey,
-): Promise<PublicKey> => {
+) {
   let instructions: TransactionInstruction[] = [];
 
-  const { realmAddress } = await withCreateRealm(
+  const realmAddress = await withCreateRealm(
     instructions,
+    rpcContext.programId,
     name,
     communityMint,
-    wallet.publicKey,
+    rpcContext.getWalletPubkey(),
     councilMint,
   );
 
   await sendTransactionWithNotifications(
-    connection,
-    wallet,
+    rpcContext.connection,
+    rpcContext.wallet,
     instructions,
     [],
     'Registering realm',
@@ -30,4 +31,4 @@ export const registerRealm = async (
   );
 
   return realmAddress;
-};
+}

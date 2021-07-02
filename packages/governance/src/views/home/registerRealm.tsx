@@ -4,21 +4,19 @@ import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../constants';
-import { contexts } from '@oyster/common';
+
 import { Redirect } from 'react-router';
 import { MintFormItem } from '../../components/MintFormItem/mintFormItem';
 
 import { registerRealm } from '../../actions/registerRealm';
 
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
-
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
+import { useRpcContext } from '../../hooks/useRpcContext';
 
 export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
   const [redirectTo, setRedirectTo] = useState('');
-  const connection = useConnection();
-  const { wallet } = useWallet();
+  const rpcContext = useRpcContext();
+
   const [councilVisible, setCouncilVisible] = useState(false);
 
   const onSubmit = async (values: {
@@ -28,8 +26,7 @@ export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
     useCouncilMint: boolean;
   }) => {
     return await registerRealm(
-      connection,
-      wallet,
+      rpcContext,
       values.name,
       new PublicKey(values.communityMint),
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,

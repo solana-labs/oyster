@@ -9,21 +9,22 @@ import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
 import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 
-export const withCreateRealm = async (
+export async function withCreateRealm(
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   name: string,
   communityMint: PublicKey,
   payer: PublicKey,
   councilMint?: PublicKey,
-): Promise<{ realmAddress: PublicKey }> => {
-  const PROGRAM_IDS = utils.programIds();
+) {
+  const { system: systemId, token: tokenId } = utils.programIds();
 
   const args = new CreateRealmArgs({ name });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const [realmAddress] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_PROGRAM_SEED), Buffer.from(args.name)],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const [communityTokenHoldingAddress] = await PublicKey.findProgramAddress(
@@ -32,7 +33,7 @@ export const withCreateRealm = async (
       realmAddress.toBuffer(),
       communityMint.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   let keys = [
@@ -57,12 +58,12 @@ export const withCreateRealm = async (
       isWritable: false,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: PROGRAM_IDS.token,
+      pubkey: tokenId,
       isSigner: false,
       isWritable: false,
     },
@@ -80,7 +81,7 @@ export const withCreateRealm = async (
         realmAddress.toBuffer(),
         councilMint.toBuffer(),
       ],
-      PROGRAM_IDS.governance.programId,
+      programId,
     );
 
     keys = [
@@ -101,10 +102,10 @@ export const withCreateRealm = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );
 
-  return { realmAddress };
-};
+  return realmAddress;
+}

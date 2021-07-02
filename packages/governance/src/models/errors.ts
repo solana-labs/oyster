@@ -72,11 +72,23 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
     const instructionError = (error.txError as any).InstructionError[1];
 
     return (
-      (instructionError.Custom !== undefined
+      (instructionError.Custom !== undefined && instructionError.Custom >= 500
         ? GovernanceError[instructionError.Custom]
         : instructionError) ?? ''
     );
   } catch {
     return JSON.stringify(error);
   }
+}
+
+export class WalletNotConnectedError extends Error {
+  constructor() {
+    super('Wallet is not connected.');
+  }
+}
+
+export function isWalletNotConnectedError(
+  error: any,
+): error is WalletNotConnectedError {
+  return error instanceof WalletNotConnectedError;
 }
