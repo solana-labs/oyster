@@ -33,23 +33,23 @@ export function useObligations() {
   };
 }
 
-export function useLendingObligation(address?: string | PublicKey) {
-  const id = typeof address === 'string' ? address : address?.toBase58();
-  const [obligationAccount, setObligationAccount] = useState(
+export function useObligation(address: string | PublicKey) {
+  const id = typeof address === 'string' ? address : address.toBase58();
+  const [obligation, setObligation] = useState(
     cache.get(id || '') as ParsedAccount<Obligation>,
   );
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.id === id) {
-        setObligationAccount(cache.get(id) as ParsedAccount<Obligation>);
+        setObligation(cache.get(id) as ParsedAccount<Obligation>);
       }
     });
 
     return () => {
       dispose();
     };
-  }, [id, setObligationAccount]);
+  }, [id, setObligation]);
 
-  return obligationAccount;
+  return obligation;
 }

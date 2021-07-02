@@ -1,22 +1,11 @@
-import { KnownTokenMap, TokenAccount, utils } from '@oyster/common';
+import { TokenAccount } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import BigNumber from 'bignumber.js';
-import { PoolInfo } from '../models';
 
-const ZERO = new BigNumber(0);
 const WAD = new BigNumber('1e+18');
 
-export function getPoolName(
-  map: KnownTokenMap,
-  pool: PoolInfo,
-  shorten = true,
-) {
-  const sorted = pool.pubkeys.holdingMints.map(a => a.toBase58()).sort();
-  return sorted.map(item => utils.getTokenName(map, item, shorten)).join('/');
-}
-
-export function wadToLamports(amount?: BigNumber): BigNumber {
-  return amount?.div(WAD) || ZERO;
+export function wadToLamports(amount: BigNumber) {
+  return amount.div(WAD);
 }
 
 export function fromLamports(

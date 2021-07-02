@@ -17,14 +17,12 @@ export const FaucetView = () => {
       return;
     }
 
-    connection
-      .requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL)
-      .then(() => {
-        notify({
-          message: LABELS.ACCOUNT_FUNDED,
-          type: 'success',
-        });
+    connection.requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL).then(() => {
+      notify({
+        message: LABELS.ACCOUNT_FUNDED,
+        type: 'success',
       });
+    });
   }, [publicKey, connection]);
 
   const bodyStyle: React.CSSProperties = {

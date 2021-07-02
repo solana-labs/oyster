@@ -25,7 +25,7 @@ export const depositObligationCollateral = async (
   source: TokenAccount,
   reserve: Reserve,
   reserveAddress: PublicKey,
-  obligationAddress: PublicKey
+  obligationAddress: PublicKey,
 ) => {
   notify({
     message: 'Depositing collateral...',

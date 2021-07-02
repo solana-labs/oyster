@@ -81,10 +81,7 @@ export const depositReserveLiquidity = async (
   );
 
   instructions.push(
-    refreshReserveInstruction(
-      reserveAddress,
-      reserve.liquidity.oraclePubkey,
-    ),
+    refreshReserveInstruction(reserveAddress, reserve.liquidity.oraclePubkey),
     depositReserveLiquidityInstruction(
       liquidityAmount,
       sourceLiquidityAccount,

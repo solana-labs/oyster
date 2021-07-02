@@ -8,7 +8,7 @@ import { ReserveParser } from '../models';
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
-export const getReserves = () => {
+const getReserves = () => {
   return cache
     .byParser(ReserveParser)
     .map(id => cache.get(id))
@@ -16,63 +16,61 @@ export const getReserves = () => {
 };
 
 export function useReserves() {
-  const [reserveAccounts, setReserveAccounts] = useState<
-    ParsedAccount<Reserve>[]
-  >(getReserves());
+  const [reserves, setReserves] = useState<ParsedAccount<Reserve>[]>(
+    getReserves(),
+  );
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.parser === ReserveParser) {
-        setReserveAccounts(getReserves());
+        setReserves(getReserves());
       }
     });
 
     return () => {
       dispose();
     };
-  }, [setReserveAccounts]);
+  }, [setReserves]);
 
   return {
-    reserveAccounts,
+    reserves,
   };
 }
 
-export function useReserve(address?: string | PublicKey) {
+export function useReserve(address: string | PublicKey) {
   const { tokenMap } = useConnectionConfig();
-  const { reserveAccounts } = useReserves();
-  let addressName = address;
+  const { reserves } = useReserves();
   if (typeof address === 'string') {
     const token: TokenInfo | null = getTokenByName(tokenMap, address);
     if (token) {
-      const account = reserveAccounts.filter(
+      const account = reserves.filter(
         acc => acc.info.liquidity.mintPubkey.toBase58() === token.address,
       )[0];
       if (account) {
-        addressName = account.pubkey;
+        address = account.pubkey;
       }
     }
   }
   const id = useMemo(
-    () =>
-      typeof addressName === 'string' ? addressName : addressName?.toBase58(),
-    [addressName],
+    () => (typeof address === 'string' ? address : address.toBase58()),
+    [address],
   );
 
-  const [reserveAccount, setReserveAccount] = useState<ParsedAccount<Reserve>>(
+  const [reserve, setReserve] = useState<ParsedAccount<Reserve>>(
     cache.get(id || '') as ParsedAccount<Reserve>,
   );
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.id === id) {
-        setReserveAccount(cache.get(id) as ParsedAccount<Reserve>);
+        setReserve(cache.get(id) as ParsedAccount<Reserve>);
       }
     });
 
     return () => {
       dispose();
     };
-  }, [id, setReserveAccount]);
+  }, [id, setReserve]);
 
-  return reserveAccount;
+  return reserve;
 }

@@ -8,11 +8,5 @@ export function createObligation(
   amount: number,
   signers: Account[],
 ) {
-  return createAccount(
-    instructions,
-    payer,
-    amount,
-    signers,
-    OBLIGATION_SIZE,
-  );
+  return createAccount(instructions, payer, amount, signers, OBLIGATION_SIZE);
 }

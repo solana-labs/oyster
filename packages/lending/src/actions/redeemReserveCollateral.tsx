@@ -74,10 +74,7 @@ export const redeemReserveCollateral = async (
   );
 
   instructions.push(
-    refreshReserveInstruction(
-      reserveAddress,
-      reserve.liquidity.oraclePubkey,
-    ),
+    refreshReserveInstruction(reserveAddress, reserve.liquidity.oraclePubkey),
     redeemReserveCollateralInstruction(
       collateralAmount,
       sourceCollateral,

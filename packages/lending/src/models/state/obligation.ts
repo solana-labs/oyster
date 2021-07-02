@@ -12,8 +12,3 @@ export const ObligationParser: AccountParser = (
     return { pubkey, account, info };
   }
 };
-
-// @TODO: implement
-export const healthFactorToRiskColor = (health: number) => {
-  return '';
-};

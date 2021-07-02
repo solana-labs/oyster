@@ -1,6 +1,6 @@
 import { contexts, fromLamports, useUserAccounts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { usePrice } from '../contexts/pyth';
 
 const { useMint } = contexts.Accounts;
@@ -15,7 +15,6 @@ export function useUserBalance(
     [mintAddress],
   );
   const { userAccounts } = useUserAccounts();
-  const [balanceInUSD, setBalanceInUSD] = useState(0);
 
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
@@ -29,10 +28,7 @@ export function useUserBalance(
   }, [userAccounts, mint, account]);
 
   const balanceLamports = useMemo(() => {
-    return accounts.reduce(
-      (res, item) => (res += item.info.amount.toNumber()),
-      0,
-    );
+    return accounts.reduce((res, item) => res + item.info.amount.toNumber(), 0);
   }, [accounts]);
 
   const balance = useMemo(() => fromLamports(balanceLamports, mintInfo), [
@@ -42,9 +38,7 @@ export function useUserBalance(
 
   const price = usePrice(mint || '');
 
-  useEffect(() => {
-    setBalanceInUSD(balance * price);
-  }, [setBalanceInUSD, balance, price]);
+  const balanceInUSD = useMemo(() => balance * price, [balance, price]);
 
   return {
     balance,

@@ -77,7 +77,7 @@ export const repayObligationLiquidity = async (
   signers.push(transferAuthority);
 
   instructions.push(
-    ...await refreshObligationAndReserves(connection, obligation),
+    ...(await refreshObligationAndReserves(connection, obligation)),
     repayObligationLiquidityInstruction(
       liquidityAmount,
       sourceLiquidity,

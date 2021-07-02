@@ -15,7 +15,11 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { liquidateObligationInstruction, Obligation, Reserve } from '@solana/spl-token-lending';
+import {
+  liquidateObligationInstruction,
+  Obligation,
+  Reserve,
+} from '@solana/spl-token-lending';
 import { refreshObligationAndReserves } from './refreshObligationAndReserves';
 
 const { approve } = models;
@@ -80,7 +84,7 @@ export const liquidateObligation = async (
   );
 
   instructions.push(
-    ...await refreshObligationAndReserves(connection, obligation),
+    ...(await refreshObligationAndReserves(connection, obligation)),
     liquidateObligationInstruction(
       liquidityAmount,
       sourceAccount,

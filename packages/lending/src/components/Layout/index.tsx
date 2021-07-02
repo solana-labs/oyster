@@ -3,10 +3,8 @@ import {
   ForkOutlined,
   GithubOutlined,
   HomeOutlined,
-  LogoutOutlined,
   PieChartOutlined,
   RocketOutlined,
-  ShoppingOutlined,
   AuditOutlined,
 } from '@ant-design/icons';
 
@@ -27,12 +25,9 @@ export const AppLayout = React.memo((props: any) => {
   const location = useLocation();
 
   const paths: { [key: string]: string } = {
-    '/dashboard': '2',
-    '/deposit': '3',
+    '/markets': '2',
+    '/reserves': '3',
     '/obligations': '4',
-    '/borrow': '5',
-    '/liquidate': '6',
-    '/margin': '7',
     '/faucet': '8',
   };
 
@@ -83,19 +78,19 @@ export const AppLayout = React.memo((props: any) => {
                 <Menu.Item key="2" icon={<PieChartOutlined />}>
                   <Link
                     to={{
-                      pathname: '/dashboard',
+                      pathname: '/markets',
                     }}
                   >
-                    {LABELS.MENU_DASHBOARD}
+                    {LABELS.MENU_MARKETS}
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="3" icon={<BankOutlined />}>
                   <Link
                     to={{
-                      pathname: '/deposit',
+                      pathname: '/reserves',
                     }}
                   >
-                    {LABELS.MENU_DEPOSIT}
+                    {LABELS.MENU_RESERVES}
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="4" icon={<AuditOutlined />}>
@@ -107,34 +102,6 @@ export const AppLayout = React.memo((props: any) => {
                     {LABELS.MENU_OBLIGATIONS}
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="5" icon={<LogoutOutlined />}>
-                  <Link
-                    to={{
-                      pathname: '/borrow',
-                    }}
-                  >
-                    {LABELS.MENU_BORROW}
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="6" icon={<ShoppingOutlined />}>
-                  <Link
-                    to={{
-                      pathname: '/liquidate',
-                    }}
-                  >
-                    {LABELS.MENU_LIQUIDATE}
-                  </Link>
-                </Menu.Item>
-                {/* Hide margin option for now  */}
-                {/* <Menu.Item key="7"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
-                <Link
-                  to={{
-                    pathname: "/margin",
-                  }}
-                >
-                  {LABELS.MARGIN_TRADING}
-                </Link>
-              </Menu.Item> */}
                 {env !== 'mainnet-beta' && (
                   <Menu.Item key="8" icon={<RocketOutlined />}>
                     <Link

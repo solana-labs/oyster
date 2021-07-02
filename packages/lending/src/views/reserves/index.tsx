@@ -1,5 +1,5 @@
 import React from 'react';
 
-export const ObligationsView = () => {
+export const ReservesView = () => {
   return <div className="flexColumn"></div>;
 };

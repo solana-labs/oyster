@@ -1,7 +1,8 @@
-import { AccountParser, wadToLamports } from '@oyster/common';
+import { AccountParser } from '@oyster/common';
 import { parseReserve, Reserve } from '@solana/spl-token-lending';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
-import BN from 'bn.js';
+import BigNumber from 'bignumber.js';
+import { wadToLamports } from '../../utils/utils';
 
 export const ReserveParser: AccountParser = (
   pubkey: PublicKey,
@@ -15,58 +16,52 @@ export const ReserveParser: AccountParser = (
 };
 
 export const calculateUtilizationRatio = (reserve: Reserve) => {
-  const totalBorrows = wadToLamports(
-    reserve.liquidity.borrowedAmountWads,
-  ).toNumber();
-  const currentUtilization =
-    totalBorrows /
-    (reserve.liquidity.availableAmount.toNumber() + totalBorrows);
-
-  return currentUtilization;
+  const borrowedAmount = wadToLamports(reserve.liquidity.borrowedAmountWads);
+  const availableAmount = new BigNumber(
+    reserve.liquidity.availableAmount.toString(),
+  );
+  return borrowedAmount.div(availableAmount.plus(borrowedAmount));
 };
 
-export const reserveMarketCap = (reserve?: Reserve) => {
-  const available = reserve?.liquidity.availableAmount.toNumber() || 0;
-  const borrowed = wadToLamports(
-    reserve?.liquidity.borrowedAmountWads,
-  ).toNumber();
-  const total = available + borrowed;
-  return total;
+export const reserveMarketCap = (reserve: Reserve) => {
+  const availableAmount = new BigNumber(
+    reserve.liquidity.availableAmount.toString(),
+  );
+  const borrowedAmount = wadToLamports(reserve.liquidity.borrowedAmountWads);
+  return availableAmount.plus(borrowedAmount);
 };
 
-export const collateralExchangeRate = (reserve?: Reserve) => {
-  return (
-    (reserve?.collateral.mintTotalSupply.toNumber() || 1) /
-    reserveMarketCap(reserve)
+export const collateralExchangeRate = (reserve: Reserve) => {
+  const marketCap = reserveMarketCap(reserve);
+  return new BigNumber(reserve.collateral.mintTotalSupply.toString()).div(
+    marketCap,
   );
 };
 
 export const collateralToLiquidity = (
-  collateralAmount: BN | number,
-  reserve?: Reserve,
+  collateralAmount: number | bigint | BigNumber,
+  reserve: Reserve,
 ) => {
-  const amount =
-    typeof collateralAmount === 'number'
-      ? collateralAmount
-      : collateralAmount.toNumber();
-  return Math.floor(amount / collateralExchangeRate(reserve));
+  const amount = BigNumber.isBigNumber(collateralAmount)
+    ? collateralAmount
+    : new BigNumber(collateralAmount.toString());
+  const exchangeRate = collateralExchangeRate(reserve);
+  return amount.div(exchangeRate);
 };
 
 export const liquidityToCollateral = (
-  liquidityAmount: BN | number,
-  reserve?: Reserve,
+  liquidityAmount: number | bigint | BigNumber,
+  reserve: Reserve,
 ) => {
-  const amount =
-    typeof liquidityAmount === 'number'
-      ? liquidityAmount
-      : liquidityAmount.toNumber();
-  return Math.floor(amount * collateralExchangeRate(reserve));
+  const amount = BigNumber.isBigNumber(liquidityAmount)
+    ? liquidityAmount
+    : new BigNumber(liquidityAmount.toString());
+  const exchangeRate = collateralExchangeRate(reserve);
+  return amount.times(exchangeRate);
 };
 
-// deposit APY utilization currentUtilizationRate * borrowAPY
-
 export const calculateBorrowAPY = (reserve: Reserve) => {
-  const currentUtilization = calculateUtilizationRatio(reserve);
+  const currentUtilization = calculateUtilizationRatio(reserve).toNumber();
   const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
 
   let borrowAPY;
@@ -90,9 +85,7 @@ export const calculateBorrowAPY = (reserve: Reserve) => {
 };
 
 export const calculateDepositAPY = (reserve: Reserve) => {
-  const currentUtilization = calculateUtilizationRatio(reserve);
-
+  const currentUtilization = calculateUtilizationRatio(reserve).toNumber();
   const borrowAPY = calculateBorrowAPY(reserve);
   return currentUtilization * borrowAPY;
 };
-

@@ -5,7 +5,10 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { initObligationInstruction, OBLIGATION_SIZE } from '@solana/spl-token-lending';
+import {
+  initObligationInstruction,
+  OBLIGATION_SIZE,
+} from '@solana/spl-token-lending';
 import { createObligation } from './createObligation';
 
 export const initObligation = async (

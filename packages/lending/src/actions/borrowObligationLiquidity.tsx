@@ -108,7 +108,7 @@ export const borrowObligationLiquidity = async (
   cleanupInstructions = [...finalCleanupInstructions];
 
   instructions.push(
-    ...await refreshObligationAndReserves(connection, obligation),
+    ...(await refreshObligationAndReserves(connection, obligation)),
     borrowObligationLiquidityInstruction(
       amountLamports,
       borrowReserve.info.liquidity.supplyPubkey,

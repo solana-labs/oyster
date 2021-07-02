@@ -5,7 +5,13 @@ import {
   parseProductData,
 } from '@pythnetwork/client';
 import { PublicKey } from '@solana/web3.js';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const { useConnection } = contexts.Connection;
 const { getMultipleAccounts } = contexts.Accounts;
@@ -70,24 +76,34 @@ export function PythProvider({ children = null as any }) {
       let symbol = tokenMap.get(mint)?.symbol;
       if (!symbol) return;
 
-      const product = products[`${ symbol }/USD`];
+      const product = products[`${symbol}/USD`];
       if (!product) return;
 
-      const id = connection.onAccountChange(product.priceAccountKey, function (accountInfo) {
-        try {
-          const price = parsePriceData(accountInfo.data);
-          setPrices({ ...prices, [mint]: price.price });
-        }
-        catch (e) {
-          console.error(e);
-        }
-      });
+      const id = connection.onAccountChange(
+        product.priceAccountKey,
+        function (accountInfo) {
+          try {
+            const price = parsePriceData(accountInfo.data);
+            setPrices({ ...prices, [mint]: price.price });
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      );
 
       // @TODO: add subscription counting / removal
       subscription = { id, count: 1 };
       setSubscriptions({ ...subscriptions, [mint]: subscription });
     },
-    [subscriptions, tokenMap, products, connection, prices, setPrices, setSubscriptions],
+    [
+      subscriptions,
+      tokenMap,
+      products,
+      connection,
+      prices,
+      setPrices,
+      setSubscriptions,
+    ],
   );
 
   const getPrice = useCallback(
@@ -117,12 +133,7 @@ export const usePyth = () => {
 
 export const usePrice = (mint: string) => {
   const { getPrice } = useContext(PythContext);
-  const [price, setPrice] = useState(0);
-
-  useEffect(() => {
-    setPrice(getPrice(mint));
-  }, [setPrice, getPrice, mint]);
-
+  const price = useMemo(() => getPrice(mint), [getPrice, mint]);
   return price;
 };
 

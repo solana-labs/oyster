@@ -7,13 +7,11 @@ import {
 } from '@solana/spl-token-lending';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useReserves } from '../hooks';
 import {
   LendingMarketParser,
   ObligationParser,
   ReserveParser,
 } from '../models';
-import { usePrecacheMarket } from './market';
 
 const { useConnection } = contexts.Connection;
 const { cache, getMultipleAccounts, MintParser } = contexts.Accounts;
@@ -37,20 +35,12 @@ export function LendingProvider({ children = null as any }) {
 
 export const useLending = () => {
   const connection = useConnection();
-  const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
-  const { reserveAccounts } = useReserves();
-  const precacheMarkets = usePrecacheMarket();
-
-  // TODO: query for all the dex from reserves
+  const [accounts, setAccounts] = useState<any[]>([]);
 
   const processAccount = useCallback(
     (item: { pubkey: PublicKey; account: AccountInfo<Buffer> }) => {
       if (isReserve(item.account)) {
-        return cache.add(
-          item.pubkey.toBase58(),
-          item.account,
-          ReserveParser,
-        );
+        return cache.add(item.pubkey.toBase58(), item.account, ReserveParser);
       } else if (isLendingMarket(item.account)) {
         return cache.add(
           item.pubkey.toBase58(),
@@ -68,19 +58,9 @@ export const useLending = () => {
     [],
   );
 
-  useEffect(() => {
-    if (reserveAccounts.length > 0) {
-      precacheMarkets(
-        reserveAccounts.map(reserve =>
-          reserve.info.liquidity.mintPubkey.toBase58(),
-        ),
-      );
-    }
-  }, [reserveAccounts, precacheMarkets]);
-
   // initial query
   useEffect(() => {
-    setLendingAccounts([]);
+    setAccounts([]);
 
     const queryLendingAccounts = async () => {
       const programAccounts = await connection.getProgramAccounts(
@@ -92,7 +72,12 @@ export const useLending = () => {
         .filter(item => item !== undefined);
 
       const lendingReserves = accounts
-        .filter(acc => acc?.account && isReserve(acc.account) && (acc.info as Reserve).lendingMarket !== undefined)
+        .filter(
+          acc =>
+            acc?.account &&
+            isReserve(acc.account) &&
+            (acc.info as Reserve).lendingMarket !== undefined,
+        )
         .map(acc => acc as ParsedAccount<Reserve>);
 
       const toQuery = [
@@ -130,7 +115,7 @@ export const useLending = () => {
     };
 
     Promise.all([queryLendingAccounts()]).then(all => {
-      setLendingAccounts(all.flat());
+      setAccounts(all.flat());
     });
   }, [connection, processAccount]);
 
@@ -138,9 +123,10 @@ export const useLending = () => {
     const subID = connection.onProgramAccountChange(
       LENDING_PROGRAM_ID,
       async info => {
-        const pubkey = typeof info.accountId === 'string' ?
-            new PublicKey((info.accountId as unknown) as string) :
-            info.accountId;
+        const pubkey =
+          typeof info.accountId === 'string'
+            ? new PublicKey((info.accountId as unknown) as string)
+            : info.accountId;
         const item = {
           pubkey,
           account: info.accountInfo,
@@ -153,7 +139,7 @@ export const useLending = () => {
     return () => {
       connection.removeProgramAccountChangeListener(subID);
     };
-  }, [connection, lendingAccounts, processAccount]);
+  }, [connection, accounts, processAccount]);
 
-  return { accounts: lendingAccounts };
+  return { accounts };
 };

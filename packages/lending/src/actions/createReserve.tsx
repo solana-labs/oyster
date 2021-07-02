@@ -8,11 +8,5 @@ export function createReserve(
   amount: number,
   signers: Account[],
 ) {
-  return createAccount(
-    instructions,
-    payer,
-    amount,
-    signers,
-    RESERVE_SIZE,
-  );
+  return createAccount(instructions, payer, amount, signers, RESERVE_SIZE);
 }

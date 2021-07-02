@@ -35,8 +35,8 @@ export function useLendingMarkets() {
   };
 }
 
-export function useLendingMarket(address?: string | PublicKey) {
-  const id = typeof address === 'string' ? address : address?.toBase58();
+export function useLendingMarket(address: string | PublicKey) {
+  const id = typeof address === 'string' ? address : address.toBase58();
   const [lendingMarket, setLendingMarket] = useState<
     ParsedAccount<LendingMarket>
   >(cache.get(id || '') as ParsedAccount<LendingMarket>);

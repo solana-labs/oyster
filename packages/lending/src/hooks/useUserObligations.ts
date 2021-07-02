@@ -12,29 +12,27 @@ export function useUserObligations() {
         obligation =>
           obligation.info.owner.toBase58() === wallet?.publicKey?.toBase58(),
       )
-      .map(obligation => ({ obligation }))
-      .sort(
-        (a, b) =>
-          b.obligation.info.borrowedValue.minus(a.obligation.info.borrowedValue).toNumber(),
+      .sort((a, b) =>
+        b.info.borrowedValue.minus(a.info.borrowedValue).toNumber(),
       );
-  }, [obligations]);
+  }, [obligations, wallet]);
 
   return {
     userObligations,
     totalDepositedValue: userObligations.reduce(
-      (result, item) => result + item.obligation.info.depositedValue.toNumber(),
+      (result, item) => result + item.info.depositedValue.toNumber(),
       0,
     ),
     totalBorrowedValue: userObligations.reduce(
-      (result, item) => result + item.obligation.info.borrowedValue.toNumber(),
+      (result, item) => result + item.info.borrowedValue.toNumber(),
       0,
     ),
   };
 }
 
 export const useUserObligation = (address: string) => {
-  const userObligations = useUserObligations();
-  return userObligations.userObligations.find(
-    obligation => obligation.obligation.pubkey.toBase58() === address,
+  const { userObligations } = useUserObligations();
+  return userObligations.find(
+    obligation => obligation.pubkey.toBase58() === address,
   );
 };
