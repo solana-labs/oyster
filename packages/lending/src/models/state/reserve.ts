@@ -1,129 +1,17 @@
-import { wadToLamports } from '@oyster/common';
+import { AccountParser, wadToLamports } from '@oyster/common';
+import { parseReserve, Reserve } from '@solana/spl-token-lending';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import * as BufferLayout from 'buffer-layout';
-import * as Layout from '../../utils/layout';
-import { LastUpdate, LastUpdateLayout } from './lastUpdate';
 
-export interface Reserve {
-  version: number;
-  lastUpdate: LastUpdate;
-  lendingMarket: PublicKey;
-  liquidity: ReserveLiquidity;
-  collateral: ReserveCollateral;
-  config: ReserveConfig;
-}
-
-export interface ReserveLiquidity {
-  mintPubkey: PublicKey;
-  mintDecimals: number;
-  supplyPubkey: PublicKey;
-  feeReceiver: PublicKey;
-  oraclePubkey: PublicKey;
-  availableAmount: BN;
-  borrowedAmountWads: BN; // decimals
-  cumulativeBorrowRateWads: BN; // decimals
-  marketPrice: BN; // decimals
-}
-
-export interface ReserveCollateral {
-  mintPubkey: PublicKey;
-  mintTotalSupply: BN;
-  supplyPubkey: PublicKey;
-}
-
-export interface ReserveConfig {
-  optimalUtilizationRate: number;
-  loanToValueRatio: number;
-  liquidationBonus: number;
-  liquidationThreshold: number;
-  minBorrowRate: number;
-  optimalBorrowRate: number;
-  maxBorrowRate: number;
-  fees: {
-    borrowFeeWad: BN;
-    hostFeePercentage: number;
-  };
-}
-
-export const ReserveLayout = BufferLayout.struct<Reserve>(
-  [
-    BufferLayout.u8('version'),
-
-    LastUpdateLayout,
-
-    Layout.publicKey('lendingMarket'),
-
-    BufferLayout.struct(
-      [
-        Layout.publicKey('mintPubkey'),
-        BufferLayout.u8('mintDecimals'),
-        Layout.publicKey('supplyPubkey'),
-        Layout.publicKey('feeReceiver'),
-        Layout.publicKey('oraclePubkey'),
-        Layout.uint64('availableAmount'),
-        Layout.uint128('borrowedAmountWads'),
-        Layout.uint128('cumulativeBorrowRateWads'),
-        Layout.uint128('marketPrice'),
-      ],
-      'liquidity',
-    ),
-
-    BufferLayout.struct(
-      [
-        Layout.publicKey('mintPubkey'),
-        Layout.uint64('mintTotalSupply'),
-        Layout.publicKey('supplyPubkey'),
-      ],
-      'collateral'
-    ),
-
-    BufferLayout.struct(
-      [
-        BufferLayout.u8('optimalUtilizationRate'),
-        BufferLayout.u8('loanToValueRatio'),
-        BufferLayout.u8('liquidationBonus'),
-        BufferLayout.u8('liquidationThreshold'),
-        BufferLayout.u8('minBorrowRate'),
-        BufferLayout.u8('optimalBorrowRate'),
-        BufferLayout.u8('maxBorrowRate'),
-        BufferLayout.struct(
-          [
-            Layout.uint64('borrowFeeWad'),
-            Layout.uint64('flashLoanFeeWad'),
-            BufferLayout.u8('hostFeePercentage')
-          ],
-          'fees',
-        ),
-      ],
-      'config'
-    ),
-
-    BufferLayout.blob(248, 'padding'),
-  ],
-);
-
-export const isReserve = (info: AccountInfo<Buffer>) => {
-  return info.data.length === ReserveLayout.span;
-};
-
-export const ReserveParser = (pubkey: PublicKey, info: AccountInfo<Buffer>) => {
-  const buffer = Buffer.from(info.data);
-  const reserve = ReserveLayout.decode(buffer);
-
-  if (reserve.lastUpdate.slot.isZero()) {
-    return;
+export const ReserveParser: AccountParser = (
+  pubkey: PublicKey,
+  info: AccountInfo<Buffer>,
+) => {
+  const parsed = parseReserve(pubkey, info);
+  if (parsed) {
+    const { pubkey, info: account, data: info } = parsed;
+    return { pubkey, account, info };
   }
-
-  const details = {
-    pubkey,
-    account: {
-      ...info,
-    },
-    info: reserve,
-  };
-
-  return details;
 };
 
 export const calculateUtilizationRatio = (reserve: Reserve) => {
@@ -174,3 +62,37 @@ export const liquidityToCollateral = (
       : liquidityAmount.toNumber();
   return Math.floor(amount * collateralExchangeRate(reserve));
 };
+
+// deposit APY utilization currentUtilizationRate * borrowAPY
+
+export const calculateBorrowAPY = (reserve: Reserve) => {
+  const currentUtilization = calculateUtilizationRatio(reserve);
+  const optimalUtilization = reserve.config.optimalUtilizationRate / 100;
+
+  let borrowAPY;
+  if (optimalUtilization === 1.0 || currentUtilization < optimalUtilization) {
+    const normalizedFactor = currentUtilization / optimalUtilization;
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const minBorrowRate = reserve.config.minBorrowRate / 100;
+    borrowAPY =
+      normalizedFactor * (optimalBorrowRate - minBorrowRate) + minBorrowRate;
+  } else {
+    const normalizedFactor =
+      (currentUtilization - optimalUtilization) / (1 - optimalUtilization);
+    const optimalBorrowRate = reserve.config.optimalBorrowRate / 100;
+    const maxBorrowRate = reserve.config.maxBorrowRate / 100;
+    borrowAPY =
+      normalizedFactor * (maxBorrowRate - optimalBorrowRate) +
+      optimalBorrowRate;
+  }
+
+  return borrowAPY;
+};
+
+export const calculateDepositAPY = (reserve: Reserve) => {
+  const currentUtilization = calculateUtilizationRatio(reserve);
+
+  const borrowAPY = calculateBorrowAPY(reserve);
+  return currentUtilization * borrowAPY;
+};
+
