@@ -21,6 +21,10 @@ export function getGovernanceUrl(
   return getItemUrl('governance', governance, programId);
 }
 
+export function getHomeUrl(programId: PublicKey) {
+  return `/?programId=${programId.toBase58()}`;
+}
+
 export function getItemUrl(
   itemName: string,
   itemId: PublicKey | string,

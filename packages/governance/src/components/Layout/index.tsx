@@ -7,6 +7,8 @@ import { LABELS } from '../../constants';
 import { components } from '@oyster/common';
 import { Content, Header } from 'antd/lib/layout/layout';
 import Logo from './dark-horizontal-combined-rainbow.inline.svg';
+import { useRpcContext } from '../../hooks/useRpcContext';
+import { getHomeUrl } from '../../tools/routeTools';
 
 const { AppBar } = components;
 
@@ -44,9 +46,7 @@ export const AppLayout = React.memo((props: any) => {
       <Layout title={LABELS.APP_TITLE}>
         <Header className="App-Bar">
           <div className="app-title">
-            <Link to="/">
-              <img alt={`Solana Logo`} src={Logo} style={{ height: 40 }} />
-            </Link>
+            <HomeUrl></HomeUrl>
           </div>
           <AppBar useWalletBadge={true} />
         </Header>
@@ -58,3 +58,13 @@ export const AppLayout = React.memo((props: any) => {
     </div>
   );
 });
+
+const HomeUrl = () => {
+  const { programId } = useRpcContext();
+
+  return (
+    <Link to={getHomeUrl(programId)}>
+      <img alt={`Solana Logo`} src={Logo} style={{ height: 40 }} />
+    </Link>
+  );
+};
