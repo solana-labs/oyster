@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, InputNumber } from 'antd';
 import { Form } from 'antd';
 
-import { contexts, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../../constants';
@@ -14,9 +14,7 @@ import '../style.less';
 
 import { formDefaults } from '../../../tools/forms';
 import InstructionInput from './InstructionInput';
-
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 export function NewInstructionCard({
   proposal,
@@ -26,8 +24,7 @@ export function NewInstructionCard({
   governance: ParsedAccount<Governance>;
 }) {
   const [form] = Form.useForm();
-  const { wallet } = useWallet();
-  const connection = useConnection();
+  const rpcContext = useRpcContext();
 
   const proposalAuthority = useProposalAuthority(
     proposal.info.tokenOwnerRecord,
@@ -42,8 +39,7 @@ export function NewInstructionCard({
 
     try {
       await insertInstruction(
-        connection,
-        wallet,
+        rpcContext,
         proposal,
         proposalAuthority!.pubkey,
         index,
