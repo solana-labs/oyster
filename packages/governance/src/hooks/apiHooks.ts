@@ -19,6 +19,7 @@ import {
 } from './accountHooks';
 
 import { useWallet } from '@oyster/common';
+import { useRpcContext } from './useRpcContext';
 
 // ----- Governance -----
 
@@ -67,7 +68,7 @@ export function useWalletTokenOwnerRecord(
   realm: PublicKey | undefined,
   governingTokenMint: PublicKey | undefined,
 ) {
-  const { wallet } = useWallet();
+  const { wallet, programId } = useRpcContext();
 
   return useGovernanceAccountByPda<TokenOwnerRecord>(
     TokenOwnerRecord,
@@ -77,6 +78,7 @@ export function useWalletTokenOwnerRecord(
       }
 
       return await getTokenOwnerAddress(
+        programId,
         realm,
         governingTokenMint,
         wallet.publicKey,
@@ -112,7 +114,7 @@ export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
 // ----- Signatory Record -----
 
 export function useWalletSignatoryRecord(proposal: PublicKey) {
-  const { wallet } = useWallet();
+  const { wallet, programId } = useRpcContext();
 
   return useGovernanceAccountByPda<SignatoryRecord>(
     SignatoryRecord,
@@ -121,7 +123,11 @@ export function useWalletSignatoryRecord(proposal: PublicKey) {
         return;
       }
 
-      return await getSignatoryRecordAddress(proposal, wallet.publicKey);
+      return await getSignatoryRecordAddress(
+        programId,
+        proposal,
+        wallet.publicKey,
+      );
     },
     [wallet?.publicKey, proposal],
   );

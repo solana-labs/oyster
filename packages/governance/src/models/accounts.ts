@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { utils, constants } from '@oyster/common';
+import { constants } from '@oyster/common';
 
 const { ZERO } = constants;
 
@@ -213,12 +213,11 @@ export class TokenOwnerRecord {
 }
 
 export async function getTokenOwnerAddress(
+  programId: PublicKey,
   realm: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
 ) {
-  const PROGRAM_IDS = utils.programIds();
-
   const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
@@ -226,7 +225,7 @@ export async function getTokenOwnerAddress(
       governingTokenMint.toBuffer(),
       governingTokenOwner.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   return tokenOwnerRecordAddress;
@@ -360,18 +359,17 @@ export class SignatoryRecord {
 }
 
 export async function getSignatoryRecordAddress(
+  programId: PublicKey,
   proposal: PublicKey,
   signatory: PublicKey,
 ) {
-  const PROGRAM_IDS = utils.programIds();
-
   const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
       proposal.toBuffer(),
       signatory.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   return signatoryRecordAddress;

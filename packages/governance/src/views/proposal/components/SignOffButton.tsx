@@ -4,13 +4,13 @@ import { PublicKey } from '@solana/web3.js';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { signOffProposal } from '../../../actions/signOffProposal';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 import { SignatoryRecord } from '../../../models/accounts';
 
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 
 export default function SignOffButton({
   signatoryRecord,
@@ -18,7 +18,7 @@ export default function SignOffButton({
   signatoryRecord: ParsedAccount<SignatoryRecord>;
 }) {
   const { wallet } = useWallet();
-  const connection = useConnection();
+  const rpcContext = useRpcContext();
 
   return (
     <>
@@ -36,8 +36,7 @@ export default function SignOffButton({
 
               onOk() {
                 return signOffProposal(
-                  connection,
-                  wallet,
+                  rpcContext,
                   signatoryRecord,
                   wallet!.publicKey as PublicKey,
                 );

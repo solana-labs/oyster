@@ -11,13 +11,14 @@ import { CreateTokenGovernanceArgs } from './instructions';
 
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   config: GovernanceConfig,
   transferTokenOwner: boolean,
   tokenOwner: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId, token: tokenId } = utils.programIds();
 
   const args = new CreateTokenGovernanceArgs({
     config,
@@ -31,7 +32,7 @@ export const withCreateTokenGovernance = async (
       realm.toBuffer(),
       config.governedAccount.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -61,12 +62,12 @@ export const withCreateTokenGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.token,
+      pubkey: tokenId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
@@ -80,7 +81,7 @@ export const withCreateTokenGovernance = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

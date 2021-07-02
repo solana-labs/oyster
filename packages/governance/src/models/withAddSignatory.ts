@@ -11,18 +11,20 @@ import { getSignatoryRecordAddress } from './accounts';
 
 export const withAddSignatory = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   signatory: PublicKey,
   payer: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId } = utils.programIds();
 
   const args = new AddSignatoryArgs({ signatory });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
+    programId,
     proposal,
     signatory,
   );
@@ -54,7 +56,7 @@ export const withAddSignatory = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isSigner: false,
       isWritable: false,
     },
@@ -68,7 +70,7 @@ export const withAddSignatory = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

@@ -12,10 +12,13 @@ import { LABELS } from '../../constants';
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { useWalletTokenOwnerRecords } from '../../hooks/apiHooks';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
+import { useRpcContext } from '../../hooks/useRpcContext';
+import { getRealmUrl } from '../../tools/routeTools';
 
 export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
+  const { programIdBase58 } = useRpcContext();
   const tokenOwnerRecords = useWalletTokenOwnerRecords();
 
   const realmItems = useMemo(() => {
@@ -37,7 +40,7 @@ export const HomeView = () => {
           );
 
         return {
-          href: '/realm/' + r.pubkey.toBase58(),
+          href: getRealmUrl(r.pubkey, programIdBase58),
           title: r.info.name,
           badge: (
             <RealmBadge
@@ -54,7 +57,7 @@ export const HomeView = () => {
           ),
         };
       });
-  }, [realms, tokenOwnerRecords]);
+  }, [realms, tokenOwnerRecords, programIdBase58]);
 
   return (
     <>

@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -10,12 +9,11 @@ import { SignOffProposalArgs } from './instructions';
 
 export const withSignOffProposal = (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   proposal: PublicKey,
   signatoryRecord: PublicKey,
   signatory: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   const args = new SignOffProposalArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -45,7 +43,7 @@ export const withSignOffProposal = (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

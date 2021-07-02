@@ -12,6 +12,7 @@ import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   governance: PublicKey,
   name: string,
@@ -25,7 +26,7 @@ export const withCreateProposal = async (
   proposalAddress: PublicKey;
   tokenOwnerRecordAddress: PublicKey;
 }> => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId } = utils.programIds();
 
   const args = new CreateProposalArgs({
     name,
@@ -44,7 +45,7 @@ export const withCreateProposal = async (
       governingTokenMint.toBuffer(),
       proposalIndexBuffer,
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
@@ -54,7 +55,7 @@ export const withCreateProposal = async (
       governingTokenMint.toBuffer(),
       governingTokenOwner.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -84,7 +85,7 @@ export const withCreateProposal = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
@@ -103,7 +104,7 @@ export const withCreateProposal = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

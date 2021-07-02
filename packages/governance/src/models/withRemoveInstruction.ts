@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
@@ -6,14 +5,13 @@ import { RemoveInstructionArgs } from './instructions';
 
 export const withRemoveInstruction = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   proposalInstruction: PublicKey,
   beneficiary: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   const args = new RemoveInstructionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -48,7 +46,7 @@ export const withRemoveInstruction = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

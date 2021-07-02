@@ -11,13 +11,17 @@ import { CreateProgramGovernanceArgs } from './instructions';
 
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   config: GovernanceConfig,
   transferUpgradeAuthority: boolean,
   programUpgradeAuthority: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const PROGRAM_IDS = utils.programIds();
+  const {
+    system: systemId,
+    bpf_upgrade_loader: bpfUpgradableLoaderId,
+  } = utils.programIds();
 
   const args = new CreateProgramGovernanceArgs({
     config,
@@ -31,12 +35,12 @@ export const withCreateProgramGovernance = async (
       realm.toBuffer(),
       config.governedAccount.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [config.governedAccount.toBuffer()],
-    PROGRAM_IDS.bpf_upgrade_loader,
+    bpfUpgradableLoaderId,
   );
 
   const keys = [
@@ -66,12 +70,12 @@ export const withCreateProgramGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.bpf_upgrade_loader,
+      pubkey: bpfUpgradableLoaderId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
@@ -85,7 +89,7 @@ export const withCreateProgramGovernance = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

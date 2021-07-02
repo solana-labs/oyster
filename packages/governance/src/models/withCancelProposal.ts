@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -10,12 +9,11 @@ import { CancelProposalArgs } from './instructions';
 
 export const withCancelProposal = (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
-
   const args = new CancelProposalArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -45,7 +43,7 @@ export const withCancelProposal = (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

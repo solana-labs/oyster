@@ -1,12 +1,12 @@
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { withCreateProposal } from '../models/withCreateProposal';
 import { withAddSignatory } from '../models/withAddSignatory';
 import { sendTransactionWithNotifications } from '../tools/transactions';
+import { RpcContext } from '../models/api';
 
 export const createProposal = async (
-  connection: Connection,
-  wallet: any,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
   governance: PublicKey,
   name: string,
@@ -16,18 +16,19 @@ export const createProposal = async (
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
-  let governanceAuthority = wallet.publicKey;
-  let signatory = wallet.publicKey;
-  let payer = wallet.publicKey;
+  let governanceAuthority = walletPubkey;
+  let signatory = walletPubkey;
+  let payer = walletPubkey;
 
   const { proposalAddress, tokenOwnerRecordAddress } = await withCreateProposal(
     instructions,
+    programId,
     realm,
     governance,
     name,
     descriptionLink,
     governingTokenMint,
-    wallet.publicKey,
+    walletPubkey,
     governanceAuthority,
     proposalIndex,
     payer,
@@ -36,6 +37,7 @@ export const createProposal = async (
   // Add the proposal creator as the default signatory
   await withAddSignatory(
     instructions,
+    programId,
     proposalAddress,
     tokenOwnerRecordAddress,
     governanceAuthority,

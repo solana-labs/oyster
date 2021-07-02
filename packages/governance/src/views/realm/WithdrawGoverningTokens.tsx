@@ -3,16 +3,15 @@ import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { Realm } from '../../models/accounts';
 import { LABELS } from '../../constants';
-import { contexts, hooks } from '@oyster/common';
+import { hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { withdrawGoverningTokens } from '../../actions/withdrawGoverningTokens';
 
 import { PublicKey } from '@solana/web3.js';
 import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
+import { useRpcContext } from '../../hooks/useRpcContext';
 
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 
 const { confirm, error } = Modal;
@@ -25,8 +24,7 @@ export function WithdrawGoverningTokens({
   governingTokenMint?: PublicKey;
   tokenName?: string;
 }) {
-  const wallet = useWallet();
-  const connection = useConnection();
+  const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
@@ -68,11 +66,10 @@ export function WithdrawGoverningTokens({
           onOk: async () => {
             if (governingTokenAccount) {
               await withdrawGoverningTokens(
-                connection,
+                rpcContext,
                 realm!.pubkey,
                 governingTokenAccount.pubkey,
                 governingTokenMint,
-                wallet.wallet,
               );
             }
           },

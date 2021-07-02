@@ -4,7 +4,6 @@ import React from 'react';
 
 import { LABELS } from '../../../constants';
 
-import { contexts } from '@oyster/common';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './style.less';
@@ -21,9 +20,7 @@ import { Vote } from '../../../models/instructions';
 import { castVote } from '../../../actions/castVote';
 import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
 import { useWalletVoteRecord } from '../../../hooks/apiHooks';
-
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 const { confirm } = Modal;
 export function CastVote({
@@ -37,8 +34,7 @@ export function CastVote({
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
   vote: Vote;
 }) {
-  const { wallet } = useWallet();
-  const connection = useConnection();
+  const rpcContext = useRpcContext();
   const voteRecord = useWalletVoteRecord(proposal.pubkey);
   const hasVotingTimeExpired = useHasVotingTimeExpired(governance, proposal);
 
@@ -82,13 +78,7 @@ export function CastVote({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            castVote(
-              connection,
-              wallet,
-              proposal,
-              tokenOwnerRecord.pubkey,
-              vote,
-            );
+            castVote(rpcContext, proposal, tokenOwnerRecord.pubkey, vote);
           },
         })
       }

@@ -11,6 +11,7 @@ import { GOVERNANCE_PROGRAM_SEED, InstructionData } from './accounts';
 
 export const withInsertInstruction = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -20,7 +21,7 @@ export const withInsertInstruction = async (
   instructionData: InstructionData,
   payer: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId } = utils.programIds();
 
   const args = new InsertInstructionArgs({
     index,
@@ -38,7 +39,7 @@ export const withInsertInstruction = async (
       proposal.toBuffer(),
       instructionIndexBuffer,
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -73,7 +74,7 @@ export const withInsertInstruction = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isSigner: false,
       isWritable: false,
     },
@@ -87,7 +88,7 @@ export const withInsertInstruction = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

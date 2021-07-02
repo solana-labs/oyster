@@ -20,12 +20,15 @@ import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import AccountDescription from './accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
+import { useRpcContext } from '../../hooks/useRpcContext';
+import { getGovernanceUrl } from '../../tools/routeTools';
 
 const { Text } = Typography;
 
 export const RealmView = () => {
   const history = useHistory();
   let realmKey = useKeyParam();
+  const { programIdBase58 } = useRpcContext();
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);
@@ -49,12 +52,12 @@ export const RealmView = () => {
       )
       .map(g => ({
         key: g.pubkey.toBase58(),
-        href: '/governance/' + g.pubkey,
+        href: getGovernanceUrl(g.pubkey, programIdBase58),
         title: g.info.config.governedAccount.toBase58(),
         badge: <GovernanceBadge governance={g}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
-  }, [governances]);
+  }, [governances, programIdBase58]);
 
   return (
     <>

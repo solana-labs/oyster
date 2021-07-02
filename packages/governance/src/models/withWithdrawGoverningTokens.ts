@@ -7,12 +7,13 @@ import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 
 export const withWithdrawGoverningTokens = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
 ) => {
-  const PROGRAM_IDS = utils.programIds();
+  const { token: tokenId } = utils.programIds();
 
   const args = new WithdrawGoverningTokensArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -24,7 +25,7 @@ export const withWithdrawGoverningTokens = async (
       governingTokenMint.toBuffer(),
       governingTokenOwner.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(
@@ -33,7 +34,7 @@ export const withWithdrawGoverningTokens = async (
       realm.toBuffer(),
       governingTokenMint.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -60,7 +61,7 @@ export const withWithdrawGoverningTokens = async (
     },
 
     {
-      pubkey: PROGRAM_IDS.token,
+      pubkey: tokenId,
       isWritable: false,
       isSigner: false,
     },
@@ -69,7 +70,7 @@ export const withWithdrawGoverningTokens = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

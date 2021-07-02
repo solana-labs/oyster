@@ -11,11 +11,12 @@ import { CreateAccountGovernanceArgs } from './instructions';
 
 export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],
+  programId: PublicKey,
   realm: PublicKey,
   config: GovernanceConfig,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const PROGRAM_IDS = utils.programIds();
+  const { system: systemId } = utils.programIds();
 
   const args = new CreateAccountGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -26,7 +27,7 @@ export const withCreateAccountGovernance = async (
       realm.toBuffer(),
       config.governedAccount.toBuffer(),
     ],
-    PROGRAM_IDS.governance.programId,
+    programId,
   );
 
   const keys = [
@@ -46,7 +47,7 @@ export const withCreateAccountGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: PROGRAM_IDS.system,
+      pubkey: systemId,
       isWritable: false,
       isSigner: false,
     },
@@ -60,7 +61,7 @@ export const withCreateAccountGovernance = async (
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: PROGRAM_IDS.governance.programId,
+      programId,
       data,
     }),
   );

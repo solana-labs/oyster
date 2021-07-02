@@ -12,11 +12,14 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
+import { getProposalUrl } from '../../tools/routeTools';
+import { useRpcContext } from '../../hooks/useRpcContext';
 
 const PAGE_SIZE = 10;
 
 export const GovernanceView = () => {
   const history = useHistory();
+  const { programIdBase58 } = useRpcContext();
 
   const [, setPage] = useState(0);
   const { tokenMap } = useConnectionConfig();
@@ -45,7 +48,7 @@ export const GovernanceView = () => {
       )
       .map(p => ({
         key: p.pubkey.toBase58(),
-        href: '/proposal/' + p.pubkey,
+        href: getProposalUrl(p.pubkey, programIdBase58),
         title: p.info.name,
         badge:
           p.info.state === ProposalState.Voting ? (
@@ -57,7 +60,7 @@ export const GovernanceView = () => {
           ),
         state: p.info.state,
       }));
-  }, [proposals]);
+  }, [proposals, programIdBase58]);
 
   return (
     <Row

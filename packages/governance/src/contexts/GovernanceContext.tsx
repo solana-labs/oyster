@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Connection, KeyedAccountInfo, PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
+import { KeyedAccountInfo, PublicKey } from '@solana/web3.js';
 
-import { utils, ParsedAccount, useConnectionConfig } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
 import { getRealms } from '../models/api';
 import { EventEmitter } from 'eventemitter3';
+import { useRpcContext } from '../hooks/useRpcContext';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
@@ -46,24 +46,18 @@ export const GovernanceContext =
   React.createContext<GovernanceContextState | null>(null);
 
 export default function GovernanceProvider({ children = null as any }) {
-  const { endpoint } = useConnectionConfig();
-
-  const connection = useMemo(
-    () => new Connection(endpoint, 'recent'),
-    [endpoint],
-  );
+  const rpcContext = useRpcContext();
+  const { connection, programId } = rpcContext;
 
   const [realms, setRealms] = useState({});
 
   useEffect(() => {
     const sub = (async () => {
-      const realms = await getRealms(endpoint);
+      const realms = await getRealms(rpcContext);
       setRealms(realms);
 
-      const PROGRAM_IDS = utils.programIds();
-
       return connection.onProgramAccountChange(
-        PROGRAM_IDS.governance.programId,
+        programId,
         async (info: KeyedAccountInfo) => {
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
             const realm = BorshAccountParser(Realm)(

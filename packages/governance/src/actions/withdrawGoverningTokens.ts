@@ -1,23 +1,24 @@
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { RpcContext } from '../models/api';
 
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const withdrawGoverningTokens = async (
-  connection: Connection,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
   governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
-  wallet: any,
 ) => {
   let instructions: TransactionInstruction[] = [];
 
   await withWithdrawGoverningTokens(
     instructions,
+    programId,
     realm,
     governingTokenDestination,
     governingTokenMint,
-    wallet.publicKey,
+    walletPubkey,
   );
 
   await sendTransactionWithNotifications(
