@@ -4,7 +4,7 @@ import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../constants';
-import { contexts, ParsedAccount } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
@@ -14,9 +14,7 @@ import { Governance, Realm, TokenOwnerRecord } from '../../models/accounts';
 import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
-
-const { useWallet } = contexts.Wallet;
-const { useConnection } = contexts.Connection;
+import { useRpcContext } from '../../hooks/useRpcContext';
 
 export function AddNewProposal({
   realm,
@@ -28,8 +26,7 @@ export function AddNewProposal({
   buttonProps?: ButtonProps;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
-  const connection = useConnection();
-  const { wallet } = useWallet();
+  const rpcContext = useRpcContext();
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.info.config.realm,
@@ -73,8 +70,7 @@ export function AddNewProposal({
     const proposalIndex = governance.info.proposalCount;
 
     return await createProposal(
-      connection,
-      wallet,
+      rpcContext,
       governance.info.config.realm,
       governance.pubkey,
       values.name,
