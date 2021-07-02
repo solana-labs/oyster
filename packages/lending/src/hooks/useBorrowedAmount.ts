@@ -13,7 +13,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
   const [borrowedInfo, setBorrowedInfo] = useState({
     borrowedLamports: 0,
     borrowedInUSD: 0,
-    colateralInUSD: 0,
+    collateralInUSD: 0,
     ltv: 0,
     health: 0,
   });
@@ -24,43 +24,35 @@ export function useBorrowedAmount(address?: string | PublicKey) {
     setBorrowedInfo({
       borrowedLamports: 0,
       borrowedInUSD: 0,
-      colateralInUSD: 0,
+      collateralInUSD: 0,
       ltv: 0,
       health: 0,
     });
 
     (async () => {
       const result = {
-        borrowedLamports: 0,
+        borrowedLamports: wadToLamports(reserve.info.liquidity.borrowedAmountWads).toNumber(),
         borrowedInUSD: 0,
-        colateralInUSD: 0,
+        collateralInUSD: 0,
         ltv: 0,
         health: 0,
       };
 
-      let liquidationThreshold = 0;
+      let liquidationThreshold = reserve.info.config.liquidationThreshold;
 
+      // @FIXME: see if this requires obligations
       userObligationsByReserve.forEach(item => {
-        // @FIXME: support multiple borrows, and decimals may be different than lamports
-        const borrowedLamports = wadToLamports(
-          item.obligation.info.borrows[0].borrowedAmountWads,
-        ).toNumber();
-
-        // @FIXME: obligation tokens
-        result.borrowedLamports += borrowedLamports;
-        result.borrowedInUSD += item.obligation.info.borrowedInQuote;
-        result.colateralInUSD += item.obligation.info.collateralInQuote;
-        // @FIXME: BigNumber
-        liquidationThreshold = item.obligation.info.liquidationThreshold;
+        result.borrowedInUSD += item.obligation.info.borrowedValue;
+        result.collateralInUSD += item.obligation.info.depositedValue;
       }, 0);
 
       if (userObligationsByReserve.length === 1) {
         result.ltv = userObligationsByReserve[0].obligation.info.ltv;
         result.health = userObligationsByReserve[0].obligation.info.health;
       } else {
-        result.ltv = (100 * result.borrowedInUSD) / result.colateralInUSD;
+        result.ltv = (100 * result.borrowedInUSD) / result.collateralInUSD;
         result.health =
-          (result.colateralInUSD * liquidationThreshold) /
+          (result.collateralInUSD * liquidationThreshold) /
           100 /
           result.borrowedInUSD;
         result.health = Number.isFinite(result.health) ? result.health : 0;
@@ -68,7 +60,7 @@ export function useBorrowedAmount(address?: string | PublicKey) {
 
       setBorrowedInfo(result);
     })();
-  }, [connection, userObligationsByReserve, setBorrowedInfo]);
+  }, [connection, reserve, userObligationsByReserve, setBorrowedInfo]);
 
   return {
     borrowed: fromLamports(borrowedInfo.borrowedLamports, liquidityMint),

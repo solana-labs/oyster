@@ -1,7 +1,6 @@
 export * from './useBorrowedAmount';
 export * from './useBorrowingPower';
 export * from './useCollateralBalance';
-export * from './useEnrichedLendingObligations';
 export * from './useLendingMarket';
 export * from './useLendingObligations';
 export * from './useLendingReserves';

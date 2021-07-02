@@ -57,7 +57,7 @@ export const HomeView = () => {
         marketSize: fromLamports(marketCapLamports, liquidityMint.info) * price,
         borrowed:
           fromLamports(
-            wadToLamports(item.info.liquidity.borrowedAmountWads).toNumber(),
+            wadToLamports(item.info.liquidity.borrowedAmountWads),
             liquidityMint.info,
           ) * price,
         name: getTokenName(tokenMap, mint),

@@ -1,46 +1,37 @@
-import { hooks, TokenAccount } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { useMemo } from 'react';
-import { useEnrichedLendingObligations } from './useEnrichedLendingObligations';
-
-const { useUserAccounts } = hooks;
+import { useLendingObligations } from './useLendingObligations';
 
 export function useUserObligations() {
-  const { userAccounts } = useUserAccounts();
-  const { obligations } = useEnrichedLendingObligations();
-
-  // @FIXME: obligation tokens were removed, simplify this
-  const accountsByMint = useMemo(() => {
-    return userAccounts.reduce((res, acc) => {
-      const id = acc.info.mint.toBase58();
-      res.set(id, [...(res.get(id) || []), acc]);
-      return res;
-    }, new Map<string, TokenAccount[]>());
-  }, [userAccounts]);
+  const { wallet } = useWallet();
+  const { obligations } = useLendingObligations();
 
   const userObligations = useMemo(() => {
-    if (accountsByMint.size === 0) {
-      return [];
-    }
-
-    // @FIXME: obligation tokens were removed, simplify this
     return obligations
-      .map(ob => {
-        return {
-          obligation: ob,
-          userAccounts: [],
-        };
-      })
+      .filter(
+        obligation =>
+          obligation.info.owner.toBase58() === wallet?.publicKey?.toBase58(),
+      )
+      .map(obligation => ({ obligation }))
       .sort(
         (a, b) =>
-          b.obligation.info.borrowedInQuote - a.obligation.info.borrowedInQuote,
+          b.obligation.info.borrowedValue.toNumber() -
+          a.obligation.info.borrowedValue.toNumber(),
       );
-  }, [accountsByMint, obligations]);
+  }, [obligations]);
 
   return {
     userObligations,
     totalInQuote: userObligations.reduce(
-      (result, item) => result + item.obligation.info.borrowedInQuote,
+      (result, item) => result + item.obligation.info.borrowedValue.toNumber(),
       0,
     ),
   };
 }
+
+export const useUserObligation = (address: string) => {
+  const userObligations = useUserObligations();
+  return userObligations.userObligations.find(
+    obligation => obligation.obligation.pubkey.toBase58() === address,
+  );
+};
