@@ -10,7 +10,7 @@ import { LendingMarket, Reserve } from '@solana/spl-token-lending';
 import { Card, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
-  useLendingReserves,
+  useReserves,
   useUserBalance,
   useUserDeposits,
 } from '../../hooks';
@@ -41,7 +41,7 @@ export default function CollateralInput(props: {
   const { balance: tokenBalance } = useUserBalance(
     props.reserve.liquidity.mintPubkey,
   );
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const { tokenMap } = useConnectionConfig();
   const [depositReserve, setCollateralReserve] = useState<string>();
   const [balance, setBalance] = useState<number>(0);

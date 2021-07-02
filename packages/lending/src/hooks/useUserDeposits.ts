@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePyth } from '../contexts/pyth';
 import { calculateDepositAPY } from '../models';
 import { calculateCollateralBalance } from './useCollateralBalance';
-import { useLendingReserves } from './useLendingReserves';
+import { useReserves } from './useReserves';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -31,7 +31,7 @@ export interface UserDeposit {
 
 export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   const { userAccounts } = useUserAccounts();
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const [userDeposits, setUserDeposits] = useState<UserDeposit[]>([]);
   const { getPrice } = usePyth();
   const { tokenMap } = useConnectionConfig();

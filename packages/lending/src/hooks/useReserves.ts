@@ -8,22 +8,22 @@ import { ReserveParser } from '../models';
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
-export const getLendingReserves = () => {
+export const getReserves = () => {
   return cache
     .byParser(ReserveParser)
     .map(id => cache.get(id))
     .filter(acc => acc !== undefined) as ParsedAccount<Reserve>[];
 };
 
-export function useLendingReserves() {
+export function useReserves() {
   const [reserveAccounts, setReserveAccounts] = useState<
     ParsedAccount<Reserve>[]
-  >(getLendingReserves());
+  >(getReserves());
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.parser === ReserveParser) {
-        setReserveAccounts(getLendingReserves());
+        setReserveAccounts(getReserves());
       }
     });
 
@@ -37,9 +37,9 @@ export function useLendingReserves() {
   };
 }
 
-export function useLendingReserve(address?: string | PublicKey) {
+export function useReserve(address?: string | PublicKey) {
   const { tokenMap } = useConnectionConfig();
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   let addressName = address;
   if (typeof address === 'string') {
     const token: TokenInfo | null = getTokenByName(tokenMap, address);

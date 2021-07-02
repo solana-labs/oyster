@@ -7,7 +7,7 @@ import {
 } from '@solana/spl-token-lending';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLendingReserves } from '../hooks';
+import { useReserves } from '../hooks';
 import {
   LendingMarketParser,
   ObligationParser,
@@ -38,7 +38,7 @@ export function LendingProvider({ children = null as any }) {
 export const useLending = () => {
   const connection = useConnection();
   const [lendingAccounts, setLendingAccounts] = useState<any[]>([]);
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const precacheMarkets = usePrecacheMarket();
 
   // TODO: query for all the dex from reserves

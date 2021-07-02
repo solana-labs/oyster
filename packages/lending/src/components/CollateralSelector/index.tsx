@@ -8,7 +8,7 @@ import {
 import { LendingMarket, Reserve } from '@solana/spl-token-lending';
 import { Select } from 'antd';
 import React from 'react';
-import { useLendingReserves, UserDeposit, useUserDeposits } from '../../hooks';
+import { useReserves, UserDeposit, useUserDeposits } from '../../hooks';
 
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
@@ -42,7 +42,7 @@ export const CollateralSelector = (props: {
   disabled?: boolean;
   onCollateralReserve?: (id: string) => void;
 }) => {
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const { tokenMap } = useConnectionConfig();
   const { userDeposits } = useUserDeposits();
 

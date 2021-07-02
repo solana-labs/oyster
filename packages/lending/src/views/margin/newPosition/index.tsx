@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useLendingReserve } from '../../../hooks';
+import { useReserve } from '../../../hooks';
 import Breakdown from './Breakdown';
 import { Position } from './interfaces';
 
@@ -10,7 +10,7 @@ import './style.less';
 
 export const NewPosition = () => {
   const { id } = useParams<{ id: string }>();
-  const lendingReserve = useLendingReserve(id);
+  const lendingReserve = useReserve(id);
   const [newPosition, setNewPosition] = useState<Position>({
     id: null,
     leverage: 5,

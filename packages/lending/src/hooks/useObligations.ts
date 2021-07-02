@@ -6,20 +6,20 @@ import { ObligationParser } from '../models';
 
 const { cache } = contexts.Accounts;
 
-const getLendingObligations = () => {
+const getObligations = () => {
   return cache
     .byParser(ObligationParser)
     .map(id => cache.get(id))
     .filter(acc => acc !== undefined) as ParsedAccount<Obligation>[];
 };
 
-export function useLendingObligations() {
-  const [obligations, setObligations] = useState(getLendingObligations());
+export function useObligations() {
+  const [obligations, setObligations] = useState(getObligations());
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.parser === ObligationParser) {
-        setObligations(getLendingObligations());
+        setObligations(getObligations());
       }
     });
 

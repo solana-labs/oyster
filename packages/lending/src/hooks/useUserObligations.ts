@@ -1,10 +1,10 @@
 import { useWallet } from '@oyster/common';
 import { useMemo } from 'react';
-import { useLendingObligations } from './useLendingObligations';
+import { useObligations } from './useObligations';
 
 export function useUserObligations() {
   const { wallet } = useWallet();
-  const { obligations } = useLendingObligations();
+  const { obligations } = useObligations();
 
   const userObligations = useMemo(() => {
     return obligations
@@ -15,14 +15,17 @@ export function useUserObligations() {
       .map(obligation => ({ obligation }))
       .sort(
         (a, b) =>
-          b.obligation.info.borrowedValue.toNumber() -
-          a.obligation.info.borrowedValue.toNumber(),
+          b.obligation.info.borrowedValue.minus(a.obligation.info.borrowedValue).toNumber(),
       );
   }, [obligations]);
 
   return {
     userObligations,
-    totalInQuote: userObligations.reduce(
+    totalDepositedValue: userObligations.reduce(
+      (result, item) => result + item.obligation.info.depositedValue.toNumber(),
+      0,
+    ),
+    totalBorrowedValue: userObligations.reduce(
       (result, item) => result + item.obligation.info.borrowedValue.toNumber(),
       0,
     ),

@@ -10,7 +10,7 @@ import { Card, Col, Row, Statistic } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { GUTTER, LABELS } from '../../constants';
 import { usePyth } from '../../contexts/pyth';
-import { useLendingReserves } from '../../hooks';
+import { useReserves } from '../../hooks';
 import { reserveMarketCap, Totals } from '../../models';
 import { BarChartStatistic } from './../../components/BarChartStatistic';
 import { LendingReserveItem } from './item';
@@ -20,7 +20,7 @@ const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
 export const HomeView = () => {
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const { getPrice } = usePyth();
   const { tokenMap } = useConnectionConfig();
   const [totals, setTotals] = useState<Totals>({
