@@ -3082,10 +3082,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@solana/spl-token-lending@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-lending/-/spl-token-lending-0.3.3.tgz#efc5813d6c45fc51340d530e8c9f498dfa4e75e7"
-  integrity sha512-CDNiNIu+31jLUO2ZduM4oEDXyOUn1Wwgim3/pyA0aiL7kOcOeatstnJWMUT3bsyy42FiY9GR+PT0eloShV6abg==
+"@solana/spl-token-lending@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-lending/-/spl-token-lending-0.3.6.tgz#df88587e2d8b65a5a1ff43b8f059b91ee168c411"
+  integrity sha512-T6o35YfN00UHtoVo3PK5yIVg6WZnHGZnyCfge8nQFPq/r9zW1Bcqg1XVv9Tz+bXEXgbihkW/p85KQQ29+Tjpng==
   dependencies:
     bigint-buffer "^1.1.5"
     bignumber.js "^9.0.1"

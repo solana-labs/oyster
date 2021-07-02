@@ -25,10 +25,11 @@ export const AppLayout = React.memo((props: any) => {
   const location = useLocation();
 
   const paths: { [key: string]: string } = {
+    '/': '1',
     '/markets': '2',
     '/reserves': '3',
     '/obligations': '4',
-    '/faucet': '8',
+    '/faucet': '5',
   };
 
   const current =
@@ -103,7 +104,7 @@ export const AppLayout = React.memo((props: any) => {
                   </Link>
                 </Menu.Item>
                 {env !== 'mainnet-beta' && (
-                  <Menu.Item key="8" icon={<RocketOutlined />}>
+                  <Menu.Item key="5" icon={<RocketOutlined />}>
                     <Link
                       to={{
                         pathname: '/faucet',
