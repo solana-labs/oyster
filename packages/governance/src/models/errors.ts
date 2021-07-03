@@ -67,15 +67,46 @@ export const GovernanceError: Record<number, string> = [
   'Proposal cool off time is not supported', // ProposalCoolOffTimeNotSupported
 ];
 
+export const TokenError: Record<number, string> = [
+  'Lamport balance below rent-exempt threshold', // NotRentExempt
+  'Insufficient funds', // InsufficientFunds
+  'Invalid Mint', // InvalidMint
+  'Account not associated with this Mint', // MintMismatch,
+  'Owner does not match', //  OwnerMismatch,
+  'Fixed supply', //  FixedSupply,
+  'Already in use', //   AlreadyInUse,
+  'Invalid number of provided signers', //  InvalidNumberOfProvidedSigners,
+  'Invalid number of required signers', //  InvalidNumberOfRequiredSigners,
+  'State is uninitialized', //  UninitializedState,
+  'Instruction does not support native tokens', // NativeNotSupported,
+  'Non-native account can only be closed if its balance is zero', //  NonNativeHasBalance,
+  'Invalid instruction', //  InvalidInstruction,
+  'State is invalid for requested operation', //  InvalidState,
+  'Operation overflowed', //  Overflow,
+  'Account does not support specified authority type', //  AuthorityTypeNotSupported,
+  'This token mint cannot freeze accounts', //  MintCannotFreeze,
+  'Account is frozen', //  AccountFrozen,
+  'The provided decimals value different from the Mint decimals', //  MintDecimalsMismatch,
+];
+
+const governanceErrorOffset = 500;
+
 export function getTransactionErrorMsg(error: SendTransactionError) {
   try {
     const instructionError = (error.txError as any).InstructionError[1];
 
-    return (
-      (instructionError.Custom !== undefined
-        ? GovernanceError[instructionError.Custom]
-        : instructionError) ?? ''
-    );
+    if (instructionError.Custom !== undefined) {
+      if (instructionError.Custom >= governanceErrorOffset) {
+        return GovernanceError[instructionError.Custom - governanceErrorOffset];
+      } else {
+        // If the error is not from the Governance error space then it's ambiguous because the custom errors share the same space
+        // And we can only use some heuristics here to guess what program returned the error
+        // For now the most common scenario is an error returned from the token program so I'm mapping the custom errors to it with the 'possible' warning
+        return `Possible error: ${TokenError[instructionError.Custom]}`;
+      }
+    }
+
+    return '';
   } catch {
     return JSON.stringify(error);
   }

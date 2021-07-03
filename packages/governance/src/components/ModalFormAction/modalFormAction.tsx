@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, ButtonProps, Modal } from 'antd';
+import { Alert, Button, ButtonProps, Modal, Space, Typography } from 'antd';
 import { Form } from 'antd';
 import './style.less';
 import { contexts, ExplorerLink } from '@oyster/common';
@@ -10,6 +10,8 @@ import {
   getTransactionErrorMsg,
   isWalletNotConnectedError,
 } from '../../models/errors';
+
+const { Text } = Typography;
 
 const { useWallet } = contexts.Wallet;
 
@@ -133,29 +135,29 @@ function ActionForm<TResult>({
       if (isSendTransactionError(ex)) {
         setError({
           txId: ex.txId,
-          message: `${getTransactionErrorMsg(ex).toString()}.`,
+          message: `${getTransactionErrorMsg(ex).toString()}`,
           recoveryAction:
-            'Please try to amend the inputs and submit the transaction again.',
+            'Please try to amend the inputs and submit the transaction again',
         });
       } else if (isSignTransactionError(ex)) {
         setError({
           header: "Couldn't sign the transaction",
           recoveryAction:
-            'Please try to submit and sign the transaction with your wallet again.',
+            'Please try to submit and sign the transaction with your wallet again',
         });
       } else if (isWalletNotConnectedError(ex)) {
         setError({
           header: "Can't submit the transaction",
           message: ex.message,
           recoveryAction:
-            'Please ensure your wallet is connected and submit the transaction again.',
+            'Please ensure your wallet is connected and submit the transaction again',
         });
       } else {
         setError({
           header: "Can't submit the transaction",
           message: ex.toString(),
           recoveryAction:
-            'Please try to amend the inputs and submit the transaction again.',
+            'Please try to amend the inputs and submit the transaction again',
         });
       }
     } finally {
@@ -186,8 +188,12 @@ function ActionForm<TResult>({
           }
           description={
             <>
-              {error.message && <div>{error.message}</div>}
-              <div>{error.recoveryAction}</div>
+              <Space direction="vertical">
+                {/* {error.message && <div>{error.message}</div>} */}
+                {error.message && <Text type="warning">{error.message}</Text>}
+
+                <Text type="secondary">{error.recoveryAction}</Text>
+              </Space>
             </>
           }
           type="error"
