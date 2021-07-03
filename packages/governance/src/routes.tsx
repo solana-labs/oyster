@@ -1,7 +1,7 @@
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { AppLayout } from './components/Layout';
+import { AppLayout } from './components/Layout/layout';
 import GovernanceProvider from './contexts/GovernanceContext';
 import { HomeView } from './views';
 import { ProposalView } from './views/proposal/ProposalView';
