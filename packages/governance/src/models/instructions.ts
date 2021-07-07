@@ -25,6 +25,7 @@ export enum GovernanceInstruction {
 
   CreateMintGovernance = 17,
   CreateTokenGovernance = 18,
+  SetGovernanceConfig = 19,
 }
 
 export class CreateRealmArgs {
@@ -95,6 +96,16 @@ export class CreateTokenGovernanceArgs {
   constructor(args: { config: GovernanceConfig; transferTokenOwner: boolean }) {
     this.config = args.config;
     this.transferTokenOwner = !!args.transferTokenOwner;
+  }
+}
+
+export class SetGovernanceConfigArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.SetGovernanceConfig;
+  config: GovernanceConfig;
+
+  constructor(args: { config: GovernanceConfig }) {
+    this.config = args.config;
   }
 }
 

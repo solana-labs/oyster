@@ -1,8 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { constants } from '@oyster/common';
-
-const { ZERO } = constants;
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -61,8 +58,17 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
 }
 
 export enum VoteThresholdPercentageType {
-  YesVote,
-  Quorum,
+  YesVote = 0,
+  Quorum = 1,
+}
+
+export class VoteThresholdPercentage {
+  type = VoteThresholdPercentageType.YesVote;
+  value: number;
+
+  constructor(args: { value: number }) {
+    this.value = args.value;
+  }
 }
 
 export enum VoteWeightSource {
@@ -71,11 +77,13 @@ export enum VoteWeightSource {
 }
 
 export enum InstructionExecutionStatus {
+  None,
   Success,
   Error,
 }
 
 export enum InstructionExecutionFlags {
+  None,
   Ordered,
   UseTransaction,
 }
@@ -85,7 +93,7 @@ export class Realm {
 
   communityMint: PublicKey;
 
-  reserved: BN;
+  reserved: Uint8Array;
 
   councilMint: PublicKey | undefined;
 
@@ -93,7 +101,7 @@ export class Realm {
 
   constructor(args: {
     communityMint: PublicKey;
-    reserved: BN;
+    reserved: Uint8Array;
     councilMint: PublicKey | undefined;
     name: string;
   }) {
@@ -107,8 +115,7 @@ export class Realm {
 export class GovernanceConfig {
   realm: PublicKey;
   governedAccount: PublicKey;
-  voteThresholdPercentageType: VoteThresholdPercentageType;
-  voteThresholdPercentage: number;
+  voteThresholdPercentage: VoteThresholdPercentage;
   minTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
@@ -118,8 +125,7 @@ export class GovernanceConfig {
   constructor(args: {
     realm: PublicKey;
     governedAccount: PublicKey;
-    voteThresholdPercentageType?: VoteThresholdPercentageType;
-    voteThresholdPercentage: number;
+    voteThresholdPercentage: VoteThresholdPercentage;
     minTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
@@ -128,8 +134,6 @@ export class GovernanceConfig {
   }) {
     this.realm = args.realm;
     this.governedAccount = args.governedAccount;
-    this.voteThresholdPercentageType =
-      args.voteThresholdPercentageType ?? VoteThresholdPercentageType.YesVote;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
     this.minTokensToCreateProposal = args.minTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
@@ -142,7 +146,7 @@ export class GovernanceConfig {
 export class Governance {
   accountType: GovernanceAccountType;
   config: GovernanceConfig;
-  reserved: BN;
+  reserved?: Uint8Array;
   proposalCount: number;
 
   isProgramGovernance() {
@@ -164,12 +168,12 @@ export class Governance {
   constructor(args: {
     accountType: number;
     config: GovernanceConfig;
-    reserved?: BN;
+    reserved?: Uint8Array;
     proposalCount: number;
   }) {
     this.accountType = args.accountType;
     this.config = args.config;
-    this.reserved = args.reserved ?? ZERO;
+    this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
   }
 }
@@ -189,7 +193,7 @@ export class TokenOwnerRecord {
 
   totalVotesCount: number;
 
-  reserved: BN;
+  reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
 
@@ -200,7 +204,7 @@ export class TokenOwnerRecord {
     governingTokenDepositAmount: BN;
     unrelinquishedVotesCount: number;
     totalVotesCount: number;
-    reserved: BN;
+    reserved: Uint8Array;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
@@ -288,7 +292,7 @@ export class Proposal {
 
   closedAt: BN | null;
 
-  executionFlags: InstructionExecutionFlags | null;
+  executionFlags: InstructionExecutionFlags;
 
   name: string;
 
@@ -444,7 +448,7 @@ export class ProposalInstruction {
   holdUpTime: number;
   instruction: InstructionData;
   executedAt: BN | null;
-  executionStatus: InstructionExecutionStatus | null;
+  executionStatus: InstructionExecutionStatus;
 
   constructor(args: {
     proposal: PublicKey;
@@ -452,7 +456,7 @@ export class ProposalInstruction {
     holdUpTime: number;
     instruction: InstructionData;
     executedAt: BN | null;
-    executionStatus: InstructionExecutionStatus | null;
+    executionStatus: InstructionExecutionStatus;
   }) {
     this.proposal = args.proposal;
     this.instructionIndex = args.instructionIndex;

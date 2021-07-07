@@ -18,7 +18,7 @@ export const GovernanceError: Record<number, string> = [
   'Invalid Proposal Owner', //InvalidProposalOwnerAccount
   'Invalid Proposal for VoterRecord', // InvalidProposalForVoterRecord
   'Invalid GoverningTokenOwner for VoteRecord', // InvalidGoverningTokenOwnerForVoteRecord
-  'Invalid Governance config', // InvalidGovernanceConfig
+  'Invalid Governance config: Vote threshold percentage out of range', // InvalidVoteThresholdPercentage
   'Proposal for the given Governance, Governing Token Mint and index already exists', // ProposalAlreadyExists
   'Token Owner already voted on the Proposal', // VoteAlreadyExists
   "Owner doesn't have enough governing tokens to create Proposal", // NotEnoughTokensToCreateProposal
@@ -65,6 +65,9 @@ export const GovernanceError: Record<number, string> = [
   'Given VoteThresholdPercentageType is not supported', //VoteThresholdPercentageTypeNotSupported
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
   'Proposal cool off time is not supported', // ProposalCoolOffTimeNotSupported
+  'Governance PDA must sign', // GovernancePdaMustSign
+  'Invalid config realm for Governance', // InvalidConfigRealmForGovernance
+  'Invalid config governed account for Governance', // InvalidConfigGovernedAccountForGovernance
 ];
 
 export const TokenError: Record<number, string> = [
@@ -104,9 +107,9 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
         // For now the most common scenario is an error returned from the token program so I'm mapping the custom errors to it with the 'possible' warning
         return `Possible error: ${TokenError[instructionError.Custom]}`;
       }
+    } else {
+      return instructionError;
     }
-
-    return '';
   } catch {
     return JSON.stringify(error);
   }
