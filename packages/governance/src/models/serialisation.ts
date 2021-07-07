@@ -22,6 +22,7 @@ import {
   InsertInstructionArgs,
   RelinquishVoteArgs,
   RemoveInstructionArgs,
+  SetGovernanceConfigArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
@@ -141,6 +142,16 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['instruction', 'u8'],
         ['config', GovernanceConfig],
         ['transferTokenOwner', 'u8'],
+      ],
+    },
+  ],
+  [
+    SetGovernanceConfigArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['config', GovernanceConfig],
       ],
     },
   ],
