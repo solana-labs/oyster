@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { useLendingReserve } from "../../../hooks";
-import { useParams } from "react-router-dom";
-import "./style.less";
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useReserve } from '../../../hooks';
+import Breakdown from './Breakdown';
+import { Position } from './interfaces';
 
-import NewPositionForm from "./NewPositionForm";
-import { Position } from "./interfaces";
-import Breakdown from "./Breakdown";
-import PoolHealth from "./PoolHealth";
+import NewPositionForm from './NewPositionForm';
+import PoolHealth from './PoolHealth';
+import './style.less';
 
 export const NewPosition = () => {
   const { id } = useParams<{ id: string }>();
-  const lendingReserve = useLendingReserve(id);
+  const lendingReserve = useReserve(id);
   const [newPosition, setNewPosition] = useState<Position>({
     id: null,
     leverage: 5,

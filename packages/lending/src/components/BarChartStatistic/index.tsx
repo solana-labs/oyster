@@ -1,5 +1,5 @@
-import { Statistic } from "antd";
-import React from "react";
+import { Statistic } from 'antd';
+import React from 'react';
 
 export const BarChartStatistic = <T,>(props: {
   items: T[];
@@ -9,14 +9,14 @@ export const BarChartStatistic = <T,>(props: {
   getPct: (item: T) => number;
 }) => {
   const colors = [
-    "#003f5c",
-    "#2f4b7c",
-    "#665191",
-    "#a05195",
-    "#d45087",
-    "#f95d6a",
-    "#ff7c43",
-    "#ffa600",
+    '#003f5c',
+    '#2f4b7c',
+    '#665191',
+    '#a05195',
+    '#d45087',
+    '#f95d6a',
+    '#ff7c43',
+    '#ffa600',
   ].reverse();
 
   return (
@@ -25,12 +25,12 @@ export const BarChartStatistic = <T,>(props: {
       valueRender={() => (
         <div
           style={{
-            width: "100%",
+            width: '100%',
             height: 37,
-            display: "flex",
-            backgroundColor: "lightgrey",
+            display: 'flex',
+            backgroundColor: 'lightgrey',
             fontSize: 12,
-            lineHeight: "37px",
+            lineHeight: '37px',
           }}
         >
           {props.items.map((item, i) => (
@@ -38,7 +38,7 @@ export const BarChartStatistic = <T,>(props: {
               key={props.name(item)}
               title={props.name(item)}
               style={{
-                overflow: "hidden",
+                overflow: 'hidden',
                 width: `${100 * props.getPct(item)}%`,
                 backgroundColor:
                   (props.color && props.color(item)) ||

@@ -1,29 +1,33 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { MINT_TO_MARKET } from './../models/marketOverrides';
-import { POOLS_WITH_AIRDROP } from './../models/airdrops';
-
-import { getPoolName } from '../utils/utils';
-
-import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
-import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
-
 import {
   contexts,
-  utils,
-  ParsedAccount,
-  KnownTokenMap,
+  convert,
   EventEmitter,
+  fromLamports,
+  getTokenName,
+  KnownTokenMap,
+  STABLE_COINS,
 } from '@oyster/common';
-
-import { DexMarketParser } from './../models/dex';
-import { LendingMarket, LendingReserve, PoolInfo } from '../models';
+import { Market, MARKETS, Orderbook, TOKEN_MINTS } from '@project-serum/serum';
+import { Reserve } from '@solana/spl-token-lending';
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { PoolInfo } from '../models';
 import { LIQUIDITY_PROVIDER_FEE, SERUM_FEE } from '../utils/pools';
+import { getPoolName } from '../utils/utils';
+import { POOLS_WITH_AIRDROP } from './../models/airdrops';
+import { DexMarketParser } from './../models/dex';
+import { MINT_TO_MARKET } from './../models/marketOverrides';
+
 const { useConnectionConfig } = contexts.Connection;
-const { convert, fromLamports, getTokenName, STABLE_COINS } = utils;
 const { cache, getMultipleAccounts } = contexts.Accounts;
 
-const INITAL_LIQUIDITY_DATE = new Date('2020-10-27');
+const INITIAL_LIQUIDITY_DATE = new Date('2021-06-21');
 export const BONFIDA_POOL_INTERVAL = 30 * 60_000; // 30 min
 
 interface RecentPoolData {
@@ -53,7 +57,8 @@ export function MarketProvider({ children = null as any }) {
   const { endpoint } = useConnectionConfig();
   const accountsToObserve = useMemo(() => new Map<string, number>(), []);
   const [marketMints, setMarketMints] = useState<string[]>([]);
-  const [dailyVolume, setDailyVolume] = useState<Map<string, RecentPoolData>>(
+  // @TODO: remove this, it never changes
+  const [dailyVolume] = useState<Map<string, RecentPoolData>>(
     new Map(),
   );
 
@@ -70,7 +75,7 @@ export function MarketProvider({ children = null as any }) {
       );
 
       const marketAddress = MINT_TO_MARKET[mintAddress];
-      const marketName = `${SERUM_TOKEN?.name}/USDC`;
+      const marketName = `${SERUM_TOKEN?.name}/USDT`;
       const marketInfo = MARKETS.find(
         m => m.name === marketName || m.address.toBase58() === marketAddress,
       );
@@ -95,7 +100,7 @@ export function MarketProvider({ children = null as any }) {
       timer = window.setTimeout(() => updateData(), REFRESH_INTERVAL);
     };
 
-    const initalQuery = async () => {
+    const initialQuery = async () => {
       const reverseSerumMarketCache = new Map<string, string>();
       [...marketByMint.keys()].forEach(mint => {
         const m = marketByMint.get(mint);
@@ -108,28 +113,27 @@ export function MarketProvider({ children = null as any }) {
         return m.marketInfo.address.toBase58();
       });
 
-      await getMultipleAccounts(
+      const accounts = await getMultipleAccounts(
         connection,
-        // only query for markets that are not in cahce
+        // only query for markets that are not in cache
         allMarkets.filter(a => cache.get(a) === undefined),
         'single',
-      ).then(({ keys, array }) => {
-        allMarkets.forEach(() => {});
+      );
 
-        return array.map((item, index) => {
-          const marketAddress = keys[index];
-          const mintAddress = reverseSerumMarketCache.get(marketAddress);
-          if (mintAddress) {
-            const market = marketByMint.get(mintAddress);
+      const { keys, array } = accounts;
+      array.forEach((item, index) => {
+        const marketAddress = keys[index];
+        const mintAddress = reverseSerumMarketCache.get(marketAddress);
+        if (mintAddress) {
+          const market = marketByMint.get(mintAddress);
 
-            if (market) {
-              const id = market.marketInfo.address;
-              cache.add(id, item, DexMarketParser);
-            }
+          if (market) {
+            const id = market.marketInfo.address;
+            cache.add(id, item, DexMarketParser);
           }
+        }
 
-          return item;
-        });
+        return item;
       });
 
       const toQuery = new Set<string>();
@@ -146,7 +150,7 @@ export function MarketProvider({ children = null as any }) {
         }
 
         if (!cache.get(decoded.info.baseMint)) {
-          toQuery.add(decoded.info.quoteMint.toBase58());
+          toQuery.add(decoded.info.quoteTokenMint.toBase58());
         }
 
         toQuery.add(decoded.info.bids.toBase58());
@@ -161,7 +165,7 @@ export function MarketProvider({ children = null as any }) {
       updateData();
     };
 
-    initalQuery();
+    initialQuery();
 
     return () => {
       window.clearTimeout(timer);
@@ -238,6 +242,7 @@ export function MarketProvider({ children = null as any }) {
   );
 }
 
+// @TODO: find all uses, use market price from reserve
 export const useMarkets = () => {
   const context = useContext(MarketsContext);
   return context as MarketsContextState;
@@ -379,7 +384,7 @@ function createEnrichedPools(
 
             // Aproximation not true for all pools we need to fine a better way
             const daysSinceInception = Math.floor(
-              (TODAY.getTime() - INITAL_LIQUIDITY_DATE.getTime()) /
+              (TODAY.getTime() - INITIAL_LIQUIDITY_DATE.getTime()) /
                 (24 * 3600 * 1000),
             );
             const apy0 =
@@ -476,6 +481,7 @@ function calculateAirdropYield(
   return airdropYield;
 }
 
+// @FIXME: replace with market price
 export const useMidPriceInUSD = (mint: string) => {
   const { midPriceInUSD, subscribeToMarket, marketEmitter } = useContext(
     MarketsContext,
@@ -509,12 +515,12 @@ export const usePrecacheMarket = () => {
 
 export const simulateMarketOrderFill = (
   amount: number,
-  reserve: LendingReserve,
+  reserve: Reserve,
   dex: PublicKey,
   useBBO = false,
 ) => {
-  const liquidityMint = cache.get(reserve.liquidityMint);
-  const collateralMint = cache.get(reserve.collateralMint);
+  const liquidityMint = cache.get(reserve.liquidity.mintPubkey);
+  const collateralMint = cache.get(reserve.collateral.mintPubkey);
   if (!liquidityMint || !collateralMint) {
     return 0.0;
   }
@@ -527,17 +533,13 @@ export const simulateMarketOrderFill = (
 
   const baseMintDecimals =
     cache.get(decodedMarket.baseMint)?.info.decimals || 0;
-  const quoteMintDecimals =
-    cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
+  const quoteTokenMintDecimals =
+    cache.get(decodedMarket.quoteTokenMint)?.info.decimals || 0;
 
-  const lendingMarket = cache.get(
-    reserve.lendingMarket,
-  ) as ParsedAccount<LendingMarket>;
-
-  const dexMarket = new Market(
+  const market = new Market(
     decodedMarket,
     baseMintDecimals,
-    quoteMintDecimals,
+    quoteTokenMintDecimals,
     undefined,
     decodedMarket.programId,
   );
@@ -548,12 +550,11 @@ export const simulateMarketOrderFill = (
     return 0;
   }
 
-  const bids = new Orderbook(dexMarket, bidInfo.accountFlags, bidInfo.slab);
-  const asks = new Orderbook(dexMarket, askInfo.accountFlags, askInfo.slab);
+  const bids = new Orderbook(market, bidInfo.accountFlags, bidInfo.slab);
+  const asks = new Orderbook(market, askInfo.accountFlags, askInfo.slab);
 
-  const book = lendingMarket.info.quoteMint.equals(reserve.liquidityMint)
-    ? bids
-    : asks;
+  // @FIXME: removed quote token mint
+  const book = asks;
 
   let cost = 0;
   let remaining = fromLamports(amount, liquidityMint.info);
@@ -617,13 +618,13 @@ const getMidPrice = (marketAddress?: string, mintAddress?: string) => {
 
   const baseMintDecimals =
     cache.get(decodedMarket.baseMint)?.info.decimals || 0;
-  const quoteMintDecimals =
-    cache.get(decodedMarket.quoteMint)?.info.decimals || 0;
+  const quoteTokenMintDecimals =
+    cache.get(decodedMarket.quoteTokenMint)?.info.decimals || 0;
 
   const market = new Market(
     decodedMarket,
     baseMintDecimals,
-    quoteMintDecimals,
+    quoteTokenMintDecimals,
     undefined,
     decodedMarket.programId,
   );

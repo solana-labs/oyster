@@ -1,20 +1,22 @@
-import React from 'react';
-import { utils, hooks, TokenIcon } from '@oyster/common';
-import { useBorrowingPower } from '../../hooks';
-import { calculateBorrowAPY, LendingReserve } from '../../models/lending';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
+import {
+  formatNumber,
+  formatPct,
+  TokenIcon,
+  useTokenName,
+} from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
+import { Button } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { LABELS } from '../../constants';
-import { useMidPriceInUSD } from '../../contexts/market';
-const { useTokenName } = hooks;
-const { formatNumber, formatPct } = utils;
-export const BorrowItem = (props: {
-  reserve: LendingReserve;
-  address: PublicKey;
-}) => {
-  const name = useTokenName(props.reserve.liquidityMint);
-  const price = useMidPriceInUSD(props.reserve.liquidityMint.toBase58()).price;
+import { usePrice } from '../../contexts/pyth';
+import { useBorrowingPower } from '../../hooks';
+import { calculateBorrowAPY } from '../../models';
+
+export const BorrowItem = (props: { reserve: Reserve; address: PublicKey }) => {
+  const name = useTokenName(props.reserve.liquidity.mintPubkey);
+  const price = usePrice(props.reserve.liquidity.mintPubkey.toBase58());
 
   const { borrowingPower, totalInQuote } = useBorrowingPower(props.address);
 
@@ -24,7 +26,7 @@ export const BorrowItem = (props: {
     <Link to={`/borrow/${props.address.toBase58()}`}>
       <div className="borrow-item">
         <span style={{ display: 'flex' }}>
-          <TokenIcon mintAddress={props.reserve.liquidityMint} />
+          <TokenIcon mintAddress={props.reserve.liquidity.mintPubkey} />
           {name}
         </span>
         <div>${formatNumber.format(price)}</div>

@@ -1,25 +1,24 @@
+import { contexts, fromLamports } from '@oyster/common';
+import { Reserve } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
-import { LendingReserve, reserveMarketCap } from '../models/lending';
+import { usePrice } from '../contexts/pyth';
+import { reserveMarketCap } from '../models';
 import { useUserBalance } from './useUserBalance';
 
-import { contexts, utils } from '@oyster/common';
 const { useMint } = contexts.Accounts;
-const { fromLamports } = utils;
 
 export function useUserCollateralBalance(
-  reserve?: LendingReserve,
+  reserve?: Reserve,
   account?: PublicKey,
 ) {
-  const mint = useMint(reserve?.collateralMint);
+  const mint = useMint(reserve?.collateral.mintPubkey);
   const { balanceLamports: userBalance, accounts } = useUserBalance(
-    reserve?.collateralMint,
+    reserve?.collateral.mintPubkey,
     account,
   );
 
   const [balanceInUSD, setBalanceInUSD] = useState(0);
-  const { marketEmitter, midPriceInUSD } = useMarkets();
 
   const balanceLamports = useMemo(
     () => reserve && calculateCollateralBalance(reserve, userBalance),
@@ -31,41 +30,27 @@ export function useUserCollateralBalance(
     mint,
   ]);
 
+  const price = usePrice(reserve?.liquidity.mintPubkey.toBase58() || '');
+
   useEffect(() => {
-    const updateBalance = () => {
-      setBalanceInUSD(
-        balance * midPriceInUSD(reserve?.liquidityMint?.toBase58() || ''),
-      );
-    };
-
-    const dispose = marketEmitter.onMarket(args => {
-      if (args.ids.has(reserve?.dexMarket.toBase58() || '')) {
-        updateBalance();
-      }
-    });
-
-    updateBalance();
-
-    return () => {
-      dispose();
-    };
-  }, [balance, midPriceInUSD, marketEmitter, mint, setBalanceInUSD, reserve]);
+    setBalanceInUSD(balance * price);
+  }, [setBalanceInUSD, balance, price]);
 
   return {
     balance,
     balanceLamports,
     balanceInUSD,
-    mint: reserve?.collateralMint,
+    mint: reserve?.collateral.mintPubkey,
     accounts,
     hasBalance: accounts.length > 0 && balance > 0,
   };
 }
 export function calculateCollateralBalance(
-  reserve: LendingReserve,
+  reserve: Reserve,
   balanceLamports: number,
 ) {
   return (
     reserveMarketCap(reserve) *
-    (balanceLamports / (reserve?.state.collateralMintSupply.toNumber() || 1))
+    (balanceLamports / (reserve?.collateral.mintTotalSupply.toNumber() || 1))
   );
 }

@@ -1,6 +1,7 @@
 import { contexts, ParsedAccountBase } from '@oyster/common';
 import { Market, MARKETS, Orderbook } from '@project-serum/serum';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
+
 const { MintParser, cache } = contexts.Accounts;
 
 export const OrderBookParser = (id: PublicKey, acc: AccountInfo<Buffer>) => {
@@ -17,8 +18,10 @@ export const OrderBookParser = (id: PublicKey, acc: AccountInfo<Buffer>) => {
   return details;
 };
 
+// Mainnet Beta: 9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin
+
 const DEFAULT_DEX_ID = new PublicKey(
-  'EUqojwWA2rd19FZrzeBncJsm38Jm1hEhE3zsmX3bRc2o',
+  '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin',
 );
 
 export const DexMarketParser = (
@@ -39,7 +42,7 @@ export const DexMarketParser = (
   } as ParsedAccountBase;
 
   cache.registerParser(details.info.baseMint, MintParser);
-  cache.registerParser(details.info.quoteMint, MintParser);
+  cache.registerParser(details.info.quoteTokenMint, MintParser);
   cache.registerParser(details.info.bids, OrderBookParser);
   cache.registerParser(details.info.asks, OrderBookParser);
 

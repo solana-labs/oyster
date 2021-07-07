@@ -1,11 +1,9 @@
+import { contexts, fromLamports, useUserAccounts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
+import { usePrice } from '../contexts/pyth';
 
-import { contexts, utils, hooks } from '@oyster/common';
 const { useMint } = contexts.Accounts;
-const { useUserAccounts } = hooks;
-const { fromLamports } = utils;
 
 export function useUserBalance(
   mintAddress?: PublicKey | string,
@@ -18,7 +16,6 @@ export function useUserBalance(
   );
   const { userAccounts } = useUserAccounts();
   const [balanceInUSD, setBalanceInUSD] = useState(0);
-  const { marketEmitter, midPriceInUSD } = useMarkets();
 
   const mintInfo = useMint(mint);
   const accounts = useMemo(() => {
@@ -43,21 +40,11 @@ export function useUserBalance(
     balanceLamports,
   ]);
 
+  const price = usePrice(mint || '');
+
   useEffect(() => {
-    const updateBalance = () => {
-      setBalanceInUSD(balance * midPriceInUSD(mint || ''));
-    };
-
-    const dispose = marketEmitter.onMarket(args => {
-      updateBalance();
-    });
-
-    updateBalance();
-
-    return () => {
-      dispose();
-    };
-  }, [balance, midPriceInUSD, marketEmitter, mint, setBalanceInUSD]);
+    setBalanceInUSD(balance * price);
+  }, [setBalanceInUSD, balance, price]);
 
   return {
     balance,

@@ -1,9 +1,10 @@
-import { HashRouter, Route, Switch } from 'react-router-dom';
-import React from 'react';
 import { contexts } from '@oyster/common';
-import { MarketProvider } from './contexts/market';
-import { LendingProvider } from './contexts/lending';
+import React from 'react';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import { AppLayout } from './components/Layout';
+import { LendingProvider } from './contexts/lending';
+import { MarketProvider } from './contexts/market';
+import { PythProvider } from './contexts/pyth';
 
 import {
   BorrowReserveView,
@@ -13,14 +14,16 @@ import {
   DepositView,
   FaucetView,
   HomeView,
+  LiquidateReserveView,
+  LiquidateView,
+  MarginTrading,
   RepayReserveView,
   ReserveView,
   WithdrawView,
-  LiquidateView,
-  LiquidateReserveView,
-  MarginTrading,
+  ObligationsView,
 } from './views';
 import { NewPosition } from './views/margin/newPosition';
+
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
@@ -32,61 +35,64 @@ export function Routes() {
         <ConnectionProvider>
           <WalletProvider>
             <AccountsProvider>
-              <MarketProvider>
-                <LendingProvider>
-                  <AppLayout>
-                    <Switch>
-                      <Route exact path="/" component={() => <HomeView />} />
-                      <Route
-                        exact
-                        path="/dashboard"
-                        children={<DashboardView />}
-                      />
-                      <Route path="/reserve/:id" children={<ReserveView />} />
-                      <Route
-                        exact
-                        path="/deposit"
-                        component={() => <DepositView />}
-                      />
-                      <Route
-                        path="/deposit/:id"
-                        children={<DepositReserveView />}
-                      />
-                      <Route path="/withdraw/:id" children={<WithdrawView />} />
-                      <Route exact path="/borrow" children={<BorrowView />} />
-                      <Route
-                        path="/borrow/:id"
-                        children={<BorrowReserveView />}
-                      />
-                      <Route
-                        path="/repay/loan/:obligation"
-                        children={<RepayReserveView />}
-                      />
-                      <Route
-                        path="/repay/:reserve"
-                        children={<RepayReserveView />}
-                      />
-                      <Route
-                        exact
-                        path="/liquidate"
-                        children={<LiquidateView />}
-                      />
-                      <Route
-                        path="/liquidate/:id"
-                        children={<LiquidateReserveView />}
-                      />
-                      <Route
-                        exact
-                        path="/margin"
-                        children={<MarginTrading />}
-                      />
+              <PythProvider>
+                <MarketProvider>
+                  <LendingProvider>
+                    <AppLayout>
+                      <Switch>
+                        <Route exact path="/" component={() => <HomeView />} />
+                        <Route
+                          exact
+                          path="/dashboard"
+                          component={() => <DashboardView />}
+                        />
+                        <Route path="/reserve/:id" component={() => <ReserveView />} />
+                        <Route
+                          exact
+                          path="/deposit"
+                          component={() => <DepositView />}
+                        />
+                        <Route
+                          path="/deposit/:id"
+                          component={() => <DepositReserveView />}
+                        />
+                        <Route path="/withdraw/:id" component={() => <WithdrawView />} />
+                        <Route exact path="/obligations" component={() => <ObligationsView />} />
+                        <Route exact path="/borrow" component={() => <BorrowView />} />
+                        <Route
+                          path="/borrow/:id"
+                          component={() => <BorrowReserveView />}
+                        />
+                        <Route
+                          path="/repay/loan/:obligation"
+                          component={() => <RepayReserveView />}
+                        />
+                        <Route
+                          path="/repay/:reserve"
+                          component={() => <RepayReserveView />}
+                        />
+                        <Route
+                          exact
+                          path="/liquidate"
+                          component={() => <LiquidateView />}
+                        />
+                        <Route
+                          path="/liquidate/:id"
+                          component={() => <LiquidateReserveView />}
+                        />
+                        <Route
+                          exact
+                          path="/margin"
+                          component={() => <MarginTrading />}
+                        />
 
-                      <Route path="/margin/:id" children={<NewPosition />} />
-                      <Route exact path="/faucet" children={<FaucetView />} />
-                    </Switch>
-                  </AppLayout>
-                </LendingProvider>
-              </MarketProvider>
+                        <Route path="/margin/:id" component={() => <NewPosition />} />
+                        <Route exact path="/faucet" component={() => <FaucetView />} />
+                      </Switch>
+                    </AppLayout>
+                  </LendingProvider>
+                </MarketProvider>
+              </PythProvider>
             </AccountsProvider>
           </WalletProvider>
         </ConnectionProvider>

@@ -1,12 +1,12 @@
-import { Card } from "antd";
-import React from "react";
-import { LABELS } from "../../constants";
-import { useLendingReserves } from "../../hooks";
-import { BorrowItem } from "./item";
-import "./itemStyle.less";
+import { Card } from 'antd';
+import React from 'react';
+import { LABELS } from '../../constants';
+import { useReserves } from '../../hooks';
+import { BorrowItem } from './item';
+import './itemStyle.less';
 
 export const BorrowView = () => {
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   return (
     <div className="flexColumn">
       <Card>
@@ -17,7 +17,7 @@ export const BorrowView = () => {
           <div>{LABELS.TABLE_TITLE_APY}</div>
           <div></div>
         </div>
-        {reserveAccounts.map((account) => (
+        {reserveAccounts.map(account => (
           <BorrowItem
             key={account.pubkey.toBase58()}
             reserve={account.info}

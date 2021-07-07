@@ -1,20 +1,20 @@
-import React from "react";
-import { useLendingReserve } from "../../hooks";
-import { useParams } from "react-router-dom";
-import "./style.less";
+import { Col, Row } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { DepositInfoLine } from '../../components/DepositInfoLine';
 
-import { DepositInput } from "../../components/DepositInput";
-import { DepositInfoLine } from "../../components/DepositInfoLine";
+import { DepositInput } from '../../components/DepositInput';
 import {
   SideReserveOverview,
   SideReserveOverviewMode,
-} from "../../components/SideReserveOverview";
-import { Col, Row } from "antd";
-import { GUTTER } from "../../constants";
+} from '../../components/SideReserveOverview';
+import { GUTTER } from '../../constants';
+import { useReserve } from '../../hooks';
+import './style.less';
 
 export const DepositReserveView = () => {
   const { id } = useParams<{ id: string }>();
-  const lendingReserve = useLendingReserve(id);
+  const lendingReserve = useReserve(id);
   const reserve = lendingReserve?.info;
 
   if (!reserve || !lendingReserve) {

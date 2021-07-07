@@ -1,21 +1,21 @@
-import { calculateDepositAPY, LendingReserve } from '../models/lending';
-import { useLendingReserves } from './useLendingReserves';
-import { useEffect, useMemo, useState } from 'react';
-import { useMarkets } from '../contexts/market';
-import { calculateCollateralBalance } from './useCollateralBalance';
-import { MintInfo } from '@solana/spl-token';
-
 import {
   contexts,
-  utils,
+  fromLamports,
+  getTokenName,
   ParsedAccount,
   TokenAccount,
-  hooks,
+  useUserAccounts,
 } from '@oyster/common';
+import { MintInfo } from '@solana/spl-token';
+import { Reserve } from '@solana/spl-token-lending';
+import { useEffect, useMemo, useState } from 'react';
+import { usePyth } from '../contexts/pyth';
+import { calculateDepositAPY } from '../models';
+import { calculateCollateralBalance } from './useCollateralBalance';
+import { useReserves } from './useReserves';
+
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
-const { fromLamports, getTokenName } = utils;
-const { useUserAccounts } = hooks;
 
 export interface UserDeposit {
   account: TokenAccount;
@@ -26,14 +26,14 @@ export interface UserDeposit {
     name: string;
     precision: number;
   };
-  reserve: ParsedAccount<LendingReserve>;
+  reserve: ParsedAccount<Reserve>;
 }
 
 export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
   const { userAccounts } = useUserAccounts();
-  const { reserveAccounts } = useLendingReserves();
+  const { reserveAccounts } = useReserves();
   const [userDeposits, setUserDeposits] = useState<UserDeposit[]>([]);
-  const { marketEmitter, midPriceInUSD } = useMarkets();
+  const { getPrice } = usePyth();
   const { tokenMap } = useConnectionConfig();
 
   const reservesByCollateralMint = useMemo(() => {
@@ -44,28 +44,24 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
       }
 
       if (!include || include.has(id)) {
-        result.set(item.info.collateralMint.toBase58(), item);
+        result.set(item.info.collateral.mintPubkey.toBase58(), item);
       }
 
       return result;
-    }, new Map<string, ParsedAccount<LendingReserve>>());
+    }, new Map<string, ParsedAccount<Reserve>>());
   }, [reserveAccounts, exclude, include]);
 
   useEffect(() => {
-    const activeMarkets = new Set(
-      reserveAccounts.map(r => r.info.dexMarket.toBase58()),
-    );
-
     const userDepositsFactory = () => {
       return userAccounts
         .filter(acc => reservesByCollateralMint.has(acc?.info.mint.toBase58()))
         .map(item => {
           const reserve = reservesByCollateralMint.get(
             item?.info.mint.toBase58(),
-          ) as ParsedAccount<LendingReserve>;
+          ) as ParsedAccount<Reserve>;
 
           let collateralMint = cache.get(
-            reserve.info.collateralMint,
+            reserve.info.collateral.mintPubkey,
           ) as ParsedAccount<MintInfo>;
 
           const amountLamports = calculateCollateralBalance(
@@ -73,16 +69,16 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
             item?.info.amount.toNumber(),
           );
           const amount = fromLamports(amountLamports, collateralMint?.info);
-          const price = midPriceInUSD(reserve.info.liquidityMint.toBase58());
+          const price = getPrice(reserve.info.liquidity.mintPubkey.toBase58());
           const amountInQuote = price * amount;
 
           return {
             account: item,
             info: {
               amount,
-              amountInQuote: amountInQuote,
+              amountInQuote,
               apy: calculateDepositAPY(reserve.info),
-              name: getTokenName(tokenMap, reserve.info.liquidityMint),
+              name: getTokenName(tokenMap, reserve.info.liquidity.mintPubkey),
             },
             reserve,
           } as UserDeposit;
@@ -90,27 +86,13 @@ export function useUserDeposits(exclude?: Set<string>, include?: Set<string>) {
         .sort((a, b) => b.info.amountInQuote - a.info.amountInQuote);
     };
 
-    const dispose = marketEmitter.onMarket(args => {
-      // ignore if none of the markets is used by the reserve
-      if ([...args.ids.values()].every(id => !activeMarkets.has(id))) {
-        return;
-      }
-
-      setUserDeposits(userDepositsFactory());
-    });
-
     setUserDeposits(userDepositsFactory());
-
-    return () => {
-      dispose();
-    };
   }, [
     userAccounts,
     reserveAccounts,
     reservesByCollateralMint,
     tokenMap,
-    midPriceInUSD,
-    marketEmitter,
+    getPrice,
   ]);
 
   return {

@@ -1,14 +1,13 @@
+import { contexts, models, programIds } from '@oyster/common';
+import { AccountLayout, MintLayout } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { MintLayout, AccountLayout } from '@solana/spl-token';
-import { utils, models, contexts } from '@oyster/common';
 import { PoolInfo } from '../models';
-const { programIds } = utils;
-const {
-  TokenSwapLayout,
-  TokenSwapLayoutLegacyV0: TokenSwapLayoutV0,
-  TokenSwapLayoutV1,
-} = models;
+import * as BufferLayout from 'buffer-layout';
+
+const TokenSwapLayout = models.TokenSwapLayout as any as BufferLayout.Structure;
+const TokenSwapLayoutV0 = models.TokenSwapLayoutLegacyV0 as any as BufferLayout.Structure;
+const TokenSwapLayoutV1 = models.TokenSwapLayoutV1 as any as BufferLayout.Structure;
 const { useConnection } = contexts.Connection;
 const { cache, getMultipleAccounts, TokenAccountParser } = contexts.Accounts;
 
@@ -23,7 +22,7 @@ const toPoolInfo = (item: any, program: PublicKey) => {
   return {
     pubkeys: {
       account: item.pubkey,
-      program: program,
+      program,
       mint: item.data.tokenPool,
       holdingMints: [] as PublicKey[],
       holdingAccounts: [item.data.tokenAccountA, item.data.tokenAccountB],
@@ -163,7 +162,7 @@ export const usePools = () => {
           const account = info.accountInfo;
           const updated = {
             data: programIds().swapLayout.decode(account.data),
-            account: account,
+            account,
             pubkey,
           };
 

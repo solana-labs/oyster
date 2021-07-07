@@ -1,8 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { useMidPriceInUSD } from '../contexts/market';
-import { useLendingMarket } from './useLendingMarket';
-import { getLendingReserves, useLendingReserve } from './useLendingReserves';
+import { usePrice } from '../contexts/pyth';
+import { useLendingReserve } from './useLendingReserves';
 import { useUserDeposits } from './useUserDeposits';
 import { useUserObligations } from './useUserObligations';
 
@@ -23,43 +22,18 @@ export function useBorrowingPower(
 
   const reserve = useLendingReserve(key);
 
-  const liquidityMint = reserve?.info.liquidityMint;
+  const liquidityMint = reserve?.info.liquidity.mintPubkey;
   const liquidityMintAddress = liquidityMint?.toBase58();
-  const market = useLendingMarket(reserve?.info.lendingMarket);
 
-  const quoteMintAddess = market?.info?.quoteMint?.toBase58();
+  const { totalInQuote } = useUserDeposits();
 
-  // TODO: remove once cross-collateral is supported
-  const onlyQuoteAllowed = liquidityMintAddress !== quoteMintAddess;
-
-  const exclude = useMemo(() => new Set([key]), [key]);
-  const inlcude = useMemo(() => {
-    const quoteReserve = getLendingReserves().find(
-      r => r.info.liquidityMint.toBase58() === quoteMintAddess,
-    );
-    return onlyQuoteAllowed && quoteReserve
-      ? new Set([quoteReserve.pubkey.toBase58()])
-      : undefined;
-  }, [onlyQuoteAllowed, quoteMintAddess]);
-
-  const { totalInQuote } = useUserDeposits(exclude, inlcude);
-
-  const price = useMidPriceInUSD(liquidityMintAddress).price;
+  const price = usePrice(liquidityMintAddress);
 
   const { totalInQuote: loansValue } = useUserObligations();
 
   const totalDeposits = loansValue + totalInQuote;
 
   const utilization = totalDeposits === 0 ? 0 : loansValue / totalDeposits;
-
-  // amounts already expressed as quite mint
-  if (liquidityMintAddress === quoteMintAddess) {
-    return {
-      borrowingPower: totalInQuote,
-      totalInQuote,
-      utilization,
-    };
-  }
 
   return {
     borrowingPower: totalInQuote / price,

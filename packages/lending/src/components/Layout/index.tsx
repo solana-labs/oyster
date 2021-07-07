@@ -1,24 +1,24 @@
-import React from 'react';
-import './../../App.less';
-import { Menu } from 'antd';
 import {
-  PieChartOutlined,
-  GithubOutlined,
   BankOutlined,
-  LogoutOutlined,
-  ShoppingOutlined,
-  HomeOutlined,
-  RocketOutlined,
   ForkOutlined,
-  // LineChartOutlined
+  GithubOutlined,
+  HomeOutlined,
+  LogoutOutlined,
+  PieChartOutlined,
+  RocketOutlined,
+  ShoppingOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 
 import BasicLayout from '@ant-design/pro-layout';
+import { AppBar, contexts } from '@oyster/common';
+import { Menu } from 'antd';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 import config from './../../../package.json';
-import { contexts, AppBar } from '@oyster/common';
+import './../../App.less';
 
 const { useConnectionConfig } = contexts.Connection;
 
@@ -29,10 +29,11 @@ export const AppLayout = React.memo((props: any) => {
   const paths: { [key: string]: string } = {
     '/dashboard': '2',
     '/deposit': '3',
-    '/borrow': '4',
-    '/liquidate': '5',
-    '/margin': '6',
-    '/faucet': '7',
+    '/obligations': '4',
+    '/borrow': '5',
+    '/liquidate': '6',
+    '/margin': '7',
+    '/faucet': '8',
   };
 
   const current =
@@ -97,7 +98,16 @@ export const AppLayout = React.memo((props: any) => {
                     {LABELS.MENU_DEPOSIT}
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="4" icon={<LogoutOutlined />}>
+                <Menu.Item key="4" icon={<AuditOutlined />}>
+                  <Link
+                    to={{
+                      pathname: '/obligations',
+                    }}
+                  >
+                    {LABELS.MENU_OBLIGATIONS}
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="5" icon={<LogoutOutlined />}>
                   <Link
                     to={{
                       pathname: '/borrow',
@@ -106,7 +116,7 @@ export const AppLayout = React.memo((props: any) => {
                     {LABELS.MENU_BORROW}
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="5" icon={<ShoppingOutlined />}>
+                <Menu.Item key="6" icon={<ShoppingOutlined />}>
                   <Link
                     to={{
                       pathname: '/liquidate',
@@ -116,7 +126,7 @@ export const AppLayout = React.memo((props: any) => {
                   </Link>
                 </Menu.Item>
                 {/* Hide margin option for now  */}
-                {/* <Menu.Item key="6"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
+                {/* <Menu.Item key="7"  onItemHover={() => {}}  icon={< LineChartOutlined/>}>
                 <Link
                   to={{
                     pathname: "/margin",
@@ -126,7 +136,7 @@ export const AppLayout = React.memo((props: any) => {
                 </Link>
               </Menu.Item> */}
                 {env !== 'mainnet-beta' && (
-                  <Menu.Item key="7" icon={<RocketOutlined />}>
+                  <Menu.Item key="8" icon={<RocketOutlined />}>
                     <Link
                       to={{
                         pathname: '/faucet',

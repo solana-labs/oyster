@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { PoolInfo } from '../../models';
+import { formatNumber, formatUSD } from '@oyster/common';
 import echarts from 'echarts';
-import { utils } from '@oyster/common';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useEnrichedPools } from '../../contexts/market';
-const { formatNumber, formatUSD } = utils;
+import { PoolInfo } from '../../models';
 
 export const SupplyOverview = (props: { pool?: PoolInfo }) => {
   const { pool } = props;

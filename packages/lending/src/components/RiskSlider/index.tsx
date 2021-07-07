@@ -1,7 +1,7 @@
-import { riskMarks } from "../../constants";
-import { Slider } from "antd";
-import React from "react";
-import "./style.less";
+import { Slider } from 'antd';
+import React from 'react';
+import { riskMarks } from '../../constants';
+import './style.less';
 
 export const RiskSlider = (props: { value: number }) => {
   return (

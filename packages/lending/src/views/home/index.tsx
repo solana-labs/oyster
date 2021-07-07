@@ -1,22 +1,27 @@
+import {
+  contexts,
+  fromLamports,
+  getTokenName,
+  ParsedAccount,
+  wadToLamports,
+} from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { Card, Col, Row, Statistic } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { GUTTER, LABELS } from '../../constants';
-import { contexts, ParsedAccount, utils } from '@oyster/common';
-import { useMarkets } from '../../contexts/market';
-import { useLendingReserves } from '../../hooks';
+import { usePyth } from '../../contexts/pyth';
+import { useReserves } from '../../hooks';
 import { reserveMarketCap, Totals } from '../../models';
-
-import { LendingReserveItem } from './item';
 import { BarChartStatistic } from './../../components/BarChartStatistic';
+import { LendingReserveItem } from './item';
 import './itemStyle.less';
-const { fromLamports, getTokenName, wadToLamports } = utils;
+
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
 export const HomeView = () => {
-  const { reserveAccounts } = useLendingReserves();
-  const { marketEmitter, midPriceInUSD } = useMarkets();
+  const { reserveAccounts } = useReserves();
+  const { getPrice } = usePyth();
   const { tokenMap } = useConnectionConfig();
   const [totals, setTotals] = useState<Totals>({
     marketSize: 0,
@@ -26,67 +31,54 @@ export const HomeView = () => {
   });
 
   useEffect(() => {
-    const refreshTotal = () => {
-      let newTotals: Totals = {
-        marketSize: 0,
-        borrowed: 0,
-        lentOutPct: 0,
-        items: [],
+    let newTotals: Totals = {
+      marketSize: 0,
+      borrowed: 0,
+      lentOutPct: 0,
+      items: [],
+    };
+
+    reserveAccounts.forEach(item => {
+      const marketCapLamports = reserveMarketCap(item.info);
+
+      const mint = item.info.liquidity.mintPubkey.toBase58();
+
+      const liquidityMint = cache.get(mint) as
+        | ParsedAccount<MintInfo>
+        | undefined;
+      if (!liquidityMint) {
+        return;
+      }
+
+      const price = getPrice(mint);
+
+      let leaf = {
+        key: item.pubkey.toBase58(),
+        marketSize: fromLamports(marketCapLamports, liquidityMint.info) * price,
+        borrowed:
+          fromLamports(
+            wadToLamports(item.info.liquidity.borrowedAmountWads),
+            liquidityMint.info,
+          ) * price,
+        name: getTokenName(tokenMap, mint),
       };
 
-      reserveAccounts.forEach(item => {
-        const marketCapLamports = reserveMarketCap(item.info);
+      newTotals.items.push(leaf);
 
-        const localCache = cache;
-        const liquidityMint = localCache.get(
-          item.info.liquidityMint.toBase58(),
-        ) as ParsedAccount<MintInfo>;
-
-        if (!liquidityMint) {
-          return;
-        }
-
-        const price = midPriceInUSD(liquidityMint?.pubkey.toBase58());
-
-        let leaf = {
-          key: item.pubkey.toBase58(),
-          marketSize:
-            fromLamports(marketCapLamports, liquidityMint?.info) * price,
-          borrowed:
-            fromLamports(
-              wadToLamports(item.info?.state.borrowedLiquidityWad).toNumber(),
-              liquidityMint.info,
-            ) * price,
-          name: getTokenName(tokenMap, item.info.liquidityMint.toBase58()),
-        };
-
-        newTotals.items.push(leaf);
-
-        newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
-        newTotals.borrowed = newTotals.borrowed + leaf.borrowed;
-      });
-
-      newTotals.lentOutPct = newTotals.borrowed / newTotals.marketSize;
-      newTotals.lentOutPct = Number.isFinite(newTotals.lentOutPct)
-        ? newTotals.lentOutPct
-        : 0;
-      newTotals.items = newTotals.items.sort(
-        (a, b) => b.marketSize - a.marketSize,
-      );
-
-      setTotals(newTotals);
-    };
-
-    const dispose = marketEmitter.onMarket(() => {
-      refreshTotal();
+      newTotals.marketSize = newTotals.marketSize + leaf.marketSize;
+      newTotals.borrowed = newTotals.borrowed + leaf.borrowed;
     });
 
-    refreshTotal();
+    newTotals.lentOutPct = newTotals.borrowed / newTotals.marketSize;
+    newTotals.lentOutPct = Number.isFinite(newTotals.lentOutPct)
+      ? newTotals.lentOutPct
+      : 0;
+    newTotals.items = newTotals.items.sort(
+      (a, b) => b.marketSize - a.marketSize,
+    );
 
-    return () => {
-      dispose();
-    };
-  }, [marketEmitter, midPriceInUSD, setTotals, reserveAccounts, tokenMap]);
+    setTotals(newTotals);
+  }, [getPrice, setTotals, reserveAccounts, tokenMap]);
 
   return (
     <div className="flexColumn">

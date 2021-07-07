@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { contexts, utils, ParsedAccount, NumericInput, TokenIcon, TokenDisplay } from '@oyster/common';
 import {
-  useLendingReserves,
+  contexts,
+  getTokenName,
+  NumericInput,
+  ParsedAccount,
+  TokenDisplay,
+  TokenIcon,
+} from '@oyster/common';
+import { LendingMarket, Reserve } from '@solana/spl-token-lending';
+import { Card, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import {
+  useReserves,
   useUserBalance,
   useUserDeposits,
 } from '../../hooks';
-import {
-  LendingReserve,
-  LendingMarket,
-  LendingReserveParser,
-} from '../../models';
-import { Card, Select } from 'antd';
+import { ReserveParser } from '../../models';
 import './style.less';
-const { getTokenName } = utils;
+
 const { cache } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
@@ -23,7 +27,7 @@ const { Option } = Select;
 export default function CollateralInput(props: {
   title: string;
   amount?: number | null;
-  reserve: LendingReserve;
+  reserve: Reserve;
   disabled?: boolean;
   onCollateralReserve?: (id: string) => void;
   onLeverage?: (leverage: number) => void;
@@ -34,10 +38,12 @@ export default function CollateralInput(props: {
   showLeverageSelector?: boolean;
   leverage?: number;
 }) {
-  const { balance: tokenBalance } = useUserBalance(props.reserve.liquidityMint);
-  const { reserveAccounts } = useLendingReserves();
+  const { balance: tokenBalance } = useUserBalance(
+    props.reserve.liquidity.mintPubkey,
+  );
+  const { reserveAccounts } = useReserves();
   const { tokenMap } = useConnectionConfig();
-  const [collateralReserve, setCollateralReserve] = useState<string>();
+  const [depositReserve, setCollateralReserve] = useState<string>();
   const [balance, setBalance] = useState<number>(0);
   const [lastAmount, setLastAmount] = useState<string>('');
   const userDeposits = useUserDeposits();
@@ -47,42 +53,31 @@ export default function CollateralInput(props: {
       setBalance(tokenBalance);
     } else {
       const id: string =
-        cache
-          .byParser(LendingReserveParser)
-          .find(acc => acc === collateralReserve) || '';
-      const parser = cache.get(id) as ParsedAccount<LendingReserve>;
+        cache.byParser(ReserveParser).find(acc => acc === depositReserve) || '';
+      const parser = cache.get(id) as ParsedAccount<Reserve>;
 
       if (parser) {
         const collateralDeposit = userDeposits.userDeposits.find(
           u =>
-            u.reserve.info.liquidityMint.toBase58() ===
-            parser.info.liquidityMint.toBase58(),
+            u.reserve.info.liquidity.mintPubkey.toBase58() ===
+            parser.info.liquidity.mintPubkey.toBase58(),
         );
         if (collateralDeposit) setBalance(collateralDeposit.info.amount);
         else setBalance(0);
       }
     }
-  }, [collateralReserve, userDeposits, tokenBalance, props.useWalletBalance]);
+  }, [depositReserve, userDeposits, tokenBalance, props.useWalletBalance]);
 
   const market = cache.get(
     props.reserve.lendingMarket,
   ) as ParsedAccount<LendingMarket>;
   if (!market) return null;
 
-  const onlyQuoteAllowed = !props.reserve?.liquidityMint?.equals(
-    market?.info?.quoteMint,
-  );
-
   const filteredReserveAccounts = reserveAccounts
-    .filter(reserve => reserve.info !== props.reserve)
-    .filter(
-      reserve =>
-        !onlyQuoteAllowed ||
-        reserve.info.liquidityMint.equals(market.info.quoteMint),
-    );
+    .filter(reserve => reserve.info !== props.reserve);
 
   if (
-    !collateralReserve &&
+    !depositReserve &&
     props.useFirstReserve &&
     filteredReserveAccounts.length
   ) {
@@ -90,7 +85,7 @@ export default function CollateralInput(props: {
     setCollateralReserve(address);
   }
   const renderReserveAccounts = filteredReserveAccounts.map(reserve => {
-    const mint = reserve.info.liquidityMint.toBase58();
+    const mint = reserve.info.liquidity.mintPubkey.toBase58();
     const address = reserve.pubkey.toBase58();
     const name = getTokenName(tokenMap, mint);
     return (
@@ -187,7 +182,7 @@ export default function CollateralInput(props: {
               showSearch
               style={{ minWidth: 150 }}
               placeholder="CCY"
-              value={collateralReserve}
+              value={depositReserve}
               onChange={item => {
                 if (props.onCollateralReserve) props.onCollateralReserve(item);
                 setCollateralReserve(item);
@@ -200,12 +195,12 @@ export default function CollateralInput(props: {
             </Select>
           ) : (
             <TokenDisplay
-              key={props.reserve.liquidityMint.toBase58()}
+              key={props.reserve.liquidity.mintPubkey.toBase58()}
               name={getTokenName(
                 tokenMap,
-                props.reserve.liquidityMint.toBase58(),
+                props.reserve.liquidity.mintPubkey.toBase58(),
               )}
-              mintAddress={props.reserve.liquidityMint.toBase58()}
+              mintAddress={props.reserve.liquidity.mintPubkey.toBase58()}
               showBalance={false}
             />
           )}

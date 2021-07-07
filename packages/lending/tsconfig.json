@@ -18,5 +18,5 @@
     "jsx": "react",
     "typeRoots": ["types", "../../types", "../../node_modules/@types"]
   },
-  "include": ["src"]
+  "include": ["src", "../../node_modules/@oyster/dist/lib"]
 }

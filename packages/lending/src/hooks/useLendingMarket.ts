@@ -1,7 +1,9 @@
 import { contexts, ParsedAccount } from '@oyster/common';
+import { LendingMarket } from '@solana/spl-token-lending';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
-import { LendingMarketParser, LendingMarket } from '../models/lending';
+import { LendingMarketParser } from '../models';
+
 const { cache } = contexts.Accounts;
 
 const getLendingMarkets = () => {
@@ -12,21 +14,21 @@ const getLendingMarkets = () => {
 };
 
 export function useLendingMarkets() {
-  const [lendingMarkets, setLendingMarket] = useState<
+  const [lendingMarkets, setLendingMarkets] = useState<
     ParsedAccount<LendingMarket>[]
   >(getLendingMarkets());
 
   useEffect(() => {
     const dispose = cache.emitter.onCache(args => {
       if (args.parser === LendingMarketParser) {
-        setLendingMarket(getLendingMarkets());
+        setLendingMarkets(getLendingMarkets());
       }
     });
 
     return () => {
       dispose();
     };
-  }, [setLendingMarket]);
+  }, [setLendingMarkets]);
 
   return {
     lendingMarkets,
