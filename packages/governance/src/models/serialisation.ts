@@ -270,7 +270,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
-        ['reserved', 'u64'],
+        ['reserved', ['u8']],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
@@ -283,7 +283,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['config', GovernanceConfig],
-        ['reserved', 'u64'],
+        ['reserved', ['u8']],
         ['proposalCount', 'u32'],
       ],
     },
@@ -317,7 +317,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['governingTokenDepositAmount', 'u64'],
         ['unrelinquishedVotesCount', 'u32'],
         ['totalVotesCount', 'u32'],
-        ['reserved', 'u64'],
+        ['reserved', ['u8']],
         ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
       ],
     },

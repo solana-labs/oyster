@@ -1,8 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { constants } from '@oyster/common';
-
-const { ZERO } = constants;
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -85,7 +82,7 @@ export class Realm {
 
   communityMint: PublicKey;
 
-  reserved: BN;
+  reserved: Uint8Array;
 
   councilMint: PublicKey | undefined;
 
@@ -93,7 +90,7 @@ export class Realm {
 
   constructor(args: {
     communityMint: PublicKey;
-    reserved: BN;
+    reserved: Uint8Array;
     councilMint: PublicKey | undefined;
     name: string;
   }) {
@@ -142,7 +139,7 @@ export class GovernanceConfig {
 export class Governance {
   accountType: GovernanceAccountType;
   config: GovernanceConfig;
-  reserved: BN;
+  reserved?: Uint8Array;
   proposalCount: number;
 
   isProgramGovernance() {
@@ -164,12 +161,12 @@ export class Governance {
   constructor(args: {
     accountType: number;
     config: GovernanceConfig;
-    reserved?: BN;
+    reserved?: Uint8Array;
     proposalCount: number;
   }) {
     this.accountType = args.accountType;
     this.config = args.config;
-    this.reserved = args.reserved ?? ZERO;
+    this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
   }
 }
@@ -189,7 +186,7 @@ export class TokenOwnerRecord {
 
   totalVotesCount: number;
 
-  reserved: BN;
+  reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
 
@@ -200,7 +197,7 @@ export class TokenOwnerRecord {
     governingTokenDepositAmount: BN;
     unrelinquishedVotesCount: number;
     totalVotesCount: number;
-    reserved: BN;
+    reserved: Uint8Array;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
