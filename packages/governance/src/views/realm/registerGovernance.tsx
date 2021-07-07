@@ -9,7 +9,10 @@ import { Redirect } from 'react-router';
 
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
-import { GovernanceConfig } from '../../models/accounts';
+import {
+  GovernanceConfig,
+  VoteThresholdPercentage,
+} from '../../models/accounts';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
@@ -43,7 +46,9 @@ export function RegisterGovernance({
     const config = new GovernanceConfig({
       realm: realmKey,
       governedAccount: new PublicKey(values.governedAccountAddress),
-      voteThresholdPercentage: values.yesVoteThresholdPercentage,
+      voteThresholdPercentage: new VoteThresholdPercentage({
+        value: values.yesVoteThresholdPercentage,
+      }),
       minTokensToCreateProposal: new BN(values.minTokensToCreateProposal),
       minInstructionHoldUpTime: values.minInstructionHoldUpTime * 86400,
       maxVotingTime: values.maxVotingTime * 86400,

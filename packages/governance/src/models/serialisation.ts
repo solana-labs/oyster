@@ -37,6 +37,7 @@ import {
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
+  VoteThresholdPercentage,
   VoteWeight,
 } from './accounts';
 import { serialize } from 'borsh';
@@ -270,7 +271,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
-        ['reserved', ['u8']],
+        ['reserved', [8]],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
@@ -283,8 +284,18 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['config', GovernanceConfig],
-        ['reserved', ['u8']],
+        ['reserved', [8]],
         ['proposalCount', 'u32'],
+      ],
+    },
+  ],
+  [
+    VoteThresholdPercentage,
+    {
+      kind: 'struct',
+      fields: [
+        ['type', 'u8'],
+        ['value', 'u8'],
       ],
     },
   ],
@@ -295,8 +306,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['realm', 'pubkey'],
         ['governedAccount', 'pubkey'],
-        ['voteThresholdPercentageType', 'u8'],
-        ['voteThresholdPercentage', 'u8'],
+        ['voteThresholdPercentage', VoteThresholdPercentage],
         ['minTokensToCreateProposal', 'u64'],
         ['minInstructionHoldUpTime', 'u32'],
         ['maxVotingTime', 'u32'],
@@ -317,7 +327,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['governingTokenDepositAmount', 'u64'],
         ['unrelinquishedVotesCount', 'u32'],
         ['totalVotesCount', 'u32'],
-        ['reserved', ['u8']],
+        ['reserved', [8]],
         ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
       ],
     },
@@ -346,7 +356,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['votingCompletedAt', { kind: 'option', type: 'u64' }],
         ['executingAt', { kind: 'option', type: 'u64' }],
         ['closedAt', { kind: 'option', type: 'u64' }],
-        ['executionFlags', { kind: 'option', type: 'u8' }],
+        ['executionFlags', 'u8'],
         ['name', 'string'],
         ['descriptionLink', 'string'],
       ],
@@ -398,7 +408,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['holdUpTime', 'u32'],
         ['instruction', InstructionData],
         ['executedAt', { kind: 'option', type: 'u64' }],
-        ['executionStatus', { kind: 'option', type: 'u8' }],
+        ['executionStatus', 'u8'],
       ],
     },
   ],

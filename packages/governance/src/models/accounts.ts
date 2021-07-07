@@ -58,8 +58,17 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
 }
 
 export enum VoteThresholdPercentageType {
-  YesVote,
-  Quorum,
+  YesVote = 0,
+  Quorum = 1,
+}
+
+export class VoteThresholdPercentage {
+  type = VoteThresholdPercentageType.YesVote;
+  value: number;
+
+  constructor(args: { value: number }) {
+    this.value = args.value;
+  }
 }
 
 export enum VoteWeightSource {
@@ -106,8 +115,7 @@ export class Realm {
 export class GovernanceConfig {
   realm: PublicKey;
   governedAccount: PublicKey;
-  voteThresholdPercentageType: VoteThresholdPercentageType;
-  voteThresholdPercentage: number;
+  voteThresholdPercentage: VoteThresholdPercentage;
   minTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
@@ -117,8 +125,7 @@ export class GovernanceConfig {
   constructor(args: {
     realm: PublicKey;
     governedAccount: PublicKey;
-    voteThresholdPercentageType?: VoteThresholdPercentageType;
-    voteThresholdPercentage: number;
+    voteThresholdPercentage: VoteThresholdPercentage;
     minTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
@@ -127,8 +134,6 @@ export class GovernanceConfig {
   }) {
     this.realm = args.realm;
     this.governedAccount = args.governedAccount;
-    this.voteThresholdPercentageType =
-      args.voteThresholdPercentageType ?? VoteThresholdPercentageType.YesVote;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
     this.minTokensToCreateProposal = args.minTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;

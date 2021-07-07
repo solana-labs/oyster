@@ -107,9 +107,9 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
         // For now the most common scenario is an error returned from the token program so I'm mapping the custom errors to it with the 'possible' warning
         return `Possible error: ${TokenError[instructionError.Custom]}`;
       }
+    } else {
+      return instructionError;
     }
-
-    return '';
   } catch {
     return JSON.stringify(error);
   }
