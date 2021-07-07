@@ -68,11 +68,13 @@ export enum VoteWeightSource {
 }
 
 export enum InstructionExecutionStatus {
+  None,
   Success,
   Error,
 }
 
 export enum InstructionExecutionFlags {
+  None,
   Ordered,
   UseTransaction,
 }
@@ -285,7 +287,7 @@ export class Proposal {
 
   closedAt: BN | null;
 
-  executionFlags: InstructionExecutionFlags | null;
+  executionFlags: InstructionExecutionFlags;
 
   name: string;
 
@@ -441,7 +443,7 @@ export class ProposalInstruction {
   holdUpTime: number;
   instruction: InstructionData;
   executedAt: BN | null;
-  executionStatus: InstructionExecutionStatus | null;
+  executionStatus: InstructionExecutionStatus;
 
   constructor(args: {
     proposal: PublicKey;
@@ -449,7 +451,7 @@ export class ProposalInstruction {
     holdUpTime: number;
     instruction: InstructionData;
     executedAt: BN | null;
-    executionStatus: InstructionExecutionStatus | null;
+    executionStatus: InstructionExecutionStatus;
   }) {
     this.proposal = args.proposal;
     this.instructionIndex = args.instructionIndex;
