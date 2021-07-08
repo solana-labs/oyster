@@ -46,10 +46,6 @@ let WORMHOLE_BRIDGE: {
   wrappedMaster: string;
 };
 
-let GOVERNANCE: {
-  programId: PublicKey;
-};
-
 let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
 let SWAP_PROGRAM_LAYOUT: any;
@@ -148,8 +144,6 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LAYOUT = swap.current.layout;
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
-  GOVERNANCE = instance.governance();
-
   if (envName === 'mainnet-beta') {
     LENDING_PROGRAM_ID = new PublicKey(
       'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
@@ -165,7 +159,7 @@ export const programIds = () => {
     swapLayout: SWAP_PROGRAM_LAYOUT,
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,
-    governance: GOVERNANCE,
+
     associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
     system: SYSTEM,

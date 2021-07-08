@@ -21,7 +21,11 @@ import {
   TokenListProvider,
   ENV as ChainId,
 } from '@solana/spl-token-registry';
-import { SendTransactionError, SignTransactionError } from '../utils/errors';
+import {
+  SendTransactionError,
+  SignTransactionError,
+  TransactionTimeoutError,
+} from '../utils/errors';
 
 export type ENV =
   | 'mainnet-beta (Serum)'
@@ -424,6 +428,10 @@ export const sendTransaction = async (
         type: 'error',
       });
 
+      if ('timeout' in confirmationStatus.err) {
+        throw new TransactionTimeoutError(txid);
+      }
+
       throw new SendTransactionError(
         `Transaction ${txid} failed (${JSON.stringify(confirmationStatus)})`,
         txid,
@@ -673,6 +681,10 @@ async function awaitTransactionSignatureConfirmation(
     })();
   })
     .catch(err => {
+      if (err.timeout && status) {
+        status.err = { timeout: true };
+      }
+
       //@ts-ignore
       if (connection._signatureSubscriptions[subId])
         connection.removeSignatureListener(subId);
