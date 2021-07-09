@@ -1,4 +1,4 @@
-import { Form, FormInstance, Input } from 'antd';
+import { Form, FormInstance } from 'antd';
 import { ExplorerLink, ParsedAccount } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
@@ -8,6 +8,7 @@ import { createSetBuffer } from '../../../../tools/anchor/idlInstructions';
 
 import { formDefaults } from '../../../../tools/forms';
 import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
+import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 
 export const AnchorIdlSetBufferForm = ({
   form,
@@ -51,13 +52,10 @@ export const AnchorIdlSetBufferForm = ({
         />
       </Form.Item>
 
-      <Form.Item
+      <AccountFormItem
         name="idlBufferAddress"
         label="idl buffer"
-        rules={[{ required: true }]}
-      >
-        <Input />
-      </Form.Item>
+      ></AccountFormItem>
 
       <Form.Item label="idl account" initialValue={idlAddress}>
         {idlAddress && <ExplorerLink address={idlAddress} type="address" />}
