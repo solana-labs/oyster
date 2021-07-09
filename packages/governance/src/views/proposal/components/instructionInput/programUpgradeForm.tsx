@@ -7,7 +7,7 @@ import React from 'react';
 import { createUpgradeInstruction } from '../../../../models/sdkInstructions';
 import { formDefaults } from '../../../../tools/forms';
 
-export const UpgradeProgramForm = ({
+export const ProgramUpgradeForm = ({
   form,
   governance,
   onCreateInstruction,

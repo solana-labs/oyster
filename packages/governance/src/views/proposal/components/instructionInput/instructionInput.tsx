@@ -11,8 +11,8 @@ import { Governance } from '../../../../models/accounts';
 import { serializeInstructionToBase64 } from '../../../../models/serialisation';
 
 import { MintToForm } from './mintToForm';
+import { ProgramInstructionForm } from './programInstructionForm';
 import { TransferForm } from './transferForm';
-import { UpgradeProgramForm } from './upgradeProgramForm';
 
 export default function InstructionInput({
   governance,
@@ -69,18 +69,18 @@ export default function InstructionInput({
         onCancel={() => setIsFormVisible(false)}
         title={`Create ${
           governance.info.isProgramGovernance()
-            ? 'Upgrade Program'
+            ? 'Program'
             : governance.info.isMintGovernance()
             ? 'Mint To'
             : 'Transfer'
         } Instruction`}
       >
         {governance.info.isProgramGovernance() && (
-          <UpgradeProgramForm
+          <ProgramInstructionForm
             form={form}
             onCreateInstruction={onCreateInstruction}
             governance={governance}
-          ></UpgradeProgramForm>
+          ></ProgramInstructionForm>
         )}
         {governance.info.isMintGovernance() && (
           <MintToForm

@@ -1,5 +1,5 @@
 import { Form, FormInstance, Input } from 'antd';
-import { ExplorerLink, ParsedAccount, useWallet } from '@oyster/common';
+import { ExplorerLink, ParsedAccount } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
@@ -7,8 +7,9 @@ import React from 'react';
 import { createSetBuffer } from '../../../../tools/anchor/idlInstructions';
 
 import { formDefaults } from '../../../../tools/forms';
+import { useProgramIdlAddress } from '../../../../tools/anchor/useProgramIdlAddress';
 
-export const UpgradeAnchorIdlForm = ({
+export const AnchorIdlSetBufferForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -17,16 +18,19 @@ export const UpgradeAnchorIdlForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const { wallet } = useWallet();
+  const idlAddress = useProgramIdlAddress(
+    governance.info.config.governedAccount,
+  );
 
-  if (!wallet?.publicKey) {
-    return <div>Wallet not connected</div>;
-  }
-
-  const onCreate = async ({ bufferAddress }: { bufferAddress: string }) => {
+  const onCreate = async ({
+    idlBufferAddress,
+  }: {
+    idlBufferAddress: string;
+  }) => {
     const upgradeIx = await createSetBuffer(
       governance.info.config.governedAccount,
-      new PublicKey(bufferAddress),
+      new PublicKey(idlBufferAddress),
+      idlAddress!,
       governance.pubkey,
     );
 
@@ -34,25 +38,33 @@ export const UpgradeAnchorIdlForm = ({
   };
 
   return (
-    <Form {...formDefaults} form={form} onFinish={onCreate}>
+    <Form
+      {...formDefaults}
+      form={form}
+      onFinish={onCreate}
+      initialValues={{ idlAccount: idlAddress }}
+    >
       <Form.Item label="program id">
         <ExplorerLink
           address={governance.info.config.governedAccount}
           type="address"
         />
       </Form.Item>
-      <Form.Item label="upgrade authority (governance account)">
-        <ExplorerLink address={governance.pubkey} type="address" />
-      </Form.Item>
-      <Form.Item label="spill account (wallet)">
-        <ExplorerLink address={wallet.publicKey} type="address" />
-      </Form.Item>
+
       <Form.Item
-        name="bufferAddress"
-        label="buffer address"
+        name="idlBufferAddress"
+        label="idl buffer"
         rules={[{ required: true }]}
       >
         <Input />
+      </Form.Item>
+
+      <Form.Item label="idl account" initialValue={idlAddress}>
+        {idlAddress && <ExplorerLink address={idlAddress} type="address" />}
+      </Form.Item>
+
+      <Form.Item label="idl authority (governance account)">
+        <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
     </Form>
   );

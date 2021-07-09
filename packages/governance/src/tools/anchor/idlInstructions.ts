@@ -51,10 +51,10 @@ export function seed(): string {
 export async function createSetBuffer(
   programId: PublicKey,
   buffer: PublicKey,
+  idlAccount: PublicKey,
   idlAuthority: PublicKey,
 ) {
   const data = encodeInstruction({ setBuffer: {} });
-  const idlAddr = await idlAddress(programId);
 
   const keys = [
     {
@@ -62,7 +62,7 @@ export async function createSetBuffer(
       isWritable: true,
       isSigner: false,
     },
-    { pubkey: idlAddr, isWritable: true, isSigner: false },
+    { pubkey: idlAccount, isWritable: true, isSigner: false },
     { pubkey: idlAuthority, isWritable: false, isSigner: true },
   ];
 
