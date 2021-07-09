@@ -7,7 +7,7 @@ import React from 'react';
 import { createSetBuffer } from '../../../../tools/anchor/idlInstructions';
 
 import { formDefaults } from '../../../../tools/forms';
-import { useProgramIdlAddress } from '../../../../tools/anchor/useProgramIdlAddress';
+import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 
 export const AnchorIdlSetBufferForm = ({
   form,
@@ -18,7 +18,7 @@ export const AnchorIdlSetBufferForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const idlAddress = useProgramIdlAddress(
+  const idlAddress = useAnchorIdlAddress(
     governance.info.config.governedAccount,
   );
 

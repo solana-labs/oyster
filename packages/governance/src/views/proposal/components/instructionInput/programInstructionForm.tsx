@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { formDefaults } from '../../../../tools/forms';
 import { ProgramUpgradeForm } from './programUpgradeForm';
 import { AnchorIdlSetBufferForm } from './anchorIdlSetBufferForm';
+import { useAnchorIdlAccount } from '../../../../tools/anchor/anchorHooks';
 
 enum InstructionType {
   UpgradeProgram,
@@ -28,17 +29,22 @@ export const ProgramInstructionForm = ({
     InstructionType.UpgradeProgram,
   );
 
-  const instructions = [
-    InstructionType.UpgradeProgram,
-    InstructionType.AnchorIDLSetBuffer,
-  ];
+  const anchorIdlAccount = useAnchorIdlAccount(
+    governance.info.config.governedAccount,
+  );
+
+  let anchorInstructions = anchorIdlAccount
+    ? [InstructionType.AnchorIDLSetBuffer]
+    : [];
+
+  let instructions = [InstructionType.UpgradeProgram, ...anchorInstructions];
 
   return (
     <Form
       {...formDefaults}
       initialValues={{ instructionType: instructions[0] }}
     >
-      <Form.Item name="instructionType">
+      <Form.Item name="instructionType" label="instruction">
         <Radio.Group onChange={e => setInstruction(e.target.value)}>
           {instructions.map(i => (
             <Radio.Button value={i} key={i}>
