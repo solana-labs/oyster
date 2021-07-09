@@ -13,7 +13,7 @@ import { insertInstruction } from '../../../actions/insertInstruction';
 import '../style.less';
 
 import { formDefaults } from '../../../tools/forms';
-import InstructionInput from './InstructionInput';
+import InstructionInput from './instructionInput/instructionInput';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 
 export function NewInstructionCard({
