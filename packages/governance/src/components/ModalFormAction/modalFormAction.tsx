@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Alert, Button, ButtonProps, Modal, Space, Typography } from 'antd';
 import { Form } from 'antd';
 import './style.less';
-import { contexts, ExplorerLink } from '@oyster/common';
+import {
+  contexts,
+  ExplorerLink,
+  isTransactionTimeoutError,
+} from '@oyster/common';
 
 import { formDefaults } from '../../tools/forms';
 import { isSendTransactionError, isSignTransactionError } from '@oyster/common';
@@ -138,6 +142,12 @@ function ActionForm<TResult>({
           message: `${getTransactionErrorMsg(ex).toString()}`,
           recoveryAction:
             'Please try to amend the inputs and submit the transaction again',
+        });
+      } else if (isTransactionTimeoutError(ex)) {
+        setError({
+          txId: ex.txId,
+          message: ex.message,
+          recoveryAction: 'Please try to submit the transaction again',
         });
       } else if (isSignTransactionError(ex)) {
         setError({

@@ -28,3 +28,18 @@ export function isSignTransactionError(
 ): error is SignTransactionError {
   return error instanceof SignTransactionError;
 }
+
+export class TransactionTimeoutError extends Error {
+  txId: string;
+  constructor(txId: string) {
+    super(`Transaction has timed out`);
+
+    this.txId = txId;
+  }
+}
+
+export function isTransactionTimeoutError(
+  error: any,
+): error is TransactionTimeoutError {
+  return error instanceof TransactionTimeoutError;
+}

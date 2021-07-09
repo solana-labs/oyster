@@ -5,7 +5,7 @@ export const formVerticalLayout = {
 
 /* eslint-disable no-template-curly-in-string */
 export const formValidateMessages = {
-  required: 'Please provide a ${label}',
+  required: 'Please provide ${label}',
 };
 /* eslint-enable no-template-curly-in-string */
 
