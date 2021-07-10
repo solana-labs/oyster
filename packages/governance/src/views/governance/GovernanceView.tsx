@@ -1,4 +1,4 @@
-import { Badge, Col, List, Row } from 'antd';
+import { Badge, Col, List, Row, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -6,7 +6,12 @@ import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { StateBadge } from '../proposal/components/StateBadge';
 import { useHistory } from 'react-router-dom';
-import { ExplorerLink, TokenIcon, useConnectionConfig } from '@oyster/common';
+import {
+  ExplorerLink,
+  TokenIcon,
+  useConnectionConfig,
+  useMint,
+} from '@oyster/common';
 import { AddNewProposal } from './NewProposal';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
@@ -14,6 +19,9 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl } from '../../tools/routeTools';
 import { useRpcContext } from '../../hooks/useRpcContext';
+import { getMintDisplayAmount, getTimestampDays } from '../../tools/units';
+
+const { Text } = Typography;
 
 const PAGE_SIZE = 10;
 
@@ -28,15 +36,16 @@ export const GovernanceView = () => {
   const governance = useGovernance(governanceKey);
   const realm = useRealm(governance?.info.realm);
   const proposals = useProposalsByGovernance(governanceKey);
+  const communityMintInfo = useMint(realm?.info.communityMint);
 
-  const communityTokenMint = realm?.info.communityMint;
-
-  const token = tokenMap.get(communityTokenMint?.toBase58() || '') as any;
+  const token = tokenMap.get(
+    realm?.info.communityMint?.toBase58() || '',
+  ) as any;
   const tokenBackground =
     token?.extensions?.background ||
     'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
 
-  const mint = communityTokenMint?.toBase58() || '';
+  const communityMint = realm?.info.communityMint?.toBase58() || '';
 
   const proposalItems = useMemo(() => {
     const getCompareKey = (p: Proposal) =>
@@ -92,12 +101,32 @@ export const GovernanceView = () => {
               )}
             </h2>
             <a
-              href={tokenMap.get(mint)?.extensions?.website}
+              href={tokenMap.get(communityMint)?.extensions?.website}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {tokenMap.get(mint)?.extensions?.website}
+              {tokenMap.get(communityMint)?.extensions?.website}
             </a>
+            {governance && communityMintInfo && (
+              <Space size="large">
+                <Space direction="vertical" size={0}>
+                  <Text type="secondary">{`max voting time: ${getTimestampDays(
+                    governance.info.config.maxVotingTime,
+                  )} days`}</Text>
+                  <Text type="secondary">{`yes vote threshold: ${governance.info.config.voteThresholdPercentage.value}%`}</Text>
+                </Space>
+
+                <Space direction="vertical" size={0}>
+                  <Text type="secondary">{`min instruction hold up time: ${getTimestampDays(
+                    governance.info.config.minInstructionHoldUpTime,
+                  )} days`}</Text>
+                  <Text type="secondary">{`min tokens to create proposal: ${getMintDisplayAmount(
+                    communityMintInfo,
+                    governance.info.config.minTokensToCreateProposal,
+                  )}`}</Text>
+                </Space>
+              </Space>
+            )}
           </div>
 
           <AddNewProposal

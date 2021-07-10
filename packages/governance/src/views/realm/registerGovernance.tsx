@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ButtonProps, InputNumber, Radio, Checkbox } from 'antd';
+import { ButtonProps, Radio, Checkbox } from 'antd';
 import { Form } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
@@ -21,6 +21,7 @@ import { AccountFormItem } from '../../components/AccountFormItem/accountFormIte
 import BN from 'bn.js';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
+import { GovernanceConfigFormItem } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 export function RegisterGovernance({
   buttonProps,
@@ -128,41 +129,7 @@ export function RegisterGovernance({
           <Checkbox></Checkbox>
         </Form.Item>
       )}
-
-      <Form.Item
-        name="minTokensToCreateProposal"
-        label={LABELS.MIN_TOKENS_TO_CREATE_PROPOSAL}
-        rules={[{ required: true }]}
-        initialValue={1}
-      >
-        <InputNumber min={1} />
-      </Form.Item>
-
-      <Form.Item
-        name="minInstructionHoldUpTime"
-        label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME_DAYS}
-        rules={[{ required: true }]}
-        initialValue={1}
-      >
-        <InputNumber min={0} />
-      </Form.Item>
-
-      <Form.Item
-        name="maxVotingTime"
-        label={LABELS.MAX_VOTING_TIME_DAYS}
-        rules={[{ required: true }]}
-        initialValue={3}
-      >
-        <InputNumber min={1} />
-      </Form.Item>
-      <Form.Item
-        name="yesVoteThresholdPercentage"
-        label={LABELS.YES_VOTE_THRESHOLD_PERCENTAGE}
-        rules={[{ required: true }]}
-        initialValue={60}
-      >
-        <InputNumber maxLength={3} min={1} max={100} />
-      </Form.Item>
+      <GovernanceConfigFormItem></GovernanceConfigFormItem>
     </ModalFormAction>
   );
 }

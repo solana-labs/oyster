@@ -135,6 +135,17 @@ export class GovernanceConfig {
     this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
     this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
   }
+
+  static getDefault() {
+    return new GovernanceConfig({
+      voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
+      minTokensToCreateProposal: new BN(1),
+      minInstructionHoldUpTime: 1,
+      maxVotingTime: 3,
+      voteWeightSource: VoteWeightSource.Deposit,
+      proposalCoolOffTime: 0,
+    });
+  }
 }
 
 export class Governance {
