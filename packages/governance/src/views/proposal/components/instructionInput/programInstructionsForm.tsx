@@ -1,4 +1,4 @@
-import { Form, FormInstance, Radio } from 'antd';
+import { Form, FormInstance } from 'antd';
 import { ParsedAccount } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
@@ -10,19 +10,9 @@ import { AnchorIdlSetBufferForm } from './anchorIdlSetBufferForm';
 import { useAnchorIdlAccount } from '../../../../tools/anchor/anchorHooks';
 import { GovernanceConfigForm } from './governanceConfigForm';
 
-enum InstructionType {
-  UpgradeProgram,
-  AnchorIDLSetBuffer,
-  GovernanceSetConfig,
-}
+import { InstructionSelector, InstructionType } from '../instructionSelector';
 
-const instructionNames = [
-  'program upgrade',
-  'anchor idl set-buffer',
-  'governance set-config',
-];
-
-export const ProgramInstructionForm = ({
+export const ProgramInstructionsForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -52,15 +42,10 @@ export const ProgramInstructionForm = ({
       {...formDefaults}
       initialValues={{ instructionType: instructions[0] }}
     >
-      <Form.Item name="instructionType" label="instruction">
-        <Radio.Group onChange={e => setInstruction(e.target.value)}>
-          {instructions.map(i => (
-            <Radio.Button value={i} key={i}>
-              {instructionNames[i]}
-            </Radio.Button>
-          ))}
-        </Radio.Group>
-      </Form.Item>
+      <InstructionSelector
+        instructions={instructions}
+        onChange={setInstruction}
+      ></InstructionSelector>
       {instruction === InstructionType.UpgradeProgram && (
         <ProgramUpgradeForm
           form={form}

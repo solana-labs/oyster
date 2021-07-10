@@ -9,9 +9,10 @@ import { useState } from 'react';
 import { Governance } from '../../../../models/accounts';
 
 import { serializeInstructionToBase64 } from '../../../../models/serialisation';
+import { AccountInstructionsForm } from './accountInstructionsForm';
 
 import { MintToForm } from './mintToForm';
-import { ProgramInstructionForm } from './programInstructionForm';
+import { ProgramInstructionsForm } from './programInstructionsForm';
 import { TransferForm } from './transferForm';
 
 export default function InstructionInput({
@@ -24,11 +25,6 @@ export default function InstructionInput({
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
-
-  const creatorsEnabled =
-    governance.info.isMintGovernance() ||
-    governance.info.isProgramGovernance() ||
-    governance.info.isTokenGovernance();
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -50,17 +46,15 @@ export default function InstructionInput({
             placeholder={`base64 encoded serialized Solana Instruction`}
           />
         </Col>
-        {creatorsEnabled && (
-          <Col span={2}>
-            <Button
-              type="text"
-              shape="circle"
-              onClick={() => setIsFormVisible(true)}
-            >
-              <PlusCircleOutlined />
-            </Button>
-          </Col>
-        )}
+        <Col span={2}>
+          <Button
+            type="text"
+            shape="circle"
+            onClick={() => setIsFormVisible(true)}
+          >
+            <PlusCircleOutlined />
+          </Button>
+        </Col>
       </Row>
       <Modal
         visible={isFormVisible}
@@ -71,16 +65,18 @@ export default function InstructionInput({
           governance.info.isProgramGovernance()
             ? 'Program'
             : governance.info.isMintGovernance()
-            ? 'Mint To'
-            : 'Transfer'
-        } Instruction`}
+            ? 'Mint'
+            : governance.info.isTokenGovernance()
+            ? 'Token'
+            : 'Account'
+        } Governance Instruction`}
       >
         {governance.info.isProgramGovernance() && (
-          <ProgramInstructionForm
+          <ProgramInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
             governance={governance}
-          ></ProgramInstructionForm>
+          ></ProgramInstructionsForm>
         )}
         {governance.info.isMintGovernance() && (
           <MintToForm
@@ -95,6 +91,13 @@ export default function InstructionInput({
             onCreateInstruction={onCreateInstruction}
             governance={governance}
           ></TransferForm>
+        )}
+        {governance.info.isAccountGovernance() && (
+          <AccountInstructionsForm
+            form={form}
+            onCreateInstruction={onCreateInstruction}
+            governance={governance}
+          ></AccountInstructionsForm>
         )}
       </Modal>
     </>
