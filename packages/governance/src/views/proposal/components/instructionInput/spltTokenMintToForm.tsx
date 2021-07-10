@@ -6,7 +6,7 @@ import { Token } from '@solana/spl-token';
 import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
 
-export const MintToForm = ({
+export const SplTokenMintToForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -15,6 +15,8 @@ export const MintToForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const { token: tokenProgramId } = utils.programIds();
+
   const onCreate = async ({
     destination,
     amount,
@@ -22,8 +24,6 @@ export const MintToForm = ({
     destination: string;
     amount: number;
   }) => {
-    const { token: tokenProgramId } = utils.programIds();
-
     const mintToIx = Token.createMintToInstruction(
       tokenProgramId,
       governance.info.governedAccount,
@@ -43,6 +43,9 @@ export const MintToForm = ({
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
     >
+      <Form.Item label="program id">
+        <ExplorerLink address={tokenProgramId} type="address" />
+      </Form.Item>
       <Form.Item label="mint">
         <ExplorerLink
           address={governance.info.governedAccount}

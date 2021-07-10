@@ -6,6 +6,7 @@ export enum InstructionType {
   AnchorIDLSetBuffer,
   GovernanceSetConfig,
   SplTokenTransfer,
+  SplTokenMintTo,
 }
 
 const instructionNames = [
@@ -13,6 +14,7 @@ const instructionNames = [
   'anchor idl set-buffer',
   'governance set-config',
   'spl-token transfer',
+  'spl-token mint-to',
 ];
 
 export function InstructionSelector({

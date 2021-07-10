@@ -11,9 +11,9 @@ import { Governance } from '../../../../models/accounts';
 import { serializeInstructionToBase64 } from '../../../../models/serialisation';
 import { AccountInstructionsForm } from './accountInstructionsForm';
 
-import { MintToForm } from './mintToForm';
 import { ProgramInstructionsForm } from './programInstructionsForm';
 import { TokenInstructionsForm } from './tokenInstructionsForm';
+import { MintInstructionsForm } from './mintInstructionsForm';
 
 export default function InstructionInput({
   governance,
@@ -79,11 +79,11 @@ export default function InstructionInput({
           ></ProgramInstructionsForm>
         )}
         {governance.info.isMintGovernance() && (
-          <MintToForm
+          <MintInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
             governance={governance}
-          ></MintToForm>
+          ></MintInstructionsForm>
         )}
         {governance.info.isTokenGovernance() && (
           <TokenInstructionsForm
