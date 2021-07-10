@@ -8,13 +8,19 @@ import { formDefaults } from '../../../../tools/forms';
 import { ProgramUpgradeForm } from './programUpgradeForm';
 import { AnchorIdlSetBufferForm } from './anchorIdlSetBufferForm';
 import { useAnchorIdlAccount } from '../../../../tools/anchor/anchorHooks';
+import { GovernanceConfigForm } from './governanceConfigForm';
 
 enum InstructionType {
   UpgradeProgram,
   AnchorIDLSetBuffer,
+  GovernanceSetConfig,
 }
 
-const instructionNames = ['program upgrade', 'anchor idl set-buffer'];
+const instructionNames = [
+  'program upgrade',
+  'anchor idl set-buffer',
+  'governance set-config',
+];
 
 export const ProgramInstructionForm = ({
   form,
@@ -35,7 +41,11 @@ export const ProgramInstructionForm = ({
     ? [InstructionType.AnchorIDLSetBuffer]
     : [];
 
-  let instructions = [InstructionType.UpgradeProgram, ...anchorInstructions];
+  let instructions = [
+    InstructionType.UpgradeProgram,
+    ...anchorInstructions,
+    InstructionType.GovernanceSetConfig,
+  ];
 
   return (
     <Form
@@ -64,6 +74,13 @@ export const ProgramInstructionForm = ({
           governance={governance}
           onCreateInstruction={onCreateInstruction}
         ></AnchorIdlSetBufferForm>
+      )}
+      {instruction === InstructionType.GovernanceSetConfig && (
+        <GovernanceConfigForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+        ></GovernanceConfigForm>
       )}
     </Form>
   );

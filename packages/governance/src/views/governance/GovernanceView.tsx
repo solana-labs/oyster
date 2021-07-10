@@ -19,7 +19,7 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl } from '../../tools/routeTools';
 import { useRpcContext } from '../../hooks/useRpcContext';
-import { getMintDisplayAmount, getTimestampDays } from '../../tools/units';
+import { getMintDisplayAmount, getDaysFromTimestamp } from '../../tools/units';
 
 const { Text } = Typography;
 
@@ -110,14 +110,14 @@ export const GovernanceView = () => {
             {governance && communityMintInfo && (
               <Space size="large">
                 <Space direction="vertical" size={0}>
-                  <Text type="secondary">{`max voting time: ${getTimestampDays(
+                  <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
                     governance.info.config.maxVotingTime,
                   )} days`}</Text>
                   <Text type="secondary">{`yes vote threshold: ${governance.info.config.voteThresholdPercentage.value}%`}</Text>
                 </Space>
 
                 <Space direction="vertical" size={0}>
-                  <Text type="secondary">{`min instruction hold up time: ${getTimestampDays(
+                  <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
                     governance.info.config.minInstructionHoldUpTime,
                   )} days`}</Text>
                   <Text type="secondary">{`min tokens to create proposal: ${getMintDisplayAmount(

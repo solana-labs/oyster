@@ -9,19 +9,19 @@ import { Redirect } from 'react-router';
 
 import { GovernanceType } from '../../models/enums';
 import { registerGovernance } from '../../actions/registerGovernance';
-import {
-  GovernanceConfig,
-  VoteThresholdPercentage,
-} from '../../models/accounts';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 
 import { AccountFormItem } from '../../components/AccountFormItem/accountFormItem';
-import BN from 'bn.js';
+
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
-import { GovernanceConfigFormItem } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
+import {
+  getGovernanceConfig,
+  GovernanceConfigFormItem,
+  GovernanceConfigValues,
+} from '../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 export function RegisterGovernance({
   buttonProps,
@@ -35,23 +35,15 @@ export function RegisterGovernance({
   const realmKey = useKeyParam();
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
 
-  const onSubmit = async (values: {
-    governanceType: GovernanceType;
-    minTokensToCreateProposal: number;
-    minInstructionHoldUpTime: number;
-    maxVotingTime: number;
-    yesVoteThresholdPercentage: number;
-    governedAccountAddress: string;
-    transferAuthority: boolean;
-  }) => {
-    const config = new GovernanceConfig({
-      voteThresholdPercentage: new VoteThresholdPercentage({
-        value: values.yesVoteThresholdPercentage,
-      }),
-      minTokensToCreateProposal: new BN(values.minTokensToCreateProposal),
-      minInstructionHoldUpTime: values.minInstructionHoldUpTime * 86400,
-      maxVotingTime: values.maxVotingTime * 86400,
-    });
+  const onSubmit = async (
+    values: {
+      governanceType: GovernanceType;
+      governedAccountAddress: string;
+      transferAuthority: boolean;
+    } & GovernanceConfigValues,
+  ) => {
+    const config = getGovernanceConfig(values);
+
     return await registerGovernance(
       rpcContext,
       values.governanceType,
