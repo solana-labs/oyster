@@ -13,6 +13,7 @@ export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   realm: PublicKey,
+  governedAccount: PublicKey,
   config: GovernanceConfig,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
@@ -25,7 +26,7 @@ export const withCreateAccountGovernance = async (
     [
       Buffer.from('account-governance'),
       realm.toBuffer(),
-      config.governedAccount.toBuffer(),
+      governedAccount.toBuffer(),
     ],
     programId,
   );
@@ -39,6 +40,11 @@ export const withCreateAccountGovernance = async (
     {
       pubkey: governanceAddress,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: governedAccount,
+      isWritable: false,
       isSigner: false,
     },
     {

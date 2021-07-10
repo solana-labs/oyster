@@ -26,7 +26,7 @@ export const MintToForm = ({
 
     const mintToIx = Token.createMintToInstruction(
       tokenProgramId,
-      governance.info.config.governedAccount,
+      governance.info.governedAccount,
       new PublicKey(destination),
       governance.pubkey,
       [],
@@ -45,7 +45,7 @@ export const MintToForm = ({
     >
       <Form.Item label="mint">
         <ExplorerLink
-          address={governance.info.config.governedAccount}
+          address={governance.info.governedAccount}
           type="address"
         />
       </Form.Item>

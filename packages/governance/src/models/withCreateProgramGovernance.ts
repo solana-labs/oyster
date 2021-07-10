@@ -13,6 +13,7 @@ export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   realm: PublicKey,
+  governedProgram: PublicKey,
   config: GovernanceConfig,
   transferUpgradeAuthority: boolean,
   programUpgradeAuthority: PublicKey,
@@ -33,13 +34,13 @@ export const withCreateProgramGovernance = async (
     [
       Buffer.from('program-governance'),
       realm.toBuffer(),
-      config.governedAccount.toBuffer(),
+      governedProgram.toBuffer(),
     ],
     programId,
   );
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
-    [config.governedAccount.toBuffer()],
+    [governedProgram.toBuffer()],
     bpfUpgradableLoaderId,
   );
 
@@ -52,6 +53,11 @@ export const withCreateProgramGovernance = async (
     {
       pubkey: governanceAddress,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: governedProgram,
+      isWritable: false,
       isSigner: false,
     },
     {

@@ -66,8 +66,6 @@ export const GovernanceError: Record<number, string> = [
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
   'Proposal cool off time is not supported', // ProposalCoolOffTimeNotSupported
   'Governance PDA must sign', // GovernancePdaMustSign
-  'Invalid config realm for Governance', // InvalidConfigRealmForGovernance
-  'Invalid config governed account for Governance', // InvalidConfigGovernedAccountForGovernance
 ];
 
 export const TokenError: Record<number, string> = [

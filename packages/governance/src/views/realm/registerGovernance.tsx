@@ -44,8 +44,6 @@ export function RegisterGovernance({
     transferAuthority: boolean;
   }) => {
     const config = new GovernanceConfig({
-      realm: realmKey,
-      governedAccount: new PublicKey(values.governedAccountAddress),
       voteThresholdPercentage: new VoteThresholdPercentage({
         value: values.yesVoteThresholdPercentage,
       }),
@@ -57,6 +55,7 @@ export function RegisterGovernance({
       rpcContext,
       values.governanceType,
       realmKey,
+      new PublicKey(values.governedAccountAddress),
       config,
       values.transferAuthority,
     );
