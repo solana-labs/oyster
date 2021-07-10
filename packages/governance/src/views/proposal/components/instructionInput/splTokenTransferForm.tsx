@@ -7,7 +7,7 @@ import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 
-export const TransferForm = ({
+export const SplTokenTransferForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -16,6 +16,8 @@ export const TransferForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const { token: tokenProgramId } = utils.programIds();
+
   const onCreate = async ({
     destination,
     amount,
@@ -23,8 +25,6 @@ export const TransferForm = ({
     destination: string;
     amount: number;
   }) => {
-    const { token: tokenProgramId } = utils.programIds();
-
     const mintToIx = Token.createTransferInstruction(
       tokenProgramId,
       governance.info.governedAccount,
@@ -44,6 +44,9 @@ export const TransferForm = ({
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
     >
+      <Form.Item label="program id">
+        <ExplorerLink address={tokenProgramId} type="address" />
+      </Form.Item>
       <Form.Item label="source account">
         <ExplorerLink
           address={governance.info.governedAccount}

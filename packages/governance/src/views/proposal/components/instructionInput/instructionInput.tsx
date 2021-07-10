@@ -13,7 +13,7 @@ import { AccountInstructionsForm } from './accountInstructionsForm';
 
 import { MintToForm } from './mintToForm';
 import { ProgramInstructionsForm } from './programInstructionsForm';
-import { TransferForm } from './transferForm';
+import { TokenInstructionsForm } from './tokenInstructionsForm';
 
 export default function InstructionInput({
   governance,
@@ -86,11 +86,11 @@ export default function InstructionInput({
           ></MintToForm>
         )}
         {governance.info.isTokenGovernance() && (
-          <TransferForm
+          <TokenInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
             governance={governance}
-          ></TransferForm>
+          ></TokenInstructionsForm>
         )}
         {governance.info.isAccountGovernance() && (
           <AccountInstructionsForm

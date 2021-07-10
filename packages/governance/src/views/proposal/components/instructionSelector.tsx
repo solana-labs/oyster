@@ -5,12 +5,14 @@ export enum InstructionType {
   UpgradeProgram,
   AnchorIDLSetBuffer,
   GovernanceSetConfig,
+  SplTokenTransfer,
 }
 
 const instructionNames = [
   'program upgrade',
   'anchor idl set-buffer',
   'governance set-config',
+  'spl-token transfer',
 ];
 
 export function InstructionSelector({
