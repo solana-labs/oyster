@@ -1,13 +1,12 @@
-import { Form, FormInstance, InputNumber } from 'antd';
+import { Form, FormInstance, Input, InputNumber } from 'antd';
 import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
-import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 
-export const TransferForm = ({
+export const SplTokenMintToForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -16,6 +15,8 @@ export const TransferForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const { token: tokenProgramId } = utils.programIds();
+
   const onCreate = async ({
     destination,
     amount,
@@ -23,9 +24,7 @@ export const TransferForm = ({
     destination: string;
     amount: number;
   }) => {
-    const { token: tokenProgramId } = utils.programIds();
-
-    const mintToIx = Token.createTransferInstruction(
+    const mintToIx = Token.createMintToInstruction(
       tokenProgramId,
       governance.info.governedAccount,
       new PublicKey(destination),
@@ -44,19 +43,25 @@ export const TransferForm = ({
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
     >
-      <Form.Item label="source account">
+      <Form.Item label="program id">
+        <ExplorerLink address={tokenProgramId} type="address" />
+      </Form.Item>
+      <Form.Item label="mint">
         <ExplorerLink
           address={governance.info.governedAccount}
           type="address"
         />
       </Form.Item>
-      <Form.Item label="account owner (governance account)">
+      <Form.Item label="mint authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
-      <AccountFormItem
+      <Form.Item
         name="destination"
         label="destination account"
-      ></AccountFormItem>
+        rules={[{ required: true }]}
+      >
+        <Input />
+      </Form.Item>
       <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
         <InputNumber min={1} />
       </Form.Item>
