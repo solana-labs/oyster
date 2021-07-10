@@ -113,8 +113,6 @@ export class Realm {
 }
 
 export class GovernanceConfig {
-  realm: PublicKey;
-  governedAccount: PublicKey;
   voteThresholdPercentage: VoteThresholdPercentage;
   minTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
@@ -123,8 +121,6 @@ export class GovernanceConfig {
   proposalCoolOffTime: number;
 
   constructor(args: {
-    realm: PublicKey;
-    governedAccount: PublicKey;
     voteThresholdPercentage: VoteThresholdPercentage;
     minTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
@@ -132,8 +128,6 @@ export class GovernanceConfig {
     voteWeightSource?: VoteWeightSource;
     proposalCoolOffTime?: number;
   }) {
-    this.realm = args.realm;
-    this.governedAccount = args.governedAccount;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
     this.minTokensToCreateProposal = args.minTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
@@ -145,9 +139,27 @@ export class GovernanceConfig {
 
 export class Governance {
   accountType: GovernanceAccountType;
+  realm: PublicKey;
+  governedAccount: PublicKey;
   config: GovernanceConfig;
   reserved?: Uint8Array;
   proposalCount: number;
+
+  constructor(args: {
+    realm: PublicKey;
+    governedAccount: PublicKey;
+    accountType: number;
+    config: GovernanceConfig;
+    reserved?: Uint8Array;
+    proposalCount: number;
+  }) {
+    this.accountType = args.accountType;
+    this.realm = args.realm;
+    this.governedAccount = args.governedAccount;
+    this.config = args.config;
+    this.reserved = args.reserved;
+    this.proposalCount = args.proposalCount;
+  }
 
   isProgramGovernance() {
     return this.accountType === GovernanceAccountType.ProgramGovernance;
@@ -163,18 +175,6 @@ export class Governance {
 
   isTokenGovernance() {
     return this.accountType === GovernanceAccountType.TokenGovernance;
-  }
-
-  constructor(args: {
-    accountType: number;
-    config: GovernanceConfig;
-    reserved?: Uint8Array;
-    proposalCount: number;
-  }) {
-    this.accountType = args.accountType;
-    this.config = args.config;
-    this.reserved = args.reserved;
-    this.proposalCount = args.proposalCount;
   }
 }
 

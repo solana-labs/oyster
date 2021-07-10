@@ -69,7 +69,7 @@ export const ProposalView = () => {
 
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
   const tokenOwnerRecords = useTokenOwnerRecords(
-    governance?.info.config.realm,
+    governance?.info.realm,
     proposal?.info.governingTokenMint,
   );
 
@@ -234,7 +234,7 @@ function InnerProposalView({
 }) {
   let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance.info.config.realm,
+    governance.info.realm,
     proposal.info.governingTokenMint,
   );
   const instructions = useInstructionsByProposal(proposal.pubkey);

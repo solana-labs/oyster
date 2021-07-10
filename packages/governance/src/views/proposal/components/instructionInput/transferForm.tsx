@@ -27,7 +27,7 @@ export const TransferForm = ({
 
     const mintToIx = Token.createTransferInstruction(
       tokenProgramId,
-      governance.info.config.governedAccount,
+      governance.info.governedAccount,
       new PublicKey(destination),
       governance.pubkey,
       [],
@@ -46,7 +46,7 @@ export const TransferForm = ({
     >
       <Form.Item label="source account">
         <ExplorerLink
-          address={governance.info.config.governedAccount}
+          address={governance.info.governedAccount}
           type="address"
         />
       </Form.Item>

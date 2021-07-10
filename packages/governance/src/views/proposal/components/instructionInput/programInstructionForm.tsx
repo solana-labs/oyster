@@ -29,9 +29,7 @@ export const ProgramInstructionForm = ({
     InstructionType.UpgradeProgram,
   );
 
-  const anchorIdlAccount = useAnchorIdlAccount(
-    governance.info.config.governedAccount,
-  );
+  const anchorIdlAccount = useAnchorIdlAccount(governance.info.governedAccount);
 
   let anchorInstructions = anchorIdlAccount
     ? [InstructionType.AnchorIDLSetBuffer]

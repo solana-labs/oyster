@@ -17,14 +17,14 @@ export default function AccountDescription({
   const connection = useConnection();
   const [mintAccount, setMintAccount] = useState<MintInfo | null>();
 
-  const tokenAccount = useAccount(governance.info.config.governedAccount);
+  const tokenAccount = useAccount(governance.info.governedAccount);
 
   useEffect(() => {
     if (!governance.info.isMintGovernance()) {
       return;
     }
     connection
-      .getAccountInfo(governance.info.config.governedAccount)
+      .getAccountInfo(governance.info.governedAccount)
       .then(info => info && deserializeMint(info.data))
       .then(setMintAccount);
   }, [connection, governance]);

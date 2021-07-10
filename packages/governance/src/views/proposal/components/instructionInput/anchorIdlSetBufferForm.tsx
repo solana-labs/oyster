@@ -19,9 +19,7 @@ export const AnchorIdlSetBufferForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const idlAddress = useAnchorIdlAddress(
-    governance.info.config.governedAccount,
-  );
+  const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
 
   const onCreate = async ({
     idlBufferAddress,
@@ -29,7 +27,7 @@ export const AnchorIdlSetBufferForm = ({
     idlBufferAddress: string;
   }) => {
     const upgradeIx = await createSetBuffer(
-      governance.info.config.governedAccount,
+      governance.info.governedAccount,
       new PublicKey(idlBufferAddress),
       idlAddress!,
       governance.pubkey,
@@ -47,7 +45,7 @@ export const AnchorIdlSetBufferForm = ({
     >
       <Form.Item label="program id">
         <ExplorerLink
-          address={governance.info.config.governedAccount}
+          address={governance.info.governedAccount}
           type="address"
         />
       </Form.Item>

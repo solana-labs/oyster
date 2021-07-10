@@ -13,6 +13,7 @@ export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   realm: PublicKey,
+  governedToken: PublicKey,
   config: GovernanceConfig,
   transferTokenOwner: boolean,
   tokenOwner: PublicKey,
@@ -30,7 +31,7 @@ export const withCreateTokenGovernance = async (
     [
       Buffer.from('token-governance'),
       realm.toBuffer(),
-      config.governedAccount.toBuffer(),
+      governedToken.toBuffer(),
     ],
     programId,
   );
@@ -47,7 +48,7 @@ export const withCreateTokenGovernance = async (
       isSigner: false,
     },
     {
-      pubkey: config.governedAccount,
+      pubkey: governedToken,
       isWritable: true,
       isSigner: false,
     },

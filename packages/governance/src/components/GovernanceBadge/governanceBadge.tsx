@@ -33,7 +33,7 @@ export function GovernanceBadge({
       <div style={{ width: size * 1.3, height: size }}>
         {governance.info.isMintGovernance() && (
           <TokenIcon
-            mintAddress={governance.info.config.governedAccount}
+            mintAddress={governance.info.governedAccount}
             size={size}
           />
         )}
@@ -44,11 +44,11 @@ export function GovernanceBadge({
           >
             <TokenIcon
               style={{ position: 'absolute', left: size * 0.5 }}
-              mintAddress={governance.info.config.governedAccount}
+              mintAddress={governance.info.governedAccount}
               size={size * 0.6}
             />
             <TokenIcon
-              mintAddress={governance.info.config.governedAccount}
+              mintAddress={governance.info.governedAccount}
               size={size * 0.6}
             />
             <TokenIcon
@@ -57,7 +57,7 @@ export function GovernanceBadge({
                 left: size * 0.25,
                 top: size * 0.3,
               }}
-              mintAddress={governance.info.config.governedAccount}
+              mintAddress={governance.info.governedAccount}
               size={size * 0.6}
             />
           </div>
@@ -68,7 +68,7 @@ export function GovernanceBadge({
             gap={2}
             style={{ background: color, marginRight: 5 }}
           >
-            {governance.info.config.governedAccount.toBase58().slice(0, 5)}
+            {governance.info.governedAccount.toBase58().slice(0, 5)}
           </Avatar>
         )}
       </div>

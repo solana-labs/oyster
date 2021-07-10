@@ -26,7 +26,7 @@ export const GovernanceView = () => {
 
   const governanceKey = useKeyParam();
   const governance = useGovernance(governanceKey);
-  const realm = useRealm(governance?.info.config.realm);
+  const realm = useRealm(governance?.info.realm);
   const proposals = useProposalsByGovernance(governanceKey);
 
   const communityTokenMint = realm?.info.communityMint;
@@ -86,7 +86,7 @@ export const GovernanceView = () => {
             <h2>
               {governance && (
                 <ExplorerLink
-                  address={governance.info.config.governedAccount}
+                  address={governance.info.governedAccount}
                   type="address"
                 />
               )}

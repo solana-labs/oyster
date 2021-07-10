@@ -28,7 +28,7 @@ export const ProgramUpgradeForm = ({
 
   const onCreate = async ({ bufferAddress }: { bufferAddress: string }) => {
     const upgradeIx = await createUpgradeInstruction(
-      governance.info.config.governedAccount,
+      governance.info.governedAccount,
       new PublicKey(bufferAddress),
       governance.pubkey,
       wallet.publicKey!,
@@ -44,7 +44,7 @@ export const ProgramUpgradeForm = ({
       </Form.Item>
       <Form.Item label="program (governed account)">
         <ExplorerLink
-          address={governance.info.config.governedAccount}
+          address={governance.info.governedAccount}
           type="address"
         />
       </Form.Item>

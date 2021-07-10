@@ -31,11 +31,11 @@ export function AddNewProposal({
   const { programId } = rpcContext;
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance?.info.config.realm,
+    governance?.info.realm,
     realm?.info.communityMint,
   );
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance?.info.config.realm,
+    governance?.info.realm,
     realm?.info.councilMint,
   );
 
@@ -73,7 +73,7 @@ export function AddNewProposal({
 
     return await createProposal(
       rpcContext,
-      governance.info.config.realm,
+      governance.info.realm,
       governance.pubkey,
       values.name,
       values.descriptionLink ?? '',

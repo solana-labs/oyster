@@ -13,6 +13,7 @@ export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   realm: PublicKey,
+  governedMint: PublicKey,
   config: GovernanceConfig,
   transferMintAuthority: boolean,
   mintAuthority: PublicKey,
@@ -27,11 +28,7 @@ export const withCreateMintGovernance = async (
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const [mintGovernanceAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('mint-governance'),
-      realm.toBuffer(),
-      config.governedAccount.toBuffer(),
-    ],
+    [Buffer.from('mint-governance'), realm.toBuffer(), governedMint.toBuffer()],
     programId,
   );
 
@@ -47,7 +44,7 @@ export const withCreateMintGovernance = async (
       isSigner: false,
     },
     {
-      pubkey: config.governedAccount,
+      pubkey: governedMint,
       isWritable: true,
       isSigner: false,
     },

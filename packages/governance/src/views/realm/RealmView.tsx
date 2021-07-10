@@ -46,14 +46,14 @@ export const RealmView = () => {
   const governanceItems = useMemo(() => {
     return governances
       .sort((g1, g2) =>
-        g1.info.config.governedAccount
+        g1.info.governedAccount
           .toBase58()
-          .localeCompare(g2.info.config.governedAccount.toBase58()),
+          .localeCompare(g2.info.governedAccount.toBase58()),
       )
       .map(g => ({
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
-        title: g.info.config.governedAccount.toBase58(),
+        title: g.info.governedAccount.toBase58(),
         badge: <GovernanceBadge governance={g}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
