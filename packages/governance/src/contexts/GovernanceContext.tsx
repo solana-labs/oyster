@@ -53,8 +53,13 @@ export default function GovernanceProvider({ children = null as any }) {
 
   useEffect(() => {
     const sub = (async () => {
-      const realms = await getRealms(rpcContext);
-      setRealms(realms);
+      try {
+        const loadedRealms = await getRealms(rpcContext);
+        setRealms(loadedRealms);
+      } catch (ex) {
+        console.error("Can't load Realms", ex);
+        setRealms({});
+      }
 
       return connection.onProgramAccountChange(
         programId,
