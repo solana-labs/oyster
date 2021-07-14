@@ -62,16 +62,6 @@ export const ENDPOINTS = [
     endpoint: 'http://127.0.0.1:8899',
     ChainId: ChainId.Devnet,
   },
-  {
-    name: 'Oyster Dev' as ENV,
-    endpoint: 'http://oyster-dev.solana.com/',
-    ChainId: ChainId.Devnet,
-  },
-  {
-    name: 'Lending' as ENV,
-    endpoint: 'https://tln.solana.com/',
-    ChainId: ChainId.Devnet,
-  },
 ];
 
 const DEFAULT = ENDPOINTS[0].endpoint;

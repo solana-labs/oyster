@@ -10,7 +10,7 @@ export enum InstructionType {
 }
 
 const instructionNames = [
-  'program upgrade',
+  'upgrade',
   'anchor idl set-buffer',
   'governance set-config',
   'spl-token transfer',
