@@ -8,12 +8,14 @@ import { ProposalView } from './views/proposal/ProposalView';
 import { GovernanceView } from './views/governance/GovernanceView';
 import { DevToolsView } from './views/devtools/DevToolsView';
 import { RealmView } from './views/realm/RealmView';
-import { Alert } from 'antd';
+
+import { ErrorBoundary } from 'react-error-boundary';
+
+import { AppErrorBanner } from './components/appErrorBanner/appErrorBanner';
 
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
 const { AccountsProvider } = contexts.Accounts;
-const { ErrorBoundary } = Alert;
 
 export function Routes() {
   return (
@@ -22,7 +24,7 @@ export function Routes() {
         {/* TODO: Adding the error boundary as a quick fix to avoid black screens
         for crashes However we should make it nicer and hide the technical
         details from users by default */}
-        <ErrorBoundary>
+        <ErrorBoundary FallbackComponent={AppErrorBanner}>
           <ConnectionProvider>
             <WalletProvider>
               <AccountsProvider>
