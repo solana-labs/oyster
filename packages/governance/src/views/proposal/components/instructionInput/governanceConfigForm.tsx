@@ -14,6 +14,7 @@ import {
 } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { createSetGovernanceConfig } from '../../../../models/createSetGovernanceConfig';
+import { useRealm } from '../../../../contexts/GovernanceContext';
 
 export const GovernanceConfigForm = ({
   form,
@@ -26,6 +27,7 @@ export const GovernanceConfigForm = ({
 }) => {
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
   const { programId } = useRpcContext();
+  const realm = useRealm(governance.info.realm);
 
   const onCreate = async (values: GovernanceConfigValues) => {
     const config = getGovernanceConfig(values);
@@ -55,6 +57,7 @@ export const GovernanceConfigForm = ({
 
       <GovernanceConfigFormItem
         governanceConfig={governance.info.config}
+        realm={realm}
       ></GovernanceConfigFormItem>
     </Form>
   );

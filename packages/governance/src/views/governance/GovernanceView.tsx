@@ -19,7 +19,11 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl } from '../../tools/routeTools';
 import { useRpcContext } from '../../hooks/useRpcContext';
-import { getMintDisplayAmount, getDaysFromTimestamp } from '../../tools/units';
+import {
+  formatMintNaturalAmountAsDecimal,
+  formatMintSupplyFractionAsDecimalPercentage,
+  getDaysFromTimestamp,
+} from '../../tools/units';
 
 const { Text } = Typography;
 
@@ -120,10 +124,13 @@ export const GovernanceView = () => {
                   <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
                     governance.info.config.minInstructionHoldUpTime,
                   )} days`}</Text>
-                  <Text type="secondary">{`min tokens to create proposal: ${getMintDisplayAmount(
+                  <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
                     communityMintInfo,
                     governance.info.config.minTokensToCreateProposal,
-                  )}`}</Text>
+                  )} (${formatMintSupplyFractionAsDecimalPercentage(
+                    communityMintInfo,
+                    governance.info.config.minTokensToCreateProposal,
+                  )})`}</Text>
                 </Space>
               </Space>
             )}

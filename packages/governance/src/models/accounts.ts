@@ -1,6 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { getTimestampFromDays } from '../tools/units';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -135,17 +134,6 @@ export class GovernanceConfig {
     this.maxVotingTime = args.maxVotingTime;
     this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
     this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
-  }
-
-  static getDefault() {
-    return new GovernanceConfig({
-      voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
-      minTokensToCreateProposal: new BN(1),
-      minInstructionHoldUpTime: getTimestampFromDays(1),
-      maxVotingTime: getTimestampFromDays(3),
-      voteWeightSource: VoteWeightSource.Deposit,
-      proposalCoolOffTime: 0,
-    });
   }
 }
 
