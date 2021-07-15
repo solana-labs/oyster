@@ -38,6 +38,7 @@ export const generateGovernanceArtifacts = async (
     0,
     new u64('7000'),
     new u64('10000'),
+    // new u64('18446744073709551615'),
   );
 
   let councilMinSigners: Account[] = [];

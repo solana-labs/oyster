@@ -1,27 +1,52 @@
-import { Form, InputNumber } from 'antd';
+import { Form, InputNumber, Space, Spin, Typography } from 'antd';
 import BN from 'bn.js';
-import React from 'react';
+import React, { useState } from 'react';
+import { contexts, ParsedAccount, constants } from '@oyster/common';
 import { LABELS } from '../../constants';
 import {
   GovernanceConfig,
+  Realm,
   VoteThresholdPercentage,
+  VoteWeightSource,
 } from '../../models/accounts';
 import { getNameOf } from '../../tools/script';
-import { getDaysFromTimestamp, getTimestampFromDays } from '../../tools/units';
+import {
+  getDaysFromTimestamp,
+  getMintNaturalAmountFromDecimal,
+  getMintDecimalAmountFromNatural,
+  getMintSupplyPercentageAsDecimal,
+  getMintMinAmountAsDecimal,
+  getTimestampFromDays,
+  parseMintNaturalAmountFromDecimal,
+  getMintSupplyFractionAsDecimalPercentage,
+  getMintSupplyAsDecimal,
+  formatPercentage,
+} from '../../tools/units';
+
+const { ZERO } = constants;
+
+const { Text } = Typography;
+const { useMint } = contexts.Accounts;
 
 export interface GovernanceConfigValues {
-  minTokensToCreateProposal: number;
+  minTokensToCreateProposal: number | string;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
   voteThresholdPercentage: number;
+  mintDecimals: number;
 }
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
+  const minTokensToCreateProposal = parseMinTokensToCreateProposal(
+    values.minTokensToCreateProposal,
+    values.mintDecimals,
+  );
+
   return new GovernanceConfig({
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,
     }),
-    minTokensToCreateProposal: new BN(values.minTokensToCreateProposal),
+    minTokensToCreateProposal: new BN(minTokensToCreateProposal),
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime,
     ),
@@ -29,22 +54,105 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
   });
 }
 
+function parseMinTokensToCreateProposal(
+  value: string | number,
+  mintDecimals: number,
+) {
+  return typeof value === 'string'
+    ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
+    : getMintNaturalAmountFromDecimal(value, mintDecimals);
+}
+
 const configNameOf = getNameOf<GovernanceConfigValues>();
 
 export function GovernanceConfigFormItem({
-  governanceConfig = GovernanceConfig.getDefault(),
+  governanceConfig,
+  realm,
 }: {
   governanceConfig?: GovernanceConfig;
+  realm: ParsedAccount<Realm> | undefined;
 }) {
+  const communityMintInfo = useMint(realm?.info.communityMint);
+  const [minTokensPercentage, setMintTokensPercentage] = useState<
+    number | undefined
+  >();
+
+  if (!communityMintInfo) {
+    return <Spin></Spin>;
+  }
+
+  let mintDecimals = communityMintInfo.decimals;
+
+  // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
+  let mintSupply1Percent = getMintSupplyPercentageAsDecimal(
+    communityMintInfo,
+    1,
+  );
+
+  let minTokenAmount = getMintMinAmountAsDecimal(communityMintInfo);
+  let maxTokenAmount = getMintSupplyAsDecimal(communityMintInfo);
+
+  // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
+  let minTokenStep = Math.max(mintSupply1Percent, minTokenAmount);
+
+  let minTokensToCreateProposal = minTokenStep;
+
+  if (!governanceConfig) {
+    governanceConfig = new GovernanceConfig({
+      voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
+      minTokensToCreateProposal: ZERO,
+      minInstructionHoldUpTime: getTimestampFromDays(1),
+      maxVotingTime: getTimestampFromDays(3),
+      voteWeightSource: VoteWeightSource.Deposit,
+      proposalCoolOffTime: 0,
+    });
+  } else {
+    minTokensToCreateProposal = getMintDecimalAmountFromNatural(
+      communityMintInfo,
+      governanceConfig.minTokensToCreateProposal,
+    ).toNumber();
+  }
+
+  const getMinTokensPercentage = (amount: number) =>
+    getMintSupplyFractionAsDecimalPercentage(communityMintInfo, amount);
+
+  const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
+    const minTokens = parseMinTokensToCreateProposal(
+      minTokensToCreateProposal,
+      mintDecimals,
+    );
+    setMintTokensPercentage(getMinTokensPercentage(minTokens));
+  };
+
+  if (!minTokensPercentage) {
+    onMinTokensChange(minTokensToCreateProposal);
+  }
+
   return (
     <>
-      <Form.Item
-        name={configNameOf('minTokensToCreateProposal')}
-        label={LABELS.MIN_TOKENS_TO_CREATE_PROPOSAL}
-        rules={[{ required: true }]}
-        initialValue={governanceConfig.minTokensToCreateProposal.toNumber()}
-      >
-        <InputNumber min={1} />
+      <Form.Item label={LABELS.MIN_TOKENS_TO_CREATE_PROPOSAL}>
+        <Space align="end">
+          <Form.Item
+            name={configNameOf('minTokensToCreateProposal')}
+            rules={[{ required: true }]}
+            initialValue={minTokensToCreateProposal}
+            noStyle
+          >
+            <InputNumber
+              min={minTokenAmount}
+              max={maxTokenAmount}
+              step={minTokenStep}
+              onChange={onMinTokensChange}
+              style={{ width: 200 }}
+              stringMode={mintDecimals !== 0}
+            />
+          </Form.Item>
+          {minTokensPercentage && (
+            <Text type="secondary">{`${formatPercentage(
+              minTokensPercentage,
+            )} of token supply`}</Text>
+          )}
+        </Space>
       </Form.Item>
 
       <Form.Item
@@ -74,6 +182,12 @@ export function GovernanceConfigFormItem({
       >
         <InputNumber maxLength={3} min={1} max={100} />
       </Form.Item>
+
+      <Form.Item
+        hidden={true}
+        name={configNameOf('mintDecimals')}
+        initialValue={mintDecimals}
+      ></Form.Item>
     </>
   );
 }

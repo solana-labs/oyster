@@ -22,11 +22,15 @@ import {
   GovernanceConfigFormItem,
   GovernanceConfigValues,
 } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
+import { ParsedAccount } from '../../../../common/dist/lib';
+import { Realm } from '../../models/accounts';
 
 export function RegisterGovernance({
   buttonProps,
+  realm,
 }: {
   buttonProps: ButtonProps;
+  realm: ParsedAccount<Realm> | undefined;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
@@ -121,7 +125,7 @@ export function RegisterGovernance({
           <Checkbox></Checkbox>
         </Form.Item>
       )}
-      <GovernanceConfigFormItem></GovernanceConfigFormItem>
+      <GovernanceConfigFormItem realm={realm}></GovernanceConfigFormItem>
     </ModalFormAction>
   );
 }

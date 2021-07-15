@@ -79,6 +79,7 @@ export const RealmView = () => {
                     <RealmDepositBadge
                       communityTokenOwnerRecord={communityTokenOwnerRecord}
                       councilTokenOwnerRecord={councilTokenOwnerRecord}
+                      showVoteWeights
                     ></RealmDepositBadge>
                   </Text>
                 </Col>
@@ -106,6 +107,7 @@ export const RealmView = () => {
                 ></WithdrawGoverningTokens>
                 <RegisterGovernance
                   buttonProps={{ className: 'governance-action' }}
+                  realm={realm}
                 ></RegisterGovernance>
               </div>
             </Col>
