@@ -73,7 +73,7 @@ export function GovernanceConfigFormItem({
   realm: ParsedAccount<Realm> | undefined;
 }) {
   const communityMintInfo = useMint(realm?.info.communityMint);
-  const [minTokensPercentage, setMintTokensPercentage] = useState<
+  const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >();
 
@@ -121,7 +121,7 @@ export function GovernanceConfigFormItem({
       minTokensToCreateProposal,
       mintDecimals,
     );
-    setMintTokensPercentage(getMinTokensPercentage(minTokens));
+    setMinTokensPercentage(getMinTokensPercentage(minTokens));
   };
 
   if (!minTokensPercentage) {
@@ -184,7 +184,7 @@ export function GovernanceConfigFormItem({
       </Form.Item>
 
       <Form.Item
-        hidden={true}
+        hidden
         name={configNameOf('mintDecimals')}
         initialValue={mintDecimals}
       ></Form.Item>
