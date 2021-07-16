@@ -4,7 +4,7 @@ import { useRealm } from '../../contexts/GovernanceContext';
 
 import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { StateBadge } from '../proposal/components/StateBadge';
+import { ProposalStateBadge } from '../proposal/components/proposalStateBadge';
 import { useHistory } from 'react-router-dom';
 import {
   ExplorerLink,
@@ -162,7 +162,7 @@ export const GovernanceView = () => {
               <List.Item.Meta
                 avatar={item.badge}
                 title={item.title}
-                description={<StateBadge state={item.state} />}
+                description={<ProposalStateBadge state={item.state} />}
               />
             </List.Item>
           )}

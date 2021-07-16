@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
-import { StateBadge } from './components/StateBadge';
+import { ProposalStateBadge } from './components/proposalStateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from './components/InstructionCard';
@@ -273,7 +273,7 @@ function InnerProposalView({
               />
               <Col>
                 <h1>{proposal.info.name}</h1>
-                <StateBadge state={proposal.info.state} />
+                <ProposalStateBadge state={proposal.info.state} />
               </Col>
             </Row>
           </Col>
