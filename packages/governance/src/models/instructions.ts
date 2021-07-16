@@ -26,6 +26,7 @@ export enum GovernanceInstruction {
   CreateMintGovernance = 17,
   CreateTokenGovernance = 18,
   SetGovernanceConfig = 19,
+  FlagInstructionError = 20,
 }
 
 export class CreateRealmArgs {
@@ -188,4 +189,9 @@ export class RemoveInstructionArgs {
 
 export class ExecuteInstructionArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.ExecuteInstruction;
+}
+
+export class FlagInstructionErrorArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.FlagInstructionError;
 }

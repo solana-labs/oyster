@@ -251,6 +251,8 @@ export enum ProposalState {
   Cancelled,
 
   Defeated,
+
+  ExecutingWithErrors,
 }
 
 export class Proposal {

@@ -1,15 +1,9 @@
-import {
-  CheckCircleOutlined,
-  DeleteOutlined,
-  LoadingOutlined,
-  PlayCircleOutlined,
-  RedoOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { ParsedAccount, contexts } from '@oyster/common';
 
-import { Card, Button } from 'antd';
+import { Card, Button, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../../constants';
 import {
   GovernanceAccountType,
@@ -21,20 +15,16 @@ import { GOVERNANCE_SCHEMA } from '../../../models/serialisation';
 import { serialize } from 'borsh';
 
 import './style.less';
-import { executeInstruction } from '../../../actions/executeInstruction';
+
 import { removeInstruction } from '../../../actions/removeInstruction';
 import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
 import { useProposalAuthority } from '../../../hooks/apiHooks';
 import { useRpcContext } from '../../../hooks/useRpcContext';
+import { FlagInstructionErrorButton } from './flagInstructionErrorButton';
+import { PlayState, PlayStatusButton } from './playStatusButton';
 
 const { useWallet } = contexts.Wallet;
 
-enum PlayState {
-  Played,
-  Unplayed,
-  Playing,
-  Error,
-}
 export function InstructionCard({
   instruction,
   proposal,
@@ -107,12 +97,20 @@ export function InstructionCard({
   return (
     <Card
       extra={
-        <PlayStatusButton
-          playing={playing}
-          setPlaying={setPlaying}
-          proposal={proposal}
-          instruction={instruction}
-        />
+        <Space>
+          <FlagInstructionErrorButton
+            playState={playing}
+            proposal={proposal}
+            proposalInstruction={instruction}
+            proposalAuthority={proposalAuthority}
+          ></FlagInstructionErrorButton>
+          <PlayStatusButton
+            playing={playing}
+            setPlaying={setPlaying}
+            proposal={proposal}
+            instruction={instruction}
+          />
+        </Space>
       }
       tabList={[
         { key: 'info', tab: 'Info' },
@@ -126,74 +124,4 @@ export function InstructionCard({
       {contentList[tabKey]}
     </Card>
   );
-}
-
-function PlayStatusButton({
-  proposal,
-  playing,
-  setPlaying,
-  instruction,
-}: {
-  proposal: ParsedAccount<Proposal>;
-  instruction: ParsedAccount<ProposalInstruction>;
-  playing: PlayState;
-  setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
-}) {
-  const { connected } = useWallet();
-
-  const rpcContext = useRpcContext();
-  const { connection } = rpcContext;
-  const [currentSlot, setCurrentSlot] = useState(0);
-
-  let canExecuteAt = proposal.info.votingCompletedAt
-    ? proposal.info.votingCompletedAt.toNumber() + 1
-    : 0;
-
-  const ineligibleToSee = currentSlot - canExecuteAt >= 0;
-
-  useEffect(() => {
-    if (ineligibleToSee) {
-      const timer = setTimeout(() => {
-        connection.getSlot().then(setCurrentSlot);
-      }, 5000);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [ineligibleToSee, connection, currentSlot]);
-
-  const onExecuteInstruction = async () => {
-    setPlaying(PlayState.Playing);
-    try {
-      await executeInstruction(rpcContext, proposal, instruction);
-    } catch (e) {
-      setPlaying(PlayState.Error);
-      return;
-    }
-    setPlaying(PlayState.Played);
-  };
-
-  if (
-    proposal.info.state !== ProposalState.Executing &&
-    proposal.info.state !== ProposalState.Succeeded
-  )
-    return null;
-  if (ineligibleToSee) return null;
-
-  if (playing === PlayState.Unplayed)
-    return (
-      <Button onClick={onExecuteInstruction} disabled={!connected}>
-        <PlayCircleOutlined style={{ color: 'green' }} key="play" />
-      </Button>
-    );
-  else if (playing === PlayState.Playing)
-    return <LoadingOutlined style={{ color: 'orange' }} key="loading" />;
-  else if (playing === PlayState.Error)
-    return (
-      <Button onClick={onExecuteInstruction} disabled={!connected}>
-        <RedoOutlined style={{ color: 'orange' }} key="play" />
-      </Button>
-    );
-  else return <CheckCircleOutlined style={{ color: 'green' }} key="played" />;
 }

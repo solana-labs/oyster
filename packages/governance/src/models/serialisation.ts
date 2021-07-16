@@ -19,6 +19,7 @@ import {
   DepositGoverningTokensArgs,
   ExecuteInstructionArgs,
   FinalizeVoteArgs,
+  FlagInstructionErrorArgs,
   InsertInstructionArgs,
   RelinquishVoteArgs,
   RemoveInstructionArgs,
@@ -237,6 +238,13 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
   [
     ExecuteInstructionArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    FlagInstructionErrorArgs,
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],
