@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ParsedAccount, useWallet } from '@oyster/common';
-import { executeInstruction } from '../../../actions/executeInstruction';
+import { executeInstruction } from '../../../../actions/executeInstruction';
 import {
   InstructionExecutionStatus,
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '../../../models/accounts';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+} from '../../../../models/accounts';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 import React from 'react';
 import {
   CheckCircleOutlined,

@@ -4,7 +4,7 @@ import { contexts } from '@oyster/common';
 import { AppLayout } from './components/Layout/layout';
 import GovernanceProvider from './contexts/GovernanceContext';
 import { HomeView } from './views';
-import { ProposalView } from './views/proposal/ProposalView';
+import { ProposalView } from './views/proposal/proposalView';
 import { GovernanceView } from './views/governance/GovernanceView';
 import { DevToolsView } from './views/devtools/DevToolsView';
 import { RealmView } from './views/realm/RealmView';

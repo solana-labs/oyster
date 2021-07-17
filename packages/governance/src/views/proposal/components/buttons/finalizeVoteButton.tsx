@@ -2,19 +2,23 @@ import { ParsedAccount } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
 
-import { LABELS } from '../../../constants';
+import { LABELS } from '../../../../constants';
 
 import { contexts } from '@oyster/common';
 
-import { Governance, Proposal, ProposalState } from '../../../models/accounts';
+import {
+  Governance,
+  Proposal,
+  ProposalState,
+} from '../../../../models/accounts';
 
-import { finalizeVote } from '../../../actions/finalizeVote';
-import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { finalizeVote } from '../../../../actions/finalizeVote';
+import { useHasVotingTimeExpired } from '../../../../hooks/useHasVotingTimeExpired';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
 
-export function FinalizeVote({
+export function FinalizeVoteButton({
   governance,
   proposal,
 }: {

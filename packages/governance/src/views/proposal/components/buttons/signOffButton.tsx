@@ -3,10 +3,10 @@ import { ParsedAccount, contexts } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { Button, Modal } from 'antd';
 import React from 'react';
-import { signOffProposal } from '../../../actions/signOffProposal';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { signOffProposal } from '../../../../actions/signOffProposal';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
-import { SignatoryRecord } from '../../../models/accounts';
+import { SignatoryRecord } from '../../../../models/accounts';
 
 const { confirm } = Modal;
 

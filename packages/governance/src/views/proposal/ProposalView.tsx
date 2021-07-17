@@ -6,19 +6,19 @@ import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
-import { ProposalStateBadge } from './components/proposalStateBadge';
+import { ProposalStateBadge } from './components/header/proposalStateBadge';
 import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
-import { InstructionCard } from './components/InstructionCard';
-import { NewInstructionCard } from './components/NewInstructionCard';
-import SignOffButton from './components/SignOffButton';
+import { InstructionCard } from './components/instruction/instructionCard';
+import { NewInstructionCard } from './components/instruction/newInstructionCard';
+import SignOffButton from './components/buttons/signOffButton';
 
-import { CastVote } from './components/CastVote';
-import { RelinquishVote } from './components/RelinquishVote';
+import { CastVoteButton } from './components/buttons/castVoteButton';
+import { RelinquishVoteButton } from './components/buttons/relinquishVoteButton';
 import './style.less';
 
-import { VoterBubbleGraph } from './components/VoterBubbleGraph';
-import { VoterTable } from './components/VoterTable';
+import { VoterBubbleGraph } from './components/vote/voterBubbleGraph';
+import { VoterTable } from './components/vote/voterTable';
 import {
   Governance,
   Proposal,
@@ -28,8 +28,8 @@ import {
 } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Vote } from '../../models/instructions';
-import CancelButton from './components/CancelButton';
-import { FinalizeVote } from './components/FinalizeVote';
+import CancelButton from './components/buttons/cancelButton';
+import { FinalizeVoteButton } from './components/buttons/finalizeVoteButton';
 
 import {
   useGovernance,
@@ -286,24 +286,24 @@ function InnerProposalView({
                   proposal.info.state === ProposalState.SigningOff) && (
                   <SignOffButton signatoryRecord={signatoryRecord} />
                 )}
-              <FinalizeVote
+              <FinalizeVoteButton
                 proposal={proposal}
                 governance={governance}
-              ></FinalizeVote>
+              ></FinalizeVoteButton>
 
               {tokenOwnerRecord && (
                 <>
-                  <RelinquishVote
+                  <RelinquishVoteButton
                     proposal={proposal}
                     tokenOwnerRecord={tokenOwnerRecord}
                   />
-                  <CastVote
+                  <CastVoteButton
                     governance={governance}
                     proposal={proposal}
                     tokenOwnerRecord={tokenOwnerRecord}
                     vote={Vote.Yes}
                   />
-                  <CastVote
+                  <CastVoteButton
                     governance={governance}
                     proposal={proposal}
                     vote={Vote.No}

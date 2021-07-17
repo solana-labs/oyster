@@ -3,8 +3,8 @@ import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
 import { utils, contexts, hooks } from '@oyster/common';
 
-import { LABELS } from '../../../constants';
-import { Proposal } from '../../../models/accounts';
+import { LABELS } from '../../../../constants';
+import { Proposal } from '../../../../models/accounts';
 
 const { notify } = utils;
 const { TextArea } = Input;
@@ -17,7 +17,7 @@ const layout = {
   wrapperCol: { span: 19 },
 };
 
-export default function AddSigners({
+export default function AddSignersButton({
   proposal,
 }: {
   proposal: ParsedAccount<Proposal>;
