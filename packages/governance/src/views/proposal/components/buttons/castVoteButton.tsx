@@ -2,28 +2,28 @@ import { ParsedAccount } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 
-import { LABELS } from '../../../constants';
+import { LABELS } from '../../../../constants';
 
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
-import './style.less';
+import '../style.less';
 
 import {
   Governance,
   Proposal,
   ProposalState,
   TokenOwnerRecord,
-} from '../../../models/accounts';
+} from '../../../../models/accounts';
 
-import { Vote } from '../../../models/instructions';
+import { Vote } from '../../../../models/instructions';
 
-import { castVote } from '../../../actions/castVote';
-import { useHasVotingTimeExpired } from '../../../hooks/useHasVotingTimeExpired';
-import { useWalletVoteRecord } from '../../../hooks/apiHooks';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { castVote } from '../../../../actions/castVote';
+import { useHasVotingTimeExpired } from '../../../../hooks/useHasVotingTimeExpired';
+import { useWalletVoteRecord } from '../../../../hooks/apiHooks';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { confirm } = Modal;
-export function CastVote({
+export function CastVoteButton({
   proposal,
   governance,
   tokenOwnerRecord,

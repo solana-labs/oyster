@@ -8,8 +8,8 @@ import { formDefaults } from '../../../../tools/forms';
 
 import { GovernanceConfigForm } from './governanceConfigForm';
 
-import { InstructionSelector, InstructionType } from '../instructionSelector';
-import { SplTokenMintToForm } from './spltTokenMintToForm';
+import { InstructionSelector, InstructionType } from './instructionSelector';
+import { SplTokenMintToForm } from './splTokenMintToForm';
 
 export const MintInstructionsForm = ({
   form,

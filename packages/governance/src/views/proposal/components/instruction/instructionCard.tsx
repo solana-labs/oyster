@@ -4,22 +4,22 @@ import { ParsedAccount, contexts } from '@oyster/common';
 import { Card, Button, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useMemo, useState } from 'react';
-import { LABELS } from '../../../constants';
+import { LABELS } from '../../../../constants';
 import {
   GovernanceAccountType,
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '../../../models/accounts';
-import { GOVERNANCE_SCHEMA } from '../../../models/serialisation';
+} from '../../../../models/accounts';
+import { GOVERNANCE_SCHEMA } from '../../../../models/serialisation';
 import { serialize } from 'borsh';
 
-import './style.less';
+import '../style.less';
 
-import { removeInstruction } from '../../../actions/removeInstruction';
-import { useAccountChangeTracker } from '../../../contexts/GovernanceContext';
-import { useProposalAuthority } from '../../../hooks/apiHooks';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { removeInstruction } from '../../../../actions/removeInstruction';
+import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
+import { useProposalAuthority } from '../../../../hooks/apiHooks';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { FlagInstructionErrorButton } from './flagInstructionErrorButton';
 import { PlayState, PlayStatusButton } from './playStatusButton';
 

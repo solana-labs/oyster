@@ -4,11 +4,11 @@ import { ParsedAccount, contexts } from '@oyster/common';
 import { Button, Modal } from 'antd';
 
 import React from 'react';
-import { cancelProposal } from '../../../actions/cancelProposal';
-import { useProposalAuthority } from '../../../hooks/apiHooks';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { cancelProposal } from '../../../../actions/cancelProposal';
+import { useProposalAuthority } from '../../../../hooks/apiHooks';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
-import { Proposal, ProposalState } from '../../../models/accounts';
+import { Proposal, ProposalState } from '../../../../models/accounts';
 
 const { confirm } = Modal;
 

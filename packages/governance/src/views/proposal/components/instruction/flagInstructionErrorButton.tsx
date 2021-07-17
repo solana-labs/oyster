@@ -1,8 +1,8 @@
 import { BugOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import React from 'react';
-import { flagInstructionError } from '../../../actions/flagInstructionError';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { flagInstructionError } from '../../../../actions/flagInstructionError';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { PlayState } from './playStatusButton';
 import { ParsedAccount } from '@oyster/common';
 import {
@@ -10,7 +10,7 @@ import {
   Proposal,
   ProposalInstruction,
   TokenOwnerRecord,
-} from '../../../models/accounts';
+} from '../../../../models/accounts';
 
 export function FlagInstructionErrorButton({
   proposal,

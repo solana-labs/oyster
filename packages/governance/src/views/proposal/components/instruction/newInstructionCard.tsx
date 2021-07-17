@@ -5,16 +5,16 @@ import { Form } from 'antd';
 import { ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { LABELS } from '../../../constants';
-import { Governance, Proposal } from '../../../models/accounts';
+import { LABELS } from '../../../../constants';
+import { Governance, Proposal } from '../../../../models/accounts';
 
-import { useProposalAuthority } from '../../../hooks/apiHooks';
-import { insertInstruction } from '../../../actions/insertInstruction';
+import { useProposalAuthority } from '../../../../hooks/apiHooks';
+import { insertInstruction } from '../../../../actions/insertInstruction';
 import '../style.less';
 
-import { formDefaults } from '../../../tools/forms';
-import InstructionInput from './instructionInput/instructionInput';
-import { useRpcContext } from '../../../hooks/useRpcContext';
+import { formDefaults } from '../../../../tools/forms';
+import InstructionInput from '../instructionInput/instructionInput';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 export function NewInstructionCard({
   proposal,

@@ -1,6 +1,6 @@
 import { Tag } from 'antd';
 import React from 'react';
-import { ProposalState } from '../../../models/accounts';
+import { ProposalState } from '../../../../models/accounts';
 
 const STATE_COLOR: Record<string, string> = {
   [ProposalState.Draft]: 'orange',

@@ -8,7 +8,7 @@ import { formDefaults } from '../../../../tools/forms';
 
 import { GovernanceConfigForm } from './governanceConfigForm';
 
-import { InstructionSelector, InstructionType } from '../instructionSelector';
+import { InstructionSelector, InstructionType } from './instructionSelector';
 import { SplTokenTransferForm } from './splTokenTransferForm';
 
 export const TokenInstructionsForm = ({

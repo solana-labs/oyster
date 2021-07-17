@@ -10,7 +10,7 @@ import { AnchorIdlSetBufferForm } from './anchorIdlSetBufferForm';
 import { useAnchorIdlAccount } from '../../../../tools/anchor/anchorHooks';
 import { GovernanceConfigForm } from './governanceConfigForm';
 
-import { InstructionSelector, InstructionType } from '../instructionSelector';
+import { InstructionSelector, InstructionType } from './instructionSelector';
 
 export const ProgramInstructionsForm = ({
   form,
