@@ -2,7 +2,7 @@ import React from 'react';
 import { LABELS } from '../../../../constants';
 
 import { Table, Grid } from 'antd';
-import { VoterDisplayData, VoteType } from '../../proposalView';
+import { VoterDisplayData, VoteType } from '../../proposalView1';
 import BN from 'bn.js';
 import { BigNumber } from 'bignumber.js';
 import { utils } from '@oyster/common';
