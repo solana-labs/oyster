@@ -8,8 +8,8 @@ import React, { useState } from 'react';
 
 import { ParsedAccount, useWallet } from '@oyster/common';
 import {
+  InstructionData,
   Proposal,
-  ProposalInstruction,
   ProposalState,
 } from '../../../../models/accounts';
 import { dryRunInstruction } from '../../../../actions/dryRunInstruction';
@@ -25,10 +25,10 @@ const { Text } = Typography;
 
 export function DryRunInstructionButton({
   proposal,
-  proposalInstruction,
+  instructionData,
 }: {
   proposal: ParsedAccount<Proposal>;
-  proposalInstruction: ParsedAccount<ProposalInstruction>;
+  instructionData: InstructionData;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
@@ -55,7 +55,7 @@ export function DryRunInstructionButton({
     setIsModalVisible(true);
     setIsPending(true);
     try {
-      const result = await dryRunInstruction(rpcContext, proposalInstruction);
+      const result = await dryRunInstruction(rpcContext, instructionData);
       setResult(result);
     } finally {
       setIsPending(false);

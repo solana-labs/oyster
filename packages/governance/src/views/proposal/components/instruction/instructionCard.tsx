@@ -105,7 +105,7 @@ export function InstructionCard({
         <Space>
           <DryRunInstructionButton
             proposal={proposal}
-            proposalInstruction={proposalInstruction}
+            instructionData={proposalInstruction.info.instruction}
           ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}

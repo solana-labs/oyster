@@ -1,17 +1,17 @@
-import { ProposalInstruction } from '../models/accounts';
+import { InstructionData } from '../models/accounts';
 import { RpcContext } from '../models/api';
-import { ParsedAccount, simulateTransaction } from '@oyster/common';
+import { simulateTransaction } from '@oyster/common';
 import { Transaction } from '@solana/web3.js';
 
 export async function dryRunInstruction(
   { connection, wallet }: RpcContext,
-  proposalInstruction: ParsedAccount<ProposalInstruction>,
+  instructionData: InstructionData,
 ) {
   let transaction = new Transaction({ feePayer: wallet!.publicKey });
   transaction.add({
-    keys: proposalInstruction.info.instruction.accounts,
-    programId: proposalInstruction.info.instruction.programId,
-    data: Buffer.from(proposalInstruction.info.instruction.data),
+    keys: instructionData.accounts,
+    programId: instructionData.programId,
+    data: Buffer.from(instructionData.data),
   });
 
   const result = await simulateTransaction(
