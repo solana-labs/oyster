@@ -3,7 +3,16 @@ import {
   CloseCircleOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Col, Modal, Row, Spin, Tooltip, Typography } from 'antd';
+import {
+  Button,
+  Col,
+  Modal,
+  Row,
+  Space,
+  Spin,
+  Tooltip,
+  Typography,
+} from 'antd';
 import React, { useState } from 'react';
 
 import { ParsedAccount, useWallet } from '@oyster/common';
@@ -39,6 +48,7 @@ export function DryRunInstructionButton({
     response: SimulatedTransactionResponse;
     transaction: Transaction;
   }>();
+  const [error, setError] = useState();
 
   if (
     !connected ||
@@ -58,6 +68,8 @@ export function DryRunInstructionButton({
     try {
       const result = await dryRunInstruction(rpcContext, instructionData);
       setResult(result);
+    } catch (ex) {
+      setError(ex);
     } finally {
       setIsPending(false);
     }
@@ -75,7 +87,7 @@ export function DryRunInstructionButton({
         </Button>
       </Tooltip>
       <Modal
-        title="Instruction simulation"
+        title="Instruction simulation results"
         visible={isModalVisible}
         onCancel={onClose}
         width={1000}
@@ -89,6 +101,7 @@ export function DryRunInstructionButton({
           isPending={isPending}
           result={result}
           rpcContext={rpcContext}
+          error={error}
         ></DryRunStatus>
       </Modal>
     </>
@@ -115,13 +128,28 @@ function DryRunStatus({
   isPending,
   result,
   rpcContext,
+  error,
 }: {
   rpcContext: RpcContext;
   isPending: boolean;
   result:
     | { response: SimulatedTransactionResponse; transaction: Transaction }
     | undefined;
+  error: Error | undefined;
 }) {
+  const iconStyle = { fontSize: '150%' };
+
+  if (error) {
+    return (
+      <Space>
+        <Text type="danger">
+          <CloseCircleOutlined style={iconStyle} />
+        </Text>
+        <Text> {`Can't run simulation. Error: ${error.message}`}</Text>
+      </Space>
+    );
+  }
+
   if (isPending || !result) {
     return <Spin />;
   }
@@ -136,8 +164,6 @@ function DryRunStatus({
     );
     window.open(inspectUrl, '_blank');
   };
-
-  const iconStyle = { fontSize: '150%' };
 
   return (
     <>
@@ -156,8 +182,8 @@ function DryRunStatus({
         <Col>
           <h3>
             {result.response.err
-              ? 'Instruction returned an error'
-              : 'Instruction ran successfully'}
+              ? 'Simulation returned an error'
+              : 'Simulation ran successfully'}
           </h3>
         </Col>
       </Row>
