@@ -23,7 +23,7 @@ const { getExplorerInspectorUrl } = utils;
 
 const { Text } = Typography;
 
-export function DryRunButton({
+export function DryRunInstructionButton({
   proposal,
   proposalInstruction,
 }: {

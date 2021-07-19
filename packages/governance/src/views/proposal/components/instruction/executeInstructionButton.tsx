@@ -24,7 +24,7 @@ export enum PlayState {
   Error,
 }
 
-export function ExecutionStatusButton({
+export function ExecuteInstructionButton({
   proposal,
   playing,
   setPlaying,
@@ -111,7 +111,7 @@ export function ExecutionStatusButton({
     return (
       <Tooltip title="retry to execute instruction">
         <Button onClick={onExecuteInstruction} disabled={!connected}>
-          <RedoOutlined style={{ color: 'orange' }} key="play" />
+          <RedoOutlined style={{ color: 'red' }} key="play" />
         </Button>
       </Tooltip>
     );

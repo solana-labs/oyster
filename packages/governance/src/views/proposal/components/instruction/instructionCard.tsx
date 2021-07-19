@@ -21,8 +21,11 @@ import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext'
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { FlagInstructionErrorButton } from './flagInstructionErrorButton';
-import { PlayState, ExecutionStatusButton } from './executionStatusButton';
-import { DryRunButton } from '../buttons/dryRunButton';
+import {
+  PlayState,
+  ExecuteInstructionButton,
+} from './executeInstructionButton';
+import { DryRunInstructionButton } from './dryRunInstructionButton';
 
 const { useWallet } = contexts.Wallet;
 
@@ -100,17 +103,17 @@ export function InstructionCard({
     <Card
       extra={
         <Space>
-          <DryRunButton
+          <DryRunInstructionButton
             proposal={proposal}
             proposalInstruction={proposalInstruction}
-          ></DryRunButton>
+          ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}
             proposal={proposal}
             proposalInstruction={proposalInstruction}
             proposalAuthority={proposalAuthority}
           ></FlagInstructionErrorButton>
-          <ExecutionStatusButton
+          <ExecuteInstructionButton
             playing={playing}
             setPlaying={setPlaying}
             proposal={proposal}
