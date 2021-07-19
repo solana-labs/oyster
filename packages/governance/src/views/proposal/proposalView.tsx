@@ -434,15 +434,20 @@ function InnerProposalView({
                     { xs: 8, sm: 16, md: 24, lg: 32 },
                   ]}
                 >
-                  {instructions.map((instruction, position) => (
-                    <Col xs={24} sm={24} md={12} lg={8} key={position}>
-                      <InstructionCard
-                        proposal={proposal}
-                        position={position + 1}
-                        instruction={instruction}
-                      />
-                    </Col>
-                  ))}
+                  {instructions
+                    .sort(
+                      (i1, i2) =>
+                        i1.info.instructionIndex - i2.info.instructionIndex,
+                    )
+                    .map((instruction, position) => (
+                      <Col xs={24} sm={24} md={12} lg={8} key={position}>
+                        <InstructionCard
+                          proposal={proposal}
+                          position={position + 1}
+                          proposalInstruction={instruction}
+                        />
+                      </Col>
+                    ))}
                   {proposal.info.state === ProposalState.Draft && (
                     <Col xs={24} sm={24} md={12} lg={8}>
                       <NewInstructionCard

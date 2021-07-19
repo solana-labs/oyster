@@ -1,11 +1,12 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { ENDPOINTS } from '../contexts';
 import { ENV as ChainId } from '@solana/spl-token-registry';
+import base58 from 'bs58';
 
 export function getExplorerUrl(
-  address: string | PublicKey,
+  viewType: string | PublicKey,
   endpoint: string,
-  type: string = 'address',
+  itemType: string = 'address',
   connection?: Connection,
 ) {
   const getClusterUrlParam = () => {
@@ -36,5 +37,33 @@ export function getExplorerUrl(
     return cluster ? `?cluster=${cluster}` : '';
   };
 
-  return `https://explorer.solana.com/${type}/${address}${getClusterUrlParam()}`;
+  return `https://explorer.solana.com/${itemType}/${viewType}${getClusterUrlParam()}`;
+}
+
+/// Returns explorer inspector URL for the given transaction
+export function getExplorerInspectorUrl(
+  endpoint: string,
+  transaction: Transaction,
+  connection?: Connection,
+) {
+  const SIGNATURE_LENGTH = 64;
+  const params = new URLSearchParams();
+
+  const signatures = transaction.signatures.map(s =>
+    base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH)),
+  );
+
+  const signaturesParam = encodeURIComponent(JSON.stringify(signatures));
+  params.set('signatures', signaturesParam);
+
+  const message = transaction.serializeMessage();
+  const messageParam = encodeURIComponent(message.toString('base64'));
+  params.set('message', messageParam);
+
+  return `${getExplorerUrl(
+    'inspector',
+    endpoint,
+    'tx',
+    connection,
+  )}&${params.toString()}`;
 }
