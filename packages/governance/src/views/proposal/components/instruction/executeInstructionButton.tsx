@@ -15,7 +15,7 @@ import {
   PlayCircleOutlined,
   RedoOutlined,
 } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 
 export enum PlayState {
   Played,
@@ -24,14 +24,14 @@ export enum PlayState {
   Error,
 }
 
-export function PlayStatusButton({
+export function ExecuteInstructionButton({
   proposal,
   playing,
   setPlaying,
-  instruction,
+  proposalInstruction,
 }: {
   proposal: ParsedAccount<Proposal>;
-  instruction: ParsedAccount<ProposalInstruction>;
+  proposalInstruction: ParsedAccount<ProposalInstruction>;
   playing: PlayState;
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
@@ -62,13 +62,24 @@ export function PlayStatusButton({
   const onExecuteInstruction = async () => {
     setPlaying(PlayState.Playing);
     try {
-      await executeInstruction(rpcContext, proposal, instruction);
+      await executeInstruction(rpcContext, proposal, proposalInstruction);
     } catch (e) {
       setPlaying(PlayState.Error);
       return;
     }
     setPlaying(PlayState.Played);
   };
+
+  if (
+    proposalInstruction.info.executionStatus ===
+    InstructionExecutionStatus.Success
+  ) {
+    return (
+      <Tooltip title="instruction has been executed successfully">
+        <CheckCircleOutlined style={{ color: 'green' }} />{' '}
+      </Tooltip>
+    );
+  }
 
   if (
     proposal.info.state !== ProposalState.Executing &&
@@ -80,23 +91,29 @@ export function PlayStatusButton({
 
   if (
     playing === PlayState.Unplayed &&
-    instruction.info.executionStatus !== InstructionExecutionStatus.Error
+    proposalInstruction.info.executionStatus !==
+      InstructionExecutionStatus.Error
   ) {
     return (
-      <Button onClick={onExecuteInstruction} disabled={!connected}>
-        <PlayCircleOutlined style={{ color: 'green' }} key="play" />
-      </Button>
+      <Tooltip title="execute instruction">
+        <Button onClick={onExecuteInstruction} disabled={!connected}>
+          <PlayCircleOutlined style={{ color: 'green' }} key="play" />
+        </Button>
+      </Tooltip>
     );
   } else if (playing === PlayState.Playing)
     return <LoadingOutlined style={{ color: 'orange' }} key="loading" />;
   else if (
     playing === PlayState.Error ||
-    instruction.info.executionStatus === InstructionExecutionStatus.Error
+    proposalInstruction.info.executionStatus ===
+      InstructionExecutionStatus.Error
   )
     return (
-      <Button onClick={onExecuteInstruction} disabled={!connected}>
-        <RedoOutlined style={{ color: 'orange' }} key="play" />
-      </Button>
+      <Tooltip title="retry to execute instruction">
+        <Button onClick={onExecuteInstruction} disabled={!connected}>
+          <RedoOutlined style={{ color: 'red' }} key="play" />
+        </Button>
+      </Tooltip>
     );
   else return <CheckCircleOutlined style={{ color: 'green' }} key="played" />;
 }

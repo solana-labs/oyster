@@ -50,6 +50,7 @@ export default function GovernanceProvider({ children = null as any }) {
   const { connection, programId } = rpcContext;
 
   const [realms, setRealms] = useState({});
+  const [changeTracker] = useState(new AccountChangeTracker());
 
   useEffect(() => {
     const sub = (async () => {
@@ -81,14 +82,13 @@ export default function GovernanceProvider({ children = null as any }) {
     return () => {
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
-  }, [connection]); //eslint-disable-line
+  }, [connection, programId.toBase58()]); //eslint-disable-line
 
   return (
     <GovernanceContext.Provider
       value={{
         realms,
-
-        changeTracker: new AccountChangeTracker(),
+        changeTracker,
       }}
     >
       {children}

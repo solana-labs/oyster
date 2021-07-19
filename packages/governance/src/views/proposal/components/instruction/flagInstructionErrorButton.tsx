@@ -3,7 +3,7 @@ import { Button, Tooltip } from 'antd';
 import React from 'react';
 import { flagInstructionError } from '../../../../actions/flagInstructionError';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { PlayState } from './playStatusButton';
+import { PlayState } from './executeInstructionButton';
 import { ParsedAccount } from '@oyster/common';
 import {
   InstructionExecutionStatus,

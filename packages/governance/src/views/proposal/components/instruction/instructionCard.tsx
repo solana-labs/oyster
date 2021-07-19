@@ -21,16 +21,20 @@ import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext'
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { FlagInstructionErrorButton } from './flagInstructionErrorButton';
-import { PlayState, PlayStatusButton } from './playStatusButton';
+import {
+  PlayState,
+  ExecuteInstructionButton,
+} from './executeInstructionButton';
+import { DryRunInstructionButton } from './dryRunInstructionButton';
 
 const { useWallet } = contexts.Wallet;
 
 export function InstructionCard({
-  instruction,
+  proposalInstruction,
   proposal,
   position,
 }: {
-  instruction: ParsedAccount<ProposalInstruction>;
+  proposalInstruction: ParsedAccount<ProposalInstruction>;
   proposal: ParsedAccount<Proposal>;
   position: number;
 }) {
@@ -44,19 +48,19 @@ export function InstructionCard({
 
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
-    instruction.info.executedAt ? PlayState.Played : PlayState.Unplayed,
+    proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed,
   );
 
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(
-      serialize(GOVERNANCE_SCHEMA, instruction.info.instruction),
+      serialize(GOVERNANCE_SCHEMA, proposalInstruction.info.instruction),
     ).toString('base64');
 
     return {
-      programId: instruction.info.instruction.programId,
+      programId: proposalInstruction.info.instruction.programId,
       dataBase64: dataBase64,
     };
-  }, [instruction]);
+  }, [proposalInstruction]);
 
   const contentList: Record<string, JSX.Element> = {
     info: (
@@ -66,7 +70,8 @@ export function InstructionCard({
           <>
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.dataBase64}`}</p>
             <p>
-              {LABELS.HOLD_UP_TIME_DAYS}: {instruction.info.holdUpTime / 86400}
+              {LABELS.HOLD_UP_TIME_DAYS}:{' '}
+              {proposalInstruction.info.holdUpTime / 86400}
             </p>
           </>
         }
@@ -80,9 +85,9 @@ export function InstructionCard({
 
   const deleteAction = () => {
     const onDelete = async () => {
-      await removeInstruction(rpcContext, proposal, instruction.pubkey);
+      await removeInstruction(rpcContext, proposal, proposalInstruction.pubkey);
       changeTracker.notifyAccountRemoved(
-        instruction.pubkey.toBase58(),
+        proposalInstruction.pubkey.toBase58(),
         GovernanceAccountType.ProposalInstruction,
       );
     };
@@ -98,17 +103,21 @@ export function InstructionCard({
     <Card
       extra={
         <Space>
+          <DryRunInstructionButton
+            proposal={proposal}
+            instructionData={proposalInstruction.info.instruction}
+          ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}
             proposal={proposal}
-            proposalInstruction={instruction}
+            proposalInstruction={proposalInstruction}
             proposalAuthority={proposalAuthority}
           ></FlagInstructionErrorButton>
-          <PlayStatusButton
+          <ExecuteInstructionButton
             playing={playing}
             setPlaying={setPlaying}
             proposal={proposal}
-            instruction={instruction}
+            proposalInstruction={proposalInstruction}
           />
         </Space>
       }

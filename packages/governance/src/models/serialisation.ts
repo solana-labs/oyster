@@ -438,3 +438,14 @@ export function BorshAccountParser(
     } as ParsedAccountBase;
   };
 }
+
+export function getInstructionDataFromBase64(instructionDataBase64: string) {
+  const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
+  const instructionData: InstructionData = deserializeBorsh(
+    GOVERNANCE_SCHEMA,
+    InstructionData,
+    instructionDataBin,
+  );
+
+  return instructionData;
+}
