@@ -28,7 +28,7 @@ export function DryRunInstructionButton({
   instructionData,
 }: {
   proposal: ParsedAccount<Proposal>;
-  instructionData: InstructionData;
+  instructionData: InstructionData | undefined;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
@@ -46,7 +46,8 @@ export function DryRunInstructionButton({
       ProposalState.Draft,
       ProposalState.SigningOff,
       ProposalState.Voting,
-    ].includes(proposal.info.state)
+    ].includes(proposal.info.state) ||
+    !instructionData
   ) {
     return null;
   }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, InputNumber } from 'antd';
 import { Form } from 'antd';
 
@@ -6,7 +6,11 @@ import { ParsedAccount } from '@oyster/common';
 
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../../../constants';
-import { Governance, Proposal } from '../../../../models/accounts';
+import {
+  Governance,
+  InstructionData,
+  Proposal,
+} from '../../../../models/accounts';
 
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { insertInstruction } from '../../../../actions/insertInstruction';
@@ -15,6 +19,12 @@ import '../style.less';
 import { formDefaults } from '../../../../tools/forms';
 import InstructionInput from '../instructionInput/instructionInput';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
+import { DryRunInstructionButton } from './dryRunInstructionButton';
+import { getInstructionDataFromBase64 } from '../../../../models/serialisation';
+import {
+  getDaysFromTimestamp,
+  getTimestampFromDays,
+} from '../../../../tools/units';
 
 export function NewInstructionCard({
   proposal,
@@ -25,6 +35,7 @@ export function NewInstructionCard({
 }) {
   const [form] = Form.useForm();
   const rpcContext = useRpcContext();
+  const [instructionData, setInstructionData] = useState<InstructionData>();
 
   const proposalAuthority = useProposalAuthority(
     proposal.info.tokenOwnerRecord,
@@ -38,27 +49,62 @@ export function NewInstructionCard({
     let index = proposal.info.instructionsNextIndex;
 
     try {
+      const instructionData = getInstructionDataFromBase64(values.instruction);
+
       await insertInstruction(
         rpcContext,
         proposal,
         proposalAuthority!.pubkey,
         index,
-        values.holdUpTime * 86400,
-        values.instruction,
+        getTimestampFromDays(values.holdUpTime),
+        instructionData,
       );
 
       form.resetFields();
+      setInstructionData(undefined);
     } catch (ex) {
       console.log('ERROR', ex);
     }
   };
 
-  const minHoldUpTime = governance.info.config.minInstructionHoldUpTime / 86400;
+  const minHoldUpTime = getDaysFromTimestamp(
+    governance.info.config.minInstructionHoldUpTime,
+  );
+
+  const onInstructionChange = (instructionDataBase64: string) => {
+    try {
+      const instructionData: InstructionData = getInstructionDataFromBase64(
+        instructionDataBase64,
+      );
+
+      setInstructionData(instructionData);
+    } catch {
+      setInstructionData(undefined);
+    }
+  };
+
+  const instructionValidator = async (rule: any, value: string) => {
+    if (rule.required && !value) {
+      throw new Error(`Please provide instruction`);
+    } else {
+      try {
+        getInstructionDataFromBase64(value);
+      } catch {
+        throw new Error(`Invalid instruction data`);
+      }
+    }
+  };
 
   return !proposalAuthority ? null : (
     <Card
       title="New Instruction"
       actions={[<SaveOutlined key="save" onClick={form.submit} />]}
+      extra={[
+        <DryRunInstructionButton
+          proposal={proposal}
+          instructionData={instructionData}
+        ></DryRunInstructionButton>,
+      ]}
     >
       <Form
         {...formDefaults}
@@ -80,9 +126,12 @@ export function NewInstructionCard({
         <Form.Item
           name="instruction"
           label="instruction"
-          rules={[{ required: true }]}
+          rules={[{ required: true, validator: instructionValidator }]}
         >
-          <InstructionInput governance={governance}></InstructionInput>
+          <InstructionInput
+            governance={governance}
+            onChange={onInstructionChange}
+          ></InstructionInput>
         </Form.Item>
       </Form>
     </Card>
