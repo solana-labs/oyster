@@ -14,8 +14,7 @@ import { formDefaults } from '../../../../tools/forms';
 
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 
-import { create } from 'superstruct';
-import { ProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
+import { validateProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
 
 export const ProgramUpgradeForm = ({
   form,
@@ -45,28 +44,8 @@ export const ProgramUpgradeForm = ({
     onCreateInstruction(upgradeIx);
   };
 
-  const bufferValidator = (info: AccountInfo<Buffer | ParsedAccountData>) => {
-    if (
-      !('parsed' in info.data && info.data.program === 'bpf-upgradeable-loader')
-    ) {
-      throw new Error('Invalid program buffer account');
-    }
-
-    let buffer: ProgramBufferAccount;
-
-    try {
-      buffer = create(info.data.parsed, ProgramBufferAccount);
-    } catch {
-      throw new Error('Invalid program buffer account');
-    }
-
-    if (buffer.info.authority?.toBase58() !== governance.pubkey.toBase58()) {
-      throw new Error(
-        `Buffer authority must be set to governance account 
-          ${governance.pubkey.toBase58()}`,
-      );
-    }
-  };
+  const bufferValidator = (info: AccountInfo<Buffer | ParsedAccountData>) =>
+    validateProgramBufferAccount(info, governance.pubkey);
 
   return (
     <Form {...formDefaults} form={form} onFinish={onCreate}>
