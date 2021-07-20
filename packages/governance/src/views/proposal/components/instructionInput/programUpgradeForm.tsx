@@ -1,13 +1,21 @@
 import { Form, FormInstance } from 'antd';
 import { ExplorerLink, ParsedAccount, useWallet, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  AccountInfo,
+  ParsedAccountData,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import React from 'react';
 
 import { createUpgradeInstruction } from '../../../../models/sdkInstructions';
 import { formDefaults } from '../../../../tools/forms';
 
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
+
+import { create } from 'superstruct';
+import { ProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
 
 export const ProgramUpgradeForm = ({
   form,
@@ -37,6 +45,29 @@ export const ProgramUpgradeForm = ({
     onCreateInstruction(upgradeIx);
   };
 
+  const bufferValidator = (info: AccountInfo<Buffer | ParsedAccountData>) => {
+    if (
+      !('parsed' in info.data && info.data.program === 'bpf-upgradeable-loader')
+    ) {
+      throw new Error('Invalid program buffer account');
+    }
+
+    let buffer: ProgramBufferAccount;
+
+    try {
+      buffer = create(info.data.parsed, ProgramBufferAccount);
+    } catch {
+      throw new Error('Invalid program buffer account');
+    }
+
+    if (buffer.info.authority?.toBase58() !== governance.pubkey.toBase58()) {
+      throw new Error(
+        `Buffer authority must be set to governance account 
+          ${governance.pubkey.toBase58()}`,
+      );
+    }
+  };
+
   return (
     <Form {...formDefaults} form={form} onFinish={onCreate}>
       <Form.Item label="program id">
@@ -51,6 +82,7 @@ export const ProgramUpgradeForm = ({
       <AccountFormItem
         name="bufferAddress"
         label="buffer address"
+        accountInfoValidator={bufferValidator}
       ></AccountFormItem>
       <Form.Item label="spill account (wallet)">
         <ExplorerLink address={wallet.publicKey} type="address" />

@@ -20,12 +20,12 @@ import {
   InstructionData,
   Proposal,
   ProposalState,
-} from '../../../../models/accounts';
-import { dryRunInstruction } from '../../../../actions/dryRunInstruction';
-import { useRpcContext } from '../../../../hooks/useRpcContext';
+} from '../../../../../models/accounts';
+import { dryRunInstruction } from '../../../../../actions/dryRunInstruction';
+import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
-import { RpcContext } from '../../../../models/api';
+import { RpcContext } from '../../../../../models/api';
 import { utils } from '@oyster/common';
 
 const { getExplorerInspectorUrl } = utils;
@@ -81,7 +81,7 @@ export function DryRunInstructionButton({
 
   return (
     <>
-      <Tooltip title="test instruction in dry run mode">
+      <Tooltip title="simulate instruction execution">
         <Button onClick={onDryRun}>
           <PlayCircleOutlined style={{ color: 'orange' }} key="play" />
         </Button>

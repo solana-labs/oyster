@@ -20,12 +20,12 @@ import { removeInstruction } from '../../../../actions/removeInstruction';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { FlagInstructionErrorButton } from './flagInstructionErrorButton';
+import { FlagInstructionErrorButton } from './buttons/flagInstructionErrorButton';
 import {
   PlayState,
   ExecuteInstructionButton,
-} from './executeInstructionButton';
-import { DryRunInstructionButton } from './dryRunInstructionButton';
+} from './buttons/executeInstructionButton';
+import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
 
 const { useWallet } = contexts.Wallet;
 

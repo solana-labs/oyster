@@ -19,7 +19,7 @@ import '../style.less';
 import { formDefaults } from '../../../../tools/forms';
 import InstructionInput from '../instructionInput/instructionInput';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { DryRunInstructionButton } from './dryRunInstructionButton';
+import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
 import { getInstructionDataFromBase64 } from '../../../../models/serialisation';
 import {
   getDaysFromTimestamp,
