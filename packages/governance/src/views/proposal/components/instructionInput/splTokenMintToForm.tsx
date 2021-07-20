@@ -1,10 +1,17 @@
-import { Form, FormInstance, Input, InputNumber } from 'antd';
+import { Form, FormInstance, InputNumber } from 'antd';
 import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  AccountInfo,
+  ParsedAccountData,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
+import { validateTokenAccount } from '../../../../tools/validators/accounts/token';
+import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 
 export const SplTokenMintToForm = ({
   form,
@@ -36,6 +43,10 @@ export const SplTokenMintToForm = ({
     onCreateInstruction(mintToIx);
   };
 
+  const tokenAccountValidator = (
+    info: AccountInfo<Buffer | ParsedAccountData>,
+  ) => validateTokenAccount(info, governance.info.governedAccount);
+
   return (
     <Form
       {...formDefaults}
@@ -55,13 +66,13 @@ export const SplTokenMintToForm = ({
       <Form.Item label="mint authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
-      <Form.Item
+
+      <AccountFormItem
         name="destination"
         label="destination account"
-        rules={[{ required: true }]}
-      >
-        <Input />
-      </Form.Item>
+        accountInfoValidator={tokenAccountValidator}
+      ></AccountFormItem>
+
       <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
         <InputNumber min={1} />
       </Form.Item>
