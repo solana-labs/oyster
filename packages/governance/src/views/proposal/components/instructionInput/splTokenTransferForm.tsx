@@ -1,11 +1,21 @@
 import { Form, FormInstance, InputNumber } from 'antd';
 import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  AccountInfo,
+  ParsedAccountData,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
+
+import { contexts } from '@oyster/common';
+import { validateTokenAccount } from '../../../../tools/validators/accounts/token';
+
+const { useAccount: useTokenAccount } = contexts.Accounts;
 
 export const SplTokenTransferForm = ({
   form,
@@ -17,6 +27,7 @@ export const SplTokenTransferForm = ({
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const { token: tokenProgramId } = utils.programIds();
+  const sourceTokenAccount = useTokenAccount(governance.info.governedAccount);
 
   const onCreate = async ({
     destination,
@@ -36,6 +47,10 @@ export const SplTokenTransferForm = ({
 
     onCreateInstruction(mintToIx);
   };
+
+  const tokenAccountValidator = (
+    info: AccountInfo<Buffer | ParsedAccountData>,
+  ) => validateTokenAccount(info, sourceTokenAccount?.info.mint);
 
   return (
     <Form
@@ -59,6 +74,7 @@ export const SplTokenTransferForm = ({
       <AccountFormItem
         name="destination"
         label="destination account"
+        accountInfoValidator={tokenAccountValidator}
       ></AccountFormItem>
       <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
         <InputNumber min={1} />
