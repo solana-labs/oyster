@@ -46,11 +46,15 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,
     }),
-    minTokensToCreateProposal: new BN(minTokensToCreateProposal),
+    minCommunityTokensToCreateProposal: new BN(minTokensToCreateProposal),
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime,
     ),
     maxVotingTime: getTimestampFromDays(values.maxVotingTime),
+    // Use 1 as default for council tokens.
+    // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
+    // If it turns to be a wrong assumption then it should be exposed in the UI
+    minCouncilTokensToCreateProposal: new BN(1),
   });
 }
 
@@ -100,16 +104,17 @@ export function GovernanceConfigFormItem({
   if (!governanceConfig) {
     governanceConfig = new GovernanceConfig({
       voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
-      minTokensToCreateProposal: ZERO,
+      minCommunityTokensToCreateProposal: ZERO,
       minInstructionHoldUpTime: getTimestampFromDays(1),
       maxVotingTime: getTimestampFromDays(3),
       voteWeightSource: VoteWeightSource.Deposit,
       proposalCoolOffTime: 0,
+      minCouncilTokensToCreateProposal: ZERO,
     });
   } else {
     minTokensToCreateProposal = getMintDecimalAmountFromNatural(
       communityMintInfo,
-      governanceConfig.minTokensToCreateProposal,
+      governanceConfig.minCommunityTokensToCreateProposal,
     ).toNumber();
   }
 

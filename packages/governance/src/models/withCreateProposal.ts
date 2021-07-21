@@ -15,17 +15,14 @@ export const withCreateProposal = async (
   programId: PublicKey,
   realm: PublicKey,
   governance: PublicKey,
+  tokenOwnerRecord: PublicKey,
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
-  governingTokenOwner: PublicKey,
   governanceAuthority: PublicKey,
   proposalIndex: number,
   payer: PublicKey,
-): Promise<{
-  proposalAddress: PublicKey;
-  tokenOwnerRecordAddress: PublicKey;
-}> => {
+) => {
   const { system: systemId } = utils.programIds();
 
   const args = new CreateProposalArgs({
@@ -48,17 +45,12 @@ export const withCreateProposal = async (
     programId,
   );
 
-  const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      realm.toBuffer(),
-      governingTokenMint.toBuffer(),
-      governingTokenOwner.toBuffer(),
-    ],
-    programId,
-  );
-
   const keys = [
+    {
+      pubkey: realm,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: proposalAddress,
       isWritable: true,
@@ -70,7 +62,7 @@ export const withCreateProposal = async (
       isSigner: false,
     },
     {
-      pubkey: tokenOwnerRecordAddress,
+      pubkey: tokenOwnerRecord,
       isWritable: false,
       isSigner: false,
     },
@@ -109,5 +101,5 @@ export const withCreateProposal = async (
     }),
   );
 
-  return { proposalAddress, tokenOwnerRecordAddress };
+  return proposalAddress;
 };
