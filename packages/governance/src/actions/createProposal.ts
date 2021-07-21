@@ -9,6 +9,7 @@ export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
   governance: PublicKey,
+  tokenOwnerRecord: PublicKey,
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
@@ -20,15 +21,16 @@ export const createProposal = async (
   let signatory = walletPubkey;
   let payer = walletPubkey;
 
-  const { proposalAddress, tokenOwnerRecordAddress } = await withCreateProposal(
+  const proposalAddress = await withCreateProposal(
     instructions,
     programId,
     realm,
     governance,
+    tokenOwnerRecord,
     name,
     descriptionLink,
     governingTokenMint,
-    walletPubkey,
+
     governanceAuthority,
     proposalIndex,
     payer,
@@ -39,7 +41,7 @@ export const createProposal = async (
     instructions,
     programId,
     proposalAddress,
-    tokenOwnerRecordAddress,
+    tokenOwnerRecord,
     governanceAuthority,
     signatory,
     payer,

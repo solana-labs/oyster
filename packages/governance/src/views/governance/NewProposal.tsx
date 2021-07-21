@@ -9,7 +9,7 @@ import { createProposal } from '../../actions/createProposal';
 import { Redirect } from 'react-router';
 
 import { GoverningTokenType } from '../../models/enums';
-import { Governance, Realm, TokenOwnerRecord } from '../../models/accounts';
+import { Governance, Realm } from '../../models/accounts';
 
 import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
@@ -43,21 +43,21 @@ export function AddNewProposal({
     return null;
   }
 
-  const canCreateProposal = (
-    tokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined,
-  ) =>
-    tokenOwnerRecord &&
-    tokenOwnerRecord.info.governingTokenDepositAmount.cmp(
-      new BN(governance?.info.config.minTokensToCreateProposal),
+  const canCreateProposalUsingCommunityTokens =
+    communityTokenOwnerRecord &&
+    communityTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
+      new BN(governance?.info.config.minCommunityTokensToCreateProposal),
     ) >= 0;
 
-  const canCreateCommunityProposal = canCreateProposal(
-    communityTokenOwnerRecord,
-  );
+  const canCreateProposalUsingCouncilTokens =
+    councilTokenOwnerRecord &&
+    councilTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
+      new BN(governance?.info.config.minCouncilTokensToCreateProposal),
+    ) >= 0;
 
-  const canCreateCouncilProposal = canCreateProposal(councilTokenOwnerRecord);
-
-  const isEnabled = canCreateCommunityProposal || canCreateCouncilProposal;
+  const canCreateProposal =
+    canCreateProposalUsingCommunityTokens ||
+    canCreateProposalUsingCouncilTokens;
 
   const onSubmit = async (values: {
     name: string;
@@ -71,10 +71,19 @@ export function AddNewProposal({
         : realm!.info.councilMint!;
     const proposalIndex = governance.info.proposalCount;
 
+    // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord
+    // When governance delegates are not used it doesn't make any difference
+    // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
+    // because user might have different delegates for council and community
+    const tokenOwnerRecord = canCreateProposalUsingCommunityTokens
+      ? communityTokenOwnerRecord
+      : councilTokenOwnerRecord;
+
     return await createProposal(
       rpcContext,
       governance.info.realm,
       governance.pubkey,
+      tokenOwnerRecord!.pubkey,
       values.name,
       values.descriptionLink ?? '',
       governingTokenMint,
@@ -93,16 +102,18 @@ export function AddNewProposal({
   return (
     <ModalFormAction<PublicKey>
       label={LABELS.ADD_NEW_PROPOSAL}
-      buttonProps={{ ...buttonProps, disabled: !isEnabled, type: 'primary' }}
+      buttonProps={{
+        ...buttonProps,
+        disabled: !canCreateProposal,
+        type: 'primary',
+      }}
       formTitle={LABELS.ADD_NEW_PROPOSAL}
       formAction={LABELS.ADD_PROPOSAL}
       formPendingAction={LABELS.ADDING_PROPOSAL}
       onSubmit={onSubmit}
       onComplete={onComplete}
       initialValues={{
-        governingTokenType: canCreateCommunityProposal
-          ? GoverningTokenType.Community
-          : GoverningTokenType.Council,
+        governingTokenType: GoverningTokenType.Community,
       }}
     >
       {realm?.info.councilMint && (
@@ -112,12 +123,11 @@ export function AddNewProposal({
           rules={[{ required: true }]}
         >
           <Radio.Group>
-            {canCreateCommunityProposal && (
-              <Radio.Button value={GoverningTokenType.Community}>
-                {LABELS.COMMUNITY_TOKEN_HOLDERS}
-              </Radio.Button>
-            )}
-            {canCreateCouncilProposal && (
+            <Radio.Button value={GoverningTokenType.Community}>
+              {LABELS.COMMUNITY_TOKEN_HOLDERS}
+            </Radio.Button>
+
+            {realm.info.councilMint && (
               <Radio.Button value={GoverningTokenType.Council}>
                 {LABELS.COUNCIL}
               </Radio.Button>

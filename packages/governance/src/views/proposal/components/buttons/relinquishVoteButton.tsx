@@ -40,6 +40,7 @@ export function RelinquishVoteButton({
     !voteRecord?.info.isRelinquished &&
     (proposal.info.state === ProposalState.Voting ||
       proposal.info.state === ProposalState.Completed ||
+      proposal.info.state === ProposalState.Cancelled ||
       proposal.info.state === ProposalState.Succeeded ||
       proposal.info.state === ProposalState.Executing ||
       proposal.info.state === ProposalState.Defeated);

@@ -114,26 +114,31 @@ export class Realm {
 
 export class GovernanceConfig {
   voteThresholdPercentage: VoteThresholdPercentage;
-  minTokensToCreateProposal: BN;
+  minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
   voteWeightSource: VoteWeightSource;
   proposalCoolOffTime: number;
+  minCouncilTokensToCreateProposal: BN;
 
   constructor(args: {
     voteThresholdPercentage: VoteThresholdPercentage;
-    minTokensToCreateProposal: BN;
+    minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
     voteWeightSource?: VoteWeightSource;
     proposalCoolOffTime?: number;
+    minCouncilTokensToCreateProposal: BN;
   }) {
     this.voteThresholdPercentage = args.voteThresholdPercentage;
-    this.minTokensToCreateProposal = args.minTokensToCreateProposal;
+    this.minCommunityTokensToCreateProposal =
+      args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
     this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
     this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
+    this.minCouncilTokensToCreateProposal =
+      args.minCouncilTokensToCreateProposal;
   }
 }
 
@@ -142,8 +147,8 @@ export class Governance {
   realm: PublicKey;
   governedAccount: PublicKey;
   config: GovernanceConfig;
-  reserved?: Uint8Array;
   proposalCount: number;
+  reserved?: Uint8Array;
 
   constructor(args: {
     realm: PublicKey;

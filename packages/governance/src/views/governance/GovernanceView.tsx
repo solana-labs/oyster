@@ -126,10 +126,10 @@ export const GovernanceView = () => {
                   )} days`}</Text>
                   <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
                     communityMintInfo,
-                    governance.info.config.minTokensToCreateProposal,
+                    governance.info.config.minCommunityTokensToCreateProposal,
                   )} (${formatMintSupplyFractionAsDecimalPercentage(
                     communityMintInfo,
-                    governance.info.config.minTokensToCreateProposal,
+                    governance.info.config.minCommunityTokensToCreateProposal,
                   )})`}</Text>
                 </Space>
               </Space>
