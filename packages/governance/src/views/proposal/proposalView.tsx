@@ -284,7 +284,10 @@ function InnerProposalView({
               {signatoryRecord &&
                 (proposal.info.state === ProposalState.Draft ||
                   proposal.info.state === ProposalState.SigningOff) && (
-                  <SignOffButton signatoryRecord={signatoryRecord} />
+                  <SignOffButton
+                    signatoryRecord={signatoryRecord}
+                    proposal={proposal}
+                  />
                 )}
               <FinalizeVoteButton
                 proposal={proposal}

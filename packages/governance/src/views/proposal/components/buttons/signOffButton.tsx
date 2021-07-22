@@ -6,15 +6,17 @@ import React from 'react';
 import { signOffProposal } from '../../../../actions/signOffProposal';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
-import { SignatoryRecord } from '../../../../models/accounts';
+import { Proposal, SignatoryRecord } from '../../../../models/accounts';
 
 const { confirm } = Modal;
 
 const { useWallet } = contexts.Wallet;
 
 export default function SignOffButton({
+  proposal,
   signatoryRecord,
 }: {
+  proposal: ParsedAccount<Proposal>;
   signatoryRecord: ParsedAccount<SignatoryRecord>;
 }) {
   const { wallet } = useWallet();
@@ -37,6 +39,7 @@ export default function SignOffButton({
               onOk() {
                 return signOffProposal(
                   rpcContext,
+                  proposal.info.governingTokenMint,
                   signatoryRecord,
                   wallet!.publicKey as PublicKey,
                 );
