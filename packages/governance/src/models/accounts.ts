@@ -97,17 +97,21 @@ export class Realm {
 
   councilMint: PublicKey | undefined;
 
+  authority: PublicKey | undefined;
+
   name: string;
 
   constructor(args: {
     communityMint: PublicKey;
     reserved: Uint8Array;
     councilMint: PublicKey | undefined;
+    authority: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
     this.reserved = args.reserved;
     this.councilMint = args.councilMint;
+    this.authority = args.authority;
     this.name = args.name;
   }
 }
@@ -301,6 +305,8 @@ export class Proposal {
 
   executionFlags: InstructionExecutionFlags;
 
+  governingTokenMintSupply: BN | null;
+
   name: string;
 
   descriptionLink: string;
@@ -327,6 +333,7 @@ export class Proposal {
     instructionsCount: number;
     instructionsNextIndex: number;
     executionFlags: InstructionExecutionFlags;
+    governingTokenMintSupply: BN | null;
   }) {
     this.governance = args.governance;
     this.governingTokenMint = args.governingTokenMint;
@@ -349,6 +356,7 @@ export class Proposal {
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
     this.executionFlags = args.executionFlags;
+    this.governingTokenMintSupply = args.governingTokenMintSupply;
   }
 }
 
