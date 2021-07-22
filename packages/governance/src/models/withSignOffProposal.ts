@@ -11,6 +11,7 @@ export const withSignOffProposal = (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   proposal: PublicKey,
+  governingTokenMint: PublicKey,
   signatoryRecord: PublicKey,
   signatory: PublicKey,
 ) => {
@@ -21,6 +22,11 @@ export const withSignOffProposal = (
     {
       pubkey: proposal,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: governingTokenMint,
+      isWritable: false,
       isSigner: false,
     },
     {
