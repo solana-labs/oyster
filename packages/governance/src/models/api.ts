@@ -157,20 +157,24 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
   let accounts: Record<string, ParsedAccount<TAccount>> = {};
 
   for (let rawAccount of rawAccounts) {
-    const account = {
-      pubkey: new PublicKey(rawAccount.pubkey),
-      account: {
-        ...rawAccount.account,
-        data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-      },
-      info: deserializeBorsh(
-        GOVERNANCE_SCHEMA,
-        accountClass,
-        Buffer.from(rawAccount.account.data[0], 'base64'),
-      ),
-    };
+    try {
+      const account = {
+        pubkey: new PublicKey(rawAccount.pubkey),
+        account: {
+          ...rawAccount.account,
+          data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
+        },
+        info: deserializeBorsh(
+          GOVERNANCE_SCHEMA,
+          accountClass,
+          Buffer.from(rawAccount.account.data[0], 'base64'),
+        ),
+      };
 
-    accounts[account.pubkey.toBase58()] = account;
+      accounts[account.pubkey.toBase58()] = account;
+    } catch (ex) {
+      console.error(`Can't deserialize ${accountClass}`, ex);
+    }
   }
 
   return accounts;
