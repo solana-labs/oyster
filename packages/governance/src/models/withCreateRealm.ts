@@ -15,7 +15,8 @@ export async function withCreateRealm(
   name: string,
   communityMint: PublicKey,
   payer: PublicKey,
-  councilMint?: PublicKey,
+  councilMint: PublicKey | undefined,
+  realmAuthority: PublicKey,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
@@ -41,6 +42,11 @@ export async function withCreateRealm(
       pubkey: realmAddress,
       isSigner: false,
       isWritable: true,
+    },
+    {
+      pubkey: realmAuthority,
+      isSigner: false,
+      isWritable: false,
     },
     {
       pubkey: communityMint,

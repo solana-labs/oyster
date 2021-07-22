@@ -19,6 +19,7 @@ export async function registerRealm(
     communityMint,
     walletPubkey,
     councilMint,
+    walletPubkey,
   );
 
   await sendTransactionWithNotifications(
