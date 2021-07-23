@@ -12,9 +12,9 @@ import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { RegisterGovernance } from './registerGovernance';
-import { DepositGoverningTokens } from './DepositGoverningTokens';
-import { WithdrawGoverningTokens } from './WithdrawGoverningTokens';
+import { RegisterGovernanceButton } from './buttons/registerGovernanceButton';
+import { DepositGoverningTokensButton } from './buttons/depositGoverningTokensButton';
+import { WithdrawGoverningTokensButton } from './buttons/withdrawGoverningTokensButton';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
@@ -22,6 +22,7 @@ import AccountDescription from './accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
+//import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
 
 const { Text } = Typography;
 
@@ -87,28 +88,31 @@ export const RealmView = () => {
             </Col>
             <Col md={12} xs={24}>
               <div className="realm-actions">
-                <DepositGoverningTokens
+                <DepositGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.communityMint}
-                ></DepositGoverningTokens>
-                <WithdrawGoverningTokens
+                ></DepositGoverningTokensButton>
+                <WithdrawGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.communityMint}
-                ></WithdrawGoverningTokens>
-                <DepositGoverningTokens
+                ></WithdrawGoverningTokensButton>
+                <DepositGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.councilMint}
                   tokenName="Council"
-                ></DepositGoverningTokens>
-                <WithdrawGoverningTokens
+                ></DepositGoverningTokensButton>
+                <WithdrawGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.councilMint}
                   tokenName="Council"
-                ></WithdrawGoverningTokens>
-                <RegisterGovernance
+                ></WithdrawGoverningTokensButton>
+                <RegisterGovernanceButton
                   buttonProps={{ className: 'governance-action' }}
                   realm={realm}
-                ></RegisterGovernance>
+                ></RegisterGovernanceButton>
+                {/* <SetRealmAuthorityButton
+                  realm={realm}
+                ></SetRealmAuthorityButton> */}
               </div>
             </Col>
           </Row>

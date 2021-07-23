@@ -39,7 +39,6 @@ export default function SignOffButton({
               onOk() {
                 return signOffProposal(
                   rpcContext,
-                  proposal.info.governingTokenMint,
                   signatoryRecord,
                   wallet!.publicKey as PublicKey,
                 );

@@ -21,6 +21,7 @@ const { useWallet } = contexts.Wallet;
 
 /// ModalFormAction is a control displayed as a Button action which opens a Modal from
 /// The ModalForm captures common form use cases: 1) Progress indicator, 2) Close/Cancel state management, 3) Submission errors
+/// TODO: add version without TResult
 export function ModalFormAction<TResult>({
   label,
   formTitle,

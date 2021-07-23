@@ -7,7 +7,7 @@ import { HomeView } from './views';
 import { ProposalView } from './views/proposal/proposalView';
 import { GovernanceView } from './views/governance/GovernanceView';
 import { DevToolsView } from './views/devtools/DevToolsView';
-import { RealmView } from './views/realm/RealmView';
+import { RealmView } from './views/realm/realmView';
 
 import { ErrorBoundary } from 'react-error-boundary';
 

@@ -1,26 +1,27 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
-import { SignatoryRecord } from '../models/accounts';
-import { withSignOffProposal } from '../models/withSignOffProposal';
+import { Realm } from '../models/accounts';
+
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/api';
+import { withSetRealmAuthority } from '../models/withSetRealmAuthority';
 
-export const signOffProposal = async (
+export const setRealmAuthority = async (
   { connection, wallet, programId }: RpcContext,
 
-  signatoryRecord: ParsedAccount<SignatoryRecord>,
-  signatory: PublicKey,
+  realm: ParsedAccount<Realm>,
+  newRealmAuthority: PublicKey,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  withSignOffProposal(
+  withSetRealmAuthority(
     instructions,
     programId,
-    signatoryRecord.info.proposal,
-    signatoryRecord.pubkey,
-    signatory,
+    realm.pubkey,
+    realm.info.authority!,
+    newRealmAuthority,
   );
 
   await sendTransactionWithNotifications(
@@ -28,7 +29,7 @@ export const signOffProposal = async (
     wallet,
     instructions,
     signers,
-    'Signing off proposal',
-    'Proposal signed off',
+    'Setting realm authority',
+    'Realm authority set',
   );
 };

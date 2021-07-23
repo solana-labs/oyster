@@ -190,4 +190,6 @@ export const LABELS = {
   INSTRUCTIONS: 'Instructions',
 
   FINALIZE_VOTE: 'Finalize Vote',
+
+  SET_REALM_AUTHORITY: 'Set Realm Authority',
 };

@@ -27,6 +27,7 @@ export enum GovernanceInstruction {
   CreateTokenGovernance = 18,
   SetGovernanceConfig = 19,
   FlagInstructionError = 20,
+  SetRealmAuthority = 21,
 }
 
 export class CreateRealmArgs {
@@ -194,4 +195,13 @@ export class ExecuteInstructionArgs {
 export class FlagInstructionErrorArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.FlagInstructionError;
+}
+
+export class SetRealmAuthorityArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.SetRealmAuthority;
+  newRealmAuthority: PublicKey;
+
+  constructor(args: { newRealmAuthority: PublicKey }) {
+    this.newRealmAuthority = args.newRealmAuthority;
+  }
 }
