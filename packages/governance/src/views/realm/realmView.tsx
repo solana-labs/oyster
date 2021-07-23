@@ -22,6 +22,7 @@ import AccountDescription from './accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
+//import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
 
 const { Text } = Typography;
 
@@ -109,6 +110,9 @@ export const RealmView = () => {
                   buttonProps={{ className: 'governance-action' }}
                   realm={realm}
                 ></RegisterGovernanceButton>
+                {/* <SetRealmAuthorityButton
+                  realm={realm}
+                ></SetRealmAuthorityButton> */}
               </div>
             </Col>
           </Row>
