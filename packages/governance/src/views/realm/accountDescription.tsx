@@ -5,9 +5,12 @@ import {
   ParsedAccount,
   useAccount,
   useConnection,
+  contexts,
 } from '@oyster/common';
 
 import { MintInfo } from '@solana/spl-token';
+import { formatMintNaturalAmountAsDecimal } from '../../tools/units';
+const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({
   governance,
@@ -18,6 +21,7 @@ export default function AccountDescription({
   const [mintAccount, setMintAccount] = useState<MintInfo | null>();
 
   const tokenAccount = useAccount(governance.info.governedAccount);
+  const tokenAccountMint = useMint(tokenAccount?.info.mint);
 
   useEffect(() => {
     if (!governance.info.isMintGovernance()) {
@@ -33,8 +37,16 @@ export default function AccountDescription({
     <>
       {governance.info.isTokenGovernance() &&
         tokenAccount &&
-        `Token Balance: ${tokenAccount.info.amount}`}
-      {mintAccount && `Mint Supply: ${mintAccount.supply}`}
+        tokenAccountMint &&
+        `Token Balance: ${formatMintNaturalAmountAsDecimal(
+          tokenAccountMint,
+          tokenAccount.info.amount,
+        )}`}
+      {mintAccount &&
+        `Mint Supply: ${formatMintNaturalAmountAsDecimal(
+          mintAccount,
+          mintAccount.supply,
+        )}`}
     </>
   );
 }
