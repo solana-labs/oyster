@@ -197,7 +197,7 @@ export class FlagInstructionErrorArgs {
     GovernanceInstruction.FlagInstructionError;
 }
 
-export class SetRealmAuthority {
+export class SetRealmAuthorityArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.SetRealmAuthority;
   newRealmAuthority: PublicKey;
 

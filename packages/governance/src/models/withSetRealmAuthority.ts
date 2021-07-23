@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { SetRealmAuthority } from './instructions';
+import { SetRealmAuthorityArgs } from './instructions';
 
 export const withSetRealmAuthority = (
   instructions: TransactionInstruction[],
@@ -10,7 +10,7 @@ export const withSetRealmAuthority = (
   realmAuthority: PublicKey,
   newRealmAuthority: PublicKey,
 ) => {
-  const args = new SetRealmAuthority({ newRealmAuthority });
+  const args = new SetRealmAuthorityArgs({ newRealmAuthority });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const keys = [

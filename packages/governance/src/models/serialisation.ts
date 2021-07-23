@@ -24,7 +24,7 @@ import {
   RelinquishVoteArgs,
   RemoveInstructionArgs,
   SetGovernanceConfigArgs,
-  SetRealmAuthority,
+  SetRealmAuthorityArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
@@ -252,7 +252,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
-    SetRealmAuthority,
+    SetRealmAuthorityArgs,
     {
       kind: 'struct',
       fields: [
