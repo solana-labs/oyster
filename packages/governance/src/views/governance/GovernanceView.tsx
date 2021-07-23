@@ -75,8 +75,6 @@ export const GovernanceView = () => {
       }));
   }, [proposals, programIdBase58]);
 
-  console.log('GOV', governance);
-
   return (
     <Row
       style={{
