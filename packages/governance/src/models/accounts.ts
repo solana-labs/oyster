@@ -305,7 +305,7 @@ export class Proposal {
 
   executionFlags: InstructionExecutionFlags;
 
-  governingTokenMintSupply: BN | null;
+  governingTokenMintVoteSupply: BN | null;
 
   name: string;
 
@@ -333,7 +333,7 @@ export class Proposal {
     instructionsCount: number;
     instructionsNextIndex: number;
     executionFlags: InstructionExecutionFlags;
-    governingTokenMintSupply: BN | null;
+    governingTokenMintVoteSupply: BN | null;
   }) {
     this.governance = args.governance;
     this.governingTokenMint = args.governingTokenMint;
@@ -356,7 +356,7 @@ export class Proposal {
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
     this.executionFlags = args.executionFlags;
-    this.governingTokenMintSupply = args.governingTokenMintSupply;
+    this.governingTokenMintVoteSupply = args.governingTokenMintVoteSupply;
   }
 }
 

@@ -8,7 +8,7 @@ import { RpcContext } from '../models/api';
 
 export const signOffProposal = async (
   { connection, wallet, programId }: RpcContext,
-  governingTokenMint: PublicKey,
+
   signatoryRecord: ParsedAccount<SignatoryRecord>,
   signatory: PublicKey,
 ) => {
@@ -19,7 +19,6 @@ export const signOffProposal = async (
     instructions,
     programId,
     signatoryRecord.info.proposal,
-    governingTokenMint,
     signatoryRecord.pubkey,
     signatory,
   );

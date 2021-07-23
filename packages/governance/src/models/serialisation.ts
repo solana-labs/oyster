@@ -367,7 +367,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['executingAt', { kind: 'option', type: 'u64' }],
         ['closedAt', { kind: 'option', type: 'u64' }],
         ['executionFlags', 'u8'],
-        ['governingTokenMintSupply', { kind: 'option', type: 'u64' }],
+        ['governingTokenMintVoteSupply', { kind: 'option', type: 'u64' }],
         ['name', 'string'],
         ['descriptionLink', 'string'],
       ],
