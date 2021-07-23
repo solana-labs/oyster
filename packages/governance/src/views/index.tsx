@@ -1,2 +1,2 @@
 export { HomeView } from './home/HomeView';
-export { RealmView } from './realm/realmViewX';
+export { RealmView } from './realm/realmView';
