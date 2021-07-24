@@ -1,4 +1,4 @@
-import { Col, List, Row, Typography } from 'antd';
+import { Col, List, Row, Space, Typography } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -22,7 +22,7 @@ import AccountDescription from './accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
-//import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
+import { ExplorerLink } from '@oyster/common';
 
 const { Text } = Typography;
 
@@ -68,21 +68,35 @@ export const RealmView = () => {
           <Row>
             <Col md={12} xs={24} className="realm-title">
               <Row>
-                <RealmBadge
-                  size={60}
-                  communityMint={realm?.info.communityMint}
-                  councilMint={realm?.info.councilMint}
-                ></RealmBadge>
-
+                <Col>
+                  <RealmBadge
+                    size={60}
+                    communityMint={realm?.info.communityMint}
+                    councilMint={realm?.info.councilMint}
+                  ></RealmBadge>
+                </Col>
                 <Col style={{ textAlign: 'left', marginLeft: 8 }}>
-                  <h1>{realm?.info.name}</h1>
-                  <Text type="secondary">
-                    <RealmDepositBadge
-                      communityTokenOwnerRecord={communityTokenOwnerRecord}
-                      councilTokenOwnerRecord={councilTokenOwnerRecord}
-                      showVoteWeights
-                    ></RealmDepositBadge>
-                  </Text>
+                  <Space direction="vertical" size={0}>
+                    <Space align="baseline">
+                      <h1>{realm?.info.name}</h1>
+                      <h3>
+                        {realm && (
+                          <ExplorerLink
+                            short
+                            address={realm.info.communityMint}
+                            type="address"
+                          />
+                        )}
+                      </h3>
+                    </Space>
+                    <Text type="secondary">
+                      <RealmDepositBadge
+                        communityTokenOwnerRecord={communityTokenOwnerRecord}
+                        councilTokenOwnerRecord={councilTokenOwnerRecord}
+                        showVoteWeights
+                      ></RealmDepositBadge>
+                    </Text>
+                  </Space>
                 </Col>
               </Row>
             </Col>
