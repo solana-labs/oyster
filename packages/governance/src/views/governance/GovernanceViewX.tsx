@@ -12,7 +12,7 @@ import {
   useConnectionConfig,
   useMint,
 } from '@oyster/common';
-import { AddNewProposal } from './NewProposal';
+import { NewProposalButton } from './buttons/newProposalButton';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -136,7 +136,7 @@ export const GovernanceView = () => {
             )}
           </div>
 
-          <AddNewProposal
+          <NewProposalButton
             buttonProps={{ className: 'proposals-new-btn' }}
             governance={governance}
             realm={realm}
