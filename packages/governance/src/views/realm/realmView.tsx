@@ -1,4 +1,4 @@
-import { Col, List, Row, Space, Typography } from 'antd';
+import { Col, List, Popover, Row, Space, Typography } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -23,6 +23,7 @@ import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepos
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
+import { RealmPopUpDetails } from './components/realmPopUpDetails';
 
 const { Text } = Typography;
 
@@ -69,16 +70,29 @@ export const RealmView = () => {
             <Col md={12} xs={24} className="realm-title">
               <Row>
                 <Col>
-                  <RealmBadge
-                    size={60}
-                    communityMint={realm?.info.communityMint}
-                    councilMint={realm?.info.councilMint}
-                  ></RealmBadge>
+                  <Popover
+                    content={
+                      realm && (
+                        <RealmPopUpDetails realm={realm}></RealmPopUpDetails>
+                      )
+                    }
+                    title={realm?.info.name}
+                    trigger="click"
+                    placement="topLeft"
+                  >
+                    <span>
+                      <RealmBadge
+                        size={60}
+                        communityMint={realm?.info.communityMint}
+                        councilMint={realm?.info.councilMint}
+                      ></RealmBadge>
+                    </span>
+                  </Popover>
                 </Col>
                 <Col style={{ textAlign: 'left', marginLeft: 8 }}>
                   <Space direction="vertical" size={0}>
                     <Space align="baseline">
-                      <h1>{realm?.info.name}</h1>
+                      <h1> {realm?.info.name}</h1>{' '}
                       <h3>
                         {realm && (
                           <ExplorerLink

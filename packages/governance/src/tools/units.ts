@@ -20,6 +20,11 @@ export function formatMintNaturalAmountAsDecimal(
   return getMintDecimalAmountFromNatural(mint, naturalAmount).toFormat();
 }
 
+/// Formats mint supply (natural units) as a decimal string
+export function formatMintSupplyAsDecimal(mint: MintInfo) {
+  return getMintDecimalAmountFromNatural(mint, mint.supply).toFormat();
+}
+
 // Converts mint amount (natural units) to decimals
 export function getMintDecimalAmountFromNatural(
   mint: MintInfo,
