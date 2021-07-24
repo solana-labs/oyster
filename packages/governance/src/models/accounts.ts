@@ -358,6 +358,23 @@ export class Proposal {
     this.executionFlags = args.executionFlags;
     this.governingTokenMintVoteSupply = args.governingTokenMintVoteSupply;
   }
+
+  /// Returns true if Proposal is in state when no voting can happen any longer
+  isVoteFinalized(): boolean {
+    switch (this.state) {
+      case ProposalState.Succeeded:
+      case ProposalState.Executing:
+      case ProposalState.Completed:
+      case ProposalState.Cancelled:
+      case ProposalState.Defeated:
+      case ProposalState.ExecutingWithErrors:
+        return true;
+      case ProposalState.Draft:
+      case ProposalState.SigningOff:
+      case ProposalState.Voting:
+        return false;
+    }
+  }
 }
 
 export class SignatoryRecord {

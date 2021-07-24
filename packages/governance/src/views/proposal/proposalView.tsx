@@ -70,7 +70,9 @@ export const ProposalView = () => {
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.realm,
-    proposal?.info.governingTokenMint,
+    proposal?.info.isVoteFinalized()
+      ? undefined
+      : proposal?.info.governingTokenMint,
   );
 
   return (
@@ -356,7 +358,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={governingTokenMint.supply}
+                    total={getMaxVoteSupply(proposal, governingTokenMint)}
                     data={voterDisplayData}
                     decimals={governingTokenMint.decimals}
                   />
@@ -381,7 +383,7 @@ function InnerProposalView({
               <Statistic
                 title={LABELS.VOTE_SCORE_IN_FAVOUR}
                 value={getVoteInFavorScore(proposal, governingTokenMint)}
-                suffix={`/ ${getMaxVoteScore(governingTokenMint)}`}
+                suffix={`/ ${getMaxVoteScore(proposal, governingTokenMint)}`}
               />
             </Card>
           </Col>
@@ -494,8 +496,24 @@ function getVoteInFavorScore(
     .toString();
 }
 
-function getMaxVoteScore(governingTokenMint: MintInfo) {
-  return new BigNumber(governingTokenMint.supply.toString())
+function getMaxVoteScore(
+  proposal: ParsedAccount<Proposal>,
+  governingTokenMint: MintInfo,
+) {
+  return new BigNumber(
+    getMaxVoteSupply(proposal, governingTokenMint).toString(),
+  )
     .shiftedBy(-governingTokenMint.decimals)
     .toFormat();
+}
+
+function getMaxVoteSupply(
+  proposal: ParsedAccount<Proposal>,
+  governingTokenMint: MintInfo,
+) {
+  return proposal.info.isVoteFinalized() &&
+    // Canceled state is final but we currently  don't capture the mint supply at the cancellation time
+    proposal.info.governingTokenMintVoteSupply
+    ? proposal.info.governingTokenMintVoteSupply
+    : governingTokenMint.supply;
 }
