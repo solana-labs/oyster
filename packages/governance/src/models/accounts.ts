@@ -375,6 +375,56 @@ export class Proposal {
         return false;
     }
   }
+
+  isFinalState(): boolean {
+    // 1) ExecutingWithErrors is not really a final state, it's undefined.
+    //    However it usually indicates none recoverable execution error so we treat is as final for the ui purposes
+    // 2) Succeeded with no instructions is also treated as final since it can't transition any longer
+    //    It really doesn't make any sense but until it's solved in the program we keep consider it final in the ui
+    switch (this.state) {
+      case ProposalState.Completed:
+      case ProposalState.Cancelled:
+      case ProposalState.Defeated:
+      case ProposalState.ExecutingWithErrors:
+        return true;
+      case ProposalState.Succeeded:
+        return this.instructionsCount == 0;
+      case ProposalState.Executing:
+      case ProposalState.Draft:
+      case ProposalState.SigningOff:
+      case ProposalState.Voting:
+        return false;
+    }
+  }
+
+  getStateTimestamp(): number {
+    switch (this.state) {
+      case ProposalState.Succeeded:
+      case ProposalState.Defeated:
+        return this.votingCompletedAt ? this.votingCompletedAt.toNumber() : 0;
+      case ProposalState.Completed:
+      case ProposalState.Cancelled:
+        return this.closedAt ? this.closedAt.toNumber() : 0;
+      case ProposalState.Executing:
+      case ProposalState.ExecutingWithErrors:
+        return this.executingAt ? this.executingAt.toNumber() : 0;
+      case ProposalState.Draft:
+        return this.draftAt.toNumber();
+      case ProposalState.SigningOff:
+        return this.signingOffAt ? this.signingOffAt.toNumber() : 0;
+      case ProposalState.Voting:
+        return this.votingAt ? this.votingAt.toNumber() : 0;
+    }
+  }
+
+  getStateSortRank(): number {
+    // Always show proposals in voting state at the top
+    if (this.state === ProposalState.Voting) {
+      return 2;
+    }
+    // Then show proposals in pending state and finalized at the end
+    return this.isFinalState() ? 0 : 1;
+  }
 }
 
 export class SignatoryRecord {

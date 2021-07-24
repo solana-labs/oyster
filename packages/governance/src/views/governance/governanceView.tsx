@@ -52,13 +52,24 @@ export const GovernanceView = () => {
   const communityMint = realm?.info.communityMint?.toBase58() || '';
 
   const proposalItems = useMemo(() => {
-    const getCompareKey = (p: Proposal) =>
-      `${p.state === ProposalState.Voting ? 0 : 1}${p.name}`;
+    const compareProposals = (p1: Proposal, p2: Proposal) => {
+      const p1Rank = p1.getStateSortRank();
+      const p2Rank = p2.getStateSortRank();
+
+      if (p1Rank > p2Rank) {
+        return 1;
+      } else if (p1Rank < p2Rank) {
+        return -1;
+      }
+
+      const tsCompare = p1.getStateTimestamp() - p2.getStateTimestamp();
+
+      // Show the proposals in voting state expiring earlier at the top
+      return p1.state === ProposalState.Voting ? ~tsCompare : tsCompare;
+    };
 
     return proposals
-      .sort((p1, p2) =>
-        getCompareKey(p1.info).localeCompare(getCompareKey(p2.info)),
-      )
+      .sort((p1, p2) => compareProposals(p2.info, p1.info))
       .map(p => ({
         key: p.pubkey.toBase58(),
         href: getProposalUrl(p.pubkey, programIdBase58),
