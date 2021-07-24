@@ -68,6 +68,9 @@ export const GovernanceError: Record<number, string> = [
   'Governance PDA must sign', // GovernancePdaMustSign
   'Instruction already flagged with error', // InstructionAlreadyFlaggedWithError
   'Invalid Realm for Governance', // InvalidRealmForGovernance
+  'Invalid Authority for Realm', // InvalidAuthorityForRealm
+  'Realm has no authority', // RealmHasNoAuthority
+  'Realm authority must sign', // RealmAuthorityMustSign
 ];
 
 export const TokenError: Record<number, string> = [
