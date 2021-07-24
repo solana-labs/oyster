@@ -388,7 +388,7 @@ export class Proposal {
       case ProposalState.ExecutingWithErrors:
         return true;
       case ProposalState.Succeeded:
-        return this.instructionsCount == 0;
+        return this.instructionsCount === 0;
       case ProposalState.Executing:
       case ProposalState.Draft:
       case ProposalState.SigningOff:
