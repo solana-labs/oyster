@@ -380,7 +380,7 @@ export class Proposal {
     // 1) ExecutingWithErrors is not really a final state, it's undefined.
     //    However it usually indicates none recoverable execution error so we treat is as final for the ui purposes
     // 2) Succeeded with no instructions is also treated as final since it can't transition any longer
-    //    It really doesn't make any sense but until it's solved in the program we keep consider it final in the ui
+    //    It really doesn't make any sense but until it's solved in the program we have to consider it as final in the ui
     switch (this.state) {
       case ProposalState.Completed:
       case ProposalState.Cancelled:
