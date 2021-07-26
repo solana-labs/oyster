@@ -63,7 +63,7 @@ export const VoterTable = (props: VoterTableProps) => {
           style={
             record.group === VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : '#d32029' }
           }
         >
           {new BigNumber(count.toString()).shiftedBy(-decimals).toFormat()}
@@ -80,7 +80,7 @@ export const VoterTable = (props: VoterTableProps) => {
           style={
             record.group === VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : '#d32029' }
           }
         >
           {formatPercentage(count.mul(new BN(100)).div(total).toNumber())}

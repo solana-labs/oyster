@@ -36,7 +36,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
       const color = d3
         .scaleOrdinal()
         .domain([VoteType.Undecided, VoteType.Yes, VoteType.No])
-        .range(['grey', 'green', 'red']);
+        .range(['grey', 'green', '#d32029']);
 
       const pack = (data: Array<VoterDisplayData>) => {
         return d3

@@ -157,7 +157,7 @@ export function VoteScore({
               style={{
                 width: `${noVotePercentAdjusted}%`,
                 height: '100%',
-                background: 'red',
+                background: '#d32029',
                 display: 'inline-block',
               }}
             ></div>
