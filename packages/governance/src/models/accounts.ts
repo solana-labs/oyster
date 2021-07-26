@@ -425,6 +425,11 @@ export class Proposal {
     // Then show proposals in pending state and finalized at the end
     return this.isFinalState() ? 0 : 1;
   }
+
+  /// Returns true if Proposal has not been voted on yet
+  isPreVotingState() {
+    return !this.votingAtSlot;
+  }
 }
 
 export class SignatoryRecord {

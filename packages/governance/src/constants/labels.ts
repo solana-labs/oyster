@@ -10,7 +10,7 @@ export const LABELS = {
   ADDING_PROPOSAL: 'Adding proposal',
 
   MENU_DASHBOARD: 'Dashboard',
-  APP_TITLE: 'Oyster Proposals',
+  APP_TITLE: 'Oyster Governance',
   CONNECT_BUTTON: 'Connect',
   WALLET_TOOLTIP: 'Wallet public key',
   WALLET_BALANCE: 'Wallet balance',
@@ -21,7 +21,7 @@ export const LABELS = {
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
   SIGNATORIES: 'Signatories',
-  VOTE_SCORE_REQUIRED: 'Vote Score Required',
+  YES_VOTES_VOTES: 'Yes Votes Required',
   VOTE_SCORE_IN_FAVOUR: 'Vote Score In Favor',
   ADMIN_PANEL: 'Admin Panel',
   COPY_FAILED_ADDRESSES_TO_INPUT: 'Copy failed addresses to the input',
