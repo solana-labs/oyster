@@ -4,6 +4,7 @@ import { useWallet, useConnection } from '@oyster/common';
 import { Button } from 'antd';
 import { generateGovernanceArtifacts } from '../../actions/devtools/generateGovernanceArtifacts';
 import './style.less';
+// import { ControlTestBench } from './controlTests';
 
 export const DevToolsView = () => {
   return (
@@ -82,6 +83,7 @@ const GovernanceArtifacts = () => {
           </div>
         </>
       )}
+      <div>{/* <ControlTestBench></ControlTestBench> */}</div>
     </div>
   );
 };

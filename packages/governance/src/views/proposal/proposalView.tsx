@@ -42,7 +42,10 @@ import {
 } from '../../hooks/apiHooks';
 import BN from 'bn.js';
 
+import { VoteScore } from './components/vote/voteScore';
+
 const { TabPane } = Tabs;
+
 const { ZERO } = constants;
 
 export const urlRegex =
@@ -70,7 +73,9 @@ export const ProposalView = () => {
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.realm,
-    proposal?.info.governingTokenMint,
+    proposal?.info.isVoteFinalized()
+      ? undefined
+      : proposal?.info.governingTokenMint,
   );
 
   return (
@@ -356,7 +361,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={governingTokenMint.supply}
+                    total={getMaxVoteSupply(proposal, governingTokenMint)}
                     data={voterDisplayData}
                     decimals={governingTokenMint.decimals}
                   />
@@ -378,18 +383,41 @@ function InnerProposalView({
           </Col>
           <Col md={7} xs={24}>
             <Card>
-              <Statistic
+              {/* <Statistic
                 title={LABELS.VOTE_SCORE_IN_FAVOUR}
                 value={getVoteInFavorScore(proposal, governingTokenMint)}
-                suffix={`/ ${getMaxVoteScore(governingTokenMint)}`}
-              />
+                suffix={`/ ${getMaxVoteScore(proposal, governingTokenMint)}`}
+              /> */}
+              <div className="ant-statistic">
+                <div className="ant-statistic-title">
+                  {proposal.info.isPreVotingState()
+                    ? 'Yes Vote Threshold'
+                    : 'Vote Results'}
+                </div>
+                <div>
+                  <VoteScore
+                    yesVoteCount={proposal.info.yesVotesCount}
+                    noVoteCount={proposal.info.noVotesCount}
+                    yesVoteThreshold={
+                      governance.info.config.voteThresholdPercentage.value
+                    }
+                    governingMintDecimals={governingTokenMint.decimals}
+                    proposalState={proposal.info.state}
+                    maxVoteScore={getMaxVoteSupply(
+                      proposal,
+                      governingTokenMint,
+                    )}
+                    isPreVotingState={proposal.info.isPreVotingState()}
+                  ></VoteScore>
+                </div>
+              </div>
             </Card>
           </Col>
           <Col md={7} xs={24}>
             <Card>
               <Statistic
                 valueStyle={{ color: 'green' }}
-                title={LABELS.VOTE_SCORE_REQUIRED}
+                title={LABELS.YES_VOTES_VOTES}
                 value={getMinRequiredYesVoteScore(
                   governance,
                   governingTokenMint,
@@ -485,17 +513,13 @@ function getMinRequiredYesVoteScore(
     .toString();
 }
 
-function getVoteInFavorScore(
+function getMaxVoteSupply(
   proposal: ParsedAccount<Proposal>,
   governingTokenMint: MintInfo,
-): string {
-  return new BigNumber(proposal.info.yesVotesCount.toString())
-    .shiftedBy(-governingTokenMint.decimals)
-    .toString();
-}
-
-function getMaxVoteScore(governingTokenMint: MintInfo) {
-  return new BigNumber(governingTokenMint.supply.toString())
-    .shiftedBy(-governingTokenMint.decimals)
-    .toFormat();
+) {
+  return proposal.info.isVoteFinalized() &&
+    // Canceled state is final but we currently  don't capture the mint supply at the cancellation time
+    proposal.info.governingTokenMintVoteSupply
+    ? proposal.info.governingTokenMintVoteSupply
+    : governingTokenMint.supply;
 }

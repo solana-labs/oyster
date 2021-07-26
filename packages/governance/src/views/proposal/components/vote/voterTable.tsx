@@ -6,6 +6,7 @@ import { VoterDisplayData, VoteType } from '../../proposalView';
 import BN from 'bn.js';
 import { BigNumber } from 'bignumber.js';
 import { utils } from '@oyster/common';
+import { formatPercentage } from '../../../../tools/units';
 
 const { getExplorerUrl } = utils;
 
@@ -56,13 +57,13 @@ export const VoterTable = (props: VoterTableProps) => {
       title: LABELS.VOTE_WEIGHT,
       dataIndex: 'value',
       key: 'value',
-      align: 'center',
+      align: 'right',
       render: (count: BN, record: VoterDisplayData) => (
         <span
           style={
             record.group === VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : '#d32029' }
           }
         >
           {new BigNumber(count.toString()).shiftedBy(-decimals).toFormat()}
@@ -73,16 +74,16 @@ export const VoterTable = (props: VoterTableProps) => {
       title: LABELS.PERCENTAGE,
       dataIndex: 'value',
       key: 'percentage',
-      align: 'center',
+      align: 'right',
       render: (count: BN, record: VoterDisplayData) => (
         <span
           style={
             record.group === VoteType.Undecided
               ? { color: 'grey' }
-              : { color: record.group === VoteType.Yes ? 'green' : 'red' }
+              : { color: record.group === VoteType.Yes ? 'green' : '#d32029' }
           }
         >
-          {count.mul(new BN(100)).div(total).toString()}%
+          {formatPercentage(count.mul(new BN(100)).div(total).toNumber())}
         </span>
       ),
     },

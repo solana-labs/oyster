@@ -3,21 +3,21 @@ import { ButtonProps, Radio } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 import { ParsedAccount } from '@oyster/common';
-import { createProposal } from '../../actions/createProposal';
+import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
-import { GoverningTokenType } from '../../models/enums';
-import { Governance, Realm } from '../../models/accounts';
+import { GoverningTokenType } from '../../../models/enums';
+import { Governance, Realm } from '../../../models/accounts';
 
-import { useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
-import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
+import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
+import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
-import { useRpcContext } from '../../hooks/useRpcContext';
-import { getProposalUrl } from '../../tools/routeTools';
+import { useRpcContext } from '../../../hooks/useRpcContext';
+import { getProposalUrl } from '../../../tools/routeTools';
 
-export function AddNewProposal({
+export function NewProposalButton({
   realm,
   governance,
   buttonProps,

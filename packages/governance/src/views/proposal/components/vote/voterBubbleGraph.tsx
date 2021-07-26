@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
 import React, { useEffect, useState } from 'react';
 import { VoterDisplayData, VoteType } from '../../proposalView';
+import { utils } from '@oyster/common';
+const { getExplorerUrl } = utils;
 //https://observablehq.com/d/86d91b23534992ff
 
 interface IVoterBubbleGraph {
@@ -30,16 +32,11 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
 
   useEffect(() => {
     if (ref) {
-      const subdomain = endpoint
-        .replace('http://', '')
-        .replace('https://', '')
-        .split('.')[0];
-
       const format = d3.format(',d');
       const color = d3
         .scaleOrdinal()
         .domain([VoteType.Undecided, VoteType.Yes, VoteType.No])
-        .range(['grey', 'green', 'red']);
+        .range(['grey', 'green', '#d32029']);
 
       const pack = (data: Array<VoterDisplayData>) => {
         return d3
@@ -89,7 +86,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
               //@ts-ignore
               id: d.name,
               //@ts-ignore
-              href: `https://explorer.solana.com/address/${d.title}?cluster=${subdomain}`,
+              href: getExplorerUrl(d.title, endpoint),
             }).id,
         )
         .append('use')
@@ -99,11 +96,9 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
       //@ts-ignore
       leaf
         .append('svg:a')
-        .attr(
-          'xlink:href',
-          d =>
-            //@ts-ignore
-            `https://explorer.solana.com/address/${d.data.title}?cluster=${subdomain}`,
+        .attr('xlink:href', d =>
+          //@ts-ignore
+          getExplorerUrl(d.data.title, endpoint),
         )
         .append('svg:text')
         //@ts-ignore

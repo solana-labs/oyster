@@ -3,7 +3,6 @@ import './../../App.less';
 import { Layout } from 'antd';
 import { Link } from 'react-router-dom';
 
-import { LABELS } from '../../constants';
 import { components } from '@oyster/common';
 import { Content, Header } from 'antd/lib/layout/layout';
 import Logo from './dark-horizontal-combined-rainbow.inline.svg';
@@ -43,7 +42,7 @@ export const AppLayout = React.memo((props: any) => {
 
   return (
     <div className="App">
-      <Layout title={LABELS.APP_TITLE}>
+      <Layout>
         <Header className="App-Bar">
           <div className="app-title">
             <HomeLink></HomeLink>

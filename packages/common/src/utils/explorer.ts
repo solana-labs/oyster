@@ -4,7 +4,7 @@ import { ENV as ChainId } from '@solana/spl-token-registry';
 import base58 from 'bs58';
 
 export function getExplorerUrl(
-  viewType: string | PublicKey,
+  viewTypeOrItemAddress: string | PublicKey,
   endpoint: string,
   itemType: string = 'address',
   connection?: Connection,
@@ -37,7 +37,7 @@ export function getExplorerUrl(
     return cluster ? `?cluster=${cluster}` : '';
   };
 
-  return `https://explorer.solana.com/${itemType}/${viewType}${getClusterUrlParam()}`;
+  return `https://explorer.solana.com/${itemType}/${viewTypeOrItemAddress}${getClusterUrlParam()}`;
 }
 
 /// Returns explorer inspector URL for the given transaction

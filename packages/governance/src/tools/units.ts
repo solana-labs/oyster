@@ -20,6 +20,11 @@ export function formatMintNaturalAmountAsDecimal(
   return getMintDecimalAmountFromNatural(mint, naturalAmount).toFormat();
 }
 
+/// Formats mint supply (natural units) as a decimal string
+export function formatMintSupplyAsDecimal(mint: MintInfo) {
+  return getMintDecimalAmountFromNatural(mint, mint.supply).toFormat();
+}
+
 // Converts mint amount (natural units) to decimals
 export function getMintDecimalAmountFromNatural(
   mint: MintInfo,
@@ -82,6 +87,17 @@ export function getMintSupplyFractionAsDecimalPercentage(
     .toNumber();
 }
 
+// Calculates mint supply fraction for the given natural amount as decimal amount
+export function getAmountFractionAsDecimalPercentage(
+  totalNaturalAmount: BN | number,
+  naturalAmount: BN | number,
+) {
+  return getBigNumberAmount(naturalAmount)
+    .multipliedBy(100)
+    .dividedBy(new BigNumber(getBigNumberAmount(totalNaturalAmount)))
+    .toNumber();
+}
+
 // Converts BN or number to BigNumber
 export function getBigNumberAmount(amount: BN | number) {
   return typeof amount === 'number'
@@ -91,6 +107,10 @@ export function getBigNumberAmount(amount: BN | number) {
 
 // Formats percentage value showing it in human readable form
 export function formatPercentage(percentage: number) {
+  if (percentage === 0) {
+    return '0%';
+  }
+
   if (percentage < 0.01) {
     return '<0.01%';
   }
@@ -103,6 +123,14 @@ export function getMintVoteWeight(mint: MintInfo, naturalAmount: BN) {
   return new BigNumber(100)
     .multipliedBy(getBigNumberAmount(naturalAmount))
     .div(getBigNumberAmount(mint.supply))
+    .toNumber();
+}
+
+// Returns amount vote weight for the given mint as percentage in decimals
+export function getMintSupplyVoteWeight(supply: BN, naturalAmount: BN) {
+  return new BigNumber(100)
+    .multipliedBy(getBigNumberAmount(naturalAmount))
+    .div(getBigNumberAmount(supply))
     .toNumber();
 }
 

@@ -5,7 +5,7 @@ import { AppLayout } from './components/Layout/layout';
 import GovernanceProvider from './contexts/GovernanceContext';
 import { HomeView } from './views';
 import { ProposalView } from './views/proposal/proposalView';
-import { GovernanceView } from './views/governance/GovernanceView';
+import { GovernanceView } from './views/governance/governanceView';
 import { DevToolsView } from './views/devtools/DevToolsView';
 import { RealmView } from './views/realm/realmView';
 
