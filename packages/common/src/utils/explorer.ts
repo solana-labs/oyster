@@ -47,23 +47,18 @@ export function getExplorerInspectorUrl(
   connection?: Connection,
 ) {
   const SIGNATURE_LENGTH = 64;
-  const params = new URLSearchParams();
+
+  const explorerUrl = new URL(
+    getExplorerUrl('inspector', endpoint, 'tx', connection),
+  );
 
   const signatures = transaction.signatures.map(s =>
     base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH)),
   );
-
-  const signaturesParam = encodeURIComponent(JSON.stringify(signatures));
-  params.set('signatures', signaturesParam);
+  explorerUrl.searchParams.append('signatures', JSON.stringify(signatures));
 
   const message = transaction.serializeMessage();
-  const messageParam = encodeURIComponent(message.toString('base64'));
-  params.set('message', messageParam);
+  explorerUrl.searchParams.append('message', message.toString('base64'));
 
-  return `${getExplorerUrl(
-    'inspector',
-    endpoint,
-    'tx',
-    connection,
-  )}&${params.toString()}`;
+  return explorerUrl.toString();
 }
