@@ -361,7 +361,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={getMaxVoteSupply(proposal, governingTokenMint)}
+                    total={getMaxVoteScore(proposal, governingTokenMint)}
                     data={voterDisplayData}
                     decimals={governingTokenMint.decimals}
                   />
@@ -398,15 +398,10 @@ function InnerProposalView({
                   <VoteScore
                     yesVoteCount={proposal.info.yesVotesCount}
                     noVoteCount={proposal.info.noVotesCount}
-                    yesVoteThreshold={
-                      governance.info.config.voteThresholdPercentage.value
-                    }
+                    yesVoteThreshold={getYesVoteThreshold(proposal, governance)}
                     governingMintDecimals={governingTokenMint.decimals}
                     proposalState={proposal.info.state}
-                    maxVoteScore={getMaxVoteSupply(
-                      proposal,
-                      governingTokenMint,
-                    )}
+                    maxVoteScore={getMaxVoteScore(proposal, governingTokenMint)}
                     isPreVotingState={proposal.info.isPreVotingState()}
                   ></VoteScore>
                 </div>
@@ -513,13 +508,24 @@ function getMinRequiredYesVoteScore(
     .toString();
 }
 
-function getMaxVoteSupply(
+function getMaxVoteScore(
   proposal: ParsedAccount<Proposal>,
   governingTokenMint: MintInfo,
 ) {
   return proposal.info.isVoteFinalized() &&
-    // Canceled state is final but we currently  don't capture the mint supply at the cancellation time
+    // Note: Canceled state is also final but we currently don't capture the mint supply at the cancellation time
     proposal.info.governingTokenMintVoteSupply
     ? proposal.info.governingTokenMintVoteSupply
     : governingTokenMint.supply;
+}
+
+function getYesVoteThreshold(
+  proposal: ParsedAccount<Proposal>,
+  governance: ParsedAccount<Governance>,
+) {
+  return proposal.info.isVoteFinalized() &&
+    // Note Canceled state is also final but we currently don't capture vote threshold at the cancellation time
+    proposal.info.voteThresholdPercentage
+    ? proposal.info.voteThresholdPercentage.value
+    : governance.info.config.voteThresholdPercentage.value;
 }

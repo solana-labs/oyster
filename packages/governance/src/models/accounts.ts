@@ -306,6 +306,7 @@ export class Proposal {
   executionFlags: InstructionExecutionFlags;
 
   governingTokenMintVoteSupply: BN | null;
+  voteThresholdPercentage: VoteThresholdPercentage | null;
 
   name: string;
 
@@ -334,6 +335,7 @@ export class Proposal {
     instructionsNextIndex: number;
     executionFlags: InstructionExecutionFlags;
     governingTokenMintVoteSupply: BN | null;
+    voteThresholdPercentage: VoteThresholdPercentage | null;
   }) {
     this.governance = args.governance;
     this.governingTokenMint = args.governingTokenMint;
@@ -357,6 +359,7 @@ export class Proposal {
     this.instructionsNextIndex = args.instructionsNextIndex;
     this.executionFlags = args.executionFlags;
     this.governingTokenMintVoteSupply = args.governingTokenMintVoteSupply;
+    this.voteThresholdPercentage = args.voteThresholdPercentage;
   }
 
   /// Returns true if Proposal is in state when no voting can happen any longer
