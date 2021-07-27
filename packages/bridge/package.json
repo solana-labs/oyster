@@ -15,7 +15,7 @@
     "@solana/wallet-base": "0.0.1",
     "@solana/wallet-ledger": "0.0.1",
     "@solana/bridge-sdk": "0.0.1",
-    "@solana/web3.js": "^1.5.0",
+    "@solana/web3.js": "^1.22.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
