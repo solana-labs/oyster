@@ -43,6 +43,9 @@ import {
 import BN from 'bn.js';
 
 import { VoteScore } from './components/vote/voteScore';
+import Countdown from 'antd/lib/statistic/Countdown';
+import moment from 'moment';
+import { VoteCountdown } from './components/header/voteCountdown';
 
 const { TabPane } = Tabs;
 
@@ -266,6 +269,20 @@ function InnerProposalView({
     proposalState: proposal,
   });
 
+  // if (proposal.info.votingAt) {
+  //   console.log('VOTING times', {
+  //     now: moment().unix(),
+  //     nowDate: moment().toDate(),
+  //     votingAt: moment.unix(proposal.info.votingAt!.toNumber()).toDate(),
+  //     votingEnd: moment
+  //       .unix(
+  //         proposal.info.votingAt!.toNumber() +
+  //           governance.info.config.maxVotingTime,
+  //       )
+  //       .toDate(),
+  //   });
+  // }
+
   return (
     <Row>
       <Col flex="auto" xxl={15} xs={24} className="proposal-container">
@@ -410,14 +427,28 @@ function InnerProposalView({
           </Col>
           <Col md={7} xs={24}>
             <Card>
-              <Statistic
-                valueStyle={{ color: 'green' }}
-                title={LABELS.YES_VOTES_VOTES}
-                value={getMinRequiredYesVoteScore(
-                  governance,
-                  governingTokenMint,
-                )}
-              />
+              <div className="ant-statistic">
+                <div className="ant-statistic-title">
+                  {proposal.info.isPreVotingState()
+                    ? 'Voting Time Left'
+                    : 'Vote Results'}
+                </div>
+                <div>
+                  <VoteCountdown></VoteCountdown>
+                </div>
+              </div>
+
+              {/* <Countdown
+                title="Voting time"
+                value={moment
+                  .unix(
+                    proposal.info.votingAt!.toNumber() +
+                      governance.info.config.maxVotingTime,
+                  )
+                  .toDate()
+                  .valueOf()}
+                format={'D [days] HH:mm:ss '}
+              /> */}
             </Card>
           </Col>
         </Row>
