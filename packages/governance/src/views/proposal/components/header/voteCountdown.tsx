@@ -49,7 +49,7 @@ export function VoteCountdown({
           now;
 
       if (timeToVoteEnd <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        return ZeroCountdown;
       }
 
       const days = Math.floor(timeToVoteEnd / 86400);
@@ -62,8 +62,6 @@ export function VoteCountdown({
       timeToVoteEnd -= minutes * 60;
 
       const seconds = Math.floor(timeToVoteEnd % 60);
-
-      console.log('COUNTDOWN', { days, hours, minutes, seconds });
 
       return { days, hours, minutes, seconds };
     };
@@ -83,63 +81,56 @@ export function VoteCountdown({
 
   return (
     <>
-      {countdown &&
-        (isZeroCountdown(countdown) ? (
-          <Space>
-            <div className="cd-number">vote has ended</div>
-          </Space>
-        ) : (
-          <Space>
-            {countdown && countdown.days > 0 && (
-              <Space direction="vertical" size={0}>
-                <div className="cd-number">
-                  {countdown.days < 10 && (
-                    <span style={{ opacity: 0.1 }}>0</span>
-                  )}
-                  {countdown.days}
-                  <span style={{ opacity: 0.2 }}>:</span>
-                </div>
-                <div className="cd-label">days</div>
-              </Space>
-            )}
-
+      {isZeroCountdown(countdown) ? (
+        <Space>
+          <div className="cd-number">vote has ended</div>
+        </Space>
+      ) : (
+        <Space>
+          {countdown && countdown.days > 0 && (
             <Space direction="vertical" size={0}>
               <div className="cd-number">
-                {countdown.hours < 10 && (
-                  <span style={{ opacity: 0.1 }}>0</span>
-                )}
-                {countdown.hours}
+                {countdown.days < 10 && <span style={{ opacity: 0.1 }}>0</span>}
+                {countdown.days}
                 <span style={{ opacity: 0.2 }}>:</span>
               </div>
-              <div className="cd-label">hours</div>
+              <div className="cd-label">days</div>
             </Space>
+          )}
 
+          <Space direction="vertical" size={0}>
+            <div className="cd-number">
+              {countdown.hours < 10 && <span style={{ opacity: 0.1 }}>0</span>}
+              {countdown.hours}
+              <span style={{ opacity: 0.2 }}>:</span>
+            </div>
+            <div className="cd-label">hours</div>
+          </Space>
+
+          <Space direction="vertical" size={0}>
+            <div className="cd-number">
+              {countdown.minutes < 10 && (
+                <span style={{ opacity: 0.1 }}>0</span>
+              )}
+              {countdown.minutes}
+              {countdown.days === 0 && <span style={{ opacity: 0.2 }}>:</span>}
+            </div>
+            <div className="cd-label">mins</div>
+          </Space>
+
+          {!countdown.days && (
             <Space direction="vertical" size={0}>
               <div className="cd-number">
-                {countdown.minutes < 10 && (
+                {countdown.seconds < 10 && (
                   <span style={{ opacity: 0.1 }}>0</span>
                 )}
-                {countdown.minutes}
-                {countdown.days === 0 && (
-                  <span style={{ opacity: 0.2 }}>:</span>
-                )}
+                {countdown.seconds}
               </div>
-              <div className="cd-label">mins</div>
+              <div className="cd-label">secs</div>
             </Space>
-
-            {!countdown.days && (
-              <Space direction="vertical" size={0}>
-                <div className="cd-number">
-                  {countdown.seconds < 10 && (
-                    <span style={{ opacity: 0.1 }}>0</span>
-                  )}
-                  {countdown.seconds}
-                </div>
-                <div className="cd-label">secs</div>
-              </Space>
-            )}
-          </Space>
-        ))}
+          )}
+        </Space>
+      )}
     </>
   );
 }
