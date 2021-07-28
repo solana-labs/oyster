@@ -279,7 +279,10 @@ function InnerProposalView({
               />
               <Col>
                 <h1>{proposal.info.name}</h1>
-                <ProposalStateBadge state={proposal.info.state} />
+                <ProposalStateBadge
+                  proposal={proposal}
+                  governance={governance}
+                />
               </Col>
             </Row>
           </Col>

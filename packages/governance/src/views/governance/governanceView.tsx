@@ -82,7 +82,7 @@ export const GovernanceView = () => {
           ) : (
             <TokenIcon mintAddress={p.info.governingTokenMint} size={30} />
           ),
-        state: p.info.state,
+        proposal: p,
       }));
   }, [proposals, programIdBase58]);
 
@@ -173,7 +173,12 @@ export const GovernanceView = () => {
               <List.Item.Meta
                 avatar={item.badge}
                 title={item.title}
-                description={<ProposalStateBadge state={item.state} />}
+                description={
+                  <ProposalStateBadge
+                    proposal={item.proposal}
+                    governance={governance}
+                  />
+                }
               />
             </List.Item>
           )}
