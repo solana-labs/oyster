@@ -24,9 +24,10 @@ export const AppLayout = React.memo((props: any) => {
             {props.children}
           </Content>
           <Footer>
-            <div className={'description-text'} style={{ color: '#2F506F' }}>
-
-            </div>
+            <div
+              className={'description-text'}
+              style={{ color: '#2F506F' }}
+            ></div>
           </Footer>
         </Layout>
       </div>

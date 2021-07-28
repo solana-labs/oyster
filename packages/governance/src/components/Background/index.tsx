@@ -1,5 +1,5 @@
 import * as CANNON from 'cannon';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Canvas } from 'react-three-fiber';
 import { useCannon, Provider } from './useCannon';
 import './styles.less';
@@ -33,15 +33,11 @@ function Box({ position }: { position: any }) {
 }
 
 export const Background = () => {
-  const [showPlane, set] = useState(true);
-  // When React removes (unmounts) the upper plane after 5 sec, objects should drop ...
-  // This may seem like magic, but as the plane unmounts it removes itself from cannon and that's that
-  useEffect(() => void setTimeout(() => set(false), 3000), []);
   return (
     <Canvas
       className="main"
       shadowMap
-      camera={{ position: [0, 0, 15] }}
+      camera={{ position: [0, 0, 20] }}
       style={{ width: '100%', height: 400, marginTop: -120, zIndex: 1 }}
     >
       <ambientLight intensity={0.5} />
@@ -54,14 +50,11 @@ export const Background = () => {
       />
       <Provider>
         <Plane position={[0, 0, -10]} />
-        {showPlane && <Plane position={[0, 0, 0]} />}
-        <Box position={[1, 0, 1]} />
-        <Box position={[2, 1, 5]} />
-        <Box position={[0, 0, 6]} />
-        <Box position={[-1, 1, 8]} />
-        <Box position={[-2, 2, 13]} />
-        <Box position={[2, -1, 13]} />
-        {!showPlane && <Box position={[0.5, 1.0, 20]} />}
+        <Box position={[1, 0, -8]} />
+        <Box position={[5, 1, -8]} />
+        <Box position={[2, 1, -8]} />
+        <Box position={[0, 0, -9]} />
+        <Box position={[0, 0, -9]} />
       </Provider>
     </Canvas>
   );

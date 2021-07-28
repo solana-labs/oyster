@@ -86,8 +86,11 @@ export const Transfer = () => {
     });
   }, [A, B, mintAddress, A.info]);
 
-
-  const tokenAccounts = useMemo(() => userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint), [request.info?.mint])
+  const tokenAccounts = useMemo(
+    () =>
+      userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint),
+    [request.info?.mint],
+  );
 
   return (
     <>
@@ -123,7 +126,6 @@ export const Transfer = () => {
           visible={popoverVisible}
         >
           <Button
-            type="primary"
             className="swap-button"
             style={{ padding: 0 }}
             disabled={false}

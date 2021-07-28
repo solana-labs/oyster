@@ -46,10 +46,6 @@ let WORMHOLE_BRIDGE: {
   wrappedMaster: string;
 };
 
-let GOVERNANCE: {
-  programId: PublicKey;
-};
-
 let SWAP_PROGRAM_ID: PublicKey;
 let SWAP_PROGRAM_LEGACY_IDS: PublicKey[];
 let SWAP_PROGRAM_LAYOUT: any;
@@ -66,9 +62,7 @@ export const ENABLE_FEES_INPUT = false;
 export const PROGRAM_IDS = [
   {
     name: 'mainnet-beta',
-    governance: () => ({
-      programId: new PublicKey('9iAeqqppjn7g1Jn8o2cQCqU5aQVV3h4q9bbWdKRbeC2w'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -87,9 +81,7 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'testnet',
-    governance: () => ({
-      programId: new PublicKey('A9KW1nhwZUr1kMX8C6rgzZvAE9AwEEUi2C77SiVvEiuN'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('5gQf5AUhAgWYgUCt9ouShm9H7dzzXUsLdssYwe5krKhg'),
       bridge: '0x251bBCD91E84098509beaeAfF0B9951859af66D3',
@@ -106,9 +98,7 @@ export const PROGRAM_IDS = [
 
   {
     name: 'devnet',
-    governance: () => ({
-      programId: new PublicKey('C3FdFYAwoAanUUHrtxnnzN8A6R13RmRoDRWmLbcpZATp'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -124,9 +114,7 @@ export const PROGRAM_IDS = [
   },
   {
     name: 'localnet',
-    governance: () => ({
-      programId: new PublicKey('2uWrXQ3tMurqTLe3Dmue6DzasUGV9UPqK7AK7HzS7v3D'),
-    }),
+
     wormhole: () => ({
       pubkey: new PublicKey('WormT3McKhFJ2RkiGpdw9GKvNCrB2aB54gb2uV9MfQC'),
       bridge: '0xf92cD566Ea4864356C5491c177A430C222d7e678',
@@ -156,8 +144,6 @@ export const setProgramIds = (envName: string) => {
   SWAP_PROGRAM_LAYOUT = swap.current.layout;
   SWAP_PROGRAM_LEGACY_IDS = swap.legacy;
 
-  GOVERNANCE = instance.governance();
-
   if (envName === 'mainnet-beta') {
     LENDING_PROGRAM_ID = new PublicKey(
       'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi',
@@ -173,7 +159,7 @@ export const programIds = () => {
     swapLayout: SWAP_PROGRAM_LAYOUT,
     lending: LENDING_PROGRAM_ID,
     wormhole: WORMHOLE_BRIDGE,
-    governance: GOVERNANCE,
+
     associatedToken: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     bpf_upgrade_loader: BPF_UPGRADE_LOADER_ID,
     system: SYSTEM,
