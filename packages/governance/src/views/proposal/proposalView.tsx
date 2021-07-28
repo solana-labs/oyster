@@ -72,9 +72,10 @@ export const ProposalView = () => {
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
 
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
+
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.realm,
-    proposal?.info.isVoteFinalized()
+    proposal?.info.isVoteFinalized() // TODO: for finalized votes show a single item for abstained votes
       ? undefined
       : proposal?.info.governingTokenMint,
   );

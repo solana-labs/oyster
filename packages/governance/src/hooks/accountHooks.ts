@@ -113,15 +113,20 @@ export function useGovernanceAccountsByFilter<
     const accountTypes = getAccountTypes(accountClass);
 
     const sub = (async () => {
-      // TODO: add retries for transient errors
-      const loadedAccounts = await getGovernanceAccounts<TAccount>(
-        programId,
-        endpoint,
-        accountClass,
-        accountTypes,
-        queryFilters,
-      );
-      setAccounts(loadedAccounts);
+      try {
+        // TODO: add retries for transient errors
+        const loadedAccounts = await getGovernanceAccounts<TAccount>(
+          programId,
+          endpoint,
+          accountClass,
+          accountTypes,
+          queryFilters,
+        );
+        setAccounts(loadedAccounts);
+      } catch (ex) {
+        console.error(`Can't load ${accountClass}`, ex);
+        setAccounts({});
+      }
 
       const connSubId = connection.onProgramAccountChange(programId, info => {
         if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
