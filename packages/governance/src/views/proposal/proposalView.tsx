@@ -2,7 +2,6 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon, constants } from '@oyster/common';
-import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -44,6 +43,8 @@ import BN from 'bn.js';
 
 import { VoteScore } from './components/vote/voteScore';
 
+import { VoteCountdown } from './components/header/voteCountdown';
+
 const { TabPane } = Tabs;
 
 const { ZERO } = constants;
@@ -71,9 +72,10 @@ export const ProposalView = () => {
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
 
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
+
   const tokenOwnerRecords = useTokenOwnerRecords(
     governance?.info.realm,
-    proposal?.info.isVoteFinalized()
+    proposal?.info.isVoteFinalized() // TODO: for finalized votes show a single item for abstained votes
       ? undefined
       : proposal?.info.governingTokenMint,
   );
@@ -278,7 +280,10 @@ function InnerProposalView({
               />
               <Col>
                 <h1>{proposal.info.name}</h1>
-                <ProposalStateBadge state={proposal.info.state} />
+                <ProposalStateBadge
+                  proposal={proposal}
+                  governance={governance}
+                />
               </Col>
             </Row>
           </Col>
@@ -383,11 +388,6 @@ function InnerProposalView({
           </Col>
           <Col md={7} xs={24}>
             <Card>
-              {/* <Statistic
-                title={LABELS.VOTE_SCORE_IN_FAVOUR}
-                value={getVoteInFavorScore(proposal, governingTokenMint)}
-                suffix={`/ ${getMaxVoteScore(proposal, governingTokenMint)}`}
-              /> */}
               <div className="ant-statistic">
                 <div className="ant-statistic-title">
                   {proposal.info.isPreVotingState()
@@ -410,14 +410,17 @@ function InnerProposalView({
           </Col>
           <Col md={7} xs={24}>
             <Card>
-              <Statistic
-                valueStyle={{ color: 'green' }}
-                title={LABELS.YES_VOTES_VOTES}
-                value={getMinRequiredYesVoteScore(
-                  governance,
-                  governingTokenMint,
-                )}
-              />
+              <div className="ant-statistic">
+                <div className="ant-statistic-title">
+                  {proposal.info.isPreVotingState()
+                    ? 'Voting Time'
+                    : 'Voting Time Left'}
+                </div>
+                <VoteCountdown
+                  proposal={proposal}
+                  governance={governance}
+                ></VoteCountdown>
+              </div>
             </Card>
           </Col>
         </Row>
@@ -490,22 +493,6 @@ function InnerProposalView({
       </Col>
     </Row>
   );
-}
-
-function getMinRequiredYesVoteScore(
-  governance: ParsedAccount<Governance>,
-  governingTokenMint: MintInfo,
-): string {
-  const minVotes =
-    governance.info.config.voteThresholdPercentage.value === 100
-      ? governingTokenMint.supply
-      : governingTokenMint.supply
-          .mul(new BN(governance.info.config.voteThresholdPercentage.value))
-          .div(new BN(100));
-
-  return new BigNumber(minVotes.toString())
-    .shiftedBy(-governingTokenMint.decimals)
-    .toString();
 }
 
 function getMaxVoteScore(
