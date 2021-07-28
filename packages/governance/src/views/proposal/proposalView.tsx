@@ -2,7 +2,6 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { ParsedAccount, TokenIcon, constants } from '@oyster/common';
-import { BigNumber } from 'bignumber.js';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -43,8 +42,7 @@ import {
 import BN from 'bn.js';
 
 import { VoteScore } from './components/vote/voteScore';
-import Countdown from 'antd/lib/statistic/Countdown';
-import moment from 'moment';
+
 import { VoteCountdown } from './components/header/voteCountdown';
 
 const { TabPane } = Tabs;
@@ -269,20 +267,6 @@ function InnerProposalView({
     proposalState: proposal,
   });
 
-  // if (proposal.info.votingAt) {
-  //   console.log('VOTING times', {
-  //     now: moment().unix(),
-  //     nowDate: moment().toDate(),
-  //     votingAt: moment.unix(proposal.info.votingAt!.toNumber()).toDate(),
-  //     votingEnd: moment
-  //       .unix(
-  //         proposal.info.votingAt!.toNumber() +
-  //           governance.info.config.maxVotingTime,
-  //       )
-  //       .toDate(),
-  //   });
-  // }
-
   return (
     <Row>
       <Col flex="auto" xxl={15} xs={24} className="proposal-container">
@@ -400,11 +384,6 @@ function InnerProposalView({
           </Col>
           <Col md={7} xs={24}>
             <Card>
-              {/* <Statistic
-                title={LABELS.VOTE_SCORE_IN_FAVOUR}
-                value={getVoteInFavorScore(proposal, governingTokenMint)}
-                suffix={`/ ${getMaxVoteScore(proposal, governingTokenMint)}`}
-              /> */}
               <div className="ant-statistic">
                 <div className="ant-statistic-title">
                   {proposal.info.isPreVotingState()
@@ -430,25 +409,14 @@ function InnerProposalView({
               <div className="ant-statistic">
                 <div className="ant-statistic-title">
                   {proposal.info.isPreVotingState()
-                    ? 'Voting Time Left'
-                    : 'Vote Results'}
+                    ? 'Voting Time'
+                    : 'Voting Time Left'}
                 </div>
-                <div>
-                  <VoteCountdown></VoteCountdown>
-                </div>
+                <VoteCountdown
+                  proposal={proposal}
+                  governance={governance}
+                ></VoteCountdown>
               </div>
-
-              {/* <Countdown
-                title="Voting time"
-                value={moment
-                  .unix(
-                    proposal.info.votingAt!.toNumber() +
-                      governance.info.config.maxVotingTime,
-                  )
-                  .toDate()
-                  .valueOf()}
-                format={'D [days] HH:mm:ss '}
-              /> */}
             </Card>
           </Col>
         </Row>
@@ -521,22 +489,6 @@ function InnerProposalView({
       </Col>
     </Row>
   );
-}
-
-function getMinRequiredYesVoteScore(
-  governance: ParsedAccount<Governance>,
-  governingTokenMint: MintInfo,
-): string {
-  const minVotes =
-    governance.info.config.voteThresholdPercentage.value === 100
-      ? governingTokenMint.supply
-      : governingTokenMint.supply
-          .mul(new BN(governance.info.config.voteThresholdPercentage.value))
-          .div(new BN(100));
-
-  return new BigNumber(minVotes.toString())
-    .shiftedBy(-governingTokenMint.decimals)
-    .toString();
 }
 
 function getMaxVoteScore(

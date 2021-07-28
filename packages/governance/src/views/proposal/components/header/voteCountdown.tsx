@@ -1,135 +1,145 @@
-import { Col, Row } from 'antd';
+import { Space } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import { ParsedAccount } from '@oyster/common';
+import { Governance, Proposal } from '../../../../models/accounts';
 
-export interface CountdownState {
+interface CountdownState {
   days: number;
   hours: number;
   minutes: number;
   seconds: number;
 }
 
-const endAt = moment().unix() + 10000;
+const ZeroCountdown: CountdownState = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+};
 
-export const VoteCountdown = () => {
-  const [state, setState] = useState<CountdownState>();
+const isZeroCountdown = (state: CountdownState) =>
+  state.days === 0 &&
+  state.hours === 0 &&
+  state.minutes === 0 &&
+  state.seconds === 0;
 
-  const getTimeToEnd = () => {
-    const now = moment().unix();
-    const ended = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
-    let delta = endAt - now;
-
-    if (!endAt || delta <= 0) return ended;
-
-    const days = Math.floor(delta / 86400);
-    delta -= days * 86400;
-
-    const hours = Math.floor(delta / 3600) % 24;
-    delta -= hours * 3600;
-
-    const minutes = Math.floor(delta / 60) % 60;
-    delta -= minutes * 60;
-
-    const seconds = Math.floor(delta % 60);
-
-    return { days, hours, minutes, seconds };
-  };
+export function VoteCountdown({
+  proposal,
+  governance,
+}: {
+  proposal: ParsedAccount<Proposal>;
+  governance: ParsedAccount<Governance>;
+}) {
+  const [countdown, setCountdown] = useState(ZeroCountdown);
 
   useEffect(() => {
-    const calc = () => {
-      const newState = getTimeToEnd();
+    if (proposal.info.isVoteFinalized()) {
+      setCountdown(ZeroCountdown);
+      return;
+    }
 
-      setState(newState);
+    const getTimeToVoteEnd = () => {
+      const now = moment().unix();
+
+      let timeToVoteEnd = proposal.info.isPreVotingState()
+        ? governance.info.config.maxVotingTime
+        : proposal.info.votingAt?.toNumber()! +
+          governance.info.config.maxVotingTime -
+          now;
+
+      if (timeToVoteEnd <= 0) {
+        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      }
+
+      const days = Math.floor(timeToVoteEnd / 86400);
+      timeToVoteEnd -= days * 86400;
+
+      const hours = Math.floor(timeToVoteEnd / 3600) % 24;
+      timeToVoteEnd -= hours * 3600;
+
+      const minutes = Math.floor(timeToVoteEnd / 60) % 60;
+      timeToVoteEnd -= minutes * 60;
+
+      const seconds = Math.floor(timeToVoteEnd % 60);
+
+      console.log('COUNTDOWN', { days, hours, minutes, seconds });
+
+      return { days, hours, minutes, seconds };
+    };
+
+    const updateCountdown = () => {
+      const newState = getTimeToVoteEnd();
+      setCountdown(newState);
     };
 
     const interval = setInterval(() => {
-      calc();
+      updateCountdown();
     }, 1000);
 
-    calc();
+    updateCountdown();
     return () => clearInterval(interval);
-    // }, [auction]);
-  }, []);
+  }, [proposal, governance]);
 
-  const ended = isEnded(state);
-
-  return <Countdown state={state} />;
-};
-
-const Countdown = ({ state }: { state?: CountdownState }) => {
   return (
     <>
-      <div style={{ width: '100%', justifyContent: 'center' }}>
-        <>
-          {state &&
-            (isEnded(state) ? (
-              <Row style={{ width: '100%' }}>
-                <div className="cd-number">This auction has ended</div>
-              </Row>
-            ) : (
-              <Row
-                style={{
-                  width: '100%',
-                  flexWrap: 'nowrap',
-                  justifyContent: 'center',
-                }}
-              >
-                {state && state.days > 0 && (
-                  <Col>
-                    <div className="cd-number">
-                      {state.days < 10 && (
-                        <span style={{ opacity: 0.2 }}>0</span>
-                      )}
-                      {state.days}
-                      <span style={{ opacity: 0.2 }}>:</span>
-                    </div>
-                    <div className="cd-label">days</div>
-                  </Col>
+      {countdown &&
+        (isZeroCountdown(countdown) ? (
+          <Space>
+            <div className="cd-number">vote has ended</div>
+          </Space>
+        ) : (
+          <Space>
+            {countdown && countdown.days > 0 && (
+              <Space direction="vertical" size={0}>
+                <div className="cd-number">
+                  {countdown.days < 10 && (
+                    <span style={{ opacity: 0.1 }}>0</span>
+                  )}
+                  {countdown.days}
+                  <span style={{ opacity: 0.2 }}>:</span>
+                </div>
+                <div className="cd-label">days</div>
+              </Space>
+            )}
+
+            <Space direction="vertical" size={0}>
+              <div className="cd-number">
+                {countdown.hours < 10 && (
+                  <span style={{ opacity: 0.1 }}>0</span>
                 )}
-                <Col>
-                  <div className="cd-number">
-                    {state.hours < 10 && (
-                      <span style={{ opacity: 0.2 }}>0</span>
-                    )}
-                    {state.hours}
-                    <span style={{ opacity: 0.2 }}>:</span>
-                  </div>
-                  <div className="cd-label">hour</div>
-                </Col>
-                <Col>
-                  <div className="cd-number">
-                    {state.minutes < 10 && (
-                      <span style={{ opacity: 0.2 }}>0</span>
-                    )}
-                    {state.minutes}
-                    {state.days === 0 && (
-                      <span style={{ opacity: 0.2 }}>:</span>
-                    )}
-                  </div>
-                  <div className="cd-label">mins</div>
-                </Col>
-                {!state.days && (
-                  <Col>
-                    <div className="cd-number">
-                      {state.seconds < 10 && (
-                        <span style={{ opacity: 0.2 }}>0</span>
-                      )}
-                      {state.seconds}
-                    </div>
-                    <div className="cd-label">secs</div>
-                  </Col>
+                {countdown.hours}
+                <span style={{ opacity: 0.2 }}>:</span>
+              </div>
+              <div className="cd-label">hours</div>
+            </Space>
+
+            <Space direction="vertical" size={0}>
+              <div className="cd-number">
+                {countdown.minutes < 10 && (
+                  <span style={{ opacity: 0.1 }}>0</span>
                 )}
-              </Row>
-            ))}
-        </>
-      </div>
+                {countdown.minutes}
+                {countdown.days === 0 && (
+                  <span style={{ opacity: 0.2 }}>:</span>
+                )}
+              </div>
+              <div className="cd-label">mins</div>
+            </Space>
+
+            {!countdown.days && (
+              <Space direction="vertical" size={0}>
+                <div className="cd-number">
+                  {countdown.seconds < 10 && (
+                    <span style={{ opacity: 0.1 }}>0</span>
+                  )}
+                  {countdown.seconds}
+                </div>
+                <div className="cd-label">secs</div>
+              </Space>
+            )}
+          </Space>
+        ))}
     </>
   );
-};
-
-const isEnded = (state?: CountdownState) =>
-  state?.days === 0 &&
-  state?.hours === 0 &&
-  state?.minutes === 0 &&
-  state?.seconds === 0;
+}
