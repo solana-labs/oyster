@@ -149,7 +149,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
               solToken = solTokens.find(t => t.address === mintKeyAddress);
               if (!solToken) {
                 symbol = ethToken.symbol;
-                decimals = ethToken.decimals;
+                decimals = Math.min(ethToken.decimals, 9);
               }
             } else {
               setInfo(defaultCoinInfo);
@@ -167,6 +167,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
         const currentAccount = userAccounts?.find(
           a => a.info.mint.toBase58() === (solToken?.address || mintKeyAddress),
         );
+
         const assetMeta = await bridge?.fetchAssetMeta(
           new PublicKey(solToken?.address || mintKeyAddress),
         );
