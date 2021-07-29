@@ -89,14 +89,12 @@ export enum InstructionExecutionFlags {
 }
 
 export class MintMaxVoteWeightSource {
-  percentage: BN;
+  percentage: number;
   absolute: BN;
-  program: BN;
 
-  constructor(args: { percentage: BN; absolute: BN; program: BN }) {
+  constructor(args: { percentage: number; absolute: BN }) {
     this.percentage = args.percentage;
     this.absolute = args.absolute;
-    this.program = args.program;
   }
 }
 
