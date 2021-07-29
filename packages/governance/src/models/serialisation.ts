@@ -33,9 +33,11 @@ import {
   Governance,
   GovernanceConfig,
   InstructionData,
+  MintMaxVoteWeightSource,
   Proposal,
   ProposalInstruction,
   Realm,
+  RealmConfig,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
@@ -43,6 +45,7 @@ import {
   VoteWeight,
 } from './accounts';
 import { serialize } from 'borsh';
+import BN from 'bn.js';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -58,6 +61,26 @@ import { serialize } from 'borsh';
   reader.maybeResize();
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
+};
+
+(BinaryReader.prototype as any).readMintMaxVoteWeightSource = function () {
+  const reader = (this as unknown) as BinaryReader;
+  const type = reader.buf.readUInt8(reader.offset);
+
+  if (type !== 0) {
+    throw new Error(
+      `MintMaxVoteWeightSource type ${type} is not supported yet`,
+    );
+  }
+
+  reader.offset += 1;
+  const percentage = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+
+  return new MintMaxVoteWeightSource({
+    percentage: percentage,
+    absolute: new BN(0),
+  });
 };
 
 // Serializes sdk instruction into InstructionData and encodes it as base64 which then can be entered into the UI form
@@ -283,6 +306,19 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
+
+  [
+    RealmConfig,
+    {
+      kind: 'struct',
+      fields: [
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ['communityMintMaxVoteWeightSource', 'mintMaxVoteWeightSource'],
+        ['custodian', { kind: 'option', type: 'pubkey' }],
+        ['reserved', [8]],
+      ],
+    },
+  ],
   [
     Realm,
     {
@@ -290,8 +326,8 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
+        ['config', RealmConfig],
         ['reserved', [8]],
-        ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['authority', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],

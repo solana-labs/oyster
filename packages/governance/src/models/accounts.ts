@@ -88,14 +88,44 @@ export enum InstructionExecutionFlags {
   UseTransaction,
 }
 
+export class MintMaxVoteWeightSource {
+  percentage: number;
+  absolute: BN;
+
+  constructor(args: { percentage: number; absolute: BN }) {
+    this.percentage = args.percentage;
+    this.absolute = args.absolute;
+  }
+}
+
+export class RealmConfig {
+  councilMint: PublicKey | undefined;
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+  custodian: PublicKey | undefined;
+  reserved: Uint8Array;
+
+  constructor(args: {
+    councilMint: PublicKey | undefined;
+    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+    custodian: PublicKey | undefined;
+    reserved: Uint8Array;
+  }) {
+    this.councilMint = args.councilMint;
+    this.communityMintMaxVoteWeightSource =
+      args.communityMintMaxVoteWeightSource;
+    this.custodian = args.custodian;
+    this.reserved = args.reserved;
+  }
+}
+
 export class Realm {
   accountType = GovernanceAccountType.Realm;
 
   communityMint: PublicKey;
 
-  reserved: Uint8Array;
+  config: RealmConfig;
 
-  councilMint: PublicKey | undefined;
+  reserved: Uint8Array;
 
   authority: PublicKey | undefined;
 
@@ -104,13 +134,14 @@ export class Realm {
   constructor(args: {
     communityMint: PublicKey;
     reserved: Uint8Array;
-    councilMint: PublicKey | undefined;
+    config: RealmConfig;
     authority: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
+    this.config = args.config;
     this.reserved = args.reserved;
-    this.councilMint = args.councilMint;
+
     this.authority = args.authority;
     this.name = args.name;
   }

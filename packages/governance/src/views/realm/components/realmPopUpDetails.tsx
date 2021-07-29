@@ -17,10 +17,10 @@ export function RealmPopUpDetails({ realm }: { realm: ParsedAccount<Realm> }) {
           mint={realm.info.communityMint}
         ></RealmMintDetails>
 
-        {realm.info.councilMint && (
+        {realm.info.config.councilMint && (
           <RealmMintDetails
             label="council token"
-            mint={realm.info.councilMint}
+            mint={realm.info.config.councilMint}
           ></RealmMintDetails>
         )}
       </>

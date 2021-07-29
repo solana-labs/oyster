@@ -39,7 +39,7 @@ export function FinalizeVoteButton({
       type="primary"
       onClick={async () => {
         try {
-          await finalizeVote(rpcContext, proposal);
+          await finalizeVote(rpcContext, governance.info.realm, proposal);
         } catch (ex) {
           console.error(ex);
         }
