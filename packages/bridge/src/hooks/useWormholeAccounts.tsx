@@ -156,9 +156,8 @@ const queryWrappedMetaAccounts = async (
 
     if (asset.mint) {
       asset.amount =
-        asset.mint?.info.supply.toNumber() /
-          Math.pow(10, asset.mint?.info.decimals || 0) ;
-
+        parseInt(asset.mint?.info.supply.toString()) /
+          Math.pow(10, asset.mint?.info.decimals || 0);
       if (!asset.mint) {
         throw new Error('missing mint');
       }
