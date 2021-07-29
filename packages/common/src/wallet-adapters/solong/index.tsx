@@ -1,7 +1,7 @@
-import EventEmitter from "eventemitter3";
-import {PublicKey, Transaction} from "@solana/web3.js";
-import { WalletAdapter } from "@solana/wallet-base";
-import { notify } from "../../utils/notifications";
+import EventEmitter from 'eventemitter3';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { WalletAdapter } from '@solana/wallet-base';
+import { notify } from '../../utils/notifications';
 
 export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   _publicKey: PublicKey | null;
@@ -22,6 +22,14 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   async signAllTransactions(transactions: Transaction[]) {
+    const solong = (window as any).solong;
+
+    // Temp. workaround to ensure requests to sign multiple transactions at once don't fail when Solong wallet is used
+    // Signing transactions one by one as a fallback works but the UX is not great because user is asked to sign multiple times
+    for (let t of transactions) {
+      await solong.signTransaction(t);
+    }
+
     return transactions;
   }
 
@@ -32,8 +40,8 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
 
     if ((window as any).solong === undefined) {
       notify({
-        message: "Solong Error",
-        description: "Please install solong wallet from Chrome ",
+        message: 'Solong Error',
+        description: 'Please install solong wallet from Chrome ',
       });
       return;
     }
@@ -43,7 +51,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
       .selectAccount()
       .then((account: any) => {
         this._publicKey = new PublicKey(account);
-        this.emit("connect", this._publicKey);
+        this.emit('connect', this._publicKey);
       })
       .catch(() => {
         this.disconnect();
@@ -56,7 +64,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   disconnect() {
     if (this._publicKey) {
       this._publicKey = null;
-      this.emit("disconnect");
+      this.emit('disconnect');
     }
   }
 }

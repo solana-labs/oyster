@@ -1,7 +1,10 @@
 import React from 'react';
 import { Typography } from 'antd';
 import { shortenAddress } from '../../utils/utils';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { useConnectionConfig } from '../../contexts';
+
+import { getExplorerUrl } from '../../utils/explorer';
 
 export const ExplorerLink = (props: {
   address: string | PublicKey;
@@ -9,8 +12,11 @@ export const ExplorerLink = (props: {
   code?: boolean;
   style?: React.CSSProperties;
   length?: number;
+  short?: boolean;
+  connection?: Connection;
 }) => {
-  const { type, code } = props;
+  const { type, code, short } = props;
+  let { endpoint } = useConnectionConfig();
 
   const address =
     typeof props.address === 'string'
@@ -21,11 +27,14 @@ export const ExplorerLink = (props: {
     return null;
   }
 
-  const length = props.length ?? 9;
+  const displayAddress =
+    short || props.length
+      ? shortenAddress(address, props.length ?? 9)
+      : address;
 
   return (
     <a
-      href={`https://explorer.solana.com/${type}/${address}`}
+      href={getExplorerUrl(address, endpoint, type, props.connection)}
       // eslint-disable-next-line react/jsx-no-target-blank
       target="_blank"
       title={address}
@@ -33,10 +42,10 @@ export const ExplorerLink = (props: {
     >
       {code ? (
         <Typography.Text style={props.style} code>
-          {shortenAddress(address, length)}
+          {displayAddress}
         </Typography.Text>
       ) : (
-        shortenAddress(address, length)
+        displayAddress
       )}
     </a>
   );

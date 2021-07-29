@@ -9,6 +9,7 @@ import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../utils/assets';
 import { useConnectionConfig } from '@oyster/common';
 import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
+import { TokenInfo } from '@solana/spl-token-registry';
 
 export const TokenSelectModal = (props: {
   onSelectToken: (token: string) => void;
@@ -24,10 +25,18 @@ export const TokenSelectModal = (props: {
 
   const inputRef = useRef<Input>(null);
   const tokens = useMemo(
-    () => [
-      ...filterModalEthTokens(ethTokens),
-      ...filterModalSolTokens(solTokens),
-    ],
+    () => {
+      const ethAddresses = ethTokens.reduce((set, t) => {
+        if(t.address) {
+          set.add(t.address.toLowerCase());
+        }
+        return set;
+      }, new Set<string>());
+      return [
+        ...filterModalEthTokens(ethTokens),
+        ...filterModalSolTokens(solTokens).filter(t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase())),
+      ];
+    },
     [ethTokens, solTokens],
   );
 
@@ -36,7 +45,8 @@ export const TokenSelectModal = (props: {
       return tokens.filter(token => {
         return (
           (token.tags?.indexOf('longList') || -1) < 0 &&
-          token.symbol.includes(search.toUpperCase())
+          (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+            token.name.toLowerCase().includes(search.toLowerCase()))
         );
       });
     }
@@ -61,15 +71,29 @@ export const TokenSelectModal = (props: {
     setSearch(val);
   });
 
+  const getTokenInfo = (token: TokenInfo | undefined, chain: ASSET_CHAIN | undefined) => {
+    let name = token?.name || '';
+    let symbol = token?.symbol || '';
+    if (token && chain !== ASSET_CHAIN.Solana) {
+      if((token.tags || []).indexOf('wormhole') >= 0) {
+        name = name.replace('(Wormhole)', '').trim();
+        symbol = symbol.startsWith('w') ? symbol.slice(1, symbol.length) : symbol;
+      }
+    }
+
+    return { name, symbol };
+  }
+
   const rowRender = (rowProps: { index: number; key: string; style: any }) => {
     const token = tokenList[rowProps.index];
     const mint = token.address;
     return [ASSET_CHAIN.Solana, ASSET_CHAIN.Ethereum].map((chain, index) => {
+      const { name , symbol } = getTokenInfo(token, chain);
       return (
         <div
           key={rowProps.key + mint + chain}
           className="multichain-option"
-          title={token.name}
+          title={name}
           onClick={() => {
             props.onSelectToken(mint);
             props.onChain(chain);
@@ -91,8 +115,8 @@ export const TokenSelectModal = (props: {
               className="multichain-option-name"
               style={{ marginLeft: '20px' }}
             >
-              <em className={'token-symbol'}>{token.symbol}</em>
-              <span className={'token-name'}>{token.name}</span>
+              <em className={'token-symbol'}>{symbol}</em>
+              <span className={'token-name'}>{name}</span>
             </div>
           </div>
         </div>
@@ -100,27 +124,25 @@ export const TokenSelectModal = (props: {
     });
   };
 
+  const { name , symbol } = getTokenInfo(firstToken, props.chain);
   return (
     <>
-      {firstToken ? (
-        <div
-          key={firstToken.address}
-          className="multichain-option"
-          title={firstToken.name}
-          onClick={() => showModal()}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="multichain-option-content">
-            <TokenDisplay
-              asset={props.asset}
-              token={firstToken}
-              chain={props.showIconChain ? props.chain : undefined}
-            />
-          </div>
-          <div className={'multichain-option-symbol'}>{firstToken.symbol}</div>
-          <span className={'down-arrow'}></span>
+      <div
+        className="multichain-option"
+        title={name}
+        onClick={() => showModal()}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="multichain-option-content">
+          <TokenDisplay
+            asset={props.asset}
+            token={firstToken}
+            chain={props.showIconChain ? props.chain : undefined}
+          />
         </div>
-      ) : null}
+        <div className={'multichain-option-symbol'}>{symbol}</div>
+        <span className={'down-arrow'}></span>
+      </div>
       <Modal
         visible={isModalVisible}
         onCancel={() => hideModal()}

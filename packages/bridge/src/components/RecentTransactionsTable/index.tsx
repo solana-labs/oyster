@@ -34,7 +34,9 @@ export const RecentTransactionsTable = (props: {
   showUserTransactions?: boolean;
   tokenAccounts: TokenAccount[];
 }) => {
-  const { loading: loadingTransfers, transfers } = useWormholeTransactions(props.tokenAccounts);
+  const { loading: loadingTransfers, transfers } = useWormholeTransactions(
+    props.tokenAccounts,
+  );
   const { provider } = useEthereum();
   const bridge = useBridge();
 
@@ -338,7 +340,6 @@ export const RecentTransactionsTable = (props: {
           scrollToFirstRowOnChange: false,
           x: 900,
         }}
-
         dataSource={transfers.sort((a, b) => b.date - a.date)}
         columns={userColumns}
         loading={loadingTransfers}
