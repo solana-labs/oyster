@@ -10,6 +10,7 @@ import { FinalizeVoteArgs } from './instructions';
 export const withFinalizeVote = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   governingTokenMint: PublicKey,
@@ -18,6 +19,11 @@ export const withFinalizeVote = async (
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   let keys = [
+    {
+      pubkey: realm,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: governance,
       isWritable: false,

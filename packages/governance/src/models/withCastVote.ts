@@ -13,6 +13,7 @@ import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 export const withCastVote = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -36,6 +37,11 @@ export const withCastVote = async (
   );
 
   const keys = [
+    {
+      pubkey: realm,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: governance,
       isWritable: false,

@@ -42,7 +42,7 @@ export const RealmView = () => {
 
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.councilMint,
+    realm?.info.config.councilMint,
   );
 
   const governanceItems = useMemo(() => {
@@ -84,7 +84,7 @@ export const RealmView = () => {
                       <RealmBadge
                         size={60}
                         communityMint={realm?.info.communityMint}
-                        councilMint={realm?.info.councilMint}
+                        councilMint={realm?.info.config.councilMint}
                       ></RealmBadge>
                     </span>
                   </Popover>
@@ -126,12 +126,12 @@ export const RealmView = () => {
                 ></WithdrawGoverningTokensButton>
                 <DepositGoverningTokensButton
                   realm={realm}
-                  governingTokenMint={realm?.info.councilMint}
+                  governingTokenMint={realm?.info.config.councilMint}
                   tokenName="Council"
                 ></DepositGoverningTokensButton>
                 <WithdrawGoverningTokensButton
                   realm={realm}
-                  governingTokenMint={realm?.info.councilMint}
+                  governingTokenMint={realm?.info.config.councilMint}
                   tokenName="Council"
                 ></WithdrawGoverningTokensButton>
                 <RegisterGovernanceButton

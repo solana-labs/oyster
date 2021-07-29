@@ -33,9 +33,11 @@ import {
   Governance,
   GovernanceConfig,
   InstructionData,
+  MintMaxVoteWeightSource,
   Proposal,
   ProposalInstruction,
   Realm,
+  RealmConfig,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
@@ -284,14 +286,37 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    MintMaxVoteWeightSource,
+    {
+      kind: 'enum',
+      values: [
+        ['percentage', 'u64'],
+        ['absolute', 'u64'],
+        ['program', 'u64'],
+      ],
+    },
+  ],
+  [
+    RealmConfig,
+    {
+      kind: 'struct',
+      fields: [
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+        ['custodian', { kind: 'option', type: 'pubkey' }],
+        ['reserved', [8]],
+      ],
+    },
+  ],
+  [
     Realm,
     {
       kind: 'struct',
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
+        ['config', RealmConfig],
         ['reserved', [8]],
-        ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['authority', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],

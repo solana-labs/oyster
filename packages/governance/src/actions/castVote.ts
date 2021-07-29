@@ -9,6 +9,7 @@ import { RpcContext } from '../models/api';
 
 export const castVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
+  realm: PublicKey,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   vote: Vote,
@@ -22,6 +23,7 @@ export const castVote = async (
   await withCastVote(
     instructions,
     programId,
+    realm,
     proposal.info.governance,
     proposal.pubkey,
     tokeOwnerRecord,

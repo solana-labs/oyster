@@ -71,6 +71,7 @@ export const GovernanceError: Record<number, string> = [
   'Invalid Authority for Realm', // InvalidAuthorityForRealm
   'Realm has no authority', // RealmHasNoAuthority
   'Realm authority must sign', // RealmAuthorityMustSign
+  'Invalid governing token holding account', // InvalidGoverningTokenHoldingAccount
 ];
 
 export const TokenError: Record<number, string> = [

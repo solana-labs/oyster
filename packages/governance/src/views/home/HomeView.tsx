@@ -32,11 +32,11 @@ export const HomeView = () => {
         );
 
         const councilTokenOwnerRecord =
-          r.info.councilMint &&
+          r.info.config.councilMint &&
           tokenOwnerRecords.find(
             tor =>
               tor.info.governingTokenMint.toBase58() ===
-              r.info.councilMint!.toBase58(),
+              r.info.config.councilMint!.toBase58(),
           );
 
         return {
@@ -45,7 +45,7 @@ export const HomeView = () => {
           badge: (
             <RealmBadge
               communityMint={r.info.communityMint}
-              councilMint={r.info.councilMint}
+              councilMint={r.info.config.councilMint}
             ></RealmBadge>
           ),
           key: r.pubkey.toBase58(),
