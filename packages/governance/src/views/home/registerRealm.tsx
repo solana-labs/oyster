@@ -13,6 +13,7 @@ import { registerRealm } from '../../actions/registerRealm';
 import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getRealmUrl } from '../../tools/routeTools';
+import { MintMaxVoteWeightSource } from '../../models/accounts';
 
 export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
   const [redirectTo, setRedirectTo] = useState('');
@@ -32,6 +33,7 @@ export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
       values.name,
       new PublicKey(values.communityMint),
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
+      MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION, // default to 100% of the supply
     );
   };
 

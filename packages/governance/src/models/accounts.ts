@@ -88,13 +88,43 @@ export enum InstructionExecutionFlags {
   UseTransaction,
 }
 
-export class MintMaxVoteWeightSource {
-  percentage: number;
-  absolute: BN;
+export enum MintMaxVoteWeightSourceType {
+  SupplyFraction = 0,
+  Absolute = 1,
+}
 
-  constructor(args: { percentage: number; absolute: BN }) {
-    this.percentage = args.percentage;
-    this.absolute = args.absolute;
+export class MintMaxVoteWeightSource {
+  type = MintMaxVoteWeightSourceType.SupplyFraction;
+  value: BN;
+
+  constructor(args: { value: BN }) {
+    this.value = args.value;
+  }
+
+  static SUPPLY_FRACTION_BASE = new BN(10000000000);
+
+  static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
+    value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
+  });
+}
+
+export class ConfigArgs {
+  useCouncilMint: boolean;
+  useCustodian: boolean;
+  useAuthority: boolean;
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+
+  constructor(args: {
+    useCouncilMint: boolean;
+    useCustodian: boolean;
+    useAuthority: boolean;
+    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+  }) {
+    this.useCouncilMint = !!args.useCouncilMint;
+    this.useCustodian = !!args.useCustodian;
+    this.useAuthority = !!args.useAuthority;
+    this.communityMintMaxVoteWeightSource =
+      args.communityMintMaxVoteWeightSource;
   }
 }
 

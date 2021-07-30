@@ -30,6 +30,7 @@ import {
 } from './instructions';
 import {
   AccountMetaData,
+  ConfigArgs,
   Governance,
   GovernanceConfig,
   InstructionData,
@@ -45,7 +46,6 @@ import {
   VoteWeight,
 } from './accounts';
 import { serialize } from 'borsh';
-import BN from 'bn.js';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -61,26 +61,6 @@ import BN from 'bn.js';
   reader.maybeResize();
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
-};
-
-(BinaryReader.prototype as any).readMintMaxVoteWeightSource = function () {
-  const reader = (this as unknown) as BinaryReader;
-  const type = reader.buf.readUInt8(reader.offset);
-
-  if (type !== 0) {
-    throw new Error(
-      `MintMaxVoteWeightSource type ${type} is not supported yet`,
-    );
-  }
-
-  reader.offset += 1;
-  const percentage = reader.buf.readUInt8(reader.offset);
-  reader.offset += 1;
-
-  return new MintMaxVoteWeightSource({
-    percentage: percentage,
-    absolute: new BN(0),
-  });
 };
 
 // Serializes sdk instruction into InstructionData and encodes it as base64 which then can be entered into the UI form
@@ -105,12 +85,25 @@ export const serializeInstructionToBase64 = (
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
+    ConfigArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['useCouncilMint', 'u8'],
+        ['useCustodian', 'u8'],
+        ['useAuthority', 'u8'],
+        ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+      ],
+    },
+  ],
+  [
     CreateRealmArgs,
     {
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
         ['name', 'string'],
+        ['configArgs', ConfigArgs],
       ],
     },
   ],
@@ -308,14 +301,25 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
 
   [
+    MintMaxVoteWeightSource,
+    {
+      kind: 'struct',
+      fields: [
+        ['type', 'u8'],
+        ['value', 'u64'],
+      ],
+    },
+  ],
+
+  [
     RealmConfig,
     {
       kind: 'struct',
       fields: [
-        ['councilMint', { kind: 'option', type: 'pubkey' }],
-        ['communityMintMaxVoteWeightSource', 'mintMaxVoteWeightSource'],
-        ['custodian', { kind: 'option', type: 'pubkey' }],
         ['reserved', [8]],
+        ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ['custodian', { kind: 'option', type: 'pubkey' }],
       ],
     },
   ],

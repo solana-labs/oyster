@@ -1,4 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { MintMaxVoteWeightSource } from '../models/accounts';
 import { RpcContext } from '../models/api';
 
 import { withCreateRealm } from '../models/withCreateRealm';
@@ -8,7 +9,8 @@ export async function registerRealm(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   name: string,
   communityMint: PublicKey,
-  councilMint?: PublicKey,
+  councilMint: PublicKey | undefined,
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
   let instructions: TransactionInstruction[] = [];
 
@@ -20,6 +22,8 @@ export async function registerRealm(
     walletPubkey,
     councilMint,
     walletPubkey,
+    walletPubkey,
+    communityMintMaxVoteWeightSource,
   );
 
   await sendTransactionWithNotifications(
