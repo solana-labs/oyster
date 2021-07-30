@@ -7,7 +7,11 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED } from './accounts';
+import {
+  ConfigArgs,
+  GOVERNANCE_PROGRAM_SEED,
+  MintMaxVoteWeightSource,
+} from './accounts';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
@@ -16,11 +20,23 @@ export async function withCreateRealm(
   communityMint: PublicKey,
   payer: PublicKey,
   councilMint: PublicKey | undefined,
-  realmAuthority: PublicKey,
+  realmAuthority: PublicKey | undefined,
+  realmCustodian: PublicKey | undefined,
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  const args = new CreateRealmArgs({ name });
+  const configArgs = new ConfigArgs({
+    useAuthority: realmAuthority !== undefined,
+    useCouncilMint: councilMint !== undefined,
+    useCustodian: realmCustodian !== undefined,
+    communityMintMaxVoteWeightSource,
+  });
+
+  const args = new CreateRealmArgs({
+    configArgs,
+    name,
+  });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const [realmAddress] = await PublicKey.findProgramAddress(
@@ -42,11 +58,6 @@ export async function withCreateRealm(
       pubkey: realmAddress,
       isSigner: false,
       isWritable: true,
-    },
-    {
-      pubkey: realmAuthority,
-      isSigner: false,
-      isWritable: false,
     },
     {
       pubkey: communityMint,
@@ -103,6 +114,22 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ];
+  }
+
+  if (realmAuthority) {
+    keys.push({
+      pubkey: realmAuthority,
+      isSigner: false,
+      isWritable: false,
+    });
+  }
+
+  if (realmCustodian) {
+    keys.push({
+      pubkey: realmCustodian,
+      isSigner: false,
+      isWritable: false,
+    });
   }
 
   instructions.push(
