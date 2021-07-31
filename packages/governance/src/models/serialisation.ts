@@ -30,7 +30,7 @@ import {
 } from './instructions';
 import {
   AccountMetaData,
-  ConfigArgs,
+  RealmConfigArgs,
   Governance,
   GovernanceConfig,
   InstructionData,
@@ -85,13 +85,12 @@ export const serializeInstructionToBase64 = (
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
-    ConfigArgs,
+    RealmConfigArgs,
     {
       kind: 'struct',
       fields: [
         ['useCouncilMint', 'u8'],
         ['useCustodian', 'u8'],
-        ['useAuthority', 'u8'],
         ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
       ],
     },
@@ -103,7 +102,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['name', 'string'],
-        ['configArgs', ConfigArgs],
+        ['configArgs', RealmConfigArgs],
       ],
     },
   ],

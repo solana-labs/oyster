@@ -108,21 +108,18 @@ export class MintMaxVoteWeightSource {
   });
 }
 
-export class ConfigArgs {
+export class RealmConfigArgs {
   useCouncilMint: boolean;
   useCustodian: boolean;
-  useAuthority: boolean;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
 
   constructor(args: {
     useCouncilMint: boolean;
     useCustodian: boolean;
-    useAuthority: boolean;
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
     this.useCustodian = !!args.useCustodian;
-    this.useAuthority = !!args.useAuthority;
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
   }

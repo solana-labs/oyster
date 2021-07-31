@@ -8,7 +8,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
 import {
-  ConfigArgs,
+  RealmConfigArgs,
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
 } from './accounts';
@@ -26,8 +26,7 @@ export async function withCreateRealm(
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  const configArgs = new ConfigArgs({
-    useAuthority: realmAuthority !== undefined,
+  const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     useCustodian: realmCustodian !== undefined,
     communityMintMaxVoteWeightSource,
