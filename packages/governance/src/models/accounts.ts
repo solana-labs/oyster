@@ -102,6 +102,7 @@ export class MintMaxVoteWeightSource {
   }
 
   static SUPPLY_FRACTION_BASE = new BN(10000000000);
+  static SUPPLY_FRACTION_DECIMALS = 10;
 
   static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
     value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
