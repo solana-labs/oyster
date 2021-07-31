@@ -68,7 +68,11 @@ const parseMintSupplyFraction = (fraction: string) => {
   });
 };
 
-export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
+export function RegisterRealmButton({
+  buttonProps,
+}: {
+  buttonProps: ButtonProps;
+}) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
   const { programId } = rpcContext;
@@ -137,7 +141,6 @@ export function RegisterRealm({ buttonProps }: { buttonProps: ButtonProps }) {
         useCouncilMint: false,
         communityMintMaxVoteWeightFraction: supplyFraction,
       }}
-      isWalletRequired={false}
     >
       <Form.Item
         name="name"
