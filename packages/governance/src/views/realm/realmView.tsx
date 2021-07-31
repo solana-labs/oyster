@@ -24,6 +24,7 @@ import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
+import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
 
 const { Text } = Typography;
 
@@ -114,8 +115,19 @@ export const RealmView = () => {
                 </Col>
               </Row>
             </Col>
-            <Col md={12} xs={24}>
-              <div className="realm-actions">
+            <Col
+              md={12}
+              xs={24}
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Space>
+                <SetRealmAuthorityButton
+                  realm={realm}
+                ></SetRealmAuthorityButton>
                 <DepositGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.communityMint}
@@ -138,10 +150,7 @@ export const RealmView = () => {
                   buttonProps={{ className: 'governance-action' }}
                   realm={realm}
                 ></RegisterGovernanceButton>
-                {/* <SetRealmAuthorityButton
-                  realm={realm}
-                ></SetRealmAuthorityButton> */}
-              </div>
+              </Space>
             </Col>
           </Row>
         </Col>
