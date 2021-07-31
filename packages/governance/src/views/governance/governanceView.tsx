@@ -100,6 +100,7 @@ export const GovernanceView = () => {
           {governance && (
             <GovernanceBadge
               size={60}
+              realm={realm}
               governance={governance}
               showVotingCount={false}
             ></GovernanceBadge>

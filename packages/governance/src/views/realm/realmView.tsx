@@ -57,10 +57,10 @@ export const RealmView = () => {
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
         title: g.info.governedAccount.toBase58(),
-        badge: <GovernanceBadge governance={g}></GovernanceBadge>,
+        badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
-  }, [governances, programIdBase58]);
+  }, [governances, programIdBase58, realm]);
 
   return (
     <>
