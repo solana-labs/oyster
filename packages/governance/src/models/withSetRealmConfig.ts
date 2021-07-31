@@ -1,95 +1,43 @@
-import { utils } from '@oyster/common';
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { CreateRealmArgs } from './instructions';
+import { SetRealmAuthorityArgs, SetRealmConfigArgs } from './instructions';
 import {
-  RealmConfigArgs,
+  getTokenHoldingAddress,
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
-  getTokenHoldingAddress,
+  RealmConfigArgs,
 } from './accounts';
 
-export async function withCreateRealm(
+export async function withSetRealmConfig(
   instructions: TransactionInstruction[],
   programId: PublicKey,
-  name: string,
+  realm: PublicKey,
   realmAuthority: PublicKey,
-  communityMint: PublicKey,
-  payer: PublicKey,
   realmCustodian: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
-  const { system: systemId, token: tokenId } = utils.programIds();
-
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     useCustodian: realmCustodian !== undefined,
     communityMintMaxVoteWeightSource,
   });
 
-  const args = new CreateRealmArgs({
-    configArgs,
-    name,
-  });
+  const args = new SetRealmConfigArgs({ configArgs });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
-
-  const [realmAddress] = await PublicKey.findProgramAddress(
-    [Buffer.from(GOVERNANCE_PROGRAM_SEED), Buffer.from(args.name)],
-    programId,
-  );
-
-  const communityTokenHoldingAddress = await getTokenHoldingAddress(
-    programId,
-    realmAddress,
-    communityMint,
-  );
 
   let keys = [
     {
-      pubkey: realmAddress,
-      isSigner: false,
+      pubkey: realm,
       isWritable: true,
+      isSigner: false,
     },
+
     {
       pubkey: realmAuthority,
-      isSigner: false,
       isWritable: false,
-    },
-    {
-      pubkey: communityMint,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: communityTokenHoldingAddress,
-      isSigner: false,
-      isWritable: true,
-    },
-    {
-      pubkey: payer,
       isSigner: true,
-      isWritable: false,
-    },
-    {
-      pubkey: systemId,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: tokenId,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: SYSVAR_RENT_PUBKEY,
-      isSigner: false,
-      isWritable: false,
     },
   ];
 
@@ -104,7 +52,7 @@ export async function withCreateRealm(
   if (councilMint) {
     const councilTokenHoldingAddress = await getTokenHoldingAddress(
       programId,
-      realmAddress,
+      realm,
       councilMint,
     );
 
@@ -130,6 +78,4 @@ export async function withCreateRealm(
       data,
     }),
   );
-
-  return realmAddress;
 }

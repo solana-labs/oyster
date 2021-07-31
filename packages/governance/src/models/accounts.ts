@@ -174,6 +174,23 @@ export class Realm {
   }
 }
 
+export async function getTokenHoldingAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+) {
+  const [tokenHoldingAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+    ],
+    programId,
+  );
+
+  return tokenHoldingAddress;
+}
+
 export class GovernanceConfig {
   voteThresholdPercentage: VoteThresholdPercentage;
   minCommunityTokensToCreateProposal: BN;
