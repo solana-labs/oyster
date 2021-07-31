@@ -18,7 +18,7 @@ import { WithdrawGoverningTokensButton } from './buttons/withdrawGoverningTokens
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
-import AccountDescription from './accountDescription';
+import AccountDescription from './components/accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
