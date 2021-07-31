@@ -10,6 +10,11 @@ import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { createSetRealmConfig } from '../../../../models/createSetRealmConfig';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
+import {
+  parseMintSupplyFraction,
+  RealmMintSupplyConfigFormItem,
+  RealmMintSupplyConfigValues,
+} from '../../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
 
 export const RealmConfigForm = ({
   form,
@@ -25,16 +30,18 @@ export const RealmConfigForm = ({
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
   const { programId } = useRpcContext();
 
-  const onCreate = async (values: { removeCouncil: boolean }) => {
-    console.log('VALUES', values);
-
+  const onCreate = async (
+    values: {
+      removeCouncil: boolean;
+    } & RealmMintSupplyConfigValues,
+  ) => {
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
       realm.pubkey,
       governance.pubkey,
       realm.info.config.custodian,
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
-      realm.info.config.communityMintMaxVoteWeightSource,
+      parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
     );
 
     onCreateInstruction(setRealmConfigIx);
@@ -65,6 +72,10 @@ export const RealmConfigForm = ({
           <Checkbox></Checkbox>
         </Form.Item>
       )}
+      <RealmMintSupplyConfigFormItem
+        communityMintAddress={realm.info.communityMint}
+        maxVoteWeightSource={realm.info.config.communityMintMaxVoteWeightSource}
+      ></RealmMintSupplyConfigFormItem>
     </Form>
   );
 };
