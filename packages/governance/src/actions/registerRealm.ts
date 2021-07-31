@@ -18,11 +18,11 @@ export async function registerRealm(
     instructions,
     programId,
     name,
+    walletPubkey,
     communityMint,
     walletPubkey,
+    walletPubkey,
     councilMint,
-    walletPubkey,
-    walletPubkey,
     communityMintMaxVoteWeightSource,
   );
 

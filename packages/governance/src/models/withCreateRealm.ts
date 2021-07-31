@@ -17,11 +17,11 @@ export async function withCreateRealm(
   instructions: TransactionInstruction[],
   programId: PublicKey,
   name: string,
+  realmAuthority: PublicKey,
   communityMint: PublicKey,
   payer: PublicKey,
-  councilMint: PublicKey | undefined,
-  realmAuthority: PublicKey | undefined,
   realmCustodian: PublicKey | undefined,
+  councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
@@ -60,6 +60,11 @@ export async function withCreateRealm(
       isWritable: true,
     },
     {
+      pubkey: realmAuthority,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
       pubkey: communityMint,
       isSigner: false,
       isWritable: false,
@@ -91,6 +96,14 @@ export async function withCreateRealm(
     },
   ];
 
+  if (realmCustodian) {
+    keys.push({
+      pubkey: realmCustodian,
+      isSigner: false,
+      isWritable: false,
+    });
+  }
+
   if (councilMint) {
     const [councilTokenHoldingAddress] = await PublicKey.findProgramAddress(
       [
@@ -114,22 +127,6 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ];
-  }
-
-  if (realmAuthority) {
-    keys.push({
-      pubkey: realmAuthority,
-      isSigner: false,
-      isWritable: false,
-    });
-  }
-
-  if (realmCustodian) {
-    keys.push({
-      pubkey: realmCustodian,
-      isSigner: false,
-      isWritable: false,
-    });
   }
 
   instructions.push(
