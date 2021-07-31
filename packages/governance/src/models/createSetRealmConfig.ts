@@ -1,16 +1,14 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
-import { serialize } from 'borsh';
-import { SetRealmAuthorityArgs, SetRealmConfigArgs } from './instructions';
 import {
   getTokenHoldingAddress,
-  GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
   RealmConfigArgs,
 } from './accounts';
+import { SetRealmConfigArgs } from './instructions';
+import { GOVERNANCE_SCHEMA } from './serialisation';
+import { serialize } from 'borsh';
 
-export async function withSetRealmConfig(
-  instructions: TransactionInstruction[],
+export async function createSetRealmConfig(
   programId: PublicKey,
   realm: PublicKey,
   realmAuthority: PublicKey,
@@ -71,11 +69,9 @@ export async function withSetRealmConfig(
     ];
   }
 
-  instructions.push(
-    new TransactionInstruction({
-      keys,
-      programId,
-      data,
-    }),
-  );
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  });
 }

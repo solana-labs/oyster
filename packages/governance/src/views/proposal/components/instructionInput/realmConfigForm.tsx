@@ -7,12 +7,8 @@ import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
 import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 
-import {
-  getGovernanceConfig,
-  GovernanceConfigValues,
-} from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { createSetGovernanceConfig } from '../../../../models/createSetGovernanceConfig';
+import { createSetRealmConfig } from '../../../../models/createSetRealmConfig';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 
 export const RealmConfigForm = ({
@@ -29,16 +25,19 @@ export const RealmConfigForm = ({
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
   const { programId } = useRpcContext();
 
-  const onCreate = async (values: GovernanceConfigValues) => {
-    const config = getGovernanceConfig(values);
+  const onCreate = async (values: { removeCouncil: boolean }) => {
+    console.log('VALUES', values);
 
-    const setGovernanceConfigIx = createSetGovernanceConfig(
+    const setRealmConfigIx = await createSetRealmConfig(
       programId,
+      realm.pubkey,
       governance.pubkey,
-      config,
+      realm.info.config.custodian,
+      values.removeCouncil === true ? undefined : realm.info.config.councilMint,
+      realm.info.config.communityMintMaxVoteWeightSource,
     );
 
-    onCreateInstruction(setGovernanceConfigIx);
+    onCreateInstruction(setRealmConfigIx);
   };
 
   return (
@@ -58,7 +57,11 @@ export const RealmConfigForm = ({
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
       {realm.info.config.councilMint && (
-        <Form.Item label="remove council">
+        <Form.Item
+          label="remove council"
+          name="removeCouncil"
+          valuePropName="checked"
+        >
           <Checkbox></Checkbox>
         </Form.Item>
       )}
