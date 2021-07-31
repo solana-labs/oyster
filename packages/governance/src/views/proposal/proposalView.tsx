@@ -22,6 +22,7 @@ import {
   Governance,
   Proposal,
   ProposalState,
+  Realm,
   TokenOwnerRecord,
   VoteRecord,
 } from '../../models/accounts';
@@ -44,6 +45,7 @@ import BN from 'bn.js';
 import { VoteScore } from './components/vote/voteScore';
 
 import { VoteCountdown } from './components/header/voteCountdown';
+import { useRealm } from '../../contexts/GovernanceContext';
 
 const { TabPane } = Tabs;
 
@@ -68,6 +70,7 @@ export const ProposalView = () => {
   let proposal = useProposal(proposalKey);
 
   let governance = useGovernance(proposal?.info.governance);
+  let realm = useRealm(governance?.info.realm);
 
   const governingTokenMint = useMint(proposal?.info.governingTokenMint);
 
@@ -80,12 +83,17 @@ export const ProposalView = () => {
       : proposal?.info.governingTokenMint,
   );
 
+  if (!realm) {
+    return <Spin></Spin>;
+  }
+
   return (
     <>
       <div className="flexColumn">
         {proposal && governance && governingTokenMint ? (
           <InnerProposalView
             proposal={proposal}
+            realm={realm}
             governance={governance}
             voterDisplayData={mapVoterDisplayData(
               voteRecords,
@@ -225,6 +233,7 @@ function mapVoterDisplayData(
 }
 
 function InnerProposalView({
+  realm,
   proposal,
   governingTokenMint,
   governance,
@@ -232,6 +241,7 @@ function InnerProposalView({
   endpoint,
   hasVotes,
 }: {
+  realm: ParsedAccount<Realm>;
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
   governingTokenMint: MintInfo;
@@ -481,6 +491,7 @@ function InnerProposalView({
                     <Col xs={24} sm={24} md={12} lg={8}>
                       <NewInstructionCard
                         proposal={proposal}
+                        realm={realm}
                         governance={governance}
                       />
                     </Col>

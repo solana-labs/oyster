@@ -6,7 +6,7 @@ import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import React from 'react';
 import { useState } from 'react';
 
-import { Governance } from '../../../../models/accounts';
+import { Governance, Realm } from '../../../../models/accounts';
 
 import { serializeInstructionToBase64 } from '../../../../models/serialisation';
 import { AccountInstructionsForm } from './accountInstructionsForm';
@@ -16,9 +16,11 @@ import { TokenInstructionsForm } from './tokenInstructionsForm';
 import { MintInstructionsForm } from './mintInstructionsForm';
 
 export default function InstructionInput({
+  realm,
   governance,
   onChange,
 }: {
+  realm: ParsedAccount<Realm>;
   governance: ParsedAccount<Governance>;
   onChange?: (v: any) => void;
 }) {
@@ -75,6 +77,7 @@ export default function InstructionInput({
           <ProgramInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
+            realm={realm}
             governance={governance}
           ></ProgramInstructionsForm>
         )}
@@ -82,6 +85,7 @@ export default function InstructionInput({
           <MintInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
+            realm={realm}
             governance={governance}
           ></MintInstructionsForm>
         )}
@@ -89,6 +93,7 @@ export default function InstructionInput({
           <TokenInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
+            realm={realm}
             governance={governance}
           ></TokenInstructionsForm>
         )}
@@ -96,6 +101,7 @@ export default function InstructionInput({
           <AccountInstructionsForm
             form={form}
             onCreateInstruction={onCreateInstruction}
+            realm={realm}
             governance={governance}
           ></AccountInstructionsForm>
         )}

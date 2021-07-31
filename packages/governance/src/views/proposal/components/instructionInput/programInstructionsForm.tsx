@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 import { ParsedAccount } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
 
@@ -8,16 +8,21 @@ import { formDefaults } from '../../../../tools/forms';
 import { ProgramUpgradeForm } from './programUpgradeForm';
 import { AnchorIdlSetBufferForm } from './anchorIdlSetBufferForm';
 import { useAnchorIdlAccount } from '../../../../tools/anchor/anchorHooks';
-import { GovernanceConfigForm } from './governanceConfigForm';
 
 import { InstructionSelector, InstructionType } from './instructionSelector';
+import {
+  getGovernanceInstructions,
+  GovernanceInstructionForm,
+} from './governanceInstructionForm';
 
 export const ProgramInstructionsForm = ({
   form,
+  realm,
   governance,
   onCreateInstruction,
 }: {
   form: FormInstance;
+  realm: ParsedAccount<Realm>;
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
@@ -35,7 +40,7 @@ export const ProgramInstructionsForm = ({
   let instructions = [
     InstructionType.UpgradeProgram,
     ...anchorInstructions,
-    InstructionType.GovernanceSetConfig,
+    ...getGovernanceInstructions(realm, governance),
   ];
 
   return (
@@ -61,13 +66,14 @@ export const ProgramInstructionsForm = ({
           onCreateInstruction={onCreateInstruction}
         ></AnchorIdlSetBufferForm>
       )}
-      {instruction === InstructionType.GovernanceSetConfig && (
-        <GovernanceConfigForm
-          form={form}
-          governance={governance}
-          onCreateInstruction={onCreateInstruction}
-        ></GovernanceConfigForm>
-      )}
+
+      <GovernanceInstructionForm
+        form={form}
+        realm={realm}
+        governance={governance}
+        onCreateInstruction={onCreateInstruction}
+        instruction={instruction}
+      ></GovernanceInstructionForm>
     </Form>
   );
 };

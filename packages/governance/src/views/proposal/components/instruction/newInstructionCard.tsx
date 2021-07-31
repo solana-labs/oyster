@@ -10,6 +10,7 @@ import {
   Governance,
   InstructionData,
   Proposal,
+  Realm,
 } from '../../../../models/accounts';
 
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
@@ -27,9 +28,11 @@ import {
 } from '../../../../tools/units';
 
 export function NewInstructionCard({
+  realm,
   proposal,
   governance,
 }: {
+  realm: ParsedAccount<Realm>;
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
 }) {
@@ -129,6 +132,7 @@ export function NewInstructionCard({
           rules={[{ required: true, validator: instructionValidator }]}
         >
           <InstructionInput
+            realm={realm}
             governance={governance}
             onChange={onInstructionChange}
           ></InstructionInput>
