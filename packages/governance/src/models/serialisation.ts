@@ -25,12 +25,13 @@ import {
   RemoveInstructionArgs,
   SetGovernanceConfigArgs,
   SetRealmAuthorityArgs,
+  SetRealmConfigArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
 import {
   AccountMetaData,
-  ConfigArgs,
+  RealmConfigArgs,
   Governance,
   GovernanceConfig,
   InstructionData,
@@ -85,13 +86,12 @@ export const serializeInstructionToBase64 = (
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
-    ConfigArgs,
+    RealmConfigArgs,
     {
       kind: 'struct',
       fields: [
         ['useCouncilMint', 'u8'],
         ['useCustodian', 'u8'],
-        ['useAuthority', 'u8'],
         ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
       ],
     },
@@ -103,7 +103,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['name', 'string'],
-        ['configArgs', ConfigArgs],
+        ['configArgs', RealmConfigArgs],
       ],
     },
   ],
@@ -278,6 +278,16 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    SetRealmConfigArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['configArgs', RealmConfigArgs],
+      ],
+    },
+  ],
+  [
     InstructionData,
     {
       kind: 'struct',
@@ -418,7 +428,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['executingAt', { kind: 'option', type: 'u64' }],
         ['closedAt', { kind: 'option', type: 'u64' }],
         ['executionFlags', 'u8'],
-        ['governingTokenMintVoteSupply', { kind: 'option', type: 'u64' }],
+        ['maxVoteWeight', { kind: 'option', type: 'u64' }],
         [
           'voteThresholdPercentage',
           { kind: 'option', type: VoteThresholdPercentage },

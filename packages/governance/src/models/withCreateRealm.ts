@@ -8,26 +8,26 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
 import {
-  ConfigArgs,
+  RealmConfigArgs,
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
+  getTokenHoldingAddress,
 } from './accounts';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
   programId: PublicKey,
   name: string,
+  realmAuthority: PublicKey,
   communityMint: PublicKey,
   payer: PublicKey,
-  councilMint: PublicKey | undefined,
-  realmAuthority: PublicKey | undefined,
   realmCustodian: PublicKey | undefined,
+  councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  const configArgs = new ConfigArgs({
-    useAuthority: realmAuthority !== undefined,
+  const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     useCustodian: realmCustodian !== undefined,
     communityMintMaxVoteWeightSource,
@@ -44,13 +44,10 @@ export async function withCreateRealm(
     programId,
   );
 
-  const [communityTokenHoldingAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      realmAddress.toBuffer(),
-      communityMint.toBuffer(),
-    ],
+  const communityTokenHoldingAddress = await getTokenHoldingAddress(
     programId,
+    realmAddress,
+    communityMint,
   );
 
   let keys = [
@@ -58,6 +55,11 @@ export async function withCreateRealm(
       pubkey: realmAddress,
       isSigner: false,
       isWritable: true,
+    },
+    {
+      pubkey: realmAuthority,
+      isSigner: false,
+      isWritable: false,
     },
     {
       pubkey: communityMint,
@@ -91,14 +93,19 @@ export async function withCreateRealm(
     },
   ];
 
+  if (realmCustodian) {
+    keys.push({
+      pubkey: realmCustodian,
+      isSigner: false,
+      isWritable: false,
+    });
+  }
+
   if (councilMint) {
-    const [councilTokenHoldingAddress] = await PublicKey.findProgramAddress(
-      [
-        Buffer.from(GOVERNANCE_PROGRAM_SEED),
-        realmAddress.toBuffer(),
-        councilMint.toBuffer(),
-      ],
+    const councilTokenHoldingAddress = await getTokenHoldingAddress(
       programId,
+      realmAddress,
+      councilMint,
     );
 
     keys = [
@@ -114,22 +121,6 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ];
-  }
-
-  if (realmAuthority) {
-    keys.push({
-      pubkey: realmAuthority,
-      isSigner: false,
-      isWritable: false,
-    });
-  }
-
-  if (realmCustodian) {
-    keys.push({
-      pubkey: realmCustodian,
-      isSigner: false,
-      isWritable: false,
-    });
   }
 
   instructions.push(

@@ -18,12 +18,13 @@ import { WithdrawGoverningTokensButton } from './buttons/withdrawGoverningTokens
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
-import AccountDescription from './accountDescription';
+import AccountDescription from './components/accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
+import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
 
 const { Text } = Typography;
 
@@ -56,10 +57,10 @@ export const RealmView = () => {
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
         title: g.info.governedAccount.toBase58(),
-        badge: <GovernanceBadge governance={g}></GovernanceBadge>,
+        badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
-  }, [governances, programIdBase58]);
+  }, [governances, programIdBase58, realm]);
 
   return (
     <>
@@ -114,8 +115,19 @@ export const RealmView = () => {
                 </Col>
               </Row>
             </Col>
-            <Col md={12} xs={24}>
-              <div className="realm-actions">
+            <Col
+              md={12}
+              xs={24}
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Space>
+                <SetRealmAuthorityButton
+                  realm={realm}
+                ></SetRealmAuthorityButton>
                 <DepositGoverningTokensButton
                   realm={realm}
                   governingTokenMint={realm?.info.communityMint}
@@ -138,10 +150,7 @@ export const RealmView = () => {
                   buttonProps={{ className: 'governance-action' }}
                   realm={realm}
                 ></RegisterGovernanceButton>
-                {/* <SetRealmAuthorityButton
-                  realm={realm}
-                ></SetRealmAuthorityButton> */}
-              </div>
+              </Space>
             </Col>
           </Row>
         </Col>

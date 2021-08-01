@@ -1,17 +1,20 @@
 import { ParsedAccount, TokenIcon } from '@oyster/common';
-import { Avatar, Badge } from 'antd';
+import { Avatar, Badge, Tooltip } from 'antd';
 import React from 'react';
-import { Governance, ProposalState } from '../../models/accounts';
+import { Governance, ProposalState, Realm } from '../../models/accounts';
 
 import { useProposalsByGovernance } from '../../hooks/apiHooks';
 
 import './style.less';
+import { SafetyCertificateOutlined } from '@ant-design/icons';
 
 export function GovernanceBadge({
+  realm,
   governance,
   size = 40,
   showVotingCount = true,
 }: {
+  realm: ParsedAccount<Realm> | undefined;
   governance: ParsedAccount<Governance>;
   size?: number;
   showVotingCount?: boolean;
@@ -72,6 +75,13 @@ export function GovernanceBadge({
           </Avatar>
         )}
       </div>
+      {realm?.info.authority?.toBase58() === governance.pubkey.toBase58() && (
+        <Tooltip title="realm authority">
+          <SafetyCertificateOutlined
+            style={{ position: 'absolute', left: size, top: size * 0.75 }}
+          />
+        </Tooltip>
+      )}
     </Badge>
   );
 }

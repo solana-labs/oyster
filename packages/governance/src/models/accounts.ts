@@ -102,27 +102,39 @@ export class MintMaxVoteWeightSource {
   }
 
   static SUPPLY_FRACTION_BASE = new BN(10000000000);
+  static SUPPLY_FRACTION_DECIMALS = 10;
 
   static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
     value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
   });
+
+  isFullSupply() {
+    return (
+      this.type === MintMaxVoteWeightSourceType.SupplyFraction &&
+      this.value.cmp(MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE) === 0
+    );
+  }
+  getSupplyFraction() {
+    if (this.type !== MintMaxVoteWeightSourceType.SupplyFraction) {
+      throw new Error('Max vote weight is not fraction');
+    }
+
+    return this.value;
+  }
 }
 
-export class ConfigArgs {
+export class RealmConfigArgs {
   useCouncilMint: boolean;
   useCustodian: boolean;
-  useAuthority: boolean;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
 
   constructor(args: {
     useCouncilMint: boolean;
     useCustodian: boolean;
-    useAuthority: boolean;
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
     this.useCustodian = !!args.useCustodian;
-    this.useAuthority = !!args.useAuthority;
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
   }
@@ -175,6 +187,23 @@ export class Realm {
     this.authority = args.authority;
     this.name = args.name;
   }
+}
+
+export async function getTokenHoldingAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+) {
+  const [tokenHoldingAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+    ],
+    programId,
+  );
+
+  return tokenHoldingAddress;
 }
 
 export class GovernanceConfig {
@@ -366,7 +395,7 @@ export class Proposal {
 
   executionFlags: InstructionExecutionFlags;
 
-  governingTokenMintVoteSupply: BN | null;
+  maxVoteWeight: BN | null;
   voteThresholdPercentage: VoteThresholdPercentage | null;
 
   name: string;
@@ -395,7 +424,7 @@ export class Proposal {
     instructionsCount: number;
     instructionsNextIndex: number;
     executionFlags: InstructionExecutionFlags;
-    governingTokenMintVoteSupply: BN | null;
+    maxVoteWeight: BN | null;
     voteThresholdPercentage: VoteThresholdPercentage | null;
   }) {
     this.governance = args.governance;
@@ -419,7 +448,7 @@ export class Proposal {
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
     this.executionFlags = args.executionFlags;
-    this.governingTokenMintVoteSupply = args.governingTokenMintVoteSupply;
+    this.maxVoteWeight = args.maxVoteWeight;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
   }
 

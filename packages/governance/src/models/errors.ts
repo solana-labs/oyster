@@ -72,6 +72,9 @@ export const GovernanceError: Record<number, string> = [
   'Realm has no authority', // RealmHasNoAuthority
   'Realm authority must sign', // RealmAuthorityMustSign
   'Invalid governing token holding account', // InvalidGoverningTokenHoldingAccount
+  'Realm council mint change is not supported', // RealmCouncilMintChangeIsNotSupported
+  'Not supported mint max vote weight source', // MintMaxVoteWeightSourceNotSupported
+  'Invalid max vote weight supply fraction', // InvalidMaxVoteWeightSupplyFraction
 ];
 
 export const TokenError: Record<number, string> = [
