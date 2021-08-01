@@ -33,15 +33,18 @@ const getMintSupplyFraction = (
     .toNumber();
 };
 
-const formatMintSupplyFraction = (mint: MintInfo, fraction: number) => {
-  return new BigNumber(fraction)
+export const formatMintSupplyFraction = (
+  mint: MintInfo,
+  decimalFraction: number,
+) => {
+  return new BigNumber(decimalFraction)
     .multipliedBy(mint.supply.toString())
     .shiftedBy(-mint.decimals)
     .toFormat(mint.decimals);
 };
 
-const formatMintSupplyPercentage = (fraction: number) => {
-  const percentage = new BigNumber(fraction).shiftedBy(2).toNumber();
+const formatMintSupplyPercentage = (decimalFraction: number) => {
+  const percentage = new BigNumber(decimalFraction).shiftedBy(2).toNumber();
 
   if (percentage < 0.01) {
     return '<0.01%';

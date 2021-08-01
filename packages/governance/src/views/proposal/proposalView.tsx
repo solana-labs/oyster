@@ -46,6 +46,7 @@ import { VoteScore } from './components/vote/voteScore';
 
 import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
+import { getMintMaxVoteWeight } from '../../tools/units';
 
 const { TabPane } = Tabs;
 
@@ -376,7 +377,7 @@ function InnerProposalView({
                 >
                   <VoterTable
                     endpoint={endpoint}
-                    total={getMaxVoteScore(proposal, governingTokenMint)}
+                    total={getMaxVoteScore(realm, proposal, governingTokenMint)}
                     data={voterDisplayData}
                     decimals={governingTokenMint.decimals}
                   />
@@ -411,7 +412,11 @@ function InnerProposalView({
                     yesVoteThreshold={getYesVoteThreshold(proposal, governance)}
                     governingMintDecimals={governingTokenMint.decimals}
                     proposalState={proposal.info.state}
-                    maxVoteScore={getMaxVoteScore(proposal, governingTokenMint)}
+                    maxVoteScore={getMaxVoteScore(
+                      realm,
+                      proposal,
+                      governingTokenMint,
+                    )}
                     isPreVotingState={proposal.info.isPreVotingState()}
                   ></VoteScore>
                 </div>
@@ -507,14 +512,25 @@ function InnerProposalView({
 }
 
 function getMaxVoteScore(
+  realm: ParsedAccount<Realm>,
   proposal: ParsedAccount<Proposal>,
   governingTokenMint: MintInfo,
 ) {
-  return proposal.info.isVoteFinalized() &&
-    // Note: Canceled state is also final but we currently don't capture the mint supply at the cancellation time
-    proposal.info.governingTokenMintVoteSupply
-    ? proposal.info.governingTokenMintVoteSupply
-    : governingTokenMint.supply;
+  if (proposal.info.isVoteFinalized() && proposal.info.maxVoteWeight) {
+    return proposal.info.maxVoteWeight;
+  }
+
+  if (
+    proposal.info.governingTokenMint.toBase58() ===
+    realm.info.config.councilMint?.toBase58()
+  ) {
+    return governingTokenMint.supply;
+  }
+
+  return getMintMaxVoteWeight(
+    governingTokenMint,
+    realm.info.config.communityMintMaxVoteWeightSource,
+  );
 }
 
 function getYesVoteThreshold(

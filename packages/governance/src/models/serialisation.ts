@@ -428,7 +428,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['executingAt', { kind: 'option', type: 'u64' }],
         ['closedAt', { kind: 'option', type: 'u64' }],
         ['executionFlags', 'u8'],
-        ['governingTokenMintVoteSupply', { kind: 'option', type: 'u64' }],
+        ['maxVoteWeight', { kind: 'option', type: 'u64' }],
         [
           'voteThresholdPercentage',
           { kind: 'option', type: VoteThresholdPercentage },
