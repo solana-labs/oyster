@@ -36,10 +36,12 @@ export function RealmActionBar({
       <DepositGoverningTokensButton
         realm={realm}
         governingTokenMint={realm.info.communityMint}
+        tokenName="Governance"
       ></DepositGoverningTokensButton>
       <WithdrawGoverningTokensButton
         realm={realm}
         governingTokenMint={realm?.info.communityMint}
+        tokenName="Governance"
       ></WithdrawGoverningTokensButton>
       <DepositGoverningTokensButton
         realm={realm}

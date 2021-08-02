@@ -133,6 +133,12 @@ export function useWalletSignatoryRecord(proposal: PublicKey) {
   );
 }
 
+export function useSignatoriesByProposal(proposal: PublicKey | undefined) {
+  return useGovernanceAccountsByFilter<SignatoryRecord>(SignatoryRecord, [
+    pubkeyFilter(1, proposal),
+  ]);
+}
+
 // ----- Proposal Instruction -----
 
 export function useInstructionsByProposal(proposal: PublicKey | undefined) {
