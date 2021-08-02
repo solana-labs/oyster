@@ -1,7 +1,12 @@
 import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { ParsedAccount, TokenIcon, constants } from '@oyster/common';
+import {
+  ParsedAccount,
+  TokenIcon,
+  constants,
+  ExplorerLink,
+} from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -39,6 +44,7 @@ import {
   useWalletSignatoryRecord,
   useInstructionsByProposal,
   useVoteRecordsByProposal,
+  useSignatoriesByProposal,
 } from '../../hooks/apiHooks';
 import BN from 'bn.js';
 
@@ -119,7 +125,7 @@ function useLoadGist({
   setMsg,
   setContent,
   isGist,
-  proposalState: proposal,
+  proposal,
 }: {
   loading: boolean;
   setLoading: (b: boolean) => void;
@@ -127,7 +133,7 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  proposalState: ParsedAccount<Proposal>;
+  proposal: ParsedAccount<Proposal>;
 }) {
   useMemo(() => {
     if (loading) {
@@ -256,6 +262,7 @@ function InnerProposalView({
     proposal.info.governingTokenMint,
   );
   const instructions = useInstructionsByProposal(proposal.pubkey);
+  const signatories = useSignatoriesByProposal(proposal.pubkey);
 
   const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
   const isGist =
@@ -276,7 +283,7 @@ function InnerProposalView({
     setMsg,
     setContent,
     isGist,
-    proposalState: proposal,
+    proposal: proposal,
   });
 
   return (
@@ -395,6 +402,15 @@ function InnerProposalView({
                 value={proposal.info.signatoriesCount}
                 suffix={`/ ${proposal.info.signatoriesSignedOffCount}`}
               />
+              {signatories
+                .filter(s => s.info.signedOff)
+                .map(s => (
+                  <ExplorerLink
+                    address={s.info.signatory}
+                    type="address"
+                    short
+                  ></ExplorerLink>
+                ))}
             </Card>
           </Col>
           <Col md={7} xs={24}>
