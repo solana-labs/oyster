@@ -12,9 +12,6 @@ import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { RegisterGovernanceButton } from './buttons/registerGovernanceButton';
-import { DepositGoverningTokensButton } from './buttons/depositGoverningTokensButton';
-import { WithdrawGoverningTokensButton } from './buttons/withdrawGoverningTokensButton';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
@@ -24,7 +21,8 @@ import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
-import { SetRealmAuthorityButton } from './buttons/setRealmAuthorityButton';
+
+import { RealmActionBar } from './buttons/realmActionBar';
 
 const { Text } = Typography;
 
@@ -124,33 +122,7 @@ export const RealmView = () => {
                 alignItems: 'flex-end',
               }}
             >
-              <Space>
-                <SetRealmAuthorityButton
-                  realm={realm}
-                ></SetRealmAuthorityButton>
-                <DepositGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.communityMint}
-                ></DepositGoverningTokensButton>
-                <WithdrawGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.communityMint}
-                ></WithdrawGoverningTokensButton>
-                <DepositGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.config.councilMint}
-                  tokenName="Council"
-                ></DepositGoverningTokensButton>
-                <WithdrawGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.config.councilMint}
-                  tokenName="Council"
-                ></WithdrawGoverningTokensButton>
-                <RegisterGovernanceButton
-                  buttonProps={{ className: 'governance-action' }}
-                  realm={realm}
-                ></RegisterGovernanceButton>
-              </Space>
+              <RealmActionBar realm={realm}></RealmActionBar>
             </Col>
           </Row>
         </Col>
