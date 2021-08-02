@@ -29,7 +29,7 @@ export function RegisterGovernanceButton({
   buttonProps,
   realm,
 }: {
-  buttonProps: ButtonProps;
+  buttonProps?: ButtonProps;
   realm: ParsedAccount<Realm> | undefined;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
@@ -68,11 +68,11 @@ export function RegisterGovernanceButton({
 
   return (
     <ModalFormAction<PublicKey>
-      label={LABELS.REGISTER_GOVERNANCE}
+      label={LABELS.CREATE_NEW_GOVERNANCE}
       buttonProps={buttonProps}
-      formTitle={LABELS.REGISTER_GOVERNANCE}
-      formAction={LABELS.REGISTER}
-      formPendingAction={LABELS.REGISTERING}
+      formTitle={LABELS.CREATE_NEW_GOVERNANCE}
+      formAction={LABELS.CREATE}
+      formPendingAction={LABELS.CREATING}
       onSubmit={onSubmit}
       onComplete={onComplete}
       initialValues={{

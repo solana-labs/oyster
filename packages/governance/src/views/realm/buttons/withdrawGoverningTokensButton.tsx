@@ -20,7 +20,7 @@ export function WithdrawGoverningTokensButton({
   governingTokenMint,
   tokenName,
 }: {
-  realm?: ParsedAccount<Realm>;
+  realm: ParsedAccount<Realm>;
   governingTokenMint?: PublicKey;
   tokenName?: string;
 }) {
@@ -31,7 +31,7 @@ export function WithdrawGoverningTokensButton({
     governingTokenMint,
   );
 
-  if (!realm || !tokenOwnerRecord || !governingTokenMint) {
+  if (!tokenOwnerRecord || !governingTokenMint) {
     return null;
   }
 
