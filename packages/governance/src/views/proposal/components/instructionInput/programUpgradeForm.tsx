@@ -9,7 +9,7 @@ import {
 } from '@solana/web3.js';
 import React from 'react';
 
-import { createUpgradeInstruction } from '../../../../models/sdkInstructions';
+import { createUpgradeInstruction } from '../../../../tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction';
 import { formDefaults } from '../../../../tools/forms';
 
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
