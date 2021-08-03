@@ -18,7 +18,6 @@ export const withCreateProgramGovernance = async (
   transferUpgradeAuthority: boolean,
   programUpgradeAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
-  governingTokenMint: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const {
@@ -74,11 +73,6 @@ export const withCreateProgramGovernance = async (
     },
     {
       pubkey: tokenOwnerRecord,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenMint,
       isWritable: false,
       isSigner: false,
     },

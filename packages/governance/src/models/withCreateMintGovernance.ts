@@ -18,7 +18,6 @@ export const withCreateMintGovernance = async (
   transferMintAuthority: boolean,
   mintAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
-  governingTokenMint: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const { system: systemId, token: tokenId } = utils.programIds();
@@ -57,11 +56,6 @@ export const withCreateMintGovernance = async (
     },
     {
       pubkey: tokenOwnerRecord,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenMint,
       isWritable: false,
       isSigner: false,
     },

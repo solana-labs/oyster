@@ -17,7 +17,6 @@ export const registerGovernance = async (
   config: GovernanceConfig,
   transferAuthority: boolean,
   tokenOwnerRecord: PublicKey,
-  governingTokenMint: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
@@ -33,7 +32,6 @@ export const registerGovernance = async (
           governedAccount,
           config,
           tokenOwnerRecord,
-          governingTokenMint,
           walletPubkey,
         )
       ).governanceAddress;
@@ -50,7 +48,6 @@ export const registerGovernance = async (
           transferAuthority!,
           walletPubkey,
           tokenOwnerRecord,
-          governingTokenMint,
           walletPubkey,
         )
       ).governanceAddress;
@@ -67,7 +64,6 @@ export const registerGovernance = async (
           transferAuthority!,
           walletPubkey,
           tokenOwnerRecord,
-          governingTokenMint,
           walletPubkey,
         )
       ).governanceAddress;
@@ -84,7 +80,6 @@ export const registerGovernance = async (
           transferAuthority!,
           walletPubkey,
           tokenOwnerRecord,
-          governingTokenMint,
           walletPubkey,
         )
       ).governanceAddress;
