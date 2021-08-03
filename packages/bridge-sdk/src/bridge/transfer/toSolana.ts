@@ -73,6 +73,8 @@ export const toSolana = async (
 
       const group = 'Initiate transfer';
       try {
+        let mintKey: PublicKey;
+
         const bridgeId = programIds().wormhole.pubkey;
         const authority = await bridgeAuthorityKey(bridgeId);
         const meta: AssetMeta = {
@@ -80,7 +82,11 @@ export const toSolana = async (
           address: request.info?.assetAddress,
           chain: request.from,
         };
-        const mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+        if (request.info.mint) {
+          mintKey = new PublicKey(request.info.mint);
+        } else {
+          mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+        }
 
         const recipientKey =
           cache
@@ -119,6 +125,7 @@ export const toSolana = async (
 
         if (!accounts.array[0]) {
           // create mint using wormhole instruction
+
           instructions.push(
             await createWrappedAssetInstruction(
               meta,
