@@ -75,6 +75,7 @@ export const GovernanceError: Record<number, string> = [
   'Realm council mint change is not supported', // RealmCouncilMintChangeIsNotSupported
   'Not supported mint max vote weight source', // MintMaxVoteWeightSourceNotSupported
   'Invalid max vote weight supply fraction', // InvalidMaxVoteWeightSupplyFraction
+  "Owner doesn't have enough governing tokens to create Governance", // NotEnoughTokensToCreateGovernance
 ];
 
 export const TokenError: Record<number, string> = [
