@@ -31,6 +31,7 @@ import {
 import { useBridge } from './bridge';
 import { PublicKey } from '@solana/web3.js';
 import { ethers } from 'ethers';
+import { deriveERC20Address } from '../utils/helpers';
 
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
@@ -187,25 +188,45 @@ export const useCurrencyLeg = (mintAddress: string) => {
           assetAddress: assetMeta.address,
           mint: solToken?.address || mintKeyAddress,
         };
+        // console.log({ info }, 'sol');
         setInfo(info);
       }
 
       if (chain === ASSET_CHAIN.Ethereum) {
-        if (!ethToken) {
+        if (!solToken && !ethToken) {
           setInfo(defaultCoinInfo);
           return;
         }
+        let derived = false;
         let signer = provider.getSigner();
-        let e = WrappedAssetFactory.connect(mintAddress, provider);
+        const ethBridgeAddress = programIds().wormhole.bridge;
+        let b = WormholeFactory.connect(ethBridgeAddress, provider);
+        mintKeyAddress = mintAddress;
+
+        if (!ethToken && solToken) {
+          mintKeyAddress = deriveERC20Address(new PublicKey(mintAddress));
+          if (mintKeyAddress) {
+            mintKeyAddress = `0x${mintKeyAddress}`;
+            derived = true;
+          }
+        }
+
+        let isWrapped = await b.isWrappedAsset(mintKeyAddress);
+        if (derived && !isWrapped) {
+          setInfo(defaultCoinInfo);
+          return;
+        }
+
+        let e = WrappedAssetFactory.connect(mintKeyAddress, provider);
+
         let addr = await signer.getAddress();
         let decimals = await e.decimals();
         let symbol = await e.symbol();
-        const ethBridgeAddress = programIds().wormhole.bridge;
         let allowance = await e.allowance(addr, ethBridgeAddress);
-        const assetAddress = Buffer.from(mintAddress.slice(2), 'hex');
+        const assetAddress = Buffer.from(mintKeyAddress.slice(2), 'hex');
 
         let info = {
-          address: mintAddress,
+          address: mintKeyAddress,
           name: symbol,
           balance: new BigNumber(0),
           allowance,
@@ -215,12 +236,9 @@ export const useCurrencyLeg = (mintAddress: string) => {
           assetAddress,
           mint: '',
         };
-
-        let b = WormholeFactory.connect(ethBridgeAddress, provider);
-        let isWrapped = await b.isWrappedAsset(mintAddress);
         if (isWrapped) {
           info.chainID = await e.assetChain();
-          info.assetAddress = Buffer.from(addr.slice(2), 'hex');
+          // info.assetAddress = Buffer.from(addr.slice(2), 'hex');
           info.isWrapped = true;
         }
 
@@ -241,7 +259,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
           });
         }
 
-        //console.log({ info });
+        // console.log({ info }, 'eth');
         setInfo(info);
       }
     })();
