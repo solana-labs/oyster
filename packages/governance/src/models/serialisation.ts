@@ -91,7 +91,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['useCouncilMint', 'u8'],
-        ['useCustodian', 'u8'],
+        ['minCommunityTokensToCreateGovernance', 'u64'],
         ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
       ],
     },
@@ -327,9 +327,9 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['reserved', [8]],
+        ['minCommunityTokensToCreateGovernance', 'u64'],
         ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
         ['councilMint', { kind: 'option', type: 'pubkey' }],
-        ['custodian', { kind: 'option', type: 'pubkey' }],
       ],
     },
   ],

@@ -7,19 +7,21 @@ import {
 import { SetRealmConfigArgs } from './instructions';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
+import BN from 'bn.js';
 
 export async function createSetRealmConfig(
   programId: PublicKey,
   realm: PublicKey,
   realmAuthority: PublicKey,
-  realmCustodian: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
+  minCommunityTokensToCreateGovernance: BN,
 ) {
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
-    useCustodian: realmCustodian !== undefined,
+
     communityMintMaxVoteWeightSource,
+    minCommunityTokensToCreateGovernance,
   });
 
   const args = new SetRealmConfigArgs({ configArgs });
@@ -38,14 +40,6 @@ export async function createSetRealmConfig(
       isSigner: true,
     },
   ];
-
-  if (realmCustodian) {
-    keys.push({
-      pubkey: realmCustodian,
-      isSigner: false,
-      isWritable: false,
-    });
-  }
 
   if (councilMint) {
     const councilTokenHoldingAddress = await getTokenHoldingAddress(

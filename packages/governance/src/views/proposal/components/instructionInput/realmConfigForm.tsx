@@ -15,6 +15,7 @@ import {
   RealmMintSupplyConfigFormItem,
   RealmMintSupplyConfigValues,
 } from '../../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
+import BN from 'bn.js';
 
 export const RealmConfigForm = ({
   form,
@@ -35,13 +36,16 @@ export const RealmConfigForm = ({
       removeCouncil: boolean;
     } & RealmMintSupplyConfigValues,
   ) => {
+    const minCommunityTokensToCreateGovernance = new BN(1);
+
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
       realm.pubkey,
       governance.pubkey,
-      realm.info.config.custodian,
+
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
+      minCommunityTokensToCreateGovernance,
     );
 
     onCreateInstruction(setRealmConfigIx);

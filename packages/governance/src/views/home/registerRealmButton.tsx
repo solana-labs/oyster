@@ -65,12 +65,15 @@ export function RegisterRealmButton({
       values.communityMintMaxVoteWeightFraction,
     );
 
+    const minCommunityTokensToCreateGovernance = new BN(1);
+
     return await registerRealm(
       rpcContext,
       values.name,
       new PublicKey(values.communityMint),
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
       supplyFraction,
+      minCommunityTokensToCreateGovernance,
     );
   };
 

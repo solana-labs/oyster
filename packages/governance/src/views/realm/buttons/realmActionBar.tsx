@@ -22,9 +22,7 @@ export function RealmActionBar({
 
   // Show CreateGovernance option only for the custodian
   // Note: This check is not enforced on the program side yet because I'm not sure if users want to take this route or maybe restrict based on token possession
-  const showCreateNewGovernance =
-    connected &&
-    realm.info.config.custodian?.toBase58() === wallet?.publicKey?.toBase58();
+  const showCreateNewGovernance = connected;
 
   const showSetRealmAuthority =
     realm.info.authority?.toBase58() === wallet?.publicKey?.toBase58();
