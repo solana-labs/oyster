@@ -20,7 +20,7 @@ export function RealmMintTokensFormItem({
   communityMintAddress: PublicKey | string | undefined;
 }) {
   // TODO: Most of the component code was copied from MinTokensToCreateProposal
-  // Unify this code with that component and create a control MinTokensToCreate
+  // Unify this code with that component and create a shared MinTokensToCreate
 
   const communityMintInfo = useMint(communityMintAddress);
   const [minTokensPercentage, setMinTokensPercentage] = useState<
