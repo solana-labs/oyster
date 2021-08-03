@@ -35,7 +35,7 @@ export const AccountInstructionsForm = ({
       initialValues={{ instructionType: instructions[0] }}
     >
       <InstructionSelector
-        instructions={[InstructionType.GovernanceSetConfig]}
+        instructions={instructions}
         onChange={setInstruction}
       ></InstructionSelector>
 

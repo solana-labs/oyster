@@ -87,7 +87,6 @@ export function RegisterGovernanceButton({
       config,
       values.transferAuthority,
       tokenOwnerRecord!.pubkey,
-      tokenOwnerRecord!.info.governingTokenMint,
     );
   };
 
