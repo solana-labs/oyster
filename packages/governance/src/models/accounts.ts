@@ -125,37 +125,43 @@ export class MintMaxVoteWeightSource {
 
 export class RealmConfigArgs {
   useCouncilMint: boolean;
-  useCustodian: boolean;
+
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+  minCommunityTokensToCreateGovernance: BN;
 
   constructor(args: {
     useCouncilMint: boolean;
-    useCustodian: boolean;
+
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+    minCommunityTokensToCreateGovernance: BN;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
-    this.useCustodian = !!args.useCustodian;
+
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
+
+    this.minCommunityTokensToCreateGovernance =
+      args.minCommunityTokensToCreateGovernance;
   }
 }
 
 export class RealmConfig {
   councilMint: PublicKey | undefined;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
-  custodian: PublicKey | undefined;
+  minCommunityTokensToCreateGovernance: BN;
   reserved: Uint8Array;
 
   constructor(args: {
     councilMint: PublicKey | undefined;
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
-    custodian: PublicKey | undefined;
+    minCommunityTokensToCreateGovernance: BN;
     reserved: Uint8Array;
   }) {
     this.councilMint = args.councilMint;
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
-    this.custodian = args.custodian;
+    this.minCommunityTokensToCreateGovernance =
+      args.minCommunityTokensToCreateGovernance;
     this.reserved = args.reserved;
   }
 }

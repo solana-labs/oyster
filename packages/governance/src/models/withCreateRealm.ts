@@ -13,6 +13,7 @@ import {
   MintMaxVoteWeightSource,
   getTokenHoldingAddress,
 } from './accounts';
+import BN from 'bn.js';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
@@ -21,15 +22,15 @@ export async function withCreateRealm(
   realmAuthority: PublicKey,
   communityMint: PublicKey,
   payer: PublicKey,
-  realmCustodian: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
+  minCommunityTokensToCreateGovernance: BN,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
-    useCustodian: realmCustodian !== undefined,
+    minCommunityTokensToCreateGovernance,
     communityMintMaxVoteWeightSource,
   });
 
@@ -92,14 +93,6 @@ export async function withCreateRealm(
       isWritable: false,
     },
   ];
-
-  if (realmCustodian) {
-    keys.push({
-      pubkey: realmCustodian,
-      isSigner: false,
-      isWritable: false,
-    });
-  }
 
   if (councilMint) {
     const councilTokenHoldingAddress = await getTokenHoldingAddress(

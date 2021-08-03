@@ -22,6 +22,8 @@ import {
   RealmMintSupplyConfigFormItem,
   RealmMintSupplyConfigValues,
 } from '../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
+import { RealmMintTokensFormItem } from '../../components/realmMintTokensFormItem/realmMintTokensFormItem';
+import { parseMinTokensToCreateProposal } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -59,10 +61,17 @@ export function RegisterRealmButton({
       councilMint: string;
       name: string;
       useCouncilMint: boolean;
+      mintDecimals: number;
+      minTokensToCreateGovernance: number | string;
     } & RealmMintSupplyConfigValues,
   ) => {
     let supplyFraction = parseMintSupplyFraction(
       values.communityMintMaxVoteWeightFraction,
+    );
+
+    const minCommunityTokensToCreateGovernance = parseMinTokensToCreateProposal(
+      values.minTokensToCreateGovernance,
+      values.mintDecimals,
     );
 
     return await registerRealm(
@@ -71,6 +80,7 @@ export function RegisterRealmButton({
       new PublicKey(values.communityMint),
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
       supplyFraction,
+      new BN(minCommunityTokensToCreateGovernance),
     );
   };
 
@@ -113,6 +123,11 @@ export function RegisterRealmButton({
         label={LABELS.COMMUNITY_TOKEN_MINT}
         onChange={mint => setCommunityMintAddress(mint)}
       ></MintFormItem>
+
+      <RealmMintTokensFormItem
+        communityMintAddress={communityMintAddress}
+      ></RealmMintTokensFormItem>
+
       <Form.Item
         name="useCouncilMint"
         label={LABELS.USE_COUNCIL_TOKEN}

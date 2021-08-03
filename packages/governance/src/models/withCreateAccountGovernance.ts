@@ -15,6 +15,8 @@ export const withCreateAccountGovernance = async (
   realm: PublicKey,
   governedAccount: PublicKey,
   config: GovernanceConfig,
+  tokenOwnerRecord: PublicKey,
+  governingTokenMint: PublicKey,
   payer: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const { system: systemId } = utils.programIds();
@@ -44,6 +46,16 @@ export const withCreateAccountGovernance = async (
     },
     {
       pubkey: governedAccount,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: tokenOwnerRecord,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: governingTokenMint,
       isWritable: false,
       isSigner: false,
     },

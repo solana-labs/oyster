@@ -35,13 +35,18 @@ export const RealmConfigForm = ({
       removeCouncil: boolean;
     } & RealmMintSupplyConfigValues,
   ) => {
+    // keep the original value until for mis updated
+    const minCommunityTokensToCreateGovernance =
+      realm.info.config.minCommunityTokensToCreateGovernance;
+
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
       realm.pubkey,
       governance.pubkey,
-      realm.info.config.custodian,
+
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
+      minCommunityTokensToCreateGovernance,
     );
 
     onCreateInstruction(setRealmConfigIx);
