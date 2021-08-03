@@ -22,7 +22,6 @@ export async function withCreateRealm(
   realmAuthority: PublicKey,
   communityMint: PublicKey,
   payer: PublicKey,
-  realmCustodian: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
@@ -94,14 +93,6 @@ export async function withCreateRealm(
       isWritable: false,
     },
   ];
-
-  if (realmCustodian) {
-    keys.push({
-      pubkey: realmCustodian,
-      isSigner: false,
-      isWritable: false,
-    });
-  }
 
   if (councilMint) {
     const councilTokenHoldingAddress = await getTokenHoldingAddress(

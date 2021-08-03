@@ -24,6 +24,7 @@ import {
 } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
 import { ParsedAccount } from '../../../../../common/dist/lib';
 import { Realm } from '../../../models/accounts';
+import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 
 export function RegisterGovernanceButton({
   buttonProps,
@@ -38,6 +39,36 @@ export function RegisterGovernanceButton({
 
   const realmKey = useKeyParam();
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
+
+  const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    realm?.info.communityMint,
+  );
+
+  const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    realm?.info.config.councilMint,
+  );
+
+  if (!realm) {
+    return null;
+  }
+
+  const canCreateGovernanceUsingCommunityTokens =
+    communityTokenOwnerRecord &&
+    communityTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
+      realm.info.config.minCommunityTokensToCreateGovernance,
+    ) >= 0;
+
+  const canCreateGovernanceUsingCouncilTokens =
+    councilTokenOwnerRecord &&
+    !councilTokenOwnerRecord.info.governingTokenDepositAmount.isZero();
+
+  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
+    ? councilTokenOwnerRecord
+    : canCreateGovernanceUsingCommunityTokens
+    ? communityTokenOwnerRecord
+    : undefined;
 
   const onSubmit = async (
     values: {
@@ -55,6 +86,8 @@ export function RegisterGovernanceButton({
       new PublicKey(values.governedAccountAddress),
       config,
       values.transferAuthority,
+      tokenOwnerRecord!.pubkey,
+      tokenOwnerRecord!.info.governingTokenMint,
     );
   };
 
@@ -69,7 +102,7 @@ export function RegisterGovernanceButton({
   return (
     <ModalFormAction<PublicKey>
       label={LABELS.CREATE_NEW_GOVERNANCE}
-      buttonProps={buttonProps}
+      buttonProps={{ disabled: !tokenOwnerRecord }}
       formTitle={LABELS.CREATE_NEW_GOVERNANCE}
       formAction={LABELS.CREATE}
       formPendingAction={LABELS.CREATING}

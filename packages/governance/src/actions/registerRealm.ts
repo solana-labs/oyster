@@ -23,7 +23,6 @@ export async function registerRealm(
     walletPubkey,
     communityMint,
     walletPubkey,
-    walletPubkey,
     councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,

@@ -36,7 +36,7 @@ export const generateGovernanceArtifacts = async (
     connection,
     wallet,
     0,
-    new u64('150'),
+    new u64('7000'),
     new u64('10000'),
     // 6,
     // new u64('340000000010000'),
