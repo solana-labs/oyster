@@ -15,7 +15,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && less-watch-compiler --run-once src/ dist/lib/",
     "start": "npm-run-all --parallel watch watch-css watch-css-src",
     "watch-css": "less-watch-compiler src/ dist/lib/",
     "watch-css-src": "less-watch-compiler src/ src/",
