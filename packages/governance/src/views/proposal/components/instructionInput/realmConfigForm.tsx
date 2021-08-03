@@ -15,7 +15,6 @@ import {
   RealmMintSupplyConfigFormItem,
   RealmMintSupplyConfigValues,
 } from '../../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
-import BN from 'bn.js';
 
 export const RealmConfigForm = ({
   form,
@@ -36,7 +35,9 @@ export const RealmConfigForm = ({
       removeCouncil: boolean;
     } & RealmMintSupplyConfigValues,
   ) => {
-    const minCommunityTokensToCreateGovernance = new BN(1);
+    // keep the original value until for mis updated
+    const minCommunityTokensToCreateGovernance =
+      realm.info.config.minCommunityTokensToCreateGovernance;
 
     const setRealmConfigIx = await createSetRealmConfig(
       programId,

@@ -6,6 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import {
   formatMintMaxVotePercentage,
   formatMintMaxVoteWeight,
+  formatMintNaturalAmountAsDecimal,
   formatMintSupplyAsDecimal,
 } from '../../../tools/units';
 
@@ -23,6 +24,7 @@ export function RealmPopUpDetails({ realm }: { realm: ParsedAccount<Realm> }) {
           showMaxVoteWeight={
             !realm.info.config.communityMintMaxVoteWeightSource.isFullSupply()
           }
+          showMinTokens
         ></RealmMintDetails>
 
         {realm.info.config.councilMint && (
@@ -41,11 +43,13 @@ function RealmMintDetails({
   label,
   mint,
   showMaxVoteWeight = false,
+  showMinTokens = false,
   realm,
 }: {
   label: string;
   mint: PublicKey;
   showMaxVoteWeight?: boolean;
+  showMinTokens?: boolean;
   realm: ParsedAccount<Realm>;
 }) {
   const mintInfo = useMint(mint);
@@ -69,6 +73,12 @@ function RealmMintDetails({
               )})`}</Text>
               {/* <Text type="secondary">{`my vote weight:`}</Text> */}
             </>
+          )}
+          {showMinTokens && (
+            <Text type="secondary">{`min tokens to create governance: ${formatMintNaturalAmountAsDecimal(
+              mintInfo,
+              realm.info.config.minCommunityTokensToCreateGovernance,
+            )}`}</Text>
           )}
         </>
       )}
