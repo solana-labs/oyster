@@ -7,14 +7,16 @@ export enum InstructionType {
   GovernanceSetConfig,
   SplTokenTransfer,
   SplTokenMintTo,
+  GovernanceSetRealmConfig,
 }
 
 const instructionNames = [
   'upgrade',
   'anchor idl set-buffer',
-  'governance set-config',
+  'set-governance-config',
   'spl-token transfer',
   'spl-token mint-to',
+  'set-realm-config',
 ];
 
 export function InstructionSelector({

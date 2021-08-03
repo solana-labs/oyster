@@ -12,17 +12,9 @@ import { setRealmAuthority } from '../../../actions/setRealmAuthority';
 export function SetRealmAuthorityButton({
   realm,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
+  realm: ParsedAccount<Realm>;
 }) {
   const rpcContext = useRpcContext();
-
-  if (
-    !realm ||
-    realm.info.authority?.toBase58() !==
-      rpcContext.wallet?.publicKey?.toBase58()
-  ) {
-    return null;
-  }
 
   const onSubmit = async (values: { newAuthority: string }) => {
     const newAuthority = new PublicKey(values.newAuthority);

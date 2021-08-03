@@ -88,14 +88,92 @@ export enum InstructionExecutionFlags {
   UseTransaction,
 }
 
+export enum MintMaxVoteWeightSourceType {
+  SupplyFraction = 0,
+  Absolute = 1,
+}
+
+export class MintMaxVoteWeightSource {
+  type = MintMaxVoteWeightSourceType.SupplyFraction;
+  value: BN;
+
+  constructor(args: { value: BN }) {
+    this.value = args.value;
+  }
+
+  static SUPPLY_FRACTION_BASE = new BN(10000000000);
+  static SUPPLY_FRACTION_DECIMALS = 10;
+
+  static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
+    value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
+  });
+
+  isFullSupply() {
+    return (
+      this.type === MintMaxVoteWeightSourceType.SupplyFraction &&
+      this.value.cmp(MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE) === 0
+    );
+  }
+  getSupplyFraction() {
+    if (this.type !== MintMaxVoteWeightSourceType.SupplyFraction) {
+      throw new Error('Max vote weight is not fraction');
+    }
+
+    return this.value;
+  }
+}
+
+export class RealmConfigArgs {
+  useCouncilMint: boolean;
+
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+  minCommunityTokensToCreateGovernance: BN;
+
+  constructor(args: {
+    useCouncilMint: boolean;
+
+    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+    minCommunityTokensToCreateGovernance: BN;
+  }) {
+    this.useCouncilMint = !!args.useCouncilMint;
+
+    this.communityMintMaxVoteWeightSource =
+      args.communityMintMaxVoteWeightSource;
+
+    this.minCommunityTokensToCreateGovernance =
+      args.minCommunityTokensToCreateGovernance;
+  }
+}
+
+export class RealmConfig {
+  councilMint: PublicKey | undefined;
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+  minCommunityTokensToCreateGovernance: BN;
+  reserved: Uint8Array;
+
+  constructor(args: {
+    councilMint: PublicKey | undefined;
+    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
+    minCommunityTokensToCreateGovernance: BN;
+    reserved: Uint8Array;
+  }) {
+    this.councilMint = args.councilMint;
+    this.communityMintMaxVoteWeightSource =
+      args.communityMintMaxVoteWeightSource;
+    this.minCommunityTokensToCreateGovernance =
+      args.minCommunityTokensToCreateGovernance;
+    this.reserved = args.reserved;
+  }
+}
+
 export class Realm {
   accountType = GovernanceAccountType.Realm;
 
   communityMint: PublicKey;
 
-  reserved: Uint8Array;
+  config: RealmConfig;
 
-  councilMint: PublicKey | undefined;
+  reserved: Uint8Array;
 
   authority: PublicKey | undefined;
 
@@ -104,16 +182,34 @@ export class Realm {
   constructor(args: {
     communityMint: PublicKey;
     reserved: Uint8Array;
-    councilMint: PublicKey | undefined;
+    config: RealmConfig;
     authority: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
+    this.config = args.config;
     this.reserved = args.reserved;
-    this.councilMint = args.councilMint;
+
     this.authority = args.authority;
     this.name = args.name;
   }
+}
+
+export async function getTokenHoldingAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+) {
+  const [tokenHoldingAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+    ],
+    programId,
+  );
+
+  return tokenHoldingAddress;
 }
 
 export class GovernanceConfig {
@@ -305,7 +401,7 @@ export class Proposal {
 
   executionFlags: InstructionExecutionFlags;
 
-  governingTokenMintVoteSupply: BN | null;
+  maxVoteWeight: BN | null;
   voteThresholdPercentage: VoteThresholdPercentage | null;
 
   name: string;
@@ -334,7 +430,7 @@ export class Proposal {
     instructionsCount: number;
     instructionsNextIndex: number;
     executionFlags: InstructionExecutionFlags;
-    governingTokenMintVoteSupply: BN | null;
+    maxVoteWeight: BN | null;
     voteThresholdPercentage: VoteThresholdPercentage | null;
   }) {
     this.governance = args.governance;
@@ -358,7 +454,7 @@ export class Proposal {
     this.instructionsCount = args.instructionsCount;
     this.instructionsNextIndex = args.instructionsNextIndex;
     this.executionFlags = args.executionFlags;
-    this.governingTokenMintVoteSupply = args.governingTokenMintVoteSupply;
+    this.maxVoteWeight = args.maxVoteWeight;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
   }
 

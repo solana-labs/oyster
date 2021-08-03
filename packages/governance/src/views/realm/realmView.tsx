@@ -12,18 +12,17 @@ import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { RegisterGovernanceButton } from './buttons/registerGovernanceButton';
-import { DepositGoverningTokensButton } from './buttons/depositGoverningTokensButton';
-import { WithdrawGoverningTokensButton } from './buttons/withdrawGoverningTokensButton';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
-import AccountDescription from './accountDescription';
+import AccountDescription from './components/accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
+
+import { RealmActionBar } from './buttons/realmActionBar';
 
 const { Text } = Typography;
 
@@ -42,7 +41,7 @@ export const RealmView = () => {
 
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.councilMint,
+    realm?.info.config.councilMint,
   );
 
   const governanceItems = useMemo(() => {
@@ -56,10 +55,10 @@ export const RealmView = () => {
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
         title: g.info.governedAccount.toBase58(),
-        badge: <GovernanceBadge governance={g}></GovernanceBadge>,
+        badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
-  }, [governances, programIdBase58]);
+  }, [governances, programIdBase58, realm]);
 
   return (
     <>
@@ -84,7 +83,7 @@ export const RealmView = () => {
                       <RealmBadge
                         size={60}
                         communityMint={realm?.info.communityMint}
-                        councilMint={realm?.info.councilMint}
+                        councilMint={realm?.info.config.councilMint}
                       ></RealmBadge>
                     </span>
                   </Popover>
@@ -114,34 +113,16 @@ export const RealmView = () => {
                 </Col>
               </Row>
             </Col>
-            <Col md={12} xs={24}>
-              <div className="realm-actions">
-                <DepositGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.communityMint}
-                ></DepositGoverningTokensButton>
-                <WithdrawGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.communityMint}
-                ></WithdrawGoverningTokensButton>
-                <DepositGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.councilMint}
-                  tokenName="Council"
-                ></DepositGoverningTokensButton>
-                <WithdrawGoverningTokensButton
-                  realm={realm}
-                  governingTokenMint={realm?.info.councilMint}
-                  tokenName="Council"
-                ></WithdrawGoverningTokensButton>
-                <RegisterGovernanceButton
-                  buttonProps={{ className: 'governance-action' }}
-                  realm={realm}
-                ></RegisterGovernanceButton>
-                {/* <SetRealmAuthorityButton
-                  realm={realm}
-                ></SetRealmAuthorityButton> */}
-              </div>
+            <Col
+              md={12}
+              xs={24}
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+              }}
+            >
+              <RealmActionBar realm={realm}></RealmActionBar>
             </Col>
           </Row>
         </Col>

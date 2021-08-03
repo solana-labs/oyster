@@ -35,10 +35,13 @@ export const generateGovernanceArtifacts = async (
     communityMintSigners,
     connection,
     wallet,
-    0,
-    new u64('7000'),
-    new u64('10000'),
-    // new u64('18446744073709551615'),
+    3,
+    new u64('7000000'),
+    new u64('10000000'),
+    // 6,
+    // new u64('340000000010000'),
+    // //  new u64('10000'),
+    // new u64('34000000001000000'),
   );
 
   let councilMinSigners: Account[] = [];

@@ -25,17 +25,21 @@ import {
   RemoveInstructionArgs,
   SetGovernanceConfigArgs,
   SetRealmAuthorityArgs,
+  SetRealmConfigArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
 } from './instructions';
 import {
   AccountMetaData,
+  RealmConfigArgs,
   Governance,
   GovernanceConfig,
   InstructionData,
+  MintMaxVoteWeightSource,
   Proposal,
   ProposalInstruction,
   Realm,
+  RealmConfig,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
@@ -82,12 +86,24 @@ export const serializeInstructionToBase64 = (
 
 export const GOVERNANCE_SCHEMA = new Map<any, any>([
   [
+    RealmConfigArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['useCouncilMint', 'u8'],
+        ['minCommunityTokensToCreateGovernance', 'u64'],
+        ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+      ],
+    },
+  ],
+  [
     CreateRealmArgs,
     {
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
         ['name', 'string'],
+        ['configArgs', RealmConfigArgs],
       ],
     },
   ],
@@ -262,6 +278,16 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
   [
+    SetRealmConfigArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['configArgs', RealmConfigArgs],
+      ],
+    },
+  ],
+  [
     InstructionData,
     {
       kind: 'struct',
@@ -283,6 +309,30 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       ],
     },
   ],
+
+  [
+    MintMaxVoteWeightSource,
+    {
+      kind: 'struct',
+      fields: [
+        ['type', 'u8'],
+        ['value', 'u64'],
+      ],
+    },
+  ],
+
+  [
+    RealmConfig,
+    {
+      kind: 'struct',
+      fields: [
+        ['reserved', [8]],
+        ['minCommunityTokensToCreateGovernance', 'u64'],
+        ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+        ['councilMint', { kind: 'option', type: 'pubkey' }],
+      ],
+    },
+  ],
   [
     Realm,
     {
@@ -290,8 +340,8 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
       fields: [
         ['accountType', 'u8'],
         ['communityMint', 'pubkey'],
+        ['config', RealmConfig],
         ['reserved', [8]],
-        ['councilMint', { kind: 'option', type: 'pubkey' }],
         ['authority', { kind: 'option', type: 'pubkey' }],
         ['name', 'string'],
       ],
@@ -378,7 +428,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['executingAt', { kind: 'option', type: 'u64' }],
         ['closedAt', { kind: 'option', type: 'u64' }],
         ['executionFlags', 'u8'],
-        ['governingTokenMintVoteSupply', { kind: 'option', type: 'u64' }],
+        ['maxVoteWeight', { kind: 'option', type: 'u64' }],
         [
           'voteThresholdPercentage',
           { kind: 'option', type: VoteThresholdPercentage },

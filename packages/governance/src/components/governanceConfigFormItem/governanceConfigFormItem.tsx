@@ -58,7 +58,7 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
   });
 }
 
-function parseMinTokensToCreateProposal(
+export function parseMinTokensToCreateProposal(
   value: string | number,
   mintDecimals: number,
 ) {
