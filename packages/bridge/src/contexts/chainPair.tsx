@@ -197,7 +197,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
           setInfo(defaultCoinInfo);
           return;
         }
-
+        let derived = false;
         let signer = provider.getSigner();
         const ethBridgeAddress = programIds().wormhole.bridge;
         let b = WormholeFactory.connect(ethBridgeAddress, provider);
@@ -207,11 +207,12 @@ export const useCurrencyLeg = (mintAddress: string) => {
           mintKeyAddress = deriveERC20Address(new PublicKey(mintAddress));
           if (mintKeyAddress) {
             mintKeyAddress = `0x${mintKeyAddress}`;
+            derived = true;
           }
         }
 
         let isWrapped = await b.isWrappedAsset(mintKeyAddress);
-        if (mintKeyAddress && !isWrapped) {
+        if (derived && !isWrapped) {
           setInfo(defaultCoinInfo);
           return;
         }
@@ -237,7 +238,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
         };
         if (isWrapped) {
           info.chainID = await e.assetChain();
-          info.assetAddress = Buffer.from(addr.slice(2), 'hex');
+          // info.assetAddress = Buffer.from(addr.slice(2), 'hex');
           info.isWrapped = true;
         }
 
