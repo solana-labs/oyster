@@ -1,4 +1,4 @@
-import { Account, TransactionInstruction } from '@solana/web3.js';
+import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
@@ -9,6 +9,7 @@ import { RpcContext } from '../models/api';
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
+  realm: PublicKey,
   proposal: ParsedAccount<Proposal>,
 ) => {
   let signers: Account[] = [];
@@ -17,6 +18,7 @@ export const finalizeVote = async (
   withFinalizeVote(
     instructions,
     programId,
+    realm,
     proposal.info.governance,
     proposal.pubkey,
     proposal.info.governingTokenMint,

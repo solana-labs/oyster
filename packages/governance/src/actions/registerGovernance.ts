@@ -15,7 +15,8 @@ export const registerGovernance = async (
   realm: PublicKey,
   governedAccount: PublicKey,
   config: GovernanceConfig,
-  transferAuthority?: boolean,
+  transferAuthority: boolean,
+  tokenOwnerRecord: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
@@ -30,6 +31,7 @@ export const registerGovernance = async (
           realm,
           governedAccount,
           config,
+          tokenOwnerRecord,
           walletPubkey,
         )
       ).governanceAddress;
@@ -45,6 +47,7 @@ export const registerGovernance = async (
           config,
           transferAuthority!,
           walletPubkey,
+          tokenOwnerRecord,
           walletPubkey,
         )
       ).governanceAddress;
@@ -60,6 +63,7 @@ export const registerGovernance = async (
           config,
           transferAuthority!,
           walletPubkey,
+          tokenOwnerRecord,
           walletPubkey,
         )
       ).governanceAddress;
@@ -75,6 +79,7 @@ export const registerGovernance = async (
           config,
           transferAuthority!,
           walletPubkey,
+          tokenOwnerRecord,
           walletPubkey,
         )
       ).governanceAddress;

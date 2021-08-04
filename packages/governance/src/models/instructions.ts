@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
-import { GovernanceConfig, InstructionData } from './accounts';
+import { RealmConfigArgs, GovernanceConfig, InstructionData } from './accounts';
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
@@ -28,14 +28,17 @@ export enum GovernanceInstruction {
   SetGovernanceConfig = 19,
   FlagInstructionError = 20,
   SetRealmAuthority = 21,
+  SetRealmConfig = 22,
 }
 
 export class CreateRealmArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CreateRealm;
+  configArgs: RealmConfigArgs;
   name: string;
 
-  constructor(args: { name: string }) {
+  constructor(args: { name: string; configArgs: RealmConfigArgs }) {
     this.name = args.name;
+    this.configArgs = args.configArgs;
   }
 }
 
@@ -203,5 +206,14 @@ export class SetRealmAuthorityArgs {
 
   constructor(args: { newRealmAuthority: PublicKey }) {
     this.newRealmAuthority = args.newRealmAuthority;
+  }
+}
+
+export class SetRealmConfigArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.SetRealmConfig;
+  configArgs: RealmConfigArgs;
+
+  constructor(args: { configArgs: RealmConfigArgs }) {
+    this.configArgs = args.configArgs;
   }
 }

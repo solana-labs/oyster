@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Governance } from '../../models/accounts';
+import { Governance } from '../../../models/accounts';
 import {
   deserializeMint,
   ParsedAccount,
@@ -9,7 +9,7 @@ import {
 } from '@oyster/common';
 
 import { MintInfo } from '@solana/spl-token';
-import { formatMintNaturalAmountAsDecimal } from '../../tools/units';
+import { formatMintNaturalAmountAsDecimal } from '../../../tools/units';
 const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({

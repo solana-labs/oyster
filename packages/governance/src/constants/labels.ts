@@ -106,14 +106,14 @@ export const LABELS = {
   REALMS: 'Realms',
   REALM: 'Realm',
 
-  REGISTER_GOVERNANCE: 'Register Governance',
+  CREATE_NEW_GOVERNANCE: 'Create New Governance',
   GOVERNANCE_OVER: 'governance over',
   PROGRAM: 'Program',
   MINT: 'Mint',
   TOKEN_ACCOUNT: 'Token Account',
 
-  REGISTER: 'Register',
-  REGISTERING: 'Registering',
+  CREATE: 'Create',
+  CREATING: 'Creating',
 
   PROGRAM_ID_LABEL: 'program id',
   MINT_ADDRESS_LABEL: 'mint address',

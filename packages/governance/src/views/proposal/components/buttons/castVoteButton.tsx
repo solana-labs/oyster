@@ -78,7 +78,13 @@ export function CastVoteButton({
           okText: LABELS.CONFIRM,
           cancelText: LABELS.CANCEL,
           onOk: async () => {
-            castVote(rpcContext, proposal, tokenOwnerRecord.pubkey, vote);
+            castVote(
+              rpcContext,
+              governance.info.realm,
+              proposal,
+              tokenOwnerRecord.pubkey,
+              vote,
+            );
           },
         })
       }

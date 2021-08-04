@@ -2941,6 +2941,14 @@
     penpal "3.0.7"
     pocket-js-core "0.0.3"
 
+"@project-serum/borsh@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@project-serum/borsh/-/borsh-0.2.2.tgz#63e558f2d6eb6ab79086bf499dea94da3182498f"
+  integrity sha512-Ms+aWmGVW6bWd3b0+MWwoaYig2QD0F90h0uhr7AzY3dpCb5e2S6RsRW02vFTfa085pY2VLB7nTZNbFECQ1liTg==
+  dependencies:
+    bn.js "^5.1.2"
+    buffer-layout "^1.2.0"
+
 "@project-serum/serum@^0.13.11":
   version "0.13.33"
   resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.33.tgz#03ce8219c1bb458f56c09dc8aa621d76538e70f5"

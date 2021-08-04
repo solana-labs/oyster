@@ -36,7 +36,7 @@ export function NewProposalButton({
   );
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.info.realm,
-    realm?.info.councilMint,
+    realm?.info.config.councilMint,
   );
 
   if (!governance) {
@@ -68,7 +68,7 @@ export function NewProposalButton({
       values.governingTokenType === undefined ||
       values.governingTokenType === GoverningTokenType.Community
         ? realm!.info.communityMint
-        : realm!.info.councilMint!;
+        : realm!.info.config.councilMint!;
     const proposalIndex = governance.info.proposalCount;
 
     // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord
@@ -116,7 +116,7 @@ export function NewProposalButton({
         governingTokenType: GoverningTokenType.Community,
       }}
     >
-      {realm?.info.councilMint && (
+      {realm?.info.config.councilMint && (
         <Form.Item
           label={LABELS.WHO_VOTES_QUESTION}
           name="governingTokenType"
@@ -127,7 +127,7 @@ export function NewProposalButton({
               {LABELS.COMMUNITY_TOKEN_HOLDERS}
             </Radio.Button>
 
-            {realm.info.councilMint && (
+            {realm.info.config.councilMint && (
               <Radio.Button value={GoverningTokenType.Council}>
                 {LABELS.COUNCIL}
               </Radio.Button>

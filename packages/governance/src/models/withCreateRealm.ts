@@ -7,20 +7,37 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED } from './accounts';
+import {
+  RealmConfigArgs,
+  GOVERNANCE_PROGRAM_SEED,
+  MintMaxVoteWeightSource,
+  getTokenHoldingAddress,
+} from './accounts';
+import BN from 'bn.js';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
   programId: PublicKey,
   name: string,
+  realmAuthority: PublicKey,
   communityMint: PublicKey,
   payer: PublicKey,
   councilMint: PublicKey | undefined,
-  realmAuthority: PublicKey,
+  communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
+  minCommunityTokensToCreateGovernance: BN,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  const args = new CreateRealmArgs({ name });
+  const configArgs = new RealmConfigArgs({
+    useCouncilMint: councilMint !== undefined,
+    minCommunityTokensToCreateGovernance,
+    communityMintMaxVoteWeightSource,
+  });
+
+  const args = new CreateRealmArgs({
+    configArgs,
+    name,
+  });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const [realmAddress] = await PublicKey.findProgramAddress(
@@ -28,13 +45,10 @@ export async function withCreateRealm(
     programId,
   );
 
-  const [communityTokenHoldingAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      realmAddress.toBuffer(),
-      communityMint.toBuffer(),
-    ],
+  const communityTokenHoldingAddress = await getTokenHoldingAddress(
     programId,
+    realmAddress,
+    communityMint,
   );
 
   let keys = [
@@ -81,13 +95,10 @@ export async function withCreateRealm(
   ];
 
   if (councilMint) {
-    const [councilTokenHoldingAddress] = await PublicKey.findProgramAddress(
-      [
-        Buffer.from(GOVERNANCE_PROGRAM_SEED),
-        realmAddress.toBuffer(),
-        councilMint.toBuffer(),
-      ],
+    const councilTokenHoldingAddress = await getTokenHoldingAddress(
       programId,
+      realmAddress,
+      councilMint,
     );
 
     keys = [

@@ -9,7 +9,7 @@ import {
 export async function createUpgradeInstruction(
   programId: PublicKey,
   bufferAddress: PublicKey,
-  governance: PublicKey,
+  upgradeAuthority: PublicKey,
   spillAddress: PublicKey,
 ) {
   const { bpf_upgrade_loader: bpfUpgradableLoaderId } = utils.programIds();
@@ -51,7 +51,7 @@ export async function createUpgradeInstruction(
       isSigner: false,
     },
     {
-      pubkey: governance,
+      pubkey: upgradeAuthority,
       isWritable: false,
       isSigner: true,
     },

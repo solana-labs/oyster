@@ -6,7 +6,7 @@ import './style.less'; // Don't remove this line, it will break dark mode if you
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
-import { RegisterRealm } from './registerRealm';
+import { RegisterRealmButton } from './registerRealmButton';
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
@@ -32,11 +32,11 @@ export const HomeView = () => {
         );
 
         const councilTokenOwnerRecord =
-          r.info.councilMint &&
+          r.info.config.councilMint &&
           tokenOwnerRecords.find(
             tor =>
               tor.info.governingTokenMint.toBase58() ===
-              r.info.councilMint!.toBase58(),
+              r.info.config.councilMint!.toBase58(),
           );
 
         return {
@@ -45,7 +45,7 @@ export const HomeView = () => {
           badge: (
             <RealmBadge
               communityMint={r.info.communityMint}
-              councilMint={r.info.councilMint}
+              councilMint={r.info.config.councilMint}
             ></RealmBadge>
           ),
           key: r.pubkey.toBase58(),
@@ -66,7 +66,7 @@ export const HomeView = () => {
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
             <h1>{LABELS.REALMS}</h1>
-            <RegisterRealm
+            <RegisterRealmButton
               buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
             />
           </div>

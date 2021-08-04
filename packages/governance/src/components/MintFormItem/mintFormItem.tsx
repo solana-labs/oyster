@@ -9,10 +9,12 @@ export function MintFormItem({
   name,
   label,
   required = true,
+  onChange,
 }: {
   name: string;
   label: string;
   required?: boolean;
+  onChange?: (mint: string) => void;
 }) {
   const connection = useConnection();
 
@@ -47,7 +49,10 @@ export function MintFormItem({
       label={label}
       rules={[{ required: required, validator: mintValidator }]}
     >
-      <Input allowClear={true} />
+      <Input
+        allowClear={true}
+        onChange={e => onChange && onChange(e.target.value)}
+      />
     </Form.Item>
   );
 }
