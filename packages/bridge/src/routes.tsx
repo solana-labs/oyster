@@ -11,6 +11,7 @@ import {
   HelpView,
   ProofOfAssetsView,
   FaqView,
+  RenbtcDebugView,
 } from './views';
 import { CoingeckoProvider } from './contexts/coingecko';
 import { BridgeProvider } from './contexts/bridge';
@@ -51,6 +52,11 @@ export function Routes() {
                                 exact
                                 path="/faucet"
                                 children={<FaucetView />}
+                              />
+                              <Route
+                                exact
+                                path="/debug-renbtc"
+                                children={<RenbtcDebugView />}
                               />
                             </Switch>
                           </AppLayout>
