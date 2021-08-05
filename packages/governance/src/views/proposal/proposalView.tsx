@@ -15,10 +15,7 @@ import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from './components/instruction/instructionCard';
 import { NewInstructionCard } from './components/instruction/newInstructionCard';
-import SignOffButton from './components/buttons/signOffButton';
 
-import { CastVoteButton } from './components/buttons/castVoteButton';
-import { RelinquishVoteButton } from './components/buttons/relinquishVoteButton';
 import './style.less';
 
 import { VoterBubbleGraph } from './components/vote/voterBubbleGraph';
@@ -32,16 +29,12 @@ import {
   VoteRecord,
 } from '../../models/accounts';
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { Vote } from '../../models/instructions';
-import CancelButton from './components/buttons/cancelButton';
-import { FinalizeVoteButton } from './components/buttons/finalizeVoteButton';
 
 import {
   useGovernance,
   useProposal,
   useTokenOwnerRecords,
   useWalletTokenOwnerRecord,
-  useWalletSignatoryRecord,
   useInstructionsByProposal,
   useVoteRecordsByProposal,
   useSignatoriesByProposal,
@@ -53,6 +46,7 @@ import { VoteScore } from './components/vote/voteScore';
 import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
+import { ProposalActionBar } from './components/buttons/proposalActionBar';
 
 const { TabPane } = Tabs;
 
@@ -256,7 +250,6 @@ function InnerProposalView({
   endpoint: string;
   hasVotes: boolean;
 }) {
-  let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
     governance.info.realm,
     proposal.info.governingTokenMint,
@@ -306,43 +299,11 @@ function InnerProposalView({
             </Row>
           </Col>
           <Col md={12} xs={24}>
-            <div className="proposal-actions">
-              <CancelButton proposal={proposal}></CancelButton>
-
-              {signatoryRecord &&
-                (proposal.info.state === ProposalState.Draft ||
-                  proposal.info.state === ProposalState.SigningOff) && (
-                  <SignOffButton
-                    signatoryRecord={signatoryRecord}
-                    proposal={proposal}
-                  />
-                )}
-              <FinalizeVoteButton
-                proposal={proposal}
-                governance={governance}
-              ></FinalizeVoteButton>
-
-              {tokenOwnerRecord && (
-                <>
-                  <RelinquishVoteButton
-                    proposal={proposal}
-                    tokenOwnerRecord={tokenOwnerRecord}
-                  />
-                  <CastVoteButton
-                    governance={governance}
-                    proposal={proposal}
-                    tokenOwnerRecord={tokenOwnerRecord}
-                    vote={Vote.Yes}
-                  />
-                  <CastVoteButton
-                    governance={governance}
-                    proposal={proposal}
-                    vote={Vote.No}
-                    tokenOwnerRecord={tokenOwnerRecord}
-                  />
-                </>
-              )}
-            </div>
+            <ProposalActionBar
+              governance={governance}
+              proposal={proposal}
+              tokenOwnerRecord={tokenOwnerRecord}
+            ></ProposalActionBar>
           </Col>
         </Row>
 
