@@ -164,7 +164,7 @@ export const useVoteRecordsByProposal = (proposal: PublicKey | undefined) => {
 
 export const useTokenOwnerVoteRecord = (
   proposal: PublicKey,
-  tokenOwnerRecord: PublicKey,
+  tokenOwnerRecord: PublicKey | undefined,
 ) => {
   const { programId } = useRpcContext();
 
@@ -177,6 +177,6 @@ export const useTokenOwnerVoteRecord = (
 
       return await getVoteRecordAddress(programId, proposal, tokenOwnerRecord);
     },
-    [tokenOwnerRecord.toBase58(), proposal],
+    [tokenOwnerRecord, proposal],
   );
 };

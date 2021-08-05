@@ -13,7 +13,11 @@ import { RelinquishVoteButton } from './relinquishVoteButton';
 import { Vote } from '../../../../models/instructions';
 import { CastVoteButton } from './castVoteButton';
 
-import { useWalletSignatoryRecord } from '../../../../hooks/apiHooks';
+import {
+  useWalletSignatoryRecord,
+  useTokenOwnerVoteRecord,
+} from '../../../../hooks/apiHooks';
+import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
 
 export function ProposalActionBar({
   governance,
@@ -25,6 +29,13 @@ export function ProposalActionBar({
   proposal: ParsedAccount<Proposal>;
 }) {
   let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
+
+  const voteRecord = useTokenOwnerVoteRecord(
+    proposal.pubkey,
+    tokenOwnerRecord?.pubkey,
+  );
+
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal);
 
   return (
     <div className="proposal-actions">
@@ -41,6 +52,7 @@ export function ProposalActionBar({
       <FinalizeVoteButton
         proposal={proposal}
         governance={governance}
+        hasVoteTimeExpired={hasVoteTimeExpired}
       ></FinalizeVoteButton>
 
       {tokenOwnerRecord && (
@@ -48,18 +60,23 @@ export function ProposalActionBar({
           <RelinquishVoteButton
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
+            voteRecord={voteRecord?.tryUnwrap()}
           />
           <CastVoteButton
             governance={governance}
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
             vote={Vote.Yes}
+            voteRecord={voteRecord}
+            hasVoteTimeExpired={hasVoteTimeExpired}
           />
           <CastVoteButton
             governance={governance}
             proposal={proposal}
             vote={Vote.No}
             tokenOwnerRecord={tokenOwnerRecord}
+            voteRecord={voteRecord}
+            hasVoteTimeExpired={hasVoteTimeExpired}
           />
         </>
       )}

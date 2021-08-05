@@ -13,14 +13,15 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
+  VoteRecord,
 } from '../../../../models/accounts';
 
 import { Vote } from '../../../../models/instructions';
 
 import { castVote } from '../../../../actions/castVote';
-import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
-import { useTokenOwnerVoteRecord } from '../../../../hooks/apiHooks';
+
 import { useRpcContext } from '../../../../hooks/useRpcContext';
+import { Option } from '../../../../tools/option';
 
 const { confirm } = Modal;
 export function CastVoteButton({
@@ -28,18 +29,17 @@ export function CastVoteButton({
   governance,
   tokenOwnerRecord,
   vote,
+  voteRecord,
+  hasVoteTimeExpired,
 }: {
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
   vote: Vote;
+  voteRecord: Option<ParsedAccount<VoteRecord>> | undefined;
+  hasVoteTimeExpired: boolean | undefined;
 }) {
   const rpcContext = useRpcContext();
-  const voteRecord = useTokenOwnerVoteRecord(
-    proposal.pubkey,
-    tokenOwnerRecord.pubkey,
-  );
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal);
 
   const isVisible =
     hasVoteTimeExpired === false &&
