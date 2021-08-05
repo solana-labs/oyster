@@ -12,12 +12,13 @@ import { ParsedAccount } from '@oyster/common';
 import { MemcmpFilter, getGovernanceAccounts } from '../models/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
+import { none, Option, some } from '../tools/option';
 
 // Fetches Governance program account using the given key and subscribes to updates
 export function useGovernanceAccountByPubkey<
   TAccount extends GovernanceAccount
 >(accountClass: GovernanceAccountClass, pubkey: PublicKey | undefined) {
-  const [account, setAccount] = useState<ParsedAccount<TAccount>>();
+  const [account, setAccount] = useState<Option<ParsedAccount<TAccount>>>();
 
   const { connection, endpoint, programId } = useRpcContext();
 
@@ -37,13 +38,13 @@ export function useGovernanceAccountByPubkey<
             pubkey,
             accountInfo!,
           );
-          setAccount(loadedAccount);
+          setAccount(some(loadedAccount));
         } else {
-          setAccount(undefined);
+          setAccount(none());
         }
       } catch (ex) {
         console.error(`Can't load ${pubkey.toBase58()} account`, ex);
-        setAccount(undefined);
+        setAccount(none());
       }
 
       return connection.onProgramAccountChange(programId, info => {
@@ -53,7 +54,7 @@ export function useGovernanceAccountByPubkey<
             info.accountInfo,
           ) as ParsedAccount<TAccount>;
 
-          setAccount(account);
+          setAccount(some(account));
         }
       });
     })();
@@ -124,7 +125,7 @@ export function useGovernanceAccountsByFilter<
         );
         setAccounts(loadedAccounts);
       } catch (ex) {
-        console.error(`Can't load ${accountClass}`, ex);
+        console.error(`Can't load ${accountClass.name}`, ex);
         setAccounts({});
       }
 
@@ -214,6 +215,6 @@ export function useGovernanceAccountByFilter<
   }
 
   throw new Error(
-    `Filters ${filters} returned multiple accounts ${accounts} for ${accountClass} while a single result was expected`,
+    `Filters ${filters} returned multiple accounts ${accounts} for ${accountClass.name} while a single result was expected`,
   );
 }
