@@ -14,7 +14,7 @@ import {
 } from '../../../../models/accounts';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../../actions/relinquishVote';
-import { useWalletVoteRecord } from '../../../../hooks/apiHooks';
+import { useTokenOwnerVoteRecord } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
@@ -30,7 +30,10 @@ export function RelinquishVoteButton({
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
 
-  const voteRecord = useWalletVoteRecord(proposal.pubkey);
+  const voteRecord = useTokenOwnerVoteRecord(
+    proposal.pubkey,
+    tokenOwnerRecord.pubkey,
+  )?.tryUnwrap();
 
   const accountChangeTracker = useAccountChangeTracker();
 

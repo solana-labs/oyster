@@ -19,7 +19,7 @@ import { Vote } from '../../../../models/instructions';
 
 import { castVote } from '../../../../actions/castVote';
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
-import { useWalletVoteRecord } from '../../../../hooks/apiHooks';
+import { useTokenOwnerVoteRecord } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { confirm } = Modal;
@@ -35,12 +35,15 @@ export function CastVoteButton({
   vote: Vote;
 }) {
   const rpcContext = useRpcContext();
-  const voteRecord = useWalletVoteRecord(proposal.pubkey);
+  const voteRecord = useTokenOwnerVoteRecord(
+    proposal.pubkey,
+    tokenOwnerRecord.pubkey,
+  );
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal);
 
   const isVisible =
     hasVoteTimeExpired === false &&
-    !voteRecord &&
+    voteRecord?.isNone() &&
     tokenOwnerRecord &&
     !tokenOwnerRecord.info.governingTokenDepositAmount.isZero() &&
     proposal.info.state === ProposalState.Voting;
