@@ -11,10 +11,11 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
+  VoteRecord,
 } from '../../../../models/accounts';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../../actions/relinquishVote';
-import { useTokenOwnerVoteRecord } from '../../../../hooks/apiHooks';
+
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
@@ -23,17 +24,14 @@ const { confirm } = Modal;
 export function RelinquishVoteButton({
   proposal,
   tokenOwnerRecord,
+  voteRecord,
 }: {
   proposal: ParsedAccount<Proposal>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
+  voteRecord: ParsedAccount<VoteRecord> | undefined;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
-
-  const voteRecord = useTokenOwnerVoteRecord(
-    proposal.pubkey,
-    tokenOwnerRecord.pubkey,
-  )?.tryUnwrap();
 
   const accountChangeTracker = useAccountChangeTracker();
 
