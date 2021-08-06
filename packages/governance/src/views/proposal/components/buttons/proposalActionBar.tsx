@@ -61,6 +61,7 @@ export function ProposalActionBar({
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
             voteRecord={voteRecord?.tryUnwrap()}
+            hasVoteTimeExpired={hasVoteTimeExpired}
           />
           <CastVoteButton
             governance={governance}

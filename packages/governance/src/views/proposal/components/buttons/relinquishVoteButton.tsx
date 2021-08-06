@@ -25,10 +25,12 @@ export function RelinquishVoteButton({
   proposal,
   tokenOwnerRecord,
   voteRecord,
+  hasVoteTimeExpired,
 }: {
   proposal: ParsedAccount<Proposal>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
   voteRecord: ParsedAccount<VoteRecord> | undefined;
+  hasVoteTimeExpired: boolean | undefined;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
@@ -46,11 +48,14 @@ export function RelinquishVoteButton({
       proposal.info.state === ProposalState.Executing ||
       proposal.info.state === ProposalState.Defeated);
 
+  const isVoting =
+    proposal.info.state === ProposalState.Voting && !hasVoteTimeExpired;
+
   return isVisible ? (
     <Button
       type="primary"
       onClick={async () => {
-        if (proposal.info.state !== ProposalState.Voting) {
+        if (!isVoting) {
           try {
             await relinquishVote(
               rpcContext,
@@ -99,9 +104,7 @@ export function RelinquishVoteButton({
         });
       }}
     >
-      {proposal.info.state === ProposalState.Voting
-        ? LABELS.WITHDRAW_VOTE
-        : LABELS.RELEASE_MY_TOKENS}
+      {isVoting ? LABELS.WITHDRAW_VOTE : LABELS.RELEASE_MY_TOKENS}
     </Button>
   ) : null;
 }
