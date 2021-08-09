@@ -3,6 +3,7 @@ import { PublicKey } from '@solana/web3.js';
 import {
   getSignatoryRecordAddress,
   getTokenOwnerAddress,
+  getVoteRecordAddress,
   Governance,
   Proposal,
   ProposalInstruction,
@@ -12,7 +13,6 @@ import {
 } from '../models/accounts';
 import { pubkeyFilter } from '../models/api';
 import {
-  useGovernanceAccountByFilter,
   useGovernanceAccountByPda,
   useGovernanceAccountByPubkey,
   useGovernanceAccountsByFilter,
@@ -24,7 +24,10 @@ import { useRpcContext } from './useRpcContext';
 // ----- Governance -----
 
 export function useGovernance(governance: PublicKey | undefined) {
-  return useGovernanceAccountByPubkey<Governance>(Governance, governance);
+  return useGovernanceAccountByPubkey<Governance>(
+    Governance,
+    governance,
+  )?.tryUnwrap();
 }
 
 export function useGovernancesByRealm(realm: PublicKey | undefined) {
@@ -36,7 +39,10 @@ export function useGovernancesByRealm(realm: PublicKey | undefined) {
 // ----- Proposal -----
 
 export function useProposal(proposal: PublicKey | undefined) {
-  return useGovernanceAccountByPubkey<Proposal>(Proposal, proposal);
+  return useGovernanceAccountByPubkey<Proposal>(
+    Proposal,
+    proposal,
+  )?.tryUnwrap();
 }
 
 export function useProposalsByGovernance(governance: PublicKey | undefined) {
@@ -85,7 +91,7 @@ export function useWalletTokenOwnerRecord(
       );
     },
     [wallet?.publicKey, governingTokenMint, realm],
-  );
+  )?.tryUnwrap();
 }
 
 /// Returns all TokenOwnerRecords for the current wallet
@@ -102,12 +108,12 @@ export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
   const tokenOwnerRecord = useTokenOwnerRecord(proposalOwner);
 
   return connected &&
-    tokenOwnerRecord &&
-    (tokenOwnerRecord.info.governingTokenOwner.toBase58() ===
+    tokenOwnerRecord?.isSome() &&
+    (tokenOwnerRecord.value.info.governingTokenOwner.toBase58() ===
       wallet?.publicKey?.toBase58() ||
-      tokenOwnerRecord.info.governanceDelegate?.toBase58() ===
+      tokenOwnerRecord.value.info.governanceDelegate?.toBase58() ===
         wallet?.publicKey?.toBase58())
-    ? tokenOwnerRecord
+    ? tokenOwnerRecord?.tryUnwrap()
     : undefined;
 }
 
@@ -130,7 +136,7 @@ export function useWalletSignatoryRecord(proposal: PublicKey) {
       );
     },
     [wallet?.publicKey, proposal],
-  );
+  )?.tryUnwrap();
 }
 
 export function useSignatoriesByProposal(proposal: PublicKey | undefined) {
@@ -156,11 +162,21 @@ export const useVoteRecordsByProposal = (proposal: PublicKey | undefined) => {
   ]);
 };
 
-export const useWalletVoteRecord = (proposal: PublicKey) => {
-  const { wallet } = useWallet();
+export const useTokenOwnerVoteRecord = (
+  proposal: PublicKey,
+  tokenOwnerRecord: PublicKey | undefined,
+) => {
+  const { programId } = useRpcContext();
 
-  return useGovernanceAccountByFilter<VoteRecord>(VoteRecord, [
-    pubkeyFilter(1, proposal),
-    pubkeyFilter(1 + 32, wallet?.publicKey),
-  ]);
+  return useGovernanceAccountByPda<VoteRecord>(
+    VoteRecord,
+    async () => {
+      if (!proposal || !tokenOwnerRecord) {
+        return;
+      }
+
+      return await getVoteRecordAddress(programId, proposal, tokenOwnerRecord);
+    },
+    [tokenOwnerRecord, proposal],
+  );
 };

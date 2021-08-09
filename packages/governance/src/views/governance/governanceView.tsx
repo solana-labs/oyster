@@ -45,9 +45,7 @@ export const GovernanceView = () => {
   const token = tokenMap.get(
     realm?.info.communityMint?.toBase58() || '',
   ) as any;
-  const tokenBackground =
-    token?.extensions?.background ||
-    'https://solana.com/static/8c151e179d2d7e80255bdae6563209f2/6833b/validators.webp';
+  const tokenBackground = token?.extensions?.background;
 
   const communityMint = realm?.info.communityMint?.toBase58() || '';
 

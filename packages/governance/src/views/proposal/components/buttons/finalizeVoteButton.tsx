@@ -13,7 +13,7 @@ import {
 } from '../../../../models/accounts';
 
 import { finalizeVote } from '../../../../actions/finalizeVote';
-import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
+
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 const { useWallet } = contexts.Wallet;
@@ -21,13 +21,14 @@ const { useWallet } = contexts.Wallet;
 export function FinalizeVoteButton({
   governance,
   proposal,
+  hasVoteTimeExpired,
 }: {
   governance: ParsedAccount<Governance>;
   proposal: ParsedAccount<Proposal>;
+  hasVoteTimeExpired: boolean | undefined;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal);
 
   const isVisible =
     hasVoteTimeExpired === true &&
