@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { useWallet, useConnection } from '@oyster/common';
+import { useConnection } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Button } from 'antd';
 import { generateGovernanceArtifacts } from '../../actions/devtools/generateGovernanceArtifacts';
 import './style.less';
@@ -16,7 +17,7 @@ export const DevToolsView = () => {
 
 const GovernanceArtifacts = () => {
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
 
   const [realmName, setRealmName] = useState('');
   const [communityMint, setCommunityMint] = useState('');
@@ -49,7 +50,7 @@ const GovernanceArtifacts = () => {
   return (
     <div>
       <h2>Governance Artifacts</h2>
-      <Button onClick={() => onGenerateArtifacts()} disabled={!connected}>
+      <Button onClick={() => onGenerateArtifacts()} disabled={!wallet.connected}>
         Generate
       </Button>
       {generated && (

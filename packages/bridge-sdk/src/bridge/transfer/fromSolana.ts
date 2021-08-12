@@ -1,5 +1,9 @@
-import { programIds, sendTransactionWithRetry, sleep } from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-base';
+import {
+  programIds,
+  sendTransactionWithRetry,
+  sleep,
+  WalletSigner,
+} from '@oyster/common';
 import { ethers } from 'ethers';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
 import { bridgeAuthorityKey } from './../helpers';
@@ -13,7 +17,7 @@ import { SolanaBridge } from '../../core';
 
 export const fromSolana = async (
   connection: Connection,
-  wallet: WalletAdapter,
+  wallet: WalletSigner,
   request: TransferRequest,
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,

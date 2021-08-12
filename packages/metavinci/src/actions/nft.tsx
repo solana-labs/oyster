@@ -11,10 +11,10 @@ import {
   updateMetadata,
   createMasterEdition,
   sendTransactionWithRetry,
+  WalletSigner,
 } from '@oyster/common';
 import React from 'react';
 import { MintLayout, Token } from '@solana/spl-token';
-import { WalletAdapter } from '@solana/wallet-base';
 import {
   Account,
   Connection,
@@ -39,7 +39,7 @@ interface IArweaveResult {
 
 export const mintNFT = async (
   connection: Connection,
-  wallet: WalletAdapter | undefined,
+  wallet: WalletSigner | undefined,
   env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },
@@ -265,7 +265,7 @@ export const mintNFT = async (
 };
 
 export const prepPayForFilesTxn = async (
-  wallet: WalletAdapter,
+  wallet: WalletSigner,
   files: File[],
   metadata: any,
 ): Promise<{

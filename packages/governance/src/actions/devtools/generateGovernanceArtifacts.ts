@@ -1,3 +1,4 @@
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -5,15 +6,14 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-
 import {
   utils,
   createMint,
   createTokenAccount,
   sendTransactions,
   SequenceType,
+  WalletSigner,
 } from '@oyster/common';
-
 import { AccountLayout, MintLayout, Token, u64 } from '@solana/spl-token';
 
 const { notify } = utils;
@@ -24,7 +24,7 @@ export interface SourceEntryInterface {
 }
 export const generateGovernanceArtifacts = async (
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
 ) => {
   let communityMintSigners: Account[] = [];
   let communityMintInstruction: TransactionInstruction[] = [];
@@ -115,10 +115,12 @@ const withTokenGovernance = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   decimals: number,
   amount: u64,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const { token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -178,11 +180,13 @@ const withMint = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   decimals: number,
   amount: u64,
   supply: u64,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const { system: systemId, token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(

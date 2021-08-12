@@ -1,9 +1,10 @@
 import EventEmitter from 'eventemitter3';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { notify } from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-base';
+import { WalletAdapter } from '@solana/wallet-adapter-base';
 import { ethers } from 'ethers';
 
+// @ts-ignore
 export class MetamaskWalletAdapter
   extends EventEmitter
   implements WalletAdapter {
@@ -42,7 +43,7 @@ export class MetamaskWalletAdapter
     return transactions;
   }
 
-  connect() {
+  async connect() {
     if (this._onProcess) {
       return;
     }
@@ -94,7 +95,7 @@ export class MetamaskWalletAdapter
       });
   }
 
-  disconnect() {
+  async disconnect() {
     if (this._provider) {
       this._publicKey = null;
       this._provider = null;

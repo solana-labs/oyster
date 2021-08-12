@@ -12,10 +12,10 @@ import CollateralInput from '../../../components/CollateralInput';
 import { usePoolAndTradeInfoFrom } from './utils';
 import { UserDeposit } from '../../../hooks';
 import { ArrowDownOutlined } from '@ant-design/icons';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const { ActionConfirmation } = components;
 const { cache } = contexts.Accounts;
-const { useWallet } = contexts.Wallet;
 
 interface NewPositionFormProps {
   lendingReserve: ParsedAccount<LendingReserve>;

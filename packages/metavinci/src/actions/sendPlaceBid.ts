@@ -1,3 +1,4 @@
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -13,21 +14,24 @@ import {
   programIds,
   BidderPot,
   models,
+  WalletSigner,
 } from '@oyster/common';
-
 import { AccountLayout } from '@solana/spl-token';
 import { AuctionView } from '../hooks';
 import BN from 'bn.js';
+
 const { createTokenAccount } = actions;
 const { approve } = models;
 
 export async function sendPlaceBid(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   bidderAccount: PublicKey,
   auctionView: AuctionView,
   amount: number,
 ) {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 

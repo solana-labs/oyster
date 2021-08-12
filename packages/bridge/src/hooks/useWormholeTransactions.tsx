@@ -6,7 +6,6 @@ import {
   useConnection,
   useConnectionConfig,
   useUserAccounts,
-  useWallet,
 } from '@oyster/common';
 import {
   POSTVAA_INSTRUCTION,

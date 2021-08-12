@@ -1,3 +1,4 @@
+import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import {
   Account,
   Connection,
@@ -11,6 +12,7 @@ import {
   models,
   ParsedAccount,
   TokenAccount,
+  WalletSigner,
 } from '@oyster/common';
 import {
   accrueInterestInstruction,
@@ -19,6 +21,7 @@ import {
 import { liquidateInstruction } from './../models/lending/liquidate';
 import { AccountLayout } from '@solana/spl-token';
 import { LendingMarket, LendingObligation } from '../models';
+
 const { cache } = contexts.Accounts;
 const { approve } = models;
 const {
@@ -31,7 +34,7 @@ const { LENDING_PROGRAM_ID, notify } = utils;
 
 export const liquidate = async (
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   from: TokenAccount, // liquidity account
   amountLamports: number, // in liquidty token (lamports)
 
@@ -42,6 +45,8 @@ export const liquidate = async (
 
   withdrawReserve: ParsedAccount<LendingReserve>,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   notify({
     message: 'Repaying funds...',
     description: 'Please review transactions to approve.',

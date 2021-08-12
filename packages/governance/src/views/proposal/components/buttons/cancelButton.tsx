@@ -1,18 +1,14 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ParsedAccount, contexts } from '@oyster/common';
-
+import { ParsedAccount } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Button, Modal } from 'antd';
-
 import React from 'react';
 import { cancelProposal } from '../../../../actions/cancelProposal';
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-
 import { Proposal, ProposalState } from '../../../../models/accounts';
 
 const { confirm } = Modal;
-
-const { useWallet } = contexts.Wallet;
 
 export default function CancelButton({
   proposal,

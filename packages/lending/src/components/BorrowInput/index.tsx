@@ -18,14 +18,14 @@ import {
   BackButton,
   ActionConfirmation,
 } from '@oyster/common';
-
+import { useWallet } from '@solana/wallet-adapter-react';
 import { borrow } from '../../actions';
 import './style.less';
 import { LABELS } from '../../constants';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
 import { RiskSlider } from '../RiskSlider';
-const { useWallet } = contexts.Wallet;
+
 const { useConnection } = contexts.Connection;
 const { cache } = contexts.Accounts;
 
@@ -34,7 +34,7 @@ export const BorrowInput = (props: {
   reserve: ParsedAccount<LendingReserve>;
 }) => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [collateralValue, setCollateralValue] = useState('');
   const [lastTyped, setLastTyped] = useState('collateral');
   const [pendingTx, setPendingTx] = useState(false);

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Divider, Button, InputNumber } from 'antd';
 
-import { Auction, Presale } from '../../types';
-
 import './index.less';
 import { getCountdown } from '../../utils/utils';
 import {
@@ -10,18 +8,15 @@ import {
   TokenAccount,
   useConnection,
   useUserAccounts,
-  hooks,
-  contexts,
-  cache,
-  BidderMetadataParser,
   BidderMetadata,
   ParsedAccount,
   Identicon,
 } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { AuctionView, AuctionViewState, useBidsForAuction } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
 import { sendRedeemBid } from '../../actions/sendRedeemBid';
-const { useWallet } = contexts.Wallet;
+
 export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   const [days, setDays] = useState<number>(99);
   const [hours, setHours] = useState<number>(23);
@@ -29,7 +24,7 @@ export const AuctionCard = ({ auctionView }: { auctionView: AuctionView }) => {
   const [seconds, setSeconds] = useState<number>(59);
   const [clock, setClock] = useState<number>(0);
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const { userAccounts } = useUserAccounts();
   const [value, setValue] = useState<number>();
   const accountByMint = userAccounts.reduce((prev, acc) => {

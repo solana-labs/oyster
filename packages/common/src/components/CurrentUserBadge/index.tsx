@@ -1,10 +1,8 @@
 import React from 'react';
-
-import { Identicon } from '../Identicon';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { useWallet } from '../../contexts/wallet';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useNativeAccount } from '../../contexts/accounts';
-import { formatNumber, shortenAddress } from '../../utils';
+import { formatNumber } from '../../utils';
 import './styles.css';
 import { Popover } from 'antd';
 import { Settings } from '../Settings';
@@ -14,10 +12,10 @@ export const CurrentUserBadge = (props: {
   showAddress?: boolean;
   iconSize?: number;
 }) => {
-  const { wallet } = useWallet();
+  const { wallet, publicKey } = useWallet();
   const { account } = useNativeAccount();
 
-  if (!wallet || !wallet.publicKey) {
+  if (!wallet || !publicKey) {
     return null;
   }
 
@@ -25,12 +23,12 @@ export const CurrentUserBadge = (props: {
     ? {
         marginLeft: '0.5rem',
         display: 'flex',
-        width: props.iconSize,
+        width: props.iconSize || 20,
         borderRadius: 50,
       }
     : {
         display: 'flex',
-        width: props.iconSize,
+        width: props.iconSize || 20,
         paddingLeft: 0,
         borderRadius: 50,
       };
@@ -44,19 +42,6 @@ export const CurrentUserBadge = (props: {
     ? baseWalletKey
     : { ...baseWalletKey, paddingLeft: 0 };
 
-  let name = props.showAddress ? shortenAddress(`${wallet.publicKey}`) : '';
-  const unknownWallet = wallet as any;
-  if (unknownWallet.name) {
-    name = unknownWallet.name;
-  }
-
-  let image = (
-    <Identicon address={wallet.publicKey?.toBase58()} style={iconStyle} />
-  );
-
-  if (unknownWallet.image) {
-    image = <img src={unknownWallet.image} style={iconStyle} />;
-  }
 
   return (
     <div className="wallet-wrapper">
@@ -73,8 +58,8 @@ export const CurrentUserBadge = (props: {
         trigger="click"
       >
         <div className="wallet-key" style={walletKeyStyle}>
-          {name && <span style={{ marginRight: '0.5rem' }}>{name}</span>}
-          {image}
+          <span style={{ marginRight: '0.5rem' }}>{wallet.name}</span>
+          <img src={wallet.icon} style={iconStyle} />
         </div>
       </Popover>
     </div>

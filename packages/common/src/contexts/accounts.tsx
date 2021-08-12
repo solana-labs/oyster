@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { useConnection } from '../contexts/connection';
-import { useWallet } from '../contexts/wallet';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AccountLayout, MintInfo, MintLayout, u64 } from '@solana/spl-token';
 import { TokenAccount } from '../models';
@@ -314,23 +314,21 @@ export const getCachedAccount = (
 
 const UseNativeAccount = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
 
   const [nativeAccount, setNativeAccount] = useState<AccountInfo<Buffer>>();
 
   const updateCache = useCallback(
     account => {
-      if (wallet && wallet.publicKey) {
-        const wrapped = wrapNativeAccount(wallet.publicKey, account);
-        if (wrapped !== undefined && wallet) {
-          const id = wallet.publicKey?.toBase58();
-          cache.registerParser(id, TokenAccountParser);
-          genericCache.set(id, wrapped as TokenAccount);
-          cache.emitter.raiseCacheUpdated(id, false, TokenAccountParser);
-        }
+      if (publicKey) {
+        const wrapped = wrapNativeAccount(publicKey, account);
+        const id = publicKey.toBase58();
+        cache.registerParser(id, TokenAccountParser);
+        genericCache.set(id, wrapped as TokenAccount);
+        cache.emitter.raiseCacheUpdated(id, false, TokenAccountParser);
       }
     },
-    [wallet],
+    [publicKey],
   );
 
   useEffect(() => {
@@ -343,14 +341,14 @@ const UseNativeAccount = () => {
     };
 
     (async () => {
-      if (!connection || !wallet?.publicKey) {
+      if (!connection || !publicKey) {
         return;
       }
 
-      const account = await connection.getAccountInfo(wallet.publicKey);
+      const account = await connection.getAccountInfo(publicKey);
       updateAccount(account);
 
-      subId = connection.onAccountChange(wallet.publicKey, updateAccount);
+      subId = connection.onAccountChange(publicKey, updateAccount);
     })();
 
     return () => {
@@ -358,7 +356,7 @@ const UseNativeAccount = () => {
         connection.removeAccountChangeListener(subId);
       }
     };
-  }, [setNativeAccount, wallet, wallet?.publicKey, connection, updateCache]);
+  }, [setNativeAccount, publicKey, connection, updateCache]);
 
   return { nativeAccount };
 };
@@ -386,7 +384,7 @@ const precacheUserTokenAccounts = async (
 
 export function AccountsProvider({ children = null as any }) {
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
+  const { publicKey } = useWallet();
   const [tokenAccounts, setTokenAccounts] = useState<TokenAccount[]>([]);
   const [userAccounts, setUserAccounts] = useState<TokenAccount[]>([]);
   const { nativeAccount } = UseNativeAccount();
@@ -396,17 +394,17 @@ export function AccountsProvider({ children = null as any }) {
       .byParser(TokenAccountParser)
       .map(id => cache.get(id))
       .filter(
-        a => a && a.info.owner.toBase58() === wallet?.publicKey?.toBase58(),
+        a => a && a.info.owner.toBase58() === publicKey?.toBase58(),
       )
       .map(a => a as TokenAccount);
-  }, [wallet]);
+  }, [publicKey]);
 
   useEffect(() => {
     const accounts = selectUserAccounts().filter(
       a => a !== undefined,
     ) as TokenAccount[];
     setUserAccounts(accounts);
-  }, [nativeAccount, wallet, tokenAccounts, selectUserAccounts]);
+  }, [nativeAccount, tokenAccounts, selectUserAccounts]);
 
   useEffect(() => {
     const subs: number[] = [];
@@ -425,7 +423,6 @@ export function AccountsProvider({ children = null as any }) {
     };
   }, [connection]);
 
-  const publicKey = wallet?.publicKey;
   useEffect(() => {
     if (!connection || !publicKey) {
       setTokenAccounts([]);
@@ -461,7 +458,7 @@ export function AccountsProvider({ children = null as any }) {
         connection.removeProgramAccountChangeListener(tokenSubID);
       };
     }
-  }, [connection, connected, publicKey, selectUserAccounts]);
+  }, [connection, publicKey, selectUserAccounts]);
 
   return (
     <AccountsContext.Provider

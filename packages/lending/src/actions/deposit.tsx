@@ -1,10 +1,11 @@
+import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, models, actions, TokenAccount } from '@oyster/common';
+import { contexts, utils, models, actions, TokenAccount, WalletSigner } from '@oyster/common';
 import {
   accrueInterestInstruction,
   depositInstruction,
@@ -28,8 +29,10 @@ export const deposit = async (
   reserve: LendingReserve,
   reserveAddress: PublicKey,
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   notify({
     message: 'Depositing funds...',
     description: 'Please review transactions to approve.',

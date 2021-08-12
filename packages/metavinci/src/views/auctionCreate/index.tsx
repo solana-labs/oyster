@@ -26,7 +26,6 @@ import {
   MAX_METADATA_LEN,
   MAX_NAME_SYMBOL_LEN,
   useConnection,
-  useWallet,
   useConnectionConfig,
   Metadata,
   ParsedAccount,
@@ -35,6 +34,7 @@ import {
   WinnerLimitType,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js';
 import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';
@@ -122,7 +122,7 @@ export const AuctionCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
   const items = useUserArts();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { step_param }: { step_param: string } = useParams();
   const history = useHistory();
 
@@ -210,7 +210,7 @@ export const AuctionCreateView = () => {
     }
 
     const endAuctionAt = moment().unix() + ((attributes.auctionDuration || 0) * 60)
-    
+
     const _auctionObj = await createAuctionManager(
       connection,
       wallet,

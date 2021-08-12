@@ -13,8 +13,9 @@ import './style.less';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
 import { contexts, ConnectButton, ActionConfirmation } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
+
 const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
 
 export const WithdrawInput = (props: {
   className?: string;
@@ -22,7 +23,7 @@ export const WithdrawInput = (props: {
   address: PublicKey;
 }) => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 

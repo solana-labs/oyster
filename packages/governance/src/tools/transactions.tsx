@@ -1,4 +1,4 @@
-import { ExplorerLink, sendTransaction, utils } from '@oyster/common';
+import { ExplorerLink, sendTransaction, utils, WalletSigner } from '@oyster/common';
 import { Account, TransactionInstruction, Connection } from '@solana/web3.js';
 import React from 'react';
 
@@ -6,7 +6,7 @@ const { notify } = utils;
 
 export async function sendTransactionWithNotifications(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   instructions: TransactionInstruction[],
   signers: Account[],
   pendingMessage: string,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { executeInstruction } from '../../../../../actions/executeInstruction';
 import {
   InstructionExecutionStatus,
@@ -16,6 +16,7 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 export enum PlayState {
   Played,

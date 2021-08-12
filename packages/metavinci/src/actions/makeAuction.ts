@@ -1,13 +1,14 @@
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, actions, WinnerLimit } from '@oyster/common';
-
+import { utils, actions, WinnerLimit, WalletSigner } from '@oyster/common';
 import BN from 'bn.js';
 import { METAPLEX_PREFIX } from '../models/metaplex';
+
 const { AUCTION_PREFIX, createAuction } = actions;
 
 // This command makes an auction
 export async function makeAuction(
-  wallet: any,
+  wallet: WalletSigner,
   winnerLimit: WinnerLimit,
   vault: PublicKey,
   endAuctionAt: BN,
@@ -18,6 +19,8 @@ export async function makeAuction(
   instructions: TransactionInstruction[];
   signers: Account[];
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const PROGRAM_IDS = utils.programIds();
 
   let signers: Account[] = [];

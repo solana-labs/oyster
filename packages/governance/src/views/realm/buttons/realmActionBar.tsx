@@ -5,8 +5,9 @@ import { DepositGoverningTokensButton } from './depositGoverningTokensButton';
 import { RegisterGovernanceButton } from './registerGovernanceButton';
 import { SetRealmAuthorityButton } from './setRealmAuthorityButton';
 import { WithdrawGoverningTokensButton } from './withdrawGoverningTokensButton';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { ParsedAccount } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 export function RealmActionBar({
   realm,
@@ -14,7 +15,7 @@ export function RealmActionBar({
   realm: ParsedAccount<Realm> | undefined;
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
-  const { wallet, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
 
   if (!realm) {
     return null;
@@ -25,7 +26,7 @@ export function RealmActionBar({
   const showCreateNewGovernance = connected;
 
   const showSetRealmAuthority =
-    realm.info.authority?.toBase58() === wallet?.publicKey?.toBase58();
+    realm.info.authority?.toBase58() === publicKey?.toBase58();
 
   const showSettings = showCreateNewGovernance || showSetRealmAuthority;
 

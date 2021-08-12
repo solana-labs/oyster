@@ -1,6 +1,7 @@
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
-import { deserializeBorsh, ParsedAccount } from '@oyster/common';
+import { deserializeBorsh, ParsedAccount, WalletSigner } from '@oyster/common';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import {
   GovernanceAccount,
@@ -8,22 +9,17 @@ import {
   GovernanceAccountType,
   Realm,
 } from './accounts';
-import { WalletNotConnectedError } from './errors';
-
-export interface IWallet {
-  publicKey: PublicKey;
-}
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey;
-  wallet: IWallet | undefined;
+  wallet: WalletSigner;
   connection: Connection;
   endpoint: string;
 
   constructor(
     programId: PublicKey,
-    wallet: IWallet | undefined,
+    wallet: WalletSigner,
     connection: Connection,
     endpoint: string,
   ) {

@@ -1,6 +1,6 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ParsedAccount, contexts } from '@oyster/common';
-import { PublicKey } from '@solana/web3.js';
+import { ParsedAccount } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { signOffProposal } from '../../../../actions/signOffProposal';
@@ -10,8 +10,6 @@ import { Proposal, SignatoryRecord } from '../../../../models/accounts';
 
 const { confirm } = Modal;
 
-const { useWallet } = contexts.Wallet;
-
 export default function SignOffButton({
   proposal,
   signatoryRecord,
@@ -19,7 +17,7 @@ export default function SignOffButton({
   proposal: ParsedAccount<Proposal>;
   signatoryRecord: ParsedAccount<SignatoryRecord>;
 }) {
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
   const rpcContext = useRpcContext();
 
   return (
@@ -40,7 +38,7 @@ export default function SignOffButton({
                 return signOffProposal(
                   rpcContext,
                   signatoryRecord,
-                  wallet!.publicKey as PublicKey,
+                  publicKey!,
                 );
               },
               onCancel() {

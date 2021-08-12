@@ -20,9 +20,9 @@ import './style.less';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const { notify, fromLamports, wadToLamports } = utils;
-const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useMint } = contexts.Accounts;
 const { useAccountByMint } = hooks;
@@ -34,7 +34,7 @@ export const RepayInput = (props: {
   obligation: EnrichedLendingObligation;
 }) => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [lastTyped, setLastTyped] = useState('repay');
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
