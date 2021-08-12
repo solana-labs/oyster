@@ -298,6 +298,8 @@ export class TokenOwnerRecord {
 
   totalVotesCount: number;
 
+  outstandingProposalCount: number;
+
   reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
@@ -309,6 +311,7 @@ export class TokenOwnerRecord {
     governingTokenDepositAmount: BN;
     unrelinquishedVotesCount: number;
     totalVotesCount: number;
+    outstandingProposalCount: number;
     reserved: Uint8Array;
   }) {
     this.realm = args.realm;
@@ -317,6 +320,7 @@ export class TokenOwnerRecord {
     this.governingTokenDepositAmount = args.governingTokenDepositAmount;
     this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
     this.totalVotesCount = args.totalVotesCount;
+    this.outstandingProposalCount = args.outstandingProposalCount;
     this.reserved = args.reserved;
   }
 }

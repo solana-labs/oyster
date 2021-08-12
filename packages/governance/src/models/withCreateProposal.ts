@@ -63,7 +63,7 @@ export const withCreateProposal = async (
     },
     {
       pubkey: tokenOwnerRecord,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
