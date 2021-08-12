@@ -25,7 +25,7 @@ export const withCancelProposal = (
     },
     {
       pubkey: tokenOwnerRecord,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

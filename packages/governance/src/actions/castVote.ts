@@ -26,6 +26,7 @@ export const castVote = async (
     realm,
     proposal.info.governance,
     proposal.pubkey,
+    proposal.info.tokenOwnerRecord,
     tokeOwnerRecord,
     governanceAuthority,
     proposal.info.governingTokenMint,
