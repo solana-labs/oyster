@@ -1,4 +1,4 @@
-import { Form, FormInstance, InputNumber } from 'antd';
+import { Form, FormInstance, InputNumber, Spin } from 'antd';
 import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
@@ -12,6 +12,13 @@ import React from 'react';
 import { formDefaults } from '../../../../tools/forms';
 import { validateTokenAccount } from '../../../../tools/validators/accounts/token';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
+import { contexts } from '@oyster/common';
+import {
+  getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimal,
+} from '../../../../tools/units';
+
+const { useMint } = contexts.Accounts;
 
 export const SplTokenMintToForm = ({
   form,
@@ -22,6 +29,12 @@ export const SplTokenMintToForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
+  const mintInfo = useMint(governance.info.governedAccount);
+
+  if (!mintInfo) {
+    return <Spin />;
+  }
+
   const { token: tokenProgramId } = utils.programIds();
 
   const onCreate = async ({
@@ -29,15 +42,20 @@ export const SplTokenMintToForm = ({
     amount,
   }: {
     destination: string;
-    amount: number;
+    amount: string;
   }) => {
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      amount,
+      mintInfo.decimals,
+    );
+
     const mintToIx = Token.createMintToInstruction(
       tokenProgramId,
       governance.info.governedAccount,
       new PublicKey(destination),
       governance.pubkey,
       [],
-      amount,
+      mintAmount,
     );
 
     onCreateInstruction(mintToIx);
@@ -46,6 +64,8 @@ export const SplTokenMintToForm = ({
   const tokenAccountValidator = (
     info: AccountInfo<Buffer | ParsedAccountData>,
   ) => validateTokenAccount(info, governance.info.governedAccount);
+
+  const mintMinAmount = getMintMinAmountAsDecimal(mintInfo);
 
   return (
     <Form
@@ -74,7 +94,12 @@ export const SplTokenMintToForm = ({
       ></AccountFormItem>
 
       <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
-        <InputNumber min={1} />
+        <InputNumber
+          min={mintMinAmount}
+          stringMode
+          style={{ width: 200 }}
+          step={mintMinAmount}
+        />
       </Form.Item>
     </Form>
   );
