@@ -234,7 +234,7 @@ export const useCurrencyLeg = (mintAddress: string) => {
           isWrapped: false,
           chainID: ASSET_CHAIN.Ethereum,
           assetAddress,
-          mint: '',
+          mint: (solToken && derived && mintAddress) || '',
         };
         if (isWrapped) {
           info.chainID = await e.assetChain();
