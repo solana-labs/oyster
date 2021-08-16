@@ -34,7 +34,7 @@ export const WalletModal: FC = () => {
       title="Select Wallet"
       okText="Connect"
       visible={visible}
-      okButtonProps={{style: {display: 'none'}}}
+      footer={null}
       onCancel={close}
       width={400}
     >

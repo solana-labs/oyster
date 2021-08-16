@@ -7,6 +7,7 @@ import { LABELS } from '../../constants/labels';
 import { ConnectButton } from '..';
 import { useWallet } from '@solana/wallet-adapter-react';
 import './style.css';
+
 export const AppBar = (props: {
   left?: JSX.Element;
   right?: JSX.Element;

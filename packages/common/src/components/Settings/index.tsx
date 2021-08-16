@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
 import { Button, Select } from 'antd';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
