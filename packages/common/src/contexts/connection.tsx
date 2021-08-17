@@ -398,6 +398,26 @@ export const sendTransaction = async (
         console.error('getErrorForTransaction() error', ex);
       }
 
+      if ('timeout' in confirmationStatus.err) {
+        notify({
+          message: `Transaction hasn't been confirmed within ${
+            DEFAULT_TIMEOUT / 1000
+          }s. Please check on Solana Explorer`,
+          description: (
+            <>
+              <ExplorerLink
+                address={txid}
+                type="transaction"
+                short
+                connection={connection}
+              />
+            </>
+          ),
+          type: 'warn',
+        });
+        throw new TransactionTimeoutError(txid);
+      }
+
       notify({
         message: 'Transaction error',
         description: (
@@ -415,10 +435,6 @@ export const sendTransaction = async (
         ),
         type: 'error',
       });
-
-      if ('timeout' in confirmationStatus.err) {
-        throw new TransactionTimeoutError(txid);
-      }
 
       throw new SendTransactionError(
         `Transaction ${txid} failed (${JSON.stringify(confirmationStatus)})`,
@@ -480,7 +496,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_TIMEOUT = 30000;
 
 export async function sendSignedTransaction({
   signedTransaction,
