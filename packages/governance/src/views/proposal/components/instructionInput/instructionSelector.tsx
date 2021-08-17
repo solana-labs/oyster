@@ -6,6 +6,7 @@ export enum InstructionType {
   AnchorIDLSetBuffer,
   GovernanceSetConfig,
   SplTokenTransfer,
+  SplTokenRaydium,
   SplTokenMintTo,
   GovernanceSetRealmConfig,
 }
@@ -15,6 +16,7 @@ const instructionNames = [
   'anchor idl set-buffer',
   'set-governance-config',
   'spl-token transfer',
+  'raydium',
   'spl-token mint-to',
   'set-realm-config',
 ];

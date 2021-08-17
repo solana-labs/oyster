@@ -12,6 +12,7 @@ import {
   getGovernanceInstructions,
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
+import { SplTokenRaydiumForm } from './splTokenRaydiumForm';
 
 export const TokenInstructionsForm = ({
   form,
@@ -25,10 +26,11 @@ export const TokenInstructionsForm = ({
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const [instruction, setInstruction] = useState(
-    InstructionType.SplTokenTransfer,
+    InstructionType.SplTokenRaydium,
   );
 
   let instructions = [
+    InstructionType.SplTokenRaydium,
     InstructionType.SplTokenTransfer,
     ...getGovernanceInstructions(realm, governance),
   ];
@@ -45,6 +47,14 @@ export const TokenInstructionsForm = ({
           governance={governance}
           onCreateInstruction={onCreateInstruction}
         ></SplTokenTransferForm>
+      )}
+
+      {instruction === InstructionType.SplTokenRaydium && (
+        <SplTokenRaydiumForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+        ></SplTokenRaydiumForm>
       )}
 
       <GovernanceInstructionForm
