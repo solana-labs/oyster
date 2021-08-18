@@ -1,4 +1,4 @@
-import { Form, FormInstance, InputNumber } from 'antd';
+import { Form, FormInstance, InputNumber, Spin } from 'antd';
 import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
@@ -14,8 +14,13 @@ import { AccountFormItem } from '../../../../components/AccountFormItem/accountF
 
 import { contexts } from '@oyster/common';
 import { validateTokenAccount } from '../../../../tools/validators/accounts/token';
+import {
+  getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimal,
+} from '../../../../tools/units';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
+const { useMint } = contexts.Accounts;
 
 export const SplTokenTransferForm = ({
   form,
@@ -28,29 +33,41 @@ export const SplTokenTransferForm = ({
 }) => {
   const { token: tokenProgramId } = utils.programIds();
   const sourceTokenAccount = useTokenAccount(governance.info.governedAccount);
+  const mintInfo = useMint(sourceTokenAccount?.info.mint);
+
+  if (!(mintInfo && sourceTokenAccount)) {
+    return <Spin />;
+  }
 
   const onCreate = async ({
     destination,
     amount,
   }: {
     destination: string;
-    amount: number;
+    amount: string;
   }) => {
-    const mintToIx = Token.createTransferInstruction(
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      amount,
+      mintInfo.decimals,
+    );
+
+    const transferIx = Token.createTransferInstruction(
       tokenProgramId,
       governance.info.governedAccount,
       new PublicKey(destination),
       governance.pubkey,
       [],
-      amount,
+      mintAmount,
     );
 
-    onCreateInstruction(mintToIx);
+    onCreateInstruction(transferIx);
   };
 
   const tokenAccountValidator = (
     info: AccountInfo<Buffer | ParsedAccountData>,
   ) => validateTokenAccount(info, sourceTokenAccount?.info.mint);
+
+  const mintMinAmount = getMintMinAmountAsDecimal(mintInfo);
 
   return (
     <Form
@@ -77,7 +94,12 @@ export const SplTokenTransferForm = ({
         accountInfoValidator={tokenAccountValidator}
       ></AccountFormItem>
       <Form.Item name="amount" label="amount" rules={[{ required: true }]}>
-        <InputNumber min={1} />
+        <InputNumber
+          min={mintMinAmount}
+          stringMode
+          style={{ width: 200 }}
+          step={mintMinAmount}
+        />
       </Form.Item>
     </Form>
   );

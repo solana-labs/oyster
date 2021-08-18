@@ -36,16 +36,21 @@ export function getMintDecimalAmountFromNatural(
 }
 
 // Parses input string in decimals to mint amount (natural units)
+// If the input is already a number then converts it to mint natural amount
 export function parseMintNaturalAmountFromDecimal(
-  decimalAmount: string,
-  decimals: number,
+  decimalAmount: string | number,
+  mintDecimals: number,
 ) {
-  if (decimals === 0) {
+  if (typeof decimalAmount === 'number') {
+    return getMintNaturalAmountFromDecimal(decimalAmount, mintDecimals);
+  }
+
+  if (mintDecimals === 0) {
     return parseInt(decimalAmount);
   }
 
   const floatAmount = parseFloat(decimalAmount);
-  return getMintNaturalAmountFromDecimal(floatAmount, decimals);
+  return getMintNaturalAmountFromDecimal(floatAmount, mintDecimals);
 }
 
 // Converts amount in decimals to mint amount (natural units)
@@ -109,7 +114,7 @@ export function getBigNumberAmount(amount: BN | number) {
 
 // Formats percentage value showing it in human readable form
 export function formatPercentage(percentage: number) {
-  if (percentage === 0) {
+  if (percentage === 0 || percentage === Infinity) {
     return '0%';
   }
 
