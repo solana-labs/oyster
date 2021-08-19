@@ -93,7 +93,10 @@ export const toSolana = async (
             .byParser(TokenAccountParser)
             .map(key => {
               let account = cache.get(key) as ParsedAccount<AccountInfo>;
-              if (account?.info.mint.toBase58() === mintKey.toBase58()) {
+              if (
+                account?.info.mint.toBase58() === mintKey.toBase58() &&
+                account?.info.owner.toBase58() === wallet?.publicKey?.toBase58()
+              ) {
                 return key;
               }
 
