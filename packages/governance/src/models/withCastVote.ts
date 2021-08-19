@@ -16,6 +16,7 @@ export const withCastVote = async (
   realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
+  proposalOwnerRecord: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   governingTokenMint: PublicKey,
@@ -46,6 +47,11 @@ export const withCastVote = async (
     },
     {
       pubkey: proposal,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: proposalOwnerRecord,
       isWritable: true,
       isSigner: false,
     },

@@ -21,6 +21,7 @@ export const finalizeVote = async (
     realm,
     proposal.info.governance,
     proposal.pubkey,
+    proposal.info.tokenOwnerRecord,
     proposal.info.governingTokenMint,
   );
 
