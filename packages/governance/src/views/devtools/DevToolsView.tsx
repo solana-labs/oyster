@@ -4,8 +4,7 @@ import { useWallet, useConnection } from '@oyster/common';
 import { Button } from 'antd';
 import { generateGovernanceArtifacts } from '../../actions/devtools/generateGovernanceArtifacts';
 import './style.less';
-import { createAccount } from '../../actions/devtools/createAccount';
-import { PublicKey } from '@solana/web3.js';
+
 // import { ControlTestBench } from './controlTests';
 
 export const DevToolsView = () => {
@@ -33,14 +32,12 @@ const GovernanceArtifacts = () => {
   const onGenerateArtifacts = async () => {
     setGenerated(false);
 
-    await createAccount(
-      connection,
-      wallet,
-      88,
-      new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
-    );
-
-    return true;
+    // await createAccount(
+    //   connection,
+    //   wallet,
+    //   88,
+    //   new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
+    // );
 
     const {
       communityMintAddress,

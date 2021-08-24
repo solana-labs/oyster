@@ -8,12 +8,12 @@ import { formDefaults } from '../../../../tools/forms';
 
 import { contexts } from '@oyster/common';
 
-import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
+import { depositInstruction } from '../../../../tools/raydium/raydium';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useMint } = contexts.Accounts;
 
-export const SplTokenRaydiumForm = ({
+export const RaydiumStakeForm = ({
   form,
   governance,
   onCreateInstruction,
@@ -36,26 +36,22 @@ export const SplTokenRaydiumForm = ({
     destination: string;
     amount: string;
   }) => {
-    const raydiumIx = addLiquidityInstructionV4(
-      new PublicKey('675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'),
-      // amm
-      new PublicKey('GaqgfieVmnmY4ZsZHHA6L5RSVzCGL3sKx4UgHBaYNy8m'),
-      new PublicKey('5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1'),
-      new PublicKey('7XWbMpdyGM5Aesaedh6V653wPYpEswA864sBvodGgWDp'),
-      new PublicKey('9u8bbHv7DnEbVRXmptz3LxrJsryY1xHqGvXLpgm9s5Ng'),
-      new PublicKey('7P5Thr9Egi2rvMmEuQkLn8x8e8Qro7u2U7yLD2tU2Hbe'),
-      new PublicKey('3FqQ8p72N85USJStyttaohu1EBsTsEZQ9tVqwcPWcuSz'),
-      new PublicKey('384kWWf2Km56EReGvmtCKVo1BBmmt2SwiEizjhwpCmrN'),
-      // serum
-      new PublicKey('Cm4MmknScg7qbKqytb1mM92xgDxv3TNXos4tKbBqTDy7'),
-      // user (governance)
-      new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf'),
-      new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh'),
-      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'),
-      new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'), // governance PDS
-      1,
-      1,
-      1,
+    const raydiumIx = depositInstruction(
+      new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
+      // staking pool
+      new PublicKey('5DFbcYNLLy5SJiBpCCDzNSs7cWCsUbYnCkLXzcPQiKnR'),
+      new PublicKey('DdFXxCbn5vpxPRaGmurmefCTTSUa5XZ9Kh6Noc4bvrU9'),
+      // user
+      new PublicKey('CjvTxyoZPfSg1aDchw79RmwFfkuWb5v1obhCt4dfw9mq'), // created user info account
+      new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'), // governance PDA
+
+      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY-SRM LP token account
+      new PublicKey('792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb'),
+
+      new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf'), // governance RAY account
+      new PublicKey('5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt'),
+
+      1, // amount
     );
 
     onCreateInstruction(raydiumIx);
@@ -68,7 +64,7 @@ export const SplTokenRaydiumForm = ({
       onFinish={onCreate}
       initialValues={{ amount: 1 }}
     >
-      <Form.Item label="account owner (governance account)">
+      <Form.Item label="account owner (governance account) - stake">
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
     </Form>

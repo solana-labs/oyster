@@ -1,5 +1,9 @@
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import { nu64, struct, u8 } from 'buffer-layout';
 
 export function addLiquidityInstructionV4(
@@ -55,6 +59,102 @@ export function addLiquidityInstructionV4(
       maxCoinAmount,
       maxPcAmount,
       fixedFromCoin,
+    },
+    data,
+  );
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  });
+}
+
+export function depositInstructionV4(
+  programId: PublicKey,
+  // staking pool
+  poolId: PublicKey,
+  poolAuthority: PublicKey,
+  // user
+  userInfoAccount: PublicKey,
+  userOwner: PublicKey,
+  userLpTokenAccount: PublicKey,
+  poolLpTokenAccount: PublicKey,
+  userRewardTokenAccount: PublicKey,
+  poolRewardTokenAccount: PublicKey,
+  userRewardTokenAccountB: PublicKey,
+  poolRewardTokenAccountB: PublicKey,
+  // tokenProgramId: PublicKey,
+  amount: number,
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')]);
+
+  const keys = [
+    { pubkey: poolId, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: userInfoAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: userRewardTokenAccountB, isSigner: false, isWritable: true },
+    { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true },
+  ];
+
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: 1,
+      amount,
+    },
+    data,
+  );
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  });
+}
+
+export function depositInstruction(
+  programId: PublicKey,
+  // staking pool
+  poolId: PublicKey,
+  poolAuthority: PublicKey,
+  // user
+  userInfoAccount: PublicKey,
+  userOwner: PublicKey,
+  userLpTokenAccount: PublicKey,
+  poolLpTokenAccount: PublicKey,
+  userRewardTokenAccount: PublicKey,
+  poolRewardTokenAccount: PublicKey,
+  // tokenProgramId: PublicKey,
+  amount: number,
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')]);
+
+  const keys = [
+    { pubkey: poolId, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: userInfoAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+  ];
+
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: 1,
+      amount,
     },
     data,
   );
