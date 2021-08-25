@@ -25,7 +25,7 @@ import { dryRunInstruction } from '../../../../../actions/dryRunInstruction';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
-import { RpcContext } from '../../../../../models/api';
+import { RpcContext } from '../../../../../models/core/api';
 import { utils } from '@oyster/common';
 
 const { getExplorerInspectorUrl } = utils;

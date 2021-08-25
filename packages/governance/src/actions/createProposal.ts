@@ -3,7 +3,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { withCreateProposal } from '../models/withCreateProposal';
 import { withAddSignatory } from '../models/withAddSignatory';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

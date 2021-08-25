@@ -4,7 +4,7 @@ import { ParsedAccount } from '@oyster/common';
 import { Realm } from '../models/accounts';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 import { withSetRealmAuthority } from '../models/withSetRealmAuthority';
 
 export const setRealmAuthority = async (

@@ -7,7 +7,7 @@ import {
   useConnection,
   useConnectionConfig,
 } from '@oyster/common';
-import { BorshAccountParser } from '../models/serialisation';
+import { GovernanceAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
 import { getRealms } from '../models/api';
 import { EventEmitter } from 'eventemitter3';
@@ -85,7 +85,7 @@ export default function GovernanceProvider({ children = null as any }) {
         programPk,
         async (info: KeyedAccountInfo) => {
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
-            const realm = BorshAccountParser(Realm)(
+            const realm = GovernanceAccountParser(Realm)(
               info.accountId,
               info.accountInfo,
             );

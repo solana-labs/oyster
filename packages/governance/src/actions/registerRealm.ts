@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import { MintMaxVoteWeightSource } from '../models/accounts';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 import { withCreateRealm } from '../models/withCreateRealm';
 import { sendTransactionWithNotifications } from '../tools/transactions';

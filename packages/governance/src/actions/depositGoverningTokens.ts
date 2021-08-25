@@ -2,7 +2,7 @@ import { PublicKey, TransactionInstruction, Account } from '@solana/web3.js';
 import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 const { approve } = models;
 

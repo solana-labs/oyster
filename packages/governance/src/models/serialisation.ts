@@ -1,9 +1,5 @@
-import {
-  AccountInfo,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js';
-import { deserializeBorsh, ParsedAccountBase } from '@oyster/common';
+import { TransactionInstruction } from '@solana/web3.js';
+import { deserializeBorsh } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
@@ -46,12 +42,14 @@ import {
   VoteThresholdPercentage,
   VoteWeight,
   RealmConfigAccount,
+  GovernanceAccountClass,
 } from './accounts';
 import { serialize } from 'borsh';
+import { BorshAccountParser } from './core/serialisation';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
-  const reader = (this as unknown) as BinaryReader;
+  const reader = this as unknown as BinaryReader;
   const value = reader.buf.readUInt16LE(reader.offset);
   reader.offset += 2;
   return value;
@@ -59,7 +57,7 @@ import { serialize } from 'borsh';
 
 // Temp. workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
-  const reader = (this as unknown) as BinaryWriter;
+  const reader = this as unknown as BinaryWriter;
   reader.maybeResize();
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
@@ -522,22 +520,8 @@ function createGovernanceSchema(programVersion: number) {
   ]);
 }
 
-export function BorshAccountParser(
-  classType: any,
-): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ParsedAccountBase {
-  return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
-    const buffer = Buffer.from(info.data);
-    const data = deserializeBorsh(GOVERNANCE_SCHEMA, classType, buffer);
-
-    return {
-      pubkey: pubKey,
-      account: {
-        ...info,
-      },
-      info: data,
-    } as ParsedAccountBase;
-  };
-}
+export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
+  BorshAccountParser(classType, GOVERNANCE_SCHEMA);
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
