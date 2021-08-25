@@ -4,6 +4,7 @@ import {
   MessageBody,
 } from './accounts';
 import { BorshAccountParser } from '../core/serialisation';
+import { PostMessageArgs } from './instructions';
 
 export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
   [
@@ -26,6 +27,16 @@ export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
         ['author', 'pubkey'],
         ['postedAt', 'u64'],
         ['replyTo', { kind: 'option', type: 'pubkey' }],
+        ['body', MessageBody],
+      ],
+    },
+  ],
+  [
+    PostMessageArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
         ['body', MessageBody],
       ],
     },

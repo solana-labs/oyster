@@ -1,6 +1,10 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
+export const governanceChatProgramId = new PublicKey(
+  'gCHAtYKrUUktTVzE4hEnZdLV4LXrdBf6Hh9qMaJALET',
+);
+
 export enum GovernanceChatAccountType {
   Uninitialized = 0,
   ChatMessage = 1,
