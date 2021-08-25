@@ -5,7 +5,7 @@ import { Proposal, ProposalInstruction } from '../models/accounts';
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const executeInstruction = async (
   { connection, wallet, programId }: RpcContext,

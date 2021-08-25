@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';

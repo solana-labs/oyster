@@ -5,7 +5,7 @@ import { Proposal } from '../models/accounts';
 
 import { withFinalizeVote } from '../models/withFinalizeVote';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,

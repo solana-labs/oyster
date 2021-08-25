@@ -5,7 +5,7 @@ import { Proposal } from '../models/accounts';
 import { withCastVote } from '../models/withCastVote';
 import { Vote } from '../models/instructions';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const castVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

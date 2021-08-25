@@ -11,7 +11,7 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
-import { pubkeyFilter } from '../models/api';
+import { pubkeyFilter } from '../models/core/api';
 import {
   useGovernanceAccountByPda,
   useGovernanceAccountByPubkey,

@@ -1,9 +1,5 @@
-import {
-  AccountInfo,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js';
-import { deserializeBorsh, ParsedAccountBase } from '@oyster/common';
+import { TransactionInstruction } from '@solana/web3.js';
+import { deserializeBorsh } from '@oyster/common';
 
 import { BinaryReader, BinaryWriter } from 'borsh';
 import {
@@ -45,8 +41,10 @@ import {
   VoteRecord,
   VoteThresholdPercentage,
   VoteWeight,
+  GovernanceAccountClass,
 } from './accounts';
 import { serialize } from 'borsh';
+import { BorshAccountParser } from './core/serialisation';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -491,22 +489,8 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
   ],
 ]);
 
-export function BorshAccountParser(
-  classType: any,
-): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ParsedAccountBase {
-  return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
-    const buffer = Buffer.from(info.data);
-    const data = deserializeBorsh(GOVERNANCE_SCHEMA, classType, buffer);
-
-    return {
-      pubkey: pubKey,
-      account: {
-        ...info,
-      },
-      info: data,
-    } as ParsedAccountBase;
-  };
-}
+export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
+  BorshAccountParser(classType, GOVERNANCE_SCHEMA);
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');

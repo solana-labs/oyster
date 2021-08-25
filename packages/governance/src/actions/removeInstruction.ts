@@ -5,7 +5,7 @@ import { Proposal } from '../models/accounts';
 
 import { withRemoveInstruction } from '../models/withRemoveInstruction';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const removeInstruction = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

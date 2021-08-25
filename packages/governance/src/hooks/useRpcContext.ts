@@ -2,7 +2,7 @@ import { useConnectionConfig, useConnection, useWallet } from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { IWallet, RpcContext } from '../models/api';
+import { IWallet, RpcContext } from '../models/core/api';
 
 export function useRpcContext() {
   const { endpoint } = useConnectionConfig();

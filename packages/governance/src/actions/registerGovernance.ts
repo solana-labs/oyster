@@ -7,7 +7,7 @@ import { withCreateProgramGovernance } from '../models/withCreateProgramGovernan
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
 import { withCreateTokenGovernance } from '../models/withCreateTokenGovernance';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const registerGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
