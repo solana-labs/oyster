@@ -146,7 +146,7 @@ export function depositInstruction(
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
   ];
 
