@@ -1,14 +1,14 @@
 import {
   ChatMessage,
   GovernanceChatAccountClass,
-  MessageBody,
+  ChatMessageBody,
 } from './accounts';
 import { BorshAccountParser } from '../core/serialisation';
-import { PostMessageArgs } from './instructions';
+import { PostChatMessageArgs } from './instructions';
 
 export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
   [
-    MessageBody,
+    ChatMessageBody,
     {
       kind: 'struct',
       fields: [
@@ -27,17 +27,17 @@ export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
         ['author', 'pubkey'],
         ['postedAt', 'u64'],
         ['replyTo', { kind: 'option', type: 'pubkey' }],
-        ['body', MessageBody],
+        ['body', ChatMessageBody],
       ],
     },
   ],
   [
-    PostMessageArgs,
+    PostChatMessageArgs,
     {
       kind: 'struct',
       fields: [
         ['instruction', 'u8'],
-        ['body', MessageBody],
+        ['body', ChatMessageBody],
       ],
     },
   ],

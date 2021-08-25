@@ -1,16 +1,11 @@
 import { utils } from '@oyster/common';
-import {
-  Account,
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { PostMessageArgs } from './instructions';
-import { governanceChatProgramId, MessageBody } from './accounts';
+import { PostChatMessageArgs } from './instructions';
+import { governanceChatProgramId, ChatMessageBody } from './accounts';
 
-export async function withPostMessage(
+export async function withPostChatMessage(
   instructions: TransactionInstruction[],
   signers: Account[],
   governanceProgramId: PublicKey,
@@ -20,17 +15,18 @@ export async function withPostMessage(
   governanceAuthority: PublicKey,
   payer: PublicKey,
   replyTo: PublicKey | undefined,
-  body: MessageBody,
+  body: ChatMessageBody,
 ) {
   const { system: systemId } = utils.programIds();
 
-  const args = new PostMessageArgs({
+  const args = new PostChatMessageArgs({
     body,
   });
 
   const data = Buffer.from(serialize(GOVERNANCE_CHAT_SCHEMA, args));
 
-  const chatMessage = new PublicKey('');
+  const chatMessage = new Account();
+  signers.push(chatMessage);
 
   let keys = [
     {
@@ -59,7 +55,7 @@ export async function withPostMessage(
       isSigner: true,
     },
     {
-      pubkey: chatMessage,
+      pubkey: chatMessage.publicKey,
       isWritable: true,
       isSigner: true,
     },

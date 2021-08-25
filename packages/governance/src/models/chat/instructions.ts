@@ -1,15 +1,15 @@
-import { MessageBody } from './accounts';
+import { ChatMessageBody } from './accounts';
 
 export enum GovernanceChatInstruction {
   PostMessage = 0,
 }
 
-export class PostMessageArgs {
+export class PostChatMessageArgs {
   instruction: GovernanceChatInstruction =
     GovernanceChatInstruction.PostMessage;
-  body: MessageBody;
+  body: ChatMessageBody;
 
-  constructor(args: { body: MessageBody }) {
+  constructor(args: { body: ChatMessageBody }) {
     this.body = args.body;
   }
 }

@@ -16,16 +16,16 @@ export interface GovernanceChatAccount {
 
 export type GovernanceChatAccountClass = typeof ChatMessage;
 
-export enum MessageBodyType {
+export enum ChatMessageBodyType {
   Text = 0,
   Reaction = 1,
 }
 
-export class MessageBody {
-  type: MessageBodyType;
+export class ChatMessageBody {
+  type: ChatMessageBodyType;
   value: string;
 
-  constructor(args: { type: MessageBodyType; value: string }) {
+  constructor(args: { type: ChatMessageBodyType; value: string }) {
     this.type = args.type;
     this.value = args.value;
   }
@@ -38,14 +38,14 @@ export class ChatMessage {
   author: PublicKey;
   postedAt: BN;
   replyTo: PublicKey | undefined;
-  body: MessageBody;
+  body: ChatMessageBody;
 
   constructor(args: {
     proposal: PublicKey;
     author: PublicKey;
     postedAt: BN;
     replyTo: PublicKey | undefined;
-    body: MessageBody;
+    body: ChatMessageBody;
   }) {
     this.proposal = args.proposal;
     this.author = args.author;

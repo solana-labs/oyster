@@ -5,15 +5,15 @@ import { Proposal } from '../../models/accounts';
 
 import { sendTransactionWithNotifications } from '../../tools/transactions';
 import { RpcContext } from '../../models/core/api';
-import { withPostMessage } from '../../models/chat/withPostMessage';
-import { MessageBody } from '../../models/chat/accounts';
+import { withPostChatMessage } from '../../models/chat/withPostChatMessage';
+import { ChatMessageBody } from '../../models/chat/accounts';
 
-export const postMessage = async (
+export const postChatMessage = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   replyTo: PublicKey | undefined,
-  body: MessageBody,
+  body: ChatMessageBody,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -21,7 +21,7 @@ export const postMessage = async (
   let governanceAuthority = walletPubkey;
   let payer = walletPubkey;
 
-  await withPostMessage(
+  await withPostChatMessage(
     instructions,
     signers,
     programId,
@@ -39,7 +39,7 @@ export const postMessage = async (
     wallet,
     instructions,
     signers,
-    'Posting message',
-    'Message post',
+    'Posting comment',
+    'Comment post',
   );
 };
