@@ -130,8 +130,6 @@ export const TokenSelectModal = (props: {
       <div
         className="multichain-option"
         title={name}
-        onClick={() => showModal()}
-        style={{ cursor: 'pointer' }}
       >
         <div className="multichain-option-content">
           <TokenDisplay
@@ -141,7 +139,6 @@ export const TokenSelectModal = (props: {
           />
         </div>
         <div className={'multichain-option-symbol'}>{symbol}</div>
-        <span className={'down-arrow'}></span>
       </div>
       <Modal
         visible={isModalVisible}
