@@ -1,5 +1,9 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { WalletNotConnectedError } from '../errors';
+import bs58 from 'bs58';
+import { deserializeBorsh, ParsedAccount } from '@oyster/common';
+import { ProgramAccountWithType } from '../core/accounts';
+import { Schema } from 'borsh';
 
 export interface IWallet {
   publicKey: PublicKey;
@@ -63,3 +67,71 @@ export const pubkeyFilter = (
   offset: number,
   pubkey: PublicKey | undefined | null,
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
+
+export async function getBorshProgramAccounts<
+  TAccount extends ProgramAccountWithType
+>(
+  programId: PublicKey,
+  borshSchema: Schema,
+  endpoint: string,
+  accountFactory: new (args: any) => TAccount,
+  filters: MemcmpFilter[] = [],
+  accountType?: number,
+) {
+  accountType = accountType ?? new accountFactory({}).accountType;
+
+  let getProgramAccounts = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getProgramAccounts',
+      params: [
+        programId.toBase58(),
+        {
+          commitment: 'single',
+          encoding: 'base64',
+          filters: [
+            {
+              memcmp: {
+                offset: 0,
+                bytes: bs58.encode([accountType]),
+              },
+            },
+            ...filters.map(f => ({
+              memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
+            })),
+          ],
+        },
+      ],
+    }),
+  });
+  const rawAccounts = (await getProgramAccounts.json())['result'];
+  let accounts: { [pubKey: string]: ParsedAccount<TAccount> } = {};
+
+  for (let rawAccount of rawAccounts) {
+    try {
+      const account = {
+        pubkey: new PublicKey(rawAccount.pubkey),
+        account: {
+          ...rawAccount.account,
+          data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
+        },
+        info: deserializeBorsh(
+          borshSchema,
+          accountFactory,
+          Buffer.from(rawAccount.account.data[0], 'base64'),
+        ),
+      };
+
+      accounts[account.pubkey.toBase58()] = account;
+    } catch (ex) {
+      console.error(`Can't deserialize ${accountFactory}`, ex);
+    }
+  }
+
+  return accounts;
+}
