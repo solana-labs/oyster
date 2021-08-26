@@ -73,22 +73,9 @@ export const toChainSymbol = (chain: number | null) => {
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
   let defaultChain = 'ETH';
-  let defaultToken = tokens[0].symbol;
+  // TODO: Make it robust for re-naming or changing mint & etc.
+  let defaultToken = 'CCAI';
 
-  const nameToToken = tokens.reduce((map, item) => {
-    map.set(item.symbol, item);
-    return map;
-  }, new Map<string, any>());
-
-  if (search) {
-    const urlParams = new URLSearchParams(search);
-    const from = urlParams.get('from');
-    defaultChain = from === 'SOL' ? from : 'ETH';
-    const token = urlParams.get('token') || defaultToken;
-    if (nameToToken.has(token)) {
-      defaultToken = token;
-    }
-  }
   return {
     defaultChain,
     defaultToken,
