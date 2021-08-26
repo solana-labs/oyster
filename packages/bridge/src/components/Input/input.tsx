@@ -68,7 +68,8 @@ export function Input(props: {
         <div className="input-select">
           <TokenSelectModal
             onSelectToken={token => props.setAsset(token)}
-            onChain={(chain: ASSET_CHAIN) => props.onChain(chain)}
+            // onChain={(chain: ASSET_CHAIN) => props.onChain(chain)}
+            onChain={() => {}}
             asset={props.asset}
             chain={props.chain}
             showIconChain={false}
