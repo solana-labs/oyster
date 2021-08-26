@@ -85,7 +85,10 @@ export const toSolana = async (
         if (request.info.mint) {
           mintKey = new PublicKey(request.info.mint);
         } else {
-          mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+          // mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+          mintKey = new PublicKey(request.info?.assetAddress);
+          // mintKey = new PublicKey('E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp')
+          // console.log('prepare phase mintKey.toBase58(): ', mintKey.toBase58())
         }
 
         const recipientKey =
