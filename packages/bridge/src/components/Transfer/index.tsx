@@ -125,7 +125,7 @@ export const Transfer = () => {
           </span>}
           visible={popoverVisible}
         >
-          <Button
+          {/* <Button
             className="swap-button"
             style={{ padding: 0 }}
             disabled={false}
@@ -139,7 +139,7 @@ export const Transfer = () => {
             }}
           >
             <span></span>
-          </Button>
+          </Button> */}
         </Popover>
         <Input
           title={`To`}
@@ -308,7 +308,7 @@ export const Transfer = () => {
             : LABELS.TRANSFER
           : LABELS.SET_CORRECT_WALLET_NETWORK}
       </Button>
-      <RecentTransactionsTable tokenAccounts={tokenAccounts} />
+      {/* <RecentTransactionsTable tokenAccounts={tokenAccounts} /> */}
     </>
   );
 };
