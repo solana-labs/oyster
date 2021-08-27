@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { notification, Spin, Button, Popover } from 'antd';
 import {contexts, useUserAccounts} from '@oyster/common';
 import { Input } from '../Input';
@@ -17,6 +17,7 @@ import { TokenDisplay } from '../TokenDisplay';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
+import { useUnload } from '../../hooks/useUnload'
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
 import { useBridge } from '../../contexts/bridge';
 import { WarningOutlined } from '@ant-design/icons';
@@ -56,6 +57,10 @@ export const Transfer = () => {
   } = useTokenChainPairState();
 
   const [popoverVisible, setPopoverVisible] = useState(true)
+  const [transferStatus, setTransferStatus] = useState({ inProcess: false })
+  const transferStateRef = useRef(transferStatus)
+  transferStateRef.current = transferStatus
+
 
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
@@ -91,6 +96,19 @@ export const Transfer = () => {
       userAccounts.filter(u => u.info.mint.toBase58() === request.info?.mint),
     [request.info?.mint],
   );
+
+  useUnload(e => {
+    e.preventDefault();
+
+    if (!transferStateRef.current.inProcess) {
+      return
+    }
+
+    const message = `Please do not leave transfering before it's complete, otherwise it might be a reason of losing funds due transfer`
+    e.returnValue = message
+
+    return message
+  })
 
   return (
     <>
@@ -181,6 +199,7 @@ export const Transfer = () => {
             useEffect(() => {
               (async () => {
                 let steps: ProgressUpdate[] = [];
+                setTransferStatus({ inProcess: true })
                 try {
                   if (request.from === ASSET_CHAIN.Solana) {
                     await fromSolana(
@@ -224,6 +243,7 @@ export const Transfer = () => {
                   // TODO...
                   console.log(err);
                 }
+                setTransferStatus({ inProcess: false })
               })();
             }, [setActiveSteps]);
 
