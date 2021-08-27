@@ -185,7 +185,7 @@ export const Transfer = () => {
         className={'transfer-button'}
         type="primary"
         size="large"
-        disabled={!(A.amount && B.amount) || !connected || !provider}
+        disabled={!(A.amount && B.amount) || !connected || !provider || transferStatus.inProcess}
         onClick={async () => {
           if (!wallet || !provider) {
             return;
