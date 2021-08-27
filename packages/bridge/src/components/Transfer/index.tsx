@@ -133,7 +133,8 @@ export const Transfer = () => {
           }}
           className={'left'}
         />
-        <Popover
+
+        {/* <Popover
           placement="top"
           title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
           content={<span style={{textAlign: "center"}}>
@@ -142,7 +143,7 @@ export const Transfer = () => {
               <br/>If possible please wait with moving funds, otherwise please plan for migration soon.</p>
           </span>}
           visible={popoverVisible}
-        >
+        > */}
           {/* <Button
             className="swap-button"
             style={{ padding: 0 }}
@@ -158,7 +159,7 @@ export const Transfer = () => {
           >
             <span></span>
           </Button> */}
-        </Popover>
+        {/* </Popover> */}
         <Input
           title={`To`}
           asset={request.asset}
