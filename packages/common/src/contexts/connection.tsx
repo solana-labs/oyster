@@ -36,6 +36,11 @@ export type ENV =
 
 export const ENDPOINTS = [
   {
+    name: 'mainnet-beta (Aldrin)' as ENV,
+    endpoint: 'https://api-cryptocurrencies-ai.rpcpool.com',
+    ChainId: ChainId.MainnetBeta,
+  },
+  {
     name: 'mainnet-beta (Serum)' as ENV,
     endpoint: 'https://solana-api.projectserum.com/',
     ChainId: ChainId.MainnetBeta,
