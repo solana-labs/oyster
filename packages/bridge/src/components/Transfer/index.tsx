@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { notification, Spin, Button, Popover } from 'antd';
-import {contexts, useUserAccounts} from '@oyster/common';
+import { contexts, useUserAccounts } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
@@ -17,7 +17,7 @@ import { TokenDisplay } from '../TokenDisplay';
 import { useTokenChainPairState } from '../../contexts/chainPair';
 import { LABELS } from '../../constants';
 import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
-import { useUnload } from '../../hooks/useUnload'
+import { useUnload } from '../../hooks/useUnload';
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
 import { useBridge } from '../../contexts/bridge';
 import { WarningOutlined } from '@ant-design/icons';
@@ -48,19 +48,13 @@ export const Transfer = () => {
   const { provider, tokenMap } = useEthereum();
   const { userAccounts } = useUserAccounts();
   const hasCorrespondingNetworks = useCorrectNetwork();
-  const {
-    A,
-    B,
-    mintAddress,
-    setMintAddress,
-    setLastTypedAccount,
-  } = useTokenChainPairState();
+  const { A, B, mintAddress, setMintAddress, setLastTypedAccount } =
+    useTokenChainPairState();
 
-  const [popoverVisible, setPopoverVisible] = useState(true)
-  const [transferStatus, setTransferStatus] = useState({ inProcess: false })
-  const transferStateRef = useRef(transferStatus)
-  transferStateRef.current = transferStatus
-
+  const [popoverVisible, setPopoverVisible] = useState(true);
+  const [transferStatus, setTransferStatus] = useState({ inProcess: false });
+  const transferStateRef = useRef(transferStatus);
+  transferStateRef.current = transferStatus;
 
   const [request, setRequest] = useState<TransferRequest>({
     from: ASSET_CHAIN.Ethereum,
@@ -101,14 +95,14 @@ export const Transfer = () => {
     e.preventDefault();
 
     if (!transferStateRef.current.inProcess) {
-      return
+      return;
     }
 
-    const message = `Please do not leave transfering before it's complete, otherwise it might be a reason of losing funds due transfer`
-    e.returnValue = message
+    const message = `Please do not leave transfering before it's complete, otherwise it might be a reason of losing funds due transfer`;
+    e.returnValue = message;
 
-    return message
-  })
+    return message;
+  });
 
   return (
     <>
@@ -133,7 +127,158 @@ export const Transfer = () => {
           }}
           className={'left'}
         />
+        <Button
+          className={'transfer-button'}
+          type="primary"
+          size="large"
+          disabled={
+            !(A.amount && B.amount) ||
+            !connected ||
+            !provider ||
+            transferStatus.inProcess
+          }
+          onClick={async () => {
+            if (!wallet || !provider) {
+              return;
+            }
 
+            const token = tokenMap.get(request.asset?.toLowerCase() || '');
+            const NotificationContent = () => {
+              const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
+                [],
+              );
+              useEffect(() => {
+                (async () => {
+                  let steps: ProgressUpdate[] = [];
+                  setTransferStatus({ inProcess: true });
+                  try {
+                    if (request.from === ASSET_CHAIN.Solana) {
+                      await fromSolana(
+                        connection,
+                        wallet,
+                        request,
+                        provider,
+                        update => {
+                          if (update.replace) {
+                            steps.pop();
+                            steps = [...steps, update];
+                          } else {
+                            steps = [...steps, update];
+                          }
+
+                          setActiveSteps(steps);
+                        },
+                        bridge,
+                      );
+                    }
+
+                    if (request.to === ASSET_CHAIN.Solana) {
+                      await toSolana(
+                        connection,
+                        wallet,
+                        request,
+                        provider,
+                        update => {
+                          if (update.replace) {
+                            steps.pop();
+                            steps = [...steps, update];
+                          } else {
+                            steps = [...steps, update];
+                          }
+
+                          setActiveSteps(steps);
+                        },
+                      );
+                    }
+                  } catch (err) {
+                    // TODO...
+                    console.log(err);
+                  }
+                  setTransferStatus({ inProcess: false });
+                })();
+              }, [setActiveSteps]);
+
+              return (
+                <div>
+                  <div style={{ display: 'flex' }}>
+                    <div>
+                      <h5>{`${chainToName(
+                        request.from,
+                      )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
+                      <h2>
+                        {request.amount?.toString()} {request.info?.name}
+                      </h2>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        marginLeft: 'auto',
+                        marginRight: 10,
+                      }}
+                    >
+                      <TokenDisplay
+                        asset={request.asset}
+                        chain={request.from}
+                        token={token}
+                      />
+                      <span style={{ margin: 15 }}>{'➔'}</span>
+                      <TokenDisplay
+                        asset={request.asset}
+                        chain={request.to}
+                        token={token}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      textAlign: 'left',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    {(() => {
+                      let group = '';
+                      return activeSteps.map((step, i) => {
+                        let prevGroup = group;
+                        group = step.group;
+                        let newGroup = prevGroup !== group;
+                        return (
+                          <>
+                            {newGroup && <span>{group}</span>}
+                            <span style={{ marginLeft: 15 }}>
+                              {typeToIcon(
+                                step.type,
+                                activeSteps.length - 1 === i,
+                              )}{' '}
+                              {step.message}
+                            </span>
+                          </>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              );
+            };
+
+            notification.open({
+              message: '',
+              duration: 0,
+              placement: 'bottomLeft',
+              description: <NotificationContent />,
+              className: 'custom-class',
+              style: {
+                width: 500,
+              },
+            });
+          }}
+        >
+          {hasCorrespondingNetworks
+            ? !(A.amount && B.amount)
+              ? LABELS.ENTER_AMOUNT
+              : LABELS.TRANSFER
+            : LABELS.SET_CORRECT_WALLET_NETWORK}
+        </Button>
         {/* <Popover
           placement="top"
           title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
@@ -144,7 +289,7 @@ export const Transfer = () => {
           </span>}
           visible={popoverVisible}
         > */}
-          {/* <Button
+        {/* <Button
             className="swap-button"
             style={{ padding: 0 }}
             disabled={false}
@@ -182,153 +327,6 @@ export const Transfer = () => {
         />
       </div>
 
-      <Button
-        className={'transfer-button'}
-        type="primary"
-        size="large"
-        disabled={!(A.amount && B.amount) || !connected || !provider || transferStatus.inProcess}
-        onClick={async () => {
-          if (!wallet || !provider) {
-            return;
-          }
-
-          const token = tokenMap.get(request.asset?.toLowerCase() || '');
-          const NotificationContent = () => {
-            const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
-              [],
-            );
-            useEffect(() => {
-              (async () => {
-                let steps: ProgressUpdate[] = [];
-                setTransferStatus({ inProcess: true })
-                try {
-                  if (request.from === ASSET_CHAIN.Solana) {
-                    await fromSolana(
-                      connection,
-                      wallet,
-                      request,
-                      provider,
-                      update => {
-                        if (update.replace) {
-                          steps.pop();
-                          steps = [...steps, update];
-                        } else {
-                          steps = [...steps, update];
-                        }
-
-                        setActiveSteps(steps);
-                      },
-                      bridge,
-                    );
-                  }
-
-                  if (request.to === ASSET_CHAIN.Solana) {
-                    await toSolana(
-                      connection,
-                      wallet,
-                      request,
-                      provider,
-                      update => {
-                        if (update.replace) {
-                          steps.pop();
-                          steps = [...steps, update];
-                        } else {
-                          steps = [...steps, update];
-                        }
-
-                        setActiveSteps(steps);
-                      },
-                    );
-                  }
-                } catch (err) {
-                  // TODO...
-                  console.log(err);
-                }
-                setTransferStatus({ inProcess: false })
-              })();
-            }, [setActiveSteps]);
-
-            return (
-              <div>
-                <div style={{ display: 'flex' }}>
-                  <div>
-                    <h5>{`${chainToName(request.from)} Mainnet -> ${chainToName(
-                      request.to,
-                    )} Mainnet`}</h5>
-                    <h2>
-                      {request.amount?.toString()} {request.info?.name}
-                    </h2>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      marginLeft: 'auto',
-                      marginRight: 10,
-                    }}
-                  >
-                    <TokenDisplay
-                      asset={request.asset}
-                      chain={request.from}
-                      token={token}
-                    />
-                    <span style={{ margin: 15 }}>{'➔'}</span>
-                    <TokenDisplay
-                      asset={request.asset}
-                      chain={request.to}
-                      token={token}
-                    />
-                  </div>
-                </div>
-                <div
-                  style={{
-                    textAlign: 'left',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  {(() => {
-                    let group = '';
-                    return activeSteps.map((step, i) => {
-                      let prevGroup = group;
-                      group = step.group;
-                      let newGroup = prevGroup !== group;
-                      return (
-                        <>
-                          {newGroup && <span>{group}</span>}
-                          <span style={{ marginLeft: 15 }}>
-                            {typeToIcon(
-                              step.type,
-                              activeSteps.length - 1 === i,
-                            )}{' '}
-                            {step.message}
-                          </span>
-                        </>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-            );
-          };
-
-          notification.open({
-            message: '',
-            duration: 0,
-            placement: 'bottomLeft',
-            description: <NotificationContent />,
-            className: 'custom-class',
-            style: {
-              width: 500,
-            },
-          });
-        }}
-      >
-        {hasCorrespondingNetworks
-          ? !(A.amount && B.amount)
-            ? LABELS.ENTER_AMOUNT
-            : LABELS.TRANSFER
-          : LABELS.SET_CORRECT_WALLET_NETWORK}
-      </Button>
       {/* <RecentTransactionsTable tokenAccounts={tokenAccounts} /> */}
     </>
   );

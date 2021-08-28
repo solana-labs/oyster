@@ -16,8 +16,10 @@ import {
 import { TokenInfo } from '@solana/spl-token-registry';
 import {
   ASSET_CHAIN,
+  ETHtokenAddress,
   filterModalEthTokens,
   filterModalSolTokens,
+  SPLtokenAddress,
 } from '../utils/assets';
 import { useEthereum } from './ethereum';
 import { BigNumber } from 'bignumber.js';
@@ -51,9 +53,8 @@ export interface TokenChainPairContextState {
   setLastTypedAccount: (chain: ASSET_CHAIN) => void;
 }
 
-const TokenChainPairContext = React.createContext<TokenChainPairContextState | null>(
-  null,
-);
+const TokenChainPairContext =
+  React.createContext<TokenChainPairContextState | null>(null);
 
 const isValidAddress = (address: string) => {
   try {

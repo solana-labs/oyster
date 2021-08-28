@@ -17,11 +17,18 @@ import { PhantomWalletAdapter } from '../wallet-adapters/phantom';
 import { TorusWalletAdapter } from '../wallet-adapters/torus';
 import { useLocation } from 'react-router';
 import { LedgerWalletAdapter } from '@solana/wallet-ledger';
-import {MathWalletAdapter} from "../wallet-adapters/mathWallet";
+import { MathWalletAdapter } from '../wallet-adapters/mathWallet';
+import { AldrinWalletAdapter } from '../wallet-adapters/aldrin/AldrinWalletAdapter';
 
 const ASSETS_URL =
   'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
 export const WALLET_PROVIDERS = [
+  {
+    name: 'Aldrin',
+    url: 'https://wallet.aldrin.com',
+    icon: 'https://aldrin.com/logo.png',
+    adapter: AldrinWalletAdapter,
+  },
   {
     name: 'Phantom',
     url: 'https://www.phantom.app',
