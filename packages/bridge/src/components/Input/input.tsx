@@ -49,7 +49,7 @@ export function Input(props: {
           value={
             parseFloat(lastAmount || '0.00') === props.amount
               ? lastAmount
-              : props.amount?.toFixed(6)?.toString()
+              : props.amount?.toFixed(2)?.toString()
           }
           onChange={(val: string) => {
             if (props.onInputChange && parseFloat(val) !== props.amount) {

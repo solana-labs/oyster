@@ -76,7 +76,12 @@ export const TokenSelectModal = (props: {
   ) => {
     const isRinToken = token?.address === SPLtokenAddress;
     let name = isRinToken ? 'Aldrin' : token?.name || '';
-    let symbol = isRinToken ? 'RIN' : token?.symbol || '';
+    let symbol =
+      isRinToken && chain === 1
+        ? 'RIN'
+        : isRinToken && chain === 2
+        ? 'WWT'
+        : token?.symbol || '';
     if (token && chain !== ASSET_CHAIN.Solana) {
       if ((token.tags || []).indexOf('wormhole') >= 0) {
         name = name.replace('(Wormhole)', '').trim();
