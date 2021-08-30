@@ -16,10 +16,8 @@ import {
 import { TokenInfo } from '@solana/spl-token-registry';
 import {
   ASSET_CHAIN,
-  ETHtokenAddress,
   filterModalEthTokens,
   filterModalSolTokens,
-  SPLtokenAddress,
 } from '../utils/assets';
 import { useEthereum } from './ethereum';
 import { BigNumber } from 'bignumber.js';

@@ -6,7 +6,7 @@ import './style.less';
 import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { ASSET_CHAIN, SPLtokenAddress } from '../../utils/assets';
+import { ASSET_CHAIN, RIN_SOLANA_MINT } from '../../utils/assets';
 import { useConnectionConfig } from '@oyster/common';
 import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
 import { TokenInfo } from '@solana/spl-token-registry';
@@ -74,7 +74,7 @@ export const TokenSelectModal = (props: {
     token: TokenInfo | undefined,
     chain: ASSET_CHAIN | undefined,
   ) => {
-    const isRinToken = token?.address === SPLtokenAddress;
+    const isRinToken = token?.address === RIN_SOLANA_MINT;
     let name = isRinToken ? 'Aldrin' : token?.name || '';
     let symbol =
       isRinToken && chain === 1

@@ -3,7 +3,7 @@ import { TokenInfo } from '@solana/spl-token-registry';
 import { debug } from 'console';
 import React from 'react';
 import { useEthereum } from '../../contexts';
-import { ASSET_CHAIN, SPLtokenAddress } from '../../utils/assets';
+import { ASSET_CHAIN, RIN_SOLANA_MINT } from '../../utils/assets';
 import './style.less';
 import { TokenChain } from './tokenChain';
 import RinLogo from '../../assets/rinLogo.svg';
@@ -19,7 +19,7 @@ export const TokenDisplay = ({
   token?: TokenInfo;
   logo?: string;
 }) => {
-  const isRinToken = token?.address === SPLtokenAddress;
+  const isRinToken = token?.address === RIN_SOLANA_MINT;
   return (
     <div className="token-chain-logo">
       <img
