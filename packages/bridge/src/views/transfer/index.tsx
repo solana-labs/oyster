@@ -8,7 +8,6 @@ export const TransferView = () => {
     <>
       <div className="flexColumn transfer-bg" style={{ flex: 1 }}>
         <Transfer />
-
         <div className="warning-box">
           <h2>Warning</h2>
           <span>
