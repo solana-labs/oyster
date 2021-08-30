@@ -12,6 +12,7 @@ import {
   toSolana,
   TransferRequest,
 } from '@solana/bridge-sdk';
+import { getETHAccountBalance } from '@solana/bridge-sdk';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { useTokenChainPairState } from '../../contexts/chainPair';
@@ -21,6 +22,8 @@ import { useUnload } from '../../hooks/useUnload'
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
 import { useBridge } from '../../contexts/bridge';
 import { WarningOutlined } from '@ant-design/icons';
+import { BN } from 'bn.js';
+import BigNumber from 'bignumber.js';
 
 const { useConnection } = contexts.Connection;
 const { useWallet } = contexts.Wallet;
@@ -45,7 +48,7 @@ export const Transfer = () => {
   const connection = useConnection();
   const bridge = useBridge();
   const { wallet, connected } = useWallet();
-  const { provider, tokenMap } = useEthereum();
+  const { provider, tokenMap, signer, accounts } = useEthereum();
   const { userAccounts } = useUserAccounts();
   const hasCorrespondingNetworks = useCorrectNetwork();
   const {
@@ -56,7 +59,10 @@ export const Transfer = () => {
     setLastTypedAccount,
   } = useTokenChainPairState();
 
-  const [popoverVisible, setPopoverVisible] = useState(true)
+  const [popoverVisible, setPopoverVisible] = useState(false)
+  const [isEnoughtETHBalance, setIsEnoughtETHBalance] = useState(true)
+  const [isEnoughtSOLBalance, setIsEnoughtSOLBalance] = useState(true)
+
   const [transferStatus, setTransferStatus] = useState({ inProcess: false })
   const transferStateRef = useRef(transferStatus)
   transferStateRef.current = transferStatus
@@ -66,6 +72,54 @@ export const Transfer = () => {
     from: ASSET_CHAIN.Ethereum,
     to: ASSET_CHAIN.Solana,
   });
+
+  useEffect(() => {
+    async function checkBalances() {
+      if (!wallet || !provider || !wallet.publicKey || !accounts || !accounts.length) {
+        return;
+      }
+
+      let shouldOpenPopup = false
+
+      try {
+        const SOL_DECIMAL = 9
+        const ADD_TOKEN_COST = 0.002039
+        const rawSOLBalance = await connection.getBalance(wallet.publicKey)
+        const SOLBalance = rawSOLBalance / Math.pow(10, SOL_DECIMAL)
+
+        if (SOLBalance < ADD_TOKEN_COST) {
+          shouldOpenPopup = true
+          setIsEnoughtSOLBalance(false)
+          // console.log('Warning: your SOL balance is too little')
+        }
+
+      } catch (e) {
+        console.log(e)
+      }
+
+      try {
+        const gweiCountInEachEth = `1000000000000000000`
+        const rawETHBalance = await getETHAccountBalance(accounts[0])
+        const ETHBalance = (new BigNumber(rawETHBalance).div(new BigNumber(gweiCountInEachEth))).toNumber()
+        const cost = 0.1
+
+        if (ETHBalance < cost) {
+          shouldOpenPopup = true
+          setIsEnoughtETHBalance(false)
+          // console.log('Warning: your ETH balance is too little')
+
+        }
+      } catch(e) {
+        console.log(e)
+      }
+
+      if (shouldOpenPopup) {
+        setPopoverVisible(true)
+      }
+    }
+
+    checkBalances()
+  }, [wallet, connected, provider, accounts, isEnoughtSOLBalance, isEnoughtETHBalance])
 
   useEffect(() => {
     if (mintAddress && !request.asset) {
@@ -134,16 +188,27 @@ export const Transfer = () => {
           className={'left'}
         />
 
-        {/* <Popover
+        <Popover
           placement="top"
           title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
-          content={<span style={{textAlign: "center"}}>
-            <WarningOutlined style={{ fontSize: '40px', color: '#ccae00' }} />
-            <p>Wormhole is upgrading on-chain contracts to v2 in next 2 weeks.
-              <br/>If possible please wait with moving funds, otherwise please plan for migration soon.</p>
-          </span>}
+          content={
+          <span style={{textAlign: "center"}}>
+            <WarningOutlined style={{ fontSize: '40px', color: '#ccae00', padding: '1.5rem' }} />
+            {!isEnoughtETHBalance && (
+              <p>Your ETH balance is less than 0.1, and it might be fine enough, however, <br/>
+                we recommend to have at least 0.1 ETH to be able to process transaction on Ethereum side, <br/>
+                since the gas for that transaction might be up to 0.1 ETH</p>
+            )}
+            {!isEnoughtSOLBalance && (
+              <p>
+                Your SOL balance is less than 0.002039, and it might be fine enough, however, <br/>
+                we recommend to have at least 0.002039 SOL to be able to process transaction on Solana side, <br/>
+                since you should create your RIN (ex. CCAI) token to recive the WWT token</p>
+            )}
+          </span>
+          }
           visible={popoverVisible}
-        > */}
+          />
           {/* <Button
             className="swap-button"
             style={{ padding: 0 }}
@@ -186,9 +251,9 @@ export const Transfer = () => {
         className={'transfer-button'}
         type="primary"
         size="large"
-        disabled={!(A.amount && B.amount) || !connected || !provider || transferStatus.inProcess}
+        disabled={!(A.amount && B.amount) || !connected || !provider || transferStatus.inProcess || popoverVisible}
         onClick={async () => {
-          if (!wallet || !provider) {
+          if (!wallet || !provider || !wallet.publicKey) {
             return;
           }
 
