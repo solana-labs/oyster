@@ -75,5 +75,6 @@ export const filterModalEthTokens = (tokens: TokenInfo[]) => {
   );
 };
 
-export const SPLtokenAddress = 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp';
-export const ETHtokenAddress = '0x07ca256267128fbe1a79b74fc7b0e6ed3359ad08';
+export const RIN_SOLANA_MINT = 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp';
+export const WWT_RIN_ETHEREUM_MINT =
+  '0x07ca256267128fbe1a79b74fc7b0e6ed3359ad08';
