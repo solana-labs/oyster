@@ -32,7 +32,7 @@ export const HelpView = () => {
             <Button
               className="action-button"
               onClick={() =>
-                window.open('https://github.com/certusone/wormhole', '_blank')
+                window.open('https://github.com/solana-labs/oyster', '_blank')
               }
             >
               View the Code
