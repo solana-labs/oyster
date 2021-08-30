@@ -1,4 +1,4 @@
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import React from 'react';
 import { contexts } from '@oyster/common';
 import { MarketProvider, EthereumProvider } from './contexts';
@@ -36,18 +36,19 @@ export function Routes() {
                         <TokenChainPairProvider>
                           <AppLayout>
                             <Switch>
-                              <Route
+                              {/* <Route
                                 exact
                                 path="/"
                                 component={() => <HomeView />}
-                              />
+                              /> */}
+                              <Redirect exact from="/" to="/move" />
                               <Route path="/move" children={<TransferView />} />
                               {/*<Route path="/faq" children={<FaqView />} />*/}
-                              <Route
+                              {/* <Route
                                 path="/proof-of-assets"
                                 children={<ProofOfAssetsView />}
-                              />
-                              <Route path="/help" children={<HelpView />} />
+                              /> */}
+                              {/* <Route path="/help" children={<HelpView />} />
                               <Route
                                 exact
                                 path="/faucet"
@@ -57,7 +58,7 @@ export function Routes() {
                                 exact
                                 path="/debug-renbtc"
                                 children={<RenbtcDebugView />}
-                              />
+                              /> */}
                             </Switch>
                           </AppLayout>
                         </TokenChainPairProvider>

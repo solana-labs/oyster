@@ -6,7 +6,7 @@ import './style.less';
 import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
-import { ASSET_CHAIN } from '../../utils/assets';
+import { ASSET_CHAIN, RIN_SOLANA_MINT } from '../../utils/assets';
 import { useConnectionConfig } from '@oyster/common';
 import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
 import { TokenInfo } from '@solana/spl-token-registry';
@@ -24,21 +24,20 @@ export const TokenSelectModal = (props: {
   const [search, setSearch] = useState<string>('');
 
   const inputRef = useRef<Input>(null);
-  const tokens = useMemo(
-    () => {
-      const ethAddresses = ethTokens.reduce((set, t) => {
-        if(t.address) {
-          set.add(t.address.toLowerCase());
-        }
-        return set;
-      }, new Set<string>());
-      return [
-        ...filterModalEthTokens(ethTokens),
-        ...filterModalSolTokens(solTokens).filter(t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase())),
-      ];
-    },
-    [ethTokens, solTokens],
-  );
+  const tokens = useMemo(() => {
+    const ethAddresses = ethTokens.reduce((set, t) => {
+      if (t.address) {
+        set.add(t.address.toLowerCase());
+      }
+      return set;
+    }, new Set<string>());
+    return [
+      ...filterModalEthTokens(ethTokens),
+      ...filterModalSolTokens(solTokens).filter(
+        t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase()),
+      ),
+    ];
+  }, [ethTokens, solTokens]);
 
   const tokenList = useMemo(() => {
     if (tokens && search) {
@@ -71,24 +70,35 @@ export const TokenSelectModal = (props: {
     setSearch(val);
   });
 
-  const getTokenInfo = (token: TokenInfo | undefined, chain: ASSET_CHAIN | undefined) => {
-    let name = token?.name || '';
-    let symbol = token?.symbol || '';
+  const getTokenInfo = (
+    token: TokenInfo | undefined,
+    chain: ASSET_CHAIN | undefined,
+  ) => {
+    const isRinToken = token?.address === RIN_SOLANA_MINT;
+    let name = isRinToken ? 'Aldrin' : token?.name || '';
+    let symbol =
+      isRinToken && chain === 1
+        ? 'RIN'
+        : isRinToken && chain === 2
+        ? 'WWT'
+        : token?.symbol || '';
     if (token && chain !== ASSET_CHAIN.Solana) {
-      if((token.tags || []).indexOf('wormhole') >= 0) {
+      if ((token.tags || []).indexOf('wormhole') >= 0) {
         name = name.replace('(Wormhole)', '').trim();
-        symbol = symbol.startsWith('w') ? symbol.slice(1, symbol.length) : symbol;
+        symbol = symbol.startsWith('w')
+          ? symbol.slice(1, symbol.length)
+          : symbol;
       }
     }
 
     return { name, symbol };
-  }
+  };
 
   const rowRender = (rowProps: { index: number; key: string; style: any }) => {
     const token = tokenList[rowProps.index];
     const mint = token.address;
     return [ASSET_CHAIN.Solana, ASSET_CHAIN.Ethereum].map((chain, index) => {
-      const { name , symbol } = getTokenInfo(token, chain);
+      const { name, symbol } = getTokenInfo(token, chain);
       return (
         <div
           key={rowProps.key + mint + chain}
@@ -124,15 +134,10 @@ export const TokenSelectModal = (props: {
     });
   };
 
-  const { name , symbol } = getTokenInfo(firstToken, props.chain);
+  const { name, symbol } = getTokenInfo(firstToken, props.chain);
   return (
     <>
-      <div
-        className="multichain-option"
-        title={name}
-        onClick={() => showModal()}
-        style={{ cursor: 'pointer' }}
-      >
+      <div className="multichain-option" title={name}>
         <div className="multichain-option-content">
           <TokenDisplay
             asset={props.asset}
@@ -141,7 +146,6 @@ export const TokenSelectModal = (props: {
           />
         </div>
         <div className={'multichain-option-symbol'}>{symbol}</div>
-        <span className={'down-arrow'}></span>
       </div>
       <Modal
         visible={isModalVisible}

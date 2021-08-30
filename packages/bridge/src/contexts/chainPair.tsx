@@ -32,6 +32,7 @@ import { useBridge } from './bridge';
 import { PublicKey } from '@solana/web3.js';
 import { ethers } from 'ethers';
 import { deriveERC20Address } from '../utils/helpers';
+import { RIN_SOLANA_MINT } from '../utils/assets'
 
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
@@ -51,9 +52,8 @@ export interface TokenChainPairContextState {
   setLastTypedAccount: (chain: ASSET_CHAIN) => void;
 }
 
-const TokenChainPairContext = React.createContext<TokenChainPairContextState | null>(
-  null,
-);
+const TokenChainPairContext =
+  React.createContext<TokenChainPairContextState | null>(null);
 
 const isValidAddress = (address: string) => {
   try {
@@ -73,22 +73,8 @@ export const toChainSymbol = (chain: number | null) => {
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
   let defaultChain = 'ETH';
-  let defaultToken = tokens[0].symbol;
+  let defaultToken = RIN_SOLANA_MINT;
 
-  const nameToToken = tokens.reduce((map, item) => {
-    map.set(item.symbol, item);
-    return map;
-  }, new Map<string, any>());
-
-  if (search) {
-    const urlParams = new URLSearchParams(search);
-    const from = urlParams.get('from');
-    defaultChain = from === 'SOL' ? from : 'ETH';
-    const token = urlParams.get('token') || defaultToken;
-    if (nameToToken.has(token)) {
-      defaultToken = token;
-    }
-  }
   return {
     defaultChain,
     defaultToken,

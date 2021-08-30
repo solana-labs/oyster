@@ -22,6 +22,7 @@ import {
   WrappedMetaLayout,
 } from '@solana/bridge-sdk';
 
+import BN from 'bn.js';
 import bs58 from 'bs58';
 import {
   COINGECKO_COIN_PRICE_API,
@@ -168,8 +169,8 @@ const queryWrappedMetaAccounts = async (
         asset.mint = cache.get(key);
         if (asset.mint) {
           asset.amount =
-            asset.mint?.info.supply.toNumber() /
-            Math.pow(10, asset.mint?.info.decimals || 0);
+          (asset.mint?.info.supply.div(
+            new BN(10).pow(new BN(asset.mint?.info.decimals || 0)))).toNumber()
         }
 
         setExternalAssets([...assets.values()]);
