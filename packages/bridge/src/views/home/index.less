@@ -7,7 +7,7 @@ section.ant-layout {
 }
 
 .get-started {
-  background: url("/home/get-started.svg") center  center no-repeat;
+  background: url('/home/get-started.svg') center center no-repeat;
   background-size: 100%;
   cursor: pointer;
   width: 224px;
@@ -15,7 +15,7 @@ section.ant-layout {
   display: inline-block;
 }
 .down-arrow {
-  background: url("/home/icons/down-arrow.svg") center  center no-repeat;
+  background: url('/home/icons/down-arrow.svg') center center no-repeat;
   background-size: 150%;
   cursor: pointer;
   display: inline-block;
@@ -24,7 +24,12 @@ section.ant-layout {
 }
 .logo-title {
   /* SOLANA <-> ETHEREUM BRIDGE */
-  background: linear-gradient(90deg, #DC1FFF 11.29%, #4DA9FF 51.42%, #00CC82 93.23%);
+  background: linear-gradient(
+    90deg,
+    #dc1fff 11.29%,
+    #4da9ff 51.42%,
+    #00cc82 93.23%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 16px;
@@ -88,7 +93,7 @@ section.ant-layout {
     margin: auto;
     padding-bottom: 70px;
     .description-text {
-      color: @tungsten-60
+      color: @tungsten-60;
     }
     .ant-table-pagination.ant-pagination {
       margin: 16px 100px;
@@ -140,7 +145,7 @@ section.ant-layout {
 }
 
 footer.ant-layout-footer {
-  padding: 30px 0;
+  // padding: 30px 0;
   background-image: url('/home/footer.svg');
   background-size: 100% auto;
   background-repeat: no-repeat;
@@ -153,7 +158,6 @@ footer.ant-layout-footer {
   background-size: 100% auto;
   background-repeat: no-repeat;
 }
-
 
 @media screen and (max-width: 900px) {
   .justify-bottom-container {
@@ -171,11 +175,109 @@ footer.ant-layout-footer {
   }
 }
 
-
 @media screen and (max-width: 1200px) {
   .home-container {
     #recent-tx-container {
       max-width: 90%;
+    }
+  }
+}
+
+.guide-link {
+  color: #fff;
+  position: absolute;
+  font-size: 18px;
+  right: 15%;
+}
+
+@media screen and (max-width: 1200px) {
+  .guide-link {
+    right: 25%;
+  }
+}
+
+.warning-box {
+  width: 75%;
+  height: 110px;
+  border: 4px solid #fff;
+  margin: 136px auto 50px auto;
+  border-radius: 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    rgba(212, 77, 50, 0.384);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .header-warning {
+    text-align: center;
+    color: #fff;
+    font-size: 35px;
+    height: 100%;
+    // width: 20%;
+    border-right: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    font-weight: bold;
+    margin: auto 20px;
+    padding-right: 20px;
+  }
+
+  .description-warning {
+    text-align: left;
+    color: #fff;
+    font-size: 16px;
+    height: 100%;
+    // width: 75%;
+    margin: auto 20px;
+    display: inline;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    font-weight: 300;
+    a {
+      padding: 0 7px;
+      color: #fff;
+      text-decoration: underline;
+    }
+  }
+}
+
+@media screen and (max-width: 2000px) {
+  .warning-box {
+    width: 65%;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .warning-box {
+    width: 75%;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .warning-box {
+    .description-warning {
+      font-size: 13px;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .warning-box {
+    height: 200px;
+    flex-direction: column;
+    .header-warning {
+      border: none;
+      height: auto;
+    }
+    .description-warning {
+      text-align: center;
     }
   }
 }

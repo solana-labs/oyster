@@ -1,4 +1,4 @@
-@import "_colors";
+@import '_colors';
 
 .multichain-option {
   display: flex;
@@ -18,8 +18,9 @@
 .ccy-input {
   margin-top: 10px;
   margin-bottom: 10px;
-  .ant-select-single.ant-select-lg:not(.ant-select-customize-input) .ant-select-selector {
-      height: 70px;
+  .ant-select-single.ant-select-lg:not(.ant-select-customize-input)
+    .ant-select-selector {
+    height: 70px;
   }
   .ant-select-selector,
   .ant-select-selector:focus,
@@ -45,13 +46,13 @@
   }
 }
 
-.from-input .token-chain-logo{
-    position: absolute;
-    right: 20px;
+.from-input .token-chain-logo {
+  position: absolute;
+  right: 20px;
 }
-.to-input .token-chain-logo{
-    position: absolute;
-    right: 40px;
+.to-input .token-chain-logo {
+  position: absolute;
+  right: 40px;
 }
 .token-balance {
   color: grey;
@@ -91,7 +92,6 @@
   align-items: center;
   justify-self: flex-end;
   justify-content: flex-end;
-
 }
 
 .ant-select-dropdown {
@@ -102,16 +102,16 @@
   width: 342px;
   height: 342px;
 
-  border: 4px dotted;
+  border: 4.5px dashed;
   border-radius: 50%;
   box-sizing: border-box;
   &.left {
-    border-color: #6E1080;
+    border-color: #278bff;
   }
   &.right {
-    border-color: #008051;
+    border-color: #a5e898;
   }
-  .input-header{
+  .input-header {
     margin-top: 26px;
     display: block;
     text-align: center;
@@ -120,7 +120,7 @@
     font-size: 16px;
     line-height: 21px;
   }
-  .input-chain{
+  .input-chain {
     margin-top: 13px;
     font-style: normal;
     font-weight: normal;
@@ -133,13 +133,13 @@
       margin-top: 22px;
       font-size: 12px;
       line-height: 16px;
-      color: @tungsten-60
+      color: #fff;
     }
   }
 
-  .input-container{
+  .input-container {
     position: relative;
-    margin: 16px -36px 34px -36px ;
+    margin: 16px -36px 34px -36px;
     height: 66px;
 
     background-image: url('/transfer/input.svg');
@@ -169,10 +169,10 @@
       background-size: 100% 52px;
       background-repeat: no-repeat;
       .token-chain-logo {
-          position: relative;
-          width: auto;
-          height: auto;
-          display: flex;
+        position: relative;
+        width: auto;
+        height: auto;
+        display: flex;
       }
       .token-logo {
         width: 32px;
@@ -184,11 +184,11 @@
 
 .dashed-input-container {
   & > button.ant-btn:not(.ant-dropdown-trigger) {
-    text-transform: uppercase;
+    text-transform: none;
     color: white;
     width: 166px;
     font-size: 14px;
-    background: #E67828;
+    background: #621ae1;
     border-radius: 8px;
     height: 40px;
   }
@@ -211,7 +211,7 @@
     margin: 0;
     font-size: 16px;
     line-height: 21px;
-    color: #03E1FF;
+    color: #03e1ff;
     display: flex;
     justify-content: space-evenly;
     align-items: center;

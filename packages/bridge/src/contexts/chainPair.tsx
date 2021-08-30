@@ -51,9 +51,8 @@ export interface TokenChainPairContextState {
   setLastTypedAccount: (chain: ASSET_CHAIN) => void;
 }
 
-const TokenChainPairContext = React.createContext<TokenChainPairContextState | null>(
-  null,
-);
+const TokenChainPairContext =
+  React.createContext<TokenChainPairContextState | null>(null);
 
 const isValidAddress = (address: string) => {
   try {

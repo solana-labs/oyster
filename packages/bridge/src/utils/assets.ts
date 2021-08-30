@@ -74,3 +74,5 @@ export const filterModalEthTokens = (tokens: TokenInfo[]) => {
     token => EXCLUDED_ETH_TOKENS.indexOf(token.symbol.toLowerCase()) < 0,
   );
 };
+
+export const RIN_SOLANA_MINT = 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp';

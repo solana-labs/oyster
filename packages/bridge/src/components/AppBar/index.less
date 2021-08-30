@@ -1,5 +1,4 @@
-@import "_colors";
-
+@import '_colors';
 
 header.ant-layout-header.App-Bar {
   position: absolute;
@@ -13,7 +12,6 @@ header.ant-layout-header.App-Bar {
     cursor: pointer;
     display: none;
   }
-
 }
 
 .app-bar-item.logo {
@@ -48,24 +46,29 @@ header.ant-layout-header.App-Bar {
 }
 
 @media screen and (min-width: 901px) {
-   header.ant-layout-header.App-Bar  {
-     width: 100% !important;
-   }
+  header.ant-layout-header.App-Bar {
+    width: 100% !important;
+  }
 }
 @media screen and (max-width: 1200px) {
-
   .app-bar-item.logo {
     position: relative;
     left: 0;
   }
-  .app-bar-item.app-right{
+  .app-bar-item.app-right {
     position: relative;
     left: 0;
     padding: 0;
   }
 }
+
+@media screen and (max-width: 1000px) {
+  .app-bar-item.logo {
+    display: none;
+  }
+}
 @media screen and (max-width: 900px) {
-  header.ant-layout-header.App-Bar  {
+  header.ant-layout-header.App-Bar {
     position: fixed;
     transition: ease-in-out 0.5s;
     width: 0;
@@ -87,6 +90,10 @@ header.ant-layout-header.App-Bar {
       position: relative;
       transition: ease-in-out 0.5s;
       flex-direction: column;
+      .guide-link {
+        right: 30%;
+        top: 30px;
+      }
     }
     background: #06101a;
     & > .nav-burger.mobile-active {
@@ -97,6 +104,10 @@ header.ant-layout-header.App-Bar {
 
     .app-bar-inner.mobile-active {
       left: 0px;
+      .guide-link {
+        right: 30%;
+        top: 30px;
+      }
     }
   }
 }
