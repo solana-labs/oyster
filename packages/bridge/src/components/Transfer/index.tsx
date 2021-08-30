@@ -173,6 +173,44 @@ export const Transfer = () => {
 
   return (
     <>
+      <Popover
+        placement="bottom"
+        title={
+          <span
+            style={{ cursor: 'pointer' }}
+            onClick={() => setPopoverVisible(false)}
+          >
+            x
+          </span>
+        }
+        content={
+          <span style={{ textAlign: 'center' }}>
+            <WarningOutlined
+              style={{ fontSize: '40px', color: '#ccae00', padding: '1.5rem' }}
+            />
+            {!isEnoughtETHBalance && (
+              <p>
+                Your ETH balance is less than 0.1, and it might be fine enough,
+                however, <br />
+                we recommend to have at least 0.1 ETH to be able to process
+                transaction on Ethereum side, <br />
+                since the gas for that transaction might be up to 0.1 ETH
+              </p>
+            )}
+            {!isEnoughtSOLBalance && (
+              <p>
+                Your SOL balance is less than 0.002039, and it might be fine
+                enough, however, <br />
+                we recommend to have at least 0.002039 SOL to be able to process
+                transaction on Solana side, <br />
+                since you should create your RIN (ex. CCAI) token to recive the
+                WWT token
+              </p>
+            )}
+          </span>
+        }
+        visible={popoverVisible}
+      />
       <div className="exchange-card">
         <Input
           title={`From`}
@@ -368,45 +406,6 @@ export const Transfer = () => {
           className={'right'}
         />
       </div>
-
-      <Popover
-        placement="top"
-        title={
-          <span
-            style={{ cursor: 'pointer' }}
-            onClick={() => setPopoverVisible(false)}
-          >
-            x
-          </span>
-        }
-        content={
-          <span style={{ textAlign: 'center' }}>
-            <WarningOutlined
-              style={{ fontSize: '40px', color: '#ccae00', padding: '1.5rem' }}
-            />
-            {!isEnoughtETHBalance && (
-              <p>
-                Your ETH balance is less than 0.1, and it might be fine enough,
-                however, <br />
-                we recommend to have at least 0.1 ETH to be able to process
-                transaction on Ethereum side, <br />
-                since the gas for that transaction might be up to 0.1 ETH
-              </p>
-            )}
-            {!isEnoughtSOLBalance && (
-              <p>
-                Your SOL balance is less than 0.002039, and it might be fine
-                enough, however, <br />
-                we recommend to have at least 0.002039 SOL to be able to process
-                transaction on Solana side, <br />
-                since you should create your RIN (ex. CCAI) token to recive the
-                WWT token
-              </p>
-            )}
-          </span>
-        }
-        visible={popoverVisible}
-      />
     </>
   );
 };
