@@ -72,9 +72,9 @@ export const toChainSymbol = (chain: number | null) => {
 };
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
+  const CCAI_MINT = 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp'
   let defaultChain = 'ETH';
-  // TODO: Make it robust for re-naming or changing mint & etc.
-  let defaultToken = 'CCAI';
+  let defaultToken = CCAI_MINT;
 
   return {
     defaultChain,
