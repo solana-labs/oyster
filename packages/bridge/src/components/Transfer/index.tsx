@@ -409,33 +409,6 @@ export const Transfer = () => {
             </label>
           </div>
         </div>
-
-        {/* <Popover
-          placement="top"
-          title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
-          content={<span style={{textAlign: "center"}}>
-            <WarningOutlined style={{ fontSize: '40px', color: '#ccae00' }} />
-            <p>Wormhole is upgrading on-chain contracts to v2 in next 2 weeks.
-              <br/>If possible please wait with moving funds, otherwise please plan for migration soon.</p>
-          </span>}
-          visible={popoverVisible}
-        > */}
-        {/* <Button
-            className="swap-button"
-            style={{ padding: 0 }}
-            disabled={false}
-            onClick={() => {
-              const from = A.chain;
-              const toChain = B.chain;
-              if (from !== undefined && toChain !== undefined) {
-                A.setChain(toChain);
-                B.setChain(from);
-              }
-            }}
-          >
-            <span></span>
-          </Button> */}
-        {/* </Popover> */}
         <Input
           title={`To`}
           asset={request.asset}
