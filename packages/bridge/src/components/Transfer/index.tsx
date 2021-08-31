@@ -313,24 +313,24 @@ export const Transfer = () => {
                   })();
                 }, [setActiveSteps]);
 
-                return (
-                  <div>
-                    <div style={{ display: 'flex' }}>
-                      <div>
-                        <h5>{`${chainToName(
+              return (
+                <div>
+                  <div style={{ display: 'flex' }}>
+                    <div>
+                      <h5>{`${chainToName(
                           request.from,
-                        )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
-                        <h2>
-                          {request.amount?.toString()} {request.info?.name}
-                        </h2>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          marginLeft: 'auto',
-                          marginRight: 10,
-                        }}
-                      >
+                      )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
+                      <h2>
+                        {request.amount?.toString()} {request.info?.name}
+                      </h2>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        marginLeft: 'auto',
+                        marginRight: 10,
+                      }}
+                    >
                       <TokenDisplay
                         asset={request.asset}
                         chain={request.from}
