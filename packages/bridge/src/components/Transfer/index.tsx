@@ -240,20 +240,20 @@ export const Transfer = () => {
             alignItems: 'center',
           }}
         >
-          <Button
-            className={'transfer-button'}
-            type="primary"
-            size="large"
-            disabled={
-              !(A.amount && B.amount) ||
-              !connected ||
-              !provider ||
-              transferStatus.inProcess ||
-              !warningChecked
-            }
-            onClick={async () => {
-              if (!wallet || !provider) {
-                return;
+         <Button
+          className={'transfer-button'}
+          type="primary"
+          size="large"
+          disabled={
+            !(A.amount && B.amount) ||
+            !connected ||
+            !provider ||
+            transferStatus.inProcess ||
+            popoverVisible
+          }
+          onClick={async () => {
+            if (!wallet || !provider || !wallet.publicKey) {
+              return;
               }
 
              
