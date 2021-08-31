@@ -59,6 +59,7 @@ export const Transfer = () => {
 
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [transferStatus, setTransferStatus] = useState({ inProcess: false });
+  const [warningChecked, setWarningChecked] = useState(false);
   const transferStateRef = useRef(transferStatus);
   transferStateRef.current = transferStatus;
 
@@ -232,7 +233,14 @@ export const Transfer = () => {
           }}
           className={'left'}
         />
-        <Button
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+         <Button
           className={'transfer-button'}
           type="primary"
           size="large"
@@ -246,8 +254,9 @@ export const Transfer = () => {
           onClick={async () => {
             if (!wallet || !provider || !wallet.publicKey) {
               return;
-            }
+              }
 
+             
             const token = tokenMap.get(request.asset?.toLowerCase() || '');
             const NotificationContent = () => {
               const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
@@ -295,21 +304,21 @@ export const Transfer = () => {
                           setActiveSteps(steps);
                         },
                       );
+                      }
+                    } catch (err) {
+                      // TODO...
+                      console.log(err);
                     }
-                  } catch (err) {
-                    // TODO...
-                    console.log(err);
-                  }
-                  setTransferStatus({ inProcess: false });
-                })();
-              }, [setActiveSteps]);
+                    setTransferStatus({ inProcess: false });
+                  })();
+                }, [setActiveSteps]);
 
               return (
                 <div>
                   <div style={{ display: 'flex' }}>
                     <div>
                       <h5>{`${chainToName(
-                        request.from,
+                          request.from,
                       )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
                       <h2>
                         {request.amount?.toString()} {request.info?.name}
@@ -333,9 +342,9 @@ export const Transfer = () => {
                         chain={request.to}
                         token={token}
                       />
+                      </div>
                     </div>
-                  </div>
-                  <div
+                    <div
                     style={{
                       textAlign: 'left',
                       display: 'flex',
@@ -385,6 +394,21 @@ export const Transfer = () => {
               : LABELS.TRANSFER
             : LABELS.SET_CORRECT_WALLET_NETWORK}
         </Button>
+          <div style={{ marginTop: '10px' }}>
+            <input
+              type="checkbox"
+              id={'warning_checkbox'}
+              style={{ padding: 0, marginRight: '10px', outline: 'none' }}
+              onChange={() => setWarningChecked(!warningChecked)}
+              checked={warningChecked}
+            />
+            <label htmlFor={'warning_checkbox'}>
+              <span style={{ fontSize: '10px' }}>
+                I read the warning and understand the risks.
+              </span>
+            </label>
+          </div>
+        </div>
         <Input
           title={`To`}
           asset={request.asset}

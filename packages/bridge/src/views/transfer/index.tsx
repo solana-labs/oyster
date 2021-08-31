@@ -10,12 +10,14 @@ export const TransferView = () => {
         <div className="warning-box">
           <div className="header-warning">Warning</div>
           <div className="description-warning">
-            To avoid loss of funds, you should never close the page before the
-            transfer is completed and you should strictly follow the
+            Aldrin didn’t build the Wormhole Bridge but simply offer an
+            interface for it. Use it at your own risk. Aldrin team is not
+            responsible for loss of funds. To avoid loss of funds, you should
+            never close the page before the transfer is completed and you should
+            strictly follow
             <a href={''} target="_blank" rel="noopener noreferrer">
-              instructions here.
+              the instructions here.
             </a>
-            Also make sure you have enough ETH and SOL to pay the fees.
           </div>
         </div>{' '}
         <Transfer />
