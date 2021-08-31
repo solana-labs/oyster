@@ -32,6 +32,7 @@ import { useBridge } from './bridge';
 import { PublicKey } from '@solana/web3.js';
 import { ethers } from 'ethers';
 import { deriveERC20Address } from '../utils/helpers';
+import { RIN_SOLANA_MINT } from '../utils/assets'
 
 export interface TokenChainContextState {
   info?: TransferRequestInfo;
@@ -72,8 +73,7 @@ export const toChainSymbol = (chain: number | null) => {
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
   let defaultChain = 'ETH';
-  // TODO: Make it robust for re-naming or changing mint & etc.
-  let defaultToken = 'CCAI';
+  let defaultToken = RIN_SOLANA_MINT;
 
   return {
     defaultChain,
