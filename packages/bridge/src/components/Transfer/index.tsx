@@ -53,6 +53,7 @@ export const Transfer = () => {
 
   const [popoverVisible, setPopoverVisible] = useState(true);
   const [transferStatus, setTransferStatus] = useState({ inProcess: false });
+  const [warningChecked, setWarningChecked] = useState(false);
   const transferStateRef = useRef(transferStatus);
   transferStateRef.current = transferStatus;
 
@@ -127,158 +128,182 @@ export const Transfer = () => {
           }}
           className={'left'}
         />
-        <Button
-          className={'transfer-button'}
-          type="primary"
-          size="large"
-          disabled={
-            !(A.amount && B.amount) ||
-            !connected ||
-            !provider ||
-            transferStatus.inProcess
-          }
-          onClick={async () => {
-            if (!wallet || !provider) {
-              return;
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            className={'transfer-button'}
+            type="primary"
+            size="large"
+            disabled={
+              !(A.amount && B.amount) ||
+              !connected ||
+              !provider ||
+              transferStatus.inProcess ||
+              !warningChecked
             }
+            onClick={async () => {
+              if (!wallet || !provider) {
+                return;
+              }
 
-            const token = tokenMap.get(request.asset?.toLowerCase() || '');
-            const NotificationContent = () => {
-              const [activeSteps, setActiveSteps] = useState<ProgressUpdate[]>(
-                [],
-              );
-              useEffect(() => {
-                (async () => {
-                  let steps: ProgressUpdate[] = [];
-                  setTransferStatus({ inProcess: true });
-                  try {
-                    if (request.from === ASSET_CHAIN.Solana) {
-                      await fromSolana(
-                        connection,
-                        wallet,
-                        request,
-                        provider,
-                        update => {
-                          if (update.replace) {
-                            steps.pop();
-                            steps = [...steps, update];
-                          } else {
-                            steps = [...steps, update];
-                          }
+              const token = tokenMap.get(request.asset?.toLowerCase() || '');
+              const NotificationContent = () => {
+                const [activeSteps, setActiveSteps] = useState<
+                  ProgressUpdate[]
+                >([]);
+                useEffect(() => {
+                  (async () => {
+                    let steps: ProgressUpdate[] = [];
+                    setTransferStatus({ inProcess: true });
+                    try {
+                      if (request.from === ASSET_CHAIN.Solana) {
+                        await fromSolana(
+                          connection,
+                          wallet,
+                          request,
+                          provider,
+                          update => {
+                            if (update.replace) {
+                              steps.pop();
+                              steps = [...steps, update];
+                            } else {
+                              steps = [...steps, update];
+                            }
 
-                          setActiveSteps(steps);
-                        },
-                        bridge,
-                      );
+                            setActiveSteps(steps);
+                          },
+                          bridge,
+                        );
+                      }
+
+                      if (request.to === ASSET_CHAIN.Solana) {
+                        await toSolana(
+                          connection,
+                          wallet,
+                          request,
+                          provider,
+                          update => {
+                            if (update.replace) {
+                              steps.pop();
+                              steps = [...steps, update];
+                            } else {
+                              steps = [...steps, update];
+                            }
+
+                            setActiveSteps(steps);
+                          },
+                        );
+                      }
+                    } catch (err) {
+                      // TODO...
+                      console.log(err);
                     }
+                    setTransferStatus({ inProcess: false });
+                  })();
+                }, [setActiveSteps]);
 
-                    if (request.to === ASSET_CHAIN.Solana) {
-                      await toSolana(
-                        connection,
-                        wallet,
-                        request,
-                        provider,
-                        update => {
-                          if (update.replace) {
-                            steps.pop();
-                            steps = [...steps, update];
-                          } else {
-                            steps = [...steps, update];
-                          }
-
-                          setActiveSteps(steps);
-                        },
-                      );
-                    }
-                  } catch (err) {
-                    // TODO...
-                    console.log(err);
-                  }
-                  setTransferStatus({ inProcess: false });
-                })();
-              }, [setActiveSteps]);
-
-              return (
-                <div>
-                  <div style={{ display: 'flex' }}>
-                    <div>
-                      <h5>{`${chainToName(
-                        request.from,
-                      )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
-                      <h2>
-                        {request.amount?.toString()} {request.info?.name}
-                      </h2>
+                return (
+                  <div>
+                    <div style={{ display: 'flex' }}>
+                      <div>
+                        <h5>{`${chainToName(
+                          request.from,
+                        )} Mainnet -> ${chainToName(request.to)} Mainnet`}</h5>
+                        <h2>
+                          {request.amount?.toString()} {request.info?.name}
+                        </h2>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          marginLeft: 'auto',
+                          marginRight: 10,
+                        }}
+                      >
+                        <TokenDisplay
+                          asset={request.asset}
+                          chain={request.from}
+                          token={token}
+                        />
+                        <span style={{ margin: 15 }}>{'➔'}</span>
+                        <TokenDisplay
+                          asset={request.asset}
+                          chain={request.to}
+                          token={token}
+                        />
+                      </div>
                     </div>
                     <div
                       style={{
+                        textAlign: 'left',
                         display: 'flex',
-                        marginLeft: 'auto',
-                        marginRight: 10,
+                        flexDirection: 'column',
                       }}
                     >
-                      <TokenDisplay
-                        asset={request.asset}
-                        chain={request.from}
-                        token={token}
-                      />
-                      <span style={{ margin: 15 }}>{'➔'}</span>
-                      <TokenDisplay
-                        asset={request.asset}
-                        chain={request.to}
-                        token={token}
-                      />
+                      {(() => {
+                        let group = '';
+                        return activeSteps.map((step, i) => {
+                          let prevGroup = group;
+                          group = step.group;
+                          let newGroup = prevGroup !== group;
+                          return (
+                            <>
+                              {newGroup && <span>{group}</span>}
+                              <span style={{ marginLeft: 15 }}>
+                                {typeToIcon(
+                                  step.type,
+                                  activeSteps.length - 1 === i,
+                                )}{' '}
+                                {step.message}
+                              </span>
+                            </>
+                          );
+                        });
+                      })()}
                     </div>
                   </div>
-                  <div
-                    style={{
-                      textAlign: 'left',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    {(() => {
-                      let group = '';
-                      return activeSteps.map((step, i) => {
-                        let prevGroup = group;
-                        group = step.group;
-                        let newGroup = prevGroup !== group;
-                        return (
-                          <>
-                            {newGroup && <span>{group}</span>}
-                            <span style={{ marginLeft: 15 }}>
-                              {typeToIcon(
-                                step.type,
-                                activeSteps.length - 1 === i,
-                              )}{' '}
-                              {step.message}
-                            </span>
-                          </>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              );
-            };
+                );
+              };
 
-            notification.open({
-              message: '',
-              duration: 0,
-              placement: 'bottomLeft',
-              description: <NotificationContent />,
-              className: 'custom-class',
-              style: {
-                width: 500,
-              },
-            });
-          }}
-        >
-          {hasCorrespondingNetworks
-            ? !(A.amount && B.amount)
-              ? LABELS.ENTER_AMOUNT
-              : LABELS.TRANSFER
-            : LABELS.SET_CORRECT_WALLET_NETWORK}
-        </Button>
+              notification.open({
+                message: '',
+                duration: 0,
+                placement: 'bottomLeft',
+                description: <NotificationContent />,
+                className: 'custom-class',
+                style: {
+                  width: 500,
+                },
+              });
+            }}
+          >
+            {hasCorrespondingNetworks
+              ? !(A.amount && B.amount)
+                ? LABELS.ENTER_AMOUNT
+                : LABELS.TRANSFER
+              : LABELS.SET_CORRECT_WALLET_NETWORK}
+          </Button>
+          <div style={{ marginTop: '10px' }}>
+            <input
+              type="checkbox"
+              id={'warning_checkbox'}
+              style={{ padding: 0, marginRight: '10px', outline: 'none' }}
+              onChange={() => setWarningChecked(!warningChecked)}
+              checked={warningChecked}
+            />
+            <label htmlFor={'warning_checkbox'}>
+              <span style={{ fontSize: '10px' }}>
+                I read the warning and understand the risks.
+              </span>
+            </label>
+          </div>
+        </div>
+
         {/* <Popover
           placement="top"
           title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
