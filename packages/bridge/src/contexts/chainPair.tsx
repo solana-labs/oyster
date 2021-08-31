@@ -72,7 +72,7 @@ export const toChainSymbol = (chain: number | null) => {
 };
 
 function getDefaultTokens(tokens: TokenInfo[], search: string) {
-  let defaultChain = 'ETH';
+  let defaultChain = 'SOL';
   let defaultToken = tokens[0].symbol;
 
   const nameToToken = tokens.reduce((map, item) => {
