@@ -249,7 +249,7 @@ export const Transfer = () => {
             !connected ||
             !provider ||
             transferStatus.inProcess ||
-            popoverVisible
+            popoverVisible || warningChecked
           }
           onClick={async () => {
             if (!wallet || !provider || !wallet.publicKey) {
