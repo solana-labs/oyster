@@ -60,7 +60,7 @@ export const AppBar = (props: { isRoot?: boolean }) => {
         {/* <div className={`app-bar-item ${isActiveClass('help')}`}>
           <Link to="/help">Help</Link>
         </div> */}
-        <a className="guide-link">Guide</a>
+        <a className="guide-link" href="https://aldrin-rin.medium.com/how-to-swap-erc20-wwt-to-solana-rin-using-wormhole-bridge-a8e805687ccd" target="_blank" rel="noopener noreferrer">Guide</a>
         {!props.isRoot && (
           <Popover
             placement="topRight"

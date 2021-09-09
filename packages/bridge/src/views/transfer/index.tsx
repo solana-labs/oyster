@@ -15,7 +15,7 @@ export const TransferView = () => {
             responsible for loss of funds. To avoid loss of funds, you should
             never close the page before the transfer is completed and you should
             strictly follow
-            <a href={''} target="_blank" rel="noopener noreferrer">
+            <a href={'https://aldrin-rin.medium.com/how-to-swap-erc20-wwt-to-solana-rin-using-wormhole-bridge-a8e805687ccd'} target="_blank" rel="noopener noreferrer">
               the instructions here.
             </a>
           </div>
