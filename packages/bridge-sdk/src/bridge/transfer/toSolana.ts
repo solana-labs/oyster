@@ -17,6 +17,7 @@ import {
   Connection,
   PublicKey,
   TransactionInstruction,
+  SystemProgram,
 } from '@solana/web3.js';
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
@@ -54,6 +55,8 @@ export const toSolana = async (
     request.info.decimals,
   );
 
+  const walletPublicKey = wallet.publicKey;
+
   let counter = 0;
   // check difference between lock/approve (invoke lock if allowance < amount)
   const steps = {
@@ -67,7 +70,12 @@ export const toSolana = async (
 
     // creates wrapped account on solana
     prepare: async (request: TransferRequest) => {
-      if (!request.info || !request.from || !wallet.publicKey) {
+      if (
+        !request.info ||
+        !request.from ||
+        !walletPublicKey ||
+        walletPublicKey.equals(SystemProgram.programId)
+      ) {
         return;
       }
 
@@ -105,7 +113,7 @@ export const toSolana = async (
           : (
               await PublicKey.findProgramAddress(
                 [
-                  wallet.publicKey.toBuffer(),
+                  walletPublicKey.toBuffer(),
                   programIds().token.toBuffer(),
                   mintKey.toBuffer(),
                 ],
@@ -132,7 +140,7 @@ export const toSolana = async (
               bridgeId,
               authority,
               mintKey,
-              wallet.publicKey,
+              walletPublicKey,
             ),
           );
         }
@@ -141,8 +149,8 @@ export const toSolana = async (
           createAssociatedTokenAccountInstruction(
             instructions,
             recipient,
-            wallet.publicKey,
-            wallet.publicKey,
+            walletPublicKey,
+            walletPublicKey,
             mintKey,
           );
         }
