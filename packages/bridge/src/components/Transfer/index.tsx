@@ -120,8 +120,9 @@ export const Transfer = () => {
           title={<span style={{cursor: "pointer"}} onClick={() => setPopoverVisible(false)}>x</span>}
           content={<span style={{textAlign: "center"}}>
             <WarningOutlined style={{ fontSize: '40px', color: '#ccae00' }} />
-            <p>Wormhole is upgrading on-chain contracts to v2 in next 2 weeks.
-              <br/>If possible please wait with moving funds, otherwise please plan for migration soon.</p>
+            <p>This website should be only used to migrate liquidity from Wormhole v1.
+            <br/>Wormhole is upgrading on-chain contracts to v2 in next 2 weeks.</p>
+
           </span>}
           visible={popoverVisible}
         >
