@@ -7,8 +7,11 @@ import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../utils/assets';
-import { useConnectionConfig } from '@oyster/common';
-import { filterModalEthTokens, filterModalSolTokens } from '../../utils/assets';
+import {
+  useConnectionConfig,
+  useUserAccounts,
+  useWallet
+} from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
 
 export const TokenSelectModal = (props: {
@@ -18,40 +21,62 @@ export const TokenSelectModal = (props: {
   chain?: ASSET_CHAIN;
   showIconChain?: boolean;
 }) => {
-  const { tokens: ethTokens } = useEthereum();
-  const { tokens: solTokens } = useConnectionConfig();
+  const { tokenMap: ethTokenMap } = useEthereum();
+  const { connected } = useWallet();
+  const { tokenMap } = useConnectionConfig()
+  const {userAccounts} = useUserAccounts()
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
 
   const inputRef = useRef<Input>(null);
-  const tokens = useMemo(
-    () => {
-      const ethAddresses = ethTokens.reduce((set, t) => {
-        if(t.address) {
-          set.add(t.address.toLowerCase());
-        }
-        return set;
-      }, new Set<string>());
-      return [
-        ...filterModalEthTokens(ethTokens),
-        ...filterModalSolTokens(solTokens).filter(t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase())),
-      ];
-    },
-    [ethTokens, solTokens],
-  );
+  // const tokens = useMemo(
+  //   () => {
+  //     const ethAddresses = ethTokens.reduce((set, t) => {
+  //       if(t.address) {
+  //         set.add(t.address.toLowerCase());
+  //       }
+  //       return set;
+  //     }, new Set<string>());
+  //     return [
+  //       ...filterModalEthTokens(ethTokens),
+  //       ...filterModalSolTokens(solTokens).filter(t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase())),
+  //     ];
+  //   },
+  //   [ethTokens, solTokens],
+  // );
 
   const tokenList = useMemo(() => {
-    if (tokens && search) {
-      return tokens.filter(token => {
-        return (
-          (token.tags?.indexOf('longList') || -1) < 0 &&
-          (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
-            token.name.toLowerCase().includes(search.toLowerCase()))
-        );
-      });
+    const tokens: any [] = [];
+    if (connected && userAccounts.length) {
+      userAccounts.forEach(async acc => {
+        const token = tokenMap.get(acc.info.mint.toBase58())
+        if (token) {
+          if (!token.name.toLowerCase().includes("wormhole")){
+            tokens.push({token, chain: ASSET_CHAIN.Ethereum})
+          } else {
+            if (token.extensions?.address) {
+              const ethToken = ethTokenMap.get(token.extensions.address.toLowerCase())
+              if (ethToken){
+                tokens.push({token: ethToken, chain: ASSET_CHAIN.Solana})
+              } else {
+                console.log("Wormhole token without contract info: ", token)
+              }
+            }
+          }
+        }
+      })
+      // if (search) {
+      //   return tokens.filter(token => {
+      //     return (
+      //       (token.tags?.indexOf('longList') || -1) < 0 &&
+      //       (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+      //         token.name.toLowerCase().includes(search.toLowerCase()))
+      //     );
+      //   });
+      // }
     }
     return tokens;
-  }, [tokens, search]);
+  }, [connected, userAccounts.length]);
 
   const showModal = () => {
     if (inputRef && inputRef.current) {
@@ -64,8 +89,8 @@ export const TokenSelectModal = (props: {
     setIsModalVisible(false);
   };
   const firstToken = useMemo(() => {
-    return tokens.find(el => el.address === props.asset);
-  }, [tokens, props.asset]);
+    return tokenList.find((el: any) => el.token.address === props.asset);
+  }, [tokenList, props.asset]);
 
   const delayedSearchChange = _.debounce(val => {
     setSearch(val);
@@ -74,57 +99,56 @@ export const TokenSelectModal = (props: {
   const getTokenInfo = (token: TokenInfo | undefined, chain: ASSET_CHAIN | undefined) => {
     let name = token?.name || '';
     let symbol = token?.symbol || '';
-    if (token && chain !== ASSET_CHAIN.Solana) {
-      if((token.tags || []).indexOf('wormhole') >= 0) {
-        name = name.replace('(Wormhole)', '').trim();
-        symbol = symbol.startsWith('w') ? symbol.slice(1, symbol.length) : symbol;
-      }
-    }
-
+    // if (token && chain !== ASSET_CHAIN.Solana) {
+    //   if((token.tags || []).indexOf('wormhole') >= 0) {
+    //     name = name.replace('(Wormhole)', '').trim();
+    //     symbol = symbol.startsWith('w') ? symbol.slice(1, symbol.length) : symbol;
+    //   }
+    // }
     return { name, symbol };
   }
 
   const rowRender = (rowProps: { index: number; key: string; style: any }) => {
-    const token = tokenList[rowProps.index];
+    const tokenObject = tokenList[rowProps.index]
+    const token = tokenObject.token;
     const mint = token.address;
-    return [ASSET_CHAIN.Solana, ASSET_CHAIN.Ethereum].map((chain, index) => {
-      const { name , symbol } = getTokenInfo(token, chain);
-      return (
+    const chain = tokenObject.chain
+    const { name , symbol } = getTokenInfo(token, chain);
+    return (
+      <div
+        key={rowProps.key + mint + chain}
+        className="multichain-option"
+        title={name}
+        onClick={() => {
+          props.onSelectToken(mint);
+          props.onChain(chain);
+          hideModal();
+        }}
+        style={{
+          ...rowProps.style,
+          cursor: 'pointer',
+          height: '70px',
+          top: `${rowProps.style.top}px`,
+        }}
+      >
         <div
-          key={rowProps.key + mint + chain}
-          className="multichain-option"
-          title={name}
-          onClick={() => {
-            props.onSelectToken(mint);
-            props.onChain(chain);
-            hideModal();
-          }}
-          style={{
-            ...rowProps.style,
-            cursor: 'pointer',
-            height: '70px',
-            top: `${rowProps.style.top + 70 * index}px`,
-          }}
+          className="multichain-option-content"
+          style={{ position: 'relative' }}
         >
+          <TokenDisplay asset={props.asset} token={token} chain={chain} />
           <div
-            className="multichain-option-content"
-            style={{ position: 'relative' }}
+            className="multichain-option-name"
+            style={{ marginLeft: '20px' }}
           >
-            <TokenDisplay asset={props.asset} token={token} chain={chain} />
-            <div
-              className="multichain-option-name"
-              style={{ marginLeft: '20px' }}
-            >
-              <em className={'token-symbol'}>{symbol}</em>
-              <span className={'token-name'}>{name}</span>
-            </div>
+            <em className={'token-symbol'}>{symbol}</em>
+            <span className={'token-name'}>{name}</span>
           </div>
         </div>
-      );
-    });
+      </div>
+    );
   };
 
-  const { name , symbol } = getTokenInfo(firstToken, props.chain);
+  const { name , symbol } = getTokenInfo(firstToken?.token, props.chain);
   return (
     <>
       <div
@@ -136,7 +160,7 @@ export const TokenSelectModal = (props: {
         <div className="multichain-option-content">
           <TokenDisplay
             asset={props.asset}
-            token={firstToken}
+            token={firstToken?.token}
             chain={props.showIconChain ? props.chain : undefined}
           />
         </div>
@@ -166,7 +190,7 @@ export const TokenSelectModal = (props: {
               <List
                 ref="List"
                 height={height}
-                rowHeight={140}
+                rowHeight={70}
                 rowCount={tokenList.length || 0}
                 rowRenderer={rowRender}
                 width={width}
