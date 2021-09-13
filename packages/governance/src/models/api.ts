@@ -136,7 +136,7 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
       params: [
         programId.toBase58(),
         {
-          commitment: 'single',
+          commitment: 'recent',
           encoding: 'base64',
           filters: [
             {
