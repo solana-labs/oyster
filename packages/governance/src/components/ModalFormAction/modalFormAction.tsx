@@ -153,6 +153,7 @@ function ActionForm<TResult>({
       } else if (isSignTransactionError(ex)) {
         setError({
           header: "Couldn't sign the transaction",
+          message: ex.message,
           recoveryAction:
             'Please try to submit and sign the transaction with your wallet again',
         });
