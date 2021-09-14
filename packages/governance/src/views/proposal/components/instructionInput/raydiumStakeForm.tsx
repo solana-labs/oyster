@@ -36,7 +36,8 @@ export const RaydiumStakeForm = ({
     destination: string;
     amount: string;
   }) => {
-    const raydiumIx = depositInstruction(
+    // stake/harvest RAY-SRM LP
+    let raydiumIx = depositInstruction(
       new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
       // staking pool
       new PublicKey('5DFbcYNLLy5SJiBpCCDzNSs7cWCsUbYnCkLXzcPQiKnR'),
@@ -52,6 +53,25 @@ export const RaydiumStakeForm = ({
       new PublicKey('5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt'),
 
       1, // amount
+    );
+
+    // stake/harvest RAY
+    raydiumIx = depositInstruction(
+      new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
+      // staking pool
+      new PublicKey('4EwbZo8BZXP5313z5A2H11MRBP15M5n6YxfmkjXESKAW'),
+      new PublicKey('4qD717qKoj3Sm8YfHMSR7tSKjWn5An817nArA6nGdcUR'),
+      // user
+      new PublicKey('CjvTxyoZPfSg1aDchw79RmwFfkuWb5v1obhCt4dfw9mq'), // created user info account
+      new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'), // governance PDA
+
+      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY-SRM LP token account
+      new PublicKey('8tnpAECxAT9nHBqR1Ba494Ar5dQMPGhL31MmPJz1zZvY'),
+
+      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY account
+      new PublicKey('BihEG2r7hYax6EherbRmuLLrySBuSXx4PYGd9gAsktKY'),
+
+      122791, // amount
     );
 
     onCreateInstruction(raydiumIx);
