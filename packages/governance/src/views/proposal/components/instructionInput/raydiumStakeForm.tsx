@@ -62,16 +62,16 @@ export const RaydiumStakeForm = ({
       new PublicKey('4EwbZo8BZXP5313z5A2H11MRBP15M5n6YxfmkjXESKAW'),
       new PublicKey('4qD717qKoj3Sm8YfHMSR7tSKjWn5An817nArA6nGdcUR'),
       // user
-      new PublicKey('CjvTxyoZPfSg1aDchw79RmwFfkuWb5v1obhCt4dfw9mq'), // created user info account
+      new PublicKey('HPDnbMNypc2BPMMzm8PKNRtPm1xgkr8YfgdUePL8oNrb'), // created user info account
       new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'), // governance PDA
 
-      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY-SRM LP token account
+      new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf'), // governance RAY  account
       new PublicKey('8tnpAECxAT9nHBqR1Ba494Ar5dQMPGhL31MmPJz1zZvY'),
 
-      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY account
+      new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf'), // governance RAY account
       new PublicKey('BihEG2r7hYax6EherbRmuLLrySBuSXx4PYGd9gAsktKY'),
 
-      122791, // amount
+      0, // amount
     );
 
     onCreateInstruction(raydiumIx);

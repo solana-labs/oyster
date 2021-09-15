@@ -37,19 +37,19 @@ export function addLiquidityInstructionV4(
   ]);
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
-    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: false },
     { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: lpMintAddress, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
   ];
 
   const data = Buffer.alloc(dataLayout.span);
@@ -139,15 +139,15 @@ export function depositInstruction(
 
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
-    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
     { pubkey: userInfoAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
   const data = Buffer.alloc(dataLayout.span);
