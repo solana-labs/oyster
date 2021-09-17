@@ -94,14 +94,12 @@ export function GovernanceConfigFormItem({
   );
 
   let minTokenAmount = getMintMinAmountAsDecimal(communityMintInfo);
-  let maxTokenAmount = getMintSupplyAsDecimal(communityMintInfo);
+  let maxTokenAmount = !communityMintInfo.supply.isZero()
+    ? getMintSupplyAsDecimal(communityMintInfo)
+    : undefined;
 
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   let minTokenStep = Math.max(mintSupply1Percent, minTokenAmount);
-
-  if (maxTokenAmount === 0) {
-    maxTokenAmount = 1;
-  }
 
   let minTokensToCreateProposal = minTokenStep;
 
@@ -156,7 +154,7 @@ export function GovernanceConfigFormItem({
               stringMode={mintDecimals !== 0}
             />
           </Form.Item>
-          {minTokensPercentage && (
+          {maxTokenAmount && minTokensPercentage && (
             <Text type="secondary">{`${formatPercentage(
               minTokensPercentage,
             )} of token supply`}</Text>

@@ -53,11 +53,11 @@ export function Routes() {
                                 path="/faucet"
                                 children={<FaucetView />}
                               />
-                              <Route
-                                exact
-                                path="/debug-renbtc"
-                                children={<RenbtcDebugView />}
-                              />
+                              {/*<Route*/}
+                              {/*  exact*/}
+                              {/*  path="/debug-renbtc"*/}
+                              {/*  children={<RenbtcDebugView />}*/}
+                              {/*/>*/}
                             </Switch>
                           </AppLayout>
                         </TokenChainPairProvider>

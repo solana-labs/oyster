@@ -48,7 +48,9 @@ export function RealmMintTokensFormItem({
   );
 
   let minTokenAmount = getMintMinAmountAsDecimal(communityMintInfo);
-  let maxTokenAmount = getMintSupplyAsDecimal(communityMintInfo);
+  const maxTokenAmount = !communityMintInfo.supply.isZero()
+    ? getMintSupplyAsDecimal(communityMintInfo)
+    : undefined;
 
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   let minTokenStep = Math.max(mintSupply1Percent, minTokenAmount);
@@ -89,7 +91,7 @@ export function RealmMintTokensFormItem({
               stringMode={mintDecimals !== 0}
             />
           </Form.Item>
-          {minTokensPercentage && (
+          {maxTokenAmount && minTokensPercentage && (
             <Text type="secondary">{`${formatPercentage(
               minTokensPercentage,
             )} of token supply`}</Text>

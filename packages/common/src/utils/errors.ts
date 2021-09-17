@@ -1,9 +1,9 @@
 import { TransactionError } from '@solana/web3.js';
 
 export class SendTransactionError extends Error {
-  txError: TransactionError;
+  txError: TransactionError | undefined;
   txId: string;
-  constructor(message: string, txId: string, txError: TransactionError) {
+  constructor(message: string, txId: string, txError?: TransactionError) {
     super(message);
 
     this.txError = txError;

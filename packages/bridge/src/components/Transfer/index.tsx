@@ -122,7 +122,10 @@ export const Transfer = () => {
             <WarningOutlined style={{ fontSize: '40px', color: '#ccae00' }} />
             <p>This website should be only used to migrate liquidity from Wormhole v1.
             <br/>Wormhole is upgrading on-chain contracts to v2 in next 2 weeks.</p>
-
+            <p>To see the tokens you need to connect both wallets first</p>
+            <p>If your SOL -&gt; ETH transaction is taking more than 1 hour, make sure to <br/>
+            to look at the recent transactions table below and click on retry Icon <br/>
+              if the transaction failed</p>
           </span>}
           visible={popoverVisible}
         >
@@ -131,12 +134,13 @@ export const Transfer = () => {
             style={{ padding: 0 }}
             disabled={false}
             onClick={() => {
-              const from = A.chain;
-              const toChain = B.chain;
-              if (from !== undefined && toChain !== undefined) {
-                A.setChain(toChain);
-                B.setChain(from);
-              }
+              return;
+              // const from = A.chain;
+              // const toChain = B.chain;
+              // if (from !== undefined && toChain !== undefined) {
+              //   A.setChain(toChain);
+              //   B.setChain(from);
+              // }
             }}
           >
             <span></span>
