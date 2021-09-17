@@ -55,8 +55,24 @@ export const RaydiumAddLiquidityForm = ({
       serAta = new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh');
     }
 
-    const rayAmount = await connection.getTokenAccountBalance(rayAta);
-    const serAmount = await connection.getTokenAccountBalance(serAta);
+    const rayTokenAmount = await connection.getTokenAccountBalance(rayAta);
+    const serTokenAmount = await connection.getTokenAccountBalance(serAta);
+
+    let maxRayAmount = parseInt(rayTokenAmount.value.amount);
+    let maxSerAmount = parseInt(serTokenAmount.value.amount);
+
+    // SRM/RAY rate hardcoded for now
+    // Note: The actual rate will be calculated when the instruction is executed but it has to be in the range to avoid slippage error
+    // TODO: Read from market at the time the instruction is created
+    const srmRayRate = 0.8;
+
+    let serAmount = maxSerAmount;
+    let rayAmount = maxSerAmount * srmRayRate;
+
+    if (rayAmount > maxRayAmount) {
+      rayAmount = maxRayAmount;
+      serAmount = rayAmount / srmRayRate;
+    }
 
     const raydiumIx = addLiquidityInstructionV4(
       new PublicKey('675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'),
@@ -75,8 +91,8 @@ export const RaydiumAddLiquidityForm = ({
       serAta, // governance SER account
       governance.info.governedAccount, // governance RAY-SRM LP token account
       governancePk, // governance PDA
-      parseInt(rayAmount.value.amount), // max RAY
-      parseInt(serAmount.value.amount), // max SER
+      rayAmount, // max RAY
+      serAmount, // max SER
       0,
     );
 
