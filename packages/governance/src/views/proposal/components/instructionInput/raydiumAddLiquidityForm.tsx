@@ -9,8 +9,10 @@ import { formDefaults } from '../../../../tools/forms';
 import { contexts } from '@oyster/common';
 
 import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
+import { getAssociatedTokenAddress } from '../../../../tools/sdk/token/splToken';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
+const { useConnection } = contexts.Connection;
 const { useMint } = contexts.Accounts;
 
 export const RaydiumAddLiquidityForm = ({
@@ -24,18 +26,38 @@ export const RaydiumAddLiquidityForm = ({
 }) => {
   const sourceTokenAccount = useTokenAccount(governance.info.governedAccount);
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
+  const connection = useConnection();
 
   if (!(mintInfo && sourceTokenAccount)) {
     return <Spin />;
   }
 
-  const onCreate = async ({
-    destination,
-    amount,
-  }: {
-    destination: string;
-    amount: string;
-  }) => {
+  const onCreate = async () => {
+    const governancePk = governance.pubkey;
+
+    let rayAta = await getAssociatedTokenAddress(
+      new PublicKey('4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'),
+      governancePk,
+    );
+
+    let serAta = await getAssociatedTokenAddress(
+      new PublicKey('SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt'),
+      governancePk,
+    );
+
+    // temp. workaround until the accounts are fixed for the dev 'Yield Farming' realm
+    if (
+      governancePk.equals(
+        new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'),
+      )
+    ) {
+      rayAta = new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf');
+      serAta = new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh');
+    }
+
+    const rayAmount = await connection.getTokenAccountBalance(rayAta);
+    const serAmount = await connection.getTokenAccountBalance(serAta);
+
     const raydiumIx = addLiquidityInstructionV4(
       new PublicKey('675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'),
       // amm
@@ -49,13 +71,13 @@ export const RaydiumAddLiquidityForm = ({
       // serum
       new PublicKey('Cm4MmknScg7qbKqytb1mM92xgDxv3TNXos4tKbBqTDy7'),
       // user (governance)
-      new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf'), // governance SER account
-      new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh'), // governance RAY account
-      new PublicKey('GbrNTxmoWhYYTY2yjnJFDyM79w9KzNmuzY6BBpUmvZGZ'), // governance RAY-SRM LP token account
-      new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'), // governance PDA
-      1,
-      1,
-      1,
+      rayAta, // governance RAY account
+      serAta, // governance SER account
+      governance.info.governedAccount, // governance RAY-SRM LP token account
+      governancePk, // governance PDA
+      parseInt(rayAmount.value.amount), // max RAY
+      parseInt(serAmount.value.amount), // max SER
+      0,
     );
 
     onCreateInstruction(raydiumIx);
