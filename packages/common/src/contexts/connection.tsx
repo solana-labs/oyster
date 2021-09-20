@@ -28,18 +28,12 @@ import {
 } from '../utils/errors';
 
 export type ENV =
-  | 'mainnet-beta (Serum)'
   | 'mainnet-beta'
   | 'testnet'
   | 'devnet'
   | 'localnet';
 
 export const ENDPOINTS = [
-  {
-    name: 'mainnet-beta (Serum)' as ENV,
-    endpoint: 'https://solana-api.projectserum.com/',
-    ChainId: ChainId.MainnetBeta,
-  },
   {
     name: 'mainnet-beta' as ENV,
     endpoint: clusterApiUrl('mainnet-beta'),
