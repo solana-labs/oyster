@@ -36,12 +36,12 @@ export const RaydiumAddLiquidityForm = ({
     const governancePk = governance.pubkey;
 
     let rayAta = await getAssociatedTokenAddress(
-      new PublicKey('4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'),
+      new PublicKey('4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'), // RAY mint
       governancePk,
     );
 
     let serAta = await getAssociatedTokenAddress(
-      new PublicKey('SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt'),
+      new PublicKey('SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt'), // SRM mint
       governancePk,
     );
 
@@ -51,6 +51,7 @@ export const RaydiumAddLiquidityForm = ({
         new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'),
       )
     ) {
+      // The accounts owned by BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ governance are not ATAs and we have to overwrite them
       rayAta = new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf');
       serAta = new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh');
     }
