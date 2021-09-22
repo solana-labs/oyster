@@ -15,6 +15,7 @@ import {
 import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
 import { RaydiumStakeLPForm } from './raydiumStakeLPForm';
 import { isYieldFarmingGovernance } from './yieldFarming';
+import { RaydiumStakeRAYForm } from './raydiumStakeRAYForm';
 
 export const TokenInstructionsForm = ({
   form,
@@ -34,6 +35,8 @@ export const TokenInstructionsForm = ({
         InstructionType.RaydiumAddLiquidity,
         InstructionType.RaydiumStakeLP,
         InstructionType.RaydiumHarvestLP,
+        InstructionType.RaydiumStakeRAY,
+        InstructionType.RaydiumHarvestRAY,
       ]
     : [];
 
@@ -85,6 +88,23 @@ export const TokenInstructionsForm = ({
           onCreateInstruction={onCreateInstruction}
           isHarvest={true}
         ></RaydiumStakeLPForm>
+      )}
+
+      {instruction === InstructionType.RaydiumStakeRAY && (
+        <RaydiumStakeRAYForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={false}
+        ></RaydiumStakeRAYForm>
+      )}
+      {instruction === InstructionType.RaydiumHarvestRAY && (
+        <RaydiumStakeRAYForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={true}
+        ></RaydiumStakeRAYForm>
       )}
 
       <GovernanceInstructionForm

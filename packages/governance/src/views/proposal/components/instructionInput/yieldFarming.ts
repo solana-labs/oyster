@@ -12,13 +12,26 @@ export function isYieldFarmingGovernance(governancePk: PublicKey) {
   return yfGovernances.includes(governancePk.toBase58());
 }
 
-export function getRaySrmLpUserAccount(governancePk: PublicKey) {
+export function getRaySrmLpFarmUserAccount(governancePk: PublicKey) {
   // TODO: define these addresses as derived ones from seeds or preferably fetch the accounts for given user
   switch (governancePk.toBase58()) {
     case 'EVhURne36yBfuTfqwn1W2hWdi6i3Vhau9n4FE8ehHbKM':
       return new PublicKey('4wmxLsrtQh7KhyhKiDPpxLNfPn6o3QzD68mWdJrHHsuH');
     case 'BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ':
       return new PublicKey('CjvTxyoZPfSg1aDchw79RmwFfkuWb5v1obhCt4dfw9mq');
+    default:
+      throw new Error(
+        `User account is not defined for ${governancePk.toBase58()}  governance`,
+      );
+  }
+}
+export function getRayFarmUserAccount(governancePk: PublicKey) {
+  // TODO: define these addresses as derived ones from seeds or preferably fetch the accounts for given user
+  switch (governancePk.toBase58()) {
+    case 'EVhURne36yBfuTfqwn1W2hWdi6i3Vhau9n4FE8ehHbKM':
+      return new PublicKey('DuJMJz1ZDQx1QeGZSaYPRN9tNFFjcgGYNA8q7f58KYQG');
+    case 'BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ':
+      return new PublicKey('HPDnbMNypc2BPMMzm8PKNRtPm1xgkr8YfgdUePL8oNrb');
     default:
       throw new Error(
         `User account is not defined for ${governancePk.toBase58()}  governance`,

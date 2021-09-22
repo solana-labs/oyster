@@ -9,6 +9,8 @@ export enum InstructionType {
   RaydiumAddLiquidity,
   RaydiumStakeLP,
   RaydiumHarvestLP,
+  RaydiumStakeRAY,
+  RaydiumHarvestRAY,
   SplTokenMintTo,
   GovernanceSetRealmConfig,
 }
@@ -21,6 +23,8 @@ const instructionNames = [
   'ray-add-liquidity',
   'ray-stake-LP',
   'ray-harvest-LP',
+  'ray-stake-RAY',
+  'ray-harvest-RAY',
   'spl-token mint-to',
   'set-realm-config',
 ];
