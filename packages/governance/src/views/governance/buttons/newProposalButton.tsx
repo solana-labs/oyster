@@ -4,7 +4,7 @@ import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../../constants';
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, useMint } from '@oyster/common';
 import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
@@ -39,7 +39,9 @@ export function NewProposalButton({
     realm?.info.config.councilMint,
   );
 
-  if (!governance) {
+  const communityMint = useMint(realm?.info.communityMint);
+
+  if (!governance || !communityMint || !realm) {
     return null;
   }
 
@@ -59,14 +61,23 @@ export function NewProposalButton({
     canCreateProposalUsingCommunityTokens ||
     canCreateProposalUsingCouncilTokens;
 
+  const defaultGoverningTokenType = !communityMint.supply.isZero()
+    ? GoverningTokenType.Community
+    : GoverningTokenType.Council;
+
+  const showTokenChoice =
+    !communityMint.supply.isZero() && realm?.info.config.councilMint;
+
   const onSubmit = async (values: {
     name: string;
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
   }) => {
+    const governingTokenType =
+      values.governingTokenType ?? defaultGoverningTokenType;
+
     const governingTokenMint =
-      values.governingTokenType === undefined ||
-      values.governingTokenType === GoverningTokenType.Community
+      governingTokenType === GoverningTokenType.Community
         ? realm!.info.communityMint
         : realm!.info.config.councilMint!;
     const proposalIndex = governance.info.proposalCount;
@@ -113,10 +124,10 @@ export function NewProposalButton({
       onSubmit={onSubmit}
       onComplete={onComplete}
       initialValues={{
-        governingTokenType: GoverningTokenType.Community,
+        governingTokenType: defaultGoverningTokenType,
       }}
     >
-      {realm?.info.config.councilMint && (
+      {showTokenChoice && (
         <Form.Item
           label={LABELS.WHO_VOTES_QUESTION}
           name="governingTokenType"

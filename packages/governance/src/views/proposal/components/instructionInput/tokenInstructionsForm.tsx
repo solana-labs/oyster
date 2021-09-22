@@ -12,6 +12,10 @@ import {
   getGovernanceInstructions,
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
+import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
+import { RaydiumStakeLPForm } from './raydiumStakeLPForm';
+import { isYieldFarmingGovernance } from './yieldFarming';
+import { RaydiumStakeRAYForm } from './raydiumStakeRAYForm';
 
 export const TokenInstructionsForm = ({
   form,
@@ -24,14 +28,28 @@ export const TokenInstructionsForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const [instruction, setInstruction] = useState(
-    InstructionType.SplTokenTransfer,
-  );
+  const [instruction, setInstruction] = useState<InstructionType | undefined>();
+
+  const yfInstructions = isYieldFarmingGovernance(governance.pubkey)
+    ? [
+        InstructionType.RaydiumAddLiquidity,
+        InstructionType.RaydiumStakeLP,
+        InstructionType.RaydiumHarvestLP,
+        InstructionType.RaydiumStakeRAY,
+        InstructionType.RaydiumHarvestRAY,
+      ]
+    : [];
 
   let instructions = [
+    ...yfInstructions,
     InstructionType.SplTokenTransfer,
     ...getGovernanceInstructions(realm, governance),
   ];
+
+  if (!instruction) {
+    setInstruction(instructions[0]);
+    return null;
+  }
 
   return (
     <Form {...formDefaults} initialValues={{ instructionType: instruction }}>
@@ -45,6 +63,48 @@ export const TokenInstructionsForm = ({
           governance={governance}
           onCreateInstruction={onCreateInstruction}
         ></SplTokenTransferForm>
+      )}
+
+      {instruction === InstructionType.RaydiumAddLiquidity && (
+        <RaydiumAddLiquidityForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+        ></RaydiumAddLiquidityForm>
+      )}
+
+      {instruction === InstructionType.RaydiumStakeLP && (
+        <RaydiumStakeLPForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={false}
+        ></RaydiumStakeLPForm>
+      )}
+      {instruction === InstructionType.RaydiumHarvestLP && (
+        <RaydiumStakeLPForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={true}
+        ></RaydiumStakeLPForm>
+      )}
+
+      {instruction === InstructionType.RaydiumStakeRAY && (
+        <RaydiumStakeRAYForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={false}
+        ></RaydiumStakeRAYForm>
+      )}
+      {instruction === InstructionType.RaydiumHarvestRAY && (
+        <RaydiumStakeRAYForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={true}
+        ></RaydiumStakeRAYForm>
       )}
 
       <GovernanceInstructionForm
