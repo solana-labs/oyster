@@ -1,13 +1,8 @@
 import anime from 'animejs';
 import React from 'react';
-import { formatUSD, shortenAddress } from '@oyster/common';
 import './itemStyle.less';
 import './index.less';
 import { Link } from 'react-router-dom';
-import { useWormholeAccounts } from '../../hooks/useWormholeAccounts';
-import { TokenDisplay } from '../../components/TokenDisplay';
-import { toChainSymbol } from '../../contexts/chainPair';
-import { AssetsTable } from '../../components/AssetsTable';
 
 export const HomeView = () => {
   const handleDownArrow = () => {
@@ -78,7 +73,7 @@ export const HomeView = () => {
             </div>
           </div>
         </div>
-        <AssetsTable />
+        {/* <AssetsTable /> */}
       </div>
     </>
   );
