@@ -64,7 +64,7 @@ export const RaydiumAddLiquidityForm = ({
     // SRM/RAY rate hardcoded for now
     // Note: The actual rate will be calculated when the instruction is executed but it has to be in the range to avoid slippage error
     // TODO: Read from market at the time the instruction is created
-    const srmRayRate = 0.8;
+    const srmRayRate = 0.77;
 
     let serAmount = maxSerAmount;
     let rayAmount = maxSerAmount * srmRayRate;

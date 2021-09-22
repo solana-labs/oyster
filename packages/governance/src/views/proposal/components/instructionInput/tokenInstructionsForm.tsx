@@ -15,6 +15,16 @@ import {
 import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
 import { RaydiumStakeForm } from './raydiumStakeForm';
 
+function isYieldFarmingGovernance(governance: ParsedAccount<Governance>) {
+  // TODO: add governance metadata to capture available instruction types
+  const yfGovernances = [
+    'EVhURne36yBfuTfqwn1W2hWdi6i3Vhau9n4FE8ehHbKM', // SCTF1 Realm
+    'BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ', // Yield Farming Realm
+  ];
+
+  return yfGovernances.includes(governance.pubkey.toBase58());
+}
+
 export const TokenInstructionsForm = ({
   form,
   realm,
@@ -26,16 +36,22 @@ export const TokenInstructionsForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const [instruction, setInstruction] = useState(
-    InstructionType.RaydiumAddLiquidity,
-  );
+  const [instruction, setInstruction] = useState<InstructionType | undefined>();
+
+  const yfInstructions = isYieldFarmingGovernance(governance)
+    ? [InstructionType.RaydiumAddLiquidity, InstructionType.RaydiumStake]
+    : [];
 
   let instructions = [
-    InstructionType.RaydiumAddLiquidity,
-    InstructionType.RaydiumStake,
+    ...yfInstructions,
     InstructionType.SplTokenTransfer,
     ...getGovernanceInstructions(realm, governance),
   ];
+
+  if (!instruction) {
+    setInstruction(instructions[0]);
+    return null;
+  }
 
   return (
     <Form {...formDefaults} initialValues={{ instructionType: instruction }}>
