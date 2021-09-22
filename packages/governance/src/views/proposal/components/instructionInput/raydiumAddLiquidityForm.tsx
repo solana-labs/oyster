@@ -9,7 +9,8 @@ import { formDefaults } from '../../../../tools/forms';
 import { contexts } from '@oyster/common';
 
 import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
-import { getAssociatedTokenAddress } from '../../../../tools/sdk/token/splToken';
+
+import { getRAYGovernanceAta, getSRMGovernanceAta } from './yieldFarming';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
@@ -35,26 +36,9 @@ export const RaydiumAddLiquidityForm = ({
   const onCreate = async () => {
     const governancePk = governance.pubkey;
 
-    let rayAta = await getAssociatedTokenAddress(
-      new PublicKey('4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'), // RAY mint
-      governancePk,
-    );
+    const rayAta = await getRAYGovernanceAta(governancePk);
 
-    let serAta = await getAssociatedTokenAddress(
-      new PublicKey('SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt'), // SRM mint
-      governancePk,
-    );
-
-    // temp. workaround until the accounts are fixed for the dev 'Yield Farming' realm
-    if (
-      governancePk.equals(
-        new PublicKey('BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ'),
-      )
-    ) {
-      // The accounts owned by BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ governance are not ATAs and we have to overwrite them
-      rayAta = new PublicKey('8bVecpkd9gbK8VtYKHxjjL1uXnSevgdH8BAnuKjScacf');
-      serAta = new PublicKey('EfQU385sk18VwfVaxZ1aiDXfvHg9jdbzqGm9Qg7261wh');
-    }
+    const serAta = await getSRMGovernanceAta(governancePk);
 
     const rayTokenAmount = await connection.getTokenAccountBalance(rayAta);
     const serTokenAmount = await connection.getTokenAccountBalance(serAta);

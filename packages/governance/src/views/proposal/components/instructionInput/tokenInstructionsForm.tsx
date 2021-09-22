@@ -13,17 +13,8 @@ import {
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
 import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
-import { RaydiumStakeForm } from './raydiumStakeForm';
-
-function isYieldFarmingGovernance(governance: ParsedAccount<Governance>) {
-  // TODO: add governance metadata to capture available instruction types
-  const yfGovernances = [
-    'EVhURne36yBfuTfqwn1W2hWdi6i3Vhau9n4FE8ehHbKM', // SCTF1 Realm
-    'BB457CW2sN2BpEXzCCi3teaCnDT3hGPZDoCCutHb6BsQ', // Yield Farming Realm
-  ];
-
-  return yfGovernances.includes(governance.pubkey.toBase58());
-}
+import { RaydiumStakeLPForm } from './raydiumStakeLPForm';
+import { isYieldFarmingGovernance } from './yieldFarming';
 
 export const TokenInstructionsForm = ({
   form,
@@ -38,8 +29,12 @@ export const TokenInstructionsForm = ({
 }) => {
   const [instruction, setInstruction] = useState<InstructionType | undefined>();
 
-  const yfInstructions = isYieldFarmingGovernance(governance)
-    ? [InstructionType.RaydiumAddLiquidity, InstructionType.RaydiumStake]
+  const yfInstructions = isYieldFarmingGovernance(governance.pubkey)
+    ? [
+        InstructionType.RaydiumAddLiquidity,
+        InstructionType.RaydiumStakeLP,
+        InstructionType.RaydiumHarvestLP,
+      ]
     : [];
 
   let instructions = [
@@ -75,12 +70,21 @@ export const TokenInstructionsForm = ({
         ></RaydiumAddLiquidityForm>
       )}
 
-      {instruction === InstructionType.RaydiumStake && (
-        <RaydiumStakeForm
+      {instruction === InstructionType.RaydiumStakeLP && (
+        <RaydiumStakeLPForm
           form={form}
           governance={governance}
           onCreateInstruction={onCreateInstruction}
-        ></RaydiumStakeForm>
+          isHarvest={false}
+        ></RaydiumStakeLPForm>
+      )}
+      {instruction === InstructionType.RaydiumHarvestLP && (
+        <RaydiumStakeLPForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+          isHarvest={true}
+        ></RaydiumStakeLPForm>
       )}
 
       <GovernanceInstructionForm
