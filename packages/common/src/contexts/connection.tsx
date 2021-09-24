@@ -83,6 +83,11 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
   tokenMap: new Map<string, TokenInfo>(),
 });
 
+enum ASSET_CHAIN {
+  Solana = 1,
+  Ethereum = 2,
+}
+
 export function ConnectionProvider({ children = undefined as any }) {
   const [endpoint, setEndpoint] = useLocalStorageState(
     'connectionEndpoint',
@@ -119,6 +124,19 @@ export function ConnectionProvider({ children = undefined as any }) {
         )
         .getList();
 
+
+      // WORMHOLE TOKEN NEEDED
+      list.push({
+        address: "66CgfJQoZkpkrEgC1z4vFJcSFc4V6T5HqbjSSNuqcNJz",
+        chainId: ASSET_CHAIN.Solana,
+        decimals: 9,
+        logoURI: "https://assets.coingecko.com/coins/images/15500/thumb/ibbtc.png?1621077589",
+        name: "Interest Bearing Bitcoin (Wormhole)",
+        symbol: "IBBTC",
+        extensions: {
+          address: "0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f",
+        }
+      })
       const knownMints = [...list].reduce((map, item) => {
         map.set(item.address, item);
         return map;
