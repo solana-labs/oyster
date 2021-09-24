@@ -29,21 +29,6 @@ export const TokenSelectModal = (props: {
   const [search, setSearch] = useState<string>('');
 
   const inputRef = useRef<Input>(null);
-  // const tokens = useMemo(
-  //   () => {
-  //     const ethAddresses = ethTokens.reduce((set, t) => {
-  //       if(t.address) {
-  //         set.add(t.address.toLowerCase());
-  //       }
-  //       return set;
-  //     }, new Set<string>());
-  //     return [
-  //       ...filterModalEthTokens(ethTokens),
-  //       ...filterModalSolTokens(solTokens).filter(t => !ethAddresses.has((t?.extensions?.address || '').toLowerCase())),
-  //     ];
-  //   },
-  //   [ethTokens, solTokens],
-  // );
 
   const tokenList = useMemo(() => {
     const tokens: any [] = [];
@@ -57,7 +42,8 @@ export const TokenSelectModal = (props: {
             if (token.extensions?.address) {
               const ethToken = ethTokenMap.get(token.extensions.address.toLowerCase())
               if (ethToken){
-                tokens.push({token: ethToken, chain: ASSET_CHAIN.Solana})
+                const name = `${ethToken.name} (Wormhole)`;
+                tokens.push({token: {...ethToken, name}, chain: ASSET_CHAIN.Solana})
               } else {
                 console.log("Wormhole token without contract info: ", token)
               }
@@ -65,15 +51,6 @@ export const TokenSelectModal = (props: {
           }
         }
       })
-      // if (search) {
-      //   return tokens.filter(token => {
-      //     return (
-      //       (token.tags?.indexOf('longList') || -1) < 0 &&
-      //       (token.symbol.toLowerCase().includes(search.toLowerCase()) ||
-      //         token.name.toLowerCase().includes(search.toLowerCase()))
-      //     );
-      //   });
-      // }
     }
     return tokens;
   }, [connected, userAccounts.length]);
@@ -99,12 +76,6 @@ export const TokenSelectModal = (props: {
   const getTokenInfo = (token: TokenInfo | undefined, chain: ASSET_CHAIN | undefined) => {
     let name = token?.name || '';
     let symbol = token?.symbol || '';
-    // if (token && chain !== ASSET_CHAIN.Solana) {
-    //   if((token.tags || []).indexOf('wormhole') >= 0) {
-    //     name = name.replace('(Wormhole)', '').trim();
-    //     symbol = symbol.startsWith('w') ? symbol.slice(1, symbol.length) : symbol;
-    //   }
-    // }
     return { name, symbol };
   }
 
