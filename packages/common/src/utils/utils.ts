@@ -35,7 +35,11 @@ export function useLocalStorageState(key: string, defaultState?: string) {
       if (newState === null) {
         localStorage.removeItem(key);
       } else {
-        localStorage.setItem(key, JSON.stringify(newState));
+        try {
+          localStorage.setItem(key, JSON.stringify(newState));
+        } catch {
+          // ignore
+        }
       }
     },
     [state, key],
@@ -43,6 +47,38 @@ export function useLocalStorageState(key: string, defaultState?: string) {
 
   return [state, setLocalStorageState];
 }
+
+export const findProgramAddress = async (
+  seeds: (Buffer | Uint8Array)[],
+  programId: PublicKey,
+) => {
+  const key =
+    'pda-' +
+    seeds.reduce((agg, item) => agg + item.toString('hex'), '') +
+    programId.toString();
+  let cached = localStorage.getItem(key);
+  if (cached) {
+    const value = JSON.parse(cached);
+
+    return [value.key, parseInt(value.nonce)] as [string, number];
+  }
+
+  const result = await PublicKey.findProgramAddress(seeds, programId);
+
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        key: result[0].toBase58(),
+        nonce: result[1],
+      }),
+    );
+  } catch {
+    // ignore
+  }
+
+  return [result[0].toBase58(), result[1]] as [string, number];
+};
 
 // shorten the checksummed version of the input address to have 4 characters at start and end
 export function shortenAddress(address: string, chars = 4): string {
@@ -159,7 +195,7 @@ export function fromLamports(
       : account.info.amount.toNumber(),
   );
 
-  const precision = Math.pow(10, mint?.decimals || 0);
+  const precision = Math.pow(10, mint?.decimals || 9);
   return (amount / precision) * rate;
 }
 
@@ -187,17 +223,17 @@ const abbreviateNumber = (number: number, precision: number) => {
 
 export const formatAmount = (
   val: number,
-  precision: number = 6,
+  precision: number = 2,
   abbr: boolean = true,
 ) => (abbr ? abbreviateNumber(val, precision) : val.toFixed(precision));
 
 export function formatTokenAmount(
-  account?: TokenAccount,
+  account?: TokenAccount | number | BN,
   mint?: MintInfo,
   rate: number = 1.0,
   prefix = '',
   suffix = '',
-  precision = 6,
+  precision = 2,
   abbr = false,
 ): string {
   if (!account) {
