@@ -1,5 +1,6 @@
 import {
   AccountInfo,
+  PublicKey,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
@@ -80,7 +81,7 @@ export class BidState {
 }
 
 export const AuctionParser: AccountParser = (
-  pubkey: StringPublicKey,
+  pubkey: PublicKey,
   account: AccountInfo<Buffer>,
 ) => ({
   pubkey,
@@ -97,7 +98,7 @@ export const decodeAuction = (buffer: Buffer) => {
 };
 
 export const BidderPotParser: AccountParser = (
-  pubkey: StringPublicKey,
+  pubkey: PublicKey,
   account: AccountInfo<Buffer>,
 ) => ({
   pubkey,
@@ -110,7 +111,7 @@ export const decodeBidderPot = (buffer: Buffer) => {
 };
 
 export const AuctionDataExtendedParser: AccountParser = (
-  pubkey: StringPublicKey,
+  pubkey: PublicKey,
   account: AccountInfo<Buffer>,
 ) => ({
   pubkey,
@@ -127,7 +128,7 @@ export const decodeAuctionDataExtended = (buffer: Buffer) => {
 };
 
 export const BidderMetadataParser: AccountParser = (
-  pubkey: StringPublicKey,
+  pubkey: PublicKey,
   account: AccountInfo<Buffer>,
 ) => ({
   pubkey,
@@ -645,7 +646,7 @@ export async function createAuction(
     {
       pubkey: toPublicKey(
         await getAuctionExtended({
-          auctionProgramId,
+          auctionProgramId: auctionProgramId.toString(),
           resource: settings.resource,
         }),
       ),
@@ -796,7 +797,7 @@ export async function placeBid(
   )[0];
 
   const bidderPotKey = await getBidderPotKey({
-    auctionProgramId,
+    auctionProgramId: auctionProgramId.toString(),
     auctionKey,
     bidderPubkey,
   });
@@ -847,7 +848,10 @@ export async function placeBid(
     },
     {
       pubkey: toPublicKey(
-        await getAuctionExtended({ auctionProgramId, resource }),
+        await getAuctionExtended({
+          auctionProgramId: auctionProgramId.toString(),
+          resource,
+        }),
       ),
       isSigner: false,
       isWritable: true,
@@ -974,7 +978,7 @@ export async function cancelBid(
   )[0];
 
   const bidderPotKey = await getBidderPotKey({
-    auctionProgramId,
+    auctionProgramId: auctionProgramId.toString(),
     auctionKey,
     bidderPubkey,
   });
@@ -1025,7 +1029,10 @@ export async function cancelBid(
     },
     {
       pubkey: toPublicKey(
-        await getAuctionExtended({ auctionProgramId, resource }),
+        await getAuctionExtended({
+          auctionProgramId: auctionProgramId.toString(),
+          resource,
+        }),
       ),
       isSigner: false,
       isWritable: true,
