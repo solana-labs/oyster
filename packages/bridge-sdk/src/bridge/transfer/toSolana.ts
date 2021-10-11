@@ -30,7 +30,12 @@ export const toSolana = async (
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,
 ) => {
-  if (!request.asset || !request.amount || !request.info) {
+  if (
+    !request.asset ||
+    !request.amount ||
+    !request.info ||
+    !request.info.address
+  ) {
     return;
   }
   const walletName = 'MetaMask';
@@ -68,6 +73,8 @@ export const toSolana = async (
 
       const group = 'Initiate transfer';
       try {
+        let mintKey: PublicKey;
+
         const bridgeId = programIds().wormhole.pubkey;
         const authority = await bridgeAuthorityKey(bridgeId);
         const meta: AssetMeta = {
@@ -75,14 +82,21 @@ export const toSolana = async (
           address: request.info?.assetAddress,
           chain: request.from,
         };
-        const mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+        if (request.info.mint) {
+          mintKey = new PublicKey(request.info.mint);
+        } else {
+          mintKey = await wrappedAssetMintKey(bridgeId, authority, meta);
+        }
 
         const recipientKey =
           cache
             .byParser(TokenAccountParser)
             .map(key => {
               let account = cache.get(key) as ParsedAccount<AccountInfo>;
-              if (account?.info.mint.toBase58() === mintKey.toBase58()) {
+              if (
+                account?.info.mint.toBase58() === mintKey.toBase58() &&
+                account?.info.owner.toBase58() === wallet?.publicKey?.toBase58()
+              ) {
                 return key;
               }
 
@@ -114,6 +128,7 @@ export const toSolana = async (
 
         if (!accounts.array[0]) {
           // create mint using wormhole instruction
+
           instructions.push(
             await createWrappedAssetInstruction(
               meta,
@@ -164,14 +179,14 @@ export const toSolana = async (
     },
     // approves assets for transfer
     approve: async (request: TransferRequest) => {
-      if (!request.asset) {
+      if (!request.info?.address) {
         return;
       }
 
       const group = 'Approve assets';
       try {
         if (request.info?.allowance.lt(amountBN)) {
-          let e = ERC20Factory.connect(request.asset, signer);
+          let e = ERC20Factory.connect(request.info.address, signer);
           setProgress({
             message: `Waiting for ${walletName} approval`,
             type: 'user',
@@ -180,7 +195,8 @@ export const toSolana = async (
           });
           let res = await e.approve(programIds().wormhole.bridge, amountBN);
           setProgress({
-            message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
+            message:
+              'Waiting for ETH transaction to be mined... (Up to few min.)',
             type: 'wait',
             group,
             step: counter++,
@@ -216,7 +232,7 @@ export const toSolana = async (
     lock: async (request: TransferRequest) => {
       if (
         !amountBN ||
-        !request.asset ||
+        !request.info?.address ||
         !request.recipient ||
         !request.to ||
         !request.info
@@ -235,7 +251,7 @@ export const toSolana = async (
           step: counter++,
         });
         let res = await wh.lockAssets(
-          request.asset,
+          request.info.address,
           amountBN,
           request.recipient,
           request.to,
@@ -243,7 +259,8 @@ export const toSolana = async (
           false,
         );
         setProgress({
-          message: 'Waiting for ETH transaction to be mined... (Up to few min.)',
+          message:
+            'Waiting for ETH transaction to be mined... (Up to few min.)',
           type: 'wait',
           group,
           step: counter++,

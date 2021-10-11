@@ -1,6 +1,6 @@
-import EventEmitter from "eventemitter3";
-import { PublicKey } from "@solana/web3.js";
-import { notify } from "../utils/notifications";
+import EventEmitter from 'eventemitter3';
+import { PublicKey } from '@solana/web3.js';
+import { notify } from '../utils/notifications';
 
 export class SolongAdapter extends EventEmitter {
   _publicKey: any;
@@ -27,8 +27,8 @@ export class SolongAdapter extends EventEmitter {
 
     if ((window as any).solong === undefined) {
       notify({
-        message: "Solong Error",
-        description: "Please install solong wallet from Chrome ",
+        message: 'Solong Error',
+        description: 'Please install solong wallet from Chrome ',
       });
       return;
     }
@@ -38,7 +38,7 @@ export class SolongAdapter extends EventEmitter {
       .selectAccount()
       .then((account: any) => {
         this._publicKey = new PublicKey(account);
-        this.emit("connect", this._publicKey);
+        this.emit('connect', this._publicKey);
       })
       .catch(() => {
         this.disconnect();
@@ -51,7 +51,7 @@ export class SolongAdapter extends EventEmitter {
   disconnect() {
     if (this._publicKey) {
       this._publicKey = null;
-      this.emit("disconnect");
+      this.emit('disconnect');
     }
   }
 }

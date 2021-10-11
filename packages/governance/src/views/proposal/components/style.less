@@ -1,0 +1,45 @@
+.wordwrap {
+  white-space: pre-wrap; /* CSS3 */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: -pre-wrap; /* Opera <7 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* IE */
+}
+
+.vote-radio-group {
+  width: 100%;
+  user-select: none;
+  padding: 10px;
+  .ant-radio-button-wrapper {
+    width: 50%;
+    text-align: center;
+  }
+}
+
+.instruction-log-list {
+  position: relative;
+  list-style: none;
+  margin-left: 0;
+  padding-left: 1.2em;
+}
+
+.instruction-log-list li:before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: gray;
+}
+
+.vote-score-container div.ant-tooltip {
+  z-index: 1;
+}
+
+.cd-number {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.cd-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}

@@ -3,9 +3,7 @@ import { Button, Select } from 'antd';
 import { useWallet } from '../../contexts/wallet';
 import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
 import { shortenAddress } from '../../utils';
-import {
-  CopyOutlined
-} from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
 
 export const Settings = ({
   additionalSettings,
@@ -33,18 +31,28 @@ export const Settings = ({
         {connected && (
           <>
             <span>Wallet:</span>
-            {wallet?.publicKey && (<Button
-                style={{ marginBottom: 5 }} onClick={() => navigator.clipboard.writeText(wallet.publicKey?.toBase58() || '')}>
-              <CopyOutlined />
-              {shortenAddress(wallet?.publicKey.toBase58())}
-            </Button>)}
+            {wallet?.publicKey && (
+              <Button
+                style={{ marginBottom: 5 }}
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    wallet.publicKey?.toBase58() || '',
+                  )
+                }
+              >
+                <CopyOutlined />
+                {shortenAddress(wallet?.publicKey.toBase58())}
+              </Button>
+            )}
 
-            <Button onClick={select}
-            style={{ marginBottom: 5 }}>
+            <Button onClick={select} style={{ marginBottom: 5 }}>
               Change
             </Button>
-            <Button type="primary" onClick={disconnect}
-            style={{ marginBottom: 5 }}>
+            <Button
+              type="primary"
+              onClick={disconnect}
+              style={{ marginBottom: 5 }}
+            >
               Disconnect
             </Button>
           </>

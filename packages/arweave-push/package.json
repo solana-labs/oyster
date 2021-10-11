@@ -24,7 +24,7 @@
     "busboy": "^0.3.0",
     "escape-html": "^1.0.3",
     "arweave": "1.10.13",
-    "@solana/web3.js": "^1.5.0",
+    "@solana/web3.js": "^1.22.0",
     "mime-types": "2.1.30",
     "node-fetch": "2.6.1",
     "coingecko-api": "1.0.10"

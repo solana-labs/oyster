@@ -1,0 +1,110 @@
+@import '~antd/dist/antd.dark.less';
+
+.realm-container {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.realm-title {
+  font-family: 'FF Oxide Solid';
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
+  position: absolute;
+  top: -40px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0px 10px;
+
+  h1 {
+    font-size: 28px;
+    margin: 0px;
+  }
+}
+
+.governances-list-title {
+  padding: 10px 0px;
+  margin-left: 10px;
+  text-align: left;
+}
+
+.realm-item {
+  margin: 10px;
+  background-color: #202020;
+  padding: 0px !important;
+  border-radius: 15px;
+
+  .ant-badge-count {
+    top: 8px !important;
+    right: 12px !important;
+  }
+
+  .ant-list-item-extra {
+    user-select: none;
+    pointer-events: none;
+    display: flex;
+    margin: 0px !important;
+    margin-left: 0px !important;
+    margin-right: auto;
+
+    .ant-statistic {
+      margin-top: 5px;
+      padding: 0px 20px;
+
+      .ant-statistic-content {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .ant-list-item-main {
+    flex: 0 !important;
+    min-width: 250px;
+  }
+
+  .ant-list-item-meta {
+    padding: 10px;
+    margin: 0px !important;
+    margin-bottom: 0px !important;
+    display: flex;
+    align-items: center;
+    text-align: left;
+
+    .ant-list-item-meta-title {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.realm-item:hover {
+  cursor: pointer;
+  background-color: #252425;
+  border-radius: 15px;
+}
+
+.realm-actions {
+  text-align: right;
+
+  .ant-btn {
+    margin: 0px 5px;
+  }
+}
+
+.governance-action {
+  font-family: 'FF Oxide Solid';
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0px;
+}
+
+.realm-popup-action-container {
+  .ant-popover {
+    z-index: 1;
+  }
+  .ant-btn {
+    width: 100%;
+  }
+}
