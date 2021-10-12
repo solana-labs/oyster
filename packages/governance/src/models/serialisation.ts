@@ -344,7 +344,8 @@ function createGovernanceSchema(programVersion: number) {
       {
         kind: 'struct',
         fields: [
-          ['reserved', [8]],
+          ['useCommunityVoterWeightAddin', 'u8'],
+          ['reserved', [7]],
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           ['councilMint', { kind: 'option', type: 'pubkey' }],

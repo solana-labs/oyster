@@ -158,6 +158,7 @@ export class RealmConfig {
   councilMint: PublicKey | undefined;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+  useCommunityVoterWeightAddin: boolean;
   reserved: Uint8Array;
 
   constructor(args: {
@@ -165,12 +166,14 @@ export class RealmConfig {
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
     minCommunityTokensToCreateGovernance: BN;
     reserved: Uint8Array;
+    useCommunityVoterWeightAddin: boolean;
   }) {
     this.councilMint = args.councilMint;
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
+    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
     this.reserved = args.reserved;
   }
 }
