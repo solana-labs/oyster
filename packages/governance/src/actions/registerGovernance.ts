@@ -21,6 +21,7 @@ export const registerGovernance = async (
   let instructions: TransactionInstruction[] = [];
 
   let governanceAddress;
+  let governanceAuthority = walletPubkey;
 
   switch (governanceType) {
     case GovernanceType.Account: {
@@ -33,6 +34,7 @@ export const registerGovernance = async (
           config,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -49,6 +51,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -65,6 +68,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -81,6 +85,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
