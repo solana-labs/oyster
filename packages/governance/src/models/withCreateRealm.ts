@@ -12,6 +12,7 @@ import {
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
   getTokenHoldingAddress,
+  getRealmConfigAddress,
 } from './accounts';
 import BN from 'bn.js';
 
@@ -29,6 +30,12 @@ export async function withCreateRealm(
   communityVoterWeightAddin: PublicKey | undefined,
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
+
+  if (communityVoterWeightAddin && programVersion < 2) {
+    throw new Error(
+      `Voter weight addin is not supported in version ${programVersion}`,
+    );
+  }
 
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
@@ -119,6 +126,25 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ];
+  }
+
+  const realmConfigAddress = await getRealmConfigAddress(
+    programId,
+    realmAddress,
+  );
+
+  keys.push({
+    pubkey: realmConfigAddress,
+    isSigner: false,
+    isWritable: true,
+  });
+
+  if (communityVoterWeightAddin) {
+    keys.push({
+      pubkey: communityVoterWeightAddin,
+      isWritable: false,
+      isSigner: false,
+    });
   }
 
   instructions.push(

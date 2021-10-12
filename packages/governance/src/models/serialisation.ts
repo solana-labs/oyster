@@ -45,6 +45,7 @@ import {
   VoteRecord,
   VoteThresholdPercentage,
   VoteWeight,
+  RealmConfigAccount,
 } from './accounts';
 import { serialize } from 'borsh';
 
@@ -361,6 +362,17 @@ function createGovernanceSchema(programVersion: number) {
           ['reserved', [8]],
           ['authority', { kind: 'option', type: 'pubkey' }],
           ['name', 'string'],
+        ],
+      },
+    ],
+    [
+      RealmConfigAccount,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['realm', 'pubkey'],
+          ['communityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
         ],
       },
     ],
