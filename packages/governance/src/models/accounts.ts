@@ -125,15 +125,19 @@ export class MintMaxVoteWeightSource {
 
 export class RealmConfigArgs {
   useCouncilMint: boolean;
-
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+
+  // Versions >= 2
+  useCommunityVoterWeightAddin: boolean;
 
   constructor(args: {
     useCouncilMint: boolean;
 
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
     minCommunityTokensToCreateGovernance: BN;
+
+    useCommunityVoterWeightAddin: boolean;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
 
@@ -142,6 +146,7 @@ export class RealmConfigArgs {
 
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
+    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
   }
 }
 

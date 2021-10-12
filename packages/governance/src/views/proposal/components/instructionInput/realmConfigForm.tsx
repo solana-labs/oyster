@@ -47,6 +47,7 @@ export const RealmConfigForm = ({
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
       minCommunityTokensToCreateGovernance,
+      undefined,
     );
 
     onCreateInstruction(setRealmConfigIx);

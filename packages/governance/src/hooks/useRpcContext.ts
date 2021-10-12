@@ -3,9 +3,10 @@ import { PublicKey } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IWallet, RpcContext } from '../models/api';
+import { getProgramVersion } from '../models/registry/api';
 
 export function useRpcContext() {
-  const { endpoint } = useConnectionConfig();
+  const { endpoint, env } = useConnectionConfig();
   const connection = useConnection();
   const { wallet } = useWallet();
   const location = useLocation();
@@ -17,9 +18,15 @@ export function useRpcContext() {
     );
   }, [location]);
 
+  const programVersion = useMemo(() => getProgramVersion(programId, env), [
+    programId,
+    env,
+  ]);
+
   const [rpcContext, setRpcContext] = useState(
     new RpcContext(
       new PublicKey(programId),
+      programVersion,
       wallet as IWallet,
       connection,
       endpoint,
@@ -31,6 +38,7 @@ export function useRpcContext() {
       setRpcContext(
         new RpcContext(
           new PublicKey(programId),
+          programVersion,
           wallet as IWallet,
           connection,
           endpoint,
