@@ -1,23 +1,29 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
+  getRealmConfigAddress,
   getTokenHoldingAddress,
   MintMaxVoteWeightSource,
   RealmConfigArgs,
 } from './accounts';
 import { SetRealmConfigArgs } from './instructions';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
+import { utils } from '@oyster/common';
 
 export async function createSetRealmConfig(
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   realmAuthority: PublicKey,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
   communityVoterWeightAddin: PublicKey | undefined,
+  payer: PublicKey,
 ) {
+  const { system: systemId } = utils.programIds();
+
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     communityMintMaxVoteWeightSource,
@@ -26,7 +32,9 @@ export async function createSetRealmConfig(
   });
 
   const args = new SetRealmConfigArgs({ configArgs });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   let keys = [
     {
@@ -62,6 +70,35 @@ export async function createSetRealmConfig(
         isWritable: true,
       },
     ];
+  }
+
+  if (programVersion > 1) {
+    keys.push({
+      pubkey: systemId,
+      isSigner: false,
+      isWritable: false,
+    });
+
+    const realmConfigAddress = await getRealmConfigAddress(programId, realm);
+
+    keys.push({
+      pubkey: realmConfigAddress,
+      isSigner: false,
+      isWritable: true,
+    });
+
+    if (communityVoterWeightAddin) {
+      keys.push({
+        pubkey: payer,
+        isSigner: true,
+        isWritable: true,
+      });
+      keys.push({
+        pubkey: communityVoterWeightAddin,
+        isWritable: false,
+        isSigner: false,
+      });
+    }
   }
 
   return new TransactionInstruction({
