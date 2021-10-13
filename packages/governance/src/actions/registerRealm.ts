@@ -7,7 +7,7 @@ import { withCreateRealm } from '../models/withCreateRealm';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export async function registerRealm(
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   name: string,
   communityMint: PublicKey,
   councilMint: PublicKey | undefined,
@@ -19,6 +19,7 @@ export async function registerRealm(
   const realmAddress = await withCreateRealm(
     instructions,
     programId,
+    programVersion,
     name,
     walletPubkey,
     communityMint,
@@ -26,6 +27,7 @@ export async function registerRealm(
     councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
+    undefined,
   );
 
   await sendTransactionWithNotifications(

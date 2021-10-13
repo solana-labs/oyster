@@ -17,6 +17,7 @@ export const withCreateAccountGovernance = async (
   config: GovernanceConfig,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
+  governanceAuthority: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const { system: systemId } = utils.programIds();
 
@@ -67,6 +68,11 @@ export const withCreateAccountGovernance = async (
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
+    },
+    {
+      pubkey: governanceAuthority,
+      isWritable: false,
+      isSigner: true,
     },
   ];
 

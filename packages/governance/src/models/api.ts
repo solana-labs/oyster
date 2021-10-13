@@ -9,6 +9,7 @@ import {
   Realm,
 } from './accounts';
 import { WalletNotConnectedError } from './errors';
+import { getErrorMessage } from '../tools/script';
 
 export interface IWallet {
   publicKey: PublicKey;
@@ -17,12 +18,14 @@ export interface IWallet {
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey;
+  programVersion: number;
   wallet: IWallet | undefined;
   connection: Connection;
   endpoint: string;
 
   constructor(
     programId: PublicKey,
+    programVersion: number,
     wallet: IWallet | undefined,
     connection: Connection,
     endpoint: string,
@@ -31,6 +34,7 @@ export class RpcContext {
     this.wallet = wallet;
     this.connection = connection;
     this.endpoint = endpoint;
+    this.programVersion = programVersion;
   }
 
   get walletPubkey() {
@@ -73,10 +77,10 @@ export const pubkeyFilter = (
   pubkey: PublicKey | undefined | null,
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
-export async function getRealms(rpcContext: RpcContext) {
+export async function getRealms(endpoint: string, programId: PublicKey) {
   return getGovernanceAccountsImpl<Realm>(
-    rpcContext.programId,
-    rpcContext.endpoint,
+    programId,
+    endpoint,
     Realm,
     GovernanceAccountType.Realm,
   );
@@ -173,7 +177,10 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
 
       accounts[account.pubkey.toBase58()] = account;
     } catch (ex) {
-      console.error(`Can't deserialize ${accountClass}`, ex);
+      console.info(
+        `Can't deserialize ${accountClass.name} @ ${rawAccount.pubkey}.`,
+        getErrorMessage(ex),
+      );
     }
   }
 
