@@ -1,8 +1,11 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { getProgramDataAccount } from '../../tools/sdk/bpfUpgradeableLoader/accounts';
 
+export const PROGRAM_VERSION_V1 = 1;
+export const PROGRAM_VERSION_V2 = 2;
+
 // The most up to date program version
-export const PROGRAM_VERSION = 2;
+export const PROGRAM_VERSION = PROGRAM_VERSION_V2;
 
 export async function getProgramVersion(
   connection: Connection,
@@ -21,7 +24,7 @@ export async function getProgramVersion(
 
   const slot = getLatestVersionCutOffSlot(env);
 
-  return programData.slot > slot ? PROGRAM_VERSION : 1;
+  return programData.slot > slot ? PROGRAM_VERSION : PROGRAM_VERSION_V1;
 }
 
 // Returns the min deployment slot from which onwards the program should be on the latest version

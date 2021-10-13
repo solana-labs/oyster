@@ -4,25 +4,30 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { DepositGoverningTokensArgs } from './instructions';
 import { getTokenOwnerAddress, GOVERNANCE_PROGRAM_SEED } from './accounts';
+import BN from 'bn.js';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governingTokenSource: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
   transferAuthority: PublicKey,
   payer: PublicKey,
+  amount: BN,
 ) => {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  const args = new DepositGoverningTokensArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const args = new DepositGoverningTokensArgs({ amount });
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   const tokenOwnerRecordAddress = await getTokenOwnerAddress(
     programId,

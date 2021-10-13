@@ -7,7 +7,7 @@ import { RpcContext } from '../models/core/api';
 const { approve } = models;
 
 export const depositGoverningTokens = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
@@ -15,12 +15,14 @@ export const depositGoverningTokens = async (
   let instructions: TransactionInstruction[] = [];
   let signers: Account[] = [];
 
+  const amount = governingTokenSource.info.amount;
+
   const transferAuthority = approve(
     instructions,
     [],
     governingTokenSource.pubkey,
     walletPubkey,
-    governingTokenSource.info.amount,
+    amount,
   );
 
   signers.push(transferAuthority);
@@ -28,12 +30,14 @@ export const depositGoverningTokens = async (
   await withDepositGoverningTokens(
     instructions,
     programId,
+    programVersion,
     realm,
     governingTokenSource.pubkey,
     governingTokenMint,
     walletPubkey,
     transferAuthority.publicKey,
     walletPubkey,
+    amount,
   );
 
   await sendTransactionWithNotifications(
