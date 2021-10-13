@@ -79,6 +79,10 @@ export function ProposalActionBar({
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
+          {/* <PostMessageButton
+            proposal={proposal}
+            tokenOwnerRecord={tokenOwnerRecord}
+          ></PostMessageButton> */}
         </>
       )}
     </div>

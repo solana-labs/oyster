@@ -12,8 +12,7 @@ import {
   Transaction,
   TransactionSignature,
 } from '@solana/web3.js';
-
-import { IWallet } from '../../../models/api';
+import { IWallet } from '../../../models/core/api';
 
 export async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));

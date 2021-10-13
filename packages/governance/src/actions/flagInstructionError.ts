@@ -5,7 +5,7 @@ import { Proposal } from '../models/accounts';
 
 import { withFlagInstructionError } from '../models/withFlagInstructionError';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const flagInstructionError = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

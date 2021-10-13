@@ -3,7 +3,7 @@ import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 
 import { useProgramInfo } from '../contexts/GovernanceContext';
-import { IWallet, RpcContext } from '../models/api';
+import { IWallet, RpcContext } from '../models/core/api';
 
 export function useRpcContext() {
   const { endpoint } = useConnectionConfig();

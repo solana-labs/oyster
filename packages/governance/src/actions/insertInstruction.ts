@@ -6,7 +6,7 @@ import { InstructionData, Proposal } from '../models/accounts';
 import { withInsertInstruction } from '../models/withInsertInstruction';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const insertInstruction = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

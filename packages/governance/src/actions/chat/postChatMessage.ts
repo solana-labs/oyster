@@ -1,18 +1,19 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { ParsedAccount } from '@oyster/common';
 
-import { Proposal } from '../models/accounts';
-import { withCastVote } from '../models/withCastVote';
-import { Vote } from '../models/instructions';
-import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
+import { Proposal } from '../../models/accounts';
 
-export const castVote = async (
+import { sendTransactionWithNotifications } from '../../tools/transactions';
+import { RpcContext } from '../../models/core/api';
+import { withPostChatMessage } from '../../models/chat/withPostChatMessage';
+import { ChatMessageBody } from '../../models/chat/accounts';
+
+export const postChatMessage = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  realm: PublicKey,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
-  vote: Vote,
+  replyTo: PublicKey | undefined,
+  body: ChatMessageBody,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -20,18 +21,17 @@ export const castVote = async (
   let governanceAuthority = walletPubkey;
   let payer = walletPubkey;
 
-  await withCastVote(
+  await withPostChatMessage(
     instructions,
+    signers,
     programId,
-    realm,
     proposal.info.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
     tokeOwnerRecord,
     governanceAuthority,
-    proposal.info.governingTokenMint,
-    vote,
     payer,
+    replyTo,
+    body,
   );
 
   await sendTransactionWithNotifications(
@@ -39,7 +39,7 @@ export const castVote = async (
     wallet,
     instructions,
     signers,
-    'Voting on proposal',
-    'Proposal voted on',
+    'Posting comment',
+    'Comment post',
   );
 };
