@@ -1,17 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { KeyedAccountInfo, PublicKey } from '@solana/web3.js';
 
-import { ParsedAccount } from '@oyster/common';
+import {
+  ParsedAccount,
+  useConnection,
+  useConnectionConfig,
+} from '@oyster/common';
 import { BorshAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
 import { getRealms } from '../models/api';
 import { EventEmitter } from 'eventemitter3';
-import { useRpcContext } from '../hooks/useRpcContext';
+
+import { useLocation } from 'react-router-dom';
+import { getProgramVersion, PROGRAM_VERSION } from '../models/registry/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
   changeTracker: AccountChangeTracker;
+  programId: string;
+  programVersion: number;
 }
 
 class AccountRemovedEventArgs {
@@ -46,16 +54,27 @@ export const GovernanceContext =
   React.createContext<GovernanceContextState | null>(null);
 
 export default function GovernanceProvider({ children = null as any }) {
-  const rpcContext = useRpcContext();
-  const { connection, programId } = rpcContext;
+  const connection = useConnection();
+  const { endpoint, env } = useConnectionConfig();
+  const location = useLocation();
+
+  const programId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return (
+      params.get('programId') ?? 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+    );
+  }, [location]);
 
   const [realms, setRealms] = useState({});
   const [changeTracker] = useState(new AccountChangeTracker());
+  const [programVersion, setProgramVersion] = useState(PROGRAM_VERSION);
 
   useEffect(() => {
     const sub = (async () => {
+      const programPk = new PublicKey(programId);
+
       try {
-        const loadedRealms = await getRealms(rpcContext);
+        const loadedRealms = await getRealms(endpoint, programPk);
         setRealms(loadedRealms);
       } catch (ex) {
         console.error("Can't load Realms", ex);
@@ -63,7 +82,7 @@ export default function GovernanceProvider({ children = null as any }) {
       }
 
       return connection.onProgramAccountChange(
-        programId,
+        programPk,
         async (info: KeyedAccountInfo) => {
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
             const realm = BorshAccountParser(Realm)(
@@ -82,13 +101,22 @@ export default function GovernanceProvider({ children = null as any }) {
     return () => {
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
-  }, [connection, programId.toBase58()]); //eslint-disable-line
+  }, [connection, programId]); //eslint-disable-line
+
+  useEffect(() => {
+    getProgramVersion(connection, programId, env).then(pVersion => {
+      console.log('PROGRAM VERSION', { pVersion, env });
+      setProgramVersion(pVersion);
+    });
+  }, [env, connection, programId]);
 
   return (
     <GovernanceContext.Provider
       value={{
         realms,
         changeTracker,
+        programVersion,
+        programId,
       }}
     >
       {children}
@@ -99,6 +127,14 @@ export default function GovernanceProvider({ children = null as any }) {
 export function useGovernanceContext() {
   const context = useContext(GovernanceContext);
   return context as GovernanceContextState;
+}
+
+export function useProgramInfo() {
+  const context = useGovernanceContext();
+  return {
+    programVersion: context.programVersion,
+    programId: context.programId,
+  };
 }
 
 export function useAccountChangeTracker() {

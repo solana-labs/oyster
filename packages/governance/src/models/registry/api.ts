@@ -1,18 +1,36 @@
-export function getProgramVersion(programId: string, env: string) {
-  switch (programId) {
-    // MNGO
-    case 'GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J':
-      return 1;
-    // SOCEAN
-    case '5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy':
-      return 1;
-    // SCTF1
-    case 'gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6':
-      return 1;
-    // Governance (default)
-    case 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw':
-      return env === 'localnet' ? 2 : 1;
+import { Connection, PublicKey } from '@solana/web3.js';
+import { getProgramDataAccount } from '../../tools/sdk/bpfUpgradeableLoader/accounts';
+
+// The most up to date program version
+export const PROGRAM_VERSION = 2;
+
+export async function getProgramVersion(
+  connection: Connection,
+  programId: string,
+  env: string,
+) {
+  // For localnet always use the latest version
+  if (env === 'localnet') {
+    return PROGRAM_VERSION;
+  }
+
+  const programData = await getProgramDataAccount(
+    connection,
+    new PublicKey(programId),
+  );
+
+  const slot = getLatestVersionCutOffSlot(env);
+
+  return programData.slot > slot ? PROGRAM_VERSION : 1;
+}
+
+// Returns the min deployment slot from which onwards the program should be on the latest version
+function getLatestVersionCutOffSlot(env: string) {
+  switch (env) {
+    case 'devnet':
+      return 87097690;
     default:
-      return 2;
+      // Default to mainnet slot
+      return 101260833;
   }
 }
