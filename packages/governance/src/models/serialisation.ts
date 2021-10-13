@@ -46,10 +46,11 @@ import {
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from './core/serialisation';
+import { PROGRAM_VERSION_V1 } from './registry/api';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
-  const reader = this as unknown as BinaryReader;
+  const reader = (this as unknown) as BinaryReader;
   const value = reader.buf.readUInt16LE(reader.offset);
   reader.offset += 2;
   return value;
@@ -57,7 +58,7 @@ import { BorshAccountParser } from './core/serialisation';
 
 // Temp. workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
-  const reader = this as unknown as BinaryWriter;
+  const reader = (this as unknown) as BinaryWriter;
   reader.maybeResize();
   reader.buf.writeUInt16LE(value, reader.length);
   reader.length += 2;
@@ -106,7 +107,7 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          programVersion > 1
+          programVersion > PROGRAM_VERSION_V1
             ? ['useCommunityVoterWeightAddin', 'u8']
             : undefined,
         ].filter(Boolean),
@@ -127,7 +128,11 @@ function createGovernanceSchema(programVersion: number) {
       DepositGoverningTokensArgs,
       {
         kind: 'struct',
-        fields: [['instruction', 'u8']],
+        fields: [
+          ['instruction', 'u8'],
+          // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
+          programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
+        ].filter(Boolean),
       },
     ],
     [
