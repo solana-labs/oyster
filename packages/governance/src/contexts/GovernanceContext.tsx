@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { KeyedAccountInfo, PublicKey } from '@solana/web3.js';
+import { AccountInfo, KeyedAccountInfo, PublicKey } from '@solana/web3.js';
 
 import {
   ParsedAccount,
@@ -32,6 +32,23 @@ class AccountRemovedEventArgs {
   }
 }
 
+// An event raised when account was updated or inserted
+class AccountUpdatedEventArgs {
+  pubkey: string;
+  accountType: GovernanceAccountType;
+  accountInfo: AccountInfo<Buffer>;
+
+  constructor(
+    pubkey: string,
+    accountType: GovernanceAccountType,
+    accountInfo: AccountInfo<Buffer>,
+  ) {
+    this.pubkey = pubkey;
+    this.accountType = accountType;
+    this.accountInfo = accountInfo;
+  }
+}
+
 // Tracks local changes not supported by connection notifications
 class AccountChangeTracker {
   private emitter = new EventEmitter();
@@ -46,6 +63,23 @@ class AccountChangeTracker {
     this.emitter.emit(
       AccountRemovedEventArgs.name,
       new AccountRemovedEventArgs(pubkey, accountType),
+    );
+  }
+
+  onAccountUpdated(callback: (args: AccountUpdatedEventArgs) => void) {
+    this.emitter.on(AccountUpdatedEventArgs.name, callback);
+    return () =>
+      this.emitter.removeListener(AccountUpdatedEventArgs.name, callback);
+  }
+
+  notifyAccountUpdated(
+    pubkey: string,
+    accountType: GovernanceAccountType,
+    accountInfo: AccountInfo<Buffer>,
+  ) {
+    this.emitter.emit(
+      AccountUpdatedEventArgs.name,
+      new AccountUpdatedEventArgs(pubkey, accountType, accountInfo),
     );
   }
 }
@@ -81,6 +115,8 @@ export default function GovernanceProvider({ children = null as any }) {
         setRealms({});
       }
 
+      // Use a single web socket subscription for all accounts and broadcast the updates using changeTracker
+      // Note: Do not create other subscriptions for the given program id. They would be silently ignored by the rpc endpoint
       return connection.onProgramAccountChange(
         programPk,
         async (info: KeyedAccountInfo) => {
@@ -94,6 +130,11 @@ export default function GovernanceProvider({ children = null as any }) {
               [info.accountId.toBase58()]: realm,
             }));
           }
+          changeTracker.notifyAccountUpdated(
+            info.accountId.toBase58(),
+            info.accountInfo.data[0],
+            info.accountInfo,
+          );
         },
       );
     })();
@@ -101,7 +142,7 @@ export default function GovernanceProvider({ children = null as any }) {
     return () => {
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
-  }, [connection, programId]); //eslint-disable-line
+  }, [connection, programId, endpoint]); //eslint-disable-line
 
   useEffect(() => {
     getProgramVersion(connection, programId, env).then(pVersion => {

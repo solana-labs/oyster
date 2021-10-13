@@ -21,7 +21,8 @@ export function useGovernanceAccountByPubkey<
 >(accountClass: GovernanceAccountClass, pubkey: PublicKey | undefined) {
   const [account, setAccount] = useState<Option<ParsedAccount<TAccount>>>();
 
-  const { connection, endpoint, programId } = useRpcContext();
+  const { connection, endpoint } = useRpcContext();
+  const accountChangeTracker = useAccountChangeTracker();
 
   const getByPubkey = pubkey?.toBase58();
 
@@ -48,11 +49,11 @@ export function useGovernanceAccountByPubkey<
         setAccount(none());
       }
 
-      return connection.onProgramAccountChange(programId, info => {
-        if (info.accountId.toBase58() === getByPubkey) {
+      return accountChangeTracker.onAccountUpdated(update => {
+        if (update.pubkey === getByPubkey) {
           const account = GovernanceAccountParser(accountClass)(
-            info.accountId,
-            info.accountInfo,
+            new PublicKey(update.pubkey),
+            update.accountInfo,
           ) as ParsedAccount<TAccount>;
 
           setAccount(some(account));
@@ -61,7 +62,7 @@ export function useGovernanceAccountByPubkey<
     })();
 
     return () => {
-      sub.then(id => connection.removeProgramAccountChangeListener(id));
+      sub.then(dispose => dispose());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getByPubkey, connection, endpoint]);
@@ -130,67 +131,69 @@ export function useGovernanceAccountsByFilter<
         setAccounts({});
       }
 
-      const connSubId = connection.onProgramAccountChange(programId, info => {
-        if (accountTypes.some(at => info.accountInfo.data[0] === at)) {
-          const isMatch = !queryFilters.some(
-            f => !f.isMatch(info.accountInfo.data),
-          );
+      const disposeUpdateTracker = accountChangeTracker.onAccountUpdated(
+        update => {
+          if (accountTypes.some(at => update.accountType === at)) {
+            const isMatch = !queryFilters.some(
+              f => !f.isMatch(update.accountInfo.data),
+            );
 
-          const base58Key = info.accountId.toBase58();
+            const account = GovernanceAccountParser(accountClass)(
+              new PublicKey(update.pubkey),
+              update.accountInfo,
+            ) as ParsedAccount<TAccount>;
 
-          const account = GovernanceAccountParser(accountClass)(
-            info.accountId,
-            info.accountInfo,
-          ) as ParsedAccount<TAccount>;
+            setAccounts((acts: any) => {
+              if (isMatch) {
+                return {
+                  ...acts,
+                  [update.pubkey]: account,
+                };
+              } else if (acts[update.pubkey]) {
+                return {
+                  ...Object.keys(acts)
+                    .filter(k => k !== update.pubkey)
+                    .reduce((res, key) => {
+                      res[key] = acts[key];
+                      return res;
+                    }, {} as any),
+                };
+              } else {
+                return acts;
+              }
+            });
+          }
+        },
+      );
 
-          setAccounts((acts: any) => {
-            if (isMatch) {
-              return {
-                ...acts,
-                [base58Key]: account,
-              };
-            } else if (acts[base58Key]) {
-              return {
-                ...Object.keys(acts)
-                  .filter(k => k !== base58Key)
-                  .reduce((res, key) => {
-                    res[key] = acts[key];
-                    return res;
-                  }, {} as any),
-              };
-            } else {
-              return acts;
-            }
-          });
-        }
-      });
+      const disposeRemoveTracker = accountChangeTracker.onAccountRemoved(
+        remove => {
+          if (accountTypes.some(at => remove.accountType === at)) {
+            setAccounts((acts: any) => {
+              if (acts[remove.pubkey]) {
+                return {
+                  ...Object.keys(acts)
+                    .filter(k => k !== remove.pubkey)
+                    .reduce((res, key) => {
+                      res[key] = acts[key];
+                      return res;
+                    }, {} as any),
+                };
+              } else {
+                return acts;
+              }
+            });
+          }
+        },
+      );
 
-      const disposeChangeTracker = accountChangeTracker.onAccountRemoved(ar => {
-        if (accountTypes.some(at => ar.accountType === at)) {
-          setAccounts((acts: any) => {
-            if (acts[ar.pubkey]) {
-              return {
-                ...Object.keys(acts)
-                  .filter(k => k !== ar.pubkey)
-                  .reduce((res, key) => {
-                    res[key] = acts[key];
-                    return res;
-                  }, {} as any),
-              };
-            } else {
-              return acts;
-            }
-          });
-        }
-      });
-
-      return { connSubId, disposeChangeTracker };
+      return { disposeRemoveTracker, disposeUpdateTracker };
     })();
 
     return () => {
-      sub.then(({ connSubId, disposeChangeTracker }) => {
-        connection.removeProgramAccountChangeListener(connSubId);
-        disposeChangeTracker();
+      sub.then(({ disposeRemoveTracker, disposeUpdateTracker }) => {
+        disposeRemoveTracker();
+        disposeUpdateTracker();
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
