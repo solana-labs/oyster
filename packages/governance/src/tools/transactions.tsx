@@ -12,14 +12,13 @@ import {
   WalletSigner,
 } from '@oyster/common';
 import React from 'react';
-import { IWallet } from "../models/core/api";
 import { DEFAULT_TX_TIMEOUT, sendTransaction2 } from './sdk/core/connection';
 
 const { notify } = utils;
 
 export async function sendTransactionWithNotifications(
   connection: Connection,
-  wallet: IWallet,
+  wallet: WalletSigner,
   instructions: TransactionInstruction[],
   signers: Account[],
   pendingMessage: string,

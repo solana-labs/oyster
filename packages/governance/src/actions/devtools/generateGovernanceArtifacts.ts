@@ -119,7 +119,8 @@ const withTokenGovernance = async (
   decimals: number,
   amount: u64,
 ) => {
-  if (!wallet.publicKey) throw new WalletNotConnectedError();
+  const { publicKey } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
 
   const { token: tokenId } = utils.programIds();
 
@@ -133,20 +134,20 @@ const withTokenGovernance = async (
 
   const mintAddress = createMint(
     instructions,
-    wallet.publicKey,
+    publicKey,
     mintRentExempt,
     decimals,
-    wallet.publicKey,
-    wallet.publicKey,
+    publicKey,
+    publicKey,
     signers,
   );
 
   const tokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -155,7 +156,7 @@ const withTokenGovernance = async (
       tokenId,
       mintAddress,
       tokenAccountAddress,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(amount),
     ),
@@ -163,10 +164,10 @@ const withTokenGovernance = async (
 
   const beneficiaryTokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -185,7 +186,8 @@ const withMint = async (
   amount: u64,
   supply: u64,
 ) => {
-  if (!wallet.publicKey) throw new WalletNotConnectedError();
+  const { publicKey } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
 
   const { system: systemId, token: tokenId } = utils.programIds();
 
@@ -203,20 +205,20 @@ const withMint = async (
 
   const mintAddress = createMint(
     instructions,
-    wallet.publicKey,
+    publicKey,
     mintRentExempt,
     decimals,
-    wallet.publicKey,
-    wallet.publicKey,
+    publicKey,
+    publicKey,
     signers,
   );
 
   const tokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -225,7 +227,7 @@ const withMint = async (
       tokenId,
       mintAddress,
       tokenAccountAddress,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(amount),
     ),
@@ -234,7 +236,7 @@ const withMint = async (
   const otherOwner = new Account();
   instructions.push(
     SystemProgram.createAccount({
-      fromPubkey: wallet.publicKey,
+      fromPubkey: publicKey,
       newAccountPubkey: otherOwner.publicKey,
       lamports: accountRentExempt,
       space: 0,
@@ -251,7 +253,7 @@ const withMint = async (
 
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
     otherOwnerPubKey,
@@ -263,7 +265,7 @@ const withMint = async (
       tokenId,
       mintAddress,
       otherOwnerTokenAccount,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(supply.sub(amount).toArray()),
     ),
