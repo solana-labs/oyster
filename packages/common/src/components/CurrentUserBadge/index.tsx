@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useNativeAccount } from '../../contexts/accounts';
@@ -15,7 +15,14 @@ export const CurrentUserBadge = (props: {
   const { wallet, publicKey } = useWallet();
   const { account } = useNativeAccount();
 
-  if (!wallet || !publicKey) {
+  const address = useMemo(() => {
+    if (publicKey) {
+      const base58 = publicKey.toBase58();
+      return `${base58.slice(0, 4)}...${base58.slice(-4)}`;
+    }
+  }, [publicKey])
+
+  if (!wallet || !address) {
     return null;
   }
 
@@ -58,7 +65,7 @@ export const CurrentUserBadge = (props: {
         trigger="click"
       >
         <div className="wallet-key" style={walletKeyStyle}>
-          <span style={{ marginRight: '0.5rem' }}>{wallet.name}</span>
+          <span style={{ marginRight: '0.5rem' }}>{address}</span>
           <img src={wallet.icon} style={iconStyle} />
         </div>
       </Popover>
