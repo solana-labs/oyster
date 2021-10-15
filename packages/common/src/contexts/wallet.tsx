@@ -24,7 +24,7 @@ export function useWalletModal(): WalletModalContextState {
   return useContext(WalletModalContext);
 }
 
-export const WalletModal: FC = () => {
+export const WalletModal = () => {
   const { wallets, wallet: selected, select } = useWallet();
   const { visible, setVisible } = useWalletModal();
   const close = useCallback(() => setVisible(false), [setVisible]);
@@ -69,7 +69,7 @@ export const WalletModal: FC = () => {
   );
 };
 
-export const WalletModalProvider: FC<{ children: ReactNode }> = ({children}) => {
+export const WalletModalProvider = ({ children }: { children: ReactNode }) => {
   const { publicKey } = useWallet();
   const [connected, setConnected] = useState(!!publicKey);
   const [visible, setVisible] = useState(false);
@@ -118,7 +118,7 @@ export const WalletModalProvider: FC<{ children: ReactNode }> = ({children}) => 
   );
 };
 
-export const WalletProvider: FC<{children: ReactNode }> = ({ children }) => {
+export const WalletProvider = ({ children }: {children: ReactNode }) => {
   const wallets = useMemo(
     () => [
       getPhantomWallet(),
