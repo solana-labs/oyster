@@ -1,17 +1,55 @@
-import { WalletAdapter, WalletError } from '@solana/wallet-adapter-base';
-import { useWallet, WalletProvider as BaseWalletProvider } from '@solana/wallet-adapter-react';
+import {
+  MessageSignerWalletAdapterProps,
+  SignerWalletAdapter,
+  SignerWalletAdapterProps,
+  WalletAdapterNetwork,
+  WalletAdapterProps,
+  WalletError,
+  WalletNotConnectedError,
+} from '@solana/wallet-adapter-base';
+import {
+  useWallet as useWalletBase,
+  WalletProvider as BaseWalletProvider
+} from '@solana/wallet-adapter-react';
 import {
   getLedgerWallet,
-  getMathWallet,
   getPhantomWallet,
+  getSlopeWallet,
   getSolflareWallet,
   getSolletWallet,
-  getSolongWallet,
+  getSolletExtensionWallet,
   getTorusWallet,
+  Wallet,
+  WalletName,
 } from '@solana/wallet-adapter-wallets';
 import { Button, Modal } from "antd";
 import React, { createContext, FC, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { notify } from "../utils";
+import { useConnectionConfig } from "./connection";
+
+export interface WalletContextState extends WalletAdapterProps {
+  wallets: Wallet[];
+  autoConnect: boolean;
+
+  wallet: Wallet | null;
+  adapter: SignerWalletAdapter | MessageSignerWalletAdapterProps | null;
+  disconnecting: boolean;
+
+  select(walletName: WalletName): void;
+
+  signTransaction: SignerWalletAdapterProps['signTransaction'];
+  signAllTransactions: SignerWalletAdapterProps['signAllTransactions'];
+
+  signMessage: MessageSignerWalletAdapterProps['signMessage'] | undefined;
+}
+
+export function useWallet (): WalletContextState {
+  return useWallet() as WalletContextState;
+}
+
+export { SignerWalletAdapter, WalletNotConnectedError };
+
+export type WalletSigner = Pick<SignerWalletAdapter, 'publicKey' | 'signTransaction' | 'signAllTransactions'>;
 
 export interface WalletModalContextState {
   visible: boolean;
@@ -119,19 +157,33 @@ export const WalletModalProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const WalletProvider = ({ children }: {children: ReactNode }) => {
+  const { env } = useConnectionConfig();
+
+  const network = useMemo(() => {
+    switch (env) {
+      case "mainnet-beta":
+      case "mainnet-beta (Serum)":
+        return WalletAdapterNetwork.Mainnet;
+      case "testnet":
+        return WalletAdapterNetwork.Testnet;
+      case "devnet":
+      case "localnet":
+      default:
+        return WalletAdapterNetwork.Devnet;
+    }
+  }, [env]);
+
   const wallets = useMemo(
     () => [
       getPhantomWallet(),
+      getSlopeWallet(),
       getSolflareWallet(),
       getTorusWallet({
-        options: {
-          clientId: 'BOM5Cl7PXgE9Ylq1Z1tqzhpydY0RVr8k90QQ85N7AKI5QGSrr9iDC-3rvmy0K_hF0JfpLMiXoDhta68JwcxS1LQ',
-        },
+        options: { clientId: 'Get a client ID @ https://developer.tor.us' }
       }),
       getLedgerWallet(),
-      getSolongWallet(),
-      getMathWallet(),
-      getSolletWallet(),
+      getSolletWallet({ network }),
+      getSolletExtensionWallet({ network }),
     ],
     []
   );
@@ -156,5 +208,3 @@ export const WalletProvider = ({ children }: {children: ReactNode }) => {
     </BaseWalletProvider>
   );
 }
-
-export type WalletSigner = Pick<WalletAdapter, 'publicKey' | 'signTransaction' | 'signAllTransactions'>;
