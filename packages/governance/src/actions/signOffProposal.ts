@@ -4,7 +4,7 @@ import { ParsedAccount } from '@oyster/common';
 import { SignatoryRecord } from '../models/accounts';
 import { withSignOffProposal } from '../models/withSignOffProposal';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const signOffProposal = async (
   { connection, wallet, programId }: RpcContext,

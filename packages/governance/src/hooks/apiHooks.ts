@@ -1,23 +1,42 @@
 import { PublicKey } from '@solana/web3.js';
 import { useWallet } from '@oyster/common';
 import {
+  getRealmConfigAddress,
   getSignatoryRecordAddress,
   getTokenOwnerAddress,
   getVoteRecordAddress,
   Governance,
   Proposal,
   ProposalInstruction,
+  RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts';
-import { pubkeyFilter } from '../models/api';
+import { pubkeyFilter } from '../models/core/api';
 import {
   useGovernanceAccountByPda,
   useGovernanceAccountByPubkey,
   useGovernanceAccountsByFilter,
 } from './accountHooks';
 import { useRpcContext } from './useRpcContext';
+
+// ----- Realm Config ---------
+
+export function useRealmConfig(realm: PublicKey) {
+  const { programId } = useRpcContext();
+
+  return useGovernanceAccountByPda<RealmConfigAccount>(
+    RealmConfigAccount,
+    async () => {
+      if (!realm) {
+        return;
+      }
+      return await getRealmConfigAddress(programId, realm);
+    },
+    [realm],
+  )?.tryUnwrap();
+}
 
 // ----- Governance -----
 

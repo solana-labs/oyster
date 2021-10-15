@@ -1,17 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { KeyedAccountInfo, PublicKey } from '@solana/web3.js';
+import { AccountInfo, KeyedAccountInfo, PublicKey } from '@solana/web3.js';
 
-import { ParsedAccount } from '@oyster/common';
-import { BorshAccountParser } from '../models/serialisation';
+import {
+  ParsedAccount,
+  useConnection,
+  useConnectionConfig,
+} from '@oyster/common';
+import { GovernanceAccountParser } from '../models/serialisation';
 import { GovernanceAccountType, Realm } from '../models/accounts';
 import { getRealms } from '../models/api';
 import { EventEmitter } from 'eventemitter3';
-import { useRpcContext } from '../hooks/useRpcContext';
+
+import { useLocation } from 'react-router-dom';
+import { getProgramVersion, PROGRAM_VERSION } from '../models/registry/api';
 
 export interface GovernanceContextState {
   realms: Record<string, ParsedAccount<Realm>>;
   changeTracker: AccountChangeTracker;
+  programId: string;
+  programVersion: number;
 }
 
 class AccountRemovedEventArgs {
@@ -21,6 +29,23 @@ class AccountRemovedEventArgs {
   constructor(pubkey: string, accountType: GovernanceAccountType) {
     this.pubkey = pubkey;
     this.accountType = accountType;
+  }
+}
+
+// An event raised when account was updated or inserted
+class AccountUpdatedEventArgs {
+  pubkey: string;
+  accountType: GovernanceAccountType;
+  accountInfo: AccountInfo<Buffer>;
+
+  constructor(
+    pubkey: string,
+    accountType: GovernanceAccountType,
+    accountInfo: AccountInfo<Buffer>,
+  ) {
+    this.pubkey = pubkey;
+    this.accountType = accountType;
+    this.accountInfo = accountInfo;
   }
 }
 
@@ -40,33 +65,63 @@ class AccountChangeTracker {
       new AccountRemovedEventArgs(pubkey, accountType),
     );
   }
+
+  onAccountUpdated(callback: (args: AccountUpdatedEventArgs) => void) {
+    this.emitter.on(AccountUpdatedEventArgs.name, callback);
+    return () =>
+      this.emitter.removeListener(AccountUpdatedEventArgs.name, callback);
+  }
+
+  notifyAccountUpdated(
+    pubkey: string,
+    accountType: GovernanceAccountType,
+    accountInfo: AccountInfo<Buffer>,
+  ) {
+    this.emitter.emit(
+      AccountUpdatedEventArgs.name,
+      new AccountUpdatedEventArgs(pubkey, accountType, accountInfo),
+    );
+  }
 }
 
 export const GovernanceContext =
   React.createContext<GovernanceContextState | null>(null);
 
 export default function GovernanceProvider({ children = null as any }) {
-  const rpcContext = useRpcContext();
-  const { connection, programId } = rpcContext;
+  const connection = useConnection();
+  const { endpoint, env } = useConnectionConfig();
+  const location = useLocation();
+
+  const programId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return (
+      params.get('programId') ?? 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+    );
+  }, [location]);
 
   const [realms, setRealms] = useState({});
   const [changeTracker] = useState(new AccountChangeTracker());
+  const [programVersion, setProgramVersion] = useState(PROGRAM_VERSION);
 
   useEffect(() => {
     const sub = (async () => {
+      const programPk = new PublicKey(programId);
+
       try {
-        const loadedRealms = await getRealms(rpcContext);
+        const loadedRealms = await getRealms(endpoint, programPk);
         setRealms(loadedRealms);
       } catch (ex) {
         console.error("Can't load Realms", ex);
         setRealms({});
       }
 
+      // Use a single web socket subscription for all accounts and broadcast the updates using changeTracker
+      // Note: Do not create other subscriptions for the given program id. They would be silently ignored by the rpc endpoint
       return connection.onProgramAccountChange(
-        programId,
+        programPk,
         async (info: KeyedAccountInfo) => {
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
-            const realm = BorshAccountParser(Realm)(
+            const realm = GovernanceAccountParser(Realm)(
               info.accountId,
               info.accountInfo,
             );
@@ -75,6 +130,11 @@ export default function GovernanceProvider({ children = null as any }) {
               [info.accountId.toBase58()]: realm,
             }));
           }
+          changeTracker.notifyAccountUpdated(
+            info.accountId.toBase58(),
+            info.accountInfo.data[0],
+            info.accountInfo,
+          );
         },
       );
     })();
@@ -82,13 +142,22 @@ export default function GovernanceProvider({ children = null as any }) {
     return () => {
       sub.then(id => connection.removeProgramAccountChangeListener(id));
     };
-  }, [connection, programId.toBase58()]); //eslint-disable-line
+  }, [connection, programId, endpoint]); //eslint-disable-line
+
+  useEffect(() => {
+    getProgramVersion(connection, programId, env).then(pVersion => {
+      console.log('PROGRAM VERSION', { pVersion, env });
+      setProgramVersion(pVersion);
+    });
+  }, [env, connection, programId]);
 
   return (
     <GovernanceContext.Provider
       value={{
         realms,
         changeTracker,
+        programVersion,
+        programId,
       }}
     >
       {children}
@@ -99,6 +168,14 @@ export default function GovernanceProvider({ children = null as any }) {
 export function useGovernanceContext() {
   const context = useContext(GovernanceContext);
   return context as GovernanceContextState;
+}
+
+export function useProgramInfo() {
+  const context = useGovernanceContext();
+  return {
+    programVersion: context.programVersion,
+    programId: context.programId,
+  };
 }
 
 export function useAccountChangeTracker() {

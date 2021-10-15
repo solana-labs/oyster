@@ -7,7 +7,7 @@ import { withCreateProgramGovernance } from '../models/withCreateProgramGovernan
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { withCreateMintGovernance } from '../models/withCreateMintGovernance';
 import { withCreateTokenGovernance } from '../models/withCreateTokenGovernance';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const registerGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -21,6 +21,7 @@ export const registerGovernance = async (
   let instructions: TransactionInstruction[] = [];
 
   let governanceAddress;
+  let governanceAuthority = walletPubkey;
 
   switch (governanceType) {
     case GovernanceType.Account: {
@@ -33,6 +34,7 @@ export const registerGovernance = async (
           config,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -49,6 +51,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -65,6 +68,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;
@@ -81,6 +85,7 @@ export const registerGovernance = async (
           walletPubkey,
           tokenOwnerRecord,
           walletPubkey,
+          governanceAuthority,
         )
       ).governanceAddress;
       break;

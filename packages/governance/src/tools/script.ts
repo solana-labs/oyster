@@ -7,3 +7,11 @@ export function nameOf<T>(name: keyof T) {
 export function getNameOf<T>() {
   return (name: keyof T) => name;
 }
+
+export function getErrorMessage(ex: any) {
+  if (ex instanceof Error) {
+    return ex.message;
+  }
+
+  return JSON.stringify(ex);
+}

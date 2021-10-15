@@ -162,7 +162,6 @@ export const WalletProvider = ({ children }: {children: ReactNode }) => {
   const network = useMemo(() => {
     switch (env) {
       case "mainnet-beta":
-      case "mainnet-beta (Serum)":
         return WalletAdapterNetwork.Mainnet;
       case "testnet":
         return WalletAdapterNetwork.Testnet;

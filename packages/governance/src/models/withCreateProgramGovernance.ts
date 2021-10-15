@@ -19,6 +19,7 @@ export const withCreateProgramGovernance = async (
   programUpgradeAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
+  governanceAuthority: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const {
     system: systemId,
@@ -95,6 +96,11 @@ export const withCreateProgramGovernance = async (
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
+    },
+    {
+      pubkey: governanceAuthority,
+      isWritable: false,
+      isSigner: true,
     },
   ];
 

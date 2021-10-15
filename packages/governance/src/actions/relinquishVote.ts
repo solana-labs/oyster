@@ -4,7 +4,7 @@ import { ParsedAccount } from '@oyster/common';
 import { Proposal } from '../models/accounts';
 import { withRelinquishVote } from '../models/withRelinquishVote';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

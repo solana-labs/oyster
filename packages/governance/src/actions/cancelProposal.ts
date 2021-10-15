@@ -5,7 +5,7 @@ import { Proposal } from '../models/accounts';
 
 import { withCancelProposal } from '../models/withCancelProposal';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/api';
+import { RpcContext } from '../models/core/api';
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

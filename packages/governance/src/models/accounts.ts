@@ -16,6 +16,7 @@ export enum GovernanceAccountType {
   ProposalInstruction = 8,
   MintGovernance = 9,
   TokenGovernance = 10,
+  RealmConfig = 11,
 }
 
 export interface GovernanceAccount {
@@ -29,7 +30,8 @@ export type GovernanceAccountClass =
   | typeof Proposal
   | typeof SignatoryRecord
   | typeof VoteRecord
-  | typeof ProposalInstruction;
+  | typeof ProposalInstruction
+  | typeof RealmConfigAccount;
 
 export function getAccountTypes(accountClass: GovernanceAccountClass) {
   switch (accountClass) {
@@ -45,6 +47,8 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
       return [GovernanceAccountType.VoteRecord];
     case ProposalInstruction:
       return [GovernanceAccountType.ProposalInstruction];
+    case RealmConfigAccount:
+      return [GovernanceAccountType.RealmConfig];
     case Governance:
       return [
         GovernanceAccountType.AccountGovernance,
@@ -125,15 +129,19 @@ export class MintMaxVoteWeightSource {
 
 export class RealmConfigArgs {
   useCouncilMint: boolean;
-
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+
+  // Versions >= 2
+  useCommunityVoterWeightAddin: boolean;
 
   constructor(args: {
     useCouncilMint: boolean;
 
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
     minCommunityTokensToCreateGovernance: BN;
+
+    useCommunityVoterWeightAddin: boolean;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
 
@@ -142,6 +150,7 @@ export class RealmConfigArgs {
 
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
+    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
   }
 }
 
@@ -149,6 +158,7 @@ export class RealmConfig {
   councilMint: PublicKey | undefined;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+  useCommunityVoterWeightAddin: boolean;
   reserved: Uint8Array;
 
   constructor(args: {
@@ -156,12 +166,14 @@ export class RealmConfig {
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
     minCommunityTokensToCreateGovernance: BN;
     reserved: Uint8Array;
+    useCommunityVoterWeightAddin: boolean;
   }) {
     this.councilMint = args.councilMint;
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
+    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
     this.reserved = args.reserved;
   }
 }
@@ -210,6 +222,33 @@ export async function getTokenHoldingAddress(
   );
 
   return tokenHoldingAddress;
+}
+
+export class RealmConfigAccount {
+  accountType = GovernanceAccountType.RealmConfig;
+
+  realm: PublicKey;
+  communityVoterWeightAddin: PublicKey | undefined;
+
+  constructor(args: {
+    realm: PublicKey;
+    communityVoterWeightAddin: PublicKey | undefined;
+  }) {
+    this.realm = args.realm;
+    this.communityVoterWeightAddin = args.communityVoterWeightAddin;
+  }
+}
+
+export async function getRealmConfigAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+) {
+  const [realmConfigAddress] = await PublicKey.findProgramAddress(
+    [Buffer.from('realm-config'), realm.toBuffer()],
+    programId,
+  );
+
+  return realmConfigAddress;
 }
 
 export class GovernanceConfig {

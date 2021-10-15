@@ -1,12 +1,25 @@
-import { ExplorerLink, sendTransaction, utils, WalletSigner } from '@oyster/common';
-import { Account, TransactionInstruction, Connection } from '@solana/web3.js';
+import {
+  Account,
+  TransactionInstruction,
+  Connection,
+  Transaction
+} from '@solana/web3.js';
+import {
+  ExplorerLink,
+  isSendTransactionError,
+  isTransactionTimeoutError,
+  utils,
+  WalletSigner,
+} from '@oyster/common';
 import React from 'react';
+import { IWallet } from "../models/core/api";
+import { DEFAULT_TX_TIMEOUT, sendTransaction2 } from './sdk/core/connection';
 
 const { notify } = utils;
 
 export async function sendTransactionWithNotifications(
   connection: Connection,
-  wallet: WalletSigner,
+  wallet: IWallet,
   instructions: TransactionInstruction[],
   signers: Account[],
   pendingMessage: string,
@@ -19,23 +32,68 @@ export async function sendTransactionWithNotifications(
   });
 
   try {
-    let tx = await sendTransaction(connection, wallet, instructions, signers);
+    const transaction = new Transaction();
+    transaction.add(...instructions);
 
-    notify({
-      message: successMessage,
-      type: 'success',
-      description: (
-        <>
-          {'Transaction: '}
-          <ExplorerLink
-            address={tx.txid}
-            type="transaction"
-            short
-            connection={connection}
-          />
-        </>
-      ),
-    });
+    try {
+      let txid = await sendTransaction2({
+        transaction,
+        wallet,
+        signers,
+        connection,
+      });
+
+      notify({
+        message: successMessage,
+        type: 'success',
+        description: (
+          <>
+            {'Transaction: '}
+            <ExplorerLink
+              address={txid}
+              type="transaction"
+              short
+              connection={connection}
+            />
+          </>
+        ),
+      });
+    } catch (txError) {
+      if (isTransactionTimeoutError(txError)) {
+        notify({
+          message: `Transaction hasn't been confirmed within ${
+            DEFAULT_TX_TIMEOUT / 1000
+          }s. Please check on Solana Explorer`,
+          description: (
+            <>
+              <ExplorerLink
+                address={txError.txId}
+                type="transaction"
+                short
+                connection={connection}
+              />
+            </>
+          ),
+          type: 'warn',
+        });
+      } else if (isSendTransactionError(txError)) {
+        notify({
+          message: 'Transaction error',
+          description: (
+            <>
+              <ExplorerLink
+                address={txError.txId}
+                type="transaction"
+                short
+                connection={connection}
+              />
+            </>
+          ),
+          type: 'error',
+        });
+      }
+      throw txError;
+    }
   } catch (ex) {
     console.error(ex);
     throw ex;

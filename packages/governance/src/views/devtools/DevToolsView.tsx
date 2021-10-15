@@ -4,6 +4,7 @@ import { useConnection, useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import { generateGovernanceArtifacts } from '../../actions/devtools/generateGovernanceArtifacts';
 import './style.less';
+
 // import { ControlTestBench } from './controlTests';
 
 export const DevToolsView = () => {
@@ -30,6 +31,16 @@ const GovernanceArtifacts = () => {
 
   const onGenerateArtifacts = async () => {
     setGenerated(false);
+
+    // Create user info account for Raydium staking
+    // await createAccount(
+    //   connection,
+    //   wallet,
+    //   88,
+    //   new PublicKey('EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'),
+    // );
+
+    // return;
 
     const {
       communityMintAddress,

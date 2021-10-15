@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, useWallet } from '@oyster/common';
 import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
@@ -28,7 +28,12 @@ export const RealmConfigForm = ({
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
-  const { programId } = useRpcContext();
+  const { programId, programVersion } = useRpcContext();
+  const wallet = useWallet();
+
+  if (!wallet?.publicKey) {
+    return <div>Wallet not connected</div>;
+  }
 
   const onCreate = async (
     values: {
@@ -41,12 +46,15 @@ export const RealmConfigForm = ({
 
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
+      programVersion,
       realm.pubkey,
       governance.pubkey,
-
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
       minCommunityTokensToCreateGovernance,
+      undefined,
+      // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
+      wallet.publicKey!,
     );
 
     onCreateInstruction(setRealmConfigIx);
