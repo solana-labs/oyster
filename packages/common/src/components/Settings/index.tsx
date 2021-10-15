@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { Button, Select } from 'antd';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
-import { useWalletModal } from "../../contexts";
+import { ENDPOINTS, useConnectionConfig, useWallet, useWalletModal } from '../../contexts';
 import { notify, shortenAddress } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
 

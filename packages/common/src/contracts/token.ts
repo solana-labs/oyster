@@ -1,5 +1,9 @@
 import { MintLayout, AccountLayout, Token } from '@solana/spl-token';
 import {
+  SignerWalletAdapter,
+  WalletNotConnectedError,
+} from '../contexts/wallet';
+import {
   Connection,
   PublicKey,
   Transaction,
@@ -9,13 +13,12 @@ import {
 
 export const mintNFT = async (
   connection: Connection,
-  wallet: {
-    publicKey: PublicKey;
-    signTransaction: (tx: Transaction) => Transaction;
-  },
+  wallet: SignerWalletAdapter,
   // SOL account
   owner: PublicKey,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const TOKEN_PROGRAM_ID = new PublicKey(
     'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
   );

@@ -4,8 +4,8 @@ import { CurrentUserBadge } from '../CurrentUserBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';
 import { LABELS } from '../../constants/labels';
-import { ConnectButton } from '..';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { ConnectButton } from '../ConnectButton';
+import { useWallet } from '../../contexts';
 import './style.css';
 
 export const AppBar = (props: {

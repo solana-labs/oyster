@@ -1,8 +1,7 @@
 import { Button, Dropdown, Menu } from 'antd';
 import { ButtonProps } from 'antd/lib/button';
-import React, {useCallback} from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from "../../contexts";
+import React, { useCallback } from 'react';
+import { useWalletModal, useWallet } from "../../contexts";
 
 export interface ConnectButtonProps
   extends ButtonProps,

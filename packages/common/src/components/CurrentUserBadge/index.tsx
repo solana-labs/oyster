@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useNativeAccount } from '../../contexts/accounts';
+import { useNativeAccount, useWallet } from '../../contexts';
 import { formatNumber } from '../../utils';
 import './styles.css';
 import { Popover } from 'antd';

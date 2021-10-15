@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import { sleep, useLocalStorageState } from '../utils/utils';
 import {
   Account,
@@ -27,7 +26,7 @@ import {
   SignTransactionError,
   TransactionTimeoutError,
 } from '../utils/errors';
-import { WalletSigner } from './wallet';
+import { WalletSigner, WalletNotConnectedError } from './wallet';
 
 export type ENV =
   | 'mainnet-beta (Serum)'

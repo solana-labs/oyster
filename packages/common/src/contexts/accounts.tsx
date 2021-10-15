@@ -5,8 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useConnection } from '../contexts/connection';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '../contexts';
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AccountLayout, MintInfo, MintLayout, u64 } from '@solana/spl-token';
 import { TokenAccount } from '../models';
