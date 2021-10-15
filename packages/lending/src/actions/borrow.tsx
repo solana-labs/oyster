@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import {
   Account,
   Connection,
@@ -13,6 +12,7 @@ import {
   TokenAccount,
   ParsedAccount,
   WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 import {
   accrueInterestInstruction,

@@ -1,8 +1,7 @@
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
 import { utils, contexts, hooks } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 import { LABELS } from '../../../../constants';
 import { Proposal } from '../../../../models/accounts';

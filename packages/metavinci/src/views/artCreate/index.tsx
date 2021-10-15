@@ -26,8 +26,8 @@ import {
   IMetadataExtension,
   MetadataCategory,
   useConnectionConfig,
+  useWallet,
 } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
 import {
   getAssetCostToStore,
   LAMPORT_MULTIPLIER,

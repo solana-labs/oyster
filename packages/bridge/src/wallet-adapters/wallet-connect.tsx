@@ -1,13 +1,13 @@
 import EventEmitter from 'eventemitter3';
 import { PublicKey, Transaction } from '@solana/web3.js';
-import { WalletAdapter } from '@solana/wallet-adapter-base';
+import { SignerWalletAdapter } from '@oyster/common';
 import { ethers } from 'ethers';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
 // @ts-ignore
 export class WalletConnectWalletAdapter
   extends EventEmitter
-  implements WalletAdapter {
+  implements SignerWalletAdapter {
   _publicKey: PublicKey | null;
   _onProcess: boolean;
   _accounts: Array<any>;

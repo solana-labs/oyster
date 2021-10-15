@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -20,6 +19,7 @@ import {
   sendSignedTransaction,
   sendTransactionWithRetry,
   WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';

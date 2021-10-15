@@ -1,5 +1,9 @@
-import { useConnectionConfig, useConnection } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import {
+  useConnectionConfig,
+  useConnection,
+  WalletSigner,
+  useWallet,
+} from '@oyster/common';
 import { PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -8,7 +12,7 @@ import { RpcContext } from '../models/api';
 export function useRpcContext() {
   const { endpoint } = useConnectionConfig();
   const connection = useConnection();
-  const { publicKey, signTransaction, signAllTransactions } = useWallet();
+  const wallet = useWallet();
   const location = useLocation();
 
   const programId = useMemo(() => {
@@ -19,20 +23,7 @@ export function useRpcContext() {
   }, [location]);
 
   return useMemo(
-    () =>
-      new RpcContext(
-        programId,
-        { publicKey, signTransaction, signAllTransactions },
-        connection,
-        endpoint,
-      ),
-    [
-      programId,
-      publicKey,
-      signTransaction,
-      signAllTransactions,
-      connection,
-      endpoint,
-    ],
+    () => new RpcContext(programId, wallet, connection, endpoint),
+    [programId, wallet, connection, endpoint],
   );
 }

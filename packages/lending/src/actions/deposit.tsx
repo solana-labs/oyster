@@ -1,11 +1,10 @@
-import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, models, actions, TokenAccount, WalletSigner } from '@oyster/common';
+import { contexts, utils, models, actions, TokenAccount, WalletSigner, WalletNotConnectedError } from '@oyster/common';
 import {
   accrueInterestInstruction,
   depositInstruction,

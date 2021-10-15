@@ -5,6 +5,7 @@ import {
   NumericInput,
   useMint,
   useUserAccounts,
+  useWallet,
 } from '@oyster/common';
 import './style.less';
 import { TokenSelectModal } from '../TokenSelectModal';
@@ -12,7 +13,6 @@ import { ASSET_CHAIN, chainToName } from '../../utils/assets';
 import { TokenChain } from '../TokenDisplay/tokenChain';
 import { EthereumConnect } from '../EthereumConnect';
 import { CurrentUserWalletBadge } from '../CurrentUserWalletBadge';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 export function Input(props: {
   title: string;

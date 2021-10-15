@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils, useWallet } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
   AccountInfo,
@@ -8,7 +8,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import React from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { createUpgradeInstruction } from '../../../../tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction';
 import { formDefaults } from '../../../../tools/forms';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';

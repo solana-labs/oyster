@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -15,6 +14,7 @@ import {
   BidderPot,
   models,
   WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import { AuctionView } from '../hooks';

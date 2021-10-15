@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import { Card } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { LABELS } from '../../constants';
-import { contexts, utils, ConnectButton } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { contexts, utils, ConnectButton, useWallet } from '@oyster/common';
 const { useConnection } = contexts.Connection;
 const { notify } = utils;
 

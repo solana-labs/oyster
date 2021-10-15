@@ -2,8 +2,7 @@ import React from 'react';
 import './index.less';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from 'antd';
-import { ConnectButton, CurrentUserBadge } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { ConnectButton, CurrentUserBadge, useWallet } from '@oyster/common';
 
 const UserActions = () => {
   return <>

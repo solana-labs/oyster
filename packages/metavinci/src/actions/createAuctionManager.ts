@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -18,6 +17,7 @@ import {
   getSafetyDepositBox,
   Edition,
   WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import BN from 'bn.js';

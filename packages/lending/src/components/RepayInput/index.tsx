@@ -14,13 +14,13 @@ import {
   hooks,
   ConnectButton,
   ActionConfirmation,
+  useWallet,
 } from '@oyster/common';
 import { repay } from '../../actions';
 import './style.less';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 const { notify, fromLamports, wadToLamports } = utils;
 const { useConnection } = contexts.Connection;

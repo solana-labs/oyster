@@ -1,5 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { LABELS } from '../../../../constants';

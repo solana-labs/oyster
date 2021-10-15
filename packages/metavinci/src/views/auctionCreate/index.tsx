@@ -32,9 +32,9 @@ import {
   deserializeBorsh,
   WinnerLimit,
   WinnerLimitType,
+  useWallet,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js';
 import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { useHistory, useParams } from 'react-router-dom';

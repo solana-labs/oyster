@@ -1,12 +1,12 @@
 import { Card, Col, Row } from 'antd';
 import React from 'react';
+import { useWallet } from '@oyster/common';
 import { GUTTER, LABELS } from '../../constants';
 import { useUserDeposits, useUserObligations } from './../../hooks';
 import { DashboardObligations } from './obligation';
 import { DashboardDeposits } from './deposit';
 import './style.less';
 import { NothingBorrowedPanel } from '../../components/NothingBorrowedPanel';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 export const DashboardView = () => {
   const { connected } = useWallet();

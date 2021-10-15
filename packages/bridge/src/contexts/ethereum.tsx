@@ -8,9 +8,7 @@ import React, {
   useState,
 } from 'react';
 
-import { useLocalStorageState } from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-adapter-base';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useLocalStorageState, useWallet, SignerWalletAdapter } from '@oyster/common';
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
 import { MetamaskWalletAdapter } from '../wallet-adapters/metamask';

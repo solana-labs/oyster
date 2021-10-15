@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -6,7 +5,13 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { utils, actions, createMint, WalletSigner } from '@oyster/common';
+import {
+  utils,
+  actions,
+  createMint,
+  WalletSigner,
+  WalletNotConnectedError,
+} from '@oyster/common';
 import { AccountLayout, MintLayout } from '@solana/spl-token';
 
 const { createTokenAccount, initVault, MAX_VAULT_SIZE, VAULT_PREFIX } = actions;

@@ -14,7 +14,7 @@ import {
   Typography,
 } from 'antd';
 import React, { useState } from 'react';
-import { ParsedAccount, utils } from '@oyster/common';
+import { ParsedAccount, utils, useWallet } from '@oyster/common';
 import {
   InstructionData,
   Proposal,
@@ -25,7 +25,6 @@ import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
 import { RpcContext } from '../../../../../models/api';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 const { getExplorerInspectorUrl } = utils;
 

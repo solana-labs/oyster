@@ -39,7 +39,7 @@ interface IArweaveResult {
 
 export const mintNFT = async (
   connection: Connection,
-  wallet: WalletSigner | undefined,
+  wallet: WalletSigner,
   env: ENV,
   files: File[],
   metadata: { name: string; symbol: string },

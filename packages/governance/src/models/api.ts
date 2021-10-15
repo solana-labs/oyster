@@ -1,7 +1,11 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
-import { deserializeBorsh, ParsedAccount, WalletSigner } from '@oyster/common';
+import {
+  deserializeBorsh,
+  ParsedAccount,
+  WalletSigner,
+  WalletNotConnectedError,
+} from '@oyster/common';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import {
   GovernanceAccount,

@@ -1,6 +1,11 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { utils, actions, WinnerLimit, WalletSigner } from '@oyster/common';
+import {
+  utils,
+  actions,
+  WinnerLimit,
+  WalletSigner,
+  WalletNotConnectedError,
+} from '@oyster/common';
 import BN from 'bn.js';
 import { METAPLEX_PREFIX } from '../models/metaplex';
 

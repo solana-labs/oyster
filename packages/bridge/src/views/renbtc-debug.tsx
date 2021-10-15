@@ -10,8 +10,8 @@ import {
   sendTransactionWithRetry,
   TokenAccountParser,
   useConnection,
+  useWallet,
 } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, TransactionInstruction, Account } from '@solana/web3.js';
 import { AccountInfo } from '@solana/spl-token';
 

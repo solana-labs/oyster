@@ -11,8 +11,8 @@ import {
   BidderMetadata,
   ParsedAccount,
   Identicon,
+  useWallet,
 } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { AuctionView, AuctionViewState, useBidsForAuction } from '../../hooks';
 import { sendPlaceBid } from '../../actions/sendPlaceBid';
 import { sendRedeemBid } from '../../actions/sendRedeemBid';

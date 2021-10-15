@@ -17,8 +17,8 @@ import {
   ConnectButton,
   BackButton,
   ActionConfirmation,
+  useWallet,
 } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { borrow } from '../../actions';
 import './style.less';
 import { LABELS } from '../../constants';

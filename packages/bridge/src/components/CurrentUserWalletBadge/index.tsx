@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { shortenAddress } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { shortenAddress, useWallet } from '@oyster/common';
 
 export const CurrentUserWalletBadge = (props: { showDisconnect?: boolean }) => {
   const { wallet, publicKey, disconnect } = useWallet();

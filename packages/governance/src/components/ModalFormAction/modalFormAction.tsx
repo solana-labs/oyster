@@ -7,8 +7,7 @@ import {
   isTransactionTimeoutError,
 } from '@oyster/common';
 import { formDefaults } from '../../tools/forms';
-import { isSendTransactionError, isSignTransactionError } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { isSendTransactionError, isSignTransactionError, useWallet } from '@oyster/common';
 import {
   getTransactionErrorMsg,
   isWalletNotConnectedError,

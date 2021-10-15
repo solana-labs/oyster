@@ -7,8 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import './style.less';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
-import { contexts, ConnectButton, ActionConfirmation } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { contexts, ConnectButton, ActionConfirmation, useWallet } from '@oyster/common';
 
 const { useConnection } = contexts.Connection;
 

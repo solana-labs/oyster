@@ -1,4 +1,3 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
   Account,
   Connection,
@@ -12,6 +11,7 @@ import {
   createMint,
   VAULT_SCHEMA,
   WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 import { MintLayout } from '@solana/spl-token';
 import BN from 'bn.js';

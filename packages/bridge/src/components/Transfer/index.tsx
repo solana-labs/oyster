@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { notification, Spin, Button, Popover } from 'antd';
-import { contexts, useUserAccounts } from '@oyster/common';
+import { contexts, useUserAccounts, WalletSigner, useWallet } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
@@ -20,7 +20,6 @@ import { useCorrectNetwork } from '../../hooks/useCorrectNetwork';
 import { RecentTransactionsTable } from '../RecentTransactionsTable';
 import { useBridge } from '../../contexts/bridge';
 import { WarningOutlined } from '@ant-design/icons';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 const { useConnection } = contexts.Connection;
 

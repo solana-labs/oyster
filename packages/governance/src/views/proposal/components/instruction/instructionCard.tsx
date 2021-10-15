@@ -1,6 +1,5 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { ParsedAccount } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Card, Button, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useMemo, useState } from 'react';

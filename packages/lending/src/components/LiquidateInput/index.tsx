@@ -9,6 +9,7 @@ import {
   utils,
   ConnectButton,
   ActionConfirmation,
+  useWallet,
 } from '@oyster/common';
 import {
   EnrichedLendingObligation,
@@ -21,7 +22,6 @@ import { liquidate } from '../../actions';
 import './style.less';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 const { notify, fromLamports, wadToLamports } = utils;
 const { useConnection } = contexts.Connection;
