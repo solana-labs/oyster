@@ -44,7 +44,7 @@ export interface WalletContextState extends WalletAdapterProps {
 }
 
 export function useWallet (): WalletContextState {
-  return useWallet() as WalletContextState;
+  return useWalletBase() as WalletContextState;
 }
 
 export { SignerWalletAdapter, WalletNotConnectedError };
