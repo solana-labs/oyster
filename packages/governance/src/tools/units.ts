@@ -199,5 +199,7 @@ export function getMintMaxVoteWeight(
     .multipliedBy(mint.supply.toString())
     .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS);
 
-  return new BN(maxVoteWeight.toString());
+  const roundedNumber = Math.floor(Number(maxVoteWeight.toString()));
+
+  return new BN(String(roundedNumber));
 }
