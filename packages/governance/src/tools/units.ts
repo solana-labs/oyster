@@ -199,5 +199,5 @@ export function getMintMaxVoteWeight(
     .multipliedBy(mint.supply.toString())
     .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS);
 
-  return new BN(maxVoteWeight.toString());
+  return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString());
 }
