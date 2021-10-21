@@ -1,4 +1,9 @@
-import { ParsedAccount, TokenIcon } from '@oyster/common';
+import {
+  ParsedAccount,
+  TokenIcon,
+  useConnectionConfig,
+  useAccount,
+} from '@oyster/common';
 import { Avatar, Badge, Tooltip } from 'antd';
 import React from 'react';
 import { Governance, ProposalState, Realm } from '../../models/accounts';
@@ -20,10 +25,15 @@ export function GovernanceBadge({
   showVotingCount?: boolean;
 }) {
   const proposals = useProposalsByGovernance(governance?.pubkey);
+  const { tokenMap } = useConnectionConfig();
+  const tokenAccount = useAccount(governance.info.governedAccount);
+
   const color = governance.info.isProgramGovernance() ? 'green' : 'gray';
   const useAvatar =
     governance.info.isProgramGovernance() ||
     governance.info.isAccountGovernance();
+
+  const tokenMint = tokenAccount ? tokenAccount.info.mint : undefined;
 
   return (
     <Badge
@@ -47,11 +57,13 @@ export function GovernanceBadge({
           >
             <TokenIcon
               style={{ position: 'absolute', left: size * 0.5 }}
-              mintAddress={governance.info.governedAccount}
+              mintAddress={tokenMint}
+              tokenMap={tokenMap}
               size={size * 0.6}
             />
             <TokenIcon
-              mintAddress={governance.info.governedAccount}
+              mintAddress={tokenMint}
+              tokenMap={tokenMap}
               size={size * 0.6}
             />
             <TokenIcon
@@ -60,7 +72,8 @@ export function GovernanceBadge({
                 left: size * 0.25,
                 top: size * 0.3,
               }}
-              mintAddress={governance.info.governedAccount}
+              mintAddress={tokenMint}
+              tokenMap={tokenMap}
               size={size * 0.6}
             />
           </div>
