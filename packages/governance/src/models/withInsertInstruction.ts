@@ -92,4 +92,6 @@ export const withInsertInstruction = async (
       data,
     }),
   );
+
+  return proposalInstructionAddress;
 };

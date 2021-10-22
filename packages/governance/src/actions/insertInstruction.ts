@@ -22,7 +22,7 @@ export const insertInstruction = async (
   const governanceAuthority = walletPubkey;
   const payer = walletPubkey;
 
-  await withInsertInstruction(
+  const proposalInstructionAddress = await withInsertInstruction(
     instructions,
     programId,
     proposal.info.governance,
@@ -43,4 +43,6 @@ export const insertInstruction = async (
     'Adding instruction',
     'Instruction added',
   );
+
+  return proposalInstructionAddress;
 };
