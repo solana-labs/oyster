@@ -6,6 +6,7 @@ import {
   TokenAccountParser,
   ParsedAccount,
   createAssociatedTokenAccountInstruction,
+  WalletSigner,
 } from '@oyster/common';
 import { ethers } from 'ethers';
 import { ERC20Factory } from '../../contracts/ERC20Factory';
@@ -20,12 +21,11 @@ import {
 } from '@solana/web3.js';
 import { AccountInfo } from '@solana/spl-token';
 import { TransferRequest, ProgressUpdate } from './interface';
-import { WalletAdapter } from '@solana/wallet-base';
 import { BigNumber } from 'bignumber.js';
 
 export const toSolana = async (
   connection: Connection,
-  wallet: WalletAdapter,
+  wallet: WalletSigner,
   request: TransferRequest,
   provider: ethers.providers.Web3Provider,
   setProgress: (update: ProgressUpdate) => void,

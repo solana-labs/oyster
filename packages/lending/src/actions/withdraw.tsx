@@ -1,16 +1,18 @@
+import {  WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import {
   Account,
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { contexts, utils, actions, models, TokenAccount } from '@oyster/common';
+import { contexts, utils, actions, models, TokenAccount, WalletSigner } from '@oyster/common';
 import {
   accrueInterestInstruction,
   LendingReserve,
   withdrawInstruction,
 } from './../models/lending';
 import { AccountLayout } from '@solana/spl-token';
+
 const { approve } = models;
 const { findOrCreateAccountByMint } = actions;
 const { sendTransaction } = contexts.Connection;
@@ -22,8 +24,10 @@ export const withdraw = async (
   reserve: LendingReserve,
   reserveAddress: PublicKey,
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   notify({
     message: 'Withdrawing funds...',
     description: 'Please review transactions to approve.',

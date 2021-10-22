@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Select } from 'antd';
-import { contexts } from '@oyster/common';
+import { contexts, useWallet } from '@oyster/common';
 
-const { useWallet, WALLET_PROVIDERS } = contexts.Wallet;
 const { ENDPOINTS, useConnectionConfig } = contexts.Connection;
 
 export const Settings = () => {

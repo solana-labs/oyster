@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
 import { utils, contexts, hooks } from '@oyster/common';
@@ -8,7 +8,6 @@ import { Proposal } from '../../../../models/accounts';
 
 const { notify } = utils;
 const { TextArea } = Input;
-const { useWallet } = contexts.Wallet;
 const { useConnection } = contexts.Connection;
 const { useAccountByMint } = hooks;
 

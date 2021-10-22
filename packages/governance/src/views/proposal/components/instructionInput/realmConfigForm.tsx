@@ -29,7 +29,7 @@ export const RealmConfigForm = ({
 }) => {
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
   const { programId, programVersion } = useRpcContext();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
 
   if (!wallet?.publicKey) {
     return <div>Wallet not connected</div>;

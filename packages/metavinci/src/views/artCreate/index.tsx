@@ -23,10 +23,10 @@ import {
   MAX_NAME_SYMBOL_LEN,
   MAX_URI_LENGTH,
   useConnection,
-  useWallet,
   IMetadataExtension,
   MetadataCategory,
   useConnectionConfig,
+  useWallet,
 } from '@oyster/common';
 import {
   getAssetCostToStore,
@@ -45,7 +45,7 @@ const { Dragger } = Upload;
 export const ArtCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { step_param }: { step_param: string } = useParams();
   const history = useHistory();
 

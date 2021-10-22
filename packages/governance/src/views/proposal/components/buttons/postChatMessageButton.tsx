@@ -1,8 +1,6 @@
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
-
-import { contexts } from '@oyster/common';
 
 import { Proposal, TokenOwnerRecord } from '../../../../models/accounts';
 
@@ -13,8 +11,6 @@ import {
   ChatMessageBody,
   ChatMessageBodyType,
 } from '../../../../models/chat/accounts';
-
-const { useWallet } = contexts.Wallet;
 
 export function PostChatMessageButton({
   tokenOwnerRecord,

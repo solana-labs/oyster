@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { useWallet, WALLET_PROVIDERS } from '@oyster/common';
-import { shortenAddress } from '@oyster/common';
+import { shortenAddress, useWallet } from '@oyster/common';
 
 export const CurrentUserWalletBadge = (props: { showDisconnect?: boolean }) => {
-  const { wallet, disconnect } = useWallet();
+  const { wallet, publicKey, disconnect } = useWallet();
 
-  if (!wallet || !wallet.publicKey) {
+  if (!wallet || !publicKey) {
     return null;
   }
 
@@ -17,10 +16,10 @@ export const CurrentUserWalletBadge = (props: { showDisconnect?: boolean }) => {
           alt={'icon'}
           width={20}
           height={20}
-          src={WALLET_PROVIDERS.filter(p => p.name === 'Sollet')[0]?.icon}
+          src={wallet.icon}
           style={{ marginRight: 8 }}
         />
-        {shortenAddress(`${wallet.publicKey}`)}
+        {shortenAddress(`${publicKey}`)}
         {props.showDisconnect && (
           <span className={'disconnect'} onClick={() => disconnect()}>
             X

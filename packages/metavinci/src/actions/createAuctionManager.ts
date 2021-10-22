@@ -16,8 +16,9 @@ import {
   sendTransactions,
   getSafetyDepositBox,
   Edition,
+  WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
-
 import { AccountLayout } from '@solana/spl-token';
 import BN from 'bn.js';
 import {
@@ -32,6 +33,7 @@ import { closeVault } from './closeVault';
 import { addTokensToVault } from './addTokensToVault';
 import { makeAuction } from './makeAuction';
 import { createExternalPriceAccount } from './createExternalPriceAccount';
+
 const { createTokenAccount } = actions;
 
 interface normalPattern {
@@ -67,7 +69,7 @@ export interface SafetyDepositDraft {
 // from some AuctionManagerSettings.
 export async function createAuctionManager(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   settings: AuctionManagerSettings,
   winnerLimit: WinnerLimit,
   endAuctionAt: BN,
@@ -79,6 +81,8 @@ export async function createAuctionManager(
   auction: PublicKey;
   auctionManager: PublicKey;
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const {
     externalPriceAccount,
     priceMint,
@@ -221,7 +225,7 @@ export async function createAuctionManager(
 
 async function setupAuctionManagerInstructions(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   vault: PublicKey,
   paymentMint: PublicKey,
   settings: AuctionManagerSettings,
@@ -231,6 +235,8 @@ async function setupAuctionManagerInstructions(
   signers: Account[];
   auctionManager: PublicKey;
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -268,12 +274,14 @@ async function setupAuctionManagerInstructions(
 }
 
 async function setupStartAuction(
-  wallet: any,
+  wallet: WalletSigner,
   vault: PublicKey,
 ): Promise<{
   instructions: TransactionInstruction[];
   signers: Account[];
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
 
@@ -283,7 +291,7 @@ async function setupStartAuction(
 }
 
 async function validateBoxes(
-  wallet: any,
+  wallet: WalletSigner,
   vault: PublicKey,
   safetyDeposits: SafetyDepositDraft[],
   stores: PublicKey[],
@@ -291,6 +299,8 @@ async function validateBoxes(
   instructions: TransactionInstruction[][];
   signers: Account[][];
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let signers: Account[][] = [];
   let instructions: TransactionInstruction[][] = [];
 

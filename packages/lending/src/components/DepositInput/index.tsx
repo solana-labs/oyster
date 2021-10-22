@@ -7,8 +7,8 @@ import { PublicKey } from '@solana/web3.js';
 import './style.less';
 import { LABELS, marks } from '../../constants';
 import CollateralInput from '../CollateralInput';
-import { contexts, ConnectButton, ActionConfirmation } from '@oyster/common';
-const { useWallet } = contexts.Wallet;
+import { contexts, ConnectButton, ActionConfirmation, useWallet } from '@oyster/common';
+
 const { useConnection } = contexts.Connection;
 
 export const DepositInput = (props: {
@@ -17,7 +17,7 @@ export const DepositInput = (props: {
   address: PublicKey;
 }) => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [pendingTx, setPendingTx] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 

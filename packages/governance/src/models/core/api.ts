@@ -1,27 +1,27 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { WalletNotConnectedError } from '../errors';
 import bs58 from 'bs58';
-import { deserializeBorsh, ParsedAccount } from '@oyster/common';
+import {
+  deserializeBorsh,
+  ParsedAccount,
+  WalletNotConnectedError,
+  WalletSigner,
+} from '@oyster/common';
 import { ProgramAccountWithType } from '../core/accounts';
 import { Schema } from 'borsh';
 import { getErrorMessage } from '../../tools/script';
-
-export interface IWallet {
-  publicKey: PublicKey;
-}
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey;
   programVersion: number;
-  wallet: IWallet | undefined;
+  wallet: WalletSigner;
   connection: Connection;
   endpoint: string;
 
   constructor(
     programId: PublicKey,
     programVersion: number,
-    wallet: IWallet | undefined,
+    wallet: WalletSigner,
     connection: Connection,
     endpoint: string,
   ) {
@@ -73,7 +73,7 @@ export const pubkeyFilter = (
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
 export async function getBorshProgramAccounts<
-  TAccount extends ProgramAccountWithType,
+  TAccount extends ProgramAccountWithType
 >(
   programId: PublicKey,
   borshSchema: Schema,

@@ -19,7 +19,7 @@ export const RenbtcDebugView = () => {
   const rentbtcMint = new PublicKey(
     'EK6iyvvqvQtsWYcySrZVHkXjCLX494r9PhnDWJaX1CPu',
   );
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const [ataa, setAtaa] = useState('');
   const [exists, setExists] = useState(false);
@@ -48,7 +48,7 @@ export const RenbtcDebugView = () => {
             <ExplorerLink address={rentbtcMint} type={'address'} />
           </span>
           <span id={'wallet-key'}>
-            Wallet Address -- {wallet?.publicKey?.toBase58()}
+            Wallet Address -- {wallet.publicKey?.toBase58()}
           </span>
           <button
             style={{
@@ -57,7 +57,7 @@ export const RenbtcDebugView = () => {
               cursor: 'pointer',
             }}
             onClick={async () => {
-              if (!connected) {
+              if (!wallet.connected) {
                 alert('connect wallet');
                 return;
               }
@@ -86,8 +86,7 @@ export const RenbtcDebugView = () => {
                 : (
                     await PublicKey.findProgramAddress(
                       [
-                        // @ts-ignore
-                        wallet.publicKey.toBuffer(),
+                        wallet.publicKey!.toBuffer(),
                         programIds().token.toBuffer(),
                         rentbtcMint.toBuffer(),
                       ],
@@ -112,7 +111,7 @@ export const RenbtcDebugView = () => {
               cursor: 'pointer',
             }}
             onClick={async () => {
-              if (!connected) {
+              if (!wallet.connected) {
                 alert('connect wallet');
                 return;
               }
@@ -144,8 +143,7 @@ export const RenbtcDebugView = () => {
                 : (
                     await PublicKey.findProgramAddress(
                       [
-                        // @ts-ignore
-                        wallet.publicKey.toBuffer(),
+                        wallet.publicKey!.toBuffer(),
                         programIds().token.toBuffer(),
                         rentbtcMint.toBuffer(),
                       ],
@@ -155,9 +153,9 @@ export const RenbtcDebugView = () => {
               if (!exists) {
                 createAssociatedTokenAccountInstruction(
                   instructions,
-                  recipient, // @ts-ignore
-                  wallet.publicKey, // @ts-ignore
-                  wallet.publicKey,
+                  recipient,
+                  wallet.publicKey!,
+                  wallet.publicKey!,
                   rentbtcMint,
                 );
               } else {

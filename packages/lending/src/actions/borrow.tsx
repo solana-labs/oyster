@@ -11,16 +11,15 @@ import {
   models,
   TokenAccount,
   ParsedAccount,
+  WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
-
 import {
   accrueInterestInstruction,
   LendingReserve,
 } from './../models/lending/reserve';
 import { AccountLayout, MintInfo, MintLayout } from '@solana/spl-token';
-
 import { createUninitializedObligation } from './obligation';
-
 import {
   LendingObligationLayout,
   borrowInstruction,
@@ -44,7 +43,7 @@ const {
 
 export const borrow = async (
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
 
   from: TokenAccount,
   amount: number,
@@ -58,6 +57,8 @@ export const borrow = async (
 
   obligationAccount?: PublicKey,
 ) => {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   notify({
     message: 'Borrowing funds...',
     description: 'Please review transactions to approve.',

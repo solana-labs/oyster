@@ -1,10 +1,7 @@
-import React from 'react';
-
-import { Identicon } from '../Identicon';
+import React, { useMemo } from 'react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { useWallet } from '../../contexts/wallet';
-import { useNativeAccount } from '../../contexts/accounts';
-import { formatNumber, shortenAddress } from '../../utils';
+import { useNativeAccount, useWallet } from '../../contexts';
+import { formatNumber } from '../../utils';
 import './styles.css';
 import { Popover } from 'antd';
 import { Settings } from '../Settings';
@@ -14,10 +11,17 @@ export const CurrentUserBadge = (props: {
   showAddress?: boolean;
   iconSize?: number;
 }) => {
-  const { wallet } = useWallet();
+  const { wallet, publicKey } = useWallet();
   const { account } = useNativeAccount();
 
-  if (!wallet || !wallet.publicKey) {
+  const address = useMemo(() => {
+    if (publicKey) {
+      const base58 = publicKey.toBase58();
+      return `${base58.slice(0, 4)}...${base58.slice(-4)}`;
+    }
+  }, [publicKey])
+
+  if (!wallet || !address) {
     return null;
   }
 
@@ -25,12 +29,12 @@ export const CurrentUserBadge = (props: {
     ? {
         marginLeft: '0.5rem',
         display: 'flex',
-        width: props.iconSize,
+        width: props.iconSize || 20,
         borderRadius: 50,
       }
     : {
         display: 'flex',
-        width: props.iconSize,
+        width: props.iconSize || 20,
         paddingLeft: 0,
         borderRadius: 50,
       };
@@ -44,19 +48,6 @@ export const CurrentUserBadge = (props: {
     ? baseWalletKey
     : { ...baseWalletKey, paddingLeft: 0 };
 
-  let name = props.showAddress ? shortenAddress(`${wallet.publicKey}`) : '';
-  const unknownWallet = wallet as any;
-  if (unknownWallet.name) {
-    name = unknownWallet.name;
-  }
-
-  let image = (
-    <Identicon address={wallet.publicKey?.toBase58()} style={iconStyle} />
-  );
-
-  if (unknownWallet.image) {
-    image = <img src={unknownWallet.image} style={iconStyle} />;
-  }
 
   return (
     <div className="wallet-wrapper">
@@ -73,8 +64,8 @@ export const CurrentUserBadge = (props: {
         trigger="click"
       >
         <div className="wallet-key" style={walletKeyStyle}>
-          {name && <span style={{ marginRight: '0.5rem' }}>{name}</span>}
-          {image}
+          <span style={{ marginRight: '0.5rem' }}>{address}</span>
+          <img src={wallet.icon} style={iconStyle} />
         </div>
       </Popover>
     </div>

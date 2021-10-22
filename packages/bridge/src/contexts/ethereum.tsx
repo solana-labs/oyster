@@ -8,8 +8,7 @@ import React, {
   useState,
 } from 'react';
 
-import { useWallet, useLocalStorageState } from '@oyster/common';
-import { WalletAdapter } from '@solana/wallet-base';
+import { useLocalStorageState, useWallet, SignerWalletAdapter } from '@oyster/common';
 import { TokenList, TokenInfo } from '@uniswap/token-lists';
 import { ethers } from 'ethers';
 import { MetamaskWalletAdapter } from '../wallet-adapters/metamask';
@@ -85,6 +84,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
   const wallet = useMemo(
     function () {
       if (walletProvider) {
+        // @ts-ignore
         return new walletProvider.adapter() as WalletAdapter;
       }
     },
@@ -158,6 +158,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
         setProvider(wallet.provider);
         setConnected(true);
       });
+      // @ts-ignore
       wallet.on('disconnect', error => {
         setConnected(false);
         setAccounts([]);
@@ -168,6 +169,7 @@ export const EthereumProvider: FunctionComponent = ({ children }) => {
       });
       // @ts-ignore
       wallet.on('accountsChanged', accounts => {
+        // @ts-ignore
         if (!accounts || !accounts[0]) setConnected(false);
       });
       // @ts-ignore

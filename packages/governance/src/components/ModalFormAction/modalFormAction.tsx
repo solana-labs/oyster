@@ -3,21 +3,17 @@ import { Alert, Button, ButtonProps, Modal, Space, Typography } from 'antd';
 import { Form } from 'antd';
 import './style.less';
 import {
-  contexts,
   ExplorerLink,
   isTransactionTimeoutError,
 } from '@oyster/common';
-
 import { formDefaults } from '../../tools/forms';
-import { isSendTransactionError, isSignTransactionError } from '@oyster/common';
+import { isSendTransactionError, isSignTransactionError, useWallet } from '@oyster/common';
 import {
   getTransactionErrorMsg,
   isWalletNotConnectedError,
 } from '../../models/errors';
 
 const { Text } = Typography;
-
-const { useWallet } = contexts.Wallet;
 
 /// ModalFormAction is a control displayed as a Button action which opens a Modal from
 /// The ModalForm captures common form use cases: 1) Progress indicator, 2) Close/Cancel state management, 3) Submission errors

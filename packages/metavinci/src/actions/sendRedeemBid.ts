@@ -18,6 +18,8 @@ import {
   sendTransactions,
   sendSignedTransaction,
   sendTransactionWithRetry,
+  WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
 
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
@@ -38,7 +40,7 @@ const { approve } = models;
 
 export async function sendRedeemBid(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   auctionView: AuctionView,
   accountsByMint: Map<string, TokenAccount>,
 ) {
@@ -158,11 +160,13 @@ async function setupRedeemInstructions(
   auctionView: AuctionView,
   accountsByMint: Map<string, TokenAccount>,
   accountRentExempt: number,
-  wallet: any,
+  wallet: WalletSigner,
   safetyDeposit: ParsedAccount<SafetyDepositBox>,
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
 ) {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let winningPrizeSigner: Account[] = [];
   let winningPrizeInstructions: TransactionInstruction[] = [];
 
@@ -199,12 +203,14 @@ async function setupRedeemMasterInstructions(
   auctionView: AuctionView,
   accountsByMint: Map<string, TokenAccount>,
   accountRentExempt: number,
-  wallet: any,
+  wallet: WalletSigner,
   safetyDeposit: ParsedAccount<SafetyDepositBox>,
   item: AuctionViewItem,
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
 ) {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   let winningPrizeSigner: Account[] = [];
   let winningPrizeInstructions: TransactionInstruction[] = [];
 
@@ -246,13 +252,15 @@ async function setupRedeemLimitedInstructions(
   accountsByMint: Map<string, TokenAccount>,
   accountRentExempt: number,
   mintRentExempt: number,
-  wallet: any,
+  wallet: WalletSigner,
   safetyDeposit: ParsedAccount<SafetyDepositBox>,
   item: AuctionViewItem,
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
   winningConfig: WinningConfig,
 ) {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const updateAuth =
     item.metadata.info.nonUniqueSpecificUpdateAuthority ||
     item.nameSymbol?.info.updateAuthority;
@@ -375,12 +383,14 @@ async function setupRedeemOpenInstructions(
   accountsByMint: Map<string, TokenAccount>,
   accountRentExempt: number,
   mintRentExempt: number,
-  wallet: any,
+  wallet: WalletSigner,
   safetyDeposit: ParsedAccount<SafetyDepositBox>,
   item: AuctionViewItem,
   signers: Array<Account[]>,
   instructions: Array<TransactionInstruction[]>,
 ) {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const updateAuth =
     item.metadata.info.nonUniqueSpecificUpdateAuthority ||
     item.nameSymbol?.info.updateAuthority;

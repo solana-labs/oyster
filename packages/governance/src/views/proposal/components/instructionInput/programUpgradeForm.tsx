@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount, useWallet, utils } from '@oyster/common';
+import { ExplorerLink, ParsedAccount, utils, useWallet } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
   AccountInfo,
@@ -8,12 +8,9 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import React from 'react';
-
 import { createUpgradeInstruction } from '../../../../tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction';
 import { formDefaults } from '../../../../tools/forms';
-
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
-
 import { validateProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
 
 export const ProgramUpgradeForm = ({
@@ -25,9 +22,9 @@ export const ProgramUpgradeForm = ({
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
 
-  if (!wallet?.publicKey) {
+  if (!publicKey) {
     return <div>Wallet not connected</div>;
   }
 
@@ -38,7 +35,7 @@ export const ProgramUpgradeForm = ({
       governance.info.governedAccount,
       new PublicKey(bufferAddress),
       governance.pubkey,
-      wallet.publicKey!,
+      publicKey,
     );
 
     onCreateInstruction(upgradeIx);
@@ -64,7 +61,7 @@ export const ProgramUpgradeForm = ({
         accountInfoValidator={bufferValidator}
       ></AccountFormItem>
       <Form.Item label="spill account (wallet)">
-        <ExplorerLink address={wallet.publicKey} type="address" />
+        <ExplorerLink address={publicKey} type="address" />
       </Form.Item>
       <Form.Item label="upgrade authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />

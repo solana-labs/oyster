@@ -4,16 +4,17 @@ import { CurrentUserBadge } from '../CurrentUserBadge';
 import { SettingOutlined } from '@ant-design/icons';
 import { Settings } from '../Settings';
 import { LABELS } from '../../constants/labels';
-import { ConnectButton } from '..';
-import { useWallet } from '../../contexts/wallet';
+import { ConnectButton } from '../ConnectButton';
+import { useWallet } from '../../contexts';
 import './style.css';
+
 export const AppBar = (props: {
   left?: JSX.Element;
   right?: JSX.Element;
   useWalletBadge?: boolean;
   additionalSettings?: JSX.Element;
 }) => {
-  const { connected, wallet } = useWallet();
+  const { connected } = useWallet();
 
   const TopBar = (
     <div className="App-Bar-right">

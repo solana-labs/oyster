@@ -9,6 +9,7 @@ import {
   utils,
   ConnectButton,
   ActionConfirmation,
+  useWallet,
 } from '@oyster/common';
 import {
   EnrichedLendingObligation,
@@ -21,9 +22,9 @@ import { liquidate } from '../../actions';
 import './style.less';
 import CollateralInput from '../CollateralInput';
 import { useMidPriceInUSD } from '../../contexts/market';
+
 const { notify, fromLamports, wadToLamports } = utils;
 const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
 const { useMint } = contexts.Accounts;
 
 export const LiquidateInput = (props: {
@@ -33,7 +34,7 @@ export const LiquidateInput = (props: {
   obligation: EnrichedLendingObligation;
 }) => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const { repayReserve, withdrawReserve, obligation } = props;
   const [lastTyped, setLastTyped] = useState('liquidate');
   const [pendingTx, setPendingTx] = useState(false);

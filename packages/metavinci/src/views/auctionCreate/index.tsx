@@ -26,13 +26,13 @@ import {
   MAX_METADATA_LEN,
   MAX_NAME_SYMBOL_LEN,
   useConnection,
-  useWallet,
   useConnectionConfig,
   Metadata,
   ParsedAccount,
   deserializeBorsh,
   WinnerLimit,
   WinnerLimitType,
+  useWallet,
 } from '@oyster/common';
 import { getAssetCostToStore, LAMPORT_MULTIPLIER } from '../../utils/assets';
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js';
@@ -122,7 +122,7 @@ export const AuctionCreateView = () => {
   const connection = useConnection();
   const { env } = useConnectionConfig();
   const items = useUserArts();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { step_param }: { step_param: string } = useParams();
   const history = useHistory();
 
@@ -210,7 +210,7 @@ export const AuctionCreateView = () => {
     }
 
     const endAuctionAt = moment().unix() + ((attributes.auctionDuration || 0) * 60)
-    
+
     const _auctionObj = await createAuctionManager(
       connection,
       wallet,

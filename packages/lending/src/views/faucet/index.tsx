@@ -2,29 +2,29 @@ import React, { useCallback } from 'react';
 import { Card } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { LABELS } from '../../constants';
-import { contexts, utils, ConnectButton } from '@oyster/common';
+import { contexts, utils, ConnectButton, useWallet } from '@oyster/common';
+
 const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
 const { notify } = utils;
 
 export const FaucetView = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
 
   const airdrop = useCallback(() => {
-    if (!wallet?.publicKey) {
+    if (!publicKey) {
         return;
     }
 
     connection
-      .requestAirdrop(wallet.publicKey, 2 * LAMPORTS_PER_SOL)
+      .requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL)
       .then(() => {
         notify({
           message: LABELS.ACCOUNT_FUNDED,
           type: "success",
         });
       });
-  }, [wallet, wallet?.publicKey, connection]);
+  }, [publicKey, connection]);
 
   const bodyStyle: React.CSSProperties = {
     display: "flex",

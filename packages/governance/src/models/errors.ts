@@ -1,4 +1,4 @@
-import { SendTransactionError } from '@oyster/common';
+import { SendTransactionError, WalletNotConnectedError } from '@oyster/common';
 
 export const GovernanceError: Record<number, string> = [
   'Invalid instruction passed to program', // InvalidInstruction
@@ -122,12 +122,6 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
     }
   } catch {
     return JSON.stringify(error);
-  }
-}
-
-export class WalletNotConnectedError extends Error {
-  constructor() {
-    super('Wallet is not connected.');
   }
 }
 

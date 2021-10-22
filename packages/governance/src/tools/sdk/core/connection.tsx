@@ -2,6 +2,8 @@ import {
   SendTransactionError,
   SignTransactionError,
   TransactionTimeoutError,
+  WalletNotConnectedError,
+  WalletSigner,
 } from '@oyster/common';
 import {
   Account,
@@ -12,7 +14,6 @@ import {
   Transaction,
   TransactionSignature,
 } from '@solana/web3.js';
-import { IWallet } from '../../../models/core/api';
 
 export async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -36,7 +37,7 @@ export async function sendTransaction2({
   timeout = DEFAULT_TX_TIMEOUT,
 }: {
   transaction: Transaction;
-  wallet: IWallet;
+  wallet: WalletSigner;
   signers?: Array<Account>;
   connection: Connection;
   sendingMessage?: string;
@@ -63,19 +64,22 @@ export async function signTransaction({
   connection,
 }: {
   transaction: Transaction;
-  wallet: IWallet;
+  wallet: WalletSigner;
   signers?: Array<Account>;
   connection: Connection;
 }) {
+  const { publicKey, signTransaction } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
+
   transaction.recentBlockhash = (
     await connection.getRecentBlockhash('max')
   ).blockhash;
-  transaction.setSigners(wallet.publicKey, ...signers.map(s => s.publicKey));
+  transaction.setSigners(publicKey, ...signers.map(s => s.publicKey));
   if (signers.length > 0) {
     transaction.partialSign(...signers);
   }
   try {
-    return await (wallet as any).signTransaction(transaction);
+    return await signTransaction(transaction);
   } catch (ex) {
     let message = '';
     if (ex instanceof Error) {
@@ -96,18 +100,21 @@ export async function signTransactions({
     transaction: Transaction;
     signers?: Array<Account>;
   }[];
-  wallet: IWallet;
+  wallet: WalletSigner;
   connection: Connection;
 }) {
+  const { publicKey, signAllTransactions } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
+
   const blockhash = (await connection.getRecentBlockhash('max')).blockhash;
   transactionsAndSigners.forEach(({ transaction, signers = [] }) => {
     transaction.recentBlockhash = blockhash;
-    transaction.setSigners(wallet.publicKey, ...signers.map(s => s.publicKey));
+    transaction.setSigners(publicKey, ...signers.map(s => s.publicKey));
     if (signers?.length > 0) {
       transaction.partialSign(...signers);
     }
   });
-  return await (wallet as any).signAllTransactions(
+  return await signAllTransactions(
     transactionsAndSigners.map(({ transaction }) => transaction),
   );
 }

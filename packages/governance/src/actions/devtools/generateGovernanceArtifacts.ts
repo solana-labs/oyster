@@ -5,15 +5,15 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
-
 import {
   utils,
   createMint,
   createTokenAccount,
   sendTransactions,
   SequenceType,
+  WalletSigner,
+  WalletNotConnectedError,
 } from '@oyster/common';
-
 import { AccountLayout, MintLayout, Token, u64 } from '@solana/spl-token';
 
 const { notify } = utils;
@@ -24,7 +24,7 @@ export interface SourceEntryInterface {
 }
 export const generateGovernanceArtifacts = async (
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
 ) => {
   let communityMintSigners: Account[] = [];
   let communityMintInstruction: TransactionInstruction[] = [];
@@ -115,10 +115,13 @@ const withTokenGovernance = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   decimals: number,
   amount: u64,
 ) => {
+  const { publicKey } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
+
   const { token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -131,20 +134,20 @@ const withTokenGovernance = async (
 
   const mintAddress = createMint(
     instructions,
-    wallet.publicKey,
+    publicKey,
     mintRentExempt,
     decimals,
-    wallet.publicKey,
-    wallet.publicKey,
+    publicKey,
+    publicKey,
     signers,
   );
 
   const tokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -153,7 +156,7 @@ const withTokenGovernance = async (
       tokenId,
       mintAddress,
       tokenAccountAddress,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(amount),
     ),
@@ -161,10 +164,10 @@ const withTokenGovernance = async (
 
   const beneficiaryTokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -178,11 +181,14 @@ const withMint = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   decimals: number,
   amount: u64,
   supply: u64,
 ) => {
+  const { publicKey } = wallet;
+  if (!publicKey) throw new WalletNotConnectedError();
+
   const { system: systemId, token: tokenId } = utils.programIds();
 
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -199,20 +205,20 @@ const withMint = async (
 
   const mintAddress = createMint(
     instructions,
-    wallet.publicKey,
+    publicKey,
     mintRentExempt,
     decimals,
-    wallet.publicKey,
-    wallet.publicKey,
+    publicKey,
+    publicKey,
     signers,
   );
 
   const tokenAccountAddress = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    wallet.publicKey,
+    publicKey,
     signers,
   );
 
@@ -221,7 +227,7 @@ const withMint = async (
       tokenId,
       mintAddress,
       tokenAccountAddress,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(amount),
     ),
@@ -230,7 +236,7 @@ const withMint = async (
   const otherOwner = new Account();
   instructions.push(
     SystemProgram.createAccount({
-      fromPubkey: wallet.publicKey,
+      fromPubkey: publicKey,
       newAccountPubkey: otherOwner.publicKey,
       lamports: accountRentExempt,
       space: 0,
@@ -247,7 +253,7 @@ const withMint = async (
 
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
-    wallet.publicKey,
+    publicKey,
     tokenAccountRentExempt,
     mintAddress,
     otherOwnerPubKey,
@@ -259,7 +265,7 @@ const withMint = async (
       tokenId,
       mintAddress,
       otherOwnerTokenAccount,
-      wallet.publicKey,
+      publicKey,
       [],
       new u64(supply.sub(amount).toArray()),
     ),

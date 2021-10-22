@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button, Select } from 'antd';
-import { useWallet } from '../../contexts/wallet';
-import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
-import { shortenAddress } from '../../utils';
+import { ENDPOINTS, useConnectionConfig, useWallet, useWalletModal } from '../../contexts';
+import { notify, shortenAddress } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
 
 export const Settings = ({
@@ -10,8 +9,10 @@ export const Settings = ({
 }: {
   additionalSettings?: JSX.Element;
 }) => {
-  const { connected, disconnect, select, wallet } = useWallet();
+  const { connected, disconnect, publicKey } = useWallet();
   const { endpoint, setEndpoint } = useConnectionConfig();
+  const { setVisible } = useWalletModal();
+  const open = useCallback(() => setVisible(true), [setVisible]);
 
   return (
     <>
@@ -31,26 +32,30 @@ export const Settings = ({
         {connected && (
           <>
             <span>Wallet:</span>
-            {wallet?.publicKey && (
+            {publicKey && (
               <Button
                 style={{ marginBottom: 5 }}
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    wallet.publicKey?.toBase58() || '',
-                  )
-                }
+                onClick={async () => {
+                  if (publicKey) {
+                    await navigator.clipboard.writeText(publicKey.toBase58());
+                    notify({
+                      message: 'Wallet update',
+                      description: 'Address copied to clipboard',
+                    });
+                  }
+                }}
               >
                 <CopyOutlined />
-                {shortenAddress(wallet?.publicKey.toBase58())}
+                {shortenAddress(publicKey.toBase58())}
               </Button>
             )}
 
-            <Button onClick={select} style={{ marginBottom: 5 }}>
+            <Button onClick={open} style={{ marginBottom: 5 }}>
               Change
             </Button>
             <Button
               type="primary"
-              onClick={disconnect}
+              onClick={() => disconnect().catch()}
               style={{ marginBottom: 5 }}
             >
               Disconnect

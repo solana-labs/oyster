@@ -1,7 +1,7 @@
 import { Button, Dropdown, Menu } from 'antd';
 import { ButtonProps } from 'antd/lib/button';
-import React from 'react';
-import { useWallet } from './../../contexts/wallet';
+import React, { useCallback } from 'react';
+import { useWalletModal, useWallet } from "../../contexts";
 
 export interface ConnectButtonProps
   extends ButtonProps,
@@ -10,24 +10,18 @@ export interface ConnectButtonProps
 }
 
 export const ConnectButton = (props: ConnectButtonProps) => {
-  const { connected, connect, select, provider } = useWallet();
+  const { wallet, connected, connect } = useWallet();
+  const { setVisible } = useWalletModal();
+  const open = useCallback(() => setVisible(true), [setVisible]);
   const { onClick, children, disabled, allowWalletChange, ...rest } = props;
 
   // only show if wallet selected or user connected
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="3" onClick={select}>
-        Change Wallet
-      </Menu.Item>
-    </Menu>
-  );
-
-  if (!provider || !allowWalletChange) {
+  if (!wallet || !allowWalletChange) {
     return (
       <Button
         {...rest}
-        onClick={connected ? onClick : connect}
+        onClick={connected ? onClick : (wallet ? connect : open)}
         disabled={connected && disabled}
       >
         {connected ? props.children : 'Connect'}
@@ -39,7 +33,13 @@ export const ConnectButton = (props: ConnectButtonProps) => {
     <Dropdown.Button
       onClick={connected ? onClick : connect}
       disabled={connected && disabled}
-      overlay={menu}
+      overlay={
+        <Menu>
+          <Menu.Item onClick={open}>
+            Change Wallet
+          </Menu.Item>
+        </Menu>
+      }
     >
       Connect
     </Dropdown.Button>

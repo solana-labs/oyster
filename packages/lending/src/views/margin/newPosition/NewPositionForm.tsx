@@ -1,7 +1,7 @@
 import { Button, Card } from 'antd';
 import React, { useState } from 'react';
 import { LABELS } from '../../../constants';
-import { contexts, ParsedAccount, components } from '@oyster/common';
+import { contexts, ParsedAccount, components, useWallet } from '@oyster/common';
 import {
   LendingReserve,
   LendingReserveParser,
@@ -15,7 +15,6 @@ import { ArrowDownOutlined } from '@ant-design/icons';
 
 const { ActionConfirmation } = components;
 const { cache } = contexts.Accounts;
-const { useWallet } = contexts.Wallet;
 
 interface NewPositionFormProps {
   lendingReserve: ParsedAccount<LendingReserve>;

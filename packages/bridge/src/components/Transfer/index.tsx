@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { notification, Spin, Button, Popover } from 'antd';
-import {contexts, useUserAccounts} from '@oyster/common';
+import { contexts, useUserAccounts, WalletSigner, useWallet } from '@oyster/common';
 import { Input } from '../Input';
 
 import './style.less';
@@ -22,7 +22,6 @@ import { useBridge } from '../../contexts/bridge';
 import { WarningOutlined } from '@ant-design/icons';
 
 const { useConnection } = contexts.Connection;
-const { useWallet } = contexts.Wallet;
 
 export const typeToIcon = (type: string, isLast: boolean) => {
   const style: React.CSSProperties = { marginRight: 5 };
@@ -43,7 +42,7 @@ export const typeToIcon = (type: string, isLast: boolean) => {
 export const Transfer = () => {
   const connection = useConnection();
   const bridge = useBridge();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { provider, tokenMap } = useEthereum();
   const { userAccounts } = useUserAccounts();
   const hasCorrespondingNetworks = useCorrectNetwork();
@@ -172,7 +171,7 @@ export const Transfer = () => {
         className={'transfer-button'}
         type="primary"
         size="large"
-        disabled={!(A.amount && B.amount) || !connected || !provider}
+        disabled={!(A.amount && B.amount) || !wallet.connected || !provider}
         onClick={async () => {
           if (!wallet || !provider) {
             return;

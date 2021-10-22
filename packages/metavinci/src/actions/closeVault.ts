@@ -4,11 +4,17 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { utils, actions, models } from '@oyster/common';
-
+import {
+  utils,
+  actions,
+  models,
+  WalletSigner,
+  WalletNotConnectedError,
+} from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import BN from 'bn.js';
 import { METAPLEX_PREFIX } from '../models/metaplex';
+
 const {
   createTokenAccount,
   activateVault,
@@ -22,7 +28,7 @@ const { approve } = models;
 // authority (that may or may not exist yet.)
 export async function closeVault(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   vault: PublicKey,
   fractionMint: PublicKey,
   fractionTreasury: PublicKey,
@@ -33,6 +39,8 @@ export async function closeVault(
   instructions: TransactionInstruction[];
   signers: Account[];
 }> {
+  if (!wallet.publicKey) throw new WalletNotConnectedError();
+
   const PROGRAM_IDS = utils.programIds();
 
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(

@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-
+import { useWallet } from '@oyster/common';
 import {
   getRealmConfigAddress,
   getSignatoryRecordAddress,
@@ -19,8 +19,6 @@ import {
   useGovernanceAccountByPubkey,
   useGovernanceAccountsByFilter,
 } from './accountHooks';
-
-import { useWallet } from '@oyster/common';
 import { useRpcContext } from './useRpcContext';
 
 // ----- Realm Config ---------
@@ -115,23 +113,23 @@ export function useWalletTokenOwnerRecord(
 
 /// Returns all TokenOwnerRecords for the current wallet
 export function useWalletTokenOwnerRecords() {
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
 
   return useGovernanceAccountsByFilter<TokenOwnerRecord>(TokenOwnerRecord, [
-    pubkeyFilter(1 + 32 + 32, wallet?.publicKey),
+    pubkeyFilter(1 + 32 + 32, publicKey),
   ]);
 }
 
 export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
-  const { wallet, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
   const tokenOwnerRecord = useTokenOwnerRecord(proposalOwner);
 
   return connected &&
     tokenOwnerRecord?.isSome() &&
     (tokenOwnerRecord.value.info.governingTokenOwner.toBase58() ===
-      wallet?.publicKey?.toBase58() ||
+      publicKey?.toBase58() ||
       tokenOwnerRecord.value.info.governanceDelegate?.toBase58() ===
-        wallet?.publicKey?.toBase58())
+        publicKey?.toBase58())
     ? tokenOwnerRecord?.tryUnwrap()
     : undefined;
 }

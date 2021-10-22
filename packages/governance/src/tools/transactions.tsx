@@ -1,15 +1,16 @@
 import {
+  Account,
+  TransactionInstruction,
+  Connection,
+  Transaction
+} from '@solana/web3.js';
+import {
   ExplorerLink,
   isSendTransactionError,
   isTransactionTimeoutError,
   utils,
+  WalletSigner,
 } from '@oyster/common';
-import {
-  Account,
-  TransactionInstruction,
-  Connection,
-  Transaction,
-} from '@solana/web3.js';
 import React from 'react';
 import { DEFAULT_TX_TIMEOUT, sendTransaction2 } from './sdk/core/connection';
 
@@ -17,7 +18,7 @@ const { notify } = utils;
 
 export async function sendTransactionWithNotifications(
   connection: Connection,
-  wallet: any,
+  wallet: WalletSigner,
   instructions: TransactionInstruction[],
   signers: Account[],
   pendingMessage: string,

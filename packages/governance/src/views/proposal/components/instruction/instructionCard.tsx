@@ -1,6 +1,5 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { ParsedAccount, contexts } from '@oyster/common';
-
+import { ParsedAccount, useWallet } from '@oyster/common';
 import { Card, Button, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useMemo, useState } from 'react';
@@ -26,8 +25,6 @@ import {
   ExecuteInstructionButton,
 } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
-
-const { useWallet } = contexts.Wallet;
 
 export function InstructionCard({
   proposalInstruction,
