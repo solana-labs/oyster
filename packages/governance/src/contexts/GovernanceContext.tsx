@@ -60,6 +60,7 @@ class AccountChangeTracker {
   }
 
   notifyAccountRemoved(pubkey: string, accountType: GovernanceAccountType) {
+    console.log('NOTIFY REMOVED', pubkey);
     this.emitter.emit(
       AccountRemovedEventArgs.name,
       new AccountRemovedEventArgs(pubkey, accountType),
@@ -77,6 +78,7 @@ class AccountChangeTracker {
     accountType: GovernanceAccountType,
     accountInfo: AccountInfo<Buffer>,
   ) {
+    console.log('NOTIFY UPDATED', pubkey);
     this.emitter.emit(
       AccountUpdatedEventArgs.name,
       new AccountUpdatedEventArgs(pubkey, accountType, accountInfo),
@@ -117,10 +119,12 @@ export default function GovernanceProvider({ children = null as any }) {
 
       // Use a single web socket subscription for all accounts and broadcast the updates using changeTracker
       // Note: Do not create other subscriptions for the given program id. They would be silently ignored by the rpc endpoint
+
+      console.log('SUBSCRIBING...');
       return connection.onProgramAccountChange(
         programPk,
         async (info: KeyedAccountInfo) => {
-          console.log('ACCOUNT UPDATED', info);
+          console.log('ACCOUNT UPDATED (CTX)', info);
 
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
             const realm = GovernanceAccountParser(Realm)(
