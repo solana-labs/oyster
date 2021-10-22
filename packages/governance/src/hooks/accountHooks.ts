@@ -133,6 +133,7 @@ export function useGovernanceAccountsByFilter<
 
       const disposeUpdateTracker = accountChangeTracker.onAccountUpdated(
         update => {
+          console.log('ACCOUNT UPDATED', update);
           if (accountTypes.some(at => update.accountType === at)) {
             const isMatch = !queryFilters.some(
               f => !f.isMatch(update.accountInfo.data),
@@ -168,6 +169,7 @@ export function useGovernanceAccountsByFilter<
 
       const disposeRemoveTracker = accountChangeTracker.onAccountRemoved(
         remove => {
+          console.log('ACCOUNT REMOVED', remove);
           if (accountTypes.some(at => remove.accountType === at)) {
             setAccounts((acts: any) => {
               if (acts[remove.pubkey]) {

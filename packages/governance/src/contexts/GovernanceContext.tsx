@@ -120,6 +120,8 @@ export default function GovernanceProvider({ children = null as any }) {
       return connection.onProgramAccountChange(
         programPk,
         async (info: KeyedAccountInfo) => {
+          console.log('ACCOUNT UPDATED', info);
+
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
             const realm = GovernanceAccountParser(Realm)(
               info.accountId,
