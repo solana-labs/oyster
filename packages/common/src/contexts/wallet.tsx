@@ -65,6 +65,11 @@ export const WALLET_PROVIDERS = [
   //   url: "https://solflare.com/access-wallet",
   //   icon: `${ASSETS_URL}solflare.svg`,
   // },
+  {
+    name: 'Zelcore',
+    url: 'https://link.zelcore.io',
+    icon: `${ASSETS_URL}zelcore.svg`,
+  },
 ];
 
 const WalletContext = React.createContext<{
