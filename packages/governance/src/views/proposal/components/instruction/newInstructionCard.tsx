@@ -26,6 +26,7 @@ import {
   getDaysFromTimestamp,
   getTimestampFromDays,
 } from '../../../../tools/units';
+import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
 
 export function NewInstructionCard({
   realm,
@@ -39,6 +40,7 @@ export function NewInstructionCard({
   const [form] = Form.useForm();
   const rpcContext = useRpcContext();
   const [instructionData, setInstructionData] = useState<InstructionData>();
+  const changeTracker = useAccountChangeTracker();
 
   const proposalAuthority = useProposalAuthority(
     proposal.info.tokenOwnerRecord,
@@ -54,7 +56,7 @@ export function NewInstructionCard({
     try {
       const instructionData = getInstructionDataFromBase64(values.instruction);
 
-      await insertInstruction(
+      const proposalInstructionAddress = await insertInstruction(
         rpcContext,
         proposal,
         proposalAuthority!.pubkey,
@@ -65,6 +67,12 @@ export function NewInstructionCard({
 
       form.resetFields();
       setInstructionData(undefined);
+
+      // Updates are not reliable and we have to fetch the new instruction and publish its update
+      changeTracker.fetchAndNotifyAccountUpdated(
+        rpcContext.connection,
+        proposalInstructionAddress,
+      );
     } catch (ex) {
       console.log('ERROR', ex);
     }

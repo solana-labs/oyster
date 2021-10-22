@@ -1,6 +1,11 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { AccountInfo, KeyedAccountInfo, PublicKey } from '@solana/web3.js';
+import {
+  AccountInfo,
+  Connection,
+  KeyedAccountInfo,
+  PublicKey,
+} from '@solana/web3.js';
 
 import {
   ParsedAccount,
@@ -51,26 +56,28 @@ class AccountUpdatedEventArgs {
 
 // Tracks local changes not supported by connection notifications
 class AccountChangeTracker {
-  private emitter = new EventEmitter();
+  // For some reasons when a single emitter is used in prod it emits both remove and update events
+  // As a workaround a single emitter per event is used
+  private removeEmitter = new EventEmitter();
+  private updateEmitter = new EventEmitter();
 
   onAccountRemoved(callback: (args: AccountRemovedEventArgs) => void) {
-    this.emitter.on(AccountRemovedEventArgs.name, callback);
+    this.removeEmitter.on(AccountRemovedEventArgs.name, callback);
     return () =>
-      this.emitter.removeListener(AccountRemovedEventArgs.name, callback);
+      this.removeEmitter.removeListener(AccountRemovedEventArgs.name, callback);
   }
 
   notifyAccountRemoved(pubkey: string, accountType: GovernanceAccountType) {
-    console.log('NOTIFY REMOVED', pubkey);
-    this.emitter.emit(
+    this.removeEmitter.emit(
       AccountRemovedEventArgs.name,
       new AccountRemovedEventArgs(pubkey, accountType),
     );
   }
 
   onAccountUpdated(callback: (args: AccountUpdatedEventArgs) => void) {
-    this.emitter.on(AccountUpdatedEventArgs.name, callback);
+    this.updateEmitter.on(AccountUpdatedEventArgs.name, callback);
     return () =>
-      this.emitter.removeListener(AccountUpdatedEventArgs.name, callback);
+      this.updateEmitter.removeListener(AccountUpdatedEventArgs.name, callback);
   }
 
   notifyAccountUpdated(
@@ -78,11 +85,22 @@ class AccountChangeTracker {
     accountType: GovernanceAccountType,
     accountInfo: AccountInfo<Buffer>,
   ) {
-    console.log('NOTIFY UPDATED', pubkey);
-    this.emitter.emit(
+    this.updateEmitter.emit(
       AccountUpdatedEventArgs.name,
       new AccountUpdatedEventArgs(pubkey, accountType, accountInfo),
     );
+  }
+
+  async fetchAndNotifyAccountUpdated(
+    connection: Connection,
+    pubkey: PublicKey,
+  ) {
+    const info = await connection.getAccountInfo(pubkey, 'recent');
+    if (info) {
+      this.notifyAccountUpdated(pubkey.toBase58(), info.data[0], info);
+    } else {
+      console.error(`Can't fetch account for ${pubkey}`);
+    }
   }
 }
 
@@ -120,12 +138,9 @@ export default function GovernanceProvider({ children = null as any }) {
       // Use a single web socket subscription for all accounts and broadcast the updates using changeTracker
       // Note: Do not create other subscriptions for the given program id. They would be silently ignored by the rpc endpoint
 
-      console.log('SUBSCRIBING...');
       return connection.onProgramAccountChange(
         programPk,
         async (info: KeyedAccountInfo) => {
-          console.log('ACCOUNT UPDATED (CTX)', info);
-
           if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
             const realm = GovernanceAccountParser(Realm)(
               info.accountId,
