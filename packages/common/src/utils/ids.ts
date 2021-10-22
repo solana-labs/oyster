@@ -1,6 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
 import { TokenSwapLayout, TokenSwapLayoutV1 } from '../models/tokenSwap';
 
+export type StringPublicKey = string;
+
 export const WRAPPED_SOL_MINT = new PublicKey(
   'So11111111111111111111111111111111111111112',
 );
@@ -37,6 +39,22 @@ export const AUCTION_ID = new PublicKey(
 export const METAPLEX_ID = new PublicKey(
   'EPtpKdKW8qciGVd1UFyGjgbBHTbSAyvbY61h9uQGVgeu',
 );
+
+const PubKeysInternedMap = new Map<string, PublicKey>();
+
+export const toPublicKey = (key: string | PublicKey) => {
+  if (typeof key !== 'string') {
+    return key;
+  }
+
+  let result = PubKeysInternedMap.get(key);
+  if (!result) {
+    result = new PublicKey(key);
+    PubKeysInternedMap.set(key, result);
+  }
+
+  return result;
+};
 
 export let SYSTEM = new PublicKey('11111111111111111111111111111111');
 

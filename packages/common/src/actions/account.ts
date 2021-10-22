@@ -1,6 +1,6 @@
 import { AccountLayout, MintLayout, Token } from '@solana/spl-token';
 import {
-  Account,
+  Keypair,
   PublicKey,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
@@ -11,6 +11,7 @@ import {
   TOKEN_PROGRAM_ID,
   WRAPPED_SOL_MINT,
 } from '../utils/ids';
+import { programIds } from '../utils/programIds';
 import { TokenAccount } from '../models/account';
 import { cache, TokenAccountParser } from '../contexts/accounts';
 
@@ -20,7 +21,7 @@ export function ensureSplAccount(
   toCheck: TokenAccount,
   payer: PublicKey,
   amount: number,
-  signers: Account[],
+  signers: Keypair[],
 ) {
   if (!toCheck.info.isNative) {
     return toCheck.pubkey;
@@ -60,11 +61,11 @@ export const DEFAULT_TEMP_MEM_SPACE = 65548;
 export function createTempMemoryAccount(
   instructions: TransactionInstruction[],
   payer: PublicKey,
-  signers: Account[],
+  signers: Keypair[],
   owner: PublicKey,
   space = DEFAULT_TEMP_MEM_SPACE,
 ) {
-  const account = new Account();
+  const account = Keypair.generate();
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
@@ -85,9 +86,9 @@ export function createUninitializedMint(
   instructions: TransactionInstruction[],
   payer: PublicKey,
   amount: number,
-  signers: Account[],
+  signers: Keypair[],
 ) {
-  const account = new Account();
+  const account = Keypair.generate();
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
@@ -107,9 +108,9 @@ export function createUninitializedAccount(
   instructions: TransactionInstruction[],
   payer: PublicKey,
   amount: number,
-  signers: Account[],
+  signers: Keypair[],
 ) {
-  const account = new Account();
+  const account = Keypair.generate();
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
@@ -185,7 +186,7 @@ export function createMint(
   decimals: number,
   owner: PublicKey,
   freezeAuthority: PublicKey,
-  signers: Account[],
+  signers: Keypair[],
 ) {
   const account = createUninitializedMint(
     instructions,
@@ -213,7 +214,7 @@ export function createTokenAccount(
   accountRentExempt: number,
   mint: PublicKey,
   owner: PublicKey,
-  signers: Account[],
+  signers: Keypair[],
 ) {
   const account = createUninitializedAccount(
     instructions,
@@ -229,6 +230,54 @@ export function createTokenAccount(
   return account;
 }
 
+export function ensureWrappedAccount(
+  instructions: TransactionInstruction[],
+  cleanupInstructions: TransactionInstruction[],
+  toCheck: TokenAccount | undefined,
+  payer: PublicKey,
+  amount: number,
+  signers: Keypair[],
+) {
+  if (toCheck && !toCheck.info.isNative) {
+    return toCheck.pubkey;
+  }
+
+  const TOKEN_PROGRAM_ID = programIds().token;
+  const account = Keypair.generate();
+  instructions.push(
+    SystemProgram.createAccount({
+      fromPubkey: payer,
+      newAccountPubkey: account.publicKey,
+      lamports: amount,
+      space: AccountLayout.span,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+  );
+
+  instructions.push(
+    Token.createInitAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      WRAPPED_SOL_MINT,
+      account.publicKey,
+      payer,
+    ),
+  );
+
+  cleanupInstructions.push(
+    Token.createCloseAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      account.publicKey,
+      payer,
+      payer,
+      [],
+    ),
+  );
+
+  signers.push(account);
+
+  return account.publicKey.toBase58();
+}
+
 // TODO: check if one of to accounts needs to be native sol ... if yes unwrap it ...
 export function findOrCreateAccountByMint(
   payer: PublicKey,
@@ -237,10 +286,11 @@ export function findOrCreateAccountByMint(
   cleanupInstructions: TransactionInstruction[],
   accountRentExempt: number,
   mint: PublicKey, // use to identify same type
-  signers: Account[],
+  signers: Keypair[],
   excluded?: Set<string>,
 ): PublicKey {
   const accountToFind = mint.toBase58();
+  const ownerKey = owner.toBase58();
   const account = cache
     .byParser(TokenAccountParser)
     .map(id => cache.get(id))
@@ -248,8 +298,8 @@ export function findOrCreateAccountByMint(
       acc =>
         acc !== undefined &&
         acc.info.mint.toBase58() === accountToFind &&
-        acc.info.owner.toBase58() === owner.toBase58() &&
-        (excluded === undefined || !excluded.has(acc.pubkey.toBase58())),
+        acc.info.owner.toBase58() === ownerKey &&
+        (excluded === undefined || !excluded.has(acc.pubkey.toString())),
     );
   const isWrappedSol = accountToFind === WRAPPED_SOL_MINT.toBase58();
 
