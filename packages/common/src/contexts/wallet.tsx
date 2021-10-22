@@ -18,6 +18,7 @@ import { TorusWalletAdapter } from '../wallet-adapters/torus';
 import { useLocation } from 'react-router';
 import { LedgerWalletAdapter } from '@solana/wallet-ledger';
 import {MathWalletAdapter} from "../wallet-adapters/mathWallet";
+import { BitKeepWalletAdapter } from "../wallet-adapters/bitkeep";
 
 const ASSETS_URL =
   'https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/';
@@ -50,6 +51,12 @@ export const WALLET_PROVIDERS = [
     name: 'MathWallet',
     url: 'https://mathwallet.org',
     icon: `${ASSETS_URL}mathwallet.svg`,
+    adapter: MathWalletAdapter,
+  },
+  {
+    name: 'BitKeep',
+    url: 'https://bitkeep.com',
+    icon: `${ASSETS_URL}bitkeep.svg`,
     adapter: MathWalletAdapter,
   },
   // {
