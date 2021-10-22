@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { getTokenIcon, KnownTokenMap } from '../../utils';
 import { useConnectionConfig } from '../../contexts/connection';
@@ -11,6 +11,8 @@ export const TokenIcon = (props: {
   className?: string;
   tokenMap?: KnownTokenMap;
 }) => {
+  const [showIcon, setShowIcon] = useState(true);
+
   let icon: string | undefined = '';
   if (props.tokenMap) {
     icon = getTokenIcon(props.tokenMap, props.mintAddress);
@@ -21,7 +23,7 @@ export const TokenIcon = (props: {
 
   const size = props.size || 20;
 
-  if (icon) {
+  if (showIcon && icon) {
     return (
       <img
         alt="Token icon"
@@ -38,6 +40,7 @@ export const TokenIcon = (props: {
           backgroundClip: 'padding-box',
           ...props.style,
         }}
+        onError={() => setShowIcon(false)}
       />
     );
   }
