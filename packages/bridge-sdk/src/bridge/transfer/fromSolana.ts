@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { WormholeFactory } from '../../contracts/WormholeFactory';
 import { bridgeAuthorityKey } from './../helpers';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Token } from '@solana/spl-token';
+import { Token, u64 } from '@solana/spl-token';
 import { ProgressUpdate, TransferRequest } from './interface';
 import BN from 'bn.js';
 import { createLockAssetInstruction } from '../lock';
@@ -66,20 +66,23 @@ export const fromSolana = async (
         return;
       }
 
+      const amountBN = ethers.utils.parseUnits(
+        request.amount.toString(),
+        request.info.decimals || 0,
+      );
+      const amountBI = BigInt(amountBN.toString())
+
       let group = 'Initiate transfer';
       const programs = programIds();
       const bridgeId = programs.wormhole.pubkey;
       const authorityKey = await bridgeAuthorityKey(bridgeId);
-
-      const precision = Math.pow(10, request.info?.decimals || 0);
-      const amount = Math.floor(request.amount * precision);
 
       let { ix: lock_ix, transferKey } = await createLockAssetInstruction(
         authorityKey,
         wallet.publicKey,
         new PublicKey(request.info.address),
         new PublicKey(request.info.mint),
-        new BN(amount),
+        new BN(amountBN.toString()),
         request.to,
         request.recipient,
         {
@@ -97,7 +100,7 @@ export const fromSolana = async (
         authorityKey,
         wallet.publicKey,
         [],
-        amount,
+        new u64(amountBI.toString(16), 16),
       );
 
       setProgress({
