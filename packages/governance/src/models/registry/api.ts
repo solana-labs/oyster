@@ -31,9 +31,9 @@ export async function getProgramVersion(
 function getLatestVersionCutOffSlot(env: string) {
   switch (env) {
     case 'devnet':
-      return 87097690;
+      return 93177719;
     default:
       // Default to mainnet slot
-      return 101260833;
+      return 106098492;
   }
 }
