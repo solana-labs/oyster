@@ -22,6 +22,7 @@ export const cancelProposal = async (
     proposal.pubkey,
     proposal.info.tokenOwnerRecord,
     governanceAuthority,
+    proposal.info.governance,
   );
 
   await sendTransactionWithNotifications(

@@ -13,6 +13,7 @@ export const withCancelProposal = (
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
+  governanceInfo: PublicKey,
 ) => {
   const args = new CancelProposalArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -35,6 +36,11 @@ export const withCancelProposal = (
     },
     {
       pubkey: SYSVAR_CLOCK_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: governanceInfo,
       isSigner: false,
       isWritable: false,
     },
