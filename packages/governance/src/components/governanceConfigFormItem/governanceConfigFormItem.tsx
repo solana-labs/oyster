@@ -108,7 +108,7 @@ export function GovernanceConfigFormItem({
     governanceConfig = new GovernanceConfig({
       voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
       minCommunityTokensToCreateProposal: ZERO,
-      minInstructionHoldUpTime: getTimestampFromDays(1),
+      minInstructionHoldUpTime: getTimestampFromDays(0),
       maxVotingTime: getTimestampFromDays(3),
       voteWeightSource: VoteWeightSource.Deposit,
       proposalCoolOffTime: 0,
