@@ -102,7 +102,9 @@ export function GovernanceConfigFormItem({
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   let minTokenStep = Math.max(mintSupply1Percent, minTokenAmount);
 
-  let minTokensToCreateProposal = minTokenStep;
+  let minTokensToCreateProposal = communityMintInfo.supply.isZero()
+    ? 1000000 // If the mint supply is zero then we use 1m as arbitrary large number
+    : minTokenStep;
 
   if (!governanceConfig) {
     governanceConfig = new GovernanceConfig({
