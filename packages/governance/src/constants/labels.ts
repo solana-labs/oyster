@@ -120,7 +120,7 @@ export const LABELS = {
   ACCOUNT_ADDRESS: 'account address',
   TOKEN_ACCOUNT_ADDRESS: 'token account address',
 
-  MIN_TOKENS_TO_CREATE_PROPOSAL: 'min tokens to create proposal',
+  MIN_TOKENS_TO_CREATE_PROPOSAL: 'min community tokens to create proposal',
   MIN_INSTRUCTION_HOLD_UP_TIME_DAYS: 'min instruction hold up time (days)',
   MAX_VOTING_TIME_DAYS: 'max voting time (days)',
 
