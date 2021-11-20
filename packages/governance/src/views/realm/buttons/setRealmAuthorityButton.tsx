@@ -6,8 +6,10 @@ import { Realm } from '../../../models/accounts';
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
-import { AccountFormItem } from '../../../components/AccountFormItem/accountFormItem';
+
 import { setRealmAuthority } from '../../../actions/setRealmAuthority';
+import { Form, Select } from 'antd';
+import { useGovernancesByRealm } from '../../../hooks/apiHooks';
 
 export function SetRealmAuthorityButton({
   realm,
@@ -15,13 +17,14 @@ export function SetRealmAuthorityButton({
   realm: ParsedAccount<Realm>;
 }) {
   const rpcContext = useRpcContext();
+  const governances = useGovernancesByRealm(realm?.pubkey);
 
-  const onSubmit = async (values: { newAuthority: string }) => {
-    const newAuthority = new PublicKey(values.newAuthority);
+  const onSubmit = async (values: { realmAuthority: string }) => {
+    const realmAuthority = new PublicKey(values.realmAuthority);
 
-    await setRealmAuthority(rpcContext, realm, newAuthority);
+    await setRealmAuthority(rpcContext, realm, realmAuthority);
 
-    return newAuthority;
+    return realmAuthority;
   };
 
   return (
@@ -33,10 +36,22 @@ export function SetRealmAuthorityButton({
       onSubmit={onSubmit}
       initialValues={{ useCouncilMint: false }}
     >
-      <AccountFormItem
-        name="newAuthority"
-        label="new authority"
-      ></AccountFormItem>
+      <Form.Item
+        name="realmAuthority"
+        label="realm authority governance"
+        rules={[{ required: true }]}
+      >
+        <Select>
+          {governances.map(g => (
+            <Select.Option
+              value={g.pubkey.toBase58()}
+              key={g.pubkey.toBase58()}
+            >
+              {g.info.governedAccount.toBase58()}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
     </ModalFormAction>
   );
 }
