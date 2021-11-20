@@ -23,7 +23,7 @@ import {
   RealmMintSupplyConfigValues,
 } from '../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
 import { RealmMintTokensFormItem } from '../../components/realmMintTokensFormItem/realmMintTokensFormItem';
-import { parseMinTokensToCreateProposal } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
+import { parseMinTokensToCreate } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -69,7 +69,7 @@ export function RegisterRealmButton({
       values.communityMintMaxVoteWeightFraction,
     );
 
-    const minCommunityTokensToCreateGovernance = parseMinTokensToCreateProposal(
+    const minCommunityTokensToCreateGovernance = parseMinTokensToCreate(
       values.minTokensToCreateGovernance,
       values.mintDecimals,
     );

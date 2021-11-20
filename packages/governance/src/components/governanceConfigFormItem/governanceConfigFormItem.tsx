@@ -37,7 +37,7 @@ export interface GovernanceConfigValues {
 }
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
-  const minTokensToCreateProposal = parseMinTokensToCreateProposal(
+  const minTokensToCreateProposal = parseMinTokensToCreate(
     values.minTokensToCreateProposal,
     values.mintDecimals,
   );
@@ -58,7 +58,8 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
   });
 }
 
-export function parseMinTokensToCreateProposal(
+// Parses min tokens to create (proposal or governance)
+export function parseMinTokensToCreate(
   value: string | number,
   mintDecimals: number,
 ) {
@@ -124,7 +125,7 @@ export function GovernanceConfigFormItem({
     getMintSupplyFractionAsDecimalPercentage(communityMintInfo, amount);
 
   const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
-    const minTokens = parseMinTokensToCreateProposal(
+    const minTokens = parseMinTokensToCreate(
       minTokensToCreateProposal,
       mintDecimals,
     );

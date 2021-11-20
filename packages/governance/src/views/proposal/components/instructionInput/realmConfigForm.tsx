@@ -1,5 +1,10 @@
-import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount, useWallet } from '@oyster/common';
+import { Form, FormInstance, InputNumber } from 'antd';
+import {
+  ExplorerLink,
+  ParsedAccount,
+  useMint,
+  useWallet,
+} from '@oyster/common';
 import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
@@ -15,6 +20,34 @@ import {
   RealmMintSupplyConfigFormItem,
   RealmMintSupplyConfigValues,
 } from '../../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
+import BN from 'bn.js';
+import {
+  getMintDecimalAmountFromNatural,
+  getMintMinAmountAsDecimal,
+} from '../../../../tools/units';
+import { parseMinTokensToCreate } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
+
+export interface RealmConfigValues {
+  minCommunityTokensToCreateGovernance: number | string;
+  communityMintDecimals: number;
+}
+
+class RealmConfigFormModel {
+  minCommunityTokensToCreateGovernance: BN;
+
+  constructor(args: { minCommunityTokensToCreateGovernance: BN }) {
+    this.minCommunityTokensToCreateGovernance =
+      args.minCommunityTokensToCreateGovernance;
+  }
+}
+
+export function getRealmConfig(values: RealmConfigValues) {
+  return new RealmConfigFormModel({
+    minCommunityTokensToCreateGovernance: new BN(
+      values.minCommunityTokensToCreateGovernance,
+    ),
+  });
+}
 
 export const RealmConfigForm = ({
   form,
@@ -30,6 +63,7 @@ export const RealmConfigForm = ({
   const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
   const { programId, programVersion } = useRpcContext();
   const wallet = useWallet();
+  const communityMintInfo = useMint(realm?.info.communityMint);
 
   if (!wallet?.publicKey) {
     return <div>Wallet not connected</div>;
@@ -38,11 +72,13 @@ export const RealmConfigForm = ({
   const onCreate = async (
     values: {
       removeCouncil: boolean;
-    } & RealmMintSupplyConfigValues,
+    } & RealmMintSupplyConfigValues &
+      RealmConfigValues,
   ) => {
-    // keep the original value until for mis updated
-    const minCommunityTokensToCreateGovernance =
-      realm.info.config.minCommunityTokensToCreateGovernance;
+    const minCommunityTokensToCreateGovernance = parseMinTokensToCreate(
+      values.minCommunityTokensToCreateGovernance,
+      values.communityMintDecimals,
+    );
 
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
@@ -51,7 +87,7 @@ export const RealmConfigForm = ({
       governance.pubkey,
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
-      minCommunityTokensToCreateGovernance,
+      new BN(minCommunityTokensToCreateGovernance),
       undefined,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,
@@ -59,6 +95,19 @@ export const RealmConfigForm = ({
 
     onCreateInstruction(setRealmConfigIx);
   };
+
+  const minCommunityTokenAmount = communityMintInfo
+    ? getMintMinAmountAsDecimal(communityMintInfo)
+    : 0;
+
+  const minCommunityTokensToCreateGovernance = communityMintInfo
+    ? getMintDecimalAmountFromNatural(
+        communityMintInfo,
+        realm.info.config.minCommunityTokensToCreateGovernance,
+      ).toNumber()
+    : 0;
+
+  let mintDecimals = communityMintInfo ? communityMintInfo.decimals : 0;
 
   return (
     <Form
@@ -76,6 +125,32 @@ export const RealmConfigForm = ({
       <Form.Item label="realm authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
+
+      {communityMintInfo && (
+        <>
+          <Form.Item
+            label="min community tokens to create governance"
+            name="minCommunityTokensToCreateGovernance"
+            rules={[{ required: true }]}
+            initialValue={minCommunityTokensToCreateGovernance}
+          >
+            <InputNumber
+              min={minCommunityTokenAmount}
+              // Do not restrict the max because teams might want to set it higher in anticipation of future mints
+              // max={maxTokenAmount}
+              step={minCommunityTokenAmount}
+              style={{ width: 200 }}
+              stringMode={mintDecimals !== 0}
+            />
+          </Form.Item>
+          <Form.Item
+            hidden
+            name="communityMintDecimals"
+            initialValue={communityMintInfo.decimals}
+          ></Form.Item>
+        </>
+      )}
+
       {realm.info.config.councilMint && (
         <Form.Item
           label="remove council"
