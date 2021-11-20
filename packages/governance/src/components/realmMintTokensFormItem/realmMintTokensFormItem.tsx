@@ -9,7 +9,7 @@ import {
   getMintSupplyFractionAsDecimalPercentage,
   getMintSupplyPercentageAsDecimal,
 } from '../../tools/units';
-import { parseMinTokensToCreateProposal } from '../governanceConfigFormItem/governanceConfigFormItem';
+import { parseMinTokensToCreate } from '../governanceConfigFormItem/governanceConfigFormItem';
 
 const { useMint } = contexts.Accounts;
 const { Text } = Typography;
@@ -61,7 +61,7 @@ export function RealmMintTokensFormItem({
     getMintSupplyFractionAsDecimalPercentage(communityMintInfo, amount);
 
   const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
-    const minTokens = parseMinTokensToCreateProposal(
+    const minTokens = parseMinTokensToCreate(
       minTokensToCreateProposal,
       mintDecimals,
     );

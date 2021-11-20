@@ -24,11 +24,12 @@ import BN from 'bn.js';
 import {
   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
-  getMintSupplyAsDecimal,
 } from '../../../../tools/units';
+import { parseMinTokensToCreate } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 export interface RealmConfigValues {
   minCommunityTokensToCreateGovernance: number | string;
+  communityMintDecimals: number;
 }
 
 class RealmConfigFormModel {
@@ -74,7 +75,11 @@ export const RealmConfigForm = ({
     } & RealmMintSupplyConfigValues &
       RealmConfigValues,
   ) => {
-    // keep the original value until for mis updated
+    const minCommunityTokensToCreateGovernance = parseMinTokensToCreate(
+      values.minCommunityTokensToCreateGovernance,
+      values.communityMintDecimals,
+    );
+
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
       programVersion,
@@ -82,7 +87,7 @@ export const RealmConfigForm = ({
       governance.pubkey,
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
-      new BN(values.minCommunityTokensToCreateGovernance),
+      new BN(minCommunityTokensToCreateGovernance),
       undefined,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,
@@ -91,21 +96,17 @@ export const RealmConfigForm = ({
     onCreateInstruction(setRealmConfigIx);
   };
 
-  let minTokenAmount = communityMintInfo
+  const minCommunityTokenAmount = communityMintInfo
     ? getMintMinAmountAsDecimal(communityMintInfo)
     : 0;
-  let minTokensToCreateProposal = minTokenAmount;
-  minTokensToCreateProposal = communityMintInfo
+
+  const minCommunityTokensToCreateGovernance = communityMintInfo
     ? getMintDecimalAmountFromNatural(
         communityMintInfo,
         realm.info.config.minCommunityTokensToCreateGovernance,
       ).toNumber()
     : 0;
 
-  let maxTokenAmount =
-    communityMintInfo && !communityMintInfo.supply.isZero()
-      ? getMintSupplyAsDecimal(communityMintInfo)
-      : 0;
   let mintDecimals = communityMintInfo ? communityMintInfo.decimals : 0;
 
   return (
@@ -124,6 +125,32 @@ export const RealmConfigForm = ({
       <Form.Item label="realm authority (governance account)">
         <ExplorerLink address={governance.pubkey} type="address" />
       </Form.Item>
+
+      {communityMintInfo && (
+        <>
+          <Form.Item
+            label="min community tokens to create governance"
+            name="minCommunityTokensToCreateGovernance"
+            rules={[{ required: true }]}
+            initialValue={minCommunityTokensToCreateGovernance}
+          >
+            <InputNumber
+              min={minCommunityTokenAmount}
+              // Do not restrict the max because teams might want to set it higher in anticipation of future mints
+              // max={maxTokenAmount}
+              step={minCommunityTokenAmount}
+              style={{ width: 200 }}
+              stringMode={mintDecimals !== 0}
+            />
+          </Form.Item>
+          <Form.Item
+            hidden
+            name="communityMintDecimals"
+            initialValue={communityMintInfo.decimals}
+          ></Form.Item>
+        </>
+      )}
+
       {realm.info.config.councilMint && (
         <Form.Item
           label="remove council"
@@ -137,23 +164,6 @@ export const RealmConfigForm = ({
         communityMintAddress={realm.info.communityMint}
         maxVoteWeightSource={realm.info.config.communityMintMaxVoteWeightSource}
       ></RealmMintSupplyConfigFormItem>
-      {communityMintInfo && (
-        <Form.Item
-          label={'Min tokens to create governance'}
-          name="minTokensToCreateGovernance"
-          rules={[{ required: true }]}
-          initialValue={minTokensToCreateProposal}
-          noStyle
-        >
-          <InputNumber
-            min={minTokenAmount}
-            max={maxTokenAmount}
-            step={minTokenAmount}
-            style={{ width: 200 }}
-            stringMode={mintDecimals !== 0}
-          />
-        </Form.Item>
-      )}
     </Form>
   );
 };
