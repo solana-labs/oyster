@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
 import { useConnection, useWallet } from '@oyster/common';
-import { Button } from 'antd';
+import { Button, Space } from 'antd';
 import { generateGovernanceArtifacts } from '../../actions/devtools/generateGovernanceArtifacts';
 import './style.less';
+import { CreateMint } from './createMint';
 
 // import { ControlTestBench } from './controlTests';
 
@@ -58,43 +59,49 @@ const GovernanceArtifacts = () => {
   };
 
   return (
-    <div>
-      <h2>Governance Artifacts</h2>
-      <Button onClick={() => onGenerateArtifacts()} disabled={!wallet.connected}>
-        Generate
-      </Button>
-      {generated && (
-        <>
-          <div>
-            <h3>realm name: </h3>
-            <div className="test-data">{realmName}</div>
-          </div>
-
-          <div>
-            <h3>community mint / governed account: </h3>
-            <div className="test-data">{communityMint}</div>
-          </div>
-
-          <div>
-            <h3>council mint: </h3>
-            <div className="test-data">{councilMint}</div>
-          </div>
-
-          <div>
-            <h3>token governance - token account: </h3>
-            <div className="test-data">
-              {tokenGovernance.tokenAccountAddress}
+    <Space direction="vertical" size="large">
+      <div>
+        <h2>Governance Artifacts</h2>
+        <Button
+          onClick={() => onGenerateArtifacts()}
+          disabled={!wallet.connected}
+        >
+          Generate
+        </Button>
+        {generated && (
+          <>
+            <div>
+              <h3>realm name: </h3>
+              <div className="test-data">{realmName}</div>
             </div>
-          </div>
-          <div>
-            <h3>token governance - beneficiary token account: </h3>
-            <div className="test-data">
-              {tokenGovernance.beneficiaryTokenAccountAddress}
+
+            <div>
+              <h3>community mint / governed account: </h3>
+              <div className="test-data">{communityMint}</div>
             </div>
-          </div>
-        </>
-      )}
-      <div>{/* <ControlTestBench></ControlTestBench> */}</div>
-    </div>
+
+            <div>
+              <h3>council mint: </h3>
+              <div className="test-data">{councilMint}</div>
+            </div>
+
+            <div>
+              <h3>token governance - token account: </h3>
+              <div className="test-data">
+                {tokenGovernance.tokenAccountAddress}
+              </div>
+            </div>
+            <div>
+              <h3>token governance - beneficiary token account: </h3>
+              <div className="test-data">
+                {tokenGovernance.beneficiaryTokenAccountAddress}
+              </div>
+            </div>
+          </>
+        )}
+        <div>{/* <ControlTestBench></ControlTestBench> */}</div>
+      </div>
+      <CreateMint></CreateMint>
+    </Space>
   );
 };

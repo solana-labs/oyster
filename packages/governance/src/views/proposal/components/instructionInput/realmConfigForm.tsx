@@ -87,7 +87,8 @@ export const RealmConfigForm = ({
       governance.pubkey,
       values.removeCouncil === true ? undefined : realm.info.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
-      new BN(minCommunityTokensToCreateGovernance),
+      // Use minCommunityTokensToCreateGovernance.toString() in case the number is larger than number
+      new BN(minCommunityTokensToCreateGovernance.toString()),
       undefined,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,

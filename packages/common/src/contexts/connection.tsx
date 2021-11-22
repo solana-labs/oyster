@@ -28,16 +28,12 @@ import {
 } from '../utils/errors';
 import { WalletSigner, WalletNotConnectedError } from './wallet';
 
-export type ENV =
-  | 'mainnet-beta'
-  | 'testnet'
-  | 'devnet'
-  | 'localnet';
+export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet';
 
 export const ENDPOINTS = [
   {
     name: 'mainnet-beta' as ENV,
-    endpoint: clusterApiUrl('mainnet-beta'),
+    endpoint: 'https://explorer-api.mainnet-beta.solana.com',
     ChainId: ChainId.MainnetBeta,
   },
   {
@@ -47,7 +43,7 @@ export const ENDPOINTS = [
   },
   {
     name: 'devnet' as ENV,
-    endpoint: clusterApiUrl('devnet'),
+    endpoint: 'https://explorer-api.devnet.solana.com',
     ChainId: ChainId.Devnet,
   },
   {
@@ -125,19 +121,19 @@ export function ConnectionProvider({ children = undefined as any }) {
         )
         .getList();
 
-
       // WORMHOLE TOKEN NEEDED
       list.push({
-        address: "66CgfJQoZkpkrEgC1z4vFJcSFc4V6T5HqbjSSNuqcNJz",
+        address: '66CgfJQoZkpkrEgC1z4vFJcSFc4V6T5HqbjSSNuqcNJz',
         chainId: ASSET_CHAIN.Solana,
         decimals: 9,
-        logoURI: "https://assets.coingecko.com/coins/images/15500/thumb/ibbtc.png?1621077589",
-        name: "Interest Bearing Bitcoin (Wormhole)",
-        symbol: "IBBTC",
+        logoURI:
+          'https://assets.coingecko.com/coins/images/15500/thumb/ibbtc.png?1621077589',
+        name: 'Interest Bearing Bitcoin (Wormhole)',
+        symbol: 'IBBTC',
         extensions: {
-          address: "0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f",
-        }
-      })
+          address: '0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f',
+        },
+      });
       const knownMints = [...list].reduce((map, item) => {
         map.set(item.address, item);
         return map;

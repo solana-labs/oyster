@@ -29,6 +29,10 @@ export const generateGovernanceArtifacts = async (
   let communityMintSigners: Account[] = [];
   let communityMintInstruction: TransactionInstruction[] = [];
 
+  const otherOwnerWallet = new PublicKey(
+    'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
+  );
+
   // Setup community mint
   const { mintAddress: communityMintAddress } = await withMint(
     communityMintInstruction,
@@ -38,10 +42,7 @@ export const generateGovernanceArtifacts = async (
     3,
     new u64('7000000'),
     new u64('10000000'),
-    // 6,
-    // new u64('340000000010000'),
-    // //  new u64('10000'),
-    // new u64('34000000001000000'),
+    otherOwnerWallet,
   );
 
   let councilMinSigners: Account[] = [];
@@ -56,6 +57,7 @@ export const generateGovernanceArtifacts = async (
     0,
     new u64(20),
     new u64(55),
+    otherOwnerWallet,
   );
 
   // Setup Realm, Governance and Proposal instruction
@@ -177,7 +179,7 @@ const withTokenGovernance = async (
   };
 };
 
-const withMint = async (
+export const withMint = async (
   instructions: TransactionInstruction[],
   signers: Account[],
   connection: Connection,
@@ -185,6 +187,7 @@ const withMint = async (
   decimals: number,
   amount: u64,
   supply: u64,
+  otherOwnerWallet: PublicKey,
 ) => {
   const { publicKey } = wallet;
   if (!publicKey) throw new WalletNotConnectedError();
@@ -246,17 +249,12 @@ const withMint = async (
 
   signers.push(otherOwner);
 
-  let otherOwnerPubKey = otherOwner.publicKey;
-  otherOwnerPubKey = new PublicKey(
-    'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
-  );
-
   const otherOwnerTokenAccount = createTokenAccount(
     instructions,
     publicKey,
     tokenAccountRentExempt,
     mintAddress,
-    otherOwnerPubKey,
+    otherOwnerWallet,
     signers,
   );
 
