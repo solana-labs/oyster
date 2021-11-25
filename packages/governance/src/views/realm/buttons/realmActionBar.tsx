@@ -7,6 +7,7 @@ import { SetRealmAuthorityButton } from './setRealmAuthorityButton';
 import { WithdrawGoverningTokensButton } from './withdrawGoverningTokensButton';
 import { ParsedAccount, useWallet } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
+import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
 
 export function RealmActionBar({
   realm,
@@ -20,8 +21,6 @@ export function RealmActionBar({
     return null;
   }
 
-  // Show CreateGovernance option only for the custodian
-  // Note: This check is not enforced on the program side yet because I'm not sure if users want to take this route or maybe restrict based on token possession
   const showCreateNewGovernance = connected;
 
   const showSetRealmAuthority =
@@ -66,6 +65,11 @@ export function RealmActionBar({
                   <RegisterGovernanceButton
                     realm={realm}
                   ></RegisterGovernanceButton>
+                )}
+                {showCreateNewGovernance && (
+                  <CreateTreasuryAccountButton
+                    realm={realm}
+                  ></CreateTreasuryAccountButton>
                 )}
                 {showSetRealmAuthority && (
                   <SetRealmAuthorityButton
