@@ -58,7 +58,7 @@ export function getMintNaturalAmountFromDecimal(
   decimalAmount: number,
   decimals: number,
 ) {
-  return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber();
+  return new BigNumber(decimalAmount.toString()).shiftedBy(decimals).toNumber();
 }
 
 // Calculates percentage (provided as 0-100) of mint supply as decimal amount
