@@ -15,6 +15,9 @@ export async function getProgramVersion(
   // For localnet always use the latest version
   if (env === 'localnet') {
     return PROGRAM_VERSION;
+  } else if (env === 'testnet') {
+    //to prevent program data bug
+    return PROGRAM_VERSION;
   }
 
   const programData = await getProgramDataAccount(

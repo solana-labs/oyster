@@ -31,7 +31,7 @@ export function Routes() {
                 <GovernanceProvider>
                   <AppLayout>
                     <Switch>
-                      <Route exact path="/" component={() => <HomeView />} />
+                      <Route exact path="/" component={() => <RealmView  />} />
                       <Route
                         path="/proposal/:key"
                         children={<ProposalView />}

@@ -33,29 +33,29 @@ function Box({ position }: { position: any }) {
 }
 
 export const Background = () => {
-  return (
+    return (
     <Canvas
-      className="main"
-      shadowMap
-      camera={{ position: [0, 0, 20] }}
-      style={{ width: '100%', height: 400, marginTop: -120, zIndex: 1 }}
+        className="main"
+        shadowMap
+        camera={{ position: [0, 0, 20] }}
+        style={{ width: '100%', height: 400, marginTop: -120, zIndex: 1 }}
     >
-      <ambientLight intensity={0.5} />
-      <spotLight
-        intensity={0.6}
-        position={[30, 30, 50]}
-        angle={0.2}
-        penumbra={1}
-        castShadow
-      />
-      <Provider>
-        <Plane position={[0, 0, -10]} />
-        <Box position={[1, 0, -8]} />
-        <Box position={[5, 1, -8]} />
-        <Box position={[2, 1, -8]} />
-        <Box position={[0, 0, -9]} />
-        <Box position={[0, 0, -9]} />
-      </Provider>
+        <ambientLight intensity={0.5} />
+        <spotLight
+            intensity={0.6}
+            position={[30, 30, 50]}
+            angle={0.2}
+            penumbra={1}
+            castShadow
+        />
+        <Provider>
+            <Plane position={[0, 0, -10]} />
+            <Box position={[1, 0, -8]} />
+            <Box position={[5, 1, -8]} />
+            <Box position={[2, 1, -8]} />
+            <Box position={[0, 0, -9]} />
+            <Box position={[0, 0, -9]} />
+        </Provider>
     </Canvas>
-  );
+    );
 };

@@ -1,0 +1,1 @@
+export const PUB_KEY="HBTW7rtmdpDUXrVigvSQfgrQ45E748N4X4LoawUyZyN6"

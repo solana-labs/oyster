@@ -24,12 +24,17 @@ import { RealmPopUpDetails } from './components/realmPopUpDetails';
 
 import { RealmActionBar } from './buttons/realmActionBar';
 
+import {PUB_KEY} from '../../settings.js';
+import { PublicKey } from '@solana/web3.js';
+
 const { Text } = Typography;
 
 export const RealmView = () => {
   const history = useHistory();
-  let realmKey = useKeyParam();
   const { programIdBase58 } = useRpcContext();
+  let realmKey = new PublicKey(PUB_KEY)
+  // let realmKey = useKeyParam();
+  // alert(realmKey+"\n"+JSON.stringify(realmKey))
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);
@@ -61,8 +66,7 @@ export const RealmView = () => {
   }, [governances, programIdBase58, realm]);
 
   return (
-    <>
-      <Background />
+    <div style={{paddingTop:64}}>
       <Row>
         <Col flex="auto" xxl={15} xs={24} className="realm-container">
           <Row>
@@ -151,6 +155,6 @@ export const RealmView = () => {
           />
         </Col>
       </Row>
-    </>
+    </div>
   );
 };

@@ -43,8 +43,11 @@
     ]
   },
   "dependencies": {
+    "n": "^8.0.0",
+    "node": "^16.13.0",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",

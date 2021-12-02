@@ -22,7 +22,7 @@ export function getGovernanceUrl(
 }
 
 export function getHomeUrl(programId: PublicKey) {
-  return `/?programId=${programId.toBase58()}`;
+  return `/`;
 }
 
 export function getItemUrl(

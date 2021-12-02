@@ -5,7 +5,9 @@ import { Governance, Realm } from '../../../../models/accounts';
 import { GovernanceConfigForm } from './governanceConfigForm';
 import { InstructionType } from './instructionSelector';
 import { TransactionInstruction } from '@solana/web3.js';
+
 import { RealmConfigForm } from './realmConfigForm';
+import {SplTokenTransferForm} from './splTokenTransferForm'
 
 export function getGovernanceInstructions(
   realm: ParsedAccount<Realm>,
@@ -16,6 +18,8 @@ export function getGovernanceInstructions(
   if (governance.pubkey.toBase58() === realm.info.authority?.toBase58()) {
     instructions.push(InstructionType.GovernanceSetRealmConfig);
   }
+
+  instructions.push(InstructionType.SplTokenTransfer);
 
   return instructions;
 }
@@ -42,14 +46,24 @@ export function GovernanceInstructionForm({
           onCreateInstruction={onCreateInstruction}
         ></GovernanceConfigForm>
       )}
-      {instruction === InstructionType.GovernanceSetRealmConfig && (
+      {
+      instruction === InstructionType.GovernanceSetRealmConfig?
         <RealmConfigForm
           form={form}
           realm={realm}
           governance={governance}
           onCreateInstruction={onCreateInstruction}
         ></RealmConfigForm>
-      )}
+        :
+      instruction === InstructionType.SplTokenTransfer?
+          <SplTokenTransferForm
+            form={form}
+            governance={governance}
+            onCreateInstruction={onCreateInstruction}
+          ></SplTokenTransferForm>
+        :
+        null
+      }
     </>
   );
 }

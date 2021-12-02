@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 
 import { components } from '@oyster/common';
 import { Content, Header } from 'antd/lib/layout/layout';
-import Logo from './dark-horizontal-combined-rainbow.inline.svg';
+// import Logo from './dark-horizontal-combined-rainbow.inline.svg';
+import Logo from './ducksidedao.png';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getHomeUrl } from '../../tools/routeTools';
 
@@ -44,11 +45,16 @@ export const AppLayout = React.memo((props: any) => {
     <div className="App">
       <Layout>
         <Header className="App-Bar">
-          <div className="app-title">
+          <div className="app-title" style={{display:"flex",flexDirection:"row"}}>
             <HomeLink></HomeLink>
-            <a href="https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md">
-              Docs
+            <div style={{marginLeft:10}}>
+                DucksideDAO Governance (Alpha)
+            </div>
+            {/*
+            <a href="https://ducksidedao.com" style={{marginLeft:10}}>
+              DucksideDAO Alpha
             </a>
+            */}
           </div>
           <AppBar useWalletBadge={true} />
         </Header>
@@ -66,7 +72,7 @@ const HomeLink = () => {
 
   return (
     <Link to={getHomeUrl(programId)}>
-      <img alt={`Solana Logo`} src={Logo} style={{ height: 40 }} />
+      <img alt={`DucksideDAO Logo`} src={Logo} style={{ height: 40 }} />
     </Link>
   );
 };
