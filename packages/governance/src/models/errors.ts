@@ -39,9 +39,6 @@ export const GovernanceError: Record<number, string> = [
   "Can't finalize vote. Voting still in progress", // CannotFinalizeVotingInProgress
   'Proposal voting time expired', // ProposalVotingTimeExpired
   'Invalid Signatory Mint', // InvalidSignatoryMint
-  'Invalid account owner', // InvalidAccountOwner
-  "Account doesn't exist", // AccountDoesNotExist
-  'Invalid Account type', // InvalidAccountType
   'Proposal does not belong to the given Governance', // InvalidGovernanceForProposal
   'Proposal does not belong to given Governing Mint', // InvalidGoverningMintForProposal
   'Current mint authority must sign transaction', // MintAuthorityMustSign
@@ -78,6 +75,19 @@ export const GovernanceError: Record<number, string> = [
   "Owner doesn't have enough governing tokens to create Governance", // NotEnoughTokensToCreateGovernance
   'Too many outstanding proposals', // TooManyOutstandingProposals
   'All proposals must be finalized to withdraw governing tokens', // AllProposalsMustBeFinalisedToWithdrawGoverningTokens
+  'Invalid VoterWeightRecord for Realm', // InvalidVoterWeightRecordForRealm
+  'Invalid VoterWeightRecord for GoverningTokenMint', // InvalidVoterWeightRecordForGoverningTokenMint
+  'Invalid VoterWeightRecord for TokenOwner', // InvalidVoterWeightRecordForTokenOwner
+  'VoterWeightRecord expired', // VoterWeightRecordExpired
+  'Invalid RealmConfig for Realm', // InvalidRealmConfigForRealm
+  'TokenOwnerRecord already exists', // TokenOwnerRecordAlreadyExists
+  'Governing token deposits not allowed', // GoverningTokenDepositsNotAllowed
+  'Invalid vote choice weight percentage', // InvalidVoteChoiceWeightPercentage
+  'Vote type not supported', // VoteTypeNotSupported
+  'Invalid proposal options', // InvalidProposalOptions
+  'Proposal is not not executable', // ProposalIsNotExecutable
+  'Invalid vote', // InvalidVote
+  'Cannot execute defeated option', // CannotExecuteDefeatedOption
 ];
 
 export const TokenError: Record<number, string> = [
@@ -102,14 +112,26 @@ export const TokenError: Record<number, string> = [
   'The provided decimals value different from the Mint decimals', //  MintDecimalsMismatch,
 ];
 
+export const GovernanceToolsError: Record<number, string> = [
+  'Account already initialized', // AccountAlreadyInitialized
+  "Account doesn't exist", // AccountDoesNotExist
+  'Invalid account owner', // InvalidAccountOwner
+  'Invalid Account type', // InvalidAccountType
+];
+
 const governanceErrorOffset = 500;
+const governanceToolsErrorOffset = 1100;
 
 export function getTransactionErrorMsg(error: SendTransactionError) {
   try {
     const instructionError = (error.txError as any).InstructionError[1];
 
     if (instructionError.Custom !== undefined) {
-      if (instructionError.Custom >= governanceErrorOffset) {
+      if (instructionError.Custom >= governanceToolsErrorOffset) {
+        return GovernanceToolsError[
+          instructionError.Custom - governanceToolsErrorOffset
+        ];
+      } else if (instructionError.Custom >= governanceErrorOffset) {
         return GovernanceError[instructionError.Custom - governanceErrorOffset];
       } else {
         // If the error is not from the Governance error space then it's ambiguous because the custom errors share the same space
