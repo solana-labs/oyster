@@ -204,11 +204,11 @@ function mapVoterDisplayData(
 
   const noVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.no?.gt(ZERO))
+      .filter(vr => vr.info.getNoVoteWeight()?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.no,
+          vr.info.getNoVoteWeight()!,
           VoteType.No,
         ),
       ),
@@ -216,11 +216,11 @@ function mapVoterDisplayData(
 
   const yesVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.voteWeight.yes?.gt(ZERO))
+      .filter(vr => vr.info.getYesVoteWeight()?.gt(ZERO))
       .map(vr =>
         mapper(
           vr.info.governingTokenOwner.toBase58(),
-          vr.info.voteWeight.yes,
+          vr.info.getYesVoteWeight()!,
           VoteType.Yes,
         ),
       ),

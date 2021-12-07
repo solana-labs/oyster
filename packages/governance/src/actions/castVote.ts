@@ -3,16 +3,16 @@ import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 import { withCastVote } from '../models/withCastVote';
-import { Vote } from '../models/instructions';
+import { YesNoVote } from '../models/instructions';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
 
 export const castVote = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   proposal: ParsedAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
-  vote: Vote,
+  vote: YesNoVote,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -23,6 +23,7 @@ export const castVote = async (
   await withCastVote(
     instructions,
     programId,
+    programVersion,
     realm,
     proposal.info.governance,
     proposal.pubkey,

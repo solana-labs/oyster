@@ -174,16 +174,75 @@ export class CancelProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CancelProposal;
 }
 
-export enum Vote {
+export enum YesNoVote {
   Yes,
   No,
 }
 
+export class VoteChoice {
+  rank: number;
+  weightPercentage: number;
+
+  constructor(args: { rank: number; weightPercentage: number }) {
+    this.rank = args.rank;
+    this.weightPercentage = args.weightPercentage;
+  }
+}
+
+export enum VoteKind {
+  Approve,
+  Deny,
+}
+
+export class Vote {
+  voteType: VoteKind;
+  approveChoices: VoteChoice[] | undefined;
+  deny: boolean | undefined;
+
+  constructor(args: {
+    voteType: VoteKind;
+    approveChoices: VoteChoice[] | undefined;
+    deny: boolean | undefined;
+  }) {
+    this.voteType = args.voteType;
+    this.approveChoices = args.approveChoices;
+    this.deny = args.deny;
+  }
+
+  static createYesNoVote(yesNoVote: YesNoVote) {
+    switch (yesNoVote) {
+      case YesNoVote.Yes: {
+        return new Vote({
+          voteType: VoteKind.Approve,
+          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+          deny: undefined,
+        });
+      }
+      case YesNoVote.No: {
+        return new Vote({
+          voteType: VoteKind.Deny,
+          approveChoices: undefined,
+          deny: true,
+        });
+      }
+    }
+  }
+}
+
 export class CastVoteArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CastVote;
-  vote: Vote;
 
-  constructor(args: { vote: Vote }) {
+  // V1
+  yesNoVote: YesNoVote | undefined;
+
+  // V2
+  vote: Vote | undefined;
+
+  constructor(args: {
+    yesNoVote: YesNoVote | undefined;
+    vote: Vote | undefined;
+  }) {
+    this.yesNoVote = args.yesNoVote;
     this.vote = args.vote;
   }
 }
