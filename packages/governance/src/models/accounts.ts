@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from './registry/api';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -10,13 +11,16 @@ export enum GovernanceAccountType {
   TokenOwnerRecord = 2,
   AccountGovernance = 3,
   ProgramGovernance = 4,
-  Proposal = 5,
+  ProposalV1 = 5,
   SignatoryRecord = 6,
-  VoteRecord = 7,
-  ProposalInstruction = 8,
+  VoteRecordV1 = 7,
+  ProposalInstructionV1 = 8,
   MintGovernance = 9,
   TokenGovernance = 10,
   RealmConfig = 11,
+  VoteRecordV2 = 12,
+  ProposalInstructionV2 = 13,
+  ProposalV2 = 14,
 }
 
 export interface GovernanceAccount {
@@ -40,13 +44,22 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
     case TokenOwnerRecord:
       return [GovernanceAccountType.TokenOwnerRecord];
     case Proposal:
-      return [GovernanceAccountType.Proposal];
+      return [
+        GovernanceAccountType.ProposalV1,
+        GovernanceAccountType.ProposalV2,
+      ];
     case SignatoryRecord:
       return [GovernanceAccountType.SignatoryRecord];
     case VoteRecord:
-      return [GovernanceAccountType.VoteRecord];
+      return [
+        GovernanceAccountType.VoteRecordV1,
+        GovernanceAccountType.VoteRecordV2,
+      ];
     case ProposalInstruction:
-      return [GovernanceAccountType.ProposalInstruction];
+      return [
+        GovernanceAccountType.ProposalInstructionV1,
+        GovernanceAccountType.ProposalInstructionV2,
+      ];
     case RealmConfigAccount:
       return [GovernanceAccountType.RealmConfig];
     case Governance:
@@ -58,6 +71,17 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
       ];
     default:
       throw Error(`${accountClass} account is not supported`);
+  }
+}
+
+export function getAccountProgramVersion(accountType: GovernanceAccountType) {
+  switch (accountType) {
+    case GovernanceAccountType.VoteRecordV2:
+    case GovernanceAccountType.ProposalInstructionV2:
+    case GovernanceAccountType.ProposalV2:
+      return PROGRAM_VERSION_V2;
+    default:
+      return PROGRAM_VERSION_V1;
   }
 }
 
@@ -145,11 +169,16 @@ export class VoteType {
     type: VoteTypeKind.SingleChoice,
     choiceCount: undefined,
   });
+
   static MULTI_CHOICE = (choiceCount: number) =>
     new VoteType({
       type: VoteTypeKind.MultiChoice,
       choiceCount: choiceCount,
     });
+
+  isSingleChoice() {
+    return this.type === VoteTypeKind.SingleChoice;
+  }
 }
 
 export class RealmConfigArgs {
@@ -428,8 +457,40 @@ export enum ProposalState {
   ExecutingWithErrors,
 }
 
+export enum OptionVoteResult {
+  None,
+  Succeeded,
+  Defeated,
+}
+
+export class ProposalOption {
+  label: string;
+  voteWeight: BN;
+  voteResult: OptionVoteResult;
+
+  instructionsExecutedCount: number;
+  instructionsCount: number;
+  instructionsNextIndex: number;
+
+  constructor(args: {
+    label: string;
+    voteWeight: BN;
+    voteResult: OptionVoteResult;
+    instructionsExecutedCount: number;
+    instructionsCount: number;
+    instructionsNextIndex: number;
+  }) {
+    this.label = args.label;
+    this.voteWeight = args.voteWeight;
+    this.voteResult = args.voteResult;
+    this.instructionsExecutedCount = args.instructionsExecutedCount;
+    this.instructionsCount = args.instructionsCount;
+    this.instructionsNextIndex = args.instructionsNextIndex;
+  }
+}
+
 export class Proposal {
-  accountType = GovernanceAccountType.Proposal;
+  accountType: GovernanceAccountType;
 
   governance: PublicKey;
 
@@ -443,15 +504,19 @@ export class Proposal {
 
   signatoriesSignedOffCount: number;
 
+  // V1 -----------------------------
   yesVotesCount: BN;
-
   noVotesCount: BN;
-
   instructionsExecutedCount: number;
-
   instructionsCount: number;
-
   instructionsNextIndex: number;
+  // --------------------------------
+
+  // V2 -----------------------------
+  voteType: VoteType;
+  options: ProposalOption[];
+  denyVoteWeight: BN | undefined;
+  // --------------------------------
 
   draftAt: BN;
 
@@ -477,6 +542,7 @@ export class Proposal {
   descriptionLink: string;
 
   constructor(args: {
+    accountType: GovernanceAccountType;
     governance: PublicKey;
     governingTokenMint: PublicKey;
     state: ProposalState;
@@ -485,8 +551,20 @@ export class Proposal {
     signatoriesSignedOffCount: number;
     descriptionLink: string;
     name: string;
+    // V1
     yesVotesCount: BN;
     noVotesCount: BN;
+    instructionsExecutedCount: number;
+    instructionsCount: number;
+    instructionsNextIndex: number;
+    //
+
+    // V2
+    voteType: VoteType;
+    options: ProposalOption[];
+    denyVoteWeight: BN | undefined;
+    //
+
     draftAt: BN;
     signingOffAt: BN | null;
     votingAt: BN | null;
@@ -494,13 +572,12 @@ export class Proposal {
     votingCompletedAt: BN | null;
     executingAt: BN | null;
     closedAt: BN | null;
-    instructionsExecutedCount: number;
-    instructionsCount: number;
-    instructionsNextIndex: number;
+
     executionFlags: InstructionExecutionFlags;
     maxVoteWeight: BN | null;
     voteThresholdPercentage: VoteThresholdPercentage | null;
   }) {
+    this.accountType = args.accountType;
     this.governance = args.governance;
     this.governingTokenMint = args.governingTokenMint;
     this.state = args.state;
@@ -509,8 +586,20 @@ export class Proposal {
     this.signatoriesSignedOffCount = args.signatoriesSignedOffCount;
     this.descriptionLink = args.descriptionLink;
     this.name = args.name;
+
+    // V1
     this.yesVotesCount = args.yesVotesCount;
     this.noVotesCount = args.noVotesCount;
+    this.instructionsExecutedCount = args.instructionsExecutedCount;
+    this.instructionsCount = args.instructionsCount;
+    this.instructionsNextIndex = args.instructionsNextIndex;
+    //
+
+    // V2
+    this.voteType = args.voteType;
+    this.options = args.options;
+    this.denyVoteWeight = args.denyVoteWeight;
+
     this.draftAt = args.draftAt;
     this.signingOffAt = args.signingOffAt;
     this.votingAt = args.votingAt;
@@ -518,9 +607,7 @@ export class Proposal {
     this.votingCompletedAt = args.votingCompletedAt;
     this.executingAt = args.executingAt;
     this.closedAt = args.closedAt;
-    this.instructionsExecutedCount = args.instructionsExecutedCount;
-    this.instructionsCount = args.instructionsCount;
-    this.instructionsNextIndex = args.instructionsNextIndex;
+
     this.executionFlags = args.executionFlags;
     this.maxVoteWeight = args.maxVoteWeight;
     this.voteThresholdPercentage = args.voteThresholdPercentage;
@@ -597,6 +684,36 @@ export class Proposal {
   isPreVotingState() {
     return !this.votingAtSlot;
   }
+
+  getYesVoteOption() {
+    if (this.options.length !== 1 && !this.voteType.isSingleChoice()) {
+      throw new Error('Proposal is not Yes/No vote');
+    }
+
+    return this.options[0];
+  }
+
+  getYesVoteCount() {
+    switch (this.accountType) {
+      case GovernanceAccountType.ProposalV1:
+        return this.yesVotesCount;
+      case GovernanceAccountType.ProposalV2:
+        return this.getYesVoteOption().voteWeight;
+      default:
+        throw new Error(`Invalid account type ${this.accountType}`);
+    }
+  }
+
+  getNoVoteCount() {
+    switch (this.accountType) {
+      case GovernanceAccountType.ProposalV1:
+        return this.noVotesCount;
+      case GovernanceAccountType.ProposalV2:
+        return this.denyVoteWeight as BN;
+      default:
+        throw new Error(`Invalid account type ${this.accountType}`);
+    }
+  }
 }
 
 export class SignatoryRecord {
@@ -644,7 +761,7 @@ export class VoteWeight {
 }
 
 export class VoteRecord {
-  accountType = GovernanceAccountType.VoteRecord;
+  accountType = GovernanceAccountType.VoteRecordV1;
   proposal: PublicKey;
   governingTokenOwner: PublicKey;
   isRelinquished: boolean;
@@ -713,7 +830,7 @@ export class InstructionData {
 }
 
 export class ProposalInstruction {
-  accountType = GovernanceAccountType.ProposalInstruction;
+  accountType = GovernanceAccountType.ProposalInstructionV1;
   proposal: PublicKey;
   instructionIndex: number;
   holdUpTime: number;

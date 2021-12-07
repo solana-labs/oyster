@@ -8,7 +8,7 @@ import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
 
 export const cancelProposal = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   proposal: ParsedAccount<Proposal>,
 ) => {
   let governanceAuthority = walletPubkey;
@@ -19,9 +19,11 @@ export const cancelProposal = async (
   withCancelProposal(
     instructions,
     programId,
+    programVersion,
     proposal.pubkey,
     proposal.info.tokenOwnerRecord,
     governanceAuthority,
+    proposal.info.governance,
   );
 
   await sendTransactionWithNotifications(

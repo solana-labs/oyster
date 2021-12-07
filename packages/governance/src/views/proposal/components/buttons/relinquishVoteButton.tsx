@@ -89,7 +89,7 @@ export function RelinquishVoteButton({
 
               accountChangeTracker.notifyAccountRemoved(
                 voteRecord!.pubkey.toBase58(),
-                GovernanceAccountType.VoteRecord,
+                GovernanceAccountType.VoteRecordV1,
               );
             } catch (ex) {
               console.error(ex);

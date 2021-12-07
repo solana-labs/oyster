@@ -44,4 +44,4 @@ export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
 ]);
 
 export const ChatAccountParser = (classType: GovernanceChatAccountClass) =>
-  BorshAccountParser(classType, GOVERNANCE_CHAT_SCHEMA);
+  BorshAccountParser(classType, _ => GOVERNANCE_CHAT_SCHEMA);

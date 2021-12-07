@@ -384,8 +384,8 @@ function InnerProposalView({
                 </div>
                 <div>
                   <VoteScore
-                    yesVoteCount={proposal.info.yesVotesCount}
-                    noVoteCount={proposal.info.noVotesCount}
+                    yesVoteCount={proposal.info.getYesVoteCount()}
+                    noVoteCount={proposal.info.getNoVoteCount()}
                     yesVoteThreshold={getYesVoteThreshold(proposal, governance)}
                     governingMintDecimals={governingTokenMint.decimals}
                     proposalState={proposal.info.state}

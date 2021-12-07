@@ -130,13 +130,15 @@ export class CreateProposalArgs {
   name: string;
   descriptionLink: string;
 
-  // V1
+  // V1 -----------------------------
   governingTokenMint: PublicKey;
+  // --------------------------------
 
-  // V2
+  // V2 -----------------------------
   voteType: VoteType;
   options: string[];
   useDenyOption: boolean;
+  // --------------------------------
 
   constructor(args: {
     name: string;
