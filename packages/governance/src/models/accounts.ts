@@ -127,6 +127,31 @@ export class MintMaxVoteWeightSource {
   }
 }
 
+export enum VoteTypeKind {
+  SingleChoice = 0,
+  MultiChoice = 1,
+}
+
+export class VoteType {
+  type: VoteTypeKind;
+  choiceCount: number | undefined;
+
+  constructor(args: { type: VoteTypeKind; choiceCount: number | undefined }) {
+    this.type = args.type;
+    this.choiceCount = args.choiceCount;
+  }
+
+  static SINGLE_CHOICE = new VoteType({
+    type: VoteTypeKind.SingleChoice,
+    choiceCount: undefined,
+  });
+  static MULTI_CHOICE = (choiceCount: number) =>
+    new VoteType({
+      type: VoteTypeKind.MultiChoice,
+      choiceCount: choiceCount,
+    });
+}
+
 export class RealmConfigArgs {
   useCouncilMint: boolean;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;

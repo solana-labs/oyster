@@ -1,7 +1,12 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'borsh/node_modules/@types/bn.js';
 
-import { RealmConfigArgs, GovernanceConfig, InstructionData } from './accounts';
+import {
+  RealmConfigArgs,
+  GovernanceConfig,
+  InstructionData,
+  VoteType,
+} from './accounts';
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
@@ -124,16 +129,29 @@ export class CreateProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CreateProposal;
   name: string;
   descriptionLink: string;
+
+  // V1
   governingTokenMint: PublicKey;
+
+  // V2
+  voteType: VoteType;
+  options: string[];
+  useDenyOption: boolean;
 
   constructor(args: {
     name: string;
     descriptionLink: string;
     governingTokenMint: PublicKey;
+    voteType: VoteType;
+    options: string[];
+    useDenyOption: boolean;
   }) {
     this.name = args.name;
     this.descriptionLink = args.descriptionLink;
     this.governingTokenMint = args.governingTokenMint;
+    this.voteType = args.voteType;
+    this.options = args.options;
+    this.useDenyOption = args.useDenyOption;
   }
 }
 
