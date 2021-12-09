@@ -658,9 +658,15 @@ function createGovernanceSchema(programVersion: number) {
   ]);
 }
 
+export function getGovernanceSchemaForAccount(
+  accountType: GovernanceAccountType,
+) {
+  return getGovernanceSchema(getAccountProgramVersion(accountType));
+}
+
 export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
   BorshAccountParser(classType, (accountType: GovernanceAccountType) =>
-    getGovernanceSchema(getAccountProgramVersion(accountType)),
+    getGovernanceSchemaForAccount(accountType),
   );
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {

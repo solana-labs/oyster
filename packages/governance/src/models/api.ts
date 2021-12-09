@@ -1,7 +1,10 @@
 import { PublicKey } from '@solana/web3.js';
 
 import { ParsedAccount } from '@oyster/common';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import {
+  getGovernanceSchemaForAccount,
+  GOVERNANCE_SCHEMA,
+} from './serialisation';
 import {
   GovernanceAccount,
   GovernanceAccountClass,
@@ -14,7 +17,7 @@ import { getBorshProgramAccounts, MemcmpFilter } from './core/api';
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(
     programId,
-    GOVERNANCE_SCHEMA,
+    at => getGovernanceSchemaForAccount(at),
     endpoint,
     Realm,
   );
@@ -30,7 +33,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   if (accountTypes.length === 1) {
     return getBorshProgramAccounts<TAccount>(
       programId,
-      GOVERNANCE_SCHEMA,
+      at => getGovernanceSchemaForAccount(at),
       endpoint,
       accountClass as any,
       filters,
@@ -42,7 +45,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     accountTypes.map(at =>
       getBorshProgramAccounts<TAccount>(
         programId,
-        GOVERNANCE_SCHEMA,
+        at => getGovernanceSchemaForAccount(at),
         endpoint,
         accountClass as any,
         filters,
