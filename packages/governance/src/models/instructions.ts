@@ -258,15 +258,18 @@ export class FinalizeVoteArgs {
 export class InsertInstructionArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.InsertInstruction;
   index: number;
+  optionIndex: number;
   holdUpTime: number;
   instructionData: InstructionData;
 
   constructor(args: {
     index: number;
+    optionIndex: number;
     holdUpTime: number;
     instructionData: InstructionData;
   }) {
     this.index = args.index;
+    this.optionIndex = args.optionIndex;
     this.holdUpTime = args.holdUpTime;
     this.instructionData = args.instructionData;
   }

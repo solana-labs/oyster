@@ -9,7 +9,7 @@ import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
 
 export const insertInstruction = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   proposal: ParsedAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   index: number,
@@ -25,6 +25,7 @@ export const insertInstruction = async (
   const proposalInstructionAddress = await withInsertInstruction(
     instructions,
     programId,
+    programVersion,
     proposal.info.governance,
     proposal.pubkey,
     tokenOwnerRecord,

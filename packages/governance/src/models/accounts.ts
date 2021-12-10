@@ -896,6 +896,9 @@ export class ProposalInstruction {
   accountType = GovernanceAccountType.ProposalInstructionV1;
   proposal: PublicKey;
   instructionIndex: number;
+  // V2
+  optionIndex: number;
+
   holdUpTime: number;
   instruction: InstructionData;
   executedAt: BN | null;
@@ -904,6 +907,7 @@ export class ProposalInstruction {
   constructor(args: {
     proposal: PublicKey;
     instructionIndex: number;
+    optionIndex: number;
     holdUpTime: number;
     instruction: InstructionData;
     executedAt: BN | null;
@@ -911,9 +915,45 @@ export class ProposalInstruction {
   }) {
     this.proposal = args.proposal;
     this.instructionIndex = args.instructionIndex;
+    this.optionIndex = args.optionIndex;
     this.holdUpTime = args.holdUpTime;
     this.instruction = args.instruction;
     this.executedAt = args.executedAt;
     this.executionStatus = args.executionStatus;
   }
+}
+
+export async function getProposalInstructionAddress(
+  programId: PublicKey,
+  programVersion: number,
+  proposal: PublicKey,
+  optionIndex: number,
+  instructionIndex: number,
+) {
+  let optionIndexBuffer = Buffer.alloc(2);
+  optionIndexBuffer.writeInt16LE(optionIndex, 0);
+
+  let instructionIndexBuffer = Buffer.alloc(2);
+  instructionIndexBuffer.writeInt16LE(instructionIndex, 0);
+
+  const seeds =
+    programVersion === PROGRAM_VERSION_V1
+      ? [
+          Buffer.from(GOVERNANCE_PROGRAM_SEED),
+          proposal.toBuffer(),
+          instructionIndexBuffer,
+        ]
+      : [
+          Buffer.from(GOVERNANCE_PROGRAM_SEED),
+          proposal.toBuffer(),
+          optionIndexBuffer,
+          instructionIndexBuffer,
+        ];
+
+  const [instructionAddress] = await PublicKey.findProgramAddress(
+    seeds,
+    programId,
+  );
+
+  return instructionAddress;
 }

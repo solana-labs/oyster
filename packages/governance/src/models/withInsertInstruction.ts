@@ -4,14 +4,15 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { InsertInstructionArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED, InstructionData } from './accounts';
+import { getProposalInstructionAddress, InstructionData } from './accounts';
 
 export const withInsertInstruction = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -22,24 +23,24 @@ export const withInsertInstruction = async (
   payer: PublicKey,
 ) => {
   const { system: systemId } = utils.programIds();
+  const optionIndex = 0;
 
   const args = new InsertInstructionArgs({
     index,
+    optionIndex: 0,
     holdUpTime,
     instructionData: instructionData,
   });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
-  let instructionIndexBuffer = Buffer.alloc(2);
-  instructionIndexBuffer.writeInt16LE(index, 0);
-
-  const [proposalInstructionAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      proposal.toBuffer(),
-      instructionIndexBuffer,
-    ],
+  const proposalInstructionAddress = await getProposalInstructionAddress(
     programId,
+    programVersion,
+    proposal,
+    optionIndex,
+    index,
   );
 
   const keys = [

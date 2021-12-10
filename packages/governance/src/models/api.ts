@@ -1,10 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
 import { ParsedAccount } from '@oyster/common';
-import {
-  getGovernanceSchemaForAccount,
-  GOVERNANCE_SCHEMA,
-} from './serialisation';
+import { getGovernanceSchemaForAccount } from './serialisation';
 import {
   GovernanceAccount,
   GovernanceAccountClass,

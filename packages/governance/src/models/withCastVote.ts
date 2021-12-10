@@ -5,7 +5,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CastVoteArgs, Vote, YesNoVote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
@@ -32,7 +32,9 @@ export const withCastVote = async (
       ? { yesNoVote: yesNoVote, vote: undefined }
       : { yesNoVote: undefined, vote: Vote.createYesNoVote(yesNoVote) },
   );
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   const voteRecordAddress = await getVoteRecordAddress(
     programId,
