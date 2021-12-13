@@ -23,6 +23,9 @@ import {
   SetRealmAuthorityArgs,
   SetRealmConfigArgs,
   SignOffProposalArgs,
+  Vote,
+  VoteChoice,
+  VoteKind,
   WithdrawGoverningTokensArgs,
 } from './instructions';
 import {
@@ -43,10 +46,17 @@ import {
   VoteWeight,
   RealmConfigAccount,
   GovernanceAccountClass,
+  VoteType,
+  VoteTypeKind,
+  ProposalOption,
+  GovernanceAccountType,
+  getAccountProgramVersion,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from './core/serialisation';
 import { PROGRAM_VERSION_V1 } from './registry/api';
+
+// ------------ u16 ------------
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
@@ -58,10 +68,84 @@ import { PROGRAM_VERSION_V1 } from './registry/api';
 
 // Temp. workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
-  const reader = (this as unknown) as BinaryWriter;
-  reader.maybeResize();
-  reader.buf.writeUInt16LE(value, reader.length);
-  reader.length += 2;
+  const writer = (this as unknown) as BinaryWriter;
+  writer.maybeResize();
+  writer.buf.writeUInt16LE(value, writer.length);
+  writer.length += 2;
+};
+
+// ------------ VoteType ------------
+
+(BinaryReader.prototype as any).readVoteType = function () {
+  const reader = (this as unknown) as BinaryReader;
+  const value = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+
+  if (value === VoteTypeKind.SingleChoice) {
+    return VoteType.SINGLE_CHOICE;
+  }
+
+  const choiceCount = reader.buf.readUInt16LE(reader.offset);
+  return VoteType.MULTI_CHOICE(choiceCount);
+};
+
+(BinaryWriter.prototype as any).writeVoteType = function (value: VoteType) {
+  const writer = (this as unknown) as BinaryWriter;
+  writer.maybeResize();
+  writer.buf.writeUInt8(value.type, writer.length);
+  writer.length += 1;
+
+  if (value.type === VoteTypeKind.MultiChoice) {
+    writer.buf.writeUInt16LE(value.choiceCount!, writer.length);
+    writer.length += 2;
+  }
+};
+
+// ------------ Vote ------------
+
+(BinaryReader.prototype as any).readVote = function () {
+  const reader = (this as unknown) as BinaryReader;
+  const value = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+
+  if (value === VoteKind.Deny) {
+    return new Vote({ voteType: value, approveChoices: undefined, deny: true });
+  }
+
+  let approveChoices: VoteChoice[] = [];
+
+  reader.readArray(() => {
+    const rank = reader.buf.readUInt8(reader.offset);
+    reader.offset += 1;
+    const weightPercentage = reader.buf.readUInt8(reader.offset);
+    reader.offset += 1;
+
+    approveChoices.push(
+      new VoteChoice({ rank: rank, weightPercentage: weightPercentage }),
+    );
+  });
+
+  return new Vote({
+    voteType: value,
+    approveChoices: approveChoices,
+    deny: undefined,
+  });
+};
+
+(BinaryWriter.prototype as any).writeVote = function (value: Vote) {
+  const writer = (this as unknown) as BinaryWriter;
+  writer.maybeResize();
+  writer.buf.writeUInt8(value.voteType, writer.length);
+  writer.length += 1;
+
+  if (value.voteType === VoteKind.Approve) {
+    writer.writeArray(value.approveChoices as any[], (item: VoteChoice) => {
+      writer.buf.writeUInt8(item.rank, writer.length);
+      writer.length += 1;
+      writer.buf.writeUInt8(item.weightPercentage, writer.length);
+      writer.length += 1;
+    });
+  }
 };
 
 // Serializes sdk instruction into InstructionData and encodes it as base64 which then can be entered into the UI form
@@ -203,7 +287,14 @@ function createGovernanceSchema(programVersion: number) {
           ['instruction', 'u8'],
           ['name', 'string'],
           ['descriptionLink', 'string'],
-          ['governingTokenMint', 'pubkey'],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? [['governingTokenMint', 'pubkey']]
+            : [
+                ['voteType', 'voteType'],
+                ['options', ['string']],
+                ['useDenyOption', 'u8'],
+              ]),
         ],
       },
     ],
@@ -246,12 +337,24 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
+      VoteChoice,
+      {
+        kind: 'struct',
+        fields: [
+          ['rank', 'u8'],
+          ['weightPercentage', 'u8'],
+        ],
+      },
+    ],
+    [
       CastVoteArgs,
       {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
-          ['vote', 'u8'],
+          programVersion === PROGRAM_VERSION_V1
+            ? ['yesNoVote', 'u8']
+            : ['vote', 'vote'],
         ],
       },
     ],
@@ -261,10 +364,13 @@ function createGovernanceSchema(programVersion: number) {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
+          programVersion > PROGRAM_VERSION_V1
+            ? ['optionIndex', 'u16']
+            : undefined,
           ['index', 'u16'],
           ['holdUpTime', 'u32'],
           ['instructionData', InstructionData],
-        ],
+        ].filter(Boolean),
       },
     ],
     [
@@ -438,6 +544,20 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
+      ProposalOption,
+      {
+        kind: 'struct',
+        fields: [
+          ['label', 'string'],
+          ['voteWeight', 'u64'],
+          ['voteResult', 'u8'],
+          ['instructionsExecutedCount', 'u16'],
+          ['instructionsCount', 'u16'],
+          ['instructionsNextIndex', 'u16'],
+        ],
+      },
+    ],
+    [
       Proposal,
       {
         kind: 'struct',
@@ -449,11 +569,21 @@ function createGovernanceSchema(programVersion: number) {
           ['tokenOwnerRecord', 'pubkey'],
           ['signatoriesCount', 'u8'],
           ['signatoriesSignedOffCount', 'u8'],
-          ['yesVotesCount', 'u64'],
-          ['noVotesCount', 'u64'],
-          ['instructionsExecutedCount', 'u16'],
-          ['instructionsCount', 'u16'],
-          ['instructionsNextIndex', 'u16'],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? [
+                ['yesVotesCount', 'u64'],
+                ['noVotesCount', 'u64'],
+                ['instructionsExecutedCount', 'u16'],
+                ['instructionsCount', 'u16'],
+                ['instructionsNextIndex', 'u16'],
+              ]
+            : [
+                ['voteType', 'voteType'],
+                ['options', [ProposalOption]],
+                ['denyVoteWeight', { kind: 'option', type: 'u64' }],
+              ]),
+
           ['draftAt', 'u64'],
           ['signingOffAt', { kind: 'option', type: 'u64' }],
           ['votingAt', { kind: 'option', type: 'u64' }],
@@ -503,7 +633,13 @@ function createGovernanceSchema(programVersion: number) {
           ['proposal', 'pubkey'],
           ['governingTokenOwner', 'pubkey'],
           ['isRelinquished', 'u8'],
-          ['voteWeight', VoteWeight],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? [['voteWeight', VoteWeight]]
+            : [
+                ['voterWeight', 'u64'],
+                ['vote', 'vote'],
+              ]),
         ],
       },
     ],
@@ -514,19 +650,30 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['accountType', 'u8'],
           ['proposal', 'pubkey'],
+          programVersion > PROGRAM_VERSION_V1
+            ? ['optionIndex', 'u16']
+            : undefined,
           ['instructionIndex', 'u16'],
           ['holdUpTime', 'u32'],
           ['instruction', InstructionData],
           ['executedAt', { kind: 'option', type: 'u64' }],
           ['executionStatus', 'u8'],
-        ],
+        ].filter(Boolean),
       },
     ],
   ]);
 }
 
+export function getGovernanceSchemaForAccount(
+  accountType: GovernanceAccountType,
+) {
+  return getGovernanceSchema(getAccountProgramVersion(accountType));
+}
+
 export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
-  BorshAccountParser(classType, GOVERNANCE_SCHEMA);
+  BorshAccountParser(classType, (accountType: GovernanceAccountType) =>
+    getGovernanceSchemaForAccount(accountType),
+  );
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');

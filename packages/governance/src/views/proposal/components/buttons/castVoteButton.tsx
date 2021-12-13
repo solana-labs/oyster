@@ -16,7 +16,7 @@ import {
   VoteRecord,
 } from '../../../../models/accounts';
 
-import { Vote } from '../../../../models/instructions';
+import { YesNoVote } from '../../../../models/instructions';
 
 import { castVote } from '../../../../actions/castVote';
 
@@ -35,7 +35,7 @@ export function CastVoteButton({
   proposal: ParsedAccount<Proposal>;
   governance: ParsedAccount<Governance>;
   tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
-  vote: Vote;
+  vote: YesNoVote;
   voteRecord: Option<ParsedAccount<VoteRecord>> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
@@ -49,7 +49,7 @@ export function CastVoteButton({
     proposal.info.state === ProposalState.Voting;
 
   const [btnLabel, title, msg, icon] =
-    vote === Vote.Yes
+    vote === YesNoVote.Yes
       ? [
           LABELS.VOTE_YEAH,
           LABELS.VOTE_YEAH_QUESTION,

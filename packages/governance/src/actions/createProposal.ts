@@ -4,9 +4,10 @@ import { withCreateProposal } from '../models/withCreateProposal';
 import { withAddSignatory } from '../models/withAddSignatory';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { VoteType } from '../models/accounts';
 
 export const createProposal = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -21,9 +22,15 @@ export const createProposal = async (
   let signatory = walletPubkey;
   let payer = walletPubkey;
 
+  // V2 Approve/Deny configuration
+  const voteType = VoteType.SINGLE_CHOICE;
+  const options = ['Approve'];
+  const useDenyOption = true;
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
+    programVersion,
     realm,
     governance,
     tokenOwnerRecord,
@@ -33,6 +40,9 @@ export const createProposal = async (
 
     governanceAuthority,
     proposalIndex,
+    voteType,
+    options,
+    useDenyOption,
     payer,
   );
 

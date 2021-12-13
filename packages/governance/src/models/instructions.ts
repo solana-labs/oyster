@@ -1,7 +1,12 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'borsh/node_modules/@types/bn.js';
 
-import { RealmConfigArgs, GovernanceConfig, InstructionData } from './accounts';
+import {
+  RealmConfigArgs,
+  GovernanceConfig,
+  InstructionData,
+  VoteType,
+} from './accounts';
 
 export enum GovernanceInstruction {
   CreateRealm = 0,
@@ -124,16 +129,31 @@ export class CreateProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CreateProposal;
   name: string;
   descriptionLink: string;
+
+  // V1 -----------------------------
   governingTokenMint: PublicKey;
+  // --------------------------------
+
+  // V2 -----------------------------
+  voteType: VoteType;
+  options: string[];
+  useDenyOption: boolean;
+  // --------------------------------
 
   constructor(args: {
     name: string;
     descriptionLink: string;
     governingTokenMint: PublicKey;
+    voteType: VoteType;
+    options: string[];
+    useDenyOption: boolean;
   }) {
     this.name = args.name;
     this.descriptionLink = args.descriptionLink;
     this.governingTokenMint = args.governingTokenMint;
+    this.voteType = args.voteType;
+    this.options = args.options;
+    this.useDenyOption = args.useDenyOption;
   }
 }
 
@@ -154,16 +174,91 @@ export class CancelProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CancelProposal;
 }
 
-export enum Vote {
+export enum YesNoVote {
   Yes,
   No,
 }
 
+export class VoteChoice {
+  rank: number;
+  weightPercentage: number;
+
+  constructor(args: { rank: number; weightPercentage: number }) {
+    this.rank = args.rank;
+    this.weightPercentage = args.weightPercentage;
+  }
+}
+
+export enum VoteKind {
+  Approve,
+  Deny,
+}
+
+export class Vote {
+  voteType: VoteKind;
+  approveChoices: VoteChoice[] | undefined;
+  deny: boolean | undefined;
+
+  constructor(args: {
+    voteType: VoteKind;
+    approveChoices: VoteChoice[] | undefined;
+    deny: boolean | undefined;
+  }) {
+    this.voteType = args.voteType;
+    this.approveChoices = args.approveChoices;
+    this.deny = args.deny;
+  }
+
+  toYesNoVote() {
+    if (this.deny === undefined) {
+      throw new Error('There is no Deny option');
+    }
+
+    if (this.approveChoices?.length !== 1) {
+      throw new Error('Too many options');
+    }
+
+    if (this.deny) {
+      return YesNoVote.No;
+    }
+
+    return YesNoVote.Yes;
+  }
+
+  static fromYesNoVote(yesNoVote: YesNoVote) {
+    switch (yesNoVote) {
+      case YesNoVote.Yes: {
+        return new Vote({
+          voteType: VoteKind.Approve,
+          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+          deny: undefined,
+        });
+      }
+      case YesNoVote.No: {
+        return new Vote({
+          voteType: VoteKind.Deny,
+          approveChoices: undefined,
+          deny: true,
+        });
+      }
+    }
+  }
+}
+
 export class CastVoteArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.CastVote;
-  vote: Vote;
 
-  constructor(args: { vote: Vote }) {
+  // V1
+  yesNoVote: YesNoVote | undefined;
+
+  // V2
+  vote: Vote | undefined;
+
+  constructor(args: {
+    yesNoVote: YesNoVote | undefined;
+    vote: Vote | undefined;
+  }) {
+    this.yesNoVote = args.yesNoVote;
     this.vote = args.vote;
   }
 }
@@ -179,15 +274,18 @@ export class FinalizeVoteArgs {
 export class InsertInstructionArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.InsertInstruction;
   index: number;
+  optionIndex: number;
   holdUpTime: number;
   instructionData: InstructionData;
 
   constructor(args: {
     index: number;
+    optionIndex: number;
     holdUpTime: number;
     instructionData: InstructionData;
   }) {
     this.index = args.index;
+    this.optionIndex = args.optionIndex;
     this.holdUpTime = args.holdUpTime;
     this.instructionData = args.instructionData;
   }

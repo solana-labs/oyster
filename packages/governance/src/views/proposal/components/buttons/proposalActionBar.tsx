@@ -10,7 +10,7 @@ import { ParsedAccount } from '@oyster/common';
 import SignOffButton from './signOffButton';
 import { FinalizeVoteButton } from './finalizeVoteButton';
 import { RelinquishVoteButton } from './relinquishVoteButton';
-import { Vote } from '../../../../models/instructions';
+import { YesNoVote } from '../../../../models/instructions';
 import { CastVoteButton } from './castVoteButton';
 
 import {
@@ -67,14 +67,14 @@ export function ProposalActionBar({
             governance={governance}
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
-            vote={Vote.Yes}
+            vote={YesNoVote.Yes}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
           <CastVoteButton
             governance={governance}
             proposal={proposal}
-            vote={Vote.No}
+            vote={YesNoVote.No}
             tokenOwnerRecord={tokenOwnerRecord}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}

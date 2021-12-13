@@ -85,7 +85,7 @@ export function InstructionCard({
       await removeInstruction(rpcContext, proposal, proposalInstruction.pubkey);
       changeTracker.notifyAccountRemoved(
         proposalInstruction.pubkey.toBase58(),
-        GovernanceAccountType.ProposalInstruction,
+        GovernanceAccountType.ProposalInstructionV1,
       );
     };
 

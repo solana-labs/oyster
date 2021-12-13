@@ -5,14 +5,16 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
+import { PROGRAM_VERSION_V1 } from './registry/api';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
@@ -25,8 +27,14 @@ export const withCastVote = async (
 ) => {
   const { system: systemId } = utils.programIds();
 
-  const args = new CastVoteArgs({ vote });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const args = new CastVoteArgs(
+    programVersion === PROGRAM_VERSION_V1
+      ? { yesNoVote: vote.toYesNoVote(), vote: undefined }
+      : { yesNoVote: undefined, vote: vote },
+  );
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   const voteRecordAddress = await getVoteRecordAddress(
     programId,
