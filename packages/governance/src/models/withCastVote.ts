@@ -7,7 +7,7 @@ import {
 } from '@solana/web3.js';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
-import { CastVoteArgs, Vote, YesNoVote } from './instructions';
+import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from './registry/api';
 
@@ -22,15 +22,15 @@ export const withCastVote = async (
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   governingTokenMint: PublicKey,
-  yesNoVote: YesNoVote,
+  vote: Vote,
   payer: PublicKey,
 ) => {
   const { system: systemId } = utils.programIds();
 
   const args = new CastVoteArgs(
     programVersion === PROGRAM_VERSION_V1
-      ? { yesNoVote: yesNoVote, vote: undefined }
-      : { yesNoVote: undefined, vote: Vote.createYesNoVote(yesNoVote) },
+      ? { yesNoVote: vote.toYesNoVote(), vote: undefined }
+      : { yesNoVote: undefined, vote: vote },
   );
   const data = Buffer.from(
     serialize(getGovernanceSchema(programVersion), args),

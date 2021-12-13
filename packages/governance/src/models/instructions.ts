@@ -209,7 +209,23 @@ export class Vote {
     this.deny = args.deny;
   }
 
-  static createYesNoVote(yesNoVote: YesNoVote) {
+  toYesNoVote() {
+    if (this.deny === undefined) {
+      throw new Error('There is no Deny option');
+    }
+
+    if (this.approveChoices?.length !== 1) {
+      throw new Error('Too many options');
+    }
+
+    if (this.deny) {
+      return YesNoVote.No;
+    }
+
+    return YesNoVote.Yes;
+  }
+
+  static fromYesNoVote(yesNoVote: YesNoVote) {
     switch (yesNoVote) {
       case YesNoVote.Yes: {
         return new Vote({
