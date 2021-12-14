@@ -419,7 +419,7 @@ export class TokenOwnerRecord {
   }
 }
 
-export async function getTokenOwnerAddress(
+export async function getTokenOwnerRecordAddress(
   programId: PublicKey,
   realm: PublicKey,
   governingTokenMint: PublicKey,

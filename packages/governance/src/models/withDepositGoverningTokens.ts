@@ -7,7 +7,10 @@ import {
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { DepositGoverningTokensArgs } from './instructions';
-import { getTokenOwnerAddress, GOVERNANCE_PROGRAM_SEED } from './accounts';
+import {
+  getTokenOwnerRecordAddress,
+  GOVERNANCE_PROGRAM_SEED,
+} from './accounts';
 import BN from 'bn.js';
 
 export const withDepositGoverningTokens = async (
@@ -29,7 +32,7 @@ export const withDepositGoverningTokens = async (
     serialize(getGovernanceSchema(programVersion), args),
   );
 
-  const tokenOwnerRecordAddress = await getTokenOwnerAddress(
+  const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
     programId,
     realm,
     governingTokenMint,

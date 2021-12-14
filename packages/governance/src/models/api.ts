@@ -1,12 +1,17 @@
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 import { ParsedAccount } from '@oyster/common';
-import { getGovernanceSchemaForAccount } from './serialisation';
 import {
+  getGovernanceSchemaForAccount,
+  GovernanceAccountParser,
+} from './serialisation';
+import {
+  getTokenOwnerRecordAddress,
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
+  TokenOwnerRecord,
 } from './accounts';
 
 import { getBorshProgramAccounts, MemcmpFilter } from './core/api';
@@ -18,6 +23,38 @@ export async function getRealms(endpoint: string, programId: PublicKey) {
     endpoint,
     Realm,
   );
+}
+
+export async function getTokenOwnerRecordForRealm(
+  connection: Connection,
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+  governingTokenOwner: PublicKey,
+) {
+  const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+    programId,
+    realm,
+    governingTokenMint,
+    governingTokenOwner,
+  );
+
+  const tokenOwnerRecordInfo = await connection.getAccountInfo(
+    tokenOwnerRecordPk,
+  );
+
+  if (!tokenOwnerRecordInfo) {
+    throw new Error(
+      `Can't fetch token owner record at ${tokenOwnerRecordPk.toBase58()}`,
+    );
+  }
+
+  const tokenOwnerRecord = GovernanceAccountParser(TokenOwnerRecord)(
+    tokenOwnerRecordPk,
+    tokenOwnerRecordInfo,
+  ) as ParsedAccount<TokenOwnerRecord>;
+
+  return tokenOwnerRecord;
 }
 
 export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
