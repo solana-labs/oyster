@@ -3,7 +3,7 @@ import { useWallet } from '@oyster/common';
 import {
   getRealmConfigAddress,
   getSignatoryRecordAddress,
-  getTokenOwnerAddress,
+  getTokenOwnerRecordAddress,
   getVoteRecordAddress,
   Governance,
   Proposal,
@@ -100,7 +100,7 @@ export function useWalletTokenOwnerRecord(
         return;
       }
 
-      return await getTokenOwnerAddress(
+      return await getTokenOwnerRecordAddress(
         programId,
         realm,
         governingTokenMint,
