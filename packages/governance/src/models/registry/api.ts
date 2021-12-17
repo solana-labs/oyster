@@ -34,6 +34,6 @@ function getLatestVersionCutOffSlot(env: string) {
       return 87097690;
     default:
       // Default to mainnet slot
-      return 110648362;
+      return 111991240;
   }
 }
