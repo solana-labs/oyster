@@ -210,19 +210,14 @@ export class Vote {
   }
 
   toYesNoVote() {
-    if (this.deny === undefined) {
-      throw new Error('There is no Deny option');
+    switch (this.voteType) {
+      case VoteKind.Deny: {
+        return YesNoVote.No;
+      }
+      case VoteKind.Approve: {
+        return YesNoVote.Yes;
+      }
     }
-
-    if (this.approveChoices?.length !== 1) {
-      throw new Error('Too many options');
-    }
-
-    if (this.deny) {
-      return YesNoVote.No;
-    }
-
-    return YesNoVote.Yes;
   }
 
   static fromYesNoVote(yesNoVote: YesNoVote) {
