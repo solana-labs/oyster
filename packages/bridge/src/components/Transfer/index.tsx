@@ -245,12 +245,11 @@ export const Transfer = () => {
           type="primary"
           size="large"
           disabled={
-            true
-            // !(A.amount && B.amount) ||
-            // !connected ||
-            // !provider ||
-            // transferStatus.inProcess ||
-            // popoverVisible || !warningChecked
+            !(A.amount && B.amount) ||
+            !connected ||
+            !provider ||
+            transferStatus.inProcess ||
+            popoverVisible || !warningChecked
           }
           onClick={async () => {
             if (!wallet || !provider || !wallet.publicKey) {
