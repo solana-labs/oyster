@@ -24,7 +24,14 @@ export async function getProgramVersion(
 
   const slot = getLatestVersionCutOffSlot(env);
 
-  return programData.slot > slot ? PROGRAM_VERSION : PROGRAM_VERSION_V1;
+  const slotVersion =
+    programData.slot > slot ? PROGRAM_VERSION : PROGRAM_VERSION_V1;
+
+  console.log('Program slot version', slotVersion);
+
+  // Default to V1 until V2 is released
+  //return slotVersion;
+  return PROGRAM_VERSION_V1;
 }
 
 // Returns the min deployment slot from which onwards the program should be on the latest version
