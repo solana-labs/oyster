@@ -6,15 +6,21 @@ import {
   GovernanceAccountParser,
 } from './serialisation';
 import {
+  getAccountTypes,
   getTokenOwnerRecordAddress,
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
   TokenOwnerRecord,
+  VoteRecord,
 } from './accounts';
 
-import { getBorshProgramAccounts, MemcmpFilter } from './core/api';
+import {
+  getBorshProgramAccounts,
+  MemcmpFilter,
+  pubkeyFilter,
+} from './core/api';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(
@@ -22,6 +28,20 @@ export async function getRealms(endpoint: string, programId: PublicKey) {
     at => getGovernanceSchemaForAccount(at),
     endpoint,
     Realm,
+  );
+}
+
+export async function getVoteRecordsByVoter(
+  programId: PublicKey,
+  endpoint: string,
+  voter: PublicKey,
+) {
+  return getGovernanceAccounts<VoteRecord>(
+    programId,
+    endpoint,
+    VoteRecord,
+    getAccountTypes(VoteRecord),
+    [pubkeyFilter(33, voter)!],
   );
 }
 
