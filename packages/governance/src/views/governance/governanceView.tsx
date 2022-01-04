@@ -12,7 +12,7 @@ import {
   useConnectionConfig,
   useMint,
 } from '@oyster/common';
-import { NewProposalButton } from './buttons/newProposalButton';
+
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -24,6 +24,7 @@ import {
   formatMintSupplyFractionAsDecimalPercentage,
   getDaysFromTimestamp,
 } from '../../tools/units';
+import { GovernanceActionBar } from './buttons/governanceActionBar';
 
 const { Text } = Typography;
 
@@ -146,11 +147,10 @@ export const GovernanceView = () => {
             )}
           </div>
 
-          <NewProposalButton
-            buttonProps={{ className: 'proposals-new-btn' }}
+          <GovernanceActionBar
             governance={governance}
             realm={realm}
-          />
+          ></GovernanceActionBar>
         </div>
         <h1 className="proposals-list-title">Proposals</h1>
         <List

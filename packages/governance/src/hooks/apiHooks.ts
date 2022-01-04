@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { useWallet } from '@oyster/common';
 import {
+  getNativeTreasuryAddress,
   getRealmConfigAddress,
   getSignatoryRecordAddress,
   getTokenOwnerRecordAddress,
@@ -15,6 +16,7 @@ import {
 } from '../models/accounts';
 import { pubkeyFilter } from '../models/core/api';
 import {
+  useAccountByPda,
   useGovernanceAccountByPda,
   useGovernanceAccountByPubkey,
   useGovernanceAccountsByFilter,
@@ -197,3 +199,14 @@ export const useTokenOwnerVoteRecord = (
     [tokenOwnerRecord, proposal],
   );
 };
+
+export function useNativeTreasury(governance: PublicKey | undefined) {
+  const { programId } = useRpcContext();
+
+  return useAccountByPda(async () => {
+    if (!governance) {
+      return;
+    }
+    return await getNativeTreasuryAddress(programId, governance);
+  }, [governance])?.tryUnwrap();
+}
