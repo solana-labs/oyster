@@ -1,6 +1,6 @@
 {
-  "name": "Wormhole Solana Bridge",
-  "short_name": "Wormhole Solana Bridge",
+  "name": "Wormhole Bridge WWT to RIN",
+  "short_name": "Wormhole Bridge WWT to RIN",
   "display": "standalone",
   "start_url": "./",
   "theme_color": "#002140",
