@@ -61,6 +61,8 @@ export const AppBar = (props: { isRoot?: boolean }) => {
           <Link to="/help">Help</Link>
         </div> */}
         <a className="guide-link" href="https://aldrin-rin.medium.com/how-to-swap-erc20-wwt-to-solana-rin-using-wormhole-bridge-a8e805687ccd" target="_blank" rel="noopener noreferrer">Guide</a>
+        <a className="support-link" href="https://t.me/aldrinwormholesupport" target="_blank" rel="noopener noreferrer">Support</a>
+
         {!props.isRoot && (
           <Popover
             placement="topRight"
