@@ -238,12 +238,14 @@ export function useAccountByPda(
   const pdaArgsKey = JSON.stringify(pdaArgs);
 
   useEffect(() => {
-    (async () => {
+    const sub = (async () => {
       const pdaPk = await getPda();
+      let subId = 0;
 
       if (pdaPk) {
         try {
           const accountInfo = await connection.getAccountInfo(pdaPk);
+
           if (accountInfo) {
             setAccount(some(GenericAccountParser(pdaPk, accountInfo)));
           } else {
@@ -253,10 +255,22 @@ export function useAccountByPda(
           console.error(`Can't load ${pdaPk.toBase58()} account`, ex);
           setAccount(none());
         }
+
+        subId = connection.onAccountChange(pdaPk, a =>
+          setAccount(some(GenericAccountParser(pdaPk, a))),
+        );
       } else {
         setAccount(none());
       }
+
+      return () => {
+        subId > 0 && connection.removeAccountChangeListener(subId);
+      };
     })();
+
+    return () => {
+      sub.then(dispose => dispose());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdaArgsKey]);
 
