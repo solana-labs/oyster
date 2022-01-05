@@ -6,7 +6,11 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { ExecuteInstructionArgs } from './instructions';
-import { AccountMetaData, InstructionData } from './accounts';
+import {
+  AccountMetaData,
+  getNativeTreasuryAddress,
+  InstructionData,
+} from './accounts';
 
 export const withExecuteInstruction = async (
   instructions: TransactionInstruction[],
@@ -19,10 +23,14 @@ export const withExecuteInstruction = async (
   const args = new ExecuteInstructionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  // When an instruction needs to be signed by the Governance PDA then its isSigner flag has to be reset on AccountMeta
+  const nativeTreasury = await getNativeTreasuryAddress(programId, governance);
+
+  // When an instruction needs to be signed by the Governance PDA or the Native treasury then its isSigner flag has to be reset on AccountMeta
   // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
   instruction.accounts = instruction.accounts.map(a =>
-    a.pubkey.toBase58() === governance.toBase58() && a.isSigner
+    (a.pubkey.toBase58() === governance.toBase58() ||
+      a.pubkey.toBase58() === nativeTreasury.toBase58()) &&
+    a.isSigner
       ? new AccountMetaData({
           pubkey: a.pubkey,
           isWritable: a.isWritable,

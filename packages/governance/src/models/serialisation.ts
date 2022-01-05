@@ -8,10 +8,12 @@ import {
   CastVoteArgs,
   CreateAccountGovernanceArgs,
   CreateMintGovernanceArgs,
+  CreateNativeTreasuryArgs,
   CreateProgramGovernanceArgs,
   CreateProposalArgs,
   CreateRealmArgs,
   CreateTokenGovernanceArgs,
+  CreateTokenOwnerRecordArgs,
   DepositGoverningTokensArgs,
   ExecuteInstructionArgs,
   FinalizeVoteArgs,
@@ -23,6 +25,7 @@ import {
   SetRealmAuthorityArgs,
   SetRealmConfigArgs,
   SignOffProposalArgs,
+  UpdateProgramMetadataArgs,
   Vote,
   VoteChoice,
   VoteKind,
@@ -51,6 +54,7 @@ import {
   ProposalOption,
   GovernanceAccountType,
   getAccountProgramVersion,
+  ProgramMetadata,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from './core/serialisation';
@@ -415,6 +419,27 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
+      CreateTokenOwnerRecordArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      UpdateProgramMetadataArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      CreateNativeTreasuryArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
       InstructionData,
       {
         kind: 'struct',
@@ -659,6 +684,18 @@ function createGovernanceSchema(programVersion: number) {
           ['executedAt', { kind: 'option', type: 'u64' }],
           ['executionStatus', 'u8'],
         ].filter(Boolean),
+      },
+    ],
+    [
+      ProgramMetadata,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['updatedAt', 'u64'],
+          ['version', 'string'],
+          ['reserved', [64]],
+        ],
       },
     ],
   ]);

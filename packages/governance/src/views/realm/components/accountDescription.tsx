@@ -10,6 +10,9 @@ import {
 
 import { MintInfo } from '@solana/spl-token';
 import { formatMintNaturalAmountAsDecimal } from '../../../tools/units';
+import { useNativeTreasury } from '../../../hooks/apiHooks';
+import { Space } from 'antd';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({
@@ -22,6 +25,7 @@ export default function AccountDescription({
 
   const tokenAccount = useAccount(governance.info.governedAccount);
   const tokenAccountMint = useMint(tokenAccount?.info.mint);
+  const nativeTreasury = useNativeTreasury(governance?.pubkey);
 
   useEffect(() => {
     if (!governance.info.isMintGovernance()) {
@@ -34,7 +38,7 @@ export default function AccountDescription({
   }, [connection, governance]);
 
   return (
-    <>
+    <Space size="large">
       {governance.info.isTokenGovernance() &&
         tokenAccount &&
         tokenAccountMint &&
@@ -47,6 +51,8 @@ export default function AccountDescription({
           mintAccount,
           mintAccount.supply,
         )}`}
-    </>
+      {nativeTreasury &&
+        `SOL: ${nativeTreasury.account.lamports / LAMPORTS_PER_SOL}`}
+    </Space>
   );
 }

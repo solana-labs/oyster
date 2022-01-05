@@ -8,7 +8,11 @@ import {
 } from '../models/accounts';
 import { GovernanceAccountParser } from '../models/serialisation';
 
-import { ParsedAccount } from '@oyster/common';
+import {
+  GenericAccountParser,
+  ParsedAccount,
+  ParsedAccountBase,
+} from '@oyster/common';
 import { MemcmpFilter } from '../models/core/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
@@ -221,4 +225,54 @@ export function useGovernanceAccountByFilter<
   throw new Error(
     `Filters ${filters} returned multiple accounts ${accounts} for ${accountClass.name} while a single result was expected`,
   );
+}
+
+// Fetches Account using the given PDA args
+export function useAccountByPda(
+  getPda: () => Promise<PublicKey | undefined>,
+  pdaArgs: any[],
+) {
+  const { connection } = useRpcContext();
+  const [account, setAccount] = useState<Option<ParsedAccountBase>>();
+
+  const pdaArgsKey = JSON.stringify(pdaArgs);
+
+  useEffect(() => {
+    const sub = (async () => {
+      const pdaPk = await getPda();
+      let subId = 0;
+
+      if (pdaPk) {
+        try {
+          const accountInfo = await connection.getAccountInfo(pdaPk);
+
+          if (accountInfo) {
+            setAccount(some(GenericAccountParser(pdaPk, accountInfo)));
+          } else {
+            setAccount(none());
+          }
+        } catch (ex) {
+          console.error(`Can't load ${pdaPk.toBase58()} account`, ex);
+          setAccount(none());
+        }
+
+        subId = connection.onAccountChange(pdaPk, a =>
+          setAccount(some(GenericAccountParser(pdaPk, a))),
+        );
+      } else {
+        setAccount(none());
+      }
+
+      return () => {
+        subId > 0 && connection.removeAccountChangeListener(subId);
+      };
+    })();
+
+    return () => {
+      sub.then(dispose => dispose());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdaArgsKey]);
+
+  return account;
 }

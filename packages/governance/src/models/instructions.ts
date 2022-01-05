@@ -35,6 +35,9 @@ export enum GovernanceInstruction {
   FlagInstructionError = 20,
   SetRealmAuthority = 21,
   SetRealmConfig = 22,
+  CreateTokenOwnerRecord = 23,
+  UpdateProgramMetadata = 24,
+  CreateNativeTreasury = 25,
 }
 
 export class CreateRealmArgs {
@@ -315,4 +318,19 @@ export class SetRealmConfigArgs {
   constructor(args: { configArgs: RealmConfigArgs }) {
     this.configArgs = args.configArgs;
   }
+}
+
+export class CreateTokenOwnerRecordArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.CreateTokenOwnerRecord;
+}
+
+export class UpdateProgramMetadataArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.UpdateProgramMetadata;
+}
+
+export class CreateNativeTreasuryArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.CreateNativeTreasury;
 }

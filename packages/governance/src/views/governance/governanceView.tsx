@@ -2,7 +2,11 @@ import { Badge, Col, List, Row, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
-import { useGovernance, useProposalsByGovernance } from '../../hooks/apiHooks';
+import {
+  useGovernance,
+  useNativeTreasury,
+  useProposalsByGovernance,
+} from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { ProposalStateBadge } from '../proposal/components/header/proposalStateBadge';
 import { useHistory } from 'react-router-dom';
@@ -12,7 +16,7 @@ import {
   useConnectionConfig,
   useMint,
 } from '@oyster/common';
-import { NewProposalButton } from './buttons/newProposalButton';
+
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '../../models/accounts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -24,6 +28,8 @@ import {
   formatMintSupplyFractionAsDecimalPercentage,
   getDaysFromTimestamp,
 } from '../../tools/units';
+import { GovernanceActionBar } from './buttons/governanceActionBar';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const { Text } = Typography;
 
@@ -41,6 +47,7 @@ export const GovernanceView = () => {
   const realm = useRealm(governance?.info.realm);
   const proposals = useProposalsByGovernance(governanceKey);
   const communityMintInfo = useMint(realm?.info.communityMint);
+  const nativeTreasury = useNativeTreasury(governance?.pubkey);
 
   const token = tokenMap.get(
     realm?.info.communityMint?.toBase58() || '',
@@ -122,35 +129,48 @@ export const GovernanceView = () => {
               {tokenMap.get(communityMint)?.extensions?.website}
             </a>
             {governance && communityMintInfo && (
-              <Space size="large">
-                <Space direction="vertical" size={0}>
-                  <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
-                    governance.info.config.maxVotingTime,
-                  )} days`}</Text>
-                  <Text type="secondary">{`yes vote threshold: ${governance.info.config.voteThresholdPercentage.value}%`}</Text>
-                </Space>
+              <Space direction="vertical">
+                <Space size="large">
+                  <Space direction="vertical" size={0}>
+                    <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
+                      governance.info.config.maxVotingTime,
+                    )} days`}</Text>
+                    <Text type="secondary">{`yes vote threshold: ${governance.info.config.voteThresholdPercentage.value}%`}</Text>
+                  </Space>
 
-                <Space direction="vertical" size={0}>
-                  <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
-                    governance.info.config.minInstructionHoldUpTime,
-                  )} days`}</Text>
-                  <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
-                    communityMintInfo,
-                    governance.info.config.minCommunityTokensToCreateProposal,
-                  )} (${formatMintSupplyFractionAsDecimalPercentage(
-                    communityMintInfo,
-                    governance.info.config.minCommunityTokensToCreateProposal,
-                  )})`}</Text>
+                  <Space direction="vertical" size={0}>
+                    <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
+                      governance.info.config.minInstructionHoldUpTime,
+                    )} days`}</Text>
+                    <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
+                      communityMintInfo,
+                      governance.info.config.minCommunityTokensToCreateProposal,
+                    )} (${formatMintSupplyFractionAsDecimalPercentage(
+                      communityMintInfo,
+                      governance.info.config.minCommunityTokensToCreateProposal,
+                    )})`}</Text>
+                  </Space>
                 </Space>
+                {nativeTreasury && (
+                  <div>
+                    {`SOL: ${
+                      nativeTreasury.account.lamports / LAMPORTS_PER_SOL
+                    }`}{' '}
+                    <ExplorerLink
+                      address={nativeTreasury.pubkey}
+                      type="address"
+                      length={3}
+                    ></ExplorerLink>{' '}
+                  </div>
+                )}
               </Space>
             )}
           </div>
 
-          <NewProposalButton
-            buttonProps={{ className: 'proposals-new-btn' }}
+          <GovernanceActionBar
             governance={governance}
             realm={realm}
-          />
+          ></GovernanceActionBar>
         </div>
         <h1 className="proposals-list-title">Proposals</h1>
         <List

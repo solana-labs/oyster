@@ -20,11 +20,13 @@ export const ProgramInstructionsForm = ({
   realm,
   governance,
   onCreateInstruction,
+  coreInstructions,
 }: {
   form: FormInstance;
   realm: ParsedAccount<Realm>;
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
+  coreInstructions: InstructionType[];
 }) => {
   const [instruction, setInstruction] = useState(
     InstructionType.UpgradeProgram,
@@ -39,6 +41,7 @@ export const ProgramInstructionsForm = ({
   // TODO: filter available instructions based on the already included into a Proposal
   let instructions = [
     InstructionType.UpgradeProgram,
+    ...coreInstructions,
     ...anchorInstructions,
     ...getGovernanceInstructions(realm, governance),
   ];

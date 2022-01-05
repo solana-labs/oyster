@@ -22,6 +22,7 @@ export enum GovernanceAccountType {
   VoteRecordV2 = 12,
   ProposalInstructionV2 = 13,
   ProposalV2 = 14,
+  ProgramMetadata = 14,
 }
 
 export interface GovernanceAccount {
@@ -36,7 +37,8 @@ export type GovernanceAccountClass =
   | typeof SignatoryRecord
   | typeof VoteRecord
   | typeof ProposalInstruction
-  | typeof RealmConfigAccount;
+  | typeof RealmConfigAccount
+  | typeof ProgramMetadata;
 
 export function getAccountTypes(accountClass: GovernanceAccountClass) {
   switch (accountClass) {
@@ -70,6 +72,8 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
         GovernanceAccountType.MintGovernance,
         GovernanceAccountType.TokenGovernance,
       ];
+    case ProgramMetadata:
+      return [GovernanceAccountType.ProgramMetadata];
     default:
       throw Error(`${accountClass} account is not supported`);
   }
@@ -956,4 +960,46 @@ export async function getProposalInstructionAddress(
   );
 
   return instructionAddress;
+}
+
+export class ProgramMetadata {
+  accountType = GovernanceAccountType.ProgramMetadata;
+
+  updatedAt: BN;
+
+  version: string;
+
+  reserved: Uint8Array;
+
+  constructor(args: {
+    updatedAt: BN;
+    reserved: Uint8Array;
+
+    version: string;
+  }) {
+    this.updatedAt = args.updatedAt;
+    this.reserved = args.reserved;
+    this.version = args.version;
+  }
+}
+
+export async function getProgramMetadataAddress(programId: PublicKey) {
+  const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
+    [Buffer.from('metadata')],
+    programId,
+  );
+
+  return signatoryRecordAddress;
+}
+
+export async function getNativeTreasuryAddress(
+  programId: PublicKey,
+  governance: PublicKey,
+) {
+  const [signatoryRecordAddress] = await PublicKey.findProgramAddress(
+    [Buffer.from('native-treasury'), governance.toBuffer()],
+    programId,
+  );
+
+  return signatoryRecordAddress;
 }

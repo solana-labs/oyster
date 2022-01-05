@@ -3,17 +3,17 @@ import { ButtonProps, Collapse, Switch, Typography } from 'antd';
 import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
-import { LABELS } from '../../constants';
+import { LABELS } from '../../../constants';
 
 import { Redirect } from 'react-router';
-import { MintFormItem } from '../../components/MintFormItem/mintFormItem';
+import { MintFormItem } from '../../../components/MintFormItem/mintFormItem';
 
-import { registerRealm } from '../../actions/registerRealm';
+import { registerRealm } from '../../../actions/registerRealm';
 
-import { ModalFormAction } from '../../components/ModalFormAction/modalFormAction';
-import { useRpcContext } from '../../hooks/useRpcContext';
-import { getRealmUrl } from '../../tools/routeTools';
-import { MintMaxVoteWeightSource } from '../../models/accounts';
+import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
+import { useRpcContext } from '../../../hooks/useRpcContext';
+import { getRealmUrl } from '../../../tools/routeTools';
+import { MintMaxVoteWeightSource } from '../../../models/accounts';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -21,9 +21,9 @@ import { BN } from 'bn.js';
 import {
   RealmMintSupplyConfigFormItem,
   RealmMintSupplyConfigValues,
-} from '../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
-import { RealmMintTokensFormItem } from '../../components/realmMintTokensFormItem/realmMintTokensFormItem';
-import { parseMinTokensToCreate } from '../../components/governanceConfigFormItem/governanceConfigFormItem';
+} from '../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
+import { RealmMintTokensFormItem } from '../../../components/realmMintTokensFormItem/realmMintTokensFormItem';
+import { parseMinTokensToCreate } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
 
 const { Panel } = Collapse;
 const { Text } = Typography;

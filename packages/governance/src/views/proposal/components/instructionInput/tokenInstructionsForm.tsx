@@ -22,11 +22,13 @@ export const TokenInstructionsForm = ({
   realm,
   governance,
   onCreateInstruction,
+  coreInstructions,
 }: {
   form: FormInstance;
   realm: ParsedAccount<Realm>;
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
+  coreInstructions: InstructionType[];
 }) => {
   const [instruction, setInstruction] = useState<InstructionType | undefined>();
 
@@ -43,6 +45,7 @@ export const TokenInstructionsForm = ({
   let instructions = [
     ...yfInstructions,
     InstructionType.SplTokenTransfer,
+    ...coreInstructions,
     ...getGovernanceInstructions(realm, governance),
   ];
 

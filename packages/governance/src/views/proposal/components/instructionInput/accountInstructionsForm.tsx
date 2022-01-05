@@ -17,17 +17,25 @@ export const AccountInstructionsForm = ({
   realm,
   governance,
   onCreateInstruction,
+  coreInstructions,
 }: {
   form: FormInstance;
   realm: ParsedAccount<Realm>;
   governance: ParsedAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
+  coreInstructions: InstructionType[];
 }) => {
-  const [instruction, setInstruction] = useState(
-    InstructionType.GovernanceSetConfig,
-  );
+  const [instruction, setInstruction] = useState<InstructionType | undefined>();
 
-  let instructions = [...getGovernanceInstructions(realm, governance)];
+  let instructions = [
+    ...coreInstructions,
+    ...getGovernanceInstructions(realm, governance),
+  ];
+
+  if (!instruction) {
+    setInstruction(instructions[0]);
+    return null;
+  }
 
   return (
     <Form
