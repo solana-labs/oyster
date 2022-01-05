@@ -3,10 +3,11 @@ import React from 'react';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
+
 import { updateProgramMetadata } from '../../../actions/updateProgramMetadata';
 import { PROGRAM_VERSION_V1 } from '../../../models/registry/api';
 
-export function CreateNativeTreasuryButton() {
+export function UpdateProgramMetadataButton() {
   const rpcContext = useRpcContext();
 
   const onSubmit = async () => {
