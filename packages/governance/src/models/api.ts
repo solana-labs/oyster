@@ -1,16 +1,24 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import {
+  Account,
+  Connection,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js';
 
-import { ParsedAccount } from '@oyster/common';
+import { ParsedAccount, simulateTransaction } from '@oyster/common';
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
 } from './serialisation';
 import {
   getAccountTypes,
+  getProgramMetadataAddress,
   getTokenOwnerRecordAddress,
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
+  ProgramMetadata,
   Realm,
   TokenOwnerRecord,
   VoteRecord,
@@ -21,6 +29,11 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from './core/api';
+import { PROGRAM_VERSION_V1 } from './registry/api';
+import { parseVersion } from '../tools/version';
+import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
+import { BN } from 'bn.js';
+import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(
@@ -112,4 +125,59 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     string,
     ParsedAccount<TAccount>
   >;
+}
+
+export async function getGovernanceProgramVersion(
+  connection: Connection,
+  programId: PublicKey,
+) {
+  // Try get program metadata
+  const programMetadataPk = await getProgramMetadataAddress(programId);
+
+  try {
+    const programMetadataInfo = await connection.getAccountInfo(
+      programMetadataPk,
+    );
+
+    // If ProgramMetadata exists then fetch to get latest updated version
+    if (programMetadataInfo) {
+      const programMetadata = GovernanceAccountParser(ProgramMetadata)(
+        programMetadataPk,
+        programMetadataInfo,
+      ) as ParsedAccount<ProgramMetadata>;
+
+      const programData = await getProgramDataAccount(
+        connection,
+        new PublicKey(programId),
+      );
+
+      // Check if ProgramMetadata is not stale
+      if (programMetadata.info.updatedAt.gte(new BN(programData.slot))) {
+        const version = parseVersion(programMetadata.info.version);
+        return version.major;
+      }
+    }
+  } catch {
+    // nop
+  }
+
+  // If we don't have the programMetadata info then simulate UpdateProgramMetadata
+  let instructions: TransactionInstruction[] = [];
+  let signer = new Account();
+  await withUpdateProgramMetadata(instructions, programId, signer.publicKey);
+
+  const transaction = new Transaction({ feePayer: signer.publicKey });
+  transaction.add(...instructions);
+
+  const getVersion = await simulateTransaction(
+    connection,
+    transaction,
+    'recent',
+  );
+
+  if (!getVersion.value.err) {
+    // TODO: read details
+  }
+
+  return PROGRAM_VERSION_V1;
 }
