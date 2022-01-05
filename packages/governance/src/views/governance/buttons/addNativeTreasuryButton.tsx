@@ -7,6 +7,7 @@ import { useRpcContext } from '../../../hooks/useRpcContext';
 import { createNativeTreasury } from '../../../actions/createNativeTreasury';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { useNativeTreasury } from '../../../hooks/apiHooks';
+import { PROGRAM_VERSION_V1 } from '../../../models/registry/api';
 
 export function CreateNativeTreasuryButton({
   realm,
@@ -36,7 +37,10 @@ export function CreateNativeTreasuryButton({
       formPendingAction="Creating"
       onSubmit={() => onSubmit()}
       buttonProps={{
-        disabled: !!nativeTreasury || created,
+        disabled:
+          !!nativeTreasury ||
+          created ||
+          rpcContext.programVersion <= PROGRAM_VERSION_V1,
       }}
     >
       <div>Create native SOL Treasury account for the governance</div>

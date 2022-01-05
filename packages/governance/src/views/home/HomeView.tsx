@@ -6,7 +6,6 @@ import './style.less'; // Don't remove this line, it will break dark mode if you
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
-import { RegisterRealmButton } from './registerRealmButton';
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
@@ -14,6 +13,8 @@ import { useWalletTokenOwnerRecords } from '../../hooks/apiHooks';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getRealmUrl } from '../../tools/routeTools';
+
+import { ProgramActionBar } from './buttons/programActionBar';
 
 export const HomeView = () => {
   const history = useHistory();
@@ -66,9 +67,7 @@ export const HomeView = () => {
         <Col flex="auto" xxl={15} xs={24} className="governance-container">
           <div className="governance-title">
             <h1>{LABELS.REALMS}</h1>
-            <RegisterRealmButton
-              buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
-            />
+            <ProgramActionBar></ProgramActionBar>
           </div>
           <List
             itemLayout="vertical"

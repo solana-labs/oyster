@@ -15,6 +15,7 @@ import {
   getRealmConfigAddress,
 } from './accounts';
 import BN from 'bn.js';
+import { PROGRAM_VERSION_V2 } from './registry/api';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
@@ -31,7 +32,7 @@ export async function withCreateRealm(
 ) {
   const { system: systemId, token: tokenId } = utils.programIds();
 
-  if (communityVoterWeightAddin && programVersion < 2) {
+  if (communityVoterWeightAddin && programVersion < PROGRAM_VERSION_V2) {
     throw new Error(
       `Voter weight addin is not supported in version ${programVersion}`,
     );
