@@ -201,3 +201,11 @@ export function getMintMaxVoteWeight(
 
   return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString());
 }
+
+export function lamportsToSOL(lamports: number) {
+  return new BigNumber(lamports).shiftedBy(-9).toNumber();
+}
+
+export function SOLToLamports(solAmount: number) {
+  return new BigNumber(solAmount).shiftedBy(9).toNumber();
+}

@@ -13,6 +13,7 @@ export enum InstructionType {
   RaydiumHarvestRAY,
   SplTokenMintTo,
   GovernanceSetRealmConfig,
+  NativeTransfer,
 }
 
 const instructionNames = [
@@ -27,6 +28,7 @@ const instructionNames = [
   'ray-harvest-RAY',
   'spl-token mint-to',
   'set-realm-config',
+  'SOL-transfer',
 ];
 
 export function InstructionSelector({

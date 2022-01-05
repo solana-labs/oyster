@@ -6,6 +6,7 @@ import { GovernanceConfigForm } from './governanceConfigForm';
 import { InstructionType } from './instructionSelector';
 import { TransactionInstruction } from '@solana/web3.js';
 import { RealmConfigForm } from './realmConfigForm';
+import { NativeTransferForm } from './nativeTokenTransferForm';
 
 export function getGovernanceInstructions(
   realm: ParsedAccount<Realm>,
@@ -35,6 +36,14 @@ export function GovernanceInstructionForm({
 }) {
   return (
     <>
+      {instruction === InstructionType.NativeTransfer && (
+        <NativeTransferForm
+          form={form}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+        ></NativeTransferForm>
+      )}
+
       {instruction === InstructionType.GovernanceSetConfig && (
         <GovernanceConfigForm
           form={form}

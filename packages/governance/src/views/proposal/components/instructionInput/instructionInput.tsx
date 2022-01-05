@@ -3,7 +3,7 @@ import { ParsedAccount } from '@oyster/common';
 
 import { TransactionInstruction } from '@solana/web3.js';
 import { Button, Col, Form, Input, Modal, Row } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 
 import { Governance, Realm } from '../../../../models/accounts';
@@ -14,6 +14,8 @@ import { AccountInstructionsForm } from './accountInstructionsForm';
 import { ProgramInstructionsForm } from './programInstructionsForm';
 import { TokenInstructionsForm } from './tokenInstructionsForm';
 import { MintInstructionsForm } from './mintInstructionsForm';
+import { useNativeTreasury } from '../../../../hooks/apiHooks';
+import { InstructionType } from './instructionSelector';
 
 export default function InstructionInput({
   realm,
@@ -27,6 +29,16 @@ export default function InstructionInput({
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [instruction, setInstruction] = useState('');
   const [form] = Form.useForm();
+  const nativeTreasury = useNativeTreasury(governance.pubkey);
+  const [coreInstructions, setCoreInstructions] = useState<InstructionType[]>(
+    [],
+  );
+
+  useEffect(() => {
+    if (nativeTreasury) {
+      setCoreInstructions([InstructionType.NativeTransfer]);
+    }
+  }, [nativeTreasury]);
 
   const updateInstruction = (instruction: string) => {
     setInstruction(instruction);
@@ -79,6 +91,7 @@ export default function InstructionInput({
             onCreateInstruction={onCreateInstruction}
             realm={realm}
             governance={governance}
+            coreInstructions={coreInstructions}
           ></ProgramInstructionsForm>
         )}
         {governance.info.isMintGovernance() && (
@@ -87,6 +100,7 @@ export default function InstructionInput({
             onCreateInstruction={onCreateInstruction}
             realm={realm}
             governance={governance}
+            coreInstructions={coreInstructions}
           ></MintInstructionsForm>
         )}
         {governance.info.isTokenGovernance() && (
@@ -95,6 +109,7 @@ export default function InstructionInput({
             onCreateInstruction={onCreateInstruction}
             realm={realm}
             governance={governance}
+            coreInstructions={coreInstructions}
           ></TokenInstructionsForm>
         )}
         {governance.info.isAccountGovernance() && (
@@ -103,6 +118,7 @@ export default function InstructionInput({
             onCreateInstruction={onCreateInstruction}
             realm={realm}
             governance={governance}
+            coreInstructions={coreInstructions}
           ></AccountInstructionsForm>
         )}
       </Modal>
