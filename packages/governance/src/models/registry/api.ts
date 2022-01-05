@@ -13,11 +13,6 @@ export async function getProgramVersion(
   programId: string,
   env: string,
 ) {
-  // For localnet always use the latest version
-  if (env === 'localnet') {
-    return PROGRAM_VERSION;
-  }
-
   return await getGovernanceProgramVersion(
     connection,
     new PublicKey(programId),
