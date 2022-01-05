@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 
 import { MoreOutlined } from '@ant-design/icons';
 import { RegisterRealmButton } from './registerRealmButton';
-import { CreateNativeTreasuryButton } from './updateProgramMetadataButton';
+import { UpdateProgramMetadataButton } from './updateProgramMetadataButton';
 
 export function ProgramActionBar() {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ export function ProgramActionBar() {
             getPopupContainer={() => parentRef.current!}
             content={
               <Space direction="vertical">
-                <CreateNativeTreasuryButton></CreateNativeTreasuryButton>
+                <UpdateProgramMetadataButton></UpdateProgramMetadataButton>
               </Space>
             }
           >

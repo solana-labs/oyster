@@ -6,8 +6,8 @@ export function parseVersion(version: string) {
   var minor = parseInt(arr[1]) || 0;
   var patch = parseInt(arr[2]) || 0;
   return {
-    major: major,
-    minor: minor,
-    build: patch,
+    major,
+    minor,
+    patch,
   };
 }

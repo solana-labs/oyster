@@ -16,5 +16,6 @@ export async function getProgramVersion(
   return await getGovernanceProgramVersion(
     connection,
     new PublicKey(programId),
+    env,
   );
 }

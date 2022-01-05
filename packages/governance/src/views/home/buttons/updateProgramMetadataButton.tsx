@@ -3,10 +3,10 @@ import React from 'react';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
-import { updateProgramMetadata } from '../../../actions/updateProgramMetadata';
-import { PROGRAM_VERSION_V1 } from '../../../models/registry/api';
 
-export function CreateNativeTreasuryButton() {
+import { updateProgramMetadata } from '../../../actions/updateProgramMetadata';
+
+export function UpdateProgramMetadataButton() {
   const rpcContext = useRpcContext();
 
   const onSubmit = async () => {
@@ -20,9 +20,6 @@ export function CreateNativeTreasuryButton() {
       formAction="Update"
       formPendingAction="Updating"
       onSubmit={() => onSubmit()}
-      buttonProps={{
-        disabled: rpcContext.programVersion <= PROGRAM_VERSION_V1,
-      }}
     >
       <div>Update Program Metadata</div>
     </ModalFormAction>
