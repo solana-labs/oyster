@@ -5,6 +5,7 @@ import { useRpcContext } from '../../../hooks/useRpcContext';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 
 import { updateProgramMetadata } from '../../../actions/updateProgramMetadata';
+import { PROGRAM_VERSION_V1 } from '../../../models/registry/api';
 
 export function UpdateProgramMetadataButton() {
   const rpcContext = useRpcContext();
@@ -20,6 +21,9 @@ export function UpdateProgramMetadataButton() {
       formAction="Update"
       formPendingAction="Updating"
       onSubmit={() => onSubmit()}
+      buttonProps={{
+        disabled: rpcContext.programVersion <= PROGRAM_VERSION_V1,
+      }}
     >
       <div>Update Program Metadata</div>
     </ModalFormAction>

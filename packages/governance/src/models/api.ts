@@ -139,7 +139,7 @@ export async function getGovernanceProgramVersion(
       programMetadataPk,
     );
 
-    // If ProgramMetadata exists then fetch to get latest updated version
+    // If ProgramMetadata exists then use it to get latest updated version
     if (programMetadataInfo) {
       const programMetadata = GovernanceAccountParser(ProgramMetadata)(
         programMetadataPk,
@@ -167,7 +167,7 @@ export async function getGovernanceProgramVersion(
       }
     }
   } catch {
-    // nop
+    // nop, let's try simulation
   }
 
   try {
@@ -184,7 +184,7 @@ export async function getGovernanceProgramVersion(
     const transaction = new Transaction({ feePayer: walletPk });
     transaction.add(...instructions);
 
-    // TODO: Once return values are supported change the simulation call to actual one
+    // TODO: Once return values are supported change the simulation call to the actual one
     const getVersion = await simulateTransaction(
       connection,
       transaction,
