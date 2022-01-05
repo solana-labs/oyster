@@ -46,7 +46,7 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,
     }),
-    minCommunityTokensToCreateProposal: new BN(minTokensToCreateProposal),
+    minCommunityTokensToCreateProposal: new BN(minTokensToCreateProposal.toString()),
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime,
     ),
