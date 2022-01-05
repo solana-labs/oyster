@@ -1,4 +1,4 @@
-import { AccountInfo, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 
 import {
@@ -8,7 +8,11 @@ import {
 } from '../models/accounts';
 import { GovernanceAccountParser } from '../models/serialisation';
 
-import { ParsedAccount } from '@oyster/common';
+import {
+  GenericAccountParser,
+  ParsedAccount,
+  ParsedAccountBase,
+} from '@oyster/common';
 import { MemcmpFilter } from '../models/core/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
@@ -229,7 +233,7 @@ export function useAccountByPda(
   pdaArgs: any[],
 ) {
   const { connection } = useRpcContext();
-  const [account, setAccount] = useState<Option<AccountInfo<Buffer>>>();
+  const [account, setAccount] = useState<Option<ParsedAccountBase>>();
 
   const pdaArgsKey = JSON.stringify(pdaArgs);
 
@@ -241,7 +245,7 @@ export function useAccountByPda(
         try {
           const accountInfo = await connection.getAccountInfo(pdaPk);
           if (accountInfo) {
-            setAccount(some(accountInfo));
+            setAccount(some(GenericAccountParser(pdaPk, accountInfo)));
           } else {
             setAccount(none());
           }
