@@ -5,6 +5,7 @@ import {
   RpcResponseAndContext,
   SimulatedTransactionResponse,
   Transaction,
+  TransactionError,
 } from '@solana/web3.js';
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(
@@ -47,4 +48,15 @@ export async function simulateTransaction(
     throw new Error('failed to simulate transaction: ' + res.error.message);
   }
   return res.result;
+}
+
+export class SendTransactionError extends Error {
+  txError: TransactionError | undefined;
+  txId: string;
+  constructor(message: string, txId: string, txError?: TransactionError) {
+    super(message);
+
+    this.txError = txError;
+    this.txId = txId;
+  }
 }

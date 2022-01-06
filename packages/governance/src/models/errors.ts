@@ -1,4 +1,5 @@
-import { SendTransactionError, WalletNotConnectedError } from '@oyster/common';
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
+import { SendTransactionError } from './tools/solanaSdk';
 
 export const GovernanceError: Record<number, string> = [
   'Invalid instruction passed to program', // InvalidInstruction
