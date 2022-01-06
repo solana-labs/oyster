@@ -5,7 +5,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 
-import { simulateTransaction, ZERO } from '@oyster/common';
+import { simulateTransaction } from '@oyster/common';
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
@@ -34,6 +34,7 @@ import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/account
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
 import { ProgramAccount } from './tools/solanaSdk';
+import { BN_ZERO } from './tools/numbers';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(
@@ -147,7 +148,7 @@ export async function getGovernanceProgramVersion(
         programMetadataInfo,
       ) as ProgramAccount<ProgramMetadata>;
 
-      let deploySlot = ZERO;
+      let deploySlot = BN_ZERO;
 
       try {
         const programData = await getProgramDataAccount(
