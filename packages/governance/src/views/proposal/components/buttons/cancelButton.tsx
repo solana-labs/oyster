@@ -1,31 +1,32 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { cancelProposal } from '../../../../actions/cancelProposal';
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Proposal, ProposalState } from '../../../../models/accounts';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { confirm } = Modal;
 
 export default function CancelButton({
   proposal,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ProgramAccount<Proposal>;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
   const proposalAuthority = useProposalAuthority(
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
   );
 
   if (
     !proposalAuthority ||
     !(
-      proposal.info.state === ProposalState.Draft ||
-      proposal.info.state === ProposalState.SigningOff ||
-      proposal.info.state === ProposalState.Voting
+      proposal.account.state === ProposalState.Draft ||
+      proposal.account.state === ProposalState.SigningOff ||
+      proposal.account.state === ProposalState.Voting
     )
   ) {
     return null;

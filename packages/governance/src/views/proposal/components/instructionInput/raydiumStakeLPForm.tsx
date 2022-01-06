@@ -1,5 +1,5 @@
 import { Form, FormInstance, Spin } from 'antd';
-import { ExplorerLink, ParsedAccount } from '@oyster/common';
+import { ExplorerLink } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
@@ -13,6 +13,7 @@ import {
   getRAYGovernanceAta,
   getRaySrmLpFarmUserAccount,
 } from './yieldFarming';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useMint } = contexts.Accounts;
@@ -25,11 +26,11 @@ export const RaydiumStakeLPForm = ({
   isHarvest,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
   isHarvest: boolean;
 }) => {
-  const sourceTokenAccount = useTokenAccount(governance.info.governedAccount);
+  const sourceTokenAccount = useTokenAccount(governance.account.governedAccount);
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
   const connection = useConnection();
 
@@ -46,7 +47,7 @@ export const RaydiumStakeLPForm = ({
 
     if (!isHarvest) {
       const lpTokenAmount = await connection.getTokenAccountBalance(
-        governance.info.governedAccount,
+        governance.account.governedAccount,
       );
       lpAmount = parseInt(lpTokenAmount.value.amount);
     }
@@ -64,7 +65,7 @@ export const RaydiumStakeLPForm = ({
       lpUserAccount, // created user info account
       governancePk, // governance PDA
 
-      governance.info.governedAccount, // governance RAY-SRM LP token account
+      governance.account.governedAccount, // governance RAY-SRM LP token account
       new PublicKey('792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb'),
 
       rayAta, // governance RAY account
@@ -84,9 +85,8 @@ export const RaydiumStakeLPForm = ({
       initialValues={{ amount: 1 }}
     >
       <Form.Item
-        label={`${
-          isHarvest ? 'harvest RAY from RAY-SRM LP farm' : 'stake RAY-SRM LP'
-        }`}
+        label={`${isHarvest ? 'harvest RAY from RAY-SRM LP farm' : 'stake RAY-SRM LP'
+          }`}
       >
         {' '}
       </Form.Item>

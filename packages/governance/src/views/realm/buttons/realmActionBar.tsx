@@ -5,14 +5,15 @@ import { DepositGoverningTokensButton } from './depositGoverningTokensButton';
 import { RegisterGovernanceButton } from './registerGovernanceButton';
 import { SetRealmAuthorityButton } from './setRealmAuthorityButton';
 import { WithdrawGoverningTokensButton } from './withdrawGoverningTokensButton';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
 import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function RealmActionBar({
   realm,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
   const { publicKey, connected } = useWallet();
@@ -24,7 +25,7 @@ export function RealmActionBar({
   const showCreateNewGovernance = connected;
 
   const showSetRealmAuthority =
-    realm.info.authority?.toBase58() === publicKey?.toBase58();
+    realm.account.authority?.toBase58() === publicKey?.toBase58();
 
   const showSettings = showCreateNewGovernance || showSetRealmAuthority;
 
@@ -32,22 +33,22 @@ export function RealmActionBar({
     <Space>
       <DepositGoverningTokensButton
         realm={realm}
-        governingTokenMint={realm.info.communityMint}
+        governingTokenMint={realm.account.communityMint}
         tokenName="Governance"
       ></DepositGoverningTokensButton>
       <WithdrawGoverningTokensButton
         realm={realm}
-        governingTokenMint={realm?.info.communityMint}
+        governingTokenMint={realm?.account.communityMint}
         tokenName="Governance"
       ></WithdrawGoverningTokensButton>
       <DepositGoverningTokensButton
         realm={realm}
-        governingTokenMint={realm.info.config.councilMint}
+        governingTokenMint={realm.account.config.councilMint}
         tokenName="Council"
       ></DepositGoverningTokensButton>
       <WithdrawGoverningTokensButton
         realm={realm}
-        governingTokenMint={realm.info.config.councilMint}
+        governingTokenMint={realm.account.config.councilMint}
         tokenName="Council"
       ></WithdrawGoverningTokensButton>
 

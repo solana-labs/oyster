@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { Governance, Realm } from '../../../models/accounts';
 
-import { ParsedAccount } from '@oyster/common';
+
 
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { createNativeTreasury } from '../../../actions/createNativeTreasury';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { useNativeTreasury } from '../../../hooks/apiHooks';
 import { PROGRAM_VERSION_V1 } from '../../../models/registry/api';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function CreateNativeTreasuryButton({
   realm,
   governance,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
-  governance: ParsedAccount<Governance> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
+  governance: ProgramAccount<Governance> | undefined;
 }) {
   const rpcContext = useRpcContext();
   const nativeTreasury = useNativeTreasury(governance?.pubkey);

@@ -1,16 +1,16 @@
 import { Account, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal, ProposalInstruction } from '../models/accounts';
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const executeInstruction = async (
   { connection, wallet, programId }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
-  instruction: ParsedAccount<ProposalInstruction>,
+  proposal: ProgramAccount<Proposal>,
+  instruction: ProgramAccount<ProposalInstruction>,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -18,10 +18,10 @@ export const executeInstruction = async (
   await withExecuteInstruction(
     instructions,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    instruction.info.instruction,
+    instruction.account.instruction,
   );
 
   await sendTransactionWithNotifications(

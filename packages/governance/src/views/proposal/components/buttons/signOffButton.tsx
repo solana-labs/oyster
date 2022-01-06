@@ -1,11 +1,12 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button, Modal } from 'antd';
 import React from 'react';
 import { signOffProposal } from '../../../../actions/signOffProposal';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 import { Proposal, SignatoryRecord } from '../../../../models/accounts';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { confirm } = Modal;
 
@@ -13,18 +14,18 @@ export default function SignOffButton({
   proposal,
   signatoryRecord,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  signatoryRecord: ParsedAccount<SignatoryRecord>;
+  proposal: ProgramAccount<Proposal>;
+  signatoryRecord: ProgramAccount<SignatoryRecord>;
 }) {
   const { publicKey } = useWallet();
   const rpcContext = useRpcContext();
 
   return (
     <>
-      {signatoryRecord.info.signedOff && (
+      {signatoryRecord.account.signedOff && (
         <Button disabled={true}>Signed</Button>
       )}
-      {!signatoryRecord.info.signedOff && (
+      {!signatoryRecord.account.signedOff && (
         <Button
           type="primary"
           onClick={() => {

@@ -2,17 +2,18 @@ import { Button, Popover, Space } from 'antd';
 import React, { useRef } from 'react';
 import { Governance, Realm } from '../../../models/accounts';
 
-import { ParsedAccount } from '@oyster/common';
+
 import { MoreOutlined } from '@ant-design/icons';
 import { NewProposalButton } from './newProposalButton';
 import { CreateNativeTreasuryButton } from './addNativeTreasuryButton';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function GovernanceActionBar({
   realm,
   governance,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
-  governance: ParsedAccount<Governance> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
+  governance: ProgramAccount<Governance> | undefined;
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
 

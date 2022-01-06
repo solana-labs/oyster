@@ -36,25 +36,25 @@ export const RealmView = () => {
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.communityMint,
+    realm?.account.communityMint,
   );
 
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.config.councilMint,
+    realm?.account.config.councilMint,
   );
 
   const governanceItems = useMemo(() => {
     return governances
       .sort((g1, g2) =>
-        g1.info.governedAccount
+        g1.account.governedAccount
           .toBase58()
-          .localeCompare(g2.info.governedAccount.toBase58()),
+          .localeCompare(g2.account.governedAccount.toBase58()),
       )
       .map(g => ({
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
-        title: g.info.governedAccount.toBase58(),
+        title: g.account.governedAccount.toBase58(),
         badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
@@ -75,15 +75,15 @@ export const RealmView = () => {
                         <RealmPopUpDetails realm={realm}></RealmPopUpDetails>
                       )
                     }
-                    title={realm?.info.name}
+                    title={realm?.account.name}
                     trigger="click"
                     placement="topLeft"
                   >
                     <span>
                       <RealmBadge
                         size={60}
-                        communityMint={realm?.info.communityMint}
-                        councilMint={realm?.info.config.councilMint}
+                        communityMint={realm?.account.communityMint}
+                        councilMint={realm?.account.config.councilMint}
                       ></RealmBadge>
                     </span>
                   </Popover>
@@ -91,12 +91,12 @@ export const RealmView = () => {
                 <Col style={{ textAlign: 'left', marginLeft: 8 }}>
                   <Space direction="vertical" size={0}>
                     <Space align="baseline">
-                      <h1> {realm?.info.name}</h1>{' '}
+                      <h1> {realm?.account.name}</h1>{' '}
                       <h3>
                         {realm && (
                           <ExplorerLink
                             short
-                            address={realm.info.communityMint}
+                            address={realm.account.communityMint}
                             type="address"
                           />
                         )}

@@ -1,15 +1,15 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withFlagInstructionError } from '../models/withFlagInstructionError';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const flagInstructionError = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   proposalInstruction: PublicKey,
 ) => {
   let governanceAuthority = walletPubkey;
@@ -21,7 +21,7 @@ export const flagInstructionError = async (
     instructions,
     programId,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     governanceAuthority,
     proposalInstruction,
   );

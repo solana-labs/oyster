@@ -1,7 +1,7 @@
 import { Form, FormInstance, InputNumber } from 'antd';
 import {
   ExplorerLink,
-  ParsedAccount,
+
   useMint,
   useWallet,
 } from '@oyster/common';
@@ -26,6 +26,7 @@ import {
   getMintMinAmountAsDecimal,
 } from '../../../../tools/units';
 import { parseMinTokensToCreate } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export interface RealmConfigValues {
   minCommunityTokensToCreateGovernance: number | string;
@@ -56,14 +57,14 @@ export const RealmConfigForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  realm: ParsedAccount<Realm>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
+  const idlAddress = useAnchorIdlAddress(governance.account.governedAccount);
   const { programId, programVersion } = useRpcContext();
   const wallet = useWallet();
-  const communityMintInfo = useMint(realm?.info.communityMint);
+  const communityMintInfo = useMint(realm?.account.communityMint);
 
   if (!wallet?.publicKey) {
     return <div>Wallet not connected</div>;
@@ -85,7 +86,7 @@ export const RealmConfigForm = ({
       programVersion,
       realm.pubkey,
       governance.pubkey,
-      values.removeCouncil === true ? undefined : realm.info.config.councilMint,
+      values.removeCouncil === true ? undefined : realm.account.config.councilMint,
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
       // Use minCommunityTokensToCreateGovernance.toString() in case the number is larger than number
       new BN(minCommunityTokensToCreateGovernance.toString()),
@@ -103,9 +104,9 @@ export const RealmConfigForm = ({
 
   const minCommunityTokensToCreateGovernance = communityMintInfo
     ? getMintDecimalAmountFromNatural(
-        communityMintInfo,
-        realm.info.config.minCommunityTokensToCreateGovernance,
-      ).toNumber()
+      communityMintInfo,
+      realm.account.config.minCommunityTokensToCreateGovernance,
+    ).toNumber()
     : 0;
 
   let mintDecimals = communityMintInfo ? communityMintInfo.decimals : 0;
@@ -152,7 +153,7 @@ export const RealmConfigForm = ({
         </>
       )}
 
-      {realm.info.config.councilMint && (
+      {realm.account.config.councilMint && (
         <Form.Item
           label="remove council"
           name="removeCouncil"
@@ -162,8 +163,8 @@ export const RealmConfigForm = ({
         </Form.Item>
       )}
       <RealmMintSupplyConfigFormItem
-        communityMintAddress={realm.info.communityMint}
-        maxVoteWeightSource={realm.info.config.communityMintMaxVoteWeightSource}
+        communityMintAddress={realm.account.communityMint}
+        maxVoteWeightSource={realm.account.config.communityMintMaxVoteWeightSource}
       ></RealmMintSupplyConfigFormItem>
     </Form>
   );

@@ -1,14 +1,14 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 import { withRelinquishVote } from '../models/withRelinquishVote';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
   IsWithdrawal: boolean,
@@ -22,10 +22,10 @@ export const relinquishVote = async (
   withRelinquishVote(
     instructions,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     tokenOwnerRecord,
-    proposal.info.governingTokenMint,
+    proposal.account.governingTokenMint,
     voteRecord,
     governanceAuthority,
     beneficiary,

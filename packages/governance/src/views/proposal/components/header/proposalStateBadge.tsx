@@ -5,8 +5,9 @@ import {
   Proposal,
   ProposalState,
 } from '../../../../models/accounts';
-import { ParsedAccount } from '@oyster/common';
+
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const STATE_COLOR: Record<string, string> = {
   [ProposalState.Draft]: 'orange',
@@ -38,15 +39,15 @@ export function ProposalStateBadge({
   governance,
   proposal,
 }: {
-  governance: ParsedAccount<Governance> | undefined;
-  proposal: ParsedAccount<Proposal>;
+  governance: ProgramAccount<Governance> | undefined;
+  proposal: ProgramAccount<Proposal>;
 }) {
   const hasVoteExpired = useHasVoteTimeExpired(governance, proposal);
 
-  let color = STATE_COLOR[proposal.info.state];
+  let color = STATE_COLOR[proposal.account.state];
   return (
     <Tag color={color} style={{ borderWidth: 0 }}>
-      {getStateLabel(proposal.info.state, hasVoteExpired)}
+      {getStateLabel(proposal.account.state, hasVoteExpired)}
     </Tag>
   );
 }

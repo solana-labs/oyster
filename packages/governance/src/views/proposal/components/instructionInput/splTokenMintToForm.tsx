@@ -1,5 +1,5 @@
 import { Form, FormInstance, InputNumber, Spin } from 'antd';
-import { ExplorerLink, ParsedAccount, utils } from '@oyster/common';
+import { ExplorerLink, utils } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
   AccountInfo,
@@ -17,6 +17,7 @@ import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '../../../../tools/units';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { useMint } = contexts.Accounts;
 
@@ -26,10 +27,10 @@ export const SplTokenMintToForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const mintInfo = useMint(governance.info.governedAccount);
+  const mintInfo = useMint(governance.account.governedAccount);
 
   if (!mintInfo) {
     return <Spin />;
@@ -51,7 +52,7 @@ export const SplTokenMintToForm = ({
 
     const mintToIx = Token.createMintToInstruction(
       tokenProgramId,
-      governance.info.governedAccount,
+      governance.account.governedAccount,
       new PublicKey(destination),
       governance.pubkey,
       [],
@@ -63,7 +64,7 @@ export const SplTokenMintToForm = ({
 
   const tokenAccountValidator = (
     info: AccountInfo<Buffer | ParsedAccountData>,
-  ) => validateTokenAccount(info, governance.info.governedAccount);
+  ) => validateTokenAccount(info, governance.account.governedAccount);
 
   const mintMinAmount = getMintMinAmountAsDecimal(mintInfo);
 
@@ -79,7 +80,7 @@ export const SplTokenMintToForm = ({
       </Form.Item>
       <Form.Item label="mint">
         <ExplorerLink
-          address={governance.info.governedAccount}
+          address={governance.account.governedAccount}
           type="address"
         />
       </Form.Item>

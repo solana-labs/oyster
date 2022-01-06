@@ -1,10 +1,11 @@
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button, Modal, Input, Form, Progress } from 'antd';
 import React, { useState } from 'react';
 import { utils, contexts, hooks } from '@oyster/common';
 
 import { LABELS } from '../../../../constants';
 import { Proposal } from '../../../../models/accounts';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { notify } = utils;
 const { TextArea } = Input;
@@ -19,11 +20,11 @@ const layout = {
 export default function AddSignersButton({
   proposal,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ProgramAccount<Proposal>;
 }) {
   const wallet = useWallet();
   const connection = useConnection();
-  const adminAccount = useAccountByMint(proposal.info.governingTokenMint);
+  const adminAccount = useAccountByMint(proposal.account.governingTokenMint);
   const [saving, setSaving] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 

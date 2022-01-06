@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, InputNumber } from 'antd';
 import { Form } from 'antd';
 
-import { ParsedAccount } from '@oyster/common';
+
 
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../../../constants';
@@ -27,15 +27,16 @@ import {
   getTimestampFromDays,
 } from '../../../../tools/units';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export function NewInstructionCard({
   realm,
   proposal,
   governance,
 }: {
-  realm: ParsedAccount<Realm>;
-  proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  proposal: ProgramAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
 }) {
   const [form] = Form.useForm();
   const rpcContext = useRpcContext();
@@ -43,7 +44,7 @@ export function NewInstructionCard({
   const changeTracker = useAccountChangeTracker();
 
   const proposalAuthority = useProposalAuthority(
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
   );
 
   const onFinish = async (values: {
@@ -51,7 +52,7 @@ export function NewInstructionCard({
     instruction: string;
     holdUpTime: number;
   }) => {
-    let index = proposal.info.instructionsNextIndex;
+    let index = proposal.account.instructionsNextIndex;
 
     try {
       const instructionData = getInstructionDataFromBase64(values.instruction);
@@ -79,7 +80,7 @@ export function NewInstructionCard({
   };
 
   const minHoldUpTime = getDaysFromTimestamp(
-    governance.info.config.minInstructionHoldUpTime,
+    governance.account.config.minInstructionHoldUpTime,
   );
 
   const onInstructionChange = (instructionDataBase64: string) => {

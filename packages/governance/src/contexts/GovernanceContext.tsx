@@ -8,7 +8,7 @@ import {
 } from '@solana/web3.js';
 
 import {
-  ParsedAccount,
+
   useConnection,
   useConnectionConfig,
 } from '@oyster/common';
@@ -19,9 +19,10 @@ import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
 import { getProgramVersion, PROGRAM_VERSION } from '../models/registry/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export interface GovernanceContextState {
-  realms: Record<string, ParsedAccount<Realm>>;
+  realms: Record<string, ProgramAccount<Realm>>;
   changeTracker: AccountChangeTracker;
   programId: string;
   programVersion: number;

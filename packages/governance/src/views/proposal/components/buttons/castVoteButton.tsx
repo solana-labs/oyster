@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 
@@ -22,6 +22,7 @@ import { castVote } from '../../../../actions/castVote';
 
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Option } from '../../../../tools/option';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { confirm } = Modal;
 export function CastVoteButton({
@@ -32,11 +33,11 @@ export function CastVoteButton({
   voteRecord,
   hasVoteTimeExpired,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<Governance>;
-  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
+  proposal: ProgramAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
   vote: YesNoVote;
-  voteRecord: Option<ParsedAccount<VoteRecord>> | undefined;
+  voteRecord: Option<ProgramAccount<VoteRecord>> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
   const rpcContext = useRpcContext();
@@ -45,23 +46,23 @@ export function CastVoteButton({
     hasVoteTimeExpired === false &&
     voteRecord?.isNone() &&
     tokenOwnerRecord &&
-    !tokenOwnerRecord.info.governingTokenDepositAmount.isZero() &&
-    proposal.info.state === ProposalState.Voting;
+    !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() &&
+    proposal.account.state === ProposalState.Voting;
 
   const [btnLabel, title, msg, icon] =
     vote === YesNoVote.Yes
       ? [
-          LABELS.VOTE_YEAH,
-          LABELS.VOTE_YEAH_QUESTION,
-          LABELS.VOTE_YEAH_MSG,
-          <CheckOutlined />,
-        ]
+        LABELS.VOTE_YEAH,
+        LABELS.VOTE_YEAH_QUESTION,
+        LABELS.VOTE_YEAH_MSG,
+        <CheckOutlined />,
+      ]
       : [
-          LABELS.VOTE_NAY,
-          LABELS.VOTE_NAY_QUESTION,
-          LABELS.VOTE_NAY_MSG,
-          <CloseOutlined />,
-        ];
+        LABELS.VOTE_NAY,
+        LABELS.VOTE_NAY_QUESTION,
+        LABELS.VOTE_NAY_MSG,
+        <CloseOutlined />,
+      ];
 
   return isVisible ? (
     <Button
@@ -83,7 +84,7 @@ export function CastVoteButton({
           onOk: async () => {
             castVote(
               rpcContext,
-              governance.info.realm,
+              governance.account.realm,
               proposal,
               tokenOwnerRecord.pubkey,
               vote,

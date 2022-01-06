@@ -8,22 +8,19 @@ import {
 } from '../models/accounts';
 import { GovernanceAccountParser } from '../models/serialisation';
 
-import {
-  GenericAccountParser,
-  ParsedAccount,
-  ParsedAccountBase,
-} from '@oyster/common';
+import { GenericAccountParser, ParsedAccountBase } from '@oyster/common';
 import { MemcmpFilter } from '../models/core/api';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
 import { none, Option, some } from '../tools/option';
 import { getGovernanceAccounts } from '../models/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 // Fetches Governance program account using the given key and subscribes to updates
 export function useGovernanceAccountByPubkey<
   TAccount extends GovernanceAccount
 >(accountClass: GovernanceAccountClass, pubkey: PublicKey | undefined) {
-  const [account, setAccount] = useState<Option<ParsedAccount<TAccount>>>();
+  const [account, setAccount] = useState<Option<ProgramAccount<TAccount>>>();
 
   const { connection, endpoint } = useRpcContext();
   const accountChangeTracker = useAccountChangeTracker();
@@ -58,7 +55,7 @@ export function useGovernanceAccountByPubkey<
           const account = GovernanceAccountParser(accountClass)(
             new PublicKey(update.pubkey),
             update.accountInfo,
-          ) as ParsedAccount<TAccount>;
+          ) as ProgramAccount<TAccount>;
 
           setAccount(some(account));
         }
@@ -100,7 +97,7 @@ export function useGovernanceAccountsByFilter<
   TAccount extends GovernanceAccount
 >(accountClass: GovernanceAccountClass, filters: (MemcmpFilter | undefined)[]) {
   const [accounts, setAccounts] = useState<
-    Record<string, ParsedAccount<TAccount>>
+    Record<string, ProgramAccount<TAccount>>
   >({});
 
   const { connection, endpoint, programId } = useRpcContext();
@@ -145,7 +142,7 @@ export function useGovernanceAccountsByFilter<
             const account = GovernanceAccountParser(accountClass)(
               new PublicKey(update.pubkey),
               update.accountInfo,
-            ) as ParsedAccount<TAccount>;
+            ) as ProgramAccount<TAccount>;
 
             setAccounts((acts: any) => {
               if (isMatch) {

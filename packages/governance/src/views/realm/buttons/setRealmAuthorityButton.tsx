@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+
 
 import React from 'react';
 import { Realm } from '../../../models/accounts';
@@ -10,11 +10,12 @@ import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAc
 import { setRealmAuthority } from '../../../actions/setRealmAuthority';
 import { Form, Select } from 'antd';
 import { useGovernancesByRealm } from '../../../hooks/apiHooks';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function SetRealmAuthorityButton({
   realm,
 }: {
-  realm: ParsedAccount<Realm>;
+  realm: ProgramAccount<Realm>;
 }) {
   const rpcContext = useRpcContext();
   const governances = useGovernancesByRealm(realm?.pubkey);
@@ -47,7 +48,7 @@ export function SetRealmAuthorityButton({
               value={g.pubkey.toBase58()}
               key={g.pubkey.toBase58()}
             >
-              {g.info.governedAccount.toBase58()}
+              {g.account.governedAccount.toBase58()}
             </Select.Option>
           ))}
         </Select>

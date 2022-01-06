@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ParsedAccount } from '@oyster/common';
+
 import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
@@ -14,6 +14,7 @@ import {
   getGovernanceInstructions,
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const ProgramInstructionsForm = ({
   form,
@@ -23,8 +24,8 @@ export const ProgramInstructionsForm = ({
   coreInstructions,
 }: {
   form: FormInstance;
-  realm: ParsedAccount<Realm>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
   coreInstructions: InstructionType[];
 }) => {
@@ -32,7 +33,7 @@ export const ProgramInstructionsForm = ({
     InstructionType.UpgradeProgram,
   );
 
-  const anchorIdlAccount = useAnchorIdlAccount(governance.info.governedAccount);
+  const anchorIdlAccount = useAnchorIdlAccount(governance.account.governedAccount);
 
   let anchorInstructions = anchorIdlAccount
     ? [InstructionType.AnchorIDLSetBuffer]

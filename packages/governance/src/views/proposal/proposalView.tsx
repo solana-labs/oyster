@@ -2,7 +2,7 @@ import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import {
-  ParsedAccount,
+
   TokenIcon,
   constants,
   ExplorerLink,
@@ -47,6 +47,7 @@ import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
+import { ProgramAccount } from '../../models/tools/solanaSdk';
 
 const { TabPane } = Tabs;
 
@@ -70,18 +71,18 @@ export const ProposalView = () => {
   let proposalKey = useKeyParam();
   let proposal = useProposal(proposalKey);
 
-  let governance = useGovernance(proposal?.info.governance);
-  let realm = useRealm(governance?.info.realm);
+  let governance = useGovernance(proposal?.account.governance);
+  let realm = useRealm(governance?.account.realm);
 
-  const governingTokenMint = useMint(proposal?.info.governingTokenMint);
+  const governingTokenMint = useMint(proposal?.account.governingTokenMint);
 
   const voteRecords = useVoteRecordsByProposal(proposal?.pubkey);
 
   const tokenOwnerRecords = useTokenOwnerRecords(
-    governance?.info.realm,
-    proposal?.info.isVoteFinalized() // TODO: for finalized votes show a single item for abstained votes
+    governance?.account.realm,
+    proposal?.account.isVoteFinalized() // TODO: for finalized votes show a single item for abstained votes
       ? undefined
-      : proposal?.info.governingTokenMint,
+      : proposal?.account.governingTokenMint,
   );
 
   if (!realm) {
@@ -127,11 +128,11 @@ function useLoadGist({
   setFailed: (b: boolean) => void;
   setContent: (b: string) => void;
   isGist: boolean;
-  proposal: ParsedAccount<Proposal>;
+  proposal: ProgramAccount<Proposal>;
 }) {
   useMemo(() => {
     if (loading) {
-      let toFetch = proposal.info.descriptionLink;
+      let toFetch = proposal.account.descriptionLink;
       const pieces = toFetch.match(urlRegex);
       if (isGist && pieces) {
         const justIdWithoutUser = pieces[1].split('/')[2];
@@ -171,8 +172,8 @@ export interface VoterDisplayData {
 }
 
 function mapVoterDisplayData(
-  voteRecords: ParsedAccount<VoteRecord>[],
-  tokenOwnerRecords: ParsedAccount<TokenOwnerRecord>[],
+  voteRecords: ProgramAccount<VoteRecord>[],
+  tokenOwnerRecords: ProgramAccount<TokenOwnerRecord>[],
 ): Array<VoterDisplayData> {
   const mapper = (key: string, amount: BN, label: string) => ({
     name: key,
@@ -186,17 +187,17 @@ function mapVoterDisplayData(
     ...tokenOwnerRecords
       .filter(
         tor =>
-          !tor.info.governingTokenDepositAmount.isZero() &&
+          !tor.account.governingTokenDepositAmount.isZero() &&
           !voteRecords.some(
             vt =>
-              vt.info.governingTokenOwner.toBase58() ===
-              tor.info.governingTokenOwner.toBase58(),
+              vt.account.governingTokenOwner.toBase58() ===
+              tor.account.governingTokenOwner.toBase58(),
           ),
       )
       .map(tor =>
         mapper(
-          tor.info.governingTokenOwner.toBase58(),
-          tor.info.governingTokenDepositAmount,
+          tor.account.governingTokenOwner.toBase58(),
+          tor.account.governingTokenDepositAmount,
           VoteType.Undecided,
         ),
       ),
@@ -204,11 +205,11 @@ function mapVoterDisplayData(
 
   const noVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.getNoVoteWeight()?.gt(ZERO))
+      .filter(vr => vr.account.getNoVoteWeight()?.gt(ZERO))
       .map(vr =>
         mapper(
-          vr.info.governingTokenOwner.toBase58(),
-          vr.info.getNoVoteWeight()!,
+          vr.account.governingTokenOwner.toBase58(),
+          vr.account.getNoVoteWeight()!,
           VoteType.No,
         ),
       ),
@@ -216,11 +217,11 @@ function mapVoterDisplayData(
 
   const yesVoteData = [
     ...voteRecords
-      .filter(vr => vr.info.getYesVoteWeight()?.gt(ZERO))
+      .filter(vr => vr.account.getYesVoteWeight()?.gt(ZERO))
       .map(vr =>
         mapper(
-          vr.info.governingTokenOwner.toBase58(),
-          vr.info.getYesVoteWeight()!,
+          vr.account.governingTokenOwner.toBase58(),
+          vr.account.getYesVoteWeight()!,
           VoteType.Yes,
         ),
       ),
@@ -242,26 +243,26 @@ function InnerProposalView({
   endpoint,
   hasVotes,
 }: {
-  realm: ParsedAccount<Realm>;
-  proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  proposal: ProgramAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
   governingTokenMint: MintInfo;
   voterDisplayData: Array<VoterDisplayData>;
   endpoint: string;
   hasVotes: boolean;
 }) {
   const tokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance.info.realm,
-    proposal.info.governingTokenMint,
+    governance.account.realm,
+    proposal.account.governingTokenMint,
   );
   const instructions = useInstructionsByProposal(proposal.pubkey);
   const signatories = useSignatoriesByProposal(proposal.pubkey);
 
-  const isUrl = !!proposal.info.descriptionLink.match(urlRegex);
+  const isUrl = !!proposal.account.descriptionLink.match(urlRegex);
   const isGist =
-    !!proposal.info.descriptionLink.match(/gist/i) &&
-    !!proposal.info.descriptionLink.match(/github/i);
-  const [content, setContent] = useState(proposal.info.descriptionLink);
+    !!proposal.account.descriptionLink.match(/gist/i) &&
+    !!proposal.account.descriptionLink.match(/github/i);
+  const [content, setContent] = useState(proposal.account.descriptionLink);
   const [loading, setLoading] = useState(isUrl);
   const [failed, setFailed] = useState(false);
   const [msg, setMsg] = useState('');
@@ -286,11 +287,11 @@ function InnerProposalView({
           <Col md={12} xs={24}>
             <Row>
               <TokenIcon
-                mintAddress={proposal?.info.governingTokenMint.toBase58()}
+                mintAddress={proposal?.account.governingTokenMint.toBase58()}
                 size={60}
               />
               <Col>
-                <h1>{proposal.info.name}</h1>
+                <h1>{proposal.account.name}</h1>
                 <ProposalStateBadge
                   proposal={proposal}
                   governance={governance}
@@ -360,14 +361,14 @@ function InnerProposalView({
             <Card>
               <Statistic
                 title={LABELS.SIGNATORIES}
-                value={proposal.info.signatoriesCount}
-                suffix={`/ ${proposal.info.signatoriesSignedOffCount}`}
+                value={proposal.account.signatoriesCount}
+                suffix={`/ ${proposal.account.signatoriesSignedOffCount}`}
               />
               {signatories
-                .filter(s => s.info.signedOff)
+                .filter(s => s.account.signedOff)
                 .map(s => (
                   <ExplorerLink
-                    address={s.info.signatory}
+                    address={s.account.signatory}
                     type="address"
                     short
                   ></ExplorerLink>
@@ -378,23 +379,23 @@ function InnerProposalView({
             <Card>
               <div className="ant-statistic">
                 <div className="ant-statistic-title">
-                  {proposal.info.isPreVotingState()
+                  {proposal.account.isPreVotingState()
                     ? 'Yes Vote Threshold'
                     : 'Vote Results'}
                 </div>
                 <div>
                   <VoteScore
-                    yesVoteCount={proposal.info.getYesVoteCount()}
-                    noVoteCount={proposal.info.getNoVoteCount()}
+                    yesVoteCount={proposal.account.getYesVoteCount()}
+                    noVoteCount={proposal.account.getNoVoteCount()}
                     yesVoteThreshold={getYesVoteThreshold(proposal, governance)}
                     governingMintDecimals={governingTokenMint.decimals}
-                    proposalState={proposal.info.state}
+                    proposalState={proposal.account.state}
                     maxVoteScore={getMaxVoteScore(
                       realm,
                       proposal,
                       governingTokenMint,
                     )}
-                    isPreVotingState={proposal.info.isPreVotingState()}
+                    isPreVotingState={proposal.account.isPreVotingState()}
                   ></VoteScore>
                 </div>
               </div>
@@ -404,7 +405,7 @@ function InnerProposalView({
             <Card>
               <div className="ant-statistic">
                 <div className="ant-statistic-title">
-                  {proposal.info.isPreVotingState()
+                  {proposal.account.isPreVotingState()
                     ? 'Voting Time'
                     : 'Voting Time Left'}
                 </div>
@@ -424,7 +425,7 @@ function InnerProposalView({
               size="large"
               style={{ marginBottom: 32 }}
             >
-              {proposal.info.descriptionLink && (
+              {proposal.account.descriptionLink && (
                 <TabPane tab="Description" key="description">
                   {loading ? (
                     <Spin />
@@ -433,7 +434,7 @@ function InnerProposalView({
                       <p>
                         {LABELS.DESCRIPTION}:{' '}
                         <a
-                          href={proposal.info.descriptionLink}
+                          href={proposal.account.descriptionLink}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -458,7 +459,7 @@ function InnerProposalView({
                   {instructions
                     .sort(
                       (i1, i2) =>
-                        i1.info.instructionIndex - i2.info.instructionIndex,
+                        i1.account.instructionIndex - i2.account.instructionIndex,
                     )
                     .map((instruction, position) => (
                       <Col xs={24} sm={24} md={12} lg={8} key={position}>
@@ -469,7 +470,7 @@ function InnerProposalView({
                         />
                       </Col>
                     ))}
-                  {proposal.info.state === ProposalState.Draft && (
+                  {proposal.account.state === ProposalState.Draft && (
                     <Col xs={24} sm={24} md={12} lg={8}>
                       <NewInstructionCard
                         proposal={proposal}
@@ -489,34 +490,34 @@ function InnerProposalView({
 }
 
 function getMaxVoteScore(
-  realm: ParsedAccount<Realm>,
-  proposal: ParsedAccount<Proposal>,
+  realm: ProgramAccount<Realm>,
+  proposal: ProgramAccount<Proposal>,
   governingTokenMint: MintInfo,
 ) {
-  if (proposal.info.isVoteFinalized() && proposal.info.maxVoteWeight) {
-    return proposal.info.maxVoteWeight;
+  if (proposal.account.isVoteFinalized() && proposal.account.maxVoteWeight) {
+    return proposal.account.maxVoteWeight;
   }
 
   if (
-    proposal.info.governingTokenMint.toBase58() ===
-    realm.info.config.councilMint?.toBase58()
+    proposal.account.governingTokenMint.toBase58() ===
+    realm.account.config.councilMint?.toBase58()
   ) {
     return governingTokenMint.supply;
   }
 
   return getMintMaxVoteWeight(
     governingTokenMint,
-    realm.info.config.communityMintMaxVoteWeightSource,
+    realm.account.config.communityMintMaxVoteWeightSource,
   );
 }
 
 function getYesVoteThreshold(
-  proposal: ParsedAccount<Proposal>,
-  governance: ParsedAccount<Governance>,
+  proposal: ProgramAccount<Proposal>,
+  governance: ProgramAccount<Governance>,
 ) {
-  return proposal.info.isVoteFinalized() &&
+  return proposal.account.isVoteFinalized() &&
     // Note Canceled state is also final but we currently don't capture vote threshold at the cancellation time
-    proposal.info.voteThresholdPercentage
-    ? proposal.info.voteThresholdPercentage.value
-    : governance.info.config.voteThresholdPercentage.value;
+    proposal.account.voteThresholdPercentage
+    ? proposal.account.voteThresholdPercentage.value
+    : governance.account.config.voteThresholdPercentage.value;
 }

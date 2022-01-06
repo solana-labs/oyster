@@ -4,13 +4,14 @@ import React from 'react';
 import { flagInstructionError } from '../../../../../actions/flagInstructionError';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { PlayState } from './executeInstructionButton';
-import { ParsedAccount } from '@oyster/common';
+
 import {
   InstructionExecutionStatus,
   Proposal,
   ProposalInstruction,
   TokenOwnerRecord,
 } from '../../../../../models/accounts';
+import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -18,17 +19,17 @@ export function FlagInstructionErrorButton({
   proposalAuthority,
   playState,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  proposalInstruction: ParsedAccount<ProposalInstruction>;
-  proposalAuthority: ParsedAccount<TokenOwnerRecord> | undefined;
+  proposal: ProgramAccount<Proposal>;
+  proposalInstruction: ProgramAccount<ProposalInstruction>;
+  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined;
   playState: PlayState;
 }) {
   const rpcContext = useRpcContext();
 
   if (
     playState !== PlayState.Error ||
-    proposalInstruction.info.executionStatus ===
-      InstructionExecutionStatus.Error ||
+    proposalInstruction.account.executionStatus ===
+    InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
     return null;
@@ -41,7 +42,7 @@ export function FlagInstructionErrorButton({
         proposal,
         proposalInstruction.pubkey,
       );
-    } catch {}
+    } catch { }
   };
 
   return (

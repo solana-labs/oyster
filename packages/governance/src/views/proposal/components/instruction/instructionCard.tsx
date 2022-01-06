@@ -1,5 +1,5 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Card, Button, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useMemo, useState } from 'react';
@@ -25,14 +25,15 @@ import {
   ExecuteInstructionButton,
 } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export function InstructionCard({
   proposalInstruction,
   proposal,
   position,
 }: {
-  proposalInstruction: ParsedAccount<ProposalInstruction>;
-  proposal: ParsedAccount<Proposal>;
+  proposalInstruction: ProgramAccount<ProposalInstruction>;
+  proposal: ProgramAccount<Proposal>;
   position: number;
 }) {
   const { connected } = useWallet();
@@ -40,21 +41,21 @@ export function InstructionCard({
   const changeTracker = useAccountChangeTracker();
 
   const proposalAuthority = useProposalAuthority(
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
   );
 
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
-    proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed,
+    proposalInstruction.account.executedAt ? PlayState.Played : PlayState.Unplayed,
   );
 
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(
-      serialize(GOVERNANCE_SCHEMA, proposalInstruction.info.instruction),
+      serialize(GOVERNANCE_SCHEMA, proposalInstruction.account.instruction),
     ).toString('base64');
 
     return {
-      programId: proposalInstruction.info.instruction.programId,
+      programId: proposalInstruction.account.instruction.programId,
       dataBase64: dataBase64,
     };
   }, [proposalInstruction]);
@@ -68,7 +69,7 @@ export function InstructionCard({
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.dataBase64}`}</p>
             <p>
               {LABELS.HOLD_UP_TIME_DAYS}:{' '}
-              {proposalInstruction.info.holdUpTime / 86400}
+              {proposalInstruction.account.holdUpTime / 86400}
             </p>
           </>
         }
@@ -78,7 +79,7 @@ export function InstructionCard({
   };
 
   const isEditable =
-    proposal.info.state === ProposalState.Draft && proposalAuthority;
+    proposal.account.state === ProposalState.Draft && proposalAuthority;
 
   const deleteAction = () => {
     const onDelete = async () => {
@@ -102,7 +103,7 @@ export function InstructionCard({
         <Space>
           <DryRunInstructionButton
             proposal={proposal}
-            instructionData={proposalInstruction.info.instruction}
+            instructionData={proposalInstruction.account.instruction}
           ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}

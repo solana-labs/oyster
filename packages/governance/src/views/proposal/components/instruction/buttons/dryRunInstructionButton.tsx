@@ -14,7 +14,7 @@ import {
   Typography,
 } from 'antd';
 import React, { useState } from 'react';
-import { ParsedAccount, utils, useWallet } from '@oyster/common';
+import { utils, useWallet } from '@oyster/common';
 import {
   InstructionData,
   Proposal,
@@ -25,6 +25,7 @@ import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
 import { RpcContext } from '../../../../../models/core/api';
+import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
 
 const { getExplorerInspectorUrl } = utils;
 
@@ -34,7 +35,7 @@ export function DryRunInstructionButton({
   proposal,
   instructionData,
 }: {
-  proposal: ParsedAccount<Proposal>;
+  proposal: ProgramAccount<Proposal>;
   instructionData: InstructionData | undefined;
 }) {
   const { connected } = useWallet();
@@ -54,7 +55,7 @@ export function DryRunInstructionButton({
       ProposalState.Draft,
       ProposalState.SigningOff,
       ProposalState.Voting,
-    ].includes(proposal.info.state) ||
+    ].includes(proposal.account.state) ||
     !instructionData
   ) {
     return null;
@@ -131,8 +132,8 @@ function DryRunStatus({
   rpcContext: RpcContext;
   isPending: boolean;
   result:
-    | { response: SimulatedTransactionResponse; transaction: Transaction }
-    | undefined;
+  | { response: SimulatedTransactionResponse; transaction: Transaction }
+  | undefined;
   error: Error | undefined;
 }) {
   const iconStyle = { fontSize: '150%' };

@@ -24,29 +24,29 @@ export const HomeView = () => {
 
   const realmItems = useMemo(() => {
     return realms
-      .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
+      .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
       .map(r => {
         const communityTokenOwnerRecord = tokenOwnerRecords.find(
           tor =>
-            tor.info.governingTokenMint.toBase58() ===
-            r.info.communityMint.toBase58(),
+            tor.account.governingTokenMint.toBase58() ===
+            r.account.communityMint.toBase58(),
         );
 
         const councilTokenOwnerRecord =
-          r.info.config.councilMint &&
+          r.account.config.councilMint &&
           tokenOwnerRecords.find(
             tor =>
-              tor.info.governingTokenMint.toBase58() ===
-              r.info.config.councilMint!.toBase58(),
+              tor.account.governingTokenMint.toBase58() ===
+              r.account.config.councilMint!.toBase58(),
           );
 
         return {
           href: getRealmUrl(r.pubkey, programIdBase58),
-          title: r.info.name,
+          title: r.account.name,
           badge: (
             <RealmBadge
-              communityMint={r.info.communityMint}
-              councilMint={r.info.config.councilMint}
+              communityMint={r.account.communityMint}
+              councilMint={r.account.config.councilMint}
             ></RealmBadge>
           ),
           key: r.pubkey.toBase58(),

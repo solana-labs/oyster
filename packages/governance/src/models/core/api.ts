@@ -2,13 +2,13 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 import {
   deserializeBorsh,
-  ParsedAccount,
   WalletNotConnectedError,
   WalletSigner,
 } from '@oyster/common';
 import { ProgramAccountWithType } from '../core/accounts';
 import { Schema } from 'borsh';
 import { getErrorMessage } from '../../tools/script';
+import { ProgramAccount } from '../tools/solanaSdk';
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
@@ -114,20 +114,19 @@ export async function getBorshProgramAccounts<
     }),
   });
   const rawAccounts = (await getProgramAccounts.json())['result'];
-  let accounts: { [pubKey: string]: ParsedAccount<TAccount> } = {};
+  let accounts: { [pubKey: string]: ProgramAccount<TAccount> } = {};
 
   for (let rawAccount of rawAccounts) {
     try {
       const data = Buffer.from(rawAccount.account.data[0], 'base64');
       const accountType = data[0];
 
-      const account = {
+      console.log('DATA', rawAccount);
+
+      const account: ProgramAccount<TAccount> = {
         pubkey: new PublicKey(rawAccount.pubkey),
-        account: {
-          ...rawAccount.account,
-          data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-        },
-        info: deserializeBorsh(getSchema(accountType), accountFactory, data),
+        account: deserializeBorsh(getSchema(accountType), accountFactory, data),
+        owner: rawAccount.account.owner,
       };
 
       accounts[account.pubkey.toBase58()] = account;
