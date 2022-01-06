@@ -8,6 +8,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "prettier.prettierPath": ".vscode/pnpify/prettier/index.js",
   "cSpell.words": [
+    "Blockhash",
     "solana"
   ]
 }

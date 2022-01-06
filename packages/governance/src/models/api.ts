@@ -5,7 +5,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 
-import { simulateTransaction } from '@oyster/common';
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
@@ -33,7 +32,7 @@ import { parseVersion } from '../tools/version';
 import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
-import { ProgramAccount } from './tools/solanaSdk';
+import { ProgramAccount, simulateTransaction } from './tools/solanaSdk';
 import { BN_ZERO } from './tools/numbers';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
