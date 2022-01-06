@@ -1,7 +1,7 @@
 import { Form, InputNumber, Space, Spin, Typography } from 'antd';
 import BN from 'bn.js';
 import React, { useState } from 'react';
-import { contexts, ParsedAccount, constants } from '@oyster/common';
+import { contexts, constants } from '@oyster/common';
 import { LABELS } from '../../constants';
 import {
   GovernanceConfig,
@@ -22,6 +22,7 @@ import {
   getMintSupplyAsDecimal,
   formatPercentage,
 } from '../../tools/units';
+import { ProgramAccount } from '../../models/tools/solanaSdk';
 
 const { ZERO } = constants;
 
@@ -75,9 +76,9 @@ export function GovernanceConfigFormItem({
   realm,
 }: {
   governanceConfig?: GovernanceConfig;
-  realm: ParsedAccount<Realm> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
 }) {
-  const communityMintInfo = useMint(realm?.info.communityMint);
+  const communityMintInfo = useMint(realm?.account.communityMint);
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >();

@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount } from '@oyster/common';
+import { ExplorerLink } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
@@ -9,6 +9,7 @@ import { createSetBuffer } from '../../../../tools/anchor/idlInstructions';
 import { formDefaults } from '../../../../tools/forms';
 import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const AnchorIdlSetBufferForm = ({
   form,
@@ -16,10 +17,10 @@ export const AnchorIdlSetBufferForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
+  const idlAddress = useAnchorIdlAddress(governance.account.governedAccount);
 
   const onCreate = async ({
     idlBufferAddress,
@@ -27,7 +28,7 @@ export const AnchorIdlSetBufferForm = ({
     idlBufferAddress: string;
   }) => {
     const upgradeIx = await createSetBuffer(
-      governance.info.governedAccount,
+      governance.account.governedAccount,
       new PublicKey(idlBufferAddress),
       idlAddress!,
       governance.pubkey,
@@ -45,7 +46,7 @@ export const AnchorIdlSetBufferForm = ({
     >
       <Form.Item label="program id">
         <ExplorerLink
-          address={governance.info.governedAccount}
+          address={governance.account.governedAccount}
           type="address"
         />
       </Form.Item>

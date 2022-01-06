@@ -1,4 +1,3 @@
-import { createTokenAccount } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import {
   Account,
@@ -6,6 +5,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
+import { createTokenAccount } from '../tools/splToken';
 
 export const withCreateSplTokenAccount = async (
   instructions: TransactionInstruction[],

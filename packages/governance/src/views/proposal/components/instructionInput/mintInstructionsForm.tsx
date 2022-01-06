@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ParsedAccount } from '@oyster/common';
+
 import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
@@ -12,6 +12,7 @@ import {
   getGovernanceInstructions,
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const MintInstructionsForm = ({
   form,
@@ -21,8 +22,8 @@ export const MintInstructionsForm = ({
   coreInstructions,
 }: {
   form: FormInstance;
-  realm: ParsedAccount<Realm>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
   coreInstructions: InstructionType[];
 }) => {

@@ -1,15 +1,15 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { SignatoryRecord } from '../models/accounts';
 import { withSignOffProposal } from '../models/withSignOffProposal';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const signOffProposal = async (
   { connection, wallet, programId }: RpcContext,
 
-  signatoryRecord: ParsedAccount<SignatoryRecord>,
+  signatoryRecord: ProgramAccount<SignatoryRecord>,
   signatory: PublicKey,
 ) => {
   let signers: Account[] = [];
@@ -18,7 +18,7 @@ export const signOffProposal = async (
   withSignOffProposal(
     instructions,
     programId,
-    signatoryRecord.info.proposal,
+    signatoryRecord.account.proposal,
     signatoryRecord.pubkey,
     signatory,
   );

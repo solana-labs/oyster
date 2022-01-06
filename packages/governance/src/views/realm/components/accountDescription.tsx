@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Governance } from '../../../models/accounts';
 import {
   deserializeMint,
-  ParsedAccount,
+
   useAccount,
   useConnection,
   contexts,
@@ -13,33 +13,34 @@ import { formatMintNaturalAmountAsDecimal } from '../../../tools/units';
 import { useNativeTreasury } from '../../../hooks/apiHooks';
 import { Space } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({
   governance,
 }: {
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
 }) {
   const connection = useConnection();
   const [mintAccount, setMintAccount] = useState<MintInfo | null>();
 
-  const tokenAccount = useAccount(governance.info.governedAccount);
+  const tokenAccount = useAccount(governance.account.governedAccount);
   const tokenAccountMint = useMint(tokenAccount?.info.mint);
   const nativeTreasury = useNativeTreasury(governance?.pubkey);
 
   useEffect(() => {
-    if (!governance.info.isMintGovernance()) {
+    if (!governance.account.isMintGovernance()) {
       return;
     }
     connection
-      .getAccountInfo(governance.info.governedAccount)
+      .getAccountInfo(governance.account.governedAccount)
       .then(info => info && deserializeMint(info.data))
       .then(setMintAccount);
   }, [connection, governance]);
 
   return (
     <Space size="large">
-      {governance.info.isTokenGovernance() &&
+      {governance.account.isTokenGovernance() &&
         tokenAccount &&
         tokenAccountMint &&
         `Token Balance: ${formatMintNaturalAmountAsDecimal(

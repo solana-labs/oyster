@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -12,6 +11,7 @@ import {
   GOVERNANCE_PROGRAM_SEED,
 } from './accounts';
 import BN from 'bn.js';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
@@ -25,8 +25,6 @@ export const withDepositGoverningTokens = async (
   payer: PublicKey,
   amount: BN,
 ) => {
-  const { system: systemId, token: tokenId } = utils.programIds();
-
   const args = new DepositGoverningTokensArgs({ amount });
   const data = Buffer.from(
     serialize(getGovernanceSchema(programVersion), args),
@@ -85,12 +83,12 @@ export const withDepositGoverningTokens = async (
       isSigner: true,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

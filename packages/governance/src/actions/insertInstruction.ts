@@ -1,5 +1,4 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { InstructionData, Proposal } from '../models/accounts';
 
@@ -7,10 +6,11 @@ import { withInsertInstruction } from '../models/withInsertInstruction';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const insertInstruction = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   index: number,
   holdUpTime: number,
@@ -26,7 +26,7 @@ export const insertInstruction = async (
     instructions,
     programId,
     programVersion,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     tokenOwnerRecord,
     governanceAuthority,

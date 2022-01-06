@@ -1,5 +1,5 @@
 import React from 'react';
-import { contexts, ParsedAccount } from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { TokenOwnerRecord } from '../../models/accounts';
 
 import {
@@ -7,6 +7,7 @@ import {
   formatMintVoteWeight,
 } from '../../tools/units';
 import { MintInfo } from '@solana/spl-token';
+import { ProgramAccount } from '../../models/tools/solanaSdk';
 
 const { useMint } = contexts.Accounts;
 
@@ -15,15 +16,15 @@ export function RealmDepositBadge({
   communityTokenOwnerRecord,
   showVoteWeights,
 }: {
-  councilTokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined;
-  communityTokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined;
+  councilTokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
+  communityTokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
   showVoteWeights?: boolean;
 }) {
   const communityMint = useMint(
-    communityTokenOwnerRecord?.info.governingTokenMint,
+    communityTokenOwnerRecord?.account.governingTokenMint,
   );
 
-  const councilMint = useMint(councilTokenOwnerRecord?.info.governingTokenMint);
+  const councilMint = useMint(councilTokenOwnerRecord?.account.governingTokenMint);
 
   if (!councilTokenOwnerRecord && !communityTokenOwnerRecord) {
     return null;
@@ -61,20 +62,20 @@ function TokenDepositStatistics({
 }: {
   label: string;
   mint: MintInfo;
-  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
   showVoteWeights: boolean | undefined;
 }) {
   return (
     <>
       <span>{`${label}: ${formatMintNaturalAmountAsDecimal(
         mint,
-        tokenOwnerRecord.info.governingTokenDepositAmount,
+        tokenOwnerRecord.account.governingTokenDepositAmount,
       )}`}</span>
       {showVoteWeights &&
-        !tokenOwnerRecord.info.governingTokenDepositAmount.isZero() && (
+        !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() && (
           <span>{` (${formatMintVoteWeight(
             mint,
-            tokenOwnerRecord.info.governingTokenDepositAmount,
+            tokenOwnerRecord.account.governingTokenDepositAmount,
           )})`}</span>
         )}
     </>

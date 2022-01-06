@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -8,6 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateMintGovernanceArgs } from './instructions';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
@@ -21,8 +21,6 @@ export const withCreateMintGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const { system: systemId, token: tokenId } = utils.programIds();
-
   const args = new CreateMintGovernanceArgs({
     config,
     transferMintAuthority,
@@ -66,12 +64,12 @@ export const withCreateMintGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

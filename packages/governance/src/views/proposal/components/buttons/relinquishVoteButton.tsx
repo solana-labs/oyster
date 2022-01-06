@@ -1,4 +1,4 @@
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { LABELS } from '../../../../constants';
@@ -13,6 +13,7 @@ import {
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
 import { relinquishVote } from '../../../../actions/relinquishVote';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { confirm } = Modal;
 export function RelinquishVoteButton({
@@ -21,9 +22,9 @@ export function RelinquishVoteButton({
   voteRecord,
   hasVoteTimeExpired,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
-  voteRecord: ParsedAccount<VoteRecord> | undefined;
+  proposal: ProgramAccount<Proposal>;
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
+  voteRecord: ProgramAccount<VoteRecord> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
   const { connected } = useWallet();
@@ -34,16 +35,16 @@ export function RelinquishVoteButton({
   const isVisible =
     connected &&
     voteRecord &&
-    !voteRecord?.info.isRelinquished &&
-    (proposal.info.state === ProposalState.Voting ||
-      proposal.info.state === ProposalState.Completed ||
-      proposal.info.state === ProposalState.Cancelled ||
-      proposal.info.state === ProposalState.Succeeded ||
-      proposal.info.state === ProposalState.Executing ||
-      proposal.info.state === ProposalState.Defeated);
+    !voteRecord?.account.isRelinquished &&
+    (proposal.account.state === ProposalState.Voting ||
+      proposal.account.state === ProposalState.Completed ||
+      proposal.account.state === ProposalState.Cancelled ||
+      proposal.account.state === ProposalState.Succeeded ||
+      proposal.account.state === ProposalState.Executing ||
+      proposal.account.state === ProposalState.Defeated);
 
   const isVoting =
-    proposal.info.state === ProposalState.Voting && !hasVoteTimeExpired;
+    proposal.account.state === ProposalState.Voting && !hasVoteTimeExpired;
 
   return isVisible ? (
     <Button

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { executeInstruction } from '../../../../../actions/executeInstruction';
 import {
   InstructionExecutionStatus,
@@ -16,6 +16,7 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
+import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
 
 export enum PlayState {
   Played,
@@ -30,8 +31,8 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  proposalInstruction: ParsedAccount<ProposalInstruction>;
+  proposal: ProgramAccount<Proposal>;
+  proposalInstruction: ProgramAccount<ProposalInstruction>;
   playing: PlayState;
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
@@ -41,8 +42,8 @@ export function ExecuteInstructionButton({
   const { connection } = rpcContext;
   const [currentSlot, setCurrentSlot] = useState(0);
 
-  let canExecuteAt = proposal.info.votingCompletedAt
-    ? proposal.info.votingCompletedAt.toNumber() + 1
+  let canExecuteAt = proposal.account.votingCompletedAt
+    ? proposal.account.votingCompletedAt.toNumber() + 1
     : 0;
 
   const ineligibleToSee = currentSlot - canExecuteAt >= 0;
@@ -71,7 +72,7 @@ export function ExecuteInstructionButton({
   };
 
   if (
-    proposalInstruction.info.executionStatus ===
+    proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
   ) {
     return (
@@ -82,17 +83,17 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposal.info.state !== ProposalState.Executing &&
-    proposal.info.state !== ProposalState.ExecutingWithErrors &&
-    proposal.info.state !== ProposalState.Succeeded
+    proposal.account.state !== ProposalState.Executing &&
+    proposal.account.state !== ProposalState.ExecutingWithErrors &&
+    proposal.account.state !== ProposalState.Succeeded
   )
     return null;
   if (ineligibleToSee) return null;
 
   if (
     playing === PlayState.Unplayed &&
-    proposalInstruction.info.executionStatus !==
-      InstructionExecutionStatus.Error
+    proposalInstruction.account.executionStatus !==
+    InstructionExecutionStatus.Error
   ) {
     return (
       <Tooltip title="execute instruction">
@@ -105,8 +106,8 @@ export function ExecuteInstructionButton({
     return <LoadingOutlined style={{ color: 'orange' }} key="loading" />;
   else if (
     playing === PlayState.Error ||
-    proposalInstruction.info.executionStatus ===
-      InstructionExecutionStatus.Error
+    proposalInstruction.account.executionStatus ===
+    InstructionExecutionStatus.Error
   )
     return (
       <Tooltip title="retry to execute instruction">

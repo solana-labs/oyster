@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount, utils, useWallet } from '@oyster/common';
+import { ExplorerLink, utils, useWallet } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
   AccountInfo,
@@ -12,6 +12,7 @@ import { createUpgradeInstruction } from '../../../../tools/sdk/bpfUpgradeableLo
 import { formDefaults } from '../../../../tools/forms';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 import { validateProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const ProgramUpgradeForm = ({
   form,
@@ -19,7 +20,7 @@ export const ProgramUpgradeForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const { publicKey } = useWallet();
@@ -32,7 +33,7 @@ export const ProgramUpgradeForm = ({
 
   const onCreate = async ({ bufferAddress }: { bufferAddress: string }) => {
     const upgradeIx = await createUpgradeInstruction(
-      governance.info.governedAccount,
+      governance.account.governedAccount,
       new PublicKey(bufferAddress),
       governance.pubkey,
       publicKey,
@@ -51,7 +52,7 @@ export const ProgramUpgradeForm = ({
       </Form.Item>
       <Form.Item label="program (governed account)">
         <ExplorerLink
-          address={governance.info.governedAccount}
+          address={governance.account.governedAccount}
           type="address"
         />
       </Form.Item>

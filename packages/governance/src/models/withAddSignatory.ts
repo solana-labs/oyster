@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -8,6 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { AddSignatoryArgs } from './instructions';
 import { getSignatoryRecordAddress } from './accounts';
+import { SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withAddSignatory = async (
   instructions: TransactionInstruction[],
@@ -18,8 +18,6 @@ export const withAddSignatory = async (
   signatory: PublicKey,
   payer: PublicKey,
 ) => {
-  const { system: systemId } = utils.programIds();
-
   const args = new AddSignatoryArgs({ signatory });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -56,7 +54,7 @@ export const withAddSignatory = async (
       isSigner: true,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },

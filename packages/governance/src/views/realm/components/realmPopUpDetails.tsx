@@ -1,6 +1,6 @@
 import { Space, Typography } from 'antd';
 import React from 'react';
-import { ExplorerLink, ParsedAccount, contexts } from '@oyster/common';
+import { ExplorerLink, contexts } from '@oyster/common';
 import { Realm } from '../../../models/accounts';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -9,28 +9,29 @@ import {
   formatMintNaturalAmountAsDecimal,
   formatMintSupplyAsDecimal,
 } from '../../../tools/units';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 const { useMint } = contexts.Accounts;
 const { Text } = Typography;
 
-export function RealmPopUpDetails({ realm }: { realm: ParsedAccount<Realm> }) {
+export function RealmPopUpDetails({ realm }: { realm: ProgramAccount<Realm> }) {
   return (
     <Space direction="vertical">
       <>
         <RealmMintDetails
           label="governance token"
           realm={realm}
-          mint={realm.info.communityMint}
+          mint={realm.account.communityMint}
           showMaxVoteWeight={
-            !realm.info.config.communityMintMaxVoteWeightSource.isFullSupply()
+            !realm.account.config.communityMintMaxVoteWeightSource.isFullSupply()
           }
           showMinTokens
         ></RealmMintDetails>
 
-        {realm.info.config.councilMint && (
+        {realm.account.config.councilMint && (
           <RealmMintDetails
             label="council token"
-            mint={realm.info.config.councilMint}
+            mint={realm.account.config.councilMint}
             realm={realm}
           ></RealmMintDetails>
         )}
@@ -50,7 +51,7 @@ function RealmMintDetails({
   mint: PublicKey;
   showMaxVoteWeight?: boolean;
   showMinTokens?: boolean;
-  realm: ParsedAccount<Realm>;
+  realm: ProgramAccount<Realm>;
 }) {
   const mintInfo = useMint(mint);
 
@@ -67,9 +68,9 @@ function RealmMintDetails({
             <>
               <Text type="secondary">{`max vote weight: ${formatMintMaxVoteWeight(
                 mintInfo,
-                realm.info.config.communityMintMaxVoteWeightSource,
+                realm.account.config.communityMintMaxVoteWeightSource,
               )} (${formatMintMaxVotePercentage(
-                realm.info.config.communityMintMaxVoteWeightSource,
+                realm.account.config.communityMintMaxVoteWeightSource,
               )})`}</Text>
               {/* <Text type="secondary">{`my vote weight:`}</Text> */}
             </>
@@ -77,7 +78,7 @@ function RealmMintDetails({
           {showMinTokens && (
             <Text type="secondary">{`min tokens to create governance: ${formatMintNaturalAmountAsDecimal(
               mintInfo,
-              realm.info.config.minCommunityTokensToCreateGovernance,
+              realm.account.config.minCommunityTokensToCreateGovernance,
             )}`}</Text>
           )}
         </>

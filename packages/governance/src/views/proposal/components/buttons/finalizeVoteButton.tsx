@@ -1,4 +1,4 @@
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
 import { LABELS } from '../../../../constants';
@@ -9,14 +9,15 @@ import {
 } from '../../../../models/accounts';
 import { finalizeVote } from '../../../../actions/finalizeVote';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export function FinalizeVoteButton({
   governance,
   proposal,
   hasVoteTimeExpired,
 }: {
-  governance: ParsedAccount<Governance>;
-  proposal: ParsedAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
+  proposal: ProgramAccount<Proposal>;
   hasVoteTimeExpired: boolean | undefined;
 }) {
   const { connected } = useWallet();
@@ -25,14 +26,14 @@ export function FinalizeVoteButton({
   const isVisible =
     hasVoteTimeExpired === true &&
     connected &&
-    proposal.info.state === ProposalState.Voting;
+    proposal.account.state === ProposalState.Voting;
 
   return isVisible ? (
     <Button
       type="primary"
       onClick={async () => {
         try {
-          await finalizeVote(rpcContext, governance.info.realm, proposal);
+          await finalizeVote(rpcContext, governance.account.realm, proposal);
         } catch (ex) {
           console.error(ex);
         }

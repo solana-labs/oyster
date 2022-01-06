@@ -1,5 +1,5 @@
 import { Form, FormInstance, Spin } from 'antd';
-import { ExplorerLink, ParsedAccount } from '@oyster/common';
+import { ExplorerLink } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
@@ -11,6 +11,7 @@ import { contexts } from '@oyster/common';
 import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
 
 import { getRAYGovernanceAta, getSRMGovernanceAta } from './yieldFarming';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
@@ -22,10 +23,10 @@ export const RaydiumAddLiquidityForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const sourceTokenAccount = useTokenAccount(governance.info.governedAccount);
+  const sourceTokenAccount = useTokenAccount(governance.account.governedAccount);
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
   const connection = useConnection();
 
@@ -74,7 +75,7 @@ export const RaydiumAddLiquidityForm = ({
       // user (governance)
       rayAta, // governance RAY account
       serAta, // governance SER account
-      governance.info.governedAccount, // governance RAY-SRM LP token account
+      governance.account.governedAccount, // governance RAY-SRM LP token account
       governancePk, // governance PDA
       rayAmount, // max RAY
       serAmount, // max SER

@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { Realm } from '../../../models/accounts';
@@ -8,6 +8,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { depositGoverningTokens } from '../../../actions/depositGoverningTokens';
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 const { useAccountByMint } = hooks;
 
@@ -17,7 +18,7 @@ export function DepositGoverningTokensButton({
   governingTokenMint,
   tokenName,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
   governingTokenMint: PublicKey | undefined;
   tokenName?: string;
 }) {

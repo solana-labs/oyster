@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ParsedAccount } from '@oyster/common';
+
 import { Governance, Realm } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
@@ -16,6 +16,7 @@ import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
 import { RaydiumStakeLPForm } from './raydiumStakeLPForm';
 import { isYieldFarmingGovernance } from './yieldFarming';
 import { RaydiumStakeRAYForm } from './raydiumStakeRAYForm';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const TokenInstructionsForm = ({
   form,
@@ -25,8 +26,8 @@ export const TokenInstructionsForm = ({
   coreInstructions,
 }: {
   form: FormInstance;
-  realm: ParsedAccount<Realm>;
-  governance: ParsedAccount<Governance>;
+  realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
   coreInstructions: InstructionType[];
 }) => {
@@ -34,12 +35,12 @@ export const TokenInstructionsForm = ({
 
   const yfInstructions = isYieldFarmingGovernance(governance.pubkey)
     ? [
-        InstructionType.RaydiumAddLiquidity,
-        InstructionType.RaydiumStakeLP,
-        InstructionType.RaydiumHarvestLP,
-        InstructionType.RaydiumStakeRAY,
-        InstructionType.RaydiumHarvestRAY,
-      ]
+      InstructionType.RaydiumAddLiquidity,
+      InstructionType.RaydiumStakeLP,
+      InstructionType.RaydiumHarvestLP,
+      InstructionType.RaydiumStakeRAY,
+      InstructionType.RaydiumHarvestRAY,
+    ]
     : [];
 
   let instructions = [

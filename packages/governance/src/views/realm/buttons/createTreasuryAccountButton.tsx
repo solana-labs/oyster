@@ -21,17 +21,18 @@ import {
   GovernanceConfigFormItem,
   GovernanceConfigValues,
 } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
-import { ParsedAccount } from '@oyster/common';
+
 import { Realm } from '../../../models/accounts';
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 import { createTreasuryAccount } from '../../../actions/createTreasuryAccount';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function CreateTreasuryAccountButton({
   buttonProps,
   realm,
 }: {
   buttonProps?: ButtonProps;
-  realm: ParsedAccount<Realm> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
@@ -41,12 +42,12 @@ export function CreateTreasuryAccountButton({
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.communityMint,
+    realm?.account.communityMint,
   );
 
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-    realm?.info.config.councilMint,
+    realm?.account.config.councilMint,
   );
 
   if (!realm) {
@@ -55,19 +56,19 @@ export function CreateTreasuryAccountButton({
 
   const canCreateGovernanceUsingCommunityTokens =
     communityTokenOwnerRecord &&
-    communityTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
-      realm.info.config.minCommunityTokensToCreateGovernance,
+    communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(
+      realm.account.config.minCommunityTokensToCreateGovernance,
     ) >= 0;
 
   const canCreateGovernanceUsingCouncilTokens =
     councilTokenOwnerRecord &&
-    !councilTokenOwnerRecord.info.governingTokenDepositAmount.isZero();
+    !councilTokenOwnerRecord.account.governingTokenDepositAmount.isZero();
 
   const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
     ? councilTokenOwnerRecord
     : canCreateGovernanceUsingCommunityTokens
-    ? communityTokenOwnerRecord
-    : undefined;
+      ? communityTokenOwnerRecord
+      : undefined;
 
   const onSubmit = async (
     values: {

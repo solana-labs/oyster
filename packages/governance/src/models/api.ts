@@ -5,7 +5,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 
-import { ParsedAccount, simulateTransaction, ZERO } from '@oyster/common';
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
@@ -33,6 +32,8 @@ import { parseVersion } from '../tools/version';
 import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
+import { ProgramAccount, simulateTransaction } from './tools/solanaSdk';
+import { BN_ZERO } from './tools/numbers';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(
@@ -84,7 +85,7 @@ export async function getTokenOwnerRecordForRealm(
   const tokenOwnerRecord = GovernanceAccountParser(TokenOwnerRecord)(
     tokenOwnerRecordPk,
     tokenOwnerRecordInfo,
-  ) as ParsedAccount<TokenOwnerRecord>;
+  ) as ProgramAccount<TokenOwnerRecord>;
 
   return tokenOwnerRecord;
 }
@@ -122,7 +123,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 
   return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
     string,
-    ParsedAccount<TAccount>
+    ProgramAccount<TAccount>
   >;
 }
 
@@ -144,9 +145,9 @@ export async function getGovernanceProgramVersion(
       const programMetadata = GovernanceAccountParser(ProgramMetadata)(
         programMetadataPk,
         programMetadataInfo,
-      ) as ParsedAccount<ProgramMetadata>;
+      ) as ProgramAccount<ProgramMetadata>;
 
-      let deploySlot = ZERO;
+      let deploySlot = BN_ZERO;
 
       try {
         const programData = await getProgramDataAccount(
@@ -160,8 +161,8 @@ export async function getGovernanceProgramVersion(
       }
 
       // Check if ProgramMetadata is not stale
-      if (programMetadata.info.updatedAt.gte(deploySlot)) {
-        const version = parseVersion(programMetadata.info.version);
+      if (programMetadata.account.updatedAt.gte(deploySlot)) {
+        const version = parseVersion(programMetadata.account.version);
         console.log('Program version (metadata)', version);
         return version.major;
       }

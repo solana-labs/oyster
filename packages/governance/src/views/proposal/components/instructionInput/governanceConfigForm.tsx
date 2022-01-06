@@ -1,5 +1,5 @@
 import { Form, FormInstance } from 'antd';
-import { ExplorerLink, ParsedAccount } from '@oyster/common';
+import { ExplorerLink } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import { TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
@@ -15,6 +15,7 @@ import {
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { createSetGovernanceConfig } from '../../../../models/createSetGovernanceConfig';
 import { useRealm } from '../../../../contexts/GovernanceContext';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const GovernanceConfigForm = ({
   form,
@@ -22,12 +23,12 @@ export const GovernanceConfigForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const idlAddress = useAnchorIdlAddress(governance.info.governedAccount);
+  const idlAddress = useAnchorIdlAddress(governance.account.governedAccount);
   const { programId } = useRpcContext();
-  const realm = useRealm(governance.info.realm);
+  const realm = useRealm(governance.account.realm);
 
   const onCreate = async (values: GovernanceConfigValues) => {
     const config = getGovernanceConfig(values);
@@ -56,7 +57,7 @@ export const GovernanceConfigForm = ({
       </Form.Item>
 
       <GovernanceConfigFormItem
-        governanceConfig={governance.info.config}
+        governanceConfig={governance.account.config}
         realm={realm}
       ></GovernanceConfigFormItem>
     </Form>

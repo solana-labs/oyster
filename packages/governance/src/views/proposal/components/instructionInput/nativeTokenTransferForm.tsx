@@ -1,5 +1,5 @@
 import { Form, FormInstance, InputNumber, Spin } from 'antd';
-import { ExplorerLink, ParsedAccount, SYSTEM } from '@oyster/common';
+import { ExplorerLink, SYSTEM } from '@oyster/common';
 import { Governance } from '../../../../models/accounts';
 import {
   PublicKey,
@@ -13,6 +13,7 @@ import { AccountFormItem } from '../../../../components/AccountFormItem/accountF
 
 import { useNativeTreasury } from '../../../../hooks/apiHooks';
 import { lamportsToSOL, SOLToLamports } from '../../../../tools/units';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export const NativeTransferForm = ({
   form,
@@ -20,7 +21,7 @@ export const NativeTransferForm = ({
   onCreateInstruction,
 }: {
   form: FormInstance;
-  governance: ParsedAccount<Governance>;
+  governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const nativeTreasury = useNativeTreasury(governance.pubkey);

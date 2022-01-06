@@ -1,5 +1,4 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../../models/accounts';
 
@@ -7,10 +6,11 @@ import { sendTransactionWithNotifications } from '../../tools/transactions';
 import { RpcContext } from '../../models/core/api';
 import { withPostChatMessage } from '../../models/chat/withPostChatMessage';
 import { ChatMessageBody } from '../../models/chat/accounts';
+import { ProgramAccount } from '../../models/tools/solanaSdk';
 
 export const postChatMessage = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   replyTo: PublicKey | undefined,
   body: ChatMessageBody,
@@ -25,7 +25,7 @@ export const postChatMessage = async (
     instructions,
     signers,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     tokeOwnerRecord,
     governanceAuthority,

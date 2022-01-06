@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -8,6 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateAccountGovernanceArgs } from './instructions';
+import { SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],
@@ -19,8 +19,6 @@ export const withCreateAccountGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const { system: systemId } = utils.programIds();
-
   const args = new CreateAccountGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -60,7 +58,7 @@ export const withCreateAccountGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

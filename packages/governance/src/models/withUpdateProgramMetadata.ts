@@ -3,7 +3,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { UpdateProgramMetadataArgs } from './instructions';
 import { getProgramMetadataAddress } from './accounts';
-import { SYSTEM } from '@oyster/common';
+import { SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withUpdateProgramMetadata = async (
   instructions: TransactionInstruction[],
@@ -28,7 +28,7 @@ export const withUpdateProgramMetadata = async (
       isSigner: true,
     },
     {
-      pubkey: SYSTEM,
+      pubkey: SYSTEM_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },

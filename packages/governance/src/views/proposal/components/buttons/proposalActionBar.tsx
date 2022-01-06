@@ -5,8 +5,7 @@ import {
   ProposalState,
   TokenOwnerRecord,
 } from '../../../../models/accounts';
-import CancelButton from './cancelButton';
-import { ParsedAccount } from '@oyster/common';
+
 import SignOffButton from './signOffButton';
 import { FinalizeVoteButton } from './finalizeVoteButton';
 import { RelinquishVoteButton } from './relinquishVoteButton';
@@ -18,15 +17,17 @@ import {
   useTokenOwnerVoteRecord,
 } from '../../../../hooks/apiHooks';
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import CancelButton from './cancelButton';
 
 export function ProposalActionBar({
   governance,
   tokenOwnerRecord,
   proposal,
 }: {
-  governance: ParsedAccount<Governance>;
-  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord> | undefined;
-  proposal: ParsedAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
+  proposal: ProgramAccount<Proposal>;
 }) {
   let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
 
@@ -42,8 +43,8 @@ export function ProposalActionBar({
       <CancelButton proposal={proposal}></CancelButton>
 
       {signatoryRecord &&
-        (proposal.info.state === ProposalState.Draft ||
-          proposal.info.state === ProposalState.SigningOff) && (
+        (proposal.account.state === ProposalState.Draft ||
+          proposal.account.state === ProposalState.SigningOff) && (
           <SignOffButton
             signatoryRecord={signatoryRecord}
             proposal={proposal}

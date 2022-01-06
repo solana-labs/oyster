@@ -1,4 +1,4 @@
-import { ParsedAccount, useWallet } from '@oyster/common';
+import { useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
 
@@ -11,13 +11,14 @@ import {
   ChatMessageBody,
   ChatMessageBodyType,
 } from '../../../../models/chat/accounts';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 export function PostChatMessageButton({
   tokenOwnerRecord,
   proposal,
 }: {
-  tokenOwnerRecord: ParsedAccount<TokenOwnerRecord>;
-  proposal: ParsedAccount<Proposal>;
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
+  proposal: ProgramAccount<Proposal>;
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();

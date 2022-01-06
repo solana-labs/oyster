@@ -128,9 +128,9 @@ export function useProposalAuthority(proposalOwner: PublicKey | undefined) {
 
   return connected &&
     tokenOwnerRecord?.isSome() &&
-    (tokenOwnerRecord.value.info.governingTokenOwner.toBase58() ===
+    (tokenOwnerRecord.value.account.governingTokenOwner.toBase58() ===
       publicKey?.toBase58() ||
-      tokenOwnerRecord.value.info.governanceDelegate?.toBase58() ===
+      tokenOwnerRecord.value.account.governanceDelegate?.toBase58() ===
         publicKey?.toBase58())
     ? tokenOwnerRecord?.tryUnwrap()
     : undefined;

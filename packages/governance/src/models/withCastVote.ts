@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -10,6 +9,7 @@ import { serialize } from 'borsh';
 import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from './registry/api';
+import { SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
@@ -25,8 +25,6 @@ export const withCastVote = async (
   vote: Vote,
   payer: PublicKey,
 ) => {
-  const { system: systemId } = utils.programIds();
-
   const args = new CastVoteArgs(
     programVersion === PROGRAM_VERSION_V1
       ? { yesNoVote: vote.toYesNoVote(), vote: undefined }
@@ -89,7 +87,7 @@ export const withCastVote = async (
       isSigner: true,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },

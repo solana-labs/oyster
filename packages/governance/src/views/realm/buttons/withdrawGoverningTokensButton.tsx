@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@oyster/common';
+
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 import { Realm } from '../../../models/accounts';
@@ -11,6 +11,7 @@ import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningToken
 import { PublicKey } from '@solana/web3.js';
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 import { useRpcContext } from '../../../hooks/useRpcContext';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 const { useAccountByMint } = hooks;
 
@@ -20,7 +21,7 @@ export function WithdrawGoverningTokensButton({
   governingTokenMint,
   tokenName,
 }: {
-  realm: ParsedAccount<Realm>;
+  realm: ProgramAccount<Realm>;
   governingTokenMint?: PublicKey;
   tokenName?: string;
 }) {
@@ -37,16 +38,16 @@ export function WithdrawGoverningTokensButton({
 
   const isVisible =
     tokenOwnerRecord &&
-    !tokenOwnerRecord.info.governingTokenDepositAmount.isZero();
+    !tokenOwnerRecord.account.governingTokenDepositAmount.isZero();
 
   return isVisible ? (
     <Button
       type="ghost"
       onClick={() => {
-        if (tokenOwnerRecord.info.unrelinquishedVotesCount > 0) {
+        if (tokenOwnerRecord.account.unrelinquishedVotesCount > 0) {
           error({
             title: "Can't withdraw tokens",
-            content: `You have tokens staked in ${tokenOwnerRecord.info.unrelinquishedVotesCount} proposal(s). Please release your tokens from the proposals before withdrawing the tokens from the realm.`,
+            content: `You have tokens staked in ${tokenOwnerRecord.account.unrelinquishedVotesCount} proposal(s). Please release your tokens from the proposals before withdrawing the tokens from the realm.`,
           });
           return;
         }

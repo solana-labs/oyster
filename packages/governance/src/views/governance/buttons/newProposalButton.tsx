@@ -4,7 +4,7 @@ import { Form, Input } from 'antd';
 import { PublicKey } from '@solana/web3.js';
 
 import { LABELS } from '../../../constants';
-import { ParsedAccount, useMint } from '@oyster/common';
+import { useMint } from '@oyster/common';
 import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
@@ -16,14 +16,15 @@ import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAc
 import BN from 'bn.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getProposalUrl } from '../../../tools/routeTools';
+import { ProgramAccount } from '../../../models/tools/solanaSdk';
 
 export function NewProposalButton({
   realm,
   governance,
   buttonProps,
 }: {
-  realm: ParsedAccount<Realm> | undefined;
-  governance: ParsedAccount<Governance> | undefined;
+  realm: ProgramAccount<Realm> | undefined;
+  governance: ProgramAccount<Governance> | undefined;
   buttonProps?: ButtonProps;
 }) {
   const [redirectTo, setRedirectTo] = useState('');
@@ -31,15 +32,15 @@ export function NewProposalButton({
   const { programId } = rpcContext;
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance?.info.realm,
-    realm?.info.communityMint,
+    governance?.account.realm,
+    realm?.account.communityMint,
   );
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
-    governance?.info.realm,
-    realm?.info.config.councilMint,
+    governance?.account.realm,
+    realm?.account.config.councilMint,
   );
 
-  const communityMint = useMint(realm?.info.communityMint);
+  const communityMint = useMint(realm?.account.communityMint);
 
   if (!governance || !communityMint || !realm) {
     return null;
@@ -47,14 +48,14 @@ export function NewProposalButton({
 
   const canCreateProposalUsingCommunityTokens =
     communityTokenOwnerRecord &&
-    communityTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
-      new BN(governance?.info.config.minCommunityTokensToCreateProposal),
+    communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(
+      new BN(governance?.account.config.minCommunityTokensToCreateProposal),
     ) >= 0;
 
   const canCreateProposalUsingCouncilTokens =
     councilTokenOwnerRecord &&
-    councilTokenOwnerRecord.info.governingTokenDepositAmount.cmp(
-      new BN(governance?.info.config.minCouncilTokensToCreateProposal),
+    councilTokenOwnerRecord.account.governingTokenDepositAmount.cmp(
+      new BN(governance?.account.config.minCouncilTokensToCreateProposal),
     ) >= 0;
 
   const canCreateProposal =
@@ -66,7 +67,7 @@ export function NewProposalButton({
     : GoverningTokenType.Council;
 
   const showTokenChoice =
-    !communityMint.supply.isZero() && realm?.info.config.councilMint;
+    !communityMint.supply.isZero() && realm?.account.config.councilMint;
 
   const onSubmit = async (values: {
     name: string;
@@ -78,9 +79,9 @@ export function NewProposalButton({
 
     const governingTokenMint =
       governingTokenType === GoverningTokenType.Community
-        ? realm!.info.communityMint
-        : realm!.info.config.councilMint!;
-    const proposalIndex = governance.info.proposalCount;
+        ? realm!.account.communityMint
+        : realm!.account.config.councilMint!;
+    const proposalIndex = governance.account.proposalCount;
 
     // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord
     // When governance delegates are not used it doesn't make any difference
@@ -92,7 +93,7 @@ export function NewProposalButton({
 
     return await createProposal(
       rpcContext,
-      governance.info.realm,
+      governance.account.realm,
       governance.pubkey,
       tokenOwnerRecord!.pubkey,
       values.name,
@@ -138,7 +139,7 @@ export function NewProposalButton({
               {LABELS.COMMUNITY_TOKEN_HOLDERS}
             </Radio.Button>
 
-            {realm.info.config.councilMint && (
+            {realm.account.config.councilMint && (
               <Radio.Button value={GoverningTokenType.Council}>
                 {LABELS.COUNCIL}
               </Radio.Button>

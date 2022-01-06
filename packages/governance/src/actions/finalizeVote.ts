@@ -1,16 +1,16 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withFinalizeVote } from '../models/withFinalizeVote';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
 ) => {
   let signers: Account[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -19,10 +19,10 @@ export const finalizeVote = async (
     instructions,
     programId,
     realm,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
-    proposal.info.governingTokenMint,
+    proposal.account.tokenOwnerRecord,
+    proposal.account.governingTokenMint,
   );
 
   await sendTransactionWithNotifications(

@@ -1,8 +1,9 @@
 import { Space } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ParsedAccount } from '@oyster/common';
+
 import { Governance, Proposal } from '../../../../models/accounts';
+import { ProgramAccount } from '../../../../models/tools/solanaSdk';
 
 interface CountdownState {
   days: number;
@@ -28,13 +29,13 @@ export function VoteCountdown({
   proposal,
   governance,
 }: {
-  proposal: ParsedAccount<Proposal>;
-  governance: ParsedAccount<Governance>;
+  proposal: ProgramAccount<Proposal>;
+  governance: ProgramAccount<Governance>;
 }) {
   const [countdown, setCountdown] = useState(ZeroCountdown);
 
   useEffect(() => {
-    if (proposal.info.isVoteFinalized()) {
+    if (proposal.account.isVoteFinalized()) {
       setCountdown(ZeroCountdown);
       return;
     }
@@ -42,11 +43,11 @@ export function VoteCountdown({
     const getTimeToVoteEnd = () => {
       const now = moment().unix();
 
-      let timeToVoteEnd = proposal.info.isPreVotingState()
-        ? governance.info.config.maxVotingTime
-        : proposal.info.votingAt?.toNumber()! +
-          governance.info.config.maxVotingTime -
-          now;
+      let timeToVoteEnd = proposal.account.isPreVotingState()
+        ? governance.account.config.maxVotingTime
+        : proposal.account.votingAt?.toNumber()! +
+        governance.account.config.maxVotingTime -
+        now;
 
       if (timeToVoteEnd <= 0) {
         return ZeroCountdown;

@@ -1,16 +1,16 @@
 import { Account, TransactionInstruction } from '@solana/web3.js';
-import { ParsedAccount } from '@oyster/common';
 
 import { Proposal } from '../models/accounts';
 
 import { withCancelProposal } from '../models/withCancelProposal';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
+import { ProgramAccount } from '../models/tools/solanaSdk';
 
-export const cancelProposal = async (
+export async function cancelProposal(
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
-) => {
+  proposal: ProgramAccount<Proposal>,
+) {
   let governanceAuthority = walletPubkey;
 
   let signers: Account[] = [];
@@ -21,9 +21,9 @@ export const cancelProposal = async (
     programId,
     programVersion,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     governanceAuthority,
-    proposal.info.governance,
+    proposal.account.governance,
   );
 
   await sendTransactionWithNotifications(
@@ -34,4 +34,4 @@ export const cancelProposal = async (
     'Cancelling proposal',
     'Proposal cancelled',
   );
-};
+}
