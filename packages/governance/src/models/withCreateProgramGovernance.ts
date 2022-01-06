@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -8,6 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateProgramGovernanceArgs } from './instructions';
+import { BPF_UPGRADE_LOADER_ID, SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
@@ -21,11 +21,6 @@ export const withCreateProgramGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
-  const {
-    system: systemId,
-    bpf_upgrade_loader: bpfUpgradableLoaderId,
-  } = utils.programIds();
-
   const args = new CreateProgramGovernanceArgs({
     config,
     transferUpgradeAuthority,
@@ -43,7 +38,7 @@ export const withCreateProgramGovernance = async (
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [governedProgram.toBuffer()],
-    bpfUpgradableLoaderId,
+    BPF_UPGRADE_LOADER_ID,
   );
 
   const keys = [
@@ -83,12 +78,12 @@ export const withCreateProgramGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: bpfUpgradableLoaderId,
+      pubkey: BPF_UPGRADE_LOADER_ID,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

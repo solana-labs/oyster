@@ -7,6 +7,16 @@ import {
   Transaction,
 } from '@solana/web3.js';
 
+export const SYSTEM_PROGRAM_ID = new PublicKey(
+  '11111111111111111111111111111111',
+);
+export const BPF_UPGRADE_LOADER_ID = new PublicKey(
+  'BPFLoaderUpgradeab1e11111111111111111111111',
+);
+export const TOKEN_PROGRAM_ID = new PublicKey(
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+);
+
 export type ProgramAccount<T> = {
   pubkey: PublicKey;
   account: T;

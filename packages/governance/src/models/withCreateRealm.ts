@@ -1,4 +1,3 @@
-import { utils } from '@oyster/common';
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
@@ -16,6 +15,7 @@ import {
 } from './accounts';
 import BN from 'bn.js';
 import { PROGRAM_VERSION_V2 } from './registry/api';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from './tools/solanaSdk';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
@@ -30,8 +30,6 @@ export async function withCreateRealm(
   minCommunityTokensToCreateGovernance: BN,
   communityVoterWeightAddin: PublicKey | undefined,
 ) {
-  const { system: systemId, token: tokenId } = utils.programIds();
-
   if (communityVoterWeightAddin && programVersion < PROGRAM_VERSION_V2) {
     throw new Error(
       `Voter weight addin is not supported in version ${programVersion}`,
@@ -91,12 +89,12 @@ export async function withCreateRealm(
       isWritable: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },

@@ -9,7 +9,7 @@ import { SetRealmConfigArgs } from './instructions';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
-import { utils } from '@oyster/common';
+import { SYSTEM_PROGRAM_ID } from './tools/solanaSdk';
 
 export async function createSetRealmConfig(
   programId: PublicKey,
@@ -22,8 +22,6 @@ export async function createSetRealmConfig(
   communityVoterWeightAddin: PublicKey | undefined,
   payer: PublicKey,
 ) {
-  const { system: systemId } = utils.programIds();
-
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     communityMintMaxVoteWeightSource,
@@ -74,7 +72,7 @@ export async function createSetRealmConfig(
 
   if (programVersion > 1) {
     keys.push({
-      pubkey: systemId,
+      pubkey: SYSTEM_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     });
