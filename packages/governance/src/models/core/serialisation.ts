@@ -1,7 +1,7 @@
 import { AccountInfo, PublicKey } from '@solana/web3.js';
-import { deserializeBorsh } from '@oyster/common';
 
 import { Schema } from 'borsh';
+import { deserializeBorsh } from '../tools/borsh';
 import { ProgramAccount } from '../tools/solanaSdk';
 
 export function BorshAccountParser(
