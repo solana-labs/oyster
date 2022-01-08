@@ -1,5 +1,5 @@
 export function formatToCurrency2(args: number): string {
-  return `$${(args / 100).toFixed(2)} XY123`;
+  return `$${(args / 100).toFixed(2)} XY1234`;
 }
 
 export enum LockupStatus2 {

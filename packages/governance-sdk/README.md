@@ -1,11 +1,8 @@
 # `governance-sdk`
 
-> TODO: description
+SPL Governance Client API for spl-governance program
 
 ## Usage
 
-```
-const governanceSdk = require('governance-sdk');
-
-// TODO: DEMONSTRATE API
-```
+```typescript
+import { withCreateRealm } from "@solana/governance-sdk";

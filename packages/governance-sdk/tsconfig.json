@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "target": "es5",
     "module": "commonjs",
-    "declaration": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
     "outDir": "./lib",
-    "strict": true,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "rootDir": "./src",
     "skipLibCheck": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "strict": true,
   },
   "include": [
     "src"
   ],
   "exclude": [
     "node_modules",
-    "**/__tests__/*"
   ]
 }
