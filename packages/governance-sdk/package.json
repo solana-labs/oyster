@@ -27,6 +27,11 @@
   "bugs": {
     "url": "https://github.com/solana-labs/oyster/issues"
   },
+  "dependencies": {
+
+    "superstruct": "^0.15.2"
+
+  },
   "devDependencies": {
     "typescript": "^4.5.4"
   }
