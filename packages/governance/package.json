@@ -8,6 +8,7 @@
     "@craco/craco": "^5.7.0",
     "@oyster/common": "0.0.2",
     "@project-serum/borsh": "^0.2.2",
+    "@solana/governance-sdk": "0.0.1",
     "@project-serum/serum": "^0.13.11",
     "@solana/spl-token": "0.0.13",
     "@solana/spl-token-swap": "0.1.0",
