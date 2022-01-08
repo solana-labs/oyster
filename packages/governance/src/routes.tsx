@@ -12,6 +12,7 @@ import { RealmView } from './views/realm/realmView';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { AppErrorBanner } from './components/appErrorBanner/appErrorBanner';
+import { MemberView } from './views/member/memberView';
 
 const { WalletProvider } = contexts.Wallet;
 const { ConnectionProvider } = contexts.Connection;
@@ -41,6 +42,12 @@ export function Routes() {
                         children={<GovernanceView />}
                       />
                       <Route path="/realm/:key" children={<RealmView />} />
+
+                      <Route
+                        exact
+                        path="/member/:key"
+                        children={<MemberView />}
+                      />
 
                       <Route
                         exact

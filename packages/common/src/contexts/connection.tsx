@@ -33,7 +33,8 @@ export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet';
 export const ENDPOINTS = [
   {
     name: 'mainnet-beta' as ENV,
-    endpoint:  process.env.REACT_APP_MAINNET_RPC ||  'https://explorer-api.mainnet-beta.solana.com',
+    endpoint:
+      process.env.REACT_APP_MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
     ChainId: ChainId.MainnetBeta,
   },
   {
@@ -43,7 +44,9 @@ export const ENDPOINTS = [
   },
   {
     name: 'devnet' as ENV,
-    endpoint: process.env.REACT_APP_DEVNET_RPC ||  'https://explorer-api.devnet.solana.com',
+    endpoint:
+      process.env.REACT_APP_DEVNET_RPC ||
+      'https://explorer-api.devnet.solana.com',
     ChainId: ChainId.Devnet,
   },
   {
