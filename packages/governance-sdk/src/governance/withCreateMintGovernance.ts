@@ -7,7 +7,8 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateMintGovernanceArgs } from './instructions';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/sdk/runtime';
+import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
