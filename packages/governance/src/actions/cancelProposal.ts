@@ -6,15 +6,12 @@ import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '../models/core/api';
 import { ProgramAccount } from '../models/tools/solanaSdk';
 
-import { formatToCurrency2 } from '@solana/governance-sdk';
 import { withCancelProposal } from '@solana/governance-sdk';
 
 export async function cancelProposal(
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   proposal: ProgramAccount<Proposal>,
 ) {
-  formatToCurrency2(10);
-
   let governanceAuthority = walletPubkey;
 
   let signers: Account[] = [];

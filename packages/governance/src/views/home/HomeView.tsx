@@ -16,21 +16,11 @@ import { getRealmUrl } from '../../tools/routeTools';
 
 import { ProgramActionBar } from './buttons/programActionBar';
 
-import { formatToCurrency2, LockupStatus2 } from '@solana/governance-sdk'
-import { LockupStatus } from '@solana/bridge-sdk'
-
 export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
   const { programIdBase58 } = useRpcContext();
   const tokenOwnerRecords = useWalletTokenOwnerRecords();
-
-  const rr = formatToCurrency2(10);
-
-  const ls = LockupStatus.AWAITING_VAA;
-  const ls2 = LockupStatus2.AWAITING_VAA;
-
-  console.log("MODULE", { rr, ls, ls2 })
 
   const realmItems = useMemo(() => {
     return realms
