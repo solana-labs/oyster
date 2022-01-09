@@ -1,14 +1,12 @@
-import { utils } from '@oyster/common';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'superstruct';
+import { BPF_UPGRADE_LOADER_ID } from '../../solanaSdk';
 import { ProgramDataAccountInfo } from '../../validators/accounts/upgradeable-program';
 
 export async function getProgramDataAddress(programId: PublicKey) {
-  const { bpf_upgrade_loader: bpfUpgradableLoaderId } = utils.programIds();
-
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
-    bpfUpgradableLoaderId,
+    BPF_UPGRADE_LOADER_ID,
   );
 
   return programDataAddress;

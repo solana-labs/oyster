@@ -1,16 +1,14 @@
-import { utils } from '@oyster/common';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { BPF_UPGRADE_LOADER_ID } from '../../solanaSdk';
 
 export async function createSetUpgradeAuthority(
   programId: PublicKey,
   upgradeAuthority: PublicKey,
   newUpgradeAuthority: PublicKey,
 ) {
-  const { bpf_upgrade_loader: bpfUpgradableLoaderId } = utils.programIds();
-
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
-    bpfUpgradableLoaderId,
+    BPF_UPGRADE_LOADER_ID,
   );
 
   const keys = [
@@ -33,7 +31,7 @@ export async function createSetUpgradeAuthority(
 
   return new TransactionInstruction({
     keys,
-    programId: bpfUpgradableLoaderId,
+    programId: BPF_UPGRADE_LOADER_ID,
     data: Buffer.from([4, 0, 0, 0]), // SetAuthority instruction bincode
   });
 }
