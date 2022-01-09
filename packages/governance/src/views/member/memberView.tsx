@@ -8,8 +8,8 @@ import { useRealm } from '../../contexts/GovernanceContext';
 import { useTokenOwnerRecordByOwner } from '../../hooks/apiHooks';
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { useRpcContext } from '../../hooks/useRpcContext';
-import { TokenOwnerRecord } from '../../models/accounts';
-import { ProgramAccount } from '../../models/tools/solanaSdk';
+import { TokenOwnerRecord } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 import { getRealmUrl } from '../../tools/routeTools';
 import { RealmActionBar } from '../realm/buttons/realmActionBar';
 
