@@ -12,8 +12,10 @@ import { ProgramAccount } from '@solana/governance-sdk';
 
 export function RealmActionBar({
   realm,
+  showSettings = true,
 }: {
   realm: ProgramAccount<Realm> | undefined;
+  showSettings?: boolean;
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
   const { publicKey, connected } = useWallet();
@@ -27,7 +29,8 @@ export function RealmActionBar({
   const showSetRealmAuthority =
     realm.account.authority?.toBase58() === publicKey?.toBase58();
 
-  const showSettings = showCreateNewGovernance || showSetRealmAuthority;
+  const settingsVisible =
+    showSettings && (showCreateNewGovernance || showSetRealmAuthority);
 
   return (
     <Space>
@@ -52,7 +55,7 @@ export function RealmActionBar({
         tokenName="Council"
       ></WithdrawGoverningTokensButton>
 
-      {showSettings && (
+      {settingsVisible && (
         <div ref={parentRef} className="realm-popup-action-container">
           <Popover
             title="Realm Settings"

@@ -113,6 +113,12 @@ export function useWalletTokenOwnerRecord(
   )?.tryUnwrap();
 }
 
+export function useTokenOwnerRecordByOwner(ownerPk: PublicKey | undefined) {
+  return useGovernanceAccountsByFilter<TokenOwnerRecord>(TokenOwnerRecord, [
+    pubkeyFilter(1 + 32 + 32, ownerPk),
+  ]);
+}
+
 /// Returns all TokenOwnerRecords for the current wallet
 export function useWalletTokenOwnerRecords() {
   const { publicKey } = useWallet();
