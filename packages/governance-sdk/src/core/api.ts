@@ -119,8 +119,6 @@ export async function getBorshProgramAccounts<
       const data = Buffer.from(rawAccount.account.data[0], 'base64');
       const accountType = data[0];
 
-      console.log('DATA', rawAccount);
-
       const account: ProgramAccount<TAccount> = {
         pubkey: new PublicKey(rawAccount.pubkey),
         account: deserializeBorsh(getSchema(accountType), accountFactory, data),

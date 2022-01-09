@@ -34,11 +34,8 @@ import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
 import { ProgramAccount, simulateTransaction2 } from '../tools/solanaSdk';
 import { BN_ZERO } from '../tools/numbers';
-import { BorshAccountParser } from '../core';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
-  console.log('GET REALMS');
-
   return getBorshProgramAccounts<Realm>(
     programId,
     at => getGovernanceSchemaForAccount(at),
