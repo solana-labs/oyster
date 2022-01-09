@@ -3,7 +3,7 @@ import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { PostChatMessageArgs } from './instructions';
 import { GOVERNANCE_CHAT_PROGRAM_ID, ChatMessageBody } from './accounts';
-import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],

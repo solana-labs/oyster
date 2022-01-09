@@ -29,10 +29,10 @@ import {
 } from '../core/api';
 import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/constants';
 import { parseVersion } from '../tools/version';
-import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
+import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader';
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
-import { ProgramAccount, simulateTransaction2 } from '../tools/solanaSdk';
+import { ProgramAccount, simulateTransaction } from '../tools/sdk/runtime';
 import { BN_ZERO } from '../tools/numbers';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
@@ -186,7 +186,7 @@ export async function getGovernanceProgramVersion(
     transaction.add(...instructions);
 
     // TODO: Once return values are supported change the simulation call to the actual one
-    const getVersion = await simulateTransaction2(
+    const getVersion = await simulateTransaction(
       connection,
       transaction,
       'recent',

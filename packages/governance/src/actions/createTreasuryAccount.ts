@@ -6,7 +6,7 @@ import { sendTransactionWithNotifications } from '../tools/transactions';
 
 import { withCreateTokenGovernance } from '@solana/governance-sdk';
 import { RpcContext } from '@solana/governance-sdk';
-import { withCreateSplTokenAccount } from '@solana/governance-sdk';
+import { withCreateSplTokenAccount } from '../tools/sdk/token/splToken';
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

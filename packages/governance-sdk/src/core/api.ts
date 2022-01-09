@@ -4,7 +4,7 @@ import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { ProgramAccountWithType } from '../core/accounts';
 import { Schema } from 'borsh';
 import { getErrorMessage } from '../tools/script';
-import { ProgramAccount } from '../tools/solanaSdk';
+import { ProgramAccount } from '../tools/sdk/runtime';
 import { deserializeBorsh } from '../tools/borsh';
 import { WalletSigner } from '../tools/walletAdapter';
 

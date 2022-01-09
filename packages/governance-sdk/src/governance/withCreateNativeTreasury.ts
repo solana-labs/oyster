@@ -3,7 +3,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateNativeTreasuryArgs } from './instructions';
 import { getNativeTreasuryAddress } from './accounts';
-import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export const withCreateNativeTreasury = async (
   instructions: TransactionInstruction[],

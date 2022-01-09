@@ -11,7 +11,7 @@ import {
   GOVERNANCE_PROGRAM_SEED,
 } from './accounts';
 import BN from 'bn.js';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],

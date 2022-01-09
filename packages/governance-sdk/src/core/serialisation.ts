@@ -2,7 +2,7 @@ import { AccountInfo, PublicKey } from '@solana/web3.js';
 
 import { Schema } from 'borsh';
 import { deserializeBorsh } from '../tools/borsh';
-import { ProgramAccount } from '../tools/solanaSdk';
+import { ProgramAccount } from '../tools/sdk/runtime';
 
 export function BorshAccountParser(
   classType: any,

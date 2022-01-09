@@ -9,7 +9,7 @@ import { serialize } from 'borsh';
 import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],

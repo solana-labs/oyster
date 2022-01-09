@@ -15,7 +15,7 @@ import {
 } from './accounts';
 import BN from 'bn.js';
 import { PROGRAM_VERSION_V2 } from '../registry/constants';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],

@@ -11,12 +11,6 @@ import {
 export const SYSTEM_PROGRAM_ID = new PublicKey(
   '11111111111111111111111111111111',
 );
-export const BPF_UPGRADE_LOADER_ID = new PublicKey(
-  'BPFLoaderUpgradeab1e11111111111111111111111',
-);
-export const TOKEN_PROGRAM_ID = new PublicKey(
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-);
 
 export type ProgramAccount<T> = {
   pubkey: PublicKey;
@@ -24,7 +18,7 @@ export type ProgramAccount<T> = {
   owner: PublicKey;
 };
 
-export async function simulateTransaction2(
+export async function simulateTransaction(
   connection: Connection,
   transaction: Transaction,
   commitment: Commitment,

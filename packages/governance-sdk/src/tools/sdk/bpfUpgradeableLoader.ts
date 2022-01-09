@@ -1,6 +1,9 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'superstruct';
-import { BPF_UPGRADE_LOADER_ID } from '../../solanaSdk';
+
+export const BPF_UPGRADE_LOADER_ID = new PublicKey(
+  'BPFLoaderUpgradeab1e11111111111111111111111',
+);
 
 // Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/upgradeable-program.ts
 import { type, number, nullable, Infer } from 'superstruct';

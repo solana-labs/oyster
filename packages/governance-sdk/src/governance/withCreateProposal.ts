@@ -9,7 +9,7 @@ import { serialize } from 'borsh';
 import { CreateProposalArgs } from './instructions';
 import { GOVERNANCE_PROGRAM_SEED, VoteType } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],

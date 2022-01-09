@@ -7,7 +7,8 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateProgramGovernanceArgs } from './instructions';
-import { BPF_UPGRADE_LOADER_ID, SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { BPF_UPGRADE_LOADER_ID } from '../tools/sdk/bpfUpgradeableLoader';
 
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
