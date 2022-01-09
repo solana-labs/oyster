@@ -17,7 +17,6 @@
 
     "start-gov": "CI=true lerna run start --scope @solana/governance-sdk --scope @oyster/common --stream --parallel --scope governance",
     "build-gov": "yarn && yarn bootstrap && yarn build --scope @oyster/common --scope @solana/governance-sdk --scope governance",
-    "build-gov2": "yarn build --scope @solana/governance-sdk --scope governance",
 
     "lint": "eslint 'packages/*/{src,test}/**/*.ts' && prettier -c 'packages/*/{src,test}/**/*.ts'",
     "lint:fix": "eslint --fix 'packages/*/{src,test}/**/*.ts' && prettier --write 'packages/*/{src,test}/**/*.ts'",

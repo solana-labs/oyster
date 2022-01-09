@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'superstruct';
 import { BPF_UPGRADE_LOADER_ID } from '../../solanaSdk';
-import { ProgramDataAccountInfo } from '../../validators/accounts/upgradeable-program';
+import { ProgramDataAccountInfo } from '../../validators/accounts/upgradeableProgram';
 
 export async function getProgramDataAddress(programId: PublicKey) {
   const [programDataAddress] = await PublicKey.findProgramAddress(

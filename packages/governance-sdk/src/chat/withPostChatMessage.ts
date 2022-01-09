@@ -2,7 +2,7 @@ import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { PostChatMessageArgs } from './instructions';
-import { governanceChatProgramId, ChatMessageBody } from './accounts';
+import { GOVERNANCE_CHAT_PROGRAM_ID, ChatMessageBody } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export async function withPostChatMessage(
@@ -80,7 +80,7 @@ export async function withPostChatMessage(
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: governanceChatProgramId,
+      programId: GOVERNANCE_CHAT_PROGRAM_ID,
       data,
     }),
   );

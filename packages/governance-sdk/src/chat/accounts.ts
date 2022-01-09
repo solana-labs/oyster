@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
-export const governanceChatProgramId = new PublicKey(
+export const GOVERNANCE_CHAT_PROGRAM_ID = new PublicKey(
   'gCHAtYKrUUktTVzE4hEnZdLV4LXrdBf6Hh9qMaJALET',
 );
 

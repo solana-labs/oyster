@@ -5,7 +5,7 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from '../core/api';
-import { ChatMessage, governanceChatProgramId } from './accounts';
+import { ChatMessage, GOVERNANCE_CHAT_PROGRAM_ID } from './accounts';
 
 import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 
@@ -14,7 +14,7 @@ export function getGovernanceChatMessages(
   proposal: PublicKey,
 ) {
   return getBorshProgramAccounts<ChatMessage>(
-    governanceChatProgramId,
+    GOVERNANCE_CHAT_PROGRAM_ID,
     _ => GOVERNANCE_CHAT_SCHEMA,
     endpoint,
     ChatMessage,
