@@ -14,8 +14,8 @@ import {
   getRealmConfigAddress,
 } from './accounts';
 import BN from 'bn.js';
-import { PROGRAM_VERSION_V2 } from 'registry/api';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'tools/solanaSdk';
+import { PROGRAM_VERSION_V2 } from '../registry/api';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/solanaSdk';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],

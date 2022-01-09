@@ -4,6 +4,7 @@ import {
   PublicKey,
   SystemProgram,
   TransactionInstruction,
+  Connection,
 } from '@solana/web3.js';
 
 export function createTokenAccount(
@@ -49,3 +50,27 @@ export function createUninitializedTokenAccount(
 
   return account.publicKey;
 }
+
+export const withCreateSplTokenAccount = async (
+  instructions: TransactionInstruction[],
+  signers: Account[],
+  connection: Connection,
+  mint: PublicKey,
+  owner: PublicKey,
+  payer: PublicKey,
+) => {
+  const tokenAccountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
+  );
+
+  const tokenAccountAddress = createTokenAccount(
+    instructions,
+    payer,
+    tokenAccountRentExempt,
+    mint,
+    owner,
+    signers,
+  );
+
+  return tokenAccountAddress;
+};

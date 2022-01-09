@@ -9,7 +9,7 @@ import { SetRealmConfigArgs } from './instructions';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
-import { SYSTEM_PROGRAM_ID } from 'tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export async function createSetRealmConfig(
   programId: PublicKey,

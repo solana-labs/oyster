@@ -22,14 +22,18 @@ import {
   VoteRecord,
 } from './accounts';
 
-import { getBorshProgramAccounts, MemcmpFilter, pubkeyFilter } from 'core/api';
-import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from 'registry/api';
-import { parseVersion } from 'tools/version';
-import { getProgramDataAccount } from 'tools/sdk/bpfUpgradeableLoader/accounts';
+import {
+  getBorshProgramAccounts,
+  MemcmpFilter,
+  pubkeyFilter,
+} from '../core/api';
+import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/api';
+import { parseVersion } from '../tools/version';
+import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
-import { ProgramAccount, simulateTransaction } from 'tools/solanaSdk';
-import { BN_ZERO } from 'tools/numbers';
+import { ProgramAccount, simulateTransaction } from '../tools/solanaSdk';
+import { BN_ZERO } from '../tools/numbers';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
   return getBorshProgramAccounts<Realm>(

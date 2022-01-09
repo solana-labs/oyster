@@ -56,9 +56,9 @@ import {
   ProgramMetadata,
 } from './accounts';
 import { serialize } from 'borsh';
-import { BorshAccountParser } from 'core/serialisation';
-import { PROGRAM_VERSION_V1 } from 'registry/api';
-import { deserializeBorsh } from 'tools/borsh';
+import { BorshAccountParser } from '../core/serialisation';
+import { PROGRAM_VERSION_V1 } from '../registry/api';
+import { deserializeBorsh } from '../tools/borsh';
 
 // ------------ u16 ------------
 

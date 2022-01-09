@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 
-import { getGovernanceProgramVersion } from 'governance/api';
+import { getGovernanceProgramVersion } from '../governance/api';
 
 export const PROGRAM_VERSION_V1 = 1;
 export const PROGRAM_VERSION_V2 = 2;

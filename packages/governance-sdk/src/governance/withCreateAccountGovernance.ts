@@ -7,7 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateAccountGovernanceArgs } from './instructions';
-import { SYSTEM_PROGRAM_ID } from 'tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],

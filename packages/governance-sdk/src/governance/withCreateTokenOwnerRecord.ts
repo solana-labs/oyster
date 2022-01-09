@@ -3,7 +3,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateTokenOwnerRecordArgs } from './instructions';
 import { getTokenOwnerRecordAddress } from './accounts';
-import { SYSTEM_PROGRAM_ID } from 'tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export const withCreateTokenOwnerRecord = async (
   instructions: TransactionInstruction[],

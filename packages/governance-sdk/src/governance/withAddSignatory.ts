@@ -7,7 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { AddSignatoryArgs } from './instructions';
 import { getSignatoryRecordAddress } from './accounts';
-import { SYSTEM_PROGRAM_ID } from 'tools/solanaSdk';
+import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export const withAddSignatory = async (
   instructions: TransactionInstruction[],

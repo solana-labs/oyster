@@ -6,7 +6,7 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CancelProposalArgs } from './instructions';
-import { PROGRAM_VERSION_V1 } from 'registry/api';
+import { PROGRAM_VERSION_V1 } from '../registry/api';
 
 export const withCancelProposal = (
   instructions: TransactionInstruction[],
