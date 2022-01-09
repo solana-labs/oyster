@@ -5,8 +5,8 @@ import React from 'react';
 import { signOffProposal } from '../../../../actions/signOffProposal';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
-import { Proposal, SignatoryRecord } from '../../../../models/accounts';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { Proposal, SignatoryRecord } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { confirm } = Modal;
 
@@ -35,11 +35,7 @@ export default function SignOffButton({
               okText: 'Sign off',
 
               onOk() {
-                return signOffProposal(
-                  rpcContext,
-                  signatoryRecord,
-                  publicKey!,
-                );
+                return signOffProposal(rpcContext, signatoryRecord, publicKey!);
               },
               onCancel() {
                 // no-op

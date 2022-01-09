@@ -1,10 +1,10 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { withCreateProposal } from '../models/withCreateProposal';
-import { withAddSignatory } from '../models/withAddSignatory';
+import { withCreateProposal } from '@solana/governance-sdk';
+import { withAddSignatory } from '@solana/governance-sdk';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
-import { VoteType } from '../models/accounts';
+import { RpcContext } from '@solana/governance-sdk';
+import { VoteType } from '@solana/governance-sdk';
 
 export const createProposal = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,

@@ -1,11 +1,11 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '../models/accounts';
-import { withCastVote } from '../models/withCastVote';
-import { Vote, YesNoVote } from '../models/instructions';
+import { Proposal } from '@solana/governance-sdk';
+import { withCastVote } from '@solana/governance-sdk';
+import { Vote, YesNoVote } from '@solana/governance-sdk';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
-import { ProgramAccount } from '../models/tools/solanaSdk';
+import { RpcContext } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export const castVote = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,

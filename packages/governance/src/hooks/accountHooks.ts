@@ -5,16 +5,16 @@ import {
   getAccountTypes,
   GovernanceAccount,
   GovernanceAccountClass,
-} from '../models/accounts';
-import { GovernanceAccountParser } from '../models/serialisation';
+} from '@solana/governance-sdk';
+import { GovernanceAccountParser } from '@solana/governance-sdk';
 
 import { GenericAccountParser, ParsedAccountBase } from '@oyster/common';
-import { MemcmpFilter } from '../models/core/api';
+import { MemcmpFilter } from '@solana/governance-sdk';
 import { useAccountChangeTracker } from '../contexts/GovernanceContext';
 import { useRpcContext } from './useRpcContext';
 import { none, Option, some } from '../tools/option';
-import { getGovernanceAccounts } from '../models/api';
-import { ProgramAccount } from '../models/tools/solanaSdk';
+import { getGovernanceAccounts } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 // Fetches Governance program account using the given key and subscribes to updates
 export function useGovernanceAccountByPubkey<

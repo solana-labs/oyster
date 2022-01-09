@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Card, InputNumber } from 'antd';
 import { Form } from 'antd';
 
-
-
 import { SaveOutlined } from '@ant-design/icons';
 import { LABELS } from '../../../../constants';
 import {
@@ -11,7 +9,7 @@ import {
   InstructionData,
   Proposal,
   Realm,
-} from '../../../../models/accounts';
+} from '@solana/governance-sdk';
 
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { insertInstruction } from '../../../../actions/insertInstruction';
@@ -21,13 +19,13 @@ import { formDefaults } from '../../../../tools/forms';
 import InstructionInput from '../instructionInput/instructionInput';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
-import { getInstructionDataFromBase64 } from '../../../../models/serialisation';
+import { getInstructionDataFromBase64 } from '@solana/governance-sdk';
 import {
   getDaysFromTimestamp,
   getTimestampFromDays,
 } from '../../../../tools/units';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function NewInstructionCard({
   realm,

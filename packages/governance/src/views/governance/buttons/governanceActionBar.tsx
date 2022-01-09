@@ -1,12 +1,11 @@
 import { Button, Popover, Space } from 'antd';
 import React, { useRef } from 'react';
-import { Governance, Realm } from '../../../models/accounts';
-
+import { Governance, Realm } from '@solana/governance-sdk';
 
 import { MoreOutlined } from '@ant-design/icons';
 import { NewProposalButton } from './newProposalButton';
 import { CreateNativeTreasuryButton } from './addNativeTreasuryButton';
-import { ProgramAccount } from '../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function GovernanceActionBar({
   realm,

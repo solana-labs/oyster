@@ -1,6 +1,6 @@
 import { Popover, Tooltip } from 'antd';
 
-import { ProposalState } from '../../../../models/accounts';
+import { ProposalState } from '@solana/governance-sdk';
 import BN from 'bn.js';
 
 import {

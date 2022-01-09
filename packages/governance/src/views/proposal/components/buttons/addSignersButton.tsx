@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { utils, contexts, hooks } from '@oyster/common';
 
 import { LABELS } from '../../../../constants';
-import { Proposal } from '../../../../models/accounts';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { Proposal } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { notify } = utils;
 const { TextArea } = Input;

@@ -1,4 +1,3 @@
-
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
 
@@ -14,15 +13,15 @@ import {
   ProposalState,
   TokenOwnerRecord,
   VoteRecord,
-} from '../../../../models/accounts';
+} from '@solana/governance-sdk';
 
-import { YesNoVote } from '../../../../models/instructions';
+import { YesNoVote } from '@solana/governance-sdk';
 
 import { castVote } from '../../../../actions/castVote';
 
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Option } from '../../../../tools/option';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { confirm } = Modal;
 export function CastVoteButton({
@@ -52,17 +51,17 @@ export function CastVoteButton({
   const [btnLabel, title, msg, icon] =
     vote === YesNoVote.Yes
       ? [
-        LABELS.VOTE_YEAH,
-        LABELS.VOTE_YEAH_QUESTION,
-        LABELS.VOTE_YEAH_MSG,
-        <CheckOutlined />,
-      ]
+          LABELS.VOTE_YEAH,
+          LABELS.VOTE_YEAH_QUESTION,
+          LABELS.VOTE_YEAH_MSG,
+          <CheckOutlined />,
+        ]
       : [
-        LABELS.VOTE_NAY,
-        LABELS.VOTE_NAY_QUESTION,
-        LABELS.VOTE_NAY_MSG,
-        <CloseOutlined />,
-      ];
+          LABELS.VOTE_NAY,
+          LABELS.VOTE_NAY_QUESTION,
+          LABELS.VOTE_NAY_MSG,
+          <CloseOutlined />,
+        ];
 
   return isVisible ? (
     <Button

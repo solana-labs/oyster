@@ -1,0 +1,38 @@
+{
+  "name": "@solana/governance-sdk",
+  "version": "0.0.1",
+  "description": "SPL Governance Client API",
+  "author": "Solana Maintainers <maintainers@solana.foundation>",
+  "homepage": "https://github.com/solana-labs/oyster#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solana-labs/oyster.git"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "start": "npm-run-all --parallel watch",
+    "watch": "tsc --watch"
+  },
+  "bugs": {
+    "url": "https://github.com/solana-labs/oyster/issues"
+  },
+  "dependencies": {
+
+    "superstruct": "^0.15.2"
+
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  }
+}

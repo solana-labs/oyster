@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   MintMaxVoteWeightSource,
   MintMaxVoteWeightSourceType,
-} from '../../models/accounts';
+} from '@solana/governance-sdk';
 import { BigNumber } from 'bignumber.js';
 import { MintInfo } from '@solana/spl-token';
 import { contexts } from '@oyster/common';

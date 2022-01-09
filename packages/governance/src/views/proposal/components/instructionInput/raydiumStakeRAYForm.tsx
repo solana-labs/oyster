@@ -1,6 +1,6 @@
 import { Form, FormInstance, Spin } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance } from '@solana/governance-sdk';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import React from 'react';
@@ -10,7 +10,7 @@ import { contexts } from '@oyster/common';
 
 import { depositInstruction } from '../../../../tools/raydium/raydium';
 import { getRayFarmUserAccount, getRAYGovernanceAta } from './yieldFarming';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useMint } = contexts.Accounts;
@@ -27,7 +27,9 @@ export const RaydiumStakeRAYForm = ({
   onCreateInstruction: (instruction: TransactionInstruction) => void;
   isHarvest: boolean;
 }) => {
-  const sourceTokenAccount = useTokenAccount(governance.account.governedAccount);
+  const sourceTokenAccount = useTokenAccount(
+    governance.account.governedAccount,
+  );
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
   const connection = useConnection();
 

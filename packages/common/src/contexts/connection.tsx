@@ -34,7 +34,7 @@ export const ENDPOINTS = [
   {
     name: 'mainnet-beta' as ENV,
     endpoint:
-      process.env.REACT_APP_MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
+      process.env.REACT_APP_MAINNET_RPC || 'https://ssc-dao.genesysgo.net',
     ChainId: ChainId.MainnetBeta,
   },
   {
@@ -46,7 +46,7 @@ export const ENDPOINTS = [
     name: 'devnet' as ENV,
     endpoint:
       process.env.REACT_APP_DEVNET_RPC ||
-      'https://explorer-api.devnet.solana.com',
+      'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
     ChainId: ChainId.Devnet,
   },
   {

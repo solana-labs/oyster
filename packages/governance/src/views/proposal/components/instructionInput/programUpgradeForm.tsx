@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 import { ExplorerLink, utils, useWallet } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance } from '@solana/governance-sdk';
 import {
   AccountInfo,
   ParsedAccountData,
@@ -12,7 +12,7 @@ import { createUpgradeInstruction } from '../../../../tools/sdk/bpfUpgradeableLo
 import { formDefaults } from '../../../../tools/forms';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
 import { validateProgramBufferAccount } from '../../../../tools/validators/accounts/upgradeable-program';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export const ProgramUpgradeForm = ({
   form,

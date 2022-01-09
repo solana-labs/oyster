@@ -5,8 +5,8 @@ import React from 'react';
 import { cancelProposal } from '../../../../actions/cancelProposal';
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { Proposal, ProposalState } from '../../../../models/accounts';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { Proposal, ProposalState } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { confirm } = Modal;
 

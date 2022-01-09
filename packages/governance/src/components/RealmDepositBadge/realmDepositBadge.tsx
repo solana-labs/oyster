@@ -1,13 +1,13 @@
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { TokenOwnerRecord } from '../../models/accounts';
+import { TokenOwnerRecord } from '@solana/governance-sdk';
 
 import {
   formatMintNaturalAmountAsDecimal,
   formatMintVoteWeight,
 } from '../../tools/units';
 import { MintInfo } from '@solana/spl-token';
-import { ProgramAccount } from '../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { useMint } = contexts.Accounts;
 
@@ -24,7 +24,9 @@ export function RealmDepositBadge({
     communityTokenOwnerRecord?.account.governingTokenMint,
   );
 
-  const councilMint = useMint(councilTokenOwnerRecord?.account.governingTokenMint);
+  const councilMint = useMint(
+    councilTokenOwnerRecord?.account.governingTokenMint,
+  );
 
   if (!councilTokenOwnerRecord && !communityTokenOwnerRecord) {
     return null;

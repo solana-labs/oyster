@@ -8,7 +8,7 @@ Be sure to be running Node v12.16.2 and yarn version 1.22.10.
 
 In order to build the common package and governance run:
 
-`yarn && yarn bootstrap && yarn build --scope @oyster/common --scope governance`
+`yarn && yarn bootstrap && yarn build --scope @oyster/common --scope @solana/governance-sdk --scope governance`
 
 Then run:
 
