@@ -1,7 +1,23 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'superstruct';
 import { BPF_UPGRADE_LOADER_ID } from '../../solanaSdk';
-import { ProgramDataAccountInfo } from '../../validators/accounts/upgradeableProgram';
+
+// Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/upgradeable-program.ts
+import { type, number, nullable, Infer } from 'superstruct';
+import { coerce, instance, string } from 'superstruct';
+
+export const PublicKeyFromString = coerce(
+  instance(PublicKey),
+  string(),
+  value => new PublicKey(value),
+);
+
+export type ProgramDataAccountInfo = Infer<typeof ProgramDataAccountInfo>;
+export const ProgramDataAccountInfo = type({
+  authority: nullable(PublicKeyFromString),
+  // don't care about data yet
+  slot: number(),
+});
 
 export async function getProgramDataAddress(programId: PublicKey) {
   const [programDataAddress] = await PublicKey.findProgramAddress(
