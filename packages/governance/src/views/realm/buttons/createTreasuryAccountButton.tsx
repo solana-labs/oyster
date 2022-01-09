@@ -7,7 +7,7 @@ import { LABELS } from '../../../constants';
 
 import { Redirect } from 'react-router';
 
-import { GovernanceType } from '../../../models/enums';
+import { GovernanceType } from '@solana/governance-sdk';
 
 import { useKeyParam } from '../../../hooks/useKeyParam';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
@@ -22,10 +22,10 @@ import {
   GovernanceConfigValues,
 } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
 
-import { Realm } from '../../../models/accounts';
+import { Realm } from '@solana/governance-sdk';
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 import { createTreasuryAccount } from '../../../actions/createTreasuryAccount';
-import { ProgramAccount } from '../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function CreateTreasuryAccountButton({
   buttonProps,
@@ -67,8 +67,8 @@ export function CreateTreasuryAccountButton({
   const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
     ? councilTokenOwnerRecord
     : canCreateGovernanceUsingCommunityTokens
-      ? communityTokenOwnerRecord
-      : undefined;
+    ? communityTokenOwnerRecord
+    : undefined;
 
   const onSubmit = async (
     values: {

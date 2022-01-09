@@ -7,7 +7,7 @@ import { LABELS } from '../../../constants';
 
 import { Redirect } from 'react-router';
 
-import { GovernanceType } from '../../../models/enums';
+import { GovernanceType } from '@solana/governance-sdk';
 import { registerGovernance } from '../../../actions/registerGovernance';
 
 import { useKeyParam } from '../../../hooks/useKeyParam';
@@ -23,9 +23,9 @@ import {
   GovernanceConfigValues,
 } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
 
-import { Realm } from '../../../models/accounts';
+import { Realm } from '@solana/governance-sdk';
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
-import { ProgramAccount } from '../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function RegisterGovernanceButton({
   buttonProps,
@@ -68,8 +68,8 @@ export function RegisterGovernanceButton({
   const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
     ? councilTokenOwnerRecord
     : canCreateGovernanceUsingCommunityTokens
-      ? communityTokenOwnerRecord
-      : undefined;
+    ? communityTokenOwnerRecord
+    : undefined;
 
   const onSubmit = async (
     values: {
@@ -134,29 +134,30 @@ export function RegisterGovernanceButton({
           governanceType === GovernanceType.Program
             ? LABELS.PROGRAM_ID_LABEL
             : governanceType === GovernanceType.Mint
-              ? LABELS.MINT_ADDRESS_LABEL
-              : governanceType === GovernanceType.Token
-                ? LABELS.TOKEN_ACCOUNT_ADDRESS
-                : LABELS.ACCOUNT_ADDRESS
+            ? LABELS.MINT_ADDRESS_LABEL
+            : governanceType === GovernanceType.Token
+            ? LABELS.TOKEN_ACCOUNT_ADDRESS
+            : LABELS.ACCOUNT_ADDRESS
         }
       ></AccountFormItem>
 
       {(governanceType === GovernanceType.Program ||
         governanceType === GovernanceType.Mint ||
         governanceType === GovernanceType.Token) && (
-          <Form.Item
-            name="transferAuthority"
-            label={`transfer ${governanceType === GovernanceType.Program
+        <Form.Item
+          name="transferAuthority"
+          label={`transfer ${
+            governanceType === GovernanceType.Program
               ? LABELS.UPGRADE_AUTHORITY
               : governanceType === GovernanceType.Mint
-                ? LABELS.MINT_AUTHORITY
-                : LABELS.TOKEN_OWNER
-              } to governance`}
-            valuePropName="checked"
-          >
-            <Checkbox></Checkbox>
-          </Form.Item>
-        )}
+              ? LABELS.MINT_AUTHORITY
+              : LABELS.TOKEN_OWNER
+          } to governance`}
+          valuePropName="checked"
+        >
+          <Checkbox></Checkbox>
+        </Form.Item>
+      )}
       <GovernanceConfigFormItem realm={realm}></GovernanceConfigFormItem>
     </ModalFormAction>
   );

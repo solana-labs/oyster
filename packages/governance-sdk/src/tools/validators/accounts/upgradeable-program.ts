@@ -10,8 +10,8 @@ export const ProgramAccountInfo = type({
   programData: PublicKeyFromString,
 });
 
-export type ProgramAccount = Infer<typeof ProgramDataAccount>;
-export const ProgramAccount = type({
+export type ExecutableProgramAccount = Infer<typeof ProgramDataAccount>;
+export const ExecutableProgramAccount = type({
   type: literal('program'),
   info: ProgramAccountInfo,
 });

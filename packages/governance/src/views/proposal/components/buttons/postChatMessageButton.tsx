@@ -2,16 +2,13 @@ import { useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
 
-import { Proposal, TokenOwnerRecord } from '../../../../models/accounts';
+import { Proposal, TokenOwnerRecord } from '@solana/governance-sdk';
 
 import { postChatMessage } from '../../../../actions/chat/postChatMessage';
 
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-} from '../../../../models/chat/accounts';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function PostChatMessageButton({
   tokenOwnerRecord,

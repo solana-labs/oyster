@@ -1,12 +1,7 @@
 import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import {
-
-  TokenIcon,
-  constants,
-  ExplorerLink,
-} from '@oyster/common';
+import { TokenIcon, constants, ExplorerLink } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -27,7 +22,7 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteRecord,
-} from '../../models/accounts';
+} from '@solana/governance-sdk';
 import { useKeyParam } from '../../hooks/useKeyParam';
 
 import {
@@ -47,7 +42,7 @@ import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
-import { ProgramAccount } from '../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { TabPane } = Tabs;
 
@@ -459,7 +454,8 @@ function InnerProposalView({
                   {instructions
                     .sort(
                       (i1, i2) =>
-                        i1.account.instructionIndex - i2.account.instructionIndex,
+                        i1.account.instructionIndex -
+                        i2.account.instructionIndex,
                     )
                     .map((instruction, position) => (
                       <Col xs={24} sm={24} md={12} lg={8} key={position}>

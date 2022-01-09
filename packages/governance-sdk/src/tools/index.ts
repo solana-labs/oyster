@@ -6,3 +6,4 @@ export * from './script';
 export * from './splToken';
 export * from './version';
 export * from './walletAdapter';
+export * from './solanaSdk';

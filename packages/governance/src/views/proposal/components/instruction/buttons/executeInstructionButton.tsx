@@ -6,7 +6,7 @@ import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '../../../../../models/accounts';
+} from '@solana/governance-sdk';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import React from 'react';
 import {
@@ -16,7 +16,7 @@ import {
   RedoOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
-import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export enum PlayState {
   Played,
@@ -93,7 +93,7 @@ export function ExecuteInstructionButton({
   if (
     playing === PlayState.Unplayed &&
     proposalInstruction.account.executionStatus !==
-    InstructionExecutionStatus.Error
+      InstructionExecutionStatus.Error
   ) {
     return (
       <Tooltip title="execute instruction">
@@ -107,7 +107,7 @@ export function ExecuteInstructionButton({
   else if (
     playing === PlayState.Error ||
     proposalInstruction.account.executionStatus ===
-    InstructionExecutionStatus.Error
+      InstructionExecutionStatus.Error
   )
     return (
       <Tooltip title="retry to execute instruction">

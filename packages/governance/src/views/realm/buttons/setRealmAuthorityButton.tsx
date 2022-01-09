@@ -1,7 +1,5 @@
-
-
 import React from 'react';
-import { Realm } from '../../../models/accounts';
+import { Realm } from '@solana/governance-sdk';
 
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
@@ -10,7 +8,7 @@ import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAc
 import { setRealmAuthority } from '../../../actions/setRealmAuthority';
 import { Form, Select } from 'antd';
 import { useGovernancesByRealm } from '../../../hooks/apiHooks';
-import { ProgramAccount } from '../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function SetRealmAuthorityButton({
   realm,

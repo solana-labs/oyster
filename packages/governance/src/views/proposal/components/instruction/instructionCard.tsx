@@ -9,8 +9,8 @@ import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '../../../../models/accounts';
-import { GOVERNANCE_SCHEMA } from '../../../../models/serialisation';
+} from '@solana/governance-sdk';
+import { GOVERNANCE_SCHEMA } from '@solana/governance-sdk';
 import { serialize } from 'borsh';
 
 import '../style.less';
@@ -25,7 +25,7 @@ import {
   ExecuteInstructionButton,
 } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function InstructionCard({
   proposalInstruction,
@@ -46,7 +46,9 @@ export function InstructionCard({
 
   const [tabKey, setTabKey] = useState('info');
   const [playing, setPlaying] = useState(
-    proposalInstruction.account.executedAt ? PlayState.Played : PlayState.Unplayed,
+    proposalInstruction.account.executedAt
+      ? PlayState.Played
+      : PlayState.Unplayed,
   );
 
   const instructionDetails = useMemo(() => {

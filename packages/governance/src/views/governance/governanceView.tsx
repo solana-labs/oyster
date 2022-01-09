@@ -18,7 +18,7 @@ import {
 } from '@oyster/common';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { Proposal, ProposalState } from '../../models/accounts';
+import { Proposal, ProposalState } from '@solana/governance-sdk';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl } from '../../tools/routeTools';
@@ -144,17 +144,20 @@ export const GovernanceView = () => {
                     )} days`}</Text>
                     <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
                       communityMintInfo,
-                      governance.account.config.minCommunityTokensToCreateProposal,
+                      governance.account.config
+                        .minCommunityTokensToCreateProposal,
                     )} (${formatMintSupplyFractionAsDecimalPercentage(
                       communityMintInfo,
-                      governance.account.config.minCommunityTokensToCreateProposal,
+                      governance.account.config
+                        .minCommunityTokensToCreateProposal,
                     )})`}</Text>
                   </Space>
                 </Space>
                 {nativeTreasury && (
                   <div>
-                    {`SOL: ${nativeTreasury.account.lamports / LAMPORTS_PER_SOL
-                      }`}{' '}
+                    {`SOL: ${
+                      nativeTreasury.account.lamports / LAMPORTS_PER_SOL
+                    }`}{' '}
                     <ExplorerLink
                       address={nativeTreasury.pubkey}
                       type="address"

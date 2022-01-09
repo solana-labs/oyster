@@ -24,7 +24,7 @@ export type ProgramAccount<T> = {
   owner: PublicKey;
 };
 
-export async function simulateTransaction(
+export async function simulateTransaction2(
   connection: Connection,
   transaction: Transaction,
   commitment: Commitment,

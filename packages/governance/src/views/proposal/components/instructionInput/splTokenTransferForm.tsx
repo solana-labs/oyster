@@ -1,6 +1,6 @@
 import { Form, FormInstance, InputNumber, Spin } from 'antd';
 import { ExplorerLink, utils } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance } from '@solana/governance-sdk';
 import {
   AccountInfo,
   ParsedAccountData,
@@ -18,7 +18,7 @@ import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '../../../../tools/units';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useMint } = contexts.Accounts;
@@ -33,7 +33,9 @@ export const SplTokenTransferForm = ({
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
   const { token: tokenProgramId } = utils.programIds();
-  const sourceTokenAccount = useTokenAccount(governance.account.governedAccount);
+  const sourceTokenAccount = useTokenAccount(
+    governance.account.governedAccount,
+  );
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
 
   if (!(mintInfo && sourceTokenAccount)) {

@@ -1,5 +1,5 @@
-import { InstructionData } from '../models/accounts';
-import { RpcContext } from '../models/core/api';
+import { InstructionData } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/governance-sdk';
 import { simulateTransaction } from '@oyster/common';
 import { Transaction } from '@solana/web3.js';
 

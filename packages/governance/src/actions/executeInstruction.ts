@@ -1,11 +1,11 @@
 import { Account, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal, ProposalInstruction } from '../models/accounts';
+import { Proposal, ProposalInstruction } from '@solana/governance-sdk';
 
-import { withExecuteInstruction } from '../models/withExecuteInstruction';
+import { withExecuteInstruction } from '@solana/governance-sdk';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
-import { ProgramAccount } from '../models/tools/solanaSdk';
+import { RpcContext } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export const executeInstruction = async (
   { connection, wallet, programId }: RpcContext,

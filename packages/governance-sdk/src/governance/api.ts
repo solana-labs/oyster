@@ -8,6 +8,7 @@ import {
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
+  GOVERNANCE_SCHEMA,
 } from './serialisation';
 import {
   getAccountTypes,
@@ -32,10 +33,13 @@ import { parseVersion } from '../tools/version';
 import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
 import { BN } from 'bn.js';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
-import { ProgramAccount, simulateTransaction } from '../tools/solanaSdk';
+import { ProgramAccount, simulateTransaction2 } from '../tools/solanaSdk';
 import { BN_ZERO } from '../tools/numbers';
+import { BorshAccountParser } from '../core';
 
 export async function getRealms(endpoint: string, programId: PublicKey) {
+  console.log('GET REALMS');
+
   return getBorshProgramAccounts<Realm>(
     programId,
     at => getGovernanceSchemaForAccount(at),
@@ -142,7 +146,10 @@ export async function getGovernanceProgramVersion(
 
     // If ProgramMetadata exists then use it to get latest updated version
     if (programMetadataInfo) {
-      const programMetadata = GovernanceAccountParser(ProgramMetadata)(
+      const programMetadata = BorshAccountParser(
+        ProgramMetadata,
+        () => GOVERNANCE_SCHEMA,
+      )(
         programMetadataPk,
         programMetadataInfo,
       ) as ProgramAccount<ProgramMetadata>;
@@ -186,7 +193,7 @@ export async function getGovernanceProgramVersion(
     transaction.add(...instructions);
 
     // TODO: Once return values are supported change the simulation call to the actual one
-    const getVersion = await simulateTransaction(
+    const getVersion = await simulateTransaction2(
       connection,
       transaction,
       'recent',

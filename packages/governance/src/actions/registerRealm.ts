@@ -1,9 +1,9 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
-import { MintMaxVoteWeightSource } from '../models/accounts';
-import { RpcContext } from '../models/core/api';
+import { MintMaxVoteWeightSource } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/governance-sdk';
 
-import { withCreateRealm } from '../models/withCreateRealm';
+import { withCreateRealm } from '@solana/governance-sdk';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export async function registerRealm(

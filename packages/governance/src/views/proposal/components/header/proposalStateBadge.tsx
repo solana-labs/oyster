@@ -1,13 +1,9 @@
 import { Tag } from 'antd';
 import React from 'react';
-import {
-  Governance,
-  Proposal,
-  ProposalState,
-} from '../../../../models/accounts';
+import { Governance, Proposal, ProposalState } from '@solana/governance-sdk';
 
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const STATE_COLOR: Record<string, string> = {
   [ProposalState.Draft]: 'orange',

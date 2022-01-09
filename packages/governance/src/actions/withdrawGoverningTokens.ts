@@ -1,7 +1,7 @@
+import { withWithdrawGoverningTokens } from '@solana/governance-sdk';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { RpcContext } from '../models/core/api';
+import { RpcContext } from '@solana/governance-sdk';
 
-import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const withdrawGoverningTokens = async (

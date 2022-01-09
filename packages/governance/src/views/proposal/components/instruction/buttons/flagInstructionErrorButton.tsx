@@ -10,8 +10,8 @@ import {
   Proposal,
   ProposalInstruction,
   TokenOwnerRecord,
-} from '../../../../../models/accounts';
-import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
+} from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -29,7 +29,7 @@ export function FlagInstructionErrorButton({
   if (
     playState !== PlayState.Error ||
     proposalInstruction.account.executionStatus ===
-    InstructionExecutionStatus.Error ||
+      InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
     return null;
@@ -42,7 +42,7 @@ export function FlagInstructionErrorButton({
         proposal,
         proposalInstruction.pubkey,
       );
-    } catch { }
+    } catch {}
   };
 
   return (

@@ -1,9 +1,9 @@
 import { Account, TransactionInstruction } from '@solana/web3.js';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
+import { RpcContext } from '@solana/governance-sdk';
 
-import { withUpdateProgramMetadata } from '../models/withUpdateProgramMetadata';
+import { withUpdateProgramMetadata } from '@solana/governance-sdk';
 
 export const updateProgramMetadata = async ({
   connection,

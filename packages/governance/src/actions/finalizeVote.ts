@@ -1,11 +1,11 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '../models/accounts';
+import { Proposal } from '@solana/governance-sdk';
 
-import { withFinalizeVote } from '../models/withFinalizeVote';
+import { withFinalizeVote } from '@solana/governance-sdk';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '../models/core/api';
-import { ProgramAccount } from '../models/tools/solanaSdk';
+import { RpcContext } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,

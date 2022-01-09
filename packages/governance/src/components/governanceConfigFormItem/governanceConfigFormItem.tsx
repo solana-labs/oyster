@@ -8,7 +8,7 @@ import {
   Realm,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '../../models/accounts';
+} from '@solana/governance-sdk';
 import { getNameOf } from '../../tools/script';
 import {
   getDaysFromTimestamp,
@@ -22,7 +22,7 @@ import {
   getMintSupplyAsDecimal,
   formatPercentage,
 } from '../../tools/units';
-import { ProgramAccount } from '../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { ZERO } = constants;
 
@@ -47,7 +47,9 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,
     }),
-    minCommunityTokensToCreateProposal: new BN(minTokensToCreateProposal.toString()),
+    minCommunityTokensToCreateProposal: new BN(
+      minTokensToCreateProposal.toString(),
+    ),
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime,
     ),

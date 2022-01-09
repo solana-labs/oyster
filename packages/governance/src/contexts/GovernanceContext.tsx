@@ -7,19 +7,15 @@ import {
   PublicKey,
 } from '@solana/web3.js';
 
-import {
-
-  useConnection,
-  useConnectionConfig,
-} from '@oyster/common';
-import { GovernanceAccountParser } from '../models/serialisation';
-import { GovernanceAccountType, Realm } from '../models/accounts';
-import { getRealms } from '../models/api';
+import { useConnection, useConnectionConfig } from '@oyster/common';
+import { GovernanceAccountParser } from '@solana/governance-sdk';
+import { GovernanceAccountType, Realm } from '@solana/governance-sdk';
+import { getRealms } from '@solana/governance-sdk';
 import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
-import { getProgramVersion, PROGRAM_VERSION } from '../models/registry/api';
-import { ProgramAccount } from '../models/tools/solanaSdk';
+import { getProgramVersion, PROGRAM_VERSION } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;

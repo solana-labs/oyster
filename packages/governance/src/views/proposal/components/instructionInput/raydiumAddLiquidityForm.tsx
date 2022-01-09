@@ -1,6 +1,6 @@
 import { Form, FormInstance, Spin } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance } from '@solana/governance-sdk';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import React from 'react';
@@ -11,7 +11,7 @@ import { contexts } from '@oyster/common';
 import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
 
 import { getRAYGovernanceAta, getSRMGovernanceAta } from './yieldFarming';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
@@ -26,7 +26,9 @@ export const RaydiumAddLiquidityForm = ({
   governance: ProgramAccount<Governance>;
   onCreateInstruction: (instruction: TransactionInstruction) => void;
 }) => {
-  const sourceTokenAccount = useTokenAccount(governance.account.governedAccount);
+  const sourceTokenAccount = useTokenAccount(
+    governance.account.governedAccount,
+  );
   const mintInfo = useMint(sourceTokenAccount?.info.mint);
   const connection = useConnection();
 

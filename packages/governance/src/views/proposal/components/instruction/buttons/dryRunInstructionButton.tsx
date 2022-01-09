@@ -19,13 +19,13 @@ import {
   InstructionData,
   Proposal,
   ProposalState,
-} from '../../../../../models/accounts';
+} from '@solana/governance-sdk';
 import { dryRunInstruction } from '../../../../../actions/dryRunInstruction';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
-import { RpcContext } from '../../../../../models/core/api';
-import { ProgramAccount } from '../../../../../models/tools/solanaSdk';
+import { RpcContext } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 const { getExplorerInspectorUrl } = utils;
 
@@ -132,8 +132,8 @@ function DryRunStatus({
   rpcContext: RpcContext;
   isPending: boolean;
   result:
-  | { response: SimulatedTransactionResponse; transaction: Transaction }
-  | undefined;
+    | { response: SimulatedTransactionResponse; transaction: Transaction }
+    | undefined;
   error: Error | undefined;
 }) {
   const iconStyle = { fontSize: '150%' };

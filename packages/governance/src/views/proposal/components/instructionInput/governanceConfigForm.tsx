@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '../../../../models/accounts';
+import { Governance } from '@solana/governance-sdk';
 import { TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
 
@@ -13,9 +13,9 @@ import {
   GovernanceConfigValues,
 } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { createSetGovernanceConfig } from '../../../../models/createSetGovernanceConfig';
+import { createSetGovernanceConfig } from '@solana/governance-sdk';
 import { useRealm } from '../../../../contexts/GovernanceContext';
-import { ProgramAccount } from '../../../../models/tools/solanaSdk';
+import { ProgramAccount } from '@solana/governance-sdk';
 
 export const GovernanceConfigForm = ({
   form,
