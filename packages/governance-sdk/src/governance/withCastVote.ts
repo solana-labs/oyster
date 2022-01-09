@@ -8,7 +8,7 @@ import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
-import { PROGRAM_VERSION_V1 } from '../registry/api';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/solanaSdk';
 
 export const withCastVote = async (

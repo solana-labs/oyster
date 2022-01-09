@@ -8,7 +8,6 @@ import {
 import {
   getGovernanceSchemaForAccount,
   GovernanceAccountParser,
-  GOVERNANCE_SCHEMA,
 } from './serialisation';
 import {
   getAccountTypes,
@@ -28,7 +27,7 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from '../core/api';
-import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/api';
+import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/constants';
 import { parseVersion } from '../tools/version';
 import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader/accounts';
 import { BN } from 'bn.js';
@@ -146,10 +145,7 @@ export async function getGovernanceProgramVersion(
 
     // If ProgramMetadata exists then use it to get latest updated version
     if (programMetadataInfo) {
-      const programMetadata = BorshAccountParser(
-        ProgramMetadata,
-        () => GOVERNANCE_SCHEMA,
-      )(
+      const programMetadata = GovernanceAccountParser(ProgramMetadata)(
         programMetadataPk,
         programMetadataInfo,
       ) as ProgramAccount<ProgramMetadata>;

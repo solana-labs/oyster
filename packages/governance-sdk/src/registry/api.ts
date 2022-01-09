@@ -1,22 +1,14 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-
-//import { getGovernanceProgramVersion } from '../governance/api';
-
-export const PROGRAM_VERSION_V1 = 1;
-export const PROGRAM_VERSION_V2 = 2;
-
-// The most up to date program version
-export const PROGRAM_VERSION = PROGRAM_VERSION_V2;
+import { getGovernanceProgramVersion } from '../governance/api';
 
 export async function getProgramVersion(
   connection: Connection,
   programId: string,
   env: string,
 ) {
-  return PROGRAM_VERSION_V1;
-  // return await getGovernanceProgramVersion(
-  //   connection,
-  //   new PublicKey(programId),
-  //   env,
-  // );
+  return await getGovernanceProgramVersion(
+    connection,
+    new PublicKey(programId),
+    env,
+  );
 }

@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { Vote, VoteKind } from './instructions';
-import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/api';
+import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';

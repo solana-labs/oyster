@@ -57,7 +57,7 @@ import {
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
-import { PROGRAM_VERSION_V1 } from '../registry/api';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { deserializeBorsh } from '../tools/borsh';
 
 // ------------ u16 ------------
