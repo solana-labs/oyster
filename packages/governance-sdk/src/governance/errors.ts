@@ -1,5 +1,5 @@
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { SendTransactionError } from '../tools/sdk/runtime';
+import { WalletNotConnectedError } from '../tools/walletAdapter';
 
 export const GovernanceError: Record<number, string> = [
   'Invalid instruction passed to program', // InvalidInstruction
