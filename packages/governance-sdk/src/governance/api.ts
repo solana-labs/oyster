@@ -44,6 +44,8 @@ export async function getRealms(endpoint: string, programId: PublicKey) {
   );
 }
 
+// Vote Records
+
 export async function getVoteRecordsByVoter(
   programId: PublicKey,
   endpoint: string,

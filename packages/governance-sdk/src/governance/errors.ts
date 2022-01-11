@@ -147,9 +147,3 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
     return JSON.stringify(error);
   }
 }
-
-export function isWalletNotConnectedError(
-  error: any,
-): error is WalletNotConnectedError {
-  return error instanceof WalletNotConnectedError;
-}
