@@ -3120,6 +3120,13 @@
   dependencies:
     buffer "~6.0.3"
 
+"@solana/spl-governance@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.1.tgz#76564ecd63b6febc8dcdb366c5f7f5e0228c2dcd"
+  integrity sha512-l+jZKWc/PACGs9jD5KDBxtpJFejhlmHOQ9zDZ/kA9jpCVq3hu/8SrReEebcHwoJWByEY1k1q1iGlIhO7XcQG/g==
+  dependencies:
+    superstruct "^0.15.2"
+
 "@solana/spl-token-registry@^0.2.0":
   version "0.2.51"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.51.tgz#a263c146575f1dbab2d3e2e1f379068a8a63706f"

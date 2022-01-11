@@ -13,6 +13,7 @@ export async function registerRealm(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
+  communityVoterWeightAddin: PublicKey | undefined,
 ) {
   let instructions: TransactionInstruction[] = [];
 
@@ -27,7 +28,7 @@ export async function registerRealm(
     councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
-    undefined,
+    communityVoterWeightAddin,
   );
 
   await sendTransactionWithNotifications(

@@ -24,6 +24,7 @@ import {
 } from '../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
 import { RealmMintTokensFormItem } from '../../../components/realmMintTokensFormItem/realmMintTokensFormItem';
 import { parseMinTokensToCreate } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
+import { tryParseKey } from '@oyster/common';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -54,6 +55,8 @@ export function RegisterRealmButton({
   const [councilVisible, setCouncilVisible] = useState(false);
 
   const [communityMintAddress, setCommunityMintAddress] = useState('');
+  const [communityVoterWeightAddin, setCommunityVoterWeightAddin] =
+    useState('');
 
   const onSubmit = async (
     values: {
@@ -63,6 +66,7 @@ export function RegisterRealmButton({
       useCouncilMint: boolean;
       mintDecimals: number;
       minTokensToCreateGovernance: number | string;
+      communityVoterWeightAddin: string;
     } & RealmMintSupplyConfigValues,
   ) => {
     let supplyFraction = parseMintSupplyFraction(
@@ -81,6 +85,7 @@ export function RegisterRealmButton({
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
       supplyFraction,
       new BN(minCommunityTokensToCreateGovernance),
+      new PublicKey(communityVoterWeightAddin),
     );
   };
 
@@ -95,6 +100,16 @@ export function RegisterRealmButton({
   if (redirectTo) {
     return <Redirect push to={getRealmUrl(redirectTo, programId)} />;
   }
+
+  const pluginValidator = async (rule: any, value: string) => {
+    if (value) {
+      const pubkey = tryParseKey(value);
+
+      if (!pubkey) {
+        throw new Error('Provided value is not a valid publickey');
+      }
+    }
+  };
 
   return (
     <ModalFormAction<PublicKey>
@@ -153,6 +168,16 @@ export function RegisterRealmButton({
             communityMintAddress={communityMintAddress}
             maxVoteWeightSource={MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION}
           ></RealmMintSupplyConfigFormItem>
+          <Form.Item
+            name="communityVoterWeightAddin"
+            label="community voter weight addin"
+            rules={[{ required: false, validator: pluginValidator }]}
+          >
+            <Input
+              allowClear={true}
+              onChange={e => setCommunityVoterWeightAddin(e.target.value)}
+            />
+          </Form.Item>
         </Panel>
       </Collapse>
     </ModalFormAction>
