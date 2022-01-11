@@ -9,8 +9,8 @@ import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '@solana/governance-sdk';
-import { GOVERNANCE_SCHEMA } from '@solana/governance-sdk';
+} from '@solana/spl-governance';
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance';
 import { serialize } from 'borsh';
 
 import '../style.less';
@@ -25,7 +25,7 @@ import {
   ExecuteInstructionButton,
 } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function InstructionCard({
   proposalInstruction,

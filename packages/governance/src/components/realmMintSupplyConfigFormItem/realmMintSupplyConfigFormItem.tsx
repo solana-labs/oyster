@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   MintMaxVoteWeightSource,
   MintMaxVoteWeightSourceType,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 import { BigNumber } from 'bignumber.js';
 import { MintInfo } from '@solana/spl-token';
 import { contexts } from '@oyster/common';
@@ -120,11 +120,10 @@ export function RealmMintSupplyConfigFormItem({
 
         {supplyFraction && (
           <Text type="secondary">
-            {`${
-              communityMint
+            {`${communityMint
                 ? formatMintSupplyFraction(communityMint, supplyFraction)
                 : ''
-            } (${formatMintSupplyPercentage(supplyFraction)})`}
+              } (${formatMintSupplyPercentage(supplyFraction)})`}
           </Text>
         )}
       </Space>

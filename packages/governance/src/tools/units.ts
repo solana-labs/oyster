@@ -2,7 +2,7 @@ import { MintInfo } from '@solana/spl-token';
 import { BigNumber } from 'bignumber.js';
 import BN from 'bn.js';
 
-import { MintMaxVoteWeightSource } from '@solana/governance-sdk';
+import { MintMaxVoteWeightSource } from '@solana/spl-governance';
 
 const SECONDS_PER_DAY = 86400;
 

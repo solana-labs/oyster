@@ -1,6 +1,6 @@
 import { Button, Popover, Space } from 'antd';
 import React, { useRef } from 'react';
-import { Realm } from '@solana/governance-sdk';
+import { Realm } from '@solana/spl-governance';
 import { DepositGoverningTokensButton } from './depositGoverningTokensButton';
 import { RegisterGovernanceButton } from './registerGovernanceButton';
 import { SetRealmAuthorityButton } from './setRealmAuthorityButton';
@@ -8,7 +8,7 @@ import { WithdrawGoverningTokensButton } from './withdrawGoverningTokensButton';
 import { useWallet } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
 import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function RealmActionBar({
   realm,

@@ -3,7 +3,7 @@ import React from 'react';
 import { VoteScore } from '../proposal/components/vote/voteScore';
 
 import { Space } from 'antd';
-import { ProposalState } from '@solana/governance-sdk';
+import { ProposalState } from '@solana/spl-governance';
 
 export function ControlTestBench() {
   const supply = 10000000;

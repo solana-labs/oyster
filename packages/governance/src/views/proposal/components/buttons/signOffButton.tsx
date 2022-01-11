@@ -5,8 +5,8 @@ import React from 'react';
 import { signOffProposal } from '../../../../actions/signOffProposal';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 
-import { Proposal, SignatoryRecord } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { Proposal, SignatoryRecord } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { confirm } = Modal;
 

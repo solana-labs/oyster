@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
 
@@ -12,7 +12,7 @@ import {
   getGovernanceInstructions,
   GovernanceInstructionForm,
 } from './governanceInstructionForm';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const MintInstructionsForm = ({
   form,

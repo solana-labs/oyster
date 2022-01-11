@@ -4,12 +4,12 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 
 import SignOffButton from './signOffButton';
 import { FinalizeVoteButton } from './finalizeVoteButton';
 import { RelinquishVoteButton } from './relinquishVoteButton';
-import { YesNoVote } from '@solana/governance-sdk';
+import { YesNoVote } from '@solana/spl-governance';
 import { CastVoteButton } from './castVoteButton';
 
 import {
@@ -17,7 +17,7 @@ import {
   useTokenOwnerVoteRecord,
 } from '../../../../hooks/apiHooks';
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 import CancelButton from './cancelButton';
 
 export function ProposalActionBar({

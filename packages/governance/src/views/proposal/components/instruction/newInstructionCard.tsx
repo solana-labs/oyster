@@ -9,7 +9,7 @@ import {
   InstructionData,
   Proposal,
   Realm,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 
 import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { insertInstruction } from '../../../../actions/insertInstruction';
@@ -19,13 +19,13 @@ import { formDefaults } from '../../../../tools/forms';
 import InstructionInput from '../instructionInput/instructionInput';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
-import { getInstructionDataFromBase64 } from '@solana/governance-sdk';
+import { getInstructionDataFromBase64 } from '@solana/spl-governance';
 import {
   getDaysFromTimestamp,
   getTimestampFromDays,
 } from '../../../../tools/units';
 import { useAccountChangeTracker } from '../../../../contexts/GovernanceContext';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function NewInstructionCard({
   realm,

@@ -1,13 +1,13 @@
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { TokenOwnerRecord } from '@solana/governance-sdk';
+import { TokenOwnerRecord } from '@solana/spl-governance';
 
 import {
   formatMintNaturalAmountAsDecimal,
   formatMintVoteWeight,
 } from '../../tools/units';
 import { MintInfo } from '@solana/spl-token';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { useMint } = contexts.Accounts;
 

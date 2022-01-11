@@ -14,10 +14,8 @@
     "bootstrap": "lerna link && lerna bootstrap",
     "build": "lerna run build",
     "start": "CI=true lerna run start --scope @oyster/common --stream --parallel --scope ",
-
     "start-gov": "CI=true lerna run start --scope @solana/governance-sdk --scope @oyster/common --stream --parallel --scope governance",
     "build-gov": "yarn && yarn bootstrap && yarn build --scope @oyster/common --scope @solana/governance-sdk --scope governance",
-
     "lint": "eslint 'packages/*/{src,test}/**/*.ts' && prettier -c 'packages/*/{src,test}/**/*.ts'",
     "lint:fix": "eslint --fix 'packages/*/{src,test}/**/*.ts' && prettier --write 'packages/*/{src,test}/**/*.ts'",
     "deploy": "run-s deploy:docs build deploy:apps && gh-pages -d docs",

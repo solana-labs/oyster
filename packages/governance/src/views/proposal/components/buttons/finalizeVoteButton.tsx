@@ -2,10 +2,10 @@ import { useWallet } from '@oyster/common';
 import { Button } from 'antd';
 import React from 'react';
 import { LABELS } from '../../../../constants';
-import { Governance, Proposal, ProposalState } from '@solana/governance-sdk';
+import { Governance, Proposal, ProposalState } from '@solana/spl-governance';
 import { finalizeVote } from '../../../../actions/finalizeVote';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function FinalizeVoteButton({
   governance,

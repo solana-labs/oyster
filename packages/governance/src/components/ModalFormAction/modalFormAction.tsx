@@ -12,7 +12,7 @@ import {
 import {
   getTransactionErrorMsg,
   isWalletNotConnectedError,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 
 const { Text } = Typography;
 

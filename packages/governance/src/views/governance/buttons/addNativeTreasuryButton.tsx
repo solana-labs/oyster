@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { createNativeTreasury } from '../../../actions/createNativeTreasury';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { useNativeTreasury } from '../../../hooks/apiHooks';
-import { PROGRAM_VERSION_V1 } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { PROGRAM_VERSION_V1 } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function CreateNativeTreasuryButton({
   realm,

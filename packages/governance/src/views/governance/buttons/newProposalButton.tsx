@@ -8,15 +8,15 @@ import { useMint } from '@oyster/common';
 import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
-import { GoverningTokenType } from '@solana/governance-sdk';
-import { Governance, Realm } from '@solana/governance-sdk';
+import { GoverningTokenType } from '@solana/spl-governance';
+import { Governance, Realm } from '@solana/spl-governance';
 
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getProposalUrl } from '../../../tools/routeTools';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function NewProposalButton({
   realm,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 import {
   deserializeMint,
   useAccount,
@@ -12,7 +12,7 @@ import { formatMintNaturalAmountAsDecimal } from '../../../tools/units';
 import { useNativeTreasury } from '../../../hooks/apiHooks';
 import { Space } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({

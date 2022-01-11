@@ -8,14 +8,14 @@ import {
 } from '@solana/web3.js';
 
 import { useConnection, useConnectionConfig } from '@oyster/common';
-import { GovernanceAccountParser } from '@solana/governance-sdk';
-import { GovernanceAccountType, Realm } from '@solana/governance-sdk';
-import { getRealms } from '@solana/governance-sdk';
+import { GovernanceAccountParser } from '@solana/spl-governance';
+import { GovernanceAccountType, Realm } from '@solana/spl-governance';
+import { getRealms } from '@solana/spl-governance';
 import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
-import { getProgramVersion, PROGRAM_VERSION } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { getProgramVersion, PROGRAM_VERSION } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;

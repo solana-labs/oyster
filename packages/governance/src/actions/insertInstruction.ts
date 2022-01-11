@@ -1,12 +1,12 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { InstructionData, Proposal } from '@solana/governance-sdk';
+import { InstructionData, Proposal } from '@solana/spl-governance';
 
-import { withInsertInstruction } from '@solana/governance-sdk';
+import { withInsertInstruction } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const insertInstruction = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,

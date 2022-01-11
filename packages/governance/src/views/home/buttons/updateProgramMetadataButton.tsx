@@ -5,7 +5,7 @@ import { useRpcContext } from '../../../hooks/useRpcContext';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 
 import { updateProgramMetadata } from '../../../actions/updateProgramMetadata';
-import { PROGRAM_VERSION_V1 } from '@solana/governance-sdk';
+import { PROGRAM_VERSION_V1 } from '@solana/spl-governance';
 
 export function UpdateProgramMetadataButton() {
   const rpcContext = useRpcContext();

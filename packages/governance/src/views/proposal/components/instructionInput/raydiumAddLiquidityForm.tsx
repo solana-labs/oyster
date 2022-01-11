@@ -1,6 +1,6 @@
 import { Form, FormInstance, Spin } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import React from 'react';
@@ -11,7 +11,7 @@ import { contexts } from '@oyster/common';
 import { addLiquidityInstructionV4 } from '../../../../tools/raydium/raydium';
 
 import { getRAYGovernanceAta, getSRMGovernanceAta } from './yieldFarming';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useConnection } = contexts.Connection;
