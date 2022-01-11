@@ -23,13 +23,13 @@ export function getGovernanceChatMessages(
 }
 
 export function getGovernanceChatMessagesByVoter(
-  endpoint: string,
+  rpcEndpoint: string,
   voter: PublicKey,
 ) {
-  return getBorshProgramAccounts<ChatMessage>(
+  return getBorshProgramAccounts(
+    rpcEndpoint,
     GOVERNANCE_CHAT_PROGRAM_ID,
     _ => GOVERNANCE_CHAT_SCHEMA,
-    endpoint,
     ChatMessage,
     [pubkeyFilter(33, voter) as MemcmpFilter],
   );
