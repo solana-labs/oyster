@@ -21,3 +21,16 @@ export function getGovernanceChatMessages(
     [pubkeyFilter(1, proposal) as MemcmpFilter],
   );
 }
+
+export function getGovernanceChatMessagesByVoter(
+  endpoint: string,
+  voter: PublicKey,
+) {
+  return getBorshProgramAccounts<ChatMessage>(
+    GOVERNANCE_CHAT_PROGRAM_ID,
+    _ => GOVERNANCE_CHAT_SCHEMA,
+    endpoint,
+    ChatMessage,
+    [pubkeyFilter(33, voter) as MemcmpFilter],
+  );
+}
