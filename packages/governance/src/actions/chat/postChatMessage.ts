@@ -1,12 +1,12 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '@solana/governance-sdk';
+import { Proposal } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../../tools/transactions';
-import { RpcContext } from '@solana/governance-sdk';
-import { withPostChatMessage } from '@solana/governance-sdk';
-import { ChatMessageBody } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
+import { withPostChatMessage } from '@solana/spl-governance';
+import { ChatMessageBody } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const postChatMessage = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

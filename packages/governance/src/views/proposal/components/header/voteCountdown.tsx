@@ -2,8 +2,8 @@ import { Space } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
-import { Governance, Proposal } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { Governance, Proposal } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 interface CountdownState {
   days: number;
@@ -46,8 +46,8 @@ export function VoteCountdown({
       let timeToVoteEnd = proposal.account.isPreVotingState()
         ? governance.account.config.maxVotingTime
         : proposal.account.votingAt?.toNumber()! +
-          governance.account.config.maxVotingTime -
-          now;
+        governance.account.config.maxVotingTime -
+        now;
 
       if (timeToVoteEnd <= 0) {
         return ZeroCountdown;

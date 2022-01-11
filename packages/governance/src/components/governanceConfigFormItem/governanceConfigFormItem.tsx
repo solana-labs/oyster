@@ -8,7 +8,7 @@ import {
   Realm,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 import { getNameOf } from '../../tools/script';
 import {
   getDaysFromTimestamp,
@@ -22,7 +22,7 @@ import {
   getMintSupplyAsDecimal,
   formatPercentage,
 } from '../../tools/units';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { ZERO } = constants;
 

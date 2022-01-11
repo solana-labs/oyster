@@ -1,6 +1,6 @@
 import { Form, FormInstance, InputNumber } from 'antd';
 import { ExplorerLink, useMint, useWallet } from '@oyster/common';
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 import { TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
 
@@ -8,7 +8,7 @@ import { formDefaults } from '../../../../tools/forms';
 import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 
 import { useRpcContext } from '../../../../hooks/useRpcContext';
-import { createSetRealmConfig } from '@solana/governance-sdk';
+import { createSetRealmConfig } from '@solana/spl-governance';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import {
   parseMintSupplyFraction,
@@ -21,7 +21,7 @@ import {
   getMintMinAmountAsDecimal,
 } from '../../../../tools/units';
 import { parseMinTokensToCreate } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export interface RealmConfigValues {
   minCommunityTokensToCreateGovernance: number | string;
@@ -101,9 +101,9 @@ export const RealmConfigForm = ({
 
   const minCommunityTokensToCreateGovernance = communityMintInfo
     ? getMintDecimalAmountFromNatural(
-        communityMintInfo,
-        realm.account.config.minCommunityTokensToCreateGovernance,
-      ).toNumber()
+      communityMintInfo,
+      realm.account.config.minCommunityTokensToCreateGovernance,
+    ).toNumber()
     : 0;
 
   let mintDecimals = communityMintInfo ? communityMintInfo.decimals : 0;

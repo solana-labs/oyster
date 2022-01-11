@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 import { TransactionInstruction } from '@solana/web3.js';
 import React, { useState } from 'react';
 
@@ -16,7 +16,7 @@ import { RaydiumAddLiquidityForm } from './raydiumAddLiquidityForm';
 import { RaydiumStakeLPForm } from './raydiumStakeLPForm';
 import { isYieldFarmingGovernance } from './yieldFarming';
 import { RaydiumStakeRAYForm } from './raydiumStakeRAYForm';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const TokenInstructionsForm = ({
   form,
@@ -35,12 +35,12 @@ export const TokenInstructionsForm = ({
 
   const yfInstructions = isYieldFarmingGovernance(governance.pubkey)
     ? [
-        InstructionType.RaydiumAddLiquidity,
-        InstructionType.RaydiumStakeLP,
-        InstructionType.RaydiumHarvestLP,
-        InstructionType.RaydiumStakeRAY,
-        InstructionType.RaydiumHarvestRAY,
-      ]
+      InstructionType.RaydiumAddLiquidity,
+      InstructionType.RaydiumStakeLP,
+      InstructionType.RaydiumHarvestLP,
+      InstructionType.RaydiumStakeRAY,
+      InstructionType.RaydiumHarvestRAY,
+    ]
     : [];
 
   let instructions = [

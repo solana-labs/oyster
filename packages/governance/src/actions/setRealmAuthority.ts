@@ -1,11 +1,11 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Realm } from '@solana/governance-sdk';
+import { Realm } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/governance-sdk';
-import { withSetRealmAuthority } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
+import { withSetRealmAuthority } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const setRealmAuthority = async (
   { connection, wallet, programId }: RpcContext,

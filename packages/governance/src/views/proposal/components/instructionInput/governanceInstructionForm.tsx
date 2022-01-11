@@ -1,13 +1,13 @@
 import { FormInstance } from 'antd';
 import React from 'react';
 
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 import { GovernanceConfigForm } from './governanceConfigForm';
 import { InstructionType } from './instructionSelector';
 import { TransactionInstruction } from '@solana/web3.js';
 import { RealmConfigForm } from './realmConfigForm';
 import { NativeTransferForm } from './nativeTokenTransferForm';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export function getGovernanceInstructions(
   realm: ProgramAccount<Realm>,

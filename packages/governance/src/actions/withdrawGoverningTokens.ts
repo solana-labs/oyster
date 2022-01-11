@@ -1,6 +1,6 @@
-import { withWithdrawGoverningTokens } from '@solana/governance-sdk';
+import { withWithdrawGoverningTokens } from '@solana/spl-governance';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { RpcContext } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
 

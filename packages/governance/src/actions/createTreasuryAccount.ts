@@ -1,11 +1,11 @@
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { GovernanceConfig } from '@solana/governance-sdk';
+import { GovernanceConfig } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
-import { withCreateTokenGovernance } from '@solana/governance-sdk';
-import { RpcContext } from '@solana/governance-sdk';
+import { withCreateTokenGovernance } from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
 import { withCreateSplTokenAccount } from '../tools/sdk/token/splToken';
 
 export const createTreasuryAccount = async (

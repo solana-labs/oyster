@@ -1,6 +1,6 @@
 import { Popover, Tooltip } from 'antd';
 
-import { ProposalState } from '@solana/governance-sdk';
+import { ProposalState } from '@solana/spl-governance';
 import BN from 'bn.js';
 
 import {
@@ -282,8 +282,8 @@ function formatVoteCountPercentage(
     percentage === 100
       ? new BigNumber(maxVoteScore.toString()).shiftedBy(-mintDecimals)
       : new BigNumber(maxVoteScore.toString())
-          .multipliedBy(percentage)
-          .shiftedBy(-(mintDecimals + 2))
+        .multipliedBy(percentage)
+        .shiftedBy(-(mintDecimals + 2))
   ).toFormat();
 }
 

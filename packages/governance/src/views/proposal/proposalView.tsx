@@ -22,7 +22,7 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteRecord,
-} from '@solana/governance-sdk';
+} from '@solana/spl-governance';
 import { useKeyParam } from '../../hooks/useKeyParam';
 
 import {
@@ -42,7 +42,7 @@ import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { TabPane } = Tabs;
 

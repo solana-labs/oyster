@@ -1,6 +1,6 @@
 import { Form, FormInstance, Spin } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import React from 'react';
@@ -13,7 +13,7 @@ import {
   getRAYGovernanceAta,
   getRaySrmLpFarmUserAccount,
 } from './yieldFarming';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { useAccount: useTokenAccount } = contexts.Accounts;
 const { useMint } = contexts.Accounts;
@@ -87,9 +87,8 @@ export const RaydiumStakeLPForm = ({
       initialValues={{ amount: 1 }}
     >
       <Form.Item
-        label={`${
-          isHarvest ? 'harvest RAY from RAY-SRM LP farm' : 'stake RAY-SRM LP'
-        }`}
+        label={`${isHarvest ? 'harvest RAY from RAY-SRM LP farm' : 'stake RAY-SRM LP'
+          }`}
       >
         {' '}
       </Form.Item>

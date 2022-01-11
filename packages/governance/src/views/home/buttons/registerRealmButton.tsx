@@ -13,7 +13,7 @@ import { registerRealm } from '../../../actions/registerRealm';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getRealmUrl } from '../../../tools/routeTools';
-import { MintMaxVoteWeightSource } from '@solana/governance-sdk';
+import { MintMaxVoteWeightSource } from '@solana/spl-governance';
 
 import { BigNumber } from 'bignumber.js';
 

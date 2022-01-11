@@ -1,6 +1,6 @@
 import { Form, FormInstance, InputNumber, Spin } from 'antd';
 import { ExplorerLink, SYSTEM } from '@oyster/common';
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 import {
   PublicKey,
   SystemProgram,
@@ -13,7 +13,7 @@ import { AccountFormItem } from '../../../../components/AccountFormItem/accountF
 
 import { useNativeTreasury } from '../../../../hooks/apiHooks';
 import { lamportsToSOL, SOLToLamports } from '../../../../tools/units';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const NativeTransferForm = ({
   form,

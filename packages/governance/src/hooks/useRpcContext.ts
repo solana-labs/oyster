@@ -3,7 +3,7 @@ import { PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 
 import { useProgramInfo } from '../contexts/GovernanceContext';
-import { RpcContext } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
 
 export function useRpcContext() {
   const { endpoint } = useConnectionConfig();

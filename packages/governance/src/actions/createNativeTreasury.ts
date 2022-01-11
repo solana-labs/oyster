@@ -1,12 +1,12 @@
 import { Account, TransactionInstruction } from '@solana/web3.js';
 
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/governance-sdk';
+import { RpcContext } from '@solana/spl-governance';
 
-import { withCreateNativeTreasury } from '@solana/governance-sdk';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { withCreateNativeTreasury } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const createNativeTreasury = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

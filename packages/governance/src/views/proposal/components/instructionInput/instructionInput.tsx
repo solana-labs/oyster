@@ -5,9 +5,9 @@ import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 
-import { Governance, Realm } from '@solana/governance-sdk';
+import { Governance, Realm } from '@solana/spl-governance';
 
-import { serializeInstructionToBase64 } from '@solana/governance-sdk';
+import { serializeInstructionToBase64 } from '@solana/spl-governance';
 import { AccountInstructionsForm } from './accountInstructionsForm';
 
 import { ProgramInstructionsForm } from './programInstructionsForm';
@@ -15,7 +15,7 @@ import { TokenInstructionsForm } from './tokenInstructionsForm';
 import { MintInstructionsForm } from './mintInstructionsForm';
 import { useNativeTreasury } from '../../../../hooks/apiHooks';
 import { InstructionType } from './instructionSelector';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export default function InstructionInput({
   realm,
@@ -75,15 +75,14 @@ export default function InstructionInput({
         onOk={form.submit}
         okText="Create"
         onCancel={() => setIsFormVisible(false)}
-        title={`Create ${
-          governance.account.isProgramGovernance()
+        title={`Create ${governance.account.isProgramGovernance()
             ? 'Program'
             : governance.account.isMintGovernance()
-            ? 'Mint'
-            : governance.account.isTokenGovernance()
-            ? 'Token'
-            : 'Account'
-        } Governance Instruction`}
+              ? 'Mint'
+              : governance.account.isTokenGovernance()
+                ? 'Token'
+                : 'Account'
+          } Governance Instruction`}
       >
         {governance.account.isProgramGovernance() && (
           <ProgramInstructionsForm

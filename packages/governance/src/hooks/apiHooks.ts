@@ -13,8 +13,8 @@ import {
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
-} from '@solana/governance-sdk';
-import { pubkeyFilter } from '@solana/governance-sdk';
+} from '@solana/spl-governance';
+import { pubkeyFilter } from '@solana/spl-governance';
 import {
   useAccountByPda,
   useGovernanceAccountByPda,

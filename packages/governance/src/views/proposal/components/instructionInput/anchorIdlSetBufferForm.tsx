@@ -1,6 +1,6 @@
 import { Form, FormInstance } from 'antd';
 import { ExplorerLink } from '@oyster/common';
-import { Governance } from '@solana/governance-sdk';
+import { Governance } from '@solana/spl-governance';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
 
@@ -9,7 +9,7 @@ import { createSetBuffer } from '../../../../tools/anchor/idlInstructions';
 import { formDefaults } from '../../../../tools/forms';
 import { useAnchorIdlAddress } from '../../../../tools/anchor/anchorHooks';
 import { AccountFormItem } from '../../../../components/AccountFormItem/accountFormItem';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 export const AnchorIdlSetBufferForm = ({
   form,

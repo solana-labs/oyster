@@ -1,6 +1,6 @@
 import { Button, Col, Modal, Row } from 'antd';
 import React from 'react';
-import { Realm } from '@solana/governance-sdk';
+import { Realm } from '@solana/spl-governance';
 import { LABELS } from '../../../constants';
 import { hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningToken
 import { PublicKey } from '@solana/web3.js';
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
 import { useRpcContext } from '../../../hooks/useRpcContext';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { useAccountByMint } = hooks;
 

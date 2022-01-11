@@ -18,7 +18,7 @@ import {
 } from '@oyster/common';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { Proposal, ProposalState } from '@solana/governance-sdk';
+import { Proposal, ProposalState } from '@solana/spl-governance';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl } from '../../tools/routeTools';
@@ -155,9 +155,8 @@ export const GovernanceView = () => {
                 </Space>
                 {nativeTreasury && (
                   <div>
-                    {`SOL: ${
-                      nativeTreasury.account.lamports / LAMPORTS_PER_SOL
-                    }`}{' '}
+                    {`SOL: ${nativeTreasury.account.lamports / LAMPORTS_PER_SOL
+                      }`}{' '}
                     <ExplorerLink
                       address={nativeTreasury.pubkey}
                       type="address"

@@ -1,7 +1,7 @@
 import { Space, Typography } from 'antd';
 import React from 'react';
 import { ExplorerLink, contexts } from '@oyster/common';
-import { Realm } from '@solana/governance-sdk';
+import { Realm } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
 import {
   formatMintMaxVotePercentage,
@@ -9,7 +9,7 @@ import {
   formatMintNaturalAmountAsDecimal,
   formatMintSupplyAsDecimal,
 } from '../../../tools/units';
-import { ProgramAccount } from '@solana/governance-sdk';
+import { ProgramAccount } from '@solana/spl-governance';
 
 const { useMint } = contexts.Accounts;
 const { Text } = Typography;
