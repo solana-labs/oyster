@@ -72,4 +72,6 @@ export const withAddSignatory = async (
       data,
     }),
   );
+
+  return signatoryRecordAddress;
 };

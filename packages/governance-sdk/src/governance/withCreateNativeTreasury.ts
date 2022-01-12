@@ -49,4 +49,6 @@ export const withCreateNativeTreasury = async (
       data,
     }),
   );
+
+  return nativeTreasuryAddress;
 };
