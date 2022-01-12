@@ -11,6 +11,8 @@
     "Addin",
     "Blockhash",
     "lamports",
+    "localnet",
+    "serialisation",
     "solana",
     "SYSVAR"
   ]

@@ -65,24 +65,29 @@ export class MemcmpFilter {
   }
 }
 
+// PublicKey MemcmpFilter
 export const pubkeyFilter = (
   offset: number,
   pubkey: PublicKey | undefined | null,
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
+// Boolean MemcmpFilter
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]));
+
 export async function getBorshProgramAccounts<
   TAccount extends ProgramAccountWithType
 >(
+  rpcEndpoint: string,
   programId: PublicKey,
   getSchema: (accountType: number) => Schema,
-  endpoint: string,
   accountFactory: new (args: any) => TAccount,
   filters: MemcmpFilter[] = [],
   accountType?: number,
 ) {
   accountType = accountType ?? new accountFactory({}).accountType;
 
-  let getProgramAccounts = await fetch(endpoint, {
+  let getProgramAccounts = await fetch(rpcEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

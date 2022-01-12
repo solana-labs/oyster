@@ -1,9 +1,4 @@
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 import {
   getGovernanceSchemaForAccount,
@@ -11,12 +6,11 @@ import {
 } from './serialisation';
 import {
   getAccountTypes,
-  getProgramMetadataAddress,
   getTokenOwnerRecordAddress,
+  Governance,
   GovernanceAccount,
   GovernanceAccountClass,
-  GovernanceAccountType,
-  ProgramMetadata,
+  Proposal,
   Realm,
   TokenOwnerRecord,
   VoteRecord,
@@ -27,36 +21,32 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from '../core/api';
-import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/constants';
-import { parseVersion } from '../tools/version';
-import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader';
-import { BN } from 'bn.js';
-import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
-import { ProgramAccount, simulateTransaction } from '../tools/sdk/runtime';
-import { BN_ZERO } from '../tools/numbers';
 
-export async function getRealms(endpoint: string, programId: PublicKey) {
-  return getBorshProgramAccounts<Realm>(
-    programId,
-    at => getGovernanceSchemaForAccount(at),
-    endpoint,
-    Realm,
-  );
+import { ProgramAccount } from '../tools/sdk/runtime';
+
+// Realms
+
+export async function getRealm(connection: Connection, realm: PublicKey) {
+  return getGovernanceAccount(connection, realm, Realm);
 }
+
+export async function getRealms(rpcEndpoint: string, programId: PublicKey) {
+  return getGovernanceAccounts(rpcEndpoint, programId, Realm);
+}
+
+// VoteRecords
 
 export async function getVoteRecordsByVoter(
+  rpcEndpoint: string,
   programId: PublicKey,
-  endpoint: string,
   voter: PublicKey,
 ) {
-  return getGovernanceAccounts<VoteRecord>(
-    programId,
-    endpoint,
-    VoteRecord,
-    getAccountTypes(VoteRecord),
-    [pubkeyFilter(33, voter)!],
-  );
+  return getGovernanceAccounts(rpcEndpoint, programId, VoteRecord, [
+    pubkeyFilter(33, voter)!,
+  ]);
 }
+
+// TokenOwnerRecords
 
 export async function getTokenOwnerRecordForRealm(
   connection: Connection,
@@ -72,37 +62,45 @@ export async function getTokenOwnerRecordForRealm(
     governingTokenOwner,
   );
 
-  const tokenOwnerRecordInfo = await connection.getAccountInfo(
-    tokenOwnerRecordPk,
-  );
-
-  if (!tokenOwnerRecordInfo) {
-    throw new Error(
-      `Can't fetch token owner record at ${tokenOwnerRecordPk.toBase58()}`,
-    );
-  }
-
-  const tokenOwnerRecord = GovernanceAccountParser(TokenOwnerRecord)(
-    tokenOwnerRecordPk,
-    tokenOwnerRecordInfo,
-  ) as ProgramAccount<TokenOwnerRecord>;
-
-  return tokenOwnerRecord;
+  return getGovernanceAccount(connection, tokenOwnerRecordPk, TokenOwnerRecord);
 }
 
+// Governances
+
+export async function getGovernance(
+  connection: Connection,
+  governance: PublicKey,
+) {
+  return getGovernanceAccount(connection, governance, Governance);
+}
+
+// Proposal
+
+export async function getProposal(
+  connection: Connection,
+  proposalPk: PublicKey,
+) {
+  return getGovernanceAccount(connection, proposalPk, Proposal);
+}
+
+// Generic API
+
 export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
+  rpcEndpoint: string,
   programId: PublicKey,
-  endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountTypes: GovernanceAccountType[],
+  accountClass: new (args: any) => TAccount,
   filters: MemcmpFilter[] = [],
 ) {
+  const accountTypes = getAccountTypes(
+    (accountClass as any) as GovernanceAccountClass,
+  );
+
   if (accountTypes.length === 1) {
-    return getBorshProgramAccounts<TAccount>(
+    return getBorshProgramAccounts(
+      rpcEndpoint,
       programId,
       at => getGovernanceSchemaForAccount(at),
-      endpoint,
-      accountClass as any,
+      accountClass,
       filters,
       accountTypes[0],
     );
@@ -111,9 +109,9 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   const all = await Promise.all(
     accountTypes.map(at =>
       getBorshProgramAccounts<TAccount>(
+        rpcEndpoint,
         programId,
         at => getGovernanceSchemaForAccount(at),
-        endpoint,
         accountClass as any,
         filters,
         at,
@@ -127,96 +125,21 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   >;
 }
 
-export async function getGovernanceProgramVersion(
+export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
   connection: Connection,
-  programId: PublicKey,
-  env: string,
+  accountPk: PublicKey,
+  accountClass: new (args: any) => TAccount,
 ) {
-  // Try get program metadata
-  const programMetadataPk = await getProgramMetadataAddress(programId);
+  const accountInfo = await connection.getAccountInfo(accountPk);
 
-  try {
-    const programMetadataInfo = await connection.getAccountInfo(
-      programMetadataPk,
+  if (!accountInfo) {
+    throw new Error(
+      `Account ${accountPk} of type ${accountClass.name} not found`,
     );
-
-    // If ProgramMetadata exists then use it to get latest updated version
-    if (programMetadataInfo) {
-      const programMetadata = GovernanceAccountParser(ProgramMetadata)(
-        programMetadataPk,
-        programMetadataInfo,
-      ) as ProgramAccount<ProgramMetadata>;
-
-      let deploySlot = BN_ZERO;
-
-      try {
-        const programData = await getProgramDataAccount(
-          connection,
-          new PublicKey(programId),
-        );
-        deploySlot = new BN(programData.slot);
-      } catch {
-        // If the program is not upgradable for example on localnet then there is no ProgramData account
-        // and Metadata must be more recent
-      }
-
-      // Check if ProgramMetadata is not stale
-      if (programMetadata.account.updatedAt.gte(deploySlot)) {
-        const version = parseVersion(programMetadata.account.version);
-        console.log('Program version (metadata)', version);
-        return version.major;
-      }
-    }
-  } catch {
-    // nop, let's try simulation
   }
 
-  try {
-    // If we don't have the programMetadata info then simulate UpdateProgramMetadata
-    let instructions: TransactionInstruction[] = [];
-    // The wallet can be any existing account for the simulation
-    // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
-    let walletPk = new PublicKey(
-      'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
-    );
-
-    await withUpdateProgramMetadata(instructions, programId, walletPk);
-
-    const transaction = new Transaction({ feePayer: walletPk });
-    transaction.add(...instructions);
-
-    // TODO: Once return values are supported change the simulation call to the actual one
-    const getVersion = await simulateTransaction(
-      connection,
-      transaction,
-      'recent',
-    );
-
-    if (!getVersion.value.err && getVersion.value.logs) {
-      const prefix = 'PROGRAM-VERSION:"';
-
-      const simVersion = getVersion.value.logs
-        .filter(l => l.includes(prefix))
-        .map(l => {
-          const versionStart = l.indexOf(prefix);
-
-          return parseVersion(
-            l.substring(versionStart + prefix.length, l.length - 1),
-          );
-        })[0];
-
-      console.log('Program version (simulation)', simVersion);
-
-      return simVersion.major;
-    }
-  } catch (ex) {
-    console.log("Can't determine program version", ex);
-  }
-
-  // If we can't determine the version using the program instance and running localnet then use the latest version
-  if (env === 'localnet') {
-    return PROGRAM_VERSION;
-  }
-
-  return PROGRAM_VERSION_V1;
+  return GovernanceAccountParser(accountClass as any)(
+    accountPk,
+    accountInfo,
+  ) as ProgramAccount<TAccount>;
 }
