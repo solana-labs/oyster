@@ -18,7 +18,7 @@ export function useVoteRegistry() {
         const options = Provider.defaultOptions();
         const provider = new Provider(
           connection,
-          wallet.wallet as unknown as Wallet,
+          wallet as unknown as Wallet,
           options,
         );
         const vsrClient = await VsrClient.connect(provider, true);

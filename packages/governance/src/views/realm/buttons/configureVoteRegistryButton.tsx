@@ -24,12 +24,12 @@ export function ConfigureVoteRegistryButton({
   const setRegistration = async () => {
     const [_registrar, _registrarBump] = await PublicKey.findProgramAddress(
       [realm.pubkey.toBuffer()],
-      new PublicKey('4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo'),
+      voteRegistryClient?.program.programId!,
     );
     const props = {
       accounts: {
         registrar: _registrar,
-        governanceProgramId: new PublicKey(realm.owner),
+        governanceProgramId: realm.owner,
         realm: realm.pubkey,
         realmGoverningTokenMint: realm.account.communityMint,
         realmAuthority: realm.account.authority!,
@@ -38,7 +38,6 @@ export function ConfigureVoteRegistryButton({
         rent,
       },
     };
-    console.log(props);
 
     await voteRegistryClient?.program.rpc.createRegistrar(
       _registrarBump,
