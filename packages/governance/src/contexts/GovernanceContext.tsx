@@ -165,7 +165,7 @@ export default function GovernanceProvider({ children = null as any }) {
   useEffect(() => {
     getProgramVersion(connection, programId, env).then(pVersion => {
       console.log('PROGRAM VERSION', { pVersion, env });
-      setProgramVersion(pVersion);
+      setProgramVersion(2);
     });
   }, [env, connection, programId]);
 

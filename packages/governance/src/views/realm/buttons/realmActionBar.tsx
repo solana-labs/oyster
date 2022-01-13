@@ -9,6 +9,7 @@ import { useWallet } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
 import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
 import { ProgramAccount } from '@solana/spl-governance';
+import { ConfigureVoteRegistryButton } from './configureVoteRegistryButton';
 
 export function RealmActionBar({
   realm,
@@ -31,7 +32,8 @@ export function RealmActionBar({
 
   const settingsVisible =
     showSettings && (showCreateNewGovernance || showSetRealmAuthority);
-
+  const useCommunityVoterWeightAddin =
+    realm.account.config.useCommunityVoterWeightAddin;
   return (
     <Space>
       <DepositGoverningTokensButton
@@ -79,6 +81,11 @@ export function RealmActionBar({
                   <SetRealmAuthorityButton
                     realm={realm}
                   ></SetRealmAuthorityButton>
+                )}
+                {useCommunityVoterWeightAddin && (
+                  <ConfigureVoteRegistryButton
+                    realm={realm}
+                  ></ConfigureVoteRegistryButton>
                 )}
               </Space>
             }
