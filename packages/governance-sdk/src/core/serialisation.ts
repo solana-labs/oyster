@@ -5,12 +5,16 @@ import { deserializeBorsh } from '../tools/borsh';
 import { ProgramAccount } from '../tools/sdk/runtime';
 
 export function BorshAccountParser(
-  classType: any,
+  classFactory: any,
   getSchema: (accountType: number) => Schema,
 ): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ProgramAccount<any> {
   return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
     const buffer = Buffer.from(info.data);
-    const data = deserializeBorsh(getSchema(info.data[0]), classType, buffer);
+    const data = deserializeBorsh(
+      getSchema(info.data[0]),
+      classFactory,
+      buffer,
+    );
 
     return {
       pubkey: pubKey,
