@@ -1,14 +1,8 @@
-import {
-  PublicKey,
-  TransactionInstruction,
-  Keypair,
-  Account,
-} from '@solana/web3.js';
-import { Accounts, models, TokenAccount } from '@oyster/common';
+import { PublicKey, TransactionInstruction, Keypair } from '@solana/web3.js';
+import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
-import { Key } from 'react';
 
 const { approve } = models;
 

@@ -15,8 +15,8 @@ import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
 import { PROGRAM_VERSION } from '@solana/spl-governance';
-import { getGovernanceProgramVersion } from '@solana/spl-governance/lib/governance/version';
-import { ProgramAccount } from '@solana/spl-governance';
+
+import { getGovernanceProgramVersion, ProgramAccount } from '@solana/spl-governance';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;

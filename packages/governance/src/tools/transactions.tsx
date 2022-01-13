@@ -1,5 +1,4 @@
 import {
-  Account,
   TransactionInstruction,
   Connection,
   Transaction,
