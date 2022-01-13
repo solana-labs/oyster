@@ -6,6 +6,7 @@ import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAc
 import { ProgramAccount } from '@solana/spl-governance';
 import { useVoteRegistry } from '../../../hooks/useVoteRegistry';
 import { useWallet } from '@oyster/common';
+import BN from 'bn.js';
 
 export function ConfigureVoteRegistryButton({
   realm,
@@ -23,26 +24,56 @@ export function ConfigureVoteRegistryButton({
   };
   const setRegistration = async () => {
     const [_registrar, _registrarBump] = await PublicKey.findProgramAddress(
-      [realm.pubkey.toBuffer()],
+      [
+        realm.pubkey.toBuffer(),
+        Buffer.from('registrar'),
+        realm.account.communityMint.toBuffer(),
+      ],
       voteRegistryClient?.program.programId!,
     );
-    const props = {
-      accounts: {
-        registrar: _registrar,
-        governanceProgramId: realm.owner,
-        realm: realm.pubkey,
-        realmGoverningTokenMint: realm.account.communityMint,
-        realmAuthority: realm.account.authority!,
-        payer: wallet.publicKey!,
-        systemProgram,
-        rent,
-      },
-    };
+    // const props = {
+    //   accounts: {
+    //     registrar: _registrar,
+    //     governanceProgramId: realm.owner,
+    //     realm: realm.pubkey,
+    //     realmGoverningTokenMint: realm.account.communityMint,
+    //     realmAuthority: realm.account.authority!,
+    //     payer: wallet.publicKey!,
+    //     systemProgram,
+    //     rent,
+    //   },
+    // };
 
-    await voteRegistryClient?.program.rpc.createRegistrar(
-      _registrarBump,
-      props,
-    );
+    // await voteRegistryClient?.program.rpc.createRegistrar(
+    //   _registrarBump,
+    //   props,
+    // );
+    try {
+      await voteRegistryClient?.program.rpc.configureVotingMint(
+        0,
+        0,
+        new BN(1),
+        new BN(0),
+        new BN(1),
+        realm.account.authority!,
+        {
+          accounts: {
+            registrar: _registrar,
+            realmAuthority: realm.account.authority!,
+            mint: realm.account.communityMint!,
+          },
+          remainingAccounts: [
+            {
+              pubkey: realm.account.communityMint!,
+              isSigner: false,
+              isWritable: false,
+            },
+          ],
+        },
+      );
+    } catch (e) {
+      console.log(e);
+    }
   };
   return (
     <ModalFormAction<null>
