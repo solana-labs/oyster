@@ -2,7 +2,8 @@ import {
   Account,
   TransactionInstruction,
   Connection,
-  Transaction
+  Transaction,
+  Keypair
 } from '@solana/web3.js';
 import {
   ExplorerLink,
@@ -20,7 +21,7 @@ export async function sendTransactionWithNotifications(
   connection: Connection,
   wallet: WalletSigner,
   instructions: TransactionInstruction[],
-  signers: Account[],
+  signers: Keypair[],
   pendingMessage: string,
   successMessage: string,
 ) {
@@ -60,9 +61,8 @@ export async function sendTransactionWithNotifications(
     } catch (txError) {
       if (isTransactionTimeoutError(txError)) {
         notify({
-          message: `Transaction hasn't been confirmed within ${
-            DEFAULT_TX_TIMEOUT / 1000
-          }s. Please check on Solana Explorer`,
+          message: `Transaction hasn't been confirmed within ${DEFAULT_TX_TIMEOUT / 1000
+            }s. Please check on Solana Explorer`,
           description: (
             <>
               <ExplorerLink

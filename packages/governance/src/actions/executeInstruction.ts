@@ -1,4 +1,4 @@
-import { Account, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, TransactionInstruction } from '@solana/web3.js';
 
 import { Proposal, ProposalInstruction } from '@solana/spl-governance';
 
@@ -12,7 +12,7 @@ export const executeInstruction = async (
   proposal: ProgramAccount<Proposal>,
   instruction: ProgramAccount<ProposalInstruction>,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   await withExecuteInstruction(

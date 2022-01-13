@@ -14,7 +14,8 @@ import { getRealms } from '@solana/spl-governance';
 import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
-import { getProgramVersion, PROGRAM_VERSION } from '@solana/spl-governance';
+import { PROGRAM_VERSION } from '@solana/spl-governance';
+import { getGovernanceProgramVersion } from '@solana/spl-governance/lib/governance/version';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export interface GovernanceContextState {
@@ -163,7 +164,7 @@ export default function GovernanceProvider({ children = null as any }) {
   }, [connection, programId, endpoint]); //eslint-disable-line
 
   useEffect(() => {
-    getProgramVersion(connection, programId, env).then(pVersion => {
+    getGovernanceProgramVersion(connection, new PublicKey(programId), env).then(pVersion => {
       console.log('PROGRAM VERSION', { pVersion, env });
       setProgramVersion(pVersion);
     });

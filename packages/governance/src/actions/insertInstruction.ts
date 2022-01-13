@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { InstructionData, Proposal } from '@solana/spl-governance';
 
@@ -16,7 +16,7 @@ export const insertInstruction = async (
   holdUpTime: number,
   instructionData: InstructionData,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   const governanceAuthority = walletPubkey;

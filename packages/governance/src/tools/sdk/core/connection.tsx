@@ -9,6 +9,7 @@ import {
   Account,
   Commitment,
   Connection,
+  Keypair,
   RpcResponseAndContext,
   SimulatedTransactionResponse,
   Transaction,
@@ -38,7 +39,7 @@ export async function sendTransaction2({
 }: {
   transaction: Transaction;
   wallet: WalletSigner;
-  signers?: Array<Account>;
+  signers?: Array<Keypair>;
   connection: Connection;
   sendingMessage?: string;
   successMessage?: string;
@@ -65,7 +66,7 @@ export async function signTransaction({
 }: {
   transaction: Transaction;
   wallet: WalletSigner;
-  signers?: Array<Account>;
+  signers?: Array<Keypair>;
   connection: Connection;
 }) {
   const { publicKey, signTransaction } = wallet;

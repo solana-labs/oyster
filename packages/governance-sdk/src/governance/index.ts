@@ -7,6 +7,7 @@ export * from './errors';
 export * from './instructions';
 export * from './serialisation';
 export * from './withAddSignatory';
+export * from './version';
 export * from './withCancelProposal';
 export * from './withCastVote';
 export * from './withCreateAccountGovernance';
