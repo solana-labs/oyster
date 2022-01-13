@@ -1,4 +1,4 @@
-import { Account, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, TransactionInstruction } from '@solana/web3.js';
 
 import { Governance } from '@solana/spl-governance';
 
@@ -13,7 +13,7 @@ export const createNativeTreasury = async (
 
   governance: ProgramAccount<Governance>,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   await withCreateNativeTreasury(

@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { SignatoryRecord } from '@solana/spl-governance';
 import { withSignOffProposal } from '@solana/spl-governance';
@@ -12,7 +12,7 @@ export const signOffProposal = async (
   signatoryRecord: ProgramAccount<SignatoryRecord>,
   signatory: PublicKey,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   withSignOffProposal(

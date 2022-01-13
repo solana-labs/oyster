@@ -14,3 +14,9 @@ export declare class WalletError extends Error {
 export declare class WalletNotConnectedError extends WalletError {
   name: string;
 }
+
+export function isWalletNotConnectedError(
+  error: any,
+): error is WalletNotConnectedError {
+  return error instanceof WalletNotConnectedError;
+}

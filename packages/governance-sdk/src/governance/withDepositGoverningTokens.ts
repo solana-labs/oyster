@@ -107,4 +107,6 @@ export const withDepositGoverningTokens = async (
       data,
     }),
   );
+
+  return tokenOwnerRecordAddress;
 };

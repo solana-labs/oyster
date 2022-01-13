@@ -1,4 +1,4 @@
-import { Account, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, TransactionInstruction } from '@solana/web3.js';
 
 import { Proposal } from '@solana/spl-governance';
 
@@ -14,7 +14,7 @@ export async function cancelProposal(
 ) {
   let governanceAuthority = walletPubkey;
 
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   withCancelProposal(
