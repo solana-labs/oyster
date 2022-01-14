@@ -4,7 +4,10 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "target": "es5",
+    "target": "es6",
+    "lib": [
+      "es2019"
+    ],
     "module": "commonjs",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,

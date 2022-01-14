@@ -135,10 +135,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     ),
   );
 
-  return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
-    string,
-    ProgramAccount<TAccount>
-  >;
+  return all.flatMap(a => a);
 }
 
 export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
