@@ -10,10 +10,10 @@ SPL Governance Client API for spl-governance program
 
 ```typescript
 import { getRealms } from '@solana/spl-governance';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 
+const connection = new Connection("https://api.mainnet-beta.solana.com", 'recent');
 const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
-const rpcEndpoint = "https://api.mainnet-beta.solana.com";
 
-const realms = getRealms(rpcEndpoint, programId);
+const realms = getRealms(connection, programId);
 
