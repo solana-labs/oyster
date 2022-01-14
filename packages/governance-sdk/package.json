@@ -45,7 +45,13 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "esbuild-jest"
-    }
+      "^.+\\.[jt]sx?$": "esbuild-jest"
+    },
+    "setupFiles": [
+      "./tests/setupTests.js"
+    ],
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!node-fetch)"
+    ]
   }
 }

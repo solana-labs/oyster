@@ -1,9 +1,3 @@
-import fetch from 'node-fetch'
-
-
-var globalRef: any = global;
-globalRef.fetch = fetch
-
 import { PublicKey } from '@solana/web3.js';
 import { getTokenOwnerRecordsByOwner } from '../../src'
 
