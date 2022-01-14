@@ -44,6 +44,7 @@
     "typescript": "^4.5.4"
   },
   "jest": {
+    "testTimeout": 20000,
     "transform": {
       "^.+\\.[jt]sx?$": "esbuild-jest"
     },
