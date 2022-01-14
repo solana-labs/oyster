@@ -1,7 +1,7 @@
 
 
 import { PublicKey } from '@solana/web3.js';
-//import { getTokenOwnerRecordsByOwner } from '../../src'
+import { getTokenOwnerRecordsByOwner } from '../../src'
 
 
 const programId = new PublicKey("GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP")
@@ -13,7 +13,7 @@ test('getTokenOwnerRecordsByOwner', async () => {
   const tokenOwnerPk = new PublicKey("EZLvwGdGyeks3jQLWeBbjL1uGeGbqb2MYU4157pDP9ch")
 
   // Act
-  //const results = await getTokenOwnerRecordsByOwner(rpcEndpoint, programId, tokenOwnerPk)
+  const results = await getTokenOwnerRecordsByOwner(rpcEndpoint, programId, tokenOwnerPk)
 
   // Assert
 
