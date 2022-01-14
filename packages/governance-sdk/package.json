@@ -1,6 +1,6 @@
 {
   "name": "@solana/spl-governance",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "SPL Governance Client API",
   "author": "Solana Maintainers <maintainers@solana.foundation>",
   "homepage": "https://github.com/solana-labs/oyster/blob/main/packages/governance-sdk/README.md",
@@ -20,7 +20,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: run tests from root\" && exit 1",
+    "test": "jest",
     "start": "npm-run-all --parallel watch",
     "watch": "tsc --watch"
   },
@@ -39,5 +39,10 @@
   "devDependencies": {
     "jest": "^27.4.7",
     "typescript": "^4.5.4"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "esbuild-jest"
+    }
   }
 }
