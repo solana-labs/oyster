@@ -34,9 +34,12 @@
     "borsh": "^0.3.1",
     "bs58": "^4.0.1",
     "moment": "^2.29.1",
+    "node-fetch": "^3.1.0",
     "superstruct": "^0.15.2"
   },
   "devDependencies": {
+    "esbuild": "^0.14.11",
+    "esbuild-jest": "^0.5.0",
     "jest": "^27.4.7",
     "typescript": "^4.5.4"
   },
