@@ -126,7 +126,7 @@ export default function GovernanceProvider({ children = null as any }) {
       const programPk = new PublicKey(programId);
 
       try {
-        const loadedRealms = await getRealms(endpoint, programPk);
+        const loadedRealms = await getRealms(connection, programPk);
         setRealms(loadedRealms);
       } catch (ex) {
         console.error("Can't load Realms", ex);

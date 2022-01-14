@@ -78,7 +78,7 @@ export const booleanFilter = (offset: number, value: boolean) =>
 export async function getBorshProgramAccounts<
   TAccount extends ProgramAccountWithType
 >(
-  rpcEndpoint: string,
+  connection: Connection,
   programId: PublicKey,
   getSchema: (accountType: number) => Schema,
   accountFactory: new (args: any) => TAccount,
@@ -86,6 +86,7 @@ export async function getBorshProgramAccounts<
   accountType?: number,
 ) {
   accountType = accountType ?? new accountFactory({}).accountType;
+  const rpcEndpoint = (connection as any)._rpcEndpoint;
 
   let getProgramAccounts = await fetch(rpcEndpoint, {
     method: 'POST',
@@ -99,7 +100,7 @@ export async function getBorshProgramAccounts<
       params: [
         programId.toBase58(),
         {
-          commitment: 'recent',
+          commitment: connection.commitment,
           encoding: 'base64',
           filters: [
             {
