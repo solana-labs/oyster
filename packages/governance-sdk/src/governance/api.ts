@@ -65,6 +65,25 @@ export async function getTokenOwnerRecordForRealm(
   return getGovernanceAccount(connection, tokenOwnerRecordPk, TokenOwnerRecord);
 }
 
+/**
+ * Returns TokenOwnerRecords for given token owner 
+
+ * 
+ * @param rpcEndpoint 
+ * @param programId 
+ * @param governingTokenOwner 
+ * @returns
+ */
+export async function getTokenOwnerRecordsByOwner(
+  rpcEndpoint: string,
+  programId: PublicKey,
+  governingTokenOwner: PublicKey,
+) {
+  return getGovernanceAccounts(rpcEndpoint, programId, TokenOwnerRecord, [
+    pubkeyFilter(1 + 32 + 32, governingTokenOwner)!,
+  ]);
+}
+
 // Governances
 
 export async function getGovernance(
