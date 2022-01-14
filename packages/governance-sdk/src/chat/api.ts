@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 import {
   getBorshProgramAccounts,
@@ -10,11 +10,11 @@ import { ChatMessage, GOVERNANCE_CHAT_PROGRAM_ID } from './accounts';
 import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 
 export function getGovernanceChatMessages(
-  rpcEndpoint: string,
+  connection: Connection,
   proposal: PublicKey,
 ) {
   return getBorshProgramAccounts(
-    rpcEndpoint,
+    connection,
     GOVERNANCE_CHAT_PROGRAM_ID,
     _ => GOVERNANCE_CHAT_SCHEMA,
     ChatMessage,
@@ -23,11 +23,11 @@ export function getGovernanceChatMessages(
 }
 
 export function getGovernanceChatMessagesByVoter(
-  rpcEndpoint: string,
+  connection: Connection,
   voter: PublicKey,
 ) {
   return getBorshProgramAccounts(
-    rpcEndpoint,
+    connection,
     GOVERNANCE_CHAT_PROGRAM_ID,
     _ => GOVERNANCE_CHAT_SCHEMA,
     ChatMessage,

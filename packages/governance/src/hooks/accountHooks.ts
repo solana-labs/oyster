@@ -120,7 +120,7 @@ export function useGovernanceAccountsByFilter<
       try {
         // TODO: add retries for transient errors
         const loadedAccounts = await getGovernanceAccounts<TAccount>(
-          endpoint,
+          connection,
           programId,
           (accountClass as any) as new (args: any) => TAccount,
           queryFilters,

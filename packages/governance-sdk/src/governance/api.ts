@@ -30,18 +30,18 @@ export async function getRealm(connection: Connection, realm: PublicKey) {
   return getGovernanceAccount(connection, realm, Realm);
 }
 
-export async function getRealms(rpcEndpoint: string, programId: PublicKey) {
-  return getGovernanceAccounts(rpcEndpoint, programId, Realm);
+export async function getRealms(connection: Connection, programId: PublicKey) {
+  return getGovernanceAccounts(connection, programId, Realm);
 }
 
 // VoteRecords
 
 export async function getVoteRecordsByVoter(
-  rpcEndpoint: string,
+  connection: Connection,
   programId: PublicKey,
   voter: PublicKey,
 ) {
-  return getGovernanceAccounts(rpcEndpoint, programId, VoteRecord, [
+  return getGovernanceAccounts(connection, programId, VoteRecord, [
     pubkeyFilter(33, voter)!,
   ]);
 }
@@ -75,11 +75,11 @@ export async function getTokenOwnerRecordForRealm(
  * @returns
  */
 export async function getTokenOwnerRecordsByOwner(
-  rpcEndpoint: string,
+  connection: Connection,
   programId: PublicKey,
   governingTokenOwner: PublicKey,
 ) {
-  return getGovernanceAccounts(rpcEndpoint, programId, TokenOwnerRecord, [
+  return getGovernanceAccounts(connection, programId, TokenOwnerRecord, [
     pubkeyFilter(1 + 32 + 32, governingTokenOwner)!,
   ]);
 }
@@ -95,17 +95,14 @@ export async function getGovernance(
 
 // Proposal
 
-export async function getProposal(
-  connection: Connection,
-  proposalPk: PublicKey,
-) {
-  return getGovernanceAccount(connection, proposalPk, Proposal);
+export async function getProposal(connection: Connection, proposal: PublicKey) {
+  return getGovernanceAccount(connection, proposal, Proposal);
 }
 
 // Generic API
 
 export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
-  rpcEndpoint: string,
+  connection: Connection,
   programId: PublicKey,
   accountClass: new (args: any) => TAccount,
   filters: MemcmpFilter[] = [],
@@ -116,7 +113,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 
   if (accountTypes.length === 1) {
     return getBorshProgramAccounts(
-      rpcEndpoint,
+      connection,
       programId,
       at => getGovernanceSchemaForAccount(at),
       accountClass,
@@ -128,7 +125,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   const all = await Promise.all(
     accountTypes.map(at =>
       getBorshProgramAccounts<TAccount>(
-        rpcEndpoint,
+        connection,
         programId,
         at => getGovernanceSchemaForAccount(at),
         accountClass as any,
