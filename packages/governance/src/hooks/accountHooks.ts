@@ -15,6 +15,7 @@ import { useRpcContext } from './useRpcContext';
 import { none, Option, some } from '../tools/option';
 import { getGovernanceAccounts } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
+import { arrayToRecord } from '../tools/script';
 
 // Fetches Governance program account using the given key and subscribes to updates
 export function useGovernanceAccountByPubkey<
@@ -125,7 +126,7 @@ export function useGovernanceAccountsByFilter<
           (accountClass as any) as new (args: any) => TAccount,
           queryFilters,
         );
-        setAccounts(loadedAccounts);
+        setAccounts(arrayToRecord(loadedAccounts, a => a.pubkey.toBase58()));
       } catch (ex) {
         console.error(`Can't load ${accountClass.name}`, ex);
         setAccounts({});

@@ -87,7 +87,7 @@ export async function getBorshProgramAccounts<
 ) {
   accountType = accountType ?? new accountFactory({}).accountType;
 
-  let programAccounts = await connection.getProgramAccounts(programId, {
+  const programAccounts = await connection.getProgramAccounts(programId, {
     commitment: connection.commitment,
     filters: [
       {
@@ -102,7 +102,7 @@ export async function getBorshProgramAccounts<
     ],
   });
 
-  let accounts: { [pubKey: string]: ProgramAccount<TAccount> } = {};
+  let accounts: ProgramAccount<TAccount>[] = [];
 
   for (let rawAccount of programAccounts) {
     try {
@@ -115,7 +115,7 @@ export async function getBorshProgramAccounts<
         owner: rawAccount.account.owner,
       };
 
-      accounts[account.pubkey.toBase58()] = account;
+      accounts.push(account);
     } catch (ex) {
       console.info(
         `Can't deserialize ${accountFactory.name} @ ${rawAccount.pubkey}.`,

@@ -17,6 +17,7 @@ import { useLocation } from 'react-router-dom';
 import { PROGRAM_VERSION } from '@solana/spl-governance';
 
 import { getGovernanceProgramVersion, ProgramAccount } from '@solana/spl-governance';
+import { arrayToRecord } from '../tools/script';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;
@@ -127,7 +128,7 @@ export default function GovernanceProvider({ children = null as any }) {
 
       try {
         const loadedRealms = await getRealms(connection, programPk);
-        setRealms(loadedRealms);
+        setRealms(arrayToRecord(loadedRealms, r => r.pubkey.toBase58()));
       } catch (ex) {
         console.error("Can't load Realms", ex);
         setRealms({});
