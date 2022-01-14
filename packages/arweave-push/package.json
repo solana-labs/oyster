@@ -15,18 +15,19 @@
     "test": "mocha test/*.test.js --timeout=60000"
   },
   "devDependencies": {
+    "jest": "^27.4.7",
     "mocha": "^8.0.0",
     "proxyquire": "^2.1.0",
     "sinon": "^10.0.0"
   },
   "dependencies": {
     "@google-cloud/storage": "^5.0.0",
-    "busboy": "^0.3.0",
-    "escape-html": "^1.0.3",
-    "arweave": "1.10.13",
     "@solana/web3.js": "^1.22.0",
+    "arweave": "1.10.13",
+    "busboy": "^0.3.0",
+    "coingecko-api": "1.0.10",
+    "escape-html": "^1.0.3",
     "mime-types": "2.1.30",
-    "node-fetch": "2.6.1",
-    "coingecko-api": "1.0.10"
+    "node-fetch": "2.6.1"
   }
 }
