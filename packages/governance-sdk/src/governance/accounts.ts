@@ -3,7 +3,6 @@ import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
 import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
-import moment from 'moment';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -728,13 +727,13 @@ export class Proposal {
   }
 
   getTimeToVoteEnd(governance: Governance) {
-    const now = moment().unix();
+    const unixTimestampInSeconds = Date.now() / 1000;
 
     return this.isPreVotingState()
       ? governance.config.maxVotingTime
       : (this.votingAt?.toNumber() ?? 0) +
           governance.config.maxVotingTime -
-          now;
+          unixTimestampInSeconds;
   }
 
   hasVoteTimeEnded(governance: Governance) {
