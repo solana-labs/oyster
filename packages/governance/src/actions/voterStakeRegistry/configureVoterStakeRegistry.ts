@@ -5,13 +5,10 @@ import {
   RpcContext,
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance';
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import { sendTransactionWithNotifications } from '../../tools/transactions';
+import { getRegistrarAddress } from '../../tools/voterStakeRegistry/accounts';
 
 export async function configureVoterStakeRegistry(
   { connection, wallet, walletPubkey }: RpcContext,
@@ -24,19 +21,16 @@ export async function configureVoterStakeRegistry(
 ) {
   let instructions: TransactionInstruction[] = [];
 
-  const [registrar, registrarBump] = await PublicKey.findProgramAddress(
-    [
-      realm.pubkey.toBuffer(),
-      Buffer.from('registrar'),
-      realm.account.communityMint.toBuffer(),
-    ],
+  const { registrarPda, registrarBump } = await getRegistrarAddress(
     vsrClient?.program.programId!,
+    realm.pubkey,
+    realm.account.communityMint,
   );
 
   instructions.push(
     vsrClient?.program.instruction.createRegistrar(registrarBump, {
       accounts: {
-        registrar: registrar,
+        registrar: registrarPda,
         governanceProgramId: realm.owner,
         realm: realm.pubkey,
         realmGoverningTokenMint: realm.account.communityMint,
@@ -58,7 +52,7 @@ export async function configureVoterStakeRegistry(
       realm.account.authority!,
       {
         accounts: {
-          registrar: registrar,
+          registrar: registrarPda,
           realmAuthority: realm.account.authority!,
           mint: realm.account.communityMint!,
         },

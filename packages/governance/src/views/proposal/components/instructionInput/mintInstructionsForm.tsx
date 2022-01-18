@@ -15,12 +15,14 @@ import {
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const MintInstructionsForm = ({
+  programVersion,
   form,
   realm,
   governance,
   onCreateInstruction,
   coreInstructions,
 }: {
+  programVersion: number;
   form: FormInstance;
   realm: ProgramAccount<Realm>;
   governance: ProgramAccount<Governance>;
@@ -32,7 +34,7 @@ export const MintInstructionsForm = ({
   let instructions = [
     InstructionType.SplTokenMintTo,
     ...coreInstructions,
-    ...getGovernanceInstructions(realm, governance),
+    ...getGovernanceInstructions(programVersion, realm, governance),
   ];
 
   if (!instruction) {

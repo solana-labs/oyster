@@ -19,12 +19,14 @@ import { RaydiumStakeRAYForm } from './raydiumStakeRAYForm';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const TokenInstructionsForm = ({
+  programVersion,
   form,
   realm,
   governance,
   onCreateInstruction,
   coreInstructions,
 }: {
+  programVersion: number;
   form: FormInstance;
   realm: ProgramAccount<Realm>;
   governance: ProgramAccount<Governance>;
@@ -35,19 +37,19 @@ export const TokenInstructionsForm = ({
 
   const yfInstructions = isYieldFarmingGovernance(governance.pubkey)
     ? [
-      InstructionType.RaydiumAddLiquidity,
-      InstructionType.RaydiumStakeLP,
-      InstructionType.RaydiumHarvestLP,
-      InstructionType.RaydiumStakeRAY,
-      InstructionType.RaydiumHarvestRAY,
-    ]
+        InstructionType.RaydiumAddLiquidity,
+        InstructionType.RaydiumStakeLP,
+        InstructionType.RaydiumHarvestLP,
+        InstructionType.RaydiumStakeRAY,
+        InstructionType.RaydiumHarvestRAY,
+      ]
     : [];
 
   let instructions = [
     ...yfInstructions,
     InstructionType.SplTokenTransfer,
     ...coreInstructions,
-    ...getGovernanceInstructions(realm, governance),
+    ...getGovernanceInstructions(programVersion, realm, governance),
   ];
 
   if (!instruction) {

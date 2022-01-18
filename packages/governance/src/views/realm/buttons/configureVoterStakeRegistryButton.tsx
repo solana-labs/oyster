@@ -5,15 +5,14 @@ import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAc
 import { ProgramAccount } from '@solana/spl-governance';
 import { useVoterStakeRegistryClient } from '../../../hooks/useVoterStakeRegistryClient';
 
-import BN from 'bn.js';
 import { configureVoterStakeRegistry } from '../../../actions/voterStakeRegistry/configureVoterStakeRegistry';
 import { useRpcContext } from '../../../hooks/useRpcContext';
-import { getSecondsFromYears } from '../../../tools/units';
+
 import {
+  getVotingMintConfigApiValues,
   VotingMintConfigFormItem,
   VotingMintConfigValues,
 } from '../../../components/voterStakeRegistry/votingMintConfigFormItem';
-import { getScaledFactor } from '../../../tools/voterStakeRegistry/voterStakeRegistry';
 
 export function ConfigureVoterStakeRegistryButton({
   realm,
@@ -24,18 +23,21 @@ export function ConfigureVoterStakeRegistryButton({
   const rpcContext = useRpcContext();
 
   const onSubmit = async (values: VotingMintConfigValues) => {
-    const dd = getScaledFactor(values.depositFactor);
-
-    console.log('VALUES:', values, dd);
+    const {
+      digitShift,
+      depositScaledFactor,
+      lockupScaledFactor,
+      lockupSaturationSecs,
+    } = getVotingMintConfigApiValues(values);
 
     await configureVoterStakeRegistry(
       rpcContext,
       vsrClient!,
       realm,
-      values.digitShift,
-      getScaledFactor(values.depositFactor),
-      getScaledFactor(values.lockupFactor),
-      new BN(getSecondsFromYears(values.lockupSaturationYears).toString()),
+      digitShift,
+      depositScaledFactor,
+      lockupScaledFactor,
+      lockupSaturationSecs,
     );
 
     return null;
