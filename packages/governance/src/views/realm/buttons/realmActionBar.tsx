@@ -9,7 +9,7 @@ import { useWallet } from '@oyster/common';
 import { MoreOutlined } from '@ant-design/icons';
 import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
 import { ProgramAccount } from '@solana/spl-governance';
-import { ConfigureVoteRegistryButton } from './configureVoteRegistryButton';
+import { ConfigureVoterStakeRegistryButton } from './configureVoterStakeRegistryButton';
 
 export function RealmActionBar({
   realm,
@@ -83,9 +83,9 @@ export function RealmActionBar({
                   ></SetRealmAuthorityButton>
                 )}
                 {useCommunityVoterWeightAddin && (
-                  <ConfigureVoteRegistryButton
+                  <ConfigureVoterStakeRegistryButton
                     realm={realm}
-                  ></ConfigureVoteRegistryButton>
+                  ></ConfigureVoterStakeRegistryButton>
                 )}
               </Space>
             }
