@@ -27,7 +27,8 @@ import {
 } from '../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
 import { RealmMintTokensFormItem } from '../../../components/realmMintTokensFormItem/realmMintTokensFormItem';
 import { parseMinTokensToCreate } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
-import { tryParseKey } from '@oyster/common';
+
+import { voterWeightPluginValidator } from '../../../tools/validators/voterWeightPlugin';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -106,16 +107,6 @@ export function RegisterRealmButton({
     return <Redirect push to={getRealmUrl(redirectTo, programId)} />;
   }
 
-  const pluginValidator = async (rule: any, value: string) => {
-    if (value) {
-      const pubkey = tryParseKey(value);
-
-      if (!pubkey) {
-        throw new Error('Provided value is not a valid publickey');
-      }
-    }
-  };
-
   return (
     <ModalFormAction<PublicKey>
       label="Register Realm"
@@ -178,7 +169,9 @@ export function RegisterRealmButton({
             <Form.Item
               name="communityVoterWeightAddin"
               label="community voter weight addin"
-              rules={[{ required: false, validator: pluginValidator }]}
+              rules={[
+                { required: false, validator: voterWeightPluginValidator },
+              ]}
             >
               <Input
                 allowClear={true}
