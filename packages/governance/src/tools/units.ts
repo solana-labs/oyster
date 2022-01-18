@@ -16,7 +16,9 @@ export function getTimestampFromDays(days: number) {
 }
 
 export function getSecondsFromYears(years: number) {
-  return years * DAYS_PER_YEAR * SECONDS_PER_DAY;
+  return new BigNumber(years).multipliedBy(
+    new BigNumber(DAYS_PER_YEAR * SECONDS_PER_DAY),
+  );
 }
 
 /// Formats mint amount (natural units) as a decimal string

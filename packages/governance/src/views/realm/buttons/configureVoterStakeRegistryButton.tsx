@@ -9,6 +9,11 @@ import BN from 'bn.js';
 import { configureVoterStakeRegistry } from '../../../actions/voterStakeRegistry/configureVoterStakeRegistry';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getSecondsFromYears } from '../../../tools/units';
+import {
+  VotingMintConfigFormItem,
+  VotingMintConfigValues,
+} from '../../../components/voterStakeRegistry/votingMintConfigFormItem';
+import { getScaledFactor } from '../../../tools/voterStakeRegistry/voterStakeRegistry';
 
 export function ConfigureVoterStakeRegistryButton({
   realm,
@@ -18,20 +23,19 @@ export function ConfigureVoterStakeRegistryButton({
   const vsrClient = useVoterStakeRegistryClient();
   const rpcContext = useRpcContext();
 
-  const digitShift = 0;
-  const depositScaledFactor = new BN(1);
-  const lockupScaledFactor = new BN(1);
-  const lockupSaturationSecs = new BN(getSecondsFromYears(5));
+  const onSubmit = async (values: VotingMintConfigValues) => {
+    const dd = getScaledFactor(values.depositFactor);
 
-  const onSubmit = async () => {
+    console.log('VALUES:', values, dd);
+
     await configureVoterStakeRegistry(
       rpcContext,
       vsrClient!,
       realm,
-      digitShift,
-      depositScaledFactor,
-      lockupScaledFactor,
-      lockupSaturationSecs,
+      values.digitShift,
+      getScaledFactor(values.depositFactor),
+      getScaledFactor(values.lockupFactor),
+      new BN(getSecondsFromYears(values.lockupSaturationYears).toString()),
     );
 
     return null;
@@ -39,12 +43,13 @@ export function ConfigureVoterStakeRegistryButton({
 
   return (
     <ModalFormAction<null>
-      label="Configure Vote Registry"
-      formTitle="Configure Vote Registry"
-      formAction="Set Configure Vote Registry"
-      formPendingAction="Setting Configure Vote Registry"
+      label="Configure Voter Stake Registry"
+      formTitle="Configure Voter Stake Registry"
+      formAction="Configure"
+      formPendingAction="Configuring"
       onSubmit={onSubmit}
-      initialValues={{ useCouncilMint: false }}
-    ></ModalFormAction>
+    >
+      <VotingMintConfigFormItem realm={realm}></VotingMintConfigFormItem>
+    </ModalFormAction>
   );
 }
