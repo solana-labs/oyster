@@ -4,7 +4,7 @@ import { Realm } from '@solana/spl-governance';
 import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { ProgramAccount } from '@solana/spl-governance';
-import { useVoteRegistry } from '../../../hooks/useVoteRegistry';
+import { useVoterStakeRegistryClient } from '../../../hooks/useVoterStakeRegistryClient';
 import { useWallet } from '@oyster/common';
 import BN from 'bn.js';
 
@@ -13,7 +13,7 @@ export function ConfigureVoteRegistryButton({
 }: {
   realm: ProgramAccount<Realm>;
 }) {
-  const voteRegistryClient = useVoteRegistry();
+  const voteRegistryClient = useVoterStakeRegistryClient();
   const wallet = useWallet();
   const systemProgram = SystemProgram.programId;
   const rent = SYSVAR_RENT_PUBKEY;

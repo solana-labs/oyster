@@ -5,8 +5,8 @@ import { useProgramInfo } from '../contexts/GovernanceContext';
 import { Provider, Wallet } from '@project-serum/anchor';
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
 
-export function useVoteRegistry() {
-  const { endpoint } = useConnectionConfig();
+export function useVoterStakeRegistryClient() {
+  const { endpoint, env } = useConnectionConfig();
   const connection = useConnection();
   const wallet = useWallet();
   const { programId, programVersion } = useProgramInfo();
@@ -18,10 +18,10 @@ export function useVoteRegistry() {
         const options = Provider.defaultOptions();
         const provider = new Provider(
           connection,
-          wallet as unknown as Wallet,
+          (wallet as unknown) as Wallet,
           options,
         );
-        const vsrClient = await VsrClient.connect(provider, true);
+        const vsrClient = await VsrClient.connect(provider, env === 'devnet');
         setClient(vsrClient);
       };
       if (wallet.connected) {
