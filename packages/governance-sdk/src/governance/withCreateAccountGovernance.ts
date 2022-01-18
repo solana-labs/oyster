@@ -8,6 +8,7 @@ import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateAccountGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { withVoterWeightAccounts } from './withVoterWeightAccounts';
 
 export const withCreateAccountGovernance = async (
   instructions: TransactionInstruction[],
@@ -18,6 +19,7 @@ export const withCreateAccountGovernance = async (
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
   governanceAuthority: PublicKey,
+  voterWeightRecord?: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const args = new CreateAccountGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -73,6 +75,8 @@ export const withCreateAccountGovernance = async (
       isSigner: true,
     },
   ];
+
+  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

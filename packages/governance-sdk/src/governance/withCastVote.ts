@@ -10,6 +10,7 @@ import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { withVoterWeightAccounts } from './withVoterWeightAccounts';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
@@ -24,6 +25,7 @@ export const withCastVote = async (
   governingTokenMint: PublicKey,
   vote: Vote,
   payer: PublicKey,
+  voterWeightRecord?: PublicKey,
 ) => {
   const args = new CastVoteArgs(
     programVersion === PROGRAM_VERSION_V1
@@ -102,6 +104,8 @@ export const withCastVote = async (
       isWritable: false,
     },
   ];
+
+  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

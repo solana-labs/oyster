@@ -7,9 +7,14 @@ import {
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateProposalArgs } from './instructions';
-import { GOVERNANCE_PROGRAM_SEED, VoteType } from './accounts';
+import {
+  getRealmConfigAddress,
+  GOVERNANCE_PROGRAM_SEED,
+  VoteType,
+} from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { withVoterWeightAccounts } from './withVoterWeightAccounts';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
@@ -27,6 +32,7 @@ export const withCreateProposal = async (
   options: string[],
   useDenyOption: boolean,
   payer: PublicKey,
+  voterWeightRecord?: PublicKey,
 ) => {
   const args = new CreateProposalArgs({
     name,
@@ -109,6 +115,8 @@ export const withCreateProposal = async (
       isSigner: false,
     },
   ];
+
+  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({
