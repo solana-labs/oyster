@@ -134,6 +134,8 @@ function ActionForm<TResult>({
       onFormSubmit(result);
       closeForm();
     } catch (ex) {
+      console.log('Submit error', ex);
+
       if (isSendTransactionError(ex)) {
         setError({
           txId: ex.txId,

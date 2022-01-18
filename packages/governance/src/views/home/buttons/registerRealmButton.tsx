@@ -13,7 +13,10 @@ import { registerRealm } from '../../../actions/registerRealm';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getRealmUrl } from '../../../tools/routeTools';
-import { MintMaxVoteWeightSource } from '@solana/spl-governance';
+import {
+  MintMaxVoteWeightSource,
+  PROGRAM_VERSION_V1,
+} from '@solana/spl-governance';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -24,6 +27,8 @@ import {
 } from '../../../components/realmMintSupplyConfigFormItem/realmMintSupplyConfigFormItem';
 import { RealmMintTokensFormItem } from '../../../components/realmMintTokensFormItem/realmMintTokensFormItem';
 import { parseMinTokensToCreate } from '../../../components/governanceConfigFormItem/governanceConfigFormItem';
+
+import { voterWeightPluginValidator } from '../../../tools/validators/voterWeightPlugin';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -49,11 +54,13 @@ export function RegisterRealmButton({
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
-  const { programId } = rpcContext;
+  const { programId, programVersion } = rpcContext;
 
   const [councilVisible, setCouncilVisible] = useState(false);
 
   const [communityMintAddress, setCommunityMintAddress] = useState('');
+  const [communityVoterWeightAddin, setCommunityVoterWeightAddin] =
+    useState('');
 
   const onSubmit = async (
     values: {
@@ -63,6 +70,7 @@ export function RegisterRealmButton({
       useCouncilMint: boolean;
       mintDecimals: number;
       minTokensToCreateGovernance: number | string;
+      communityVoterWeightAddin: string;
     } & RealmMintSupplyConfigValues,
   ) => {
     let supplyFraction = parseMintSupplyFraction(
@@ -81,6 +89,9 @@ export function RegisterRealmButton({
       values.useCouncilMint ? new PublicKey(values.councilMint) : undefined,
       supplyFraction,
       new BN(minCommunityTokensToCreateGovernance),
+      communityVoterWeightAddin
+        ? new PublicKey(communityVoterWeightAddin)
+        : undefined,
     );
   };
 
@@ -153,6 +164,21 @@ export function RegisterRealmButton({
             communityMintAddress={communityMintAddress}
             maxVoteWeightSource={MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION}
           ></RealmMintSupplyConfigFormItem>
+
+          {programVersion > PROGRAM_VERSION_V1 && (
+            <Form.Item
+              name="communityVoterWeightAddin"
+              label="community voter weight addin"
+              rules={[
+                { required: false, validator: voterWeightPluginValidator },
+              ]}
+            >
+              <Input
+                allowClear={true}
+                onChange={e => setCommunityVoterWeightAddin(e.target.value)}
+              />
+            </Form.Item>
+          )}
         </Panel>
       </Collapse>
     </ModalFormAction>

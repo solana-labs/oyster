@@ -9,6 +9,7 @@ import { GovernanceConfig } from './accounts';
 import { CreateTokenGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
+import { withVoterWeightAccounts } from './withVoterWeightAccounts';
 
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
@@ -21,6 +22,7 @@ export const withCreateTokenGovernance = async (
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
   governanceAuthority: PublicKey,
+  voterWeightRecord?: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const args = new CreateTokenGovernanceArgs({
     config,
@@ -89,6 +91,8 @@ export const withCreateTokenGovernance = async (
       isSigner: true,
     },
   ];
+
+  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

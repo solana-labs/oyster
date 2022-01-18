@@ -14,12 +14,14 @@ import {
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const AccountInstructionsForm = ({
+  programVersion,
   form,
   realm,
   governance,
   onCreateInstruction,
   coreInstructions,
 }: {
+  programVersion: number;
   form: FormInstance;
   realm: ProgramAccount<Realm>;
   governance: ProgramAccount<Governance>;
@@ -30,7 +32,7 @@ export const AccountInstructionsForm = ({
 
   let instructions = [
     ...coreInstructions,
-    ...getGovernanceInstructions(realm, governance),
+    ...getGovernanceInstructions(programVersion, realm, governance),
   ];
 
   if (!instruction) {

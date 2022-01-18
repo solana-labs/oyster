@@ -5,6 +5,7 @@ import BN from 'bn.js';
 import { MintMaxVoteWeightSource } from '@solana/spl-governance';
 
 const SECONDS_PER_DAY = 86400;
+const DAYS_PER_YEAR = 365;
 
 export function getDaysFromTimestamp(unixTimestamp: number) {
   return unixTimestamp / SECONDS_PER_DAY;
@@ -12,6 +13,12 @@ export function getDaysFromTimestamp(unixTimestamp: number) {
 
 export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY;
+}
+
+export function getSecondsFromYears(years: number) {
+  return new BigNumber(years).multipliedBy(
+    new BigNumber(DAYS_PER_YEAR * SECONDS_PER_DAY),
+  );
 }
 
 /// Formats mint amount (natural units) as a decimal string

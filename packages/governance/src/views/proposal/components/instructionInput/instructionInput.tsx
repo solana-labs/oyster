@@ -16,6 +16,7 @@ import { MintInstructionsForm } from './mintInstructionsForm';
 import { useNativeTreasury } from '../../../../hooks/apiHooks';
 import { InstructionType } from './instructionSelector';
 import { ProgramAccount } from '@solana/spl-governance';
+import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 export default function InstructionInput({
   realm,
@@ -33,6 +34,7 @@ export default function InstructionInput({
   const [coreInstructions, setCoreInstructions] = useState<InstructionType[]>(
     [],
   );
+  const { programVersion } = useRpcContext();
 
   useEffect(() => {
     if (nativeTreasury) {
@@ -75,17 +77,19 @@ export default function InstructionInput({
         onOk={form.submit}
         okText="Create"
         onCancel={() => setIsFormVisible(false)}
-        title={`Create ${governance.account.isProgramGovernance()
+        title={`Create ${
+          governance.account.isProgramGovernance()
             ? 'Program'
             : governance.account.isMintGovernance()
-              ? 'Mint'
-              : governance.account.isTokenGovernance()
-                ? 'Token'
-                : 'Account'
-          } Governance Instruction`}
+            ? 'Mint'
+            : governance.account.isTokenGovernance()
+            ? 'Token'
+            : 'Account'
+        } Governance Instruction`}
       >
         {governance.account.isProgramGovernance() && (
           <ProgramInstructionsForm
+            programVersion={programVersion}
             form={form}
             onCreateInstruction={onCreateInstruction}
             realm={realm}
@@ -95,6 +99,7 @@ export default function InstructionInput({
         )}
         {governance.account.isMintGovernance() && (
           <MintInstructionsForm
+            programVersion={programVersion}
             form={form}
             onCreateInstruction={onCreateInstruction}
             realm={realm}
@@ -104,6 +109,7 @@ export default function InstructionInput({
         )}
         {governance.account.isTokenGovernance() && (
           <TokenInstructionsForm
+            programVersion={programVersion}
             form={form}
             onCreateInstruction={onCreateInstruction}
             realm={realm}
@@ -113,6 +119,7 @@ export default function InstructionInput({
         )}
         {governance.account.isAccountGovernance() && (
           <AccountInstructionsForm
+            programVersion={programVersion}
             form={form}
             onCreateInstruction={onCreateInstruction}
             realm={realm}

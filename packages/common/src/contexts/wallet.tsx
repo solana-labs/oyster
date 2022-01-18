@@ -9,7 +9,7 @@ import {
 } from '@solana/wallet-adapter-base';
 import {
   useWallet as useWalletBase,
-  WalletProvider as BaseWalletProvider
+  WalletProvider as BaseWalletProvider,
 } from '@solana/wallet-adapter-react';
 import {
   getLedgerWallet,
@@ -22,10 +22,19 @@ import {
   Wallet,
   WalletName,
 } from '@solana/wallet-adapter-wallets';
-import { Button, Modal } from "antd";
-import React, { createContext, FC, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { notify } from "../utils";
-import { useConnectionConfig } from "./connection";
+import { Button, Modal } from 'antd';
+import React, {
+  createContext,
+  FC,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { notify } from '../utils';
+import { useConnectionConfig } from './connection';
 
 export interface WalletContextState extends WalletAdapterProps {
   wallets: Wallet[];
@@ -43,20 +52,25 @@ export interface WalletContextState extends WalletAdapterProps {
   signMessage: MessageSignerWalletAdapterProps['signMessage'] | undefined;
 }
 
-export function useWallet (): WalletContextState {
+export function useWallet(): WalletContextState {
   return useWalletBase() as WalletContextState;
 }
 
 export { SignerWalletAdapter, WalletNotConnectedError };
 
-export type WalletSigner = Pick<SignerWalletAdapter, 'publicKey' | 'signTransaction' | 'signAllTransactions'>;
+export type WalletSigner = Pick<
+  SignerWalletAdapter,
+  'publicKey' | 'signTransaction' | 'signAllTransactions'
+>;
 
 export interface WalletModalContextState {
   visible: boolean;
   setVisible: (open: boolean) => void;
 }
 
-export const WalletModalContext = createContext<WalletModalContextState>({} as WalletModalContextState);
+export const WalletModalContext = createContext<WalletModalContextState>(
+  {} as WalletModalContextState,
+);
 
 export function useWalletModal(): WalletModalContextState {
   return useContext(WalletModalContext);
@@ -76,20 +90,23 @@ export const WalletModal = () => {
       onCancel={close}
       width={400}
     >
-      {wallets.map((wallet) => {
+      {wallets.map(wallet => {
         return (
           <Button
             key={wallet.name}
             size="large"
             type={wallet === selected ? 'primary' : 'ghost'}
-            onClick={() => { select(wallet.name); close(); }}
+            onClick={() => {
+              select(wallet.name);
+              close();
+            }}
             icon={
               <img
                 alt={`${wallet.name}`}
                 width={20}
                 height={20}
                 src={wallet.icon}
-                style={{marginRight: 8}}
+                style={{ marginRight: 8 }}
               />
             }
             style={{
@@ -117,13 +134,10 @@ export const WalletModalProvider = ({ children }: { children: ReactNode }) => {
       const base58 = publicKey.toBase58();
       const keyToDisplay =
         base58.length > 20
-          ? `${base58.substring(
-            0,
-            7,
-          )}.....${base58.substring(
-            base58.length - 7,
-            base58.length,
-          )}`
+          ? `${base58.substring(0, 7)}.....${base58.substring(
+              base58.length - 7,
+              base58.length,
+            )}`
           : base58;
 
       notify({
@@ -151,22 +165,22 @@ export const WalletModalProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-      <WalletModal/>
+      <WalletModal />
     </WalletModalContext.Provider>
   );
 };
 
-export const WalletProvider = ({ children }: {children: ReactNode }) => {
+export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const { env } = useConnectionConfig();
 
   const network = useMemo(() => {
     switch (env) {
-      case "mainnet-beta":
+      case 'mainnet-beta':
         return WalletAdapterNetwork.Mainnet;
-      case "testnet":
+      case 'testnet':
         return WalletAdapterNetwork.Testnet;
-      case "devnet":
-      case "localnet":
+      case 'devnet':
+      case 'localnet':
       default:
         return WalletAdapterNetwork.Devnet;
     }
@@ -178,13 +192,13 @@ export const WalletProvider = ({ children }: {children: ReactNode }) => {
       getSlopeWallet(),
       getSolflareWallet(),
       getTorusWallet({
-        options: { clientId: 'Get a client ID @ https://developer.tor.us' }
+        options: { clientId: 'Get a client ID @ https://developer.tor.us' },
       }),
       getLedgerWallet(),
       getSolletWallet({ network }),
       getSolletExtensionWallet({ network }),
     ],
-    []
+    [],
   );
 
   const onError = useCallback((error: WalletError) => {
@@ -196,14 +210,8 @@ export const WalletProvider = ({ children }: {children: ReactNode }) => {
   }, []);
 
   return (
-    <BaseWalletProvider
-      wallets={wallets}
-      onError={onError}
-      autoConnect
-    >
-      <WalletModalProvider>
-        {children}
-      </WalletModalProvider>
+    <BaseWalletProvider wallets={wallets} onError={onError} autoConnect>
+      <WalletModalProvider>{children}</WalletModalProvider>
     </BaseWalletProvider>
   );
-}
+};

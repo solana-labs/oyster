@@ -12,7 +12,9 @@ export enum InstructionType {
   RaydiumStakeRAY,
   RaydiumHarvestRAY,
   SplTokenMintTo,
-  GovernanceSetRealmConfig,
+  SetRealmConfig,
+  VoterStakeSetRegistrar,
+  VoterStakeConfigureMint,
   NativeTransfer,
 }
 
@@ -28,6 +30,8 @@ const instructionNames = [
   'ray-harvest-RAY',
   'spl-token mint-to',
   'set-realm-config',
+  'voter-stake set-registrar',
+  'voter-stake config-mint',
   'SOL-transfer',
 ];
 

@@ -9,6 +9,7 @@ import { GovernanceConfig } from './accounts';
 import { CreateProgramGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { BPF_UPGRADE_LOADER_ID } from '../tools/sdk/bpfUpgradeableLoader';
+import { withVoterWeightAccounts } from './withVoterWeightAccounts';
 
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
@@ -21,6 +22,7 @@ export const withCreateProgramGovernance = async (
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
   governanceAuthority: PublicKey,
+  voterWeightRecord?: PublicKey,
 ): Promise<{ governanceAddress: PublicKey }> => {
   const args = new CreateProgramGovernanceArgs({
     config,
@@ -99,6 +101,8 @@ export const withCreateProgramGovernance = async (
       isSigner: true,
     },
   ];
+
+  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

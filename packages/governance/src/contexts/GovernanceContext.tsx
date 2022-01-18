@@ -113,8 +113,16 @@ export default function GovernanceProvider({ children = null as any }) {
 
   const programId = useMemo(() => {
     const params = new URLSearchParams(location.search);
+
+    console.log(
+      'DEFAULT_GOVERNANCE_PROGRAM_ID',
+      process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID,
+    );
+
     return (
-      params.get('programId') ?? 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+      params.get('programId') ??
+      process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID ??
+      'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
     );
   }, [location]);
 

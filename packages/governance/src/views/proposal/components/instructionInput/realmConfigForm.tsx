@@ -1,7 +1,7 @@
-import { Form, FormInstance, InputNumber } from 'antd';
+import { Form, FormInstance, Input, InputNumber } from 'antd';
 import { ExplorerLink, useMint, useWallet } from '@oyster/common';
-import { Governance, Realm } from '@solana/spl-governance';
-import { TransactionInstruction } from '@solana/web3.js';
+import { Governance, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
 
 import { formDefaults } from '../../../../tools/forms';
@@ -22,6 +22,7 @@ import {
 } from '../../../../tools/units';
 import { parseMinTokensToCreate } from '../../../../components/governanceConfigFormItem/governanceConfigFormItem';
 import { ProgramAccount } from '@solana/spl-governance';
+import { voterWeightPluginValidator } from '../../../../tools/validators/voterWeightPlugin';
 
 export interface RealmConfigValues {
   minCommunityTokensToCreateGovernance: number | string;
@@ -68,6 +69,7 @@ export const RealmConfigForm = ({
   const onCreate = async (
     values: {
       removeCouncil: boolean;
+      communityVoterWeightAddin: string | undefined;
     } & RealmMintSupplyConfigValues &
       RealmConfigValues,
   ) => {
@@ -75,6 +77,10 @@ export const RealmConfigForm = ({
       values.minCommunityTokensToCreateGovernance,
       values.communityMintDecimals,
     );
+
+    const communityVoterWeightAddin = values.communityVoterWeightAddin
+      ? new PublicKey(values.communityVoterWeightAddin)
+      : undefined;
 
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
@@ -87,7 +93,7 @@ export const RealmConfigForm = ({
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
       // Use minCommunityTokensToCreateGovernance.toString() in case the number is larger than number
       new BN(minCommunityTokensToCreateGovernance.toString()),
-      undefined,
+      communityVoterWeightAddin,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,
     );
@@ -101,9 +107,9 @@ export const RealmConfigForm = ({
 
   const minCommunityTokensToCreateGovernance = communityMintInfo
     ? getMintDecimalAmountFromNatural(
-      communityMintInfo,
-      realm.account.config.minCommunityTokensToCreateGovernance,
-    ).toNumber()
+        communityMintInfo,
+        realm.account.config.minCommunityTokensToCreateGovernance,
+      ).toNumber()
     : 0;
 
   let mintDecimals = communityMintInfo ? communityMintInfo.decimals : 0;
@@ -165,6 +171,16 @@ export const RealmConfigForm = ({
           realm.account.config.communityMintMaxVoteWeightSource
         }
       ></RealmMintSupplyConfigFormItem>
+
+      {programVersion > PROGRAM_VERSION_V1 && (
+        <Form.Item
+          name="communityVoterWeightAddin"
+          label="community voter weight addin"
+          rules={[{ required: false, validator: voterWeightPluginValidator }]}
+        >
+          <Input allowClear={true} />
+        </Form.Item>
+      )}
     </Form>
   );
 };
