@@ -1,6 +1,6 @@
 import { Button, Popover, Space } from 'antd';
 import React, { useRef } from 'react';
-import { Realm } from '@solana/spl-governance';
+import { PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance';
 import { DepositGoverningTokensButton } from './depositGoverningTokensButton';
 import { RegisterGovernanceButton } from './registerGovernanceButton';
 import { SetRealmAuthorityButton } from './setRealmAuthorityButton';
@@ -10,6 +10,7 @@ import { MoreOutlined } from '@ant-design/icons';
 import { CreateTreasuryAccountButton } from './createTreasuryAccountButton';
 import { ProgramAccount } from '@solana/spl-governance';
 import { ConfigureVoterStakeRegistryButton } from './configureVoterStakeRegistryButton';
+import { useRpcContext } from '../../../hooks/useRpcContext';
 
 export function RealmActionBar({
   realm,
@@ -20,6 +21,7 @@ export function RealmActionBar({
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
   const { publicKey, connected } = useWallet();
+  const { programVersion } = useRpcContext();
 
   if (!realm) {
     return null;
@@ -32,8 +34,11 @@ export function RealmActionBar({
 
   const settingsVisible =
     showSettings && (showCreateNewGovernance || showSetRealmAuthority);
+
   const useCommunityVoterWeightAddin =
-    realm.account.config.useCommunityVoterWeightAddin;
+    programVersion > PROGRAM_VERSION_V1 &&
+    !!realm.account.config.useCommunityVoterWeightAddin;
+
   return (
     <Space>
       <DepositGoverningTokensButton

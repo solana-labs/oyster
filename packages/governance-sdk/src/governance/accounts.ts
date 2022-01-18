@@ -238,7 +238,7 @@ export class RealmConfig {
       args.communityMintMaxVoteWeightSource;
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
-    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
+    this.useCommunityVoterWeightAddin = !!args.useCommunityVoterWeightAddin;
     this.reserved = args.reserved;
   }
 }
