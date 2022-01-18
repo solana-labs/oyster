@@ -63,4 +63,6 @@ export const withCreateTokenOwnerRecord = async (
       data,
     }),
   );
+
+  return tokenOwnerRecordAddress;
 };

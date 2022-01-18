@@ -1,4 +1,9 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  Account,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js';
 
 import { Proposal } from '@solana/spl-governance';
 
@@ -15,7 +20,7 @@ export const postChatMessage = async (
   replyTo: PublicKey | undefined,
   body: ChatMessageBody,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   let governanceAuthority = walletPubkey;

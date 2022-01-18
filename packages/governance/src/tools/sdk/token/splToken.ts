@@ -2,11 +2,10 @@ import {
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from '@oyster/common';
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 
 import { AccountLayout, Token } from '@solana/spl-token';
 import {
-  Account,
   SystemProgram,
   TransactionInstruction,
   Connection,
@@ -37,7 +36,7 @@ export function createTokenAccount(
   accountRentExempt: number,
   mint: PublicKey,
   owner: PublicKey,
-  signers: Account[],
+  signers: Keypair[],
 ) {
   const account = createUninitializedTokenAccount(
     instructions,
@@ -57,9 +56,9 @@ export function createUninitializedTokenAccount(
   instructions: TransactionInstruction[],
   payer: PublicKey,
   amount: number,
-  signers: Account[],
+  signers: Keypair[],
 ) {
-  const account = new Account();
+  const account = new Keypair();
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
@@ -77,7 +76,7 @@ export function createUninitializedTokenAccount(
 
 export const withCreateSplTokenAccount = async (
   instructions: TransactionInstruction[],
-  signers: Account[],
+  signers: Keypair[],
   connection: Connection,
   mint: PublicKey,
   owner: PublicKey,

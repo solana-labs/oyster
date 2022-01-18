@@ -1,4 +1,4 @@
-import { PublicKey, TransactionInstruction, Account } from '@solana/web3.js';
+import { PublicKey, TransactionInstruction, Keypair } from '@solana/web3.js';
 import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
@@ -13,7 +13,7 @@ export const depositGoverningTokens = async (
   governingTokenMint: PublicKey,
 ) => {
   let instructions: TransactionInstruction[] = [];
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
 
   const amount = governingTokenSource.info.amount;
 
@@ -25,7 +25,7 @@ export const depositGoverningTokens = async (
     amount,
   );
 
-  signers.push(transferAuthority);
+  signers.push((transferAuthority as any) as Keypair);
 
   await withDepositGoverningTokens(
     instructions,

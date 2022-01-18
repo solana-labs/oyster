@@ -14,8 +14,10 @@ import { getRealms } from '@solana/spl-governance';
 import { EventEmitter } from 'eventemitter3';
 
 import { useLocation } from 'react-router-dom';
-import { getProgramVersion, PROGRAM_VERSION } from '@solana/spl-governance';
-import { ProgramAccount } from '@solana/spl-governance';
+import { PROGRAM_VERSION } from '@solana/spl-governance';
+
+import { getGovernanceProgramVersion, ProgramAccount } from '@solana/spl-governance';
+import { arrayToRecord } from '../tools/script';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;
@@ -133,8 +135,8 @@ export default function GovernanceProvider({ children = null as any }) {
       const programPk = new PublicKey(programId);
 
       try {
-        const loadedRealms = await getRealms(endpoint, programPk);
-        setRealms(loadedRealms);
+        const loadedRealms = await getRealms(connection, programPk);
+        setRealms(arrayToRecord(loadedRealms, r => r.pubkey.toBase58()));
       } catch (ex) {
         console.error("Can't load Realms", ex);
         setRealms({});
@@ -171,7 +173,7 @@ export default function GovernanceProvider({ children = null as any }) {
   }, [connection, programId, endpoint]); //eslint-disable-line
 
   useEffect(() => {
-    getProgramVersion(connection, programId, env).then(pVersion => {
+    getGovernanceProgramVersion(connection, new PublicKey(programId), env).then(pVersion => {
       console.log('PROGRAM VERSION', { pVersion, env });
       setProgramVersion(pVersion);
     });

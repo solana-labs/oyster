@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
 import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
 
@@ -153,6 +154,11 @@ export class MintMaxVoteWeightSource {
     }
 
     return this.value;
+  }
+  fmtSupplyFractionPercentage() {
+    return new BigNumber(this.getSupplyFraction() as any)
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS + 2)
+      .toFormat();
   }
 }
 
@@ -718,6 +724,52 @@ export class Proposal {
       default:
         throw new Error(`Invalid account type ${this.accountType}`);
     }
+  }
+
+  getTimeToVoteEnd(governance: Governance) {
+    const unixTimestampInSeconds = Date.now() / 1000;
+
+    return this.isPreVotingState()
+      ? governance.config.maxVotingTime
+      : (this.votingAt?.toNumber() ?? 0) +
+          governance.config.maxVotingTime -
+          unixTimestampInSeconds;
+  }
+
+  hasVoteTimeEnded(governance: Governance) {
+    return this.getTimeToVoteEnd(governance) <= 0;
+  }
+
+  canCancel(governance: Governance) {
+    if (
+      this.state === ProposalState.Draft ||
+      this.state === ProposalState.SigningOff
+    ) {
+      return true;
+    }
+
+    if (
+      this.state === ProposalState.Voting &&
+      !this.hasVoteTimeEnded(governance)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  canWalletCancel(
+    governance: Governance,
+    proposalOwner: TokenOwnerRecord,
+    walletPk: PublicKey,
+  ) {
+    if (!this.canCancel(governance)) {
+      return false;
+    }
+    return (
+      proposalOwner.governingTokenOwner.equals(walletPk) ||
+      proposalOwner.governanceDelegate?.equals(walletPk)
+    );
   }
 }
 

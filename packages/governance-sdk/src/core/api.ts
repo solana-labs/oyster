@@ -65,58 +65,48 @@ export class MemcmpFilter {
   }
 }
 
+// PublicKey MemcmpFilter
 export const pubkeyFilter = (
   offset: number,
   pubkey: PublicKey | undefined | null,
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()));
 
+// Boolean MemcmpFilter
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]));
+
 export async function getBorshProgramAccounts<
   TAccount extends ProgramAccountWithType
 >(
+  connection: Connection,
   programId: PublicKey,
   getSchema: (accountType: number) => Schema,
-  endpoint: string,
   accountFactory: new (args: any) => TAccount,
   filters: MemcmpFilter[] = [],
   accountType?: number,
 ) {
   accountType = accountType ?? new accountFactory({}).accountType;
 
-  let getProgramAccounts = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'getProgramAccounts',
-      params: [
-        programId.toBase58(),
-        {
-          commitment: 'recent',
-          encoding: 'base64',
-          filters: [
-            {
-              memcmp: {
-                offset: 0,
-                bytes: bs58.encode([accountType]),
-              },
-            },
-            ...filters.map(f => ({
-              memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
-            })),
-          ],
+  const programAccounts = await connection.getProgramAccounts(programId, {
+    commitment: connection.commitment,
+    filters: [
+      {
+        memcmp: {
+          offset: 0,
+          bytes: bs58.encode([accountType]),
         },
-      ],
-    }),
+      },
+      ...filters.map(f => ({
+        memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
+      })),
+    ],
   });
-  const rawAccounts = (await getProgramAccounts.json())['result'];
-  let accounts: { [pubKey: string]: ProgramAccount<TAccount> } = {};
 
-  for (let rawAccount of rawAccounts) {
+  let accounts: ProgramAccount<TAccount>[] = [];
+
+  for (let rawAccount of programAccounts) {
     try {
-      const data = Buffer.from(rawAccount.account.data[0], 'base64');
+      const data = rawAccount.account.data;
       const accountType = data[0];
 
       const account: ProgramAccount<TAccount> = {
@@ -125,7 +115,7 @@ export async function getBorshProgramAccounts<
         owner: rawAccount.account.owner,
       };
 
-      accounts[account.pubkey.toBase58()] = account;
+      accounts.push(account);
     } catch (ex) {
       console.info(
         `Can't deserialize ${accountFactory.name} @ ${rawAccount.pubkey}.`,

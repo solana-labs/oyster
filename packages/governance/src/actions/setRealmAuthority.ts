@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { Realm } from '@solana/spl-governance';
 
@@ -13,7 +13,7 @@ export const setRealmAuthority = async (
   realm: ProgramAccount<Realm>,
   newRealmAuthority: PublicKey,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   withSetRealmAuthority(

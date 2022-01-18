@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { GovernanceConfig } from '@solana/spl-governance';
 
@@ -16,7 +16,7 @@ export const createTreasuryAccount = async (
   tokenOwnerRecord: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
 
   const tokenAccount = await withCreateSplTokenAccount(
     instructions,

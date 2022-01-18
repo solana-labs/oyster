@@ -110,4 +110,6 @@ export const withCastVote = async (
       data,
     }),
   );
+
+  return voteRecordAddress;
 };

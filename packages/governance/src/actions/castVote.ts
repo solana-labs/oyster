@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { Proposal } from '@solana/spl-governance';
 import { withCastVote } from '@solana/spl-governance';
@@ -14,7 +14,7 @@ export const castVote = async (
   tokeOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
 ) => {
-  let signers: Account[] = [];
+  let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
   let governanceAuthority = walletPubkey;
