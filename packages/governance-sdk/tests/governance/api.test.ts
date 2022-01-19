@@ -58,7 +58,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
     minCouncilTokensToCreateProposal: new BN(1),
   })
 
-  const { governanceAddress: governancePk } = await withCreateMintGovernance(instructions, programId, realmPk, mintPk, config, true, walletPk, tokenOwnerRecordPk, walletPk, walletPk, undefined)
+  const governancePk = await withCreateMintGovernance(instructions, programId, realmPk, mintPk, config, true, walletPk, tokenOwnerRecordPk, walletPk, walletPk, undefined)
 
   // Create single choice Approve/Deny proposal with instruction to mint more governance tokens
   const voteType = VoteType.SINGLE_CHOICE

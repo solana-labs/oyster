@@ -10,6 +10,7 @@ import { CreateMintGovernanceArgs } from './instructions';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { withVoterWeightAccounts } from './withVoterWeightAccounts';
+import { GOVERNANCE_PROGRAM_SEED } from '.';
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
@@ -23,14 +24,14 @@ export const withCreateMintGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
-): Promise<{ governanceAddress: PublicKey }> => {
+) => {
   const args = new CreateMintGovernanceArgs({
     config,
     transferMintAuthority,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const [mintGovernanceAddress] = await PublicKey.findProgramAddress(
+  const [governanceAddress] = await PublicKey.findProgramAddress(
     [Buffer.from('mint-governance'), realm.toBuffer(), governedMint.toBuffer()],
     programId,
   );
@@ -42,7 +43,7 @@ export const withCreateMintGovernance = async (
       isSigner: false,
     },
     {
-      pubkey: mintGovernanceAddress,
+      pubkey: governanceAddress,
       isWritable: true,
       isSigner: false,
     },
@@ -98,5 +99,5 @@ export const withCreateMintGovernance = async (
     }),
   );
 
-  return { governanceAddress: mintGovernanceAddress };
+  return governanceAddress;
 };

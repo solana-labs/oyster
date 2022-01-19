@@ -8,6 +8,7 @@ import {
 } from '../../tools/units';
 import { MintInfo } from '@solana/spl-token';
 import { ProgramAccount } from '@solana/spl-governance';
+import BN from 'bn.js';
 
 const { useMint } = contexts.Accounts;
 
@@ -71,13 +72,13 @@ function TokenDepositStatistics({
     <>
       <span>{`${label}: ${formatMintNaturalAmountAsDecimal(
         mint,
-        tokenOwnerRecord.account.governingTokenDepositAmount,
+        tokenOwnerRecord.account.governingTokenDepositAmount as BN,
       )}`}</span>
       {showVoteWeights &&
         !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() && (
           <span>{` (${formatMintVoteWeight(
             mint,
-            tokenOwnerRecord.account.governingTokenDepositAmount,
+            tokenOwnerRecord.account.governingTokenDepositAmount as BN,
           )})`}</span>
         )}
     </>

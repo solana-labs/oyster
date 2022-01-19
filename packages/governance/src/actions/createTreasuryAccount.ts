@@ -30,20 +30,18 @@ export const createTreasuryAccount = async (
   let governanceAddress;
   let governanceAuthority = walletPubkey;
 
-  governanceAddress = (
-    await withCreateTokenGovernance(
-      instructions,
-      programId,
-      realm,
-      tokenAccount,
-      config,
-      true,
-      walletPubkey,
-      tokenOwnerRecord,
-      walletPubkey,
-      governanceAuthority,
-    )
-  ).governanceAddress;
+  governanceAddress = await withCreateTokenGovernance(
+    instructions,
+    programId,
+    realm,
+    tokenAccount,
+    config,
+    true,
+    walletPubkey,
+    tokenOwnerRecord,
+    walletPubkey,
+    governanceAuthority,
+  );
 
   await sendTransactionWithNotifications(
     connection,

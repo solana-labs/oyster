@@ -23,7 +23,7 @@ export const withCreateProgramGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
-): Promise<{ governanceAddress: PublicKey }> => {
+) => {
   const args = new CreateProgramGovernanceArgs({
     config,
     transferUpgradeAuthority,
@@ -112,5 +112,5 @@ export const withCreateProgramGovernance = async (
     }),
   );
 
-  return { governanceAddress };
+  return governanceAddress;
 };
