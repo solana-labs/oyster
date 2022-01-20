@@ -8,7 +8,6 @@ import {
 } from '../../tools/units';
 import { MintInfo } from '@solana/spl-token';
 import { ProgramAccount } from '@solana/spl-governance';
-import BN from 'bn.js';
 
 const { useMint } = contexts.Accounts;
 
