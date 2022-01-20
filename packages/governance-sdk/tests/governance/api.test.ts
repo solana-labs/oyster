@@ -3,7 +3,7 @@
 import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { BN } from 'bn.js';
-import { getGovernanceProgramVersion, getInstructionDataFromBase64, getRealm, getRealms, getTokenOwnerRecordsByOwner, GovernanceConfig, MintMaxVoteWeightSource, PROGRAM_VERSION_V2, serializeInstructionToBase64, VoteThresholdPercentage, VoteType, VoteWeightSource, withAddSignatory, withCreateMintGovernance, withCreateProposal, withCreateRealm, withDepositGoverningTokens, withInsertInstruction, withSignOffProposal } from '../../src'
+import { createInstructionData, getGovernanceProgramVersion, getInstructionDataFromBase64, getRealm, getRealms, getTokenOwnerRecordsByOwner, GovernanceConfig, MintMaxVoteWeightSource, PROGRAM_VERSION_V2, serializeInstructionToBase64, VoteThresholdPercentage, VoteType, VoteWeightSource, withAddSignatory, withCreateMintGovernance, withCreateProposal, withCreateRealm, withDepositGoverningTokens, withInsertInstruction, withSignOffProposal } from '../../src'
 import { requestAirdrop, sendTransaction } from '../tools/sdk';
 import { getTimestampFromDays } from '../tools/units';
 import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedTokenAccount';
@@ -38,9 +38,9 @@ test('createRealmWithGovernanceAndProposal', async () => {
 
   // Create Realm
   const name = `Realm-${new Keypair().publicKey.toBase58().slice(0, 6)}`;
-  const realmAuthority = walletPk;
+  const realmAuthorityPk = walletPk;
 
-  const realmPk = await withCreateRealm(instructions, programId, programVersion, name, realmAuthority, mintPk, walletPk, undefined, MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION, new BN(1), undefined)
+  const realmPk = await withCreateRealm(instructions, programId, programVersion, name, realmAuthorityPk, mintPk, walletPk, undefined, MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION, new BN(1), undefined)
 
   // Deposit governance tokens
   const tokenOwnerRecordPk = await withDepositGoverningTokens(instructions, programId, programVersion, realmPk, ataPk, mintPk, walletPk, walletPk, walletPk, new BN(1));
@@ -75,8 +75,8 @@ test('createRealmWithGovernanceAndProposal', async () => {
     [],
     1
   )
-  const instructionBase64 = serializeInstructionToBase64(instruction)
-  const instructionData = getInstructionDataFromBase64(instructionBase64);
+
+  const instructionData = createInstructionData(instruction);
 
   await withInsertInstruction(instructions, programId, programVersion, governancePk, proposalPk, tokenOwnerRecordPk, walletPk, 0, 0, instructionData, walletPk)
 

@@ -156,7 +156,14 @@ import { deserializeBorsh } from '../tools/borsh';
 export const serializeInstructionToBase64 = (
   instruction: TransactionInstruction,
 ) => {
-  let data = new InstructionData({
+  let data = createInstructionData(instruction);
+
+  return Buffer.from(serialize(GOVERNANCE_SCHEMA, data)).toString('base64');
+};
+
+// Converts TransactionInstruction to InstructionData format
+export const createInstructionData = (instruction: TransactionInstruction) => {
+  return new InstructionData({
     programId: instruction.programId,
     data: instruction.data,
     accounts: instruction.keys.map(
@@ -168,8 +175,6 @@ export const serializeInstructionToBase64 = (
         }),
     ),
   });
-
-  return Buffer.from(serialize(GOVERNANCE_SCHEMA, data)).toString('base64');
 };
 
 export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);

@@ -13,6 +13,7 @@ import { useNativeTreasury } from '../../../hooks/apiHooks';
 import { Space } from 'antd';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { ProgramAccount } from '@solana/spl-governance';
+import BN from 'bn.js';
 const { useMint } = contexts.Accounts;
 
 export default function AccountDescription({
@@ -44,12 +45,12 @@ export default function AccountDescription({
         tokenAccountMint &&
         `Token Balance: ${formatMintNaturalAmountAsDecimal(
           tokenAccountMint,
-          tokenAccount.info.amount,
+          tokenAccount.info.amount as BN,
         )}`}
       {mintAccount &&
         `Mint Supply: ${formatMintNaturalAmountAsDecimal(
           mintAccount,
-          mintAccount.supply,
+          mintAccount.supply as BN,
         )}`}
       {nativeTreasury &&
         `SOL: ${nativeTreasury.account.lamports / LAMPORTS_PER_SOL}`}

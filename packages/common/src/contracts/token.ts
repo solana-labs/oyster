@@ -95,6 +95,7 @@ export const mintNFT = async (
       TOKEN_PROGRAM_ID,
       mintAccount.publicKey,
       null,
+      'MintTokens',
       wallet.publicKey,
       [],
     ),

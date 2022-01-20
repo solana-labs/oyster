@@ -31,7 +31,7 @@ export function formatMintNaturalAmountAsDecimal(
 
 /// Formats mint supply (natural units) as a decimal string
 export function formatMintSupplyAsDecimal(mint: MintInfo) {
-  return getMintDecimalAmountFromNatural(mint, mint.supply).toFormat();
+  return getMintDecimalAmountFromNatural(mint, mint.supply as BN).toFormat();
 }
 
 // Converts mint amount (natural units) to decimals
@@ -136,7 +136,7 @@ export function formatPercentage(percentage: number) {
 export function getMintVoteWeight(mint: MintInfo, naturalAmount: BN) {
   return new BigNumber(100)
     .multipliedBy(getBigNumberAmount(naturalAmount))
-    .div(getBigNumberAmount(mint.supply))
+    .div(getBigNumberAmount(mint.supply as BN))
     .toNumber();
 }
 
@@ -197,7 +197,7 @@ export function getMintMaxVoteWeight(
   maxVoteWeightSource: MintMaxVoteWeightSource,
 ) {
   if (maxVoteWeightSource.isFullSupply()) {
-    return mint.supply;
+    return mint.supply as BN;
   }
 
   const supplyFraction = maxVoteWeightSource.getSupplyFraction();
