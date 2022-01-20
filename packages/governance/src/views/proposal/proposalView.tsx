@@ -498,7 +498,7 @@ function getMaxVoteScore(
     proposal.account.governingTokenMint.toBase58() ===
     realm.account.config.councilMint?.toBase58()
   ) {
-    return governingTokenMint.supply;
+    return governingTokenMint.supply as BN;
   }
 
   return getMintMaxVoteWeight(

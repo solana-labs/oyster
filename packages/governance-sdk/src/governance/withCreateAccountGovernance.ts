@@ -20,7 +20,7 @@ export const withCreateAccountGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
-): Promise<{ governanceAddress: PublicKey }> => {
+) => {
   const args = new CreateAccountGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -86,5 +86,5 @@ export const withCreateAccountGovernance = async (
     }),
   );
 
-  return { governanceAddress };
+  return governanceAddress;
 };

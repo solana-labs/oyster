@@ -73,9 +73,9 @@ interface ConnectionConfig {
 
 const ConnectionContext = React.createContext<ConnectionConfig>({
   endpoint: DEFAULT,
-  setEndpoint: () => {},
+  setEndpoint: () => { },
   slippage: DEFAULT_SLIPPAGE,
-  setSlippage: (val: number) => {},
+  setSlippage: (val: number) => { },
   connection: new Connection(DEFAULT, 'recent'),
   sendConnection: new Connection(DEFAULT, 'recent'),
   env: ENDPOINTS[0].name,
@@ -120,7 +120,7 @@ export function ConnectionProvider({ children = undefined as any }) {
         .excludeByTag('nft')
         .filterByChainId(
           ENDPOINTS.find(end => end.endpoint === endpoint)?.ChainId ||
-            ChainId.MainnetBeta,
+          ChainId.MainnetBeta,
         )
         .getList();
 
@@ -153,7 +153,7 @@ export function ConnectionProvider({ children = undefined as any }) {
   // is empty after opening its first time, preventing subsequent subscriptions from receiving responses.
   // This is a hack to prevent the list from every getting empty
   useEffect(() => {
-    const id = connection.onAccountChange(new Account().publicKey, () => {});
+    const id = connection.onAccountChange(new Account().publicKey, () => { });
     return () => {
       connection.removeAccountChangeListener(id);
     };
@@ -169,7 +169,7 @@ export function ConnectionProvider({ children = undefined as any }) {
   useEffect(() => {
     const id = sendConnection.onAccountChange(
       new Account().publicKey,
-      () => {},
+      () => { },
     );
     return () => {
       sendConnection.removeAccountChangeListener(id);
@@ -270,7 +270,7 @@ export const sendTransactions = async (
   signersSet: Account[][],
   sequenceType: SequenceType = SequenceType.Parallel,
   commitment: Commitment = 'singleGossip',
-  successCallback: (txid: string, ind: number) => void = (txid, ind) => {},
+  successCallback: (txid: string, ind: number) => void = (txid, ind) => { },
   failCallback: (reason: string, ind: number) => boolean = (txid, ind) => false,
   block?: BlockhashAndFeeCalculator,
 ): Promise<number> => {
@@ -382,7 +382,7 @@ export const sendTransaction = async (
     try {
       transaction = await wallet.signTransaction(transaction);
     } catch (ex) {
-      throw new SignTransactionError(ex);
+      throw new SignTransactionError(JSON.stringify(ex));
     }
   }
 
@@ -415,11 +415,10 @@ export const sendTransaction = async (
         console.error('getErrorForTransaction() error', ex);
       }
 
-      if ('timeout' in confirmationStatus.err) {
+      if ('timeout' in (confirmationStatus.err as any)) {
         notify({
-          message: `Transaction hasn't been confirmed within ${
-            DEFAULT_TIMEOUT / 1000
-          }s. Please check on Solana Explorer`,
+          message: `Transaction hasn't been confirmed within ${DEFAULT_TIMEOUT / 1000
+            }s. Please check on Solana Explorer`,
           description: (
             <>
               <ExplorerLink
@@ -566,7 +565,7 @@ export async function sendSignedTransaction({
 
     slot = confirmation?.slot || 0;
   } catch (err) {
-    if (err.timeout) {
+    if ((err as any).timeout) {
       throw new Error('Timed out awaiting confirmation on transaction');
     }
     let simulateResult: SimulatedTransactionResponse | null = null;
@@ -574,7 +573,7 @@ export async function sendSignedTransaction({
       simulateResult = (
         await simulateTransaction(connection, signedTransaction, 'single')
       ).value;
-    } catch (e) {}
+    } catch (e) { }
     if (simulateResult && simulateResult.err) {
       if (simulateResult.logs) {
         for (let i = simulateResult.logs.length - 1; i >= 0; --i) {

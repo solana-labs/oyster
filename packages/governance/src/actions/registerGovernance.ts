@@ -25,69 +25,61 @@ export const registerGovernance = async (
 
   switch (governanceType) {
     case GovernanceType.Account: {
-      governanceAddress = (
-        await withCreateAccountGovernance(
-          instructions,
-          programId,
-          realm,
-          governedAccount,
-          config,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority,
-        )
-      ).governanceAddress;
+      governanceAddress = await withCreateAccountGovernance(
+        instructions,
+        programId,
+        realm,
+        governedAccount,
+        config,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+      );
       break;
     }
     case GovernanceType.Program: {
-      governanceAddress = (
-        await withCreateProgramGovernance(
-          instructions,
-          programId,
-          realm,
-          governedAccount,
-          config,
-          transferAuthority!,
-          walletPubkey,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority,
-        )
-      ).governanceAddress;
+      governanceAddress = await withCreateProgramGovernance(
+        instructions,
+        programId,
+        realm,
+        governedAccount,
+        config,
+        transferAuthority!,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+      );
       break;
     }
     case GovernanceType.Mint: {
-      governanceAddress = (
-        await withCreateMintGovernance(
-          instructions,
-          programId,
-          realm,
-          governedAccount,
-          config,
-          transferAuthority!,
-          walletPubkey,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority,
-        )
-      ).governanceAddress;
+      governanceAddress = await withCreateMintGovernance(
+        instructions,
+        programId,
+        realm,
+        governedAccount,
+        config,
+        transferAuthority!,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+      );
       break;
     }
     case GovernanceType.Token: {
-      governanceAddress = (
-        await withCreateTokenGovernance(
-          instructions,
-          programId,
-          realm,
-          governedAccount,
-          config,
-          transferAuthority!,
-          walletPubkey,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority,
-        )
-      ).governanceAddress;
+      governanceAddress = await withCreateTokenGovernance(
+        instructions,
+        programId,
+        realm,
+        governedAccount,
+        config,
+        transferAuthority!,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+      );
       break;
     }
     default: {

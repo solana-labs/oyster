@@ -122,7 +122,7 @@ export function GovernanceConfigFormItem({
   } else {
     minTokensToCreateProposal = getMintDecimalAmountFromNatural(
       communityMintInfo,
-      governanceConfig.minCommunityTokensToCreateProposal,
+      governanceConfig.minCommunityTokensToCreateProposal as BN,
     ).toNumber();
   }
 

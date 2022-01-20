@@ -23,14 +23,14 @@ export const withCreateTokenGovernance = async (
   payer: PublicKey,
   governanceAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
-): Promise<{ governanceAddress: PublicKey }> => {
+) => {
   const args = new CreateTokenGovernanceArgs({
     config,
     transferTokenOwner,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const [tokenGovernanceAddress] = await PublicKey.findProgramAddress(
+  const [governanceAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from('token-governance'),
       realm.toBuffer(),
@@ -46,7 +46,7 @@ export const withCreateTokenGovernance = async (
       isSigner: false,
     },
     {
-      pubkey: tokenGovernanceAddress,
+      pubkey: governanceAddress,
       isWritable: true,
       isSigner: false,
     },
@@ -102,5 +102,5 @@ export const withCreateTokenGovernance = async (
     }),
   );
 
-  return { governanceAddress: tokenGovernanceAddress };
+  return governanceAddress;
 };

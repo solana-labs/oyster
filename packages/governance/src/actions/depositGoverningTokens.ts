@@ -3,6 +3,7 @@ import { models, TokenAccount } from '@oyster/common';
 import { withDepositGoverningTokens } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
+import BN from 'bn.js';
 
 const { approve } = models;
 
@@ -37,7 +38,7 @@ export const depositGoverningTokens = async (
     walletPubkey,
     transferAuthority.publicKey,
     walletPubkey,
-    amount,
+    amount as BN,
   );
 
   await sendTransactionWithNotifications(

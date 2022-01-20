@@ -17,7 +17,7 @@ import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';
 export async function getGovernanceProgramVersion(
   connection: Connection,
   programId: PublicKey,
-  env: string,
+  env?: string,
 ) {
   // Try get program metadata
   const programMetadataPk = await getProgramMetadataAddress(programId);
