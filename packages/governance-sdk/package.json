@@ -43,6 +43,7 @@
     "@solana/spl-token": "0.1.3"
   },
   "jest": {
+    "testTimeout": 20000,
     "transform": {
       "^.+\\.tsx?$": "esbuild-jest"
     }
