@@ -415,7 +415,7 @@ export const sendTransaction = async (
         console.error('getErrorForTransaction() error', ex);
       }
 
-      if ('timeout' in confirmationStatus.err) {
+      if ('timeout' in (confirmationStatus.err as any)) {
         notify({
           message: `Transaction hasn't been confirmed within ${DEFAULT_TIMEOUT / 1000
             }s. Please check on Solana Explorer`,
@@ -565,7 +565,7 @@ export async function sendSignedTransaction({
 
     slot = confirmation?.slot || 0;
   } catch (err) {
-    if (err.timeout) {
+    if ((err as any).timeout) {
       throw new Error('Timed out awaiting confirmation on transaction');
     }
     let simulateResult: SimulatedTransactionResponse | null = null;

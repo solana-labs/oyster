@@ -72,13 +72,13 @@ function TokenDepositStatistics({
     <>
       <span>{`${label}: ${formatMintNaturalAmountAsDecimal(
         mint,
-        tokenOwnerRecord.account.governingTokenDepositAmount as BN,
+        tokenOwnerRecord.account.governingTokenDepositAmount,
       )}`}</span>
       {showVoteWeights &&
         !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() && (
           <span>{` (${formatMintVoteWeight(
             mint,
-            tokenOwnerRecord.account.governingTokenDepositAmount as BN,
+            tokenOwnerRecord.account.governingTokenDepositAmount,
           )})`}</span>
         )}
     </>
