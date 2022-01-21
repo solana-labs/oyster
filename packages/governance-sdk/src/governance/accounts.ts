@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
 import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
+import { BorshClass } from '../tools/borsh';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -96,13 +97,12 @@ export enum VoteThresholdPercentageType {
   Quorum = 1,
 }
 
-export class VoteThresholdPercentage {
-  type = VoteThresholdPercentageType.YesVote;
+interface VoteThresholdPercentageProps {
   value: number;
-
-  constructor(args: { value: number }) {
-    this.value = args.value;
-  }
+}
+export interface VoteThresholdPercentage extends VoteThresholdPercentageProps {}
+export class VoteThresholdPercentage extends BorshClass<VoteThresholdPercentageProps> {
+  type = VoteThresholdPercentageType.YesVote;
 }
 
 export enum VoteWeightSource {
@@ -127,13 +127,12 @@ export enum MintMaxVoteWeightSourceType {
   Absolute = 1,
 }
 
-export class MintMaxVoteWeightSource {
-  type = MintMaxVoteWeightSourceType.SupplyFraction;
+interface MintMaxVoteWeightSourceProps {
   value: BN;
-
-  constructor(args: { value: BN }) {
-    this.value = args.value;
-  }
+}
+export interface MintMaxVoteWeightSource extends MintMaxVoteWeightSourceProps {}
+export class MintMaxVoteWeightSource extends BorshClass<MintMaxVoteWeightSourceProps> {
+  type = MintMaxVoteWeightSourceType.SupplyFraction;
 
   static SUPPLY_FRACTION_BASE = new BN(10000000000);
   static SUPPLY_FRACTION_DECIMALS = 10;
@@ -167,15 +166,12 @@ export enum VoteTypeKind {
   MultiChoice = 1,
 }
 
-export class VoteType {
+interface VoteTypeProps {
   type: VoteTypeKind;
-  choiceCount: number | undefined;
-
-  constructor(args: { type: VoteTypeKind; choiceCount: number | undefined }) {
-    this.type = args.type;
-    this.choiceCount = args.choiceCount;
-  }
-
+  choiceCount?: number;
+}
+export interface VoteType extends VoteTypeProps {}
+export class VoteType extends BorshClass<VoteTypeProps> {
   static SINGLE_CHOICE = new VoteType({
     type: VoteTypeKind.SingleChoice,
     choiceCount: undefined,
@@ -192,84 +188,35 @@ export class VoteType {
   }
 }
 
-export class RealmConfigArgs {
+export interface RealmConfigArgs {
   useCouncilMint: boolean;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
 
   // Versions >= 2
   useCommunityVoterWeightAddin: boolean;
-
-  constructor(args: {
-    useCouncilMint: boolean;
-
-    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
-    minCommunityTokensToCreateGovernance: BN;
-
-    useCommunityVoterWeightAddin: boolean;
-  }) {
-    this.useCouncilMint = !!args.useCouncilMint;
-
-    this.communityMintMaxVoteWeightSource =
-      args.communityMintMaxVoteWeightSource;
-
-    this.minCommunityTokensToCreateGovernance =
-      args.minCommunityTokensToCreateGovernance;
-    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
-  }
 }
+export class RealmConfigArgs extends BorshClass<RealmConfigArgs> {}
 
-export class RealmConfig {
-  councilMint: PublicKey | undefined;
+export interface RealmConfig {
+  councilMint?: PublicKey;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+  reserved: Uint8Array;
   useCommunityVoterWeightAddin: boolean;
-  reserved: Uint8Array;
-
-  constructor(args: {
-    councilMint: PublicKey | undefined;
-    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
-    minCommunityTokensToCreateGovernance: BN;
-    reserved: Uint8Array;
-    useCommunityVoterWeightAddin: boolean;
-  }) {
-    this.councilMint = args.councilMint;
-    this.communityMintMaxVoteWeightSource =
-      args.communityMintMaxVoteWeightSource;
-    this.minCommunityTokensToCreateGovernance =
-      args.minCommunityTokensToCreateGovernance;
-    this.useCommunityVoterWeightAddin = !!args.useCommunityVoterWeightAddin;
-    this.reserved = args.reserved;
-  }
 }
+export class RealmConfig extends BorshClass<RealmConfig> {}
 
-export class Realm {
-  accountType = GovernanceAccountType.Realm;
-
+interface RealmProps {
   communityMint: PublicKey;
-
-  config: RealmConfig;
-
   reserved: Uint8Array;
-
-  authority: PublicKey | undefined;
-
+  config: RealmConfig;
+  authority?: PublicKey;
   name: string;
-
-  constructor(args: {
-    communityMint: PublicKey;
-    reserved: Uint8Array;
-    config: RealmConfig;
-    authority: PublicKey | undefined;
-    name: string;
-  }) {
-    this.communityMint = args.communityMint;
-    this.config = args.config;
-    this.reserved = args.reserved;
-
-    this.authority = args.authority;
-    this.name = args.name;
-  }
+}
+export interface Realm extends RealmProps {}
+export class Realm extends BorshClass<RealmProps> {
+  accountType = GovernanceAccountType.Realm;
 }
 
 export async function getTokenHoldingAddress(
@@ -293,11 +240,11 @@ export class RealmConfigAccount {
   accountType = GovernanceAccountType.RealmConfig;
 
   realm: PublicKey;
-  communityVoterWeightAddin: PublicKey | undefined;
+  communityVoterWeightAddin?: PublicKey;
 
   constructor(args: {
     realm: PublicKey;
-    communityVoterWeightAddin: PublicKey | undefined;
+    communityVoterWeightAddin?: PublicKey;
   }) {
     this.realm = args.realm;
     this.communityVoterWeightAddin = args.communityVoterWeightAddin;
@@ -316,60 +263,31 @@ export async function getRealmConfigAddress(
   return realmConfigAddress;
 }
 
-export class GovernanceConfig {
+interface GovernanceConfigProps {
   voteThresholdPercentage: VoteThresholdPercentage;
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
-  voteWeightSource: VoteWeightSource;
-  proposalCoolOffTime: number;
+  voteWeightSource?: VoteWeightSource;
+  proposalCoolOffTime?: number;
   minCouncilTokensToCreateProposal: BN;
-
-  constructor(args: {
-    voteThresholdPercentage: VoteThresholdPercentage;
-    minCommunityTokensToCreateProposal: BN;
-    minInstructionHoldUpTime: number;
-    maxVotingTime: number;
-    voteWeightSource?: VoteWeightSource;
-    proposalCoolOffTime?: number;
-    minCouncilTokensToCreateProposal: BN;
-  }) {
-    this.voteThresholdPercentage = args.voteThresholdPercentage;
-    this.minCommunityTokensToCreateProposal =
-      args.minCommunityTokensToCreateProposal;
-    this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
-    this.maxVotingTime = args.maxVotingTime;
-    this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
-    this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
-    this.minCouncilTokensToCreateProposal =
-      args.minCouncilTokensToCreateProposal;
-  }
+}
+export interface GovernanceConfig extends GovernanceConfigProps {}
+export class GovernanceConfig extends BorshClass<GovernanceConfigProps> {
+  voteWeightSource = VoteWeightSource.Deposit;
+  proposalCoolOffTime = 0;
 }
 
-export class Governance {
-  accountType: GovernanceAccountType;
+interface GovernanceProps {
   realm: PublicKey;
   governedAccount: PublicKey;
+  accountType: number;
   config: GovernanceConfig;
-  proposalCount: number;
   reserved?: Uint8Array;
-
-  constructor(args: {
-    realm: PublicKey;
-    governedAccount: PublicKey;
-    accountType: number;
-    config: GovernanceConfig;
-    reserved?: Uint8Array;
-    proposalCount: number;
-  }) {
-    this.accountType = args.accountType;
-    this.realm = args.realm;
-    this.governedAccount = args.governedAccount;
-    this.config = args.config;
-    this.reserved = args.reserved;
-    this.proposalCount = args.proposalCount;
-  }
-
+  proposalCount: number;
+}
+export interface Governance extends GovernanceProps {}
+export class Governance extends BorshClass<GovernanceProps> {
   isProgramGovernance() {
     return this.accountType === GovernanceAccountType.ProgramGovernance;
   }
@@ -387,46 +305,20 @@ export class Governance {
   }
 }
 
-export class TokenOwnerRecord {
-  accountType = GovernanceAccountType.TokenOwnerRecord;
-
+interface TokenOwnerRecordProps {
   realm: PublicKey;
-
   governingTokenMint: PublicKey;
-
   governingTokenOwner: PublicKey;
-
   governingTokenDepositAmount: BN;
-
   unrelinquishedVotesCount: number;
-
   totalVotesCount: number;
-
   outstandingProposalCount: number;
-
   reserved: Uint8Array;
-
+}
+export interface TokenOwnerRecord extends TokenOwnerRecordProps {}
+export class TokenOwnerRecord extends BorshClass<TokenOwnerRecordProps> {
+  accountType = GovernanceAccountType.TokenOwnerRecord;
   governanceDelegate?: PublicKey;
-
-  constructor(args: {
-    realm: PublicKey;
-    governingTokenMint: PublicKey;
-    governingTokenOwner: PublicKey;
-    governingTokenDepositAmount: BN;
-    unrelinquishedVotesCount: number;
-    totalVotesCount: number;
-    outstandingProposalCount: number;
-    reserved: Uint8Array;
-  }) {
-    this.realm = args.realm;
-    this.governingTokenMint = args.governingTokenMint;
-    this.governingTokenOwner = args.governingTokenOwner;
-    this.governingTokenDepositAmount = args.governingTokenDepositAmount;
-    this.unrelinquishedVotesCount = args.unrelinquishedVotesCount;
-    this.totalVotesCount = args.totalVotesCount;
-    this.outstandingProposalCount = args.outstandingProposalCount;
-    this.reserved = args.reserved;
-  }
 }
 
 export async function getTokenOwnerRecordAddress(
@@ -474,7 +366,7 @@ export enum OptionVoteResult {
   Defeated,
 }
 
-export class ProposalOption {
+export interface ProposalOption {
   label: string;
   voteWeight: BN;
   voteResult: OptionVoteResult;
@@ -482,148 +374,44 @@ export class ProposalOption {
   instructionsExecutedCount: number;
   instructionsCount: number;
   instructionsNextIndex: number;
-
-  constructor(args: {
-    label: string;
-    voteWeight: BN;
-    voteResult: OptionVoteResult;
-    instructionsExecutedCount: number;
-    instructionsCount: number;
-    instructionsNextIndex: number;
-  }) {
-    this.label = args.label;
-    this.voteWeight = args.voteWeight;
-    this.voteResult = args.voteResult;
-    this.instructionsExecutedCount = args.instructionsExecutedCount;
-    this.instructionsCount = args.instructionsCount;
-    this.instructionsNextIndex = args.instructionsNextIndex;
-  }
 }
+export class ProposalOption extends BorshClass<ProposalOption> {}
 
-export class Proposal {
+interface ProposalProps {
   accountType: GovernanceAccountType;
-
   governance: PublicKey;
-
   governingTokenMint: PublicKey;
-
   state: ProposalState;
-
   tokenOwnerRecord: PublicKey;
-
   signatoriesCount: number;
-
   signatoriesSignedOffCount: number;
+  draftAt: BN;
+  signingOffAt: BN | null;
+  votingAt: BN | null;
+  votingAtSlot: BN | null;
+  votingCompletedAt: BN | null;
+  executingAt: BN | null;
+  closedAt: BN | null;
+  executionFlags: InstructionExecutionFlags;
+  maxVoteWeight: BN | null;
+  voteThresholdPercentage: VoteThresholdPercentage | null;
+  name: string;
+  descriptionLink: string;
 
-  // V1 -----------------------------
+  // v1
   yesVotesCount: BN;
   noVotesCount: BN;
   instructionsExecutedCount: number;
   instructionsCount: number;
   instructionsNextIndex: number;
-  // --------------------------------
 
-  // V2 -----------------------------
+  // v2
   voteType: VoteType;
   options: ProposalOption[];
-  denyVoteWeight: BN | undefined;
-  // --------------------------------
-
-  draftAt: BN;
-
-  signingOffAt: BN | null;
-
-  votingAt: BN | null;
-
-  votingAtSlot: BN | null;
-
-  votingCompletedAt: BN | null;
-
-  executingAt: BN | null;
-
-  closedAt: BN | null;
-
-  executionFlags: InstructionExecutionFlags;
-
-  maxVoteWeight: BN | null;
-  voteThresholdPercentage: VoteThresholdPercentage | null;
-
-  name: string;
-
-  descriptionLink: string;
-
-  constructor(args: {
-    accountType: GovernanceAccountType;
-    governance: PublicKey;
-    governingTokenMint: PublicKey;
-    state: ProposalState;
-    tokenOwnerRecord: PublicKey;
-    signatoriesCount: number;
-    signatoriesSignedOffCount: number;
-    descriptionLink: string;
-    name: string;
-    // V1
-    yesVotesCount: BN;
-    noVotesCount: BN;
-    instructionsExecutedCount: number;
-    instructionsCount: number;
-    instructionsNextIndex: number;
-    //
-
-    // V2
-    voteType: VoteType;
-    options: ProposalOption[];
-    denyVoteWeight: BN | undefined;
-    //
-
-    draftAt: BN;
-    signingOffAt: BN | null;
-    votingAt: BN | null;
-    votingAtSlot: BN | null;
-    votingCompletedAt: BN | null;
-    executingAt: BN | null;
-    closedAt: BN | null;
-
-    executionFlags: InstructionExecutionFlags;
-    maxVoteWeight: BN | null;
-    voteThresholdPercentage: VoteThresholdPercentage | null;
-  }) {
-    this.accountType = args.accountType;
-    this.governance = args.governance;
-    this.governingTokenMint = args.governingTokenMint;
-    this.state = args.state;
-    this.tokenOwnerRecord = args.tokenOwnerRecord;
-    this.signatoriesCount = args.signatoriesCount;
-    this.signatoriesSignedOffCount = args.signatoriesSignedOffCount;
-    this.descriptionLink = args.descriptionLink;
-    this.name = args.name;
-
-    // V1
-    this.yesVotesCount = args.yesVotesCount;
-    this.noVotesCount = args.noVotesCount;
-    this.instructionsExecutedCount = args.instructionsExecutedCount;
-    this.instructionsCount = args.instructionsCount;
-    this.instructionsNextIndex = args.instructionsNextIndex;
-    //
-
-    // V2
-    this.voteType = args.voteType;
-    this.options = args.options;
-    this.denyVoteWeight = args.denyVoteWeight;
-
-    this.draftAt = args.draftAt;
-    this.signingOffAt = args.signingOffAt;
-    this.votingAt = args.votingAt;
-    this.votingAtSlot = args.votingAtSlot;
-    this.votingCompletedAt = args.votingCompletedAt;
-    this.executingAt = args.executingAt;
-    this.closedAt = args.closedAt;
-
-    this.executionFlags = args.executionFlags;
-    this.maxVoteWeight = args.maxVoteWeight;
-    this.voteThresholdPercentage = args.voteThresholdPercentage;
-  }
-
+  denyVoteWeight?: BN;
+}
+export interface Proposal extends ProposalProps {}
+export class Proposal extends BorshClass<ProposalProps> {
   /// Returns true if Proposal is in state when no voting can happen any longer
   isVoteFinalized(): boolean {
     switch (this.state) {
@@ -773,21 +561,14 @@ export class Proposal {
   }
 }
 
-export class SignatoryRecord {
-  accountType: GovernanceAccountType = GovernanceAccountType.SignatoryRecord;
+interface SignatoryRecordProps {
   proposal: PublicKey;
   signatory: PublicKey;
   signedOff: boolean;
-
-  constructor(args: {
-    proposal: PublicKey;
-    signatory: PublicKey;
-    signedOff: boolean;
-  }) {
-    this.proposal = args.proposal;
-    this.signatory = args.signatory;
-    this.signedOff = !!args.signedOff;
-  }
+}
+export interface SignatoryRecord extends SignatoryRecordProps {}
+export class SignatoryRecord extends BorshClass<SignatoryRecordProps> {
+  accountType: GovernanceAccountType = GovernanceAccountType.SignatoryRecord;
 }
 
 export async function getSignatoryRecordAddress(
@@ -807,54 +588,26 @@ export async function getSignatoryRecordAddress(
   return signatoryRecordAddress;
 }
 
-export class VoteWeight {
+export interface VoteWeight {
   yes: BN;
   no: BN;
-
-  constructor(args: { yes: BN; no: BN }) {
-    this.yes = args.yes;
-    this.no = args.no;
-  }
 }
+export class VoteWeight extends BorshClass<VoteWeight> {}
 
-export class VoteRecord {
+interface VoteRecordProps {
   accountType: GovernanceAccountType;
   proposal: PublicKey;
   governingTokenOwner: PublicKey;
   isRelinquished: boolean;
-
   // V1
-  voteWeight: VoteWeight | undefined;
-
+  voteWeight?: VoteWeight;
   // V2 -------------------------------
-  voterWeight: BN | undefined;
-  vote: Vote | undefined;
+  voterWeight?: BN;
+  vote?: Vote;
   // -------------------------------
-
-  constructor(args: {
-    accountType: GovernanceAccountType;
-    proposal: PublicKey;
-    governingTokenOwner: PublicKey;
-    isRelinquished: boolean;
-    // V1
-    voteWeight: VoteWeight | undefined;
-    // V2 -------------------------------
-    voterWeight: BN | undefined;
-    vote: Vote | undefined;
-    // -------------------------------
-  }) {
-    this.accountType = args.accountType;
-    this.proposal = args.proposal;
-    this.governingTokenOwner = args.governingTokenOwner;
-    this.isRelinquished = !!args.isRelinquished;
-    // V1
-    this.voteWeight = args.voteWeight;
-    // V2 -------------------------------
-    this.voterWeight = args.voterWeight;
-    this.vote = args.vote;
-    // -------------------------------
-  }
-
+}
+export interface VoteRecord extends VoteRecordProps {}
+export class VoteRecord extends BorshClass<VoteRecordProps> {
   getNoVoteWeight() {
     switch (this.accountType) {
       case GovernanceAccountType.VoteRecordV1: {
@@ -916,40 +669,21 @@ export async function getVoteRecordAddress(
   return voteRecordAddress;
 }
 
-export class AccountMetaData {
+export interface AccountMetaData {
   pubkey: PublicKey;
   isSigner: boolean;
   isWritable: boolean;
-
-  constructor(args: {
-    pubkey: PublicKey;
-    isSigner: boolean;
-    isWritable: boolean;
-  }) {
-    this.pubkey = args.pubkey;
-    this.isSigner = !!args.isSigner;
-    this.isWritable = !!args.isWritable;
-  }
 }
+export class AccountMetaData extends BorshClass<AccountMetaData> {}
 
-export class InstructionData {
+export interface InstructionData {
   programId: PublicKey;
   accounts: AccountMetaData[];
   data: Uint8Array;
-
-  constructor(args: {
-    programId: PublicKey;
-    accounts: AccountMetaData[];
-    data: Uint8Array;
-  }) {
-    this.programId = args.programId;
-    this.accounts = args.accounts;
-    this.data = args.data;
-  }
 }
+export class InstructionData extends BorshClass<InstructionData> {}
 
-export class ProposalInstruction {
-  accountType = GovernanceAccountType.ProposalInstructionV1;
+interface ProposalInstructionProps {
   proposal: PublicKey;
   instructionIndex: number;
   // V2
@@ -959,24 +693,10 @@ export class ProposalInstruction {
   instruction: InstructionData;
   executedAt: BN | null;
   executionStatus: InstructionExecutionStatus;
-
-  constructor(args: {
-    proposal: PublicKey;
-    instructionIndex: number;
-    optionIndex: number;
-    holdUpTime: number;
-    instruction: InstructionData;
-    executedAt: BN | null;
-    executionStatus: InstructionExecutionStatus;
-  }) {
-    this.proposal = args.proposal;
-    this.instructionIndex = args.instructionIndex;
-    this.optionIndex = args.optionIndex;
-    this.holdUpTime = args.holdUpTime;
-    this.instruction = args.instruction;
-    this.executedAt = args.executedAt;
-    this.executionStatus = args.executionStatus;
-  }
+}
+export interface ProposalInstruction extends ProposalInstructionProps {}
+export class ProposalInstruction extends BorshClass<ProposalInstructionProps> {
+  accountType = GovernanceAccountType.ProposalInstructionV1;
 }
 
 export async function getProposalInstructionAddress(
@@ -1014,25 +734,14 @@ export async function getProposalInstructionAddress(
   return instructionAddress;
 }
 
-export class ProgramMetadata {
-  accountType = GovernanceAccountType.ProgramMetadata;
-
+interface ProgramMetadataProps {
   updatedAt: BN;
-
   version: string;
-
   reserved: Uint8Array;
-
-  constructor(args: {
-    updatedAt: BN;
-    reserved: Uint8Array;
-
-    version: string;
-  }) {
-    this.updatedAt = args.updatedAt;
-    this.reserved = args.reserved;
-    this.version = args.version;
-  }
+}
+export interface ProgramMetadata extends ProgramMetadataProps {}
+export class ProgramMetadata extends BorshClass<ProgramMetadataProps> {
+  accountType = GovernanceAccountType.ProgramMetadata;
 }
 
 export async function getProgramMetadataAddress(programId: PublicKey) {

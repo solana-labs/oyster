@@ -10,24 +10,13 @@ import { WalletNotConnectedError, WalletSigner } from '../tools/walletAdapter';
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
-  programId: PublicKey;
-  programVersion: number;
-  wallet: WalletSigner;
-  connection: Connection;
-  endpoint: string;
-
   constructor(
-    programId: PublicKey,
-    programVersion: number,
-    wallet: WalletSigner,
-    connection: Connection,
-    endpoint: string,
+    public programId: PublicKey,
+    public programVersion: number,
+    public wallet: WalletSigner,
+    public connection: Connection,
+    public endpoint: string,
   ) {
-    this.programId = programId;
-    this.wallet = wallet;
-    this.connection = connection;
-    this.endpoint = endpoint;
-    this.programVersion = programVersion;
   }
 
   get walletPubkey() {
@@ -44,12 +33,7 @@ export class RpcContext {
 }
 
 export class MemcmpFilter {
-  offset: number;
-  bytes: Buffer;
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset;
-    this.bytes = bytes;
+  constructor(public offset: number, public bytes: Buffer) {
   }
 
   isMatch(buffer: Buffer) {
