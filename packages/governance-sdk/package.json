@@ -6,6 +6,7 @@
   "homepage": "https://github.com/solana-labs/oyster/blob/main/packages/governance-sdk/README.md",
   "license": "MIT",
   "main": "lib/cjs/index.js",
+  "browser": "lib/cjs/index.js",
   "module": "lib/mjs/index.js",
   "types": "lib/mjs/index.d.ts",
   "source": "src/index.ts",
