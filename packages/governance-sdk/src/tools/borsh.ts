@@ -102,3 +102,9 @@ export function deserializeBorsh(
   const reader = new BinaryReader(buffer);
   return deserializeStruct(schema, classType, reader);
 }
+
+export abstract class BorshClass<T> {
+  constructor(args: T) {
+    Object.assign(this, args);
+  }
+}
