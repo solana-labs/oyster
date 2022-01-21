@@ -1,6 +1,6 @@
 import { SendTransactionError } from '../tools/sdk/runtime';
 
-export const GovernanceError: Record<number, string> = [
+export const GovernanceError = [
   'Invalid instruction passed to program', // InvalidInstruction
   'Realm with the given name and governing mints already exists', // RealmAlreadyExists
   'Invalid realm', // InvalidRealm
@@ -88,9 +88,9 @@ export const GovernanceError: Record<number, string> = [
   'Proposal is not not executable', // ProposalIsNotExecutable
   'Invalid vote', // InvalidVote
   'Cannot execute defeated option', // CannotExecuteDefeatedOption
-];
+] as const;
 
-export const TokenError: Record<number, string> = [
+export const TokenError = [
   'Lamport balance below rent-exempt threshold', // NotRentExempt
   'Insufficient funds', // InsufficientFunds
   'Invalid Mint', // InvalidMint
@@ -110,14 +110,14 @@ export const TokenError: Record<number, string> = [
   'This token mint cannot freeze accounts', //  MintCannotFreeze,
   'Account is frozen', //  AccountFrozen,
   'The provided decimals value different from the Mint decimals', //  MintDecimalsMismatch,
-];
+] as const;
 
-export const GovernanceToolsError: Record<number, string> = [
+export const GovernanceToolsError = [
   'Account already initialized', // AccountAlreadyInitialized
   "Account doesn't exist", // AccountDoesNotExist
   'Invalid account owner', // InvalidAccountOwner
   'Invalid Account type', // InvalidAccountType
-];
+] as const;
 
 const governanceErrorOffset = 500;
 const governanceToolsErrorOffset = 1100;
