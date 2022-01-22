@@ -8,7 +8,9 @@ import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],
   signers: Keypair[],
+  chatProgramId: PublicKey,
   governanceProgramId: PublicKey,
+  realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -29,6 +31,11 @@ export async function withPostChatMessage(
   let keys = [
     {
       pubkey: governanceProgramId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: realm,
       isWritable: false,
       isSigner: false,
     },
@@ -80,7 +87,7 @@ export async function withPostChatMessage(
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: GOVERNANCE_CHAT_PROGRAM_ID,
+      programId: chatProgramId,
       data,
     }),
   );

@@ -1,11 +1,6 @@
-import {
-  Account,
-  Keypair,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '@solana/spl-governance';
+import { GOVERNANCE_CHAT_PROGRAM_ID, Proposal } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
@@ -15,6 +10,7 @@ import { ProgramAccount } from '@solana/spl-governance';
 
 export const postChatMessage = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
+  realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   replyTo: PublicKey | undefined,
@@ -29,7 +25,9 @@ export const postChatMessage = async (
   await withPostChatMessage(
     instructions,
     signers,
+    GOVERNANCE_CHAT_PROGRAM_ID,
     programId,
+    realm,
     proposal.account.governance,
     proposal.pubkey,
     tokeOwnerRecord,

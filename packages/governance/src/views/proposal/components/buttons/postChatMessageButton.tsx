@@ -33,6 +33,7 @@ export function PostChatMessageButton({
         try {
           await postChatMessage(
             rpcContext,
+            tokenOwnerRecord.account.realm,
             proposal,
             tokenOwnerRecord.pubkey,
             undefined,

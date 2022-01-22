@@ -24,10 +24,16 @@ export enum ChatMessageBodyType {
 export class ChatMessageBody {
   type: ChatMessageBodyType;
   value: string;
+  isReply: boolean;
 
-  constructor(args: { type: ChatMessageBodyType; value: string }) {
+  constructor(args: {
+    type: ChatMessageBodyType;
+    value: string;
+    isReply?: boolean;
+  }) {
     this.type = args.type;
     this.value = args.value;
+    this.isReply = args.isReply ?? false;
   }
 }
 
