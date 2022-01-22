@@ -4,11 +4,14 @@ import { serialize } from 'borsh';
 import { PostChatMessageArgs } from './instructions';
 import { GOVERNANCE_CHAT_PROGRAM_ID, ChatMessageBody } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { withVoterWeightAccounts } from '../governance/withVoterWeightAccounts';
 
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],
   signers: Keypair[],
+  chatProgramId: PublicKey,
   governanceProgramId: PublicKey,
+  realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -16,6 +19,7 @@ export async function withPostChatMessage(
   payer: PublicKey,
   replyTo: PublicKey | undefined,
   body: ChatMessageBody,
+  voterWeightRecord?: PublicKey,
 ) {
   const args = new PostChatMessageArgs({
     body,
@@ -29,6 +33,11 @@ export async function withPostChatMessage(
   let keys = [
     {
       pubkey: governanceProgramId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: realm,
       isWritable: false,
       isSigner: false,
     },
@@ -77,10 +86,12 @@ export async function withPostChatMessage(
     });
   }
 
+  withVoterWeightAccounts(keys, governanceProgramId, realm, voterWeightRecord);
+
   instructions.push(
     new TransactionInstruction({
       keys,
-      programId: GOVERNANCE_CHAT_PROGRAM_ID,
+      programId: chatProgramId,
       data,
     }),
   );

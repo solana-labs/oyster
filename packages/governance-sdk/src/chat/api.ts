@@ -11,11 +11,12 @@ import { GOVERNANCE_CHAT_SCHEMA } from './serialisation';
 
 export function getGovernanceChatMessages(
   connection: Connection,
+  chatProgramId: PublicKey,
   proposal: PublicKey,
 ) {
   return getBorshProgramAccounts(
     connection,
-    GOVERNANCE_CHAT_PROGRAM_ID,
+    chatProgramId,
     _ => GOVERNANCE_CHAT_SCHEMA,
     ChatMessage,
     [pubkeyFilter(1, proposal) as MemcmpFilter],
@@ -24,11 +25,12 @@ export function getGovernanceChatMessages(
 
 export function getGovernanceChatMessagesByVoter(
   connection: Connection,
+  chatProgramId: PublicKey,
   voter: PublicKey,
 ) {
   return getBorshProgramAccounts(
     connection,
-    GOVERNANCE_CHAT_PROGRAM_ID,
+    chatProgramId,
     _ => GOVERNANCE_CHAT_SCHEMA,
     ChatMessage,
     [pubkeyFilter(33, voter) as MemcmpFilter],
