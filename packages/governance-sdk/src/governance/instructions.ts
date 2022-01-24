@@ -304,10 +304,22 @@ export class FlagInstructionErrorArgs {
 
 export class SetRealmAuthorityArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.SetRealmAuthority;
-  newRealmAuthority: PublicKey;
 
-  constructor(args: { newRealmAuthority: PublicKey }) {
+  // V1
+  newRealmAuthority: PublicKey | undefined;
+
+  // V2
+  removeAuthority: boolean;
+
+  constructor(args: {
+    newRealmAuthority: PublicKey | undefined;
+    removeAuthority: boolean;
+  }) {
+    // V1
     this.newRealmAuthority = args.newRealmAuthority;
+
+    // V2
+    this.removeAuthority = args.removeAuthority;
   }
 }
 

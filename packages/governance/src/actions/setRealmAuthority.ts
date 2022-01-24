@@ -8,7 +8,7 @@ import { withSetRealmAuthority } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const setRealmAuthority = async (
-  { connection, wallet, programId }: RpcContext,
+  { connection, wallet, programId, programVersion }: RpcContext,
 
   realm: ProgramAccount<Realm>,
   newRealmAuthority: PublicKey,
@@ -19,6 +19,7 @@ export const setRealmAuthority = async (
   withSetRealmAuthority(
     instructions,
     programId,
+    programVersion,
     realm.pubkey,
     realm.account.authority!,
     newRealmAuthority,
