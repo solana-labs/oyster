@@ -409,7 +409,9 @@ function createGovernanceSchema(programVersion: number) {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
-          ['newRealmAuthority', { kind: 'option', type: 'pubkey' }],
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? [['newRealmAuthority', { kind: 'option', type: 'pubkey' }]]
+            : [['removeAuthority', 'u8']]),
         ],
       },
     ],
