@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-import BN from 'borsh/node_modules/@types/bn.js';
+import BN from 'bn.js';
 
 import {
   RealmConfigArgs,
