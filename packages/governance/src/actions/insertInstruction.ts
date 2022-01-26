@@ -13,6 +13,7 @@ export const insertInstruction = async (
   proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   index: number,
+  optionIndex: number,
   holdUpTime: number,
   instructionData: InstructionData,
 ) => {
@@ -31,6 +32,7 @@ export const insertInstruction = async (
     tokenOwnerRecord,
     governanceAuthority,
     index,
+    optionIndex,
     holdUpTime,
     instructionData,
     payer,

@@ -38,7 +38,7 @@ export const VoterStakeConfigureMintForm = ({
   const onCreate = async (values: VotingMintConfigValues) => {
     const {
       digitShift,
-      depositScaledFactor,
+      unlockedScaledFactor,
       lockupScaledFactor,
       lockupSaturationSecs,
     } = getVotingMintConfigApiValues(values);
@@ -53,7 +53,7 @@ export const VoterStakeConfigureMintForm = ({
       vsrClient?.program.instruction.configureVotingMint(
         0, // mint index
         digitShift, // digit_shift
-        depositScaledFactor, // deposit_scaled_factor
+        unlockedScaledFactor, // unlocked_scaled_factor
         lockupScaledFactor, // lockup_scaled_factor
         lockupSaturationSecs, // lockup_saturation_secs
         realm.account.authority!,

@@ -25,7 +25,7 @@ export function ConfigureVoterStakeRegistryButton({
   const onSubmit = async (values: VotingMintConfigValues) => {
     const {
       digitShift,
-      depositScaledFactor,
+      unlockedScaledFactor,
       lockupScaledFactor,
       lockupSaturationSecs,
     } = getVotingMintConfigApiValues(values);
@@ -35,7 +35,7 @@ export function ConfigureVoterStakeRegistryButton({
       vsrClient!,
       realm,
       digitShift,
-      depositScaledFactor,
+      unlockedScaledFactor,
       lockupScaledFactor,
       lockupSaturationSecs,
     );

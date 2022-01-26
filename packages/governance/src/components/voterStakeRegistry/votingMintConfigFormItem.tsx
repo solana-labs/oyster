@@ -11,7 +11,7 @@ import { getScaledFactor } from '../../tools/voterStakeRegistry/voterStakeRegist
 
 export interface VotingMintConfigValues {
   digitShift: number;
-  depositFactor: number;
+  unlockedFactor: number;
   maxVotingTime: number;
   lockupFactor: number;
   lockupSaturationYears: number;
@@ -19,7 +19,7 @@ export interface VotingMintConfigValues {
 
 export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
   const digitShift = values.digitShift;
-  const depositScaledFactor = getScaledFactor(values.depositFactor);
+  const unlockedScaledFactor = getScaledFactor(values.unlockedFactor);
   const lockupScaledFactor = getScaledFactor(values.lockupFactor);
   const lockupSaturationSecs = new BN(
     getSecondsFromYears(values.lockupSaturationYears).toString(),
@@ -27,7 +27,7 @@ export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
 
   return {
     digitShift,
-    depositScaledFactor,
+    unlockedScaledFactor,
     lockupScaledFactor,
     lockupSaturationSecs,
   };
@@ -56,8 +56,8 @@ export function VotingMintConfigFormItem({
       </Form.Item>
 
       <Form.Item
-        name={configNameOf('depositFactor')}
-        label={'mint deposit factor'}
+        name={configNameOf('unlockedFactor')}
+        label={'mint unlocked factor'}
         rules={[{ required: true }]}
         initialValue={1}
       >
