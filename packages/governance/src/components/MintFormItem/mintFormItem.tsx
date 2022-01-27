@@ -10,11 +10,13 @@ export function MintFormItem({
   label,
   required = true,
   onChange,
+  initialValue,
 }: {
   name: string;
   label: string;
   required?: boolean;
   onChange?: (mint: string) => void;
+  initialValue?: any;
 }) {
   const connection = useConnection();
 
@@ -45,6 +47,7 @@ export function MintFormItem({
 
   return (
     <Form.Item
+      initialValue={initialValue}
       name={name}
       label={label}
       rules={[{ required: required, validator: mintValidator }]}
