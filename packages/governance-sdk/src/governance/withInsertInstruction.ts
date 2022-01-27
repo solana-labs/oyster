@@ -18,15 +18,14 @@ export const withInsertInstruction = async (
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   index: number,
+  optionIndex: number,
   holdUpTime: number,
   instructionData: InstructionData,
   payer: PublicKey,
 ) => {
-  const optionIndex = 0;
-
   const args = new InsertInstructionArgs({
     index,
-    optionIndex: 0,
+    optionIndex,
     holdUpTime,
     instructionData: instructionData,
   });

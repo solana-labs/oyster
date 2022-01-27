@@ -15,7 +15,7 @@ export async function configureVoterStakeRegistry(
   vsrClient: VsrClient,
   realm: ProgramAccount<Realm>,
   digitShift: number,
-  depositScaledFactor: BN,
+  unlockedScaledFactor: BN,
   lockupScaledFactor: BN,
   lockupSaturationSecs: BN,
 ) {
@@ -46,7 +46,7 @@ export async function configureVoterStakeRegistry(
     vsrClient?.program.instruction.configureVotingMint(
       0, // mint index
       digitShift, // digit_shift
-      depositScaledFactor, // deposit_scaled_factor
+      unlockedScaledFactor, // unlocked_scaled_factor
       lockupScaledFactor, // lockup_scaled_factor
       lockupSaturationSecs, // lockup_saturation_secs
       realm.account.authority!,

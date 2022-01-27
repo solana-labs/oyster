@@ -7,6 +7,7 @@ import { LABELS } from '../../../../constants';
 import {
   Governance,
   InstructionData,
+  PROGRAM_VERSION_V1,
   Proposal,
   Realm,
 } from '@solana/spl-governance';
@@ -50,7 +51,13 @@ export function NewInstructionCard({
     instruction: string;
     holdUpTime: number;
   }) => {
-    let index = proposal.account.instructionsNextIndex;
+
+    let { programVersion } = rpcContext;
+    let optionIndex = 0; // default to first option
+
+    let index = programVersion === PROGRAM_VERSION_V1
+      ? proposal.account.instructionsNextIndex
+      : proposal.account.options[optionIndex].instructionsNextIndex;
 
     try {
       const instructionData = getInstructionDataFromBase64(values.instruction);
@@ -60,6 +67,7 @@ export function NewInstructionCard({
         proposal,
         proposalAuthority!.pubkey,
         index,
+        optionIndex,
         getTimestampFromDays(values.holdUpTime),
         instructionData,
       );
