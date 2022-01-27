@@ -1,5 +1,5 @@
-import { ExplorerLink } from '@oyster/common';
 import { ProgramAccount, Realm } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
 import { Form, InputNumber } from 'antd';
 import BN from 'bn.js';
 
@@ -8,8 +8,10 @@ import React from 'react';
 import { getNameOf } from '../../tools/script';
 import { getSecondsFromYears } from '../../tools/units';
 import { getScaledFactor } from '../../tools/voterStakeRegistry/voterStakeRegistry';
+import { MintFormItem } from '../MintFormItem/mintFormItem';
 
 export interface VotingMintConfigValues {
+  mint: string;
   digitShift: number;
   unlockedFactor: number;
   maxVotingTime: number;
@@ -24,12 +26,14 @@ export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
   const lockupSaturationSecs = new BN(
     getSecondsFromYears(values.lockupSaturationYears).toString(),
   );
+  const mint = new PublicKey(values.mint);
 
   return {
     digitShift,
     unlockedScaledFactor,
     lockupScaledFactor,
     lockupSaturationSecs,
+    mint,
   };
 }
 
@@ -42,9 +46,11 @@ export function VotingMintConfigFormItem({
 }) {
   return (
     <>
-      <Form.Item label="community mint">
-        <ExplorerLink address={realm.account.communityMint} type="address" />
-      </Form.Item>
+      <MintFormItem
+        name={configNameOf('mint')}
+        label="mint"
+        initialValue={realm.account.communityMint}
+      ></MintFormItem>
 
       <Form.Item
         name={configNameOf('digitShift')}
@@ -61,7 +67,7 @@ export function VotingMintConfigFormItem({
         rules={[{ required: true }]}
         initialValue={1}
       >
-        <InputNumber min={1} />
+        <InputNumber min={0} />
       </Form.Item>
 
       <Form.Item
@@ -70,7 +76,7 @@ export function VotingMintConfigFormItem({
         rules={[{ required: true }]}
         initialValue={1}
       >
-        <InputNumber min={1} />
+        <InputNumber min={0} />
       </Form.Item>
 
       <Form.Item

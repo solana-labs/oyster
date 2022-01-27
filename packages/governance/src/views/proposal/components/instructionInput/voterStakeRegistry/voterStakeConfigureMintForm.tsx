@@ -9,7 +9,7 @@ import { ProgramAccount } from '@solana/spl-governance';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { formDefaults } from '../../../../../tools/forms';
 import { useVoterStakeRegistryClient } from '../../../../../hooks/useVoterStakeRegistryClient';
-import { getRegistrarAddress } from '../../../../../tools/voterStakeRegistry/accounts';
+import { getRegistrarAddress, Registrar, unusedMintPk } from '../../../../../tools/voterStakeRegistry/accounts';
 import {
   getVotingMintConfigApiValues,
   VotingMintConfigFormItem,
@@ -41,6 +41,8 @@ export const VoterStakeConfigureMintForm = ({
       unlockedScaledFactor,
       lockupScaledFactor,
       lockupSaturationSecs,
+      mint
+
     } = getVotingMintConfigApiValues(values);
 
     const { registrarPda } = await getRegistrarAddress(
@@ -49,9 +51,39 @@ export const VoterStakeConfigureMintForm = ({
       realm.account.communityMint,
     );
 
+    let mintIndex = 0;
+    let remainingAccounts = [{
+      pubkey: mint,
+      isSigner: false,
+      isWritable: false,
+    }];
+
+    try {
+      // If we can fetch the registrar then use it for the additional mint configs
+      // Note: The registrar might not exist if we are setting this for the first time in a single proposal
+      // In that case we default to 0 existing mints
+      const registrar = await vsrClient?.program.account.registrar.fetch(registrarPda) as Registrar;
+
+      const registrarMints = registrar?.votingMints.filter(vm => !vm.mint.equals(unusedMintPk)).map(vm => {
+        return {
+          pubkey: vm.mint,
+          isSigner: false,
+          isWritable: false,
+        }
+      });
+
+      mintIndex = remainingAccounts.length
+      remainingAccounts = remainingAccounts.concat(registrarMints)
+    }
+    catch (ex) {
+      console.info("Can't fetch registrar", ex)
+    }
+
+    console.log("REMAINING", { remainingAccounts, mintIndex })
+
     const configureVotingMintIx =
       vsrClient?.program.instruction.configureVotingMint(
-        0, // mint index
+        mintIndex, // mint index
         digitShift, // digit_shift
         unlockedScaledFactor, // unlocked_scaled_factor
         lockupScaledFactor, // lockup_scaled_factor
@@ -61,15 +93,9 @@ export const VoterStakeConfigureMintForm = ({
           accounts: {
             registrar: registrarPda,
             realmAuthority: realm.account.authority!,
-            mint: realm.account.communityMint!,
+            mint: mint,
           },
-          remainingAccounts: [
-            {
-              pubkey: realm.account.communityMint!,
-              isSigner: false,
-              isWritable: false,
-            },
-          ],
+          remainingAccounts: remainingAccounts,
         },
       )!;
 
