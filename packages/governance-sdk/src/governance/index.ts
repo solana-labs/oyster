@@ -19,7 +19,7 @@ export * from './withCreateRealm';
 export * from './withCreateTokenGovernance';
 export * from './withCreateTokenOwnerRecord';
 export * from './withDepositGoverningTokens';
-export * from './withExecuteInstruction';
+export * from './withExecuteTransaction';
 export * from './withFinalizeVote';
 export * from './withFlagTransactionError';
 export * from './withInsertTransaction';

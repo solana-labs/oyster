@@ -13,7 +13,7 @@ import {
 } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
-export const withExecuteInstruction = async (
+export const withExecuteTransaction = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
