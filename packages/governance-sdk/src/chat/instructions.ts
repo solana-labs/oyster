@@ -8,8 +8,10 @@ export class PostChatMessageArgs {
   instruction: GovernanceChatInstruction =
     GovernanceChatInstruction.PostMessage;
   body: ChatMessageBody;
+  isReply: boolean;
 
-  constructor(args: { body: ChatMessageBody }) {
+  constructor(args: { body: ChatMessageBody; isReply: boolean }) {
     this.body = args.body;
+    this.isReply = args.isReply;
   }
 }
