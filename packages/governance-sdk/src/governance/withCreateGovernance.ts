@@ -17,7 +17,7 @@ export const withCreateGovernance = async (
   programId: PublicKey,
   programVersion: number,
   realm: PublicKey,
-  governedAccount: PublicKey,
+  governedAccount: PublicKey | undefined,
   config: GovernanceConfig,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,

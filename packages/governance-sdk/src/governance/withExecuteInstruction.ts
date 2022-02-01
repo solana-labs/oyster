@@ -20,26 +20,12 @@ export const withExecuteInstruction = async (
   governance: PublicKey,
   proposal: PublicKey,
   transactionAddress: PublicKey,
-  instruction: InstructionData,
+  transactionInstructions: InstructionData[],
 ) => {
   const args = new ExecuteTransactionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const nativeTreasury = await getNativeTreasuryAddress(programId, governance);
-
-  // When an instruction needs to be signed by the Governance PDA or the Native treasury then its isSigner flag has to be reset on AccountMeta
-  // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
-  instruction.accounts = instruction.accounts.map(a =>
-    (a.pubkey.toBase58() === governance.toBase58() ||
-      a.pubkey.toBase58() === nativeTreasury.toBase58()) &&
-    a.isSigner
-      ? new AccountMetaData({
-          pubkey: a.pubkey,
-          isWritable: a.isWritable,
-          isSigner: false,
-        })
-      : a,
-  );
 
   let keys = [
     {
@@ -66,14 +52,30 @@ export const withExecuteInstruction = async (
     });
   }
 
-  keys.push(
-    {
-      pubkey: instruction.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    ...instruction.accounts,
-  );
+  for (let instruction of transactionInstructions) {
+    // When an instruction needs to be signed by the Governance PDA or the Native treasury then its isSigner flag has to be reset on AccountMeta
+    // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
+    instruction.accounts = instruction.accounts.map(a =>
+      (a.pubkey.toBase58() === governance.toBase58() ||
+        a.pubkey.toBase58() === nativeTreasury.toBase58()) &&
+      a.isSigner
+        ? new AccountMetaData({
+            pubkey: a.pubkey,
+            isWritable: a.isWritable,
+            isSigner: false,
+          })
+        : a,
+    );
+
+    keys.push(
+      {
+        pubkey: instruction.programId,
+        isWritable: false,
+        isSigner: false,
+      },
+      ...instruction.accounts,
+    );
+  }
 
   instructions.push(
     new TransactionInstruction({

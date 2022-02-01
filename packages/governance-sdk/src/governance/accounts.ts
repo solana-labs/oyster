@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
 import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
+import { getErrorMessage } from '..';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -1045,12 +1046,27 @@ export class ProposalTransaction {
     this.instructions = args.instructions;
   }
 
-  getFirstInstruction() {
-    if (this.accountType === GovernanceAccountType.ProposalTransactionV2) {
-      return this.instructions[0];
+  getSingleInstruction() {
+    if (this.accountType === GovernanceAccountType.ProposalInstructionV1) {
+      return this.instruction;
     }
 
-    return this.instruction;
+    if (this.instructions.length === 0) {
+      throw new Error(`Transaction has no instructions`);
+    }
+    if (this.instructions.length > 1) {
+      throw new Error(`Transaction has multiple instructions`);
+    }
+
+    return this.instructions[0];
+  }
+
+  getAllInstructions() {
+    if (this.accountType === GovernanceAccountType.ProposalInstructionV1) {
+      return [this.instruction];
+    }
+
+    return this.instructions;
   }
 }
 

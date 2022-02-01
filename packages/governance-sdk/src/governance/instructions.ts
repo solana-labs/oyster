@@ -94,14 +94,14 @@ export class CreateMintGovernanceArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.CreateMintGovernance;
   config: GovernanceConfig;
-  transferMintAuthority: boolean;
+  transferMintAuthorities: boolean;
 
   constructor(args: {
     config: GovernanceConfig;
-    transferMintAuthority: boolean;
+    transferMintAuthorities: boolean;
   }) {
     this.config = args.config;
-    this.transferMintAuthority = !!args.transferMintAuthority;
+    this.transferMintAuthorities = !!args.transferMintAuthorities;
   }
 }
 

@@ -22,7 +22,7 @@ export const executeInstruction = async (
     proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    instruction.account.getFirstInstruction(),
+    instruction.account.getAllInstructions(),
   );
 
   await sendTransactionWithNotifications(

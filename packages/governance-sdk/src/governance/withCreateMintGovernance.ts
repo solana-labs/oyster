@@ -28,7 +28,7 @@ export const withCreateMintGovernance = async (
 ) => {
   const args = new CreateMintGovernanceArgs({
     config,
-    transferMintAuthority: transferMintAuthorities,
+    transferMintAuthorities: transferMintAuthorities,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 

@@ -55,12 +55,12 @@ export function InstructionCard({
     const dataBase64 = Buffer.from(
       serialize(
         GOVERNANCE_SCHEMA,
-        proposalInstruction.account.getFirstInstruction(),
+        proposalInstruction.account.getSingleInstruction(),
       ),
     ).toString('base64');
 
     return {
-      programId: proposalInstruction.account.getFirstInstruction().programId,
+      programId: proposalInstruction.account.getSingleInstruction().programId,
       dataBase64: dataBase64,
     };
   }, [proposalInstruction]);
@@ -108,7 +108,7 @@ export function InstructionCard({
         <Space>
           <DryRunInstructionButton
             proposal={proposal}
-            instructionData={proposalInstruction.account.getFirstInstruction()}
+            instructionData={proposalInstruction.account.getSingleInstruction()}
           ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}

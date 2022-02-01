@@ -266,7 +266,7 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['instruction', 'u8'],
           ['config', GovernanceConfig],
-          ['transferMintAuthority', 'u8'],
+          ['transferMintAuthorities', 'u8'],
         ],
       },
     ],
