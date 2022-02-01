@@ -9,16 +9,17 @@ import { GovernanceConfig } from './accounts';
 import { CreateMintGovernanceArgs } from './instructions';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withVoterWeightAccounts } from './withVoterWeightAccounts';
-import { GOVERNANCE_PROGRAM_SEED } from '.';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governedMint: PublicKey,
   config: GovernanceConfig,
-  transferMintAuthority: boolean,
+  transferMintAuthorities: boolean,
   mintAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
@@ -27,7 +28,7 @@ export const withCreateMintGovernance = async (
 ) => {
   const args = new CreateMintGovernanceArgs({
     config,
-    transferMintAuthority,
+    transferMintAuthority: transferMintAuthorities,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -38,58 +39,62 @@ export const withCreateMintGovernance = async (
 
   const keys = [
     {
-      pubkey: realm,
+      pubkey: realm, // 0
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: governanceAddress,
+      pubkey: governanceAddress, // 1
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: governedMint,
+      pubkey: governedMint, // 2
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: mintAuthority,
+      pubkey: mintAuthority, // 3
       isWritable: false,
       isSigner: true,
     },
     {
-      pubkey: tokenOwnerRecord,
+      pubkey: tokenOwnerRecord, // 4
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: payer,
+      pubkey: payer, // 5
       isWritable: false,
       isSigner: true,
     },
     {
-      pubkey: TOKEN_PROGRAM_ID,
+      pubkey: TOKEN_PROGRAM_ID, // 6
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: SYSTEM_PROGRAM_ID,
+      pubkey: SYSTEM_PROGRAM_ID, // 7
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: SYSVAR_RENT_PUBKEY,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: governanceAuthority,
-      isWritable: false,
-      isSigner: true,
     },
   ];
 
-  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
+      pubkey: SYSVAR_RENT_PUBKEY,
+      isWritable: false,
+      isSigner: false,
+    });
+  }
+
+  keys.push({
+    pubkey: governanceAuthority,
+    isWritable: false,
+    isSigner: true,
+  });
+
+  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

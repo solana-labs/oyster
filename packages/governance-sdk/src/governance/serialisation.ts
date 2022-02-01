@@ -5,7 +5,7 @@ import {
   AddSignatoryArgs,
   CancelProposalArgs,
   CastVoteArgs,
-  CreateAccountGovernanceArgs,
+  CreateGovernanceArgs,
   CreateMintGovernanceArgs,
   CreateNativeTreasuryArgs,
   CreateProgramGovernanceArgs,
@@ -14,12 +14,12 @@ import {
   CreateTokenGovernanceArgs,
   CreateTokenOwnerRecordArgs,
   DepositGoverningTokensArgs,
-  ExecuteInstructionArgs,
+  ExecuteTransactionArgs,
   FinalizeVoteArgs,
-  FlagInstructionErrorArgs,
-  InsertInstructionArgs,
+  FlagTransactionErrorArgs,
+  InsertTransactionArgs,
   RelinquishVoteArgs,
-  RemoveInstructionArgs,
+  RemoveTransactionArgs,
   SetGovernanceConfigArgs,
   SetRealmAuthorityArgs,
   SetRealmConfigArgs,
@@ -200,10 +200,13 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          programVersion > PROGRAM_VERSION_V1
-            ? ['useCommunityVoterWeightAddin', 'u8']
-            : undefined,
-        ].filter(Boolean),
+          ...(programVersion > PROGRAM_VERSION_V1
+            ? [
+                ['useCommunityVoterWeightAddin', 'u8'],
+                ['useMaxCommunityVoterWeightAddin', 'u8'],
+              ]
+            : []),
+        ],
       },
     ],
     [
@@ -236,7 +239,7 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
-      CreateAccountGovernanceArgs,
+      CreateGovernanceArgs,
       {
         kind: 'struct',
         fields: [
@@ -368,36 +371,39 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
-      InsertInstructionArgs,
+      InsertTransactionArgs,
       {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
           programVersion > PROGRAM_VERSION_V1
-            ? ['optionIndex', 'u16']
+            ? ['optionIndex', 'u8']
             : undefined,
           ['index', 'u16'],
           ['holdUpTime', 'u32'],
-          ['instructionData', InstructionData],
+
+          programVersion > PROGRAM_VERSION_V1
+            ? ['instructions', [InstructionData]]
+            : ['instructionData', InstructionData],
         ].filter(Boolean),
       },
     ],
     [
-      RemoveInstructionArgs,
+      RemoveTransactionArgs,
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],
       },
     ],
     [
-      ExecuteInstructionArgs,
+      ExecuteTransactionArgs,
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],
       },
     ],
     [
-      FlagInstructionErrorArgs,
+      FlagTransactionErrorArgs,
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],
@@ -411,7 +417,7 @@ function createGovernanceSchema(programVersion: number) {
           ['instruction', 'u8'],
           ...(programVersion === PROGRAM_VERSION_V1
             ? [['newRealmAuthority', { kind: 'option', type: 'pubkey' }]]
-            : [['removeAuthority', 'u8']]),
+            : [['action', 'u8']]),
         ],
       },
     ],

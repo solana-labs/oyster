@@ -105,9 +105,10 @@ export class VoteThresholdPercentage {
   }
 }
 
-export enum VoteWeightSource {
-  Deposit,
-  Snapshot,
+export enum VoteTipping {
+  Strict,
+  Early, // V2 Only
+  Disabled, // V2 Only
 }
 
 export enum InstructionExecutionStatus {
@@ -199,14 +200,16 @@ export class RealmConfigArgs {
 
   // Versions >= 2
   useCommunityVoterWeightAddin: boolean;
+  useMaxCommunityVoterWeightAddin: boolean;
 
   constructor(args: {
     useCouncilMint: boolean;
 
-    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
     minCommunityTokensToCreateGovernance: BN;
+    communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
 
     useCommunityVoterWeightAddin: boolean;
+    useMaxCommunityVoterWeightAddin: boolean;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
 
@@ -216,6 +219,7 @@ export class RealmConfigArgs {
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
     this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
+    this.useMaxCommunityVoterWeightAddin = args.useMaxCommunityVoterWeightAddin;
   }
 }
 
@@ -321,7 +325,7 @@ export class GovernanceConfig {
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
-  voteWeightSource: VoteWeightSource;
+  voteTipping: VoteTipping;
   proposalCoolOffTime: number;
   minCouncilTokensToCreateProposal: BN;
 
@@ -330,7 +334,7 @@ export class GovernanceConfig {
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
-    voteWeightSource?: VoteWeightSource;
+    voteWeightSource?: VoteTipping;
     proposalCoolOffTime?: number;
     minCouncilTokensToCreateProposal: BN;
   }) {
@@ -339,7 +343,7 @@ export class GovernanceConfig {
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
-    this.voteWeightSource = args.voteWeightSource ?? VoteWeightSource.Deposit;
+    this.voteTipping = args.voteWeightSource ?? VoteTipping.Strict;
     this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
@@ -979,18 +983,18 @@ export class ProposalInstruction {
   }
 }
 
-export async function getProposalInstructionAddress(
+export async function getProposalTransactionAddress(
   programId: PublicKey,
   programVersion: number,
   proposal: PublicKey,
   optionIndex: number,
-  instructionIndex: number,
+  transactionIndex: number,
 ) {
-  let optionIndexBuffer = Buffer.alloc(2);
-  optionIndexBuffer.writeInt16LE(optionIndex, 0);
+  let optionIndexBuffer = Buffer.alloc(1);
+  optionIndexBuffer.writeUInt8(optionIndex);
 
   let instructionIndexBuffer = Buffer.alloc(2);
-  instructionIndexBuffer.writeInt16LE(instructionIndex, 0);
+  instructionIndexBuffer.writeInt16LE(transactionIndex, 0);
 
   const seeds =
     programVersion === PROGRAM_VERSION_V1

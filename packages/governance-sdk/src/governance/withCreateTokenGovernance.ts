@@ -9,15 +9,17 @@ import { GovernanceConfig } from './accounts';
 import { CreateTokenGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { withVoterWeightAccounts } from './withVoterWeightAccounts';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governedToken: PublicKey,
   config: GovernanceConfig,
-  transferTokenOwner: boolean,
+  transferAccountAuthorities: boolean,
   tokenOwner: PublicKey,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
@@ -26,7 +28,7 @@ export const withCreateTokenGovernance = async (
 ) => {
   const args = new CreateTokenGovernanceArgs({
     config,
-    transferTokenOwner,
+    transferTokenOwner: transferAccountAuthorities,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -80,19 +82,23 @@ export const withCreateTokenGovernance = async (
       isWritable: false,
       isSigner: false,
     },
-    {
+  ];
+
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: governanceAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-  ];
+    });
+  }
 
-  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
+  keys.push({
+    pubkey: governanceAuthority,
+    isWritable: false,
+    isSigner: true,
+  });
+
+  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

@@ -5,22 +5,24 @@ import {
 } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { ExecuteInstructionArgs } from './instructions';
+import { ExecuteTransactionArgs } from './instructions';
 import {
   AccountMetaData,
   getNativeTreasuryAddress,
   InstructionData,
 } from './accounts';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withExecuteInstruction = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   governance: PublicKey,
   proposal: PublicKey,
-  instructionAddress: PublicKey,
+  transactionAddress: PublicKey,
   instruction: InstructionData,
 ) => {
-  const args = new ExecuteInstructionArgs();
+  const args = new ExecuteTransactionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const nativeTreasury = await getNativeTreasuryAddress(programId, governance);
@@ -51,22 +53,27 @@ export const withExecuteInstruction = async (
       isSigner: false,
     },
     {
-      pubkey: instructionAddress,
+      pubkey: transactionAddress,
       isWritable: true,
       isSigner: false,
     },
-    {
+  ];
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
+    });
+  }
+
+  keys.push(
     {
       pubkey: instruction.programId,
       isWritable: false,
       isSigner: false,
     },
     ...instruction.accounts,
-  ];
+  );
 
   instructions.push(
     new TransactionInstruction({

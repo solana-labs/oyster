@@ -4,7 +4,7 @@ import { serialize } from 'borsh';
 import { PostChatMessageArgs } from './instructions';
 import { GOVERNANCE_CHAT_PROGRAM_ID, ChatMessageBody } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withVoterWeightAccounts } from '../governance/withVoterWeightAccounts';
+import { withRealmConfigAccounts } from '../governance/withRealmConfigAccounts';
 
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],
@@ -86,7 +86,12 @@ export async function withPostChatMessage(
     });
   }
 
-  withVoterWeightAccounts(keys, governanceProgramId, realm, voterWeightRecord);
+  await withRealmConfigAccounts(
+    keys,
+    governanceProgramId,
+    realm,
+    voterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({

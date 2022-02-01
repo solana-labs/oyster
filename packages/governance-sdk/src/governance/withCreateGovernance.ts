@@ -1,4 +1,5 @@
 import {
+  Keypair,
   PublicKey,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
@@ -6,23 +7,27 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
-import { CreateAccountGovernanceArgs } from './instructions';
+import { CreateGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withVoterWeightAccounts } from './withVoterWeightAccounts';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
-export const withCreateAccountGovernance = async (
+export const withCreateGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governedAccount: PublicKey,
   config: GovernanceConfig,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
-  governanceAuthority: PublicKey,
+  createAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
 ) => {
-  const args = new CreateAccountGovernanceArgs({ config });
+  const args = new CreateGovernanceArgs({ config });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+
+  governedAccount = governedAccount ?? new Keypair().publicKey;
 
   const [governanceAddress] = await PublicKey.findProgramAddress(
     [
@@ -33,7 +38,7 @@ export const withCreateAccountGovernance = async (
     programId,
   );
 
-  const keys = [
+  let keys = [
     {
       pubkey: realm,
       isWritable: false,
@@ -64,19 +69,23 @@ export const withCreateAccountGovernance = async (
       isWritable: false,
       isSigner: false,
     },
-    {
+  ];
+
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: governanceAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-  ];
+    });
+  }
 
-  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
+  keys.push({
+    pubkey: createAuthority,
+    isWritable: false,
+    isSigner: true,
+  });
+
+  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

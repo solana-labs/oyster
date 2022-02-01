@@ -13,6 +13,7 @@ import {
 import BN from 'bn.js';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
@@ -93,12 +94,15 @@ export const withDepositGoverningTokens = async (
       isWritable: false,
       isSigner: false,
     },
-    {
+  ];
+
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
-    },
-  ];
+    });
+  }
 
   instructions.push(
     new TransactionInstruction({

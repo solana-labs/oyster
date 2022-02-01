@@ -8,10 +8,12 @@ import { serialize } from 'borsh';
 import { AddSignatoryArgs } from './instructions';
 import { getSignatoryRecordAddress } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withAddSignatory = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
@@ -58,12 +60,15 @@ export const withAddSignatory = async (
       isSigner: false,
       isWritable: false,
     },
-    {
+  ];
+
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_RENT_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
-  ];
+    });
+  }
 
   instructions.push(
     new TransactionInstruction({

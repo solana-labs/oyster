@@ -27,8 +27,9 @@ export async function withCreateRealm(
   payer: PublicKey,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
-  minCommunityTokensToCreateGovernance: BN,
-  communityVoterWeightAddin: PublicKey | undefined,
+  minCommunityWeightToCreateGovernance: BN,
+  communityVoterWeightAddin?: PublicKey | undefined,
+  maxCommunityVoterWeightAddin?: PublicKey | undefined,
 ) {
   if (communityVoterWeightAddin && programVersion < PROGRAM_VERSION_V2) {
     throw new Error(
@@ -38,9 +39,10 @@ export async function withCreateRealm(
 
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
-    minCommunityTokensToCreateGovernance,
+    minCommunityTokensToCreateGovernance: minCommunityWeightToCreateGovernance,
     communityMintMaxVoteWeightSource,
     useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
+    useMaxCommunityVoterWeightAddin: maxCommunityVoterWeightAddin !== undefined,
   });
 
   const args = new CreateRealmArgs({
@@ -127,22 +129,32 @@ export async function withCreateRealm(
     ];
   }
 
-  const realmConfigAddress = await getRealmConfigAddress(
-    programId,
-    realmAddress,
-  );
-
-  keys.push({
-    pubkey: realmConfigAddress,
-    isSigner: false,
-    isWritable: true,
-  });
-
   if (communityVoterWeightAddin) {
     keys.push({
       pubkey: communityVoterWeightAddin,
       isWritable: false,
       isSigner: false,
+    });
+  }
+
+  if (maxCommunityVoterWeightAddin) {
+    keys.push({
+      pubkey: maxCommunityVoterWeightAddin,
+      isWritable: false,
+      isSigner: false,
+    });
+  }
+
+  if (communityVoterWeightAddin || maxCommunityVoterWeightAddin) {
+    const realmConfigAddress = await getRealmConfigAddress(
+      programId,
+      realmAddress,
+    );
+
+    keys.push({
+      pubkey: realmConfigAddress,
+      isSigner: false,
+      isWritable: true,
     });
   }
 
