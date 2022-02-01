@@ -647,6 +647,11 @@ function createGovernanceSchema(programVersion: number) {
             'voteThresholdPercentage',
             { kind: 'option', type: VoteThresholdPercentage },
           ],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? []
+            : [['reserved', [64]]]),
+
           ['name', 'string'],
           ['descriptionLink', 'string'],
         ],
