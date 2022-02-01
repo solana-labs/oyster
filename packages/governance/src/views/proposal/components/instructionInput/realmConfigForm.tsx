@@ -94,6 +94,7 @@ export const RealmConfigForm = ({
       // Use minCommunityTokensToCreateGovernance.toString() in case the number is larger than number
       new BN(minCommunityTokensToCreateGovernance.toString()),
       communityVoterWeightAddin,
+      undefined,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,
     );

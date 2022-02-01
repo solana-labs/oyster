@@ -2,7 +2,7 @@ import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { Proposal } from '@solana/spl-governance';
 
-import { withRemoveInstruction } from '@solana/spl-governance';
+import { withRemoveTransaction } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
@@ -18,7 +18,7 @@ export const removeInstruction = async (
   const governanceAuthority = walletPubkey;
   const beneficiary = walletPubkey;
 
-  await withRemoveInstruction(
+  await withRemoveTransaction(
     instructions,
     programId,
     proposal.pubkey,

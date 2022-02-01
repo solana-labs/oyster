@@ -1,6 +1,6 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { withCreateAccountGovernance } from '@solana/spl-governance';
+import { withCreateGovernance } from '@solana/spl-governance';
 import { GovernanceType } from '@solana/spl-governance';
 import { GovernanceConfig } from '@solana/spl-governance';
 import { withCreateProgramGovernance } from '@solana/spl-governance';
@@ -10,7 +10,7 @@ import { withCreateTokenGovernance } from '@solana/spl-governance';
 import { RpcContext } from '@solana/spl-governance';
 
 export const registerGovernance = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
   realm: PublicKey,
   governedAccount: PublicKey,
@@ -25,9 +25,10 @@ export const registerGovernance = async (
 
   switch (governanceType) {
     case GovernanceType.Account: {
-      governanceAddress = await withCreateAccountGovernance(
+      governanceAddress = await withCreateGovernance(
         instructions,
         programId,
+        programVersion,
         realm,
         governedAccount,
         config,
@@ -41,6 +42,7 @@ export const registerGovernance = async (
       governanceAddress = await withCreateProgramGovernance(
         instructions,
         programId,
+        programVersion,
         realm,
         governedAccount,
         config,
@@ -56,6 +58,7 @@ export const registerGovernance = async (
       governanceAddress = await withCreateMintGovernance(
         instructions,
         programId,
+        programVersion,
         realm,
         governedAccount,
         config,
@@ -71,6 +74,7 @@ export const registerGovernance = async (
       governanceAddress = await withCreateTokenGovernance(
         instructions,
         programId,
+        programVersion,
         realm,
         governedAccount,
         config,

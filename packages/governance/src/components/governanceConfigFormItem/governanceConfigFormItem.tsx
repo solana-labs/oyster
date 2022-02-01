@@ -7,7 +7,7 @@ import {
   GovernanceConfig,
   Realm,
   VoteThresholdPercentage,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance';
 import { getNameOf } from '../../tools/script';
 import {
@@ -115,7 +115,7 @@ export function GovernanceConfigFormItem({
       minCommunityTokensToCreateProposal: ZERO,
       minInstructionHoldUpTime: getTimestampFromDays(0),
       maxVotingTime: getTimestampFromDays(3),
-      voteWeightSource: VoteWeightSource.Deposit,
+      voteTipping: VoteTipping.Strict,
       proposalCoolOffTime: 0,
       minCouncilTokensToCreateProposal: ZERO,
     });

@@ -561,7 +561,7 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateProposal', 'u64'],
           ['minInstructionHoldUpTime', 'u32'],
           ['maxVotingTime', 'u32'],
-          ['voteWeightSource', 'u8'],
+          ['voteTipping', 'u8'],
           ['proposalCoolOffTime', 'u32'],
           ['minCouncilTokensToCreateProposal', 'u64'],
         ],

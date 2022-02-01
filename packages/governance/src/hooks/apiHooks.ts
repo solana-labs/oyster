@@ -8,7 +8,7 @@ import {
   getVoteRecordAddress,
   Governance,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
@@ -173,8 +173,8 @@ export function useSignatoriesByProposal(proposal: PublicKey | undefined) {
 // ----- Proposal Instruction -----
 
 export function useInstructionsByProposal(proposal: PublicKey | undefined) {
-  return useGovernanceAccountsByFilter<ProposalInstruction>(
-    ProposalInstruction,
+  return useGovernanceAccountsByFilter<ProposalTransaction>(
+    ProposalTransaction,
     [pubkeyFilter(1, proposal)],
   );
 }

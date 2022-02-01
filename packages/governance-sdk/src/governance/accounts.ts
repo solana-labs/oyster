@@ -360,7 +360,7 @@ export class GovernanceConfig {
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
-    voteWeightSource?: VoteTipping;
+    voteTipping?: VoteTipping;
     proposalCoolOffTime?: number;
     minCouncilTokensToCreateProposal: BN;
   }) {
@@ -369,7 +369,7 @@ export class GovernanceConfig {
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
-    this.voteTipping = args.voteWeightSource ?? VoteTipping.Strict;
+    this.voteTipping = args.voteTipping ?? VoteTipping.Strict;
     this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
@@ -404,19 +404,31 @@ export class Governance {
   }
 
   isProgramGovernance() {
-    return this.accountType === GovernanceAccountType.ProgramGovernanceV1;
+    return (
+      this.accountType === GovernanceAccountType.ProgramGovernanceV1 ||
+      this.accountType === GovernanceAccountType.ProgramGovernanceV2
+    );
   }
 
   isAccountGovernance() {
-    return this.accountType === GovernanceAccountType.GovernanceV1;
+    return (
+      this.accountType === GovernanceAccountType.GovernanceV1 ||
+      this.accountType === GovernanceAccountType.GovernanceV2
+    );
   }
 
   isMintGovernance() {
-    return this.accountType === GovernanceAccountType.MintGovernanceV1;
+    return (
+      this.accountType === GovernanceAccountType.MintGovernanceV1 ||
+      this.accountType === GovernanceAccountType.MintGovernanceV2
+    );
   }
 
   isTokenGovernance() {
-    return this.accountType === GovernanceAccountType.TokenGovernanceV1;
+    return (
+      this.accountType === GovernanceAccountType.TokenGovernanceV1 ||
+      this.accountType === GovernanceAccountType.TokenGovernanceV2
+    );
   }
 }
 
@@ -995,7 +1007,7 @@ export class InstructionData {
 }
 
 export class ProposalTransaction {
-  accountType = GovernanceAccountType.ProposalInstructionV1;
+  accountType;
   proposal: PublicKey;
   instructionIndex: number;
 
@@ -1012,6 +1024,7 @@ export class ProposalTransaction {
   executionStatus: InstructionExecutionStatus;
 
   constructor(args: {
+    accountType: GovernanceAccountType;
     proposal: PublicKey;
     instructionIndex: number;
     optionIndex: number;
@@ -1021,6 +1034,7 @@ export class ProposalTransaction {
     executionStatus: InstructionExecutionStatus;
     instructions: InstructionData[];
   }) {
+    this.accountType = args.accountType;
     this.proposal = args.proposal;
     this.instructionIndex = args.instructionIndex;
     this.optionIndex = args.optionIndex;
@@ -1029,6 +1043,14 @@ export class ProposalTransaction {
     this.executedAt = args.executedAt;
     this.executionStatus = args.executionStatus;
     this.instructions = args.instructions;
+  }
+
+  getFirstInstruction() {
+    if (this.accountType === GovernanceAccountType.ProposalTransactionV2) {
+      return this.instructions[0];
+    }
+
+    return this.instruction;
   }
 }
 

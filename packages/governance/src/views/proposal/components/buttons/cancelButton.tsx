@@ -7,12 +7,15 @@ import { useProposalAuthority } from '../../../../hooks/apiHooks';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Proposal, ProposalState } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
 
 const { confirm } = Modal;
 
 export default function CancelButton({
+  realm,
   proposal,
 }: {
+  realm: PublicKey;
   proposal: ProgramAccount<Proposal>;
 }) {
   const { connected } = useWallet();
@@ -42,7 +45,7 @@ export default function CancelButton({
           cancelText: 'No',
 
           onOk() {
-            return cancelProposal(rpcContext, proposal);
+            return cancelProposal(rpcContext, realm, proposal);
           },
           onCancel() {
             // no-op

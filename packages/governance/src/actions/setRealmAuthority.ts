@@ -1,6 +1,6 @@
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Realm } from '@solana/spl-governance';
+import { Realm, SetRealmAuthorityAction } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
@@ -23,6 +23,7 @@ export const setRealmAuthority = async (
     realm.pubkey,
     realm.account.authority!,
     newRealmAuthority,
+    SetRealmAuthorityAction.SetChecked,
   );
 
   await sendTransactionWithNotifications(
