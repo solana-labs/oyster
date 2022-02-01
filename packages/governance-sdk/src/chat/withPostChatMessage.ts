@@ -23,6 +23,7 @@ export async function withPostChatMessage(
 ) {
   const args = new PostChatMessageArgs({
     body,
+    isReply: false,
   });
 
   const data = Buffer.from(serialize(GOVERNANCE_CHAT_SCHEMA, args));

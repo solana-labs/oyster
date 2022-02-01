@@ -39,6 +39,7 @@ export const GOVERNANCE_CHAT_SCHEMA = new Map<any, any>([
       fields: [
         ['instruction', 'u8'],
         ['body', ChatMessageBody],
+        ['isReply', 'u8'],
       ],
     },
   ],

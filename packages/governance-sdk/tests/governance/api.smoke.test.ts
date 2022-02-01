@@ -45,11 +45,11 @@ import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedT
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
 
-// const programId = new PublicKey('GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP');
-// const rpcEndpoint = clusterApiUrl('devnet');
+const programId = new PublicKey('BfFUxwBiJLhD1wL36xGXWRe7RXAFL4QKircHydAHS3wt');
+const rpcEndpoint = clusterApiUrl('devnet');
 
-const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
-const rpcEndpoint = 'http://127.0.0.1:8899';
+// const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
+// const rpcEndpoint = 'http://127.0.0.1:8899';
 
 const connection = new Connection(rpcEndpoint, 'recent');
 

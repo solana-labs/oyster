@@ -111,31 +111,22 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     (accountClass as any) as GovernanceAccountClass,
   );
 
-  if (accountTypes.length === 1) {
-    return getBorshProgramAccounts(
+  let all: ProgramAccount<TAccount>[] = [];
+
+  for (const accountType of accountTypes) {
+    let accounts = await getBorshProgramAccounts(
       connection,
       programId,
       at => getGovernanceSchemaForAccount(at),
       accountClass,
       filters,
-      accountTypes[0],
+      accountType,
     );
+
+    all.push(...accounts);
   }
 
-  const all = await Promise.all(
-    accountTypes.map(at =>
-      getBorshProgramAccounts<TAccount>(
-        connection,
-        programId,
-        at => getGovernanceSchemaForAccount(at),
-        accountClass as any,
-        filters,
-        at,
-      ),
-    ),
-  );
-
-  return all.flatMap(a => a);
+  return all;
 }
 
 export async function getGovernanceAccount<TAccount extends GovernanceAccount>(

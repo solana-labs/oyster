@@ -32,12 +32,12 @@ const chatProgramId = new PublicKey(
   '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG',
 );
 
-//const rpcEndpoint = clusterApiUrl('devnet');
+const rpcEndpoint = clusterApiUrl('devnet');
 
 const governanceProgramId = new PublicKey(
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
+  'BfFUxwBiJLhD1wL36xGXWRe7RXAFL4QKircHydAHS3wt',
 );
-const rpcEndpoint = 'http://127.0.0.1:8899';
+//const rpcEndpoint = 'http://127.0.0.1:8899';
 
 const connection = new Connection(rpcEndpoint, 'recent');
 
