@@ -14,14 +14,15 @@ import {
   getTokenOwnerRecordsByOwner,
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  SetRealmAuthorityAction,
   VoteThresholdPercentage,
+  VoteTipping,
   VoteType,
-  VoteWeightSource,
   withCreateMintGovernance,
   withCreateProposal,
   withCreateRealm,
   withDepositGoverningTokens,
-  withInsertInstruction,
+  withInsertTransaction,
   withSetRealmAuthority,
 } from '../../src';
 import { requestAirdrop, sendTransaction } from '../tools/sdk';
@@ -113,7 +114,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   });
@@ -121,6 +122,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
   const governancePk = await withCreateMintGovernance(
     instructions,
     programId,
+    programVersion,
     realmPk,
     mintPk,
     config,
@@ -142,6 +144,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
     realmPk,
     walletPk,
     governancePk,
+    SetRealmAuthorityAction.SetChecked,
   );
 
   // Create single choice Approve/Deny proposal with instruction to mint more governance tokens
@@ -178,7 +181,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
 
   const instructionData = createInstructionData(instruction);
 
-  await withInsertInstruction(
+  await withInsertTransaction(
     instructions,
     programId,
     programVersion,
@@ -188,7 +191,8 @@ test('createRealmWithGovernanceAndProposal', async () => {
     walletPk,
     0,
     0,
-    instructionData,
+    0,
+    [instructionData],
     walletPk,
   );
 

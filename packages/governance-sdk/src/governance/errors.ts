@@ -11,7 +11,7 @@ export const GovernanceError = [
   'Invalid Token Owner Record account address', // InvalidTokenOwnerRecordAccountAddress
   'Invalid GoverningMint for TokenOwnerRecord', // InvalidGoverningMintForTokenOwnerRecord
   'Invalid Realm for TokenOwnerRecord', // InvalidRealmForTokenOwnerRecord
-  'Invalid Proposal for ProposalInstruction', // InvalidProposalForProposalInstruction
+  'Invalid Proposal for ProposalTransaction', // InvalidProposalForProposalTransaction
   'Invalid Signatory account address', // InvalidSignatoryAddress
   'Signatory already signed off', // SignatoryAlreadySignedOff
   'Signatory must sign', // SignatoryMustSign
@@ -88,6 +88,15 @@ export const GovernanceError = [
   'Proposal is not not executable', // ProposalIsNotExecutable
   'Invalid vote', // InvalidVote
   'Cannot execute defeated option', // CannotExecuteDefeatedOption
+
+  'VoterWeightRecord invalid action', // VoterWeightRecordInvalidAction
+  'VoterWeightRecord invalid action target', // VoterWeightRecordInvalidActionTarget
+  'Invalid MaxVoterWeightRecord for Realm', // InvalidMaxVoterWeightRecordForRealm
+  'MaxVoterWeightRecord expired', // InvalidMaxVoterWeightRecordForGoverningTokenMint
+  'Cannot execute defeated option', // MaxVoterWeightRecordExpired
+  'Not supported VoteType', // NotSupportedVoteType
+  'RealmConfig change not allowed', // RealmConfigChangeNotAllowed
+  'GovernanceConfig change not allowed', // GovernanceConfigChangeNotAllowed
 ] as const;
 
 export const TokenError = [

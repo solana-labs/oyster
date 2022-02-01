@@ -2,7 +2,7 @@ import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 import { InstructionData, Proposal } from '@solana/spl-governance';
 
-import { withInsertInstruction } from '@solana/spl-governance';
+import { withInsertTransaction } from '@solana/spl-governance';
 
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
@@ -23,7 +23,7 @@ export const insertInstruction = async (
   const governanceAuthority = walletPubkey;
   const payer = walletPubkey;
 
-  const proposalInstructionAddress = await withInsertInstruction(
+  const proposalInstructionAddress = await withInsertTransaction(
     instructions,
     programId,
     programVersion,
@@ -34,7 +34,7 @@ export const insertInstruction = async (
     index,
     optionIndex,
     holdUpTime,
-    instructionData,
+    [instructionData],
     payer,
   );
 

@@ -5,39 +5,27 @@ import {
 } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { ExecuteInstructionArgs } from './instructions';
+import { ExecuteTransactionArgs } from './instructions';
 import {
   AccountMetaData,
   getNativeTreasuryAddress,
   InstructionData,
 } from './accounts';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withExecuteInstruction = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   governance: PublicKey,
   proposal: PublicKey,
-  instructionAddress: PublicKey,
-  instruction: InstructionData,
+  transactionAddress: PublicKey,
+  transactionInstructions: InstructionData[],
 ) => {
-  const args = new ExecuteInstructionArgs();
+  const args = new ExecuteTransactionArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const nativeTreasury = await getNativeTreasuryAddress(programId, governance);
-
-  // When an instruction needs to be signed by the Governance PDA or the Native treasury then its isSigner flag has to be reset on AccountMeta
-  // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
-  instruction.accounts = instruction.accounts.map(a =>
-    (a.pubkey.toBase58() === governance.toBase58() ||
-      a.pubkey.toBase58() === nativeTreasury.toBase58()) &&
-    a.isSigner
-      ? new AccountMetaData({
-          pubkey: a.pubkey,
-          isWritable: a.isWritable,
-          isSigner: false,
-        })
-      : a,
-  );
 
   let keys = [
     {
@@ -51,22 +39,43 @@ export const withExecuteInstruction = async (
       isSigner: false,
     },
     {
-      pubkey: instructionAddress,
+      pubkey: transactionAddress,
       isWritable: true,
       isSigner: false,
     },
-    {
+  ];
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
-    {
-      pubkey: instruction.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    ...instruction.accounts,
-  ];
+    });
+  }
+
+  for (let instruction of transactionInstructions) {
+    // When an instruction needs to be signed by the Governance PDA or the Native treasury then its isSigner flag has to be reset on AccountMeta
+    // because the signature will be required during cpi call invoke_signed() and not when we send ExecuteInstruction
+    instruction.accounts = instruction.accounts.map(a =>
+      (a.pubkey.toBase58() === governance.toBase58() ||
+        a.pubkey.toBase58() === nativeTreasury.toBase58()) &&
+      a.isSigner
+        ? new AccountMetaData({
+            pubkey: a.pubkey,
+            isWritable: a.isWritable,
+            isSigner: false,
+          })
+        : a,
+    );
+
+    keys.push(
+      {
+        pubkey: instruction.programId,
+        isWritable: false,
+        isSigner: false,
+      },
+      ...instruction.accounts,
+    );
+  }
 
   instructions.push(
     new TransactionInstruction({

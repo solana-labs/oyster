@@ -4,7 +4,7 @@ import { executeInstruction } from '../../../../../actions/executeInstruction';
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
 } from '@solana/spl-governance';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
@@ -32,7 +32,7 @@ export function ExecuteInstructionButton({
   proposalInstruction,
 }: {
   proposal: ProgramAccount<Proposal>;
-  proposalInstruction: ProgramAccount<ProposalInstruction>;
+  proposalInstruction: ProgramAccount<ProposalTransaction>;
   playing: PlayState;
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
@@ -93,7 +93,7 @@ export function ExecuteInstructionButton({
   if (
     playing === PlayState.Unplayed &&
     proposalInstruction.account.executionStatus !==
-    InstructionExecutionStatus.Error
+      InstructionExecutionStatus.Error
   ) {
     return (
       <Tooltip title="execute instruction">
@@ -107,7 +107,7 @@ export function ExecuteInstructionButton({
   else if (
     playing === PlayState.Error ||
     proposalInstruction.account.executionStatus ===
-    InstructionExecutionStatus.Error
+      InstructionExecutionStatus.Error
   )
     return (
       <Tooltip title="retry to execute instruction">

@@ -16,7 +16,10 @@ import { EventEmitter } from 'eventemitter3';
 import { useLocation } from 'react-router-dom';
 import { PROGRAM_VERSION } from '@solana/spl-governance';
 
-import { getGovernanceProgramVersion, ProgramAccount } from '@solana/spl-governance';
+import {
+  getGovernanceProgramVersion,
+  ProgramAccount,
+} from '@solana/spl-governance';
 import { arrayToRecord } from '../tools/script';
 
 export interface GovernanceContextState {
@@ -148,7 +151,10 @@ export default function GovernanceProvider({ children = null as any }) {
       return connection.onProgramAccountChange(
         programPk,
         async (info: KeyedAccountInfo) => {
-          if (info.accountInfo.data[0] === GovernanceAccountType.Realm) {
+          if (
+            info.accountInfo.data[0] === GovernanceAccountType.RealmV1 ||
+            info.accountInfo.data[0] === GovernanceAccountType.RealmV2
+          ) {
             const realm = GovernanceAccountParser(Realm)(
               info.accountId,
               info.accountInfo,
@@ -173,10 +179,12 @@ export default function GovernanceProvider({ children = null as any }) {
   }, [connection, programId, endpoint]); //eslint-disable-line
 
   useEffect(() => {
-    getGovernanceProgramVersion(connection, new PublicKey(programId), env).then(pVersion => {
-      console.log('PROGRAM VERSION', { pVersion, env });
-      setProgramVersion(pVersion);
-    });
+    getGovernanceProgramVersion(connection, new PublicKey(programId), env).then(
+      pVersion => {
+        console.log('PROGRAM VERSION', { pVersion, env });
+        setProgramVersion(pVersion);
+      },
+    );
   }, [env, connection, programId]);
 
   return (

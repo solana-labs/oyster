@@ -8,7 +8,7 @@ import { PlayState } from './executeInstructionButton';
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   TokenOwnerRecord,
 } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
@@ -20,7 +20,7 @@ export function FlagInstructionErrorButton({
   playState,
 }: {
   proposal: ProgramAccount<Proposal>;
-  proposalInstruction: ProgramAccount<ProposalInstruction>;
+  proposalInstruction: ProgramAccount<ProposalTransaction>;
   proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined;
   playState: PlayState;
 }) {
@@ -29,7 +29,7 @@ export function FlagInstructionErrorButton({
   if (
     playState !== PlayState.Error ||
     proposalInstruction.account.executionStatus ===
-    InstructionExecutionStatus.Error ||
+      InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
     return null;
@@ -42,7 +42,7 @@ export function FlagInstructionErrorButton({
         proposal,
         proposalInstruction.pubkey,
       );
-    } catch { }
+    } catch {}
   };
 
   return (

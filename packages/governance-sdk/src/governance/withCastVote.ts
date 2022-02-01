@@ -10,7 +10,7 @@ import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withVoterWeightAccounts } from './withVoterWeightAccounts';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
@@ -26,6 +26,7 @@ export const withCastVote = async (
   vote: Vote,
   payer: PublicKey,
   voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   const args = new CastVoteArgs(
     programVersion === PROGRAM_VERSION_V1
@@ -42,15 +43,18 @@ export const withCastVote = async (
     tokenOwnerRecord,
   );
 
+  const [realmIsWritable, governanceIsWritable] =
+    programVersion === PROGRAM_VERSION_V1 ? [false, false] : [true, true];
+
   const keys = [
     {
       pubkey: realm,
-      isWritable: false,
+      isWritable: realmIsWritable,
       isSigner: false,
     },
     {
       pubkey: governance,
-      isWritable: false,
+      isWritable: governanceIsWritable,
       isSigner: false,
     },
     {
@@ -93,19 +97,30 @@ export const withCastVote = async (
       isSigner: false,
       isWritable: false,
     },
-    {
-      pubkey: SYSVAR_RENT_PUBKEY,
-      isSigner: false,
-      isWritable: false,
-    },
-    {
-      pubkey: SYSVAR_CLOCK_PUBKEY,
-      isSigner: false,
-      isWritable: false,
-    },
   ];
 
-  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push(
+      {
+        pubkey: SYSVAR_RENT_PUBKEY,
+        isWritable: false,
+        isSigner: false,
+      },
+      {
+        pubkey: SYSVAR_CLOCK_PUBKEY,
+        isSigner: false,
+        isWritable: false,
+      },
+    );
+  }
+
+  await withRealmConfigAccounts(
+    keys,
+    programId,
+    realm,
+    voterWeightRecord,
+    maxVoterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({

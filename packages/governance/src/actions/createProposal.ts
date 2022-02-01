@@ -50,6 +50,7 @@ export const createProposal = async (
   await withAddSignatory(
     instructions,
     programId,
+    programVersion,
     proposalAddress,
     tokenOwnerRecord,
     governanceAuthority,

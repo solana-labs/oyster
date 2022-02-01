@@ -13,26 +13,26 @@ export enum GovernanceInstruction {
   DepositGoverningTokens = 1,
   WithdrawGoverningTokens = 2,
   SetGovernanceDelegate = 3, // --
-  CreateAccountGovernance = 4,
+  CreateGovernance = 4,
   CreateProgramGovernance = 5,
 
   CreateProposal = 6,
   AddSignatory = 7,
   RemoveSignatory = 8,
 
-  InsertInstruction = 9,
-  RemoveInstruction = 10,
+  InsertTransaction = 9,
+  RemoveTransaction = 10,
   CancelProposal = 11,
   SignOffProposal = 12,
   CastVote = 13,
   FinalizeVote = 14,
   RelinquishVote = 15,
-  ExecuteInstruction = 16,
+  ExecuteTransaction = 16,
 
   CreateMintGovernance = 17,
   CreateTokenGovernance = 18,
   SetGovernanceConfig = 19,
-  FlagInstructionError = 20,
+  FlagTransactionError = 20,
   SetRealmAuthority = 21,
   SetRealmConfig = 22,
   CreateTokenOwnerRecord = 23,
@@ -66,9 +66,8 @@ export class WithdrawGoverningTokensArgs {
     GovernanceInstruction.WithdrawGoverningTokens;
 }
 
-export class CreateAccountGovernanceArgs {
-  instruction: GovernanceInstruction =
-    GovernanceInstruction.CreateAccountGovernance;
+export class CreateGovernanceArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.CreateGovernance;
   config: GovernanceConfig;
 
   constructor(args: { config: GovernanceConfig }) {
@@ -95,14 +94,14 @@ export class CreateMintGovernanceArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.CreateMintGovernance;
   config: GovernanceConfig;
-  transferMintAuthority: boolean;
+  transferMintAuthorities: boolean;
 
   constructor(args: {
     config: GovernanceConfig;
-    transferMintAuthority: boolean;
+    transferMintAuthorities: boolean;
   }) {
     this.config = args.config;
-    this.transferMintAuthority = !!args.transferMintAuthority;
+    this.transferMintAuthorities = !!args.transferMintAuthorities;
   }
 }
 
@@ -269,37 +268,54 @@ export class FinalizeVoteArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.FinalizeVote;
 }
 
-export class InsertInstructionArgs {
-  instruction: GovernanceInstruction = GovernanceInstruction.InsertInstruction;
+export class InsertTransactionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.InsertTransaction;
   index: number;
   optionIndex: number;
   holdUpTime: number;
-  instructionData: InstructionData;
+
+  // V1
+  instructionData: InstructionData | undefined;
+
+  // V2
+  instructions: InstructionData[] | undefined;
 
   constructor(args: {
     index: number;
     optionIndex: number;
     holdUpTime: number;
-    instructionData: InstructionData;
+    // V1
+    instructionData: InstructionData | undefined;
+    // V2
+    instructions: InstructionData[] | undefined;
   }) {
     this.index = args.index;
     this.optionIndex = args.optionIndex;
     this.holdUpTime = args.holdUpTime;
+    // V1
     this.instructionData = args.instructionData;
+    // V2
+    this.instructions = args.instructions;
   }
 }
 
-export class RemoveInstructionArgs {
-  instruction: GovernanceInstruction = GovernanceInstruction.RemoveInstruction;
+export class RemoveTransactionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.RemoveTransaction;
 }
 
-export class ExecuteInstructionArgs {
-  instruction: GovernanceInstruction = GovernanceInstruction.ExecuteInstruction;
+export class ExecuteTransactionArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.ExecuteTransaction;
 }
 
-export class FlagInstructionErrorArgs {
+export class FlagTransactionErrorArgs {
   instruction: GovernanceInstruction =
-    GovernanceInstruction.FlagInstructionError;
+    GovernanceInstruction.FlagTransactionError;
+}
+
+export enum SetRealmAuthorityAction {
+  SetUnchecked,
+  SetChecked,
+  Remove,
 }
 
 export class SetRealmAuthorityArgs {
@@ -309,17 +325,17 @@ export class SetRealmAuthorityArgs {
   newRealmAuthority: PublicKey | undefined;
 
   // V2
-  removeAuthority: boolean;
+  action: SetRealmAuthorityAction | undefined;
 
   constructor(args: {
     newRealmAuthority: PublicKey | undefined;
-    removeAuthority: boolean;
+    action: SetRealmAuthorityAction | undefined;
   }) {
     // V1
     this.newRealmAuthority = args.newRealmAuthority;
 
     // V2
-    this.removeAuthority = args.removeAuthority;
+    this.action = args.action;
   }
 }
 

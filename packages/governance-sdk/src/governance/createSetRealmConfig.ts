@@ -1,15 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import {
-  getRealmConfigAddress,
-  getTokenHoldingAddress,
-  MintMaxVoteWeightSource,
-  RealmConfigArgs,
-} from './accounts';
-import { SetRealmConfigArgs } from './instructions';
-import { getGovernanceSchema } from './serialisation';
-import { serialize } from 'borsh';
+import { MintMaxVoteWeightSource } from './accounts';
 import BN from 'bn.js';
-import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { withSetRealmConfig } from './withSetRealmConfig';
 
 export async function createSetRealmConfig(
   programId: PublicKey,
@@ -20,88 +12,23 @@ export async function createSetRealmConfig(
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
   communityVoterWeightAddin: PublicKey | undefined,
+  maxCommunityVoterWeightAddin: PublicKey | undefined,
   payer: PublicKey,
 ) {
-  const configArgs = new RealmConfigArgs({
-    useCouncilMint: councilMint !== undefined,
+  const instructions: TransactionInstruction[] = [];
+  await withSetRealmConfig(
+    instructions,
+    programId,
+    programVersion,
+    realm,
+    realmAuthority,
+    councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
-    useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
-  });
-
-  const args = new SetRealmConfigArgs({ configArgs });
-  const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    communityVoterWeightAddin,
+    maxCommunityVoterWeightAddin,
+    payer,
   );
 
-  let keys = [
-    {
-      pubkey: realm,
-      isWritable: true,
-      isSigner: false,
-    },
-
-    {
-      pubkey: realmAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-  ];
-
-  if (councilMint) {
-    const councilTokenHoldingAddress = await getTokenHoldingAddress(
-      programId,
-      realm,
-      councilMint,
-    );
-
-    keys = [
-      ...keys,
-      {
-        pubkey: councilMint,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: councilTokenHoldingAddress,
-        isSigner: false,
-        isWritable: true,
-      },
-    ];
-  }
-
-  if (programVersion > 1) {
-    keys.push({
-      pubkey: SYSTEM_PROGRAM_ID,
-      isSigner: false,
-      isWritable: false,
-    });
-
-    const realmConfigAddress = await getRealmConfigAddress(programId, realm);
-
-    keys.push({
-      pubkey: realmConfigAddress,
-      isSigner: false,
-      isWritable: true,
-    });
-
-    if (communityVoterWeightAddin) {
-      keys.push({
-        pubkey: payer,
-        isSigner: true,
-        isWritable: true,
-      });
-      keys.push({
-        pubkey: communityVoterWeightAddin,
-        isWritable: false,
-        isSigner: false,
-      });
-    }
-  }
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  });
+  return instructions[0];
 }

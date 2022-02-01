@@ -5,17 +5,19 @@ import {
 } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
-import { FlagInstructionErrorArgs } from './instructions';
+import { FlagTransactionErrorArgs } from './instructions';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
-export const withFlagInstructionError = (
+export const withFlagTransactionError = (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
-  proposalInstruction: PublicKey,
+  proposalTransaction: PublicKey,
 ) => {
-  const args = new FlagInstructionErrorArgs();
+  const args = new FlagTransactionErrorArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
   const keys = [
@@ -35,16 +37,18 @@ export const withFlagInstructionError = (
       isSigner: true,
     },
     {
-      pubkey: proposalInstruction,
+      pubkey: proposalTransaction,
       isWritable: true,
       isSigner: false,
     },
-    {
+  ];
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
-  ];
+    });
+  }
 
   instructions.push(
     new TransactionInstruction({

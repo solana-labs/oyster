@@ -5,11 +5,12 @@ import {
 } from '@solana/web3.js';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
-import { InsertInstructionArgs } from './instructions';
-import { getProposalInstructionAddress, InstructionData } from './accounts';
+import { InsertTransactionArgs } from './instructions';
+import { getProposalTransactionAddress, InstructionData } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
 
-export const withInsertInstruction = async (
+export const withInsertTransaction = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
@@ -20,20 +21,27 @@ export const withInsertInstruction = async (
   index: number,
   optionIndex: number,
   holdUpTime: number,
-  instructionData: InstructionData,
+  transactionInstructions: InstructionData[],
   payer: PublicKey,
 ) => {
-  const args = new InsertInstructionArgs({
+  const args = new InsertTransactionArgs({
     index,
     optionIndex,
     holdUpTime,
-    instructionData: instructionData,
+    instructionData:
+      programVersion === PROGRAM_VERSION_V1
+        ? transactionInstructions[0]
+        : undefined,
+    instructions:
+      programVersion >= PROGRAM_VERSION_V2
+        ? transactionInstructions
+        : undefined,
   });
   const data = Buffer.from(
     serialize(getGovernanceSchema(programVersion), args),
   );
 
-  const proposalInstructionAddress = await getProposalInstructionAddress(
+  const proposalTransactionAddress = await getProposalTransactionAddress(
     programId,
     programVersion,
     proposal,
@@ -63,7 +71,7 @@ export const withInsertInstruction = async (
       isSigner: true,
     },
     {
-      pubkey: proposalInstructionAddress,
+      pubkey: proposalTransactionAddress,
       isWritable: true,
       isSigner: false,
     },
@@ -92,5 +100,5 @@ export const withInsertInstruction = async (
     }),
   );
 
-  return proposalInstructionAddress;
+  return proposalTransactionAddress;
 };

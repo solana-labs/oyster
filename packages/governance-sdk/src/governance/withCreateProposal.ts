@@ -14,7 +14,7 @@ import {
 } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withVoterWeightAccounts } from './withVoterWeightAccounts';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
@@ -59,7 +59,7 @@ export const withCreateProposal = async (
     programId,
   );
 
-  const keys = [
+  let keys = [
     {
       pubkey: realm,
       isWritable: false,
@@ -104,19 +104,22 @@ export const withCreateProposal = async (
       isWritable: false,
       isSigner: false,
     },
-    {
+  ];
+
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
-    },
-    {
+    });
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isWritable: false,
       isSigner: false,
-    },
-  ];
+    });
+  }
 
-  withVoterWeightAccounts(keys, programId, realm, voterWeightRecord);
+  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
 
   instructions.push(
     new TransactionInstruction({

@@ -7,7 +7,7 @@ import { LABELS } from '../../../../constants';
 import {
   GovernanceAccountType,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
 } from '@solana/spl-governance';
 import { GOVERNANCE_SCHEMA } from '@solana/spl-governance';
@@ -32,7 +32,7 @@ export function InstructionCard({
   proposal,
   position,
 }: {
-  proposalInstruction: ProgramAccount<ProposalInstruction>;
+  proposalInstruction: ProgramAccount<ProposalTransaction>;
   proposal: ProgramAccount<Proposal>;
   position: number;
 }) {
@@ -53,11 +53,14 @@ export function InstructionCard({
 
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(
-      serialize(GOVERNANCE_SCHEMA, proposalInstruction.account.instruction),
+      serialize(
+        GOVERNANCE_SCHEMA,
+        proposalInstruction.account.getSingleInstruction(),
+      ),
     ).toString('base64');
 
     return {
-      programId: proposalInstruction.account.instruction.programId,
+      programId: proposalInstruction.account.getSingleInstruction().programId,
       dataBase64: dataBase64,
     };
   }, [proposalInstruction]);
@@ -105,7 +108,7 @@ export function InstructionCard({
         <Space>
           <DryRunInstructionButton
             proposal={proposal}
-            instructionData={proposalInstruction.account.instruction}
+            instructionData={proposalInstruction.account.getSingleInstruction()}
           ></DryRunInstructionButton>
           <FlagInstructionErrorButton
             playState={playing}

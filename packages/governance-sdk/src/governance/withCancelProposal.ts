@@ -1,4 +1,5 @@
 import {
+  AccountMeta,
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
@@ -12,15 +13,33 @@ export const withCancelProposal = (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
+  realm: PublicKey,
+  governance: PublicKey,
   proposal: PublicKey,
   proposalOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
-  governance: PublicKey,
 ) => {
   const args = new CancelProposalArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  let keys = [
+  let keys: AccountMeta[] = [];
+
+  if (programVersion > PROGRAM_VERSION_V1) {
+    keys.push(
+      {
+        pubkey: realm,
+        isWritable: true,
+        isSigner: false,
+      },
+      {
+        pubkey: governance,
+        isWritable: true,
+        isSigner: false,
+      },
+    );
+  }
+
+  keys.push(
     {
       pubkey: proposal,
       isWritable: true,
@@ -36,18 +55,13 @@ export const withCancelProposal = (
       isWritable: false,
       isSigner: true,
     },
-    {
+  );
+
+  if (programVersion == PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
-  ];
-
-  if (programVersion > PROGRAM_VERSION_V1) {
-    keys.push({
-      pubkey: governance,
-      isWritable: false,
-      isSigner: false,
     });
   }
 

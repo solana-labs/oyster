@@ -7,13 +7,16 @@ import { useRpcContext } from '../../../../hooks/useRpcContext';
 
 import { Proposal, SignatoryRecord } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
 
 const { confirm } = Modal;
 
 export default function SignOffButton({
+  realm,
   proposal,
   signatoryRecord,
 }: {
+  realm: PublicKey;
   proposal: ProgramAccount<Proposal>;
   signatoryRecord: ProgramAccount<SignatoryRecord>;
 }) {
@@ -35,7 +38,13 @@ export default function SignOffButton({
               okText: 'Sign off',
 
               onOk() {
-                return signOffProposal(rpcContext, signatoryRecord, publicKey!);
+                return signOffProposal(
+                  rpcContext,
+                  realm,
+                  proposal,
+                  signatoryRecord,
+                  publicKey!,
+                );
               },
               onCancel() {
                 // no-op

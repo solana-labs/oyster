@@ -9,7 +9,7 @@ import { RpcContext } from '@solana/spl-governance';
 import { withCreateSplTokenAccount } from '../tools/sdk/token/splToken';
 
 export const createTreasuryAccount = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   mint: PublicKey,
   config: GovernanceConfig,
@@ -33,6 +33,7 @@ export const createTreasuryAccount = async (
   governanceAddress = await withCreateTokenGovernance(
     instructions,
     programId,
+    programVersion,
     realm,
     tokenAccount,
     config,

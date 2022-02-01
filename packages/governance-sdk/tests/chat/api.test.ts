@@ -14,8 +14,8 @@ import {
   GovernanceConfig,
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
+  VoteTipping,
   VoteType,
-  VoteWeightSource,
   withCreateMintGovernance,
   withCreateProposal,
   withCreateRealm,
@@ -28,14 +28,17 @@ import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedT
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
 
-const governanceProgramId = new PublicKey(
-  'BfFUxwBiJLhD1wL36xGXWRe7RXAFL4QKircHydAHS3wt',
-);
 const chatProgramId = new PublicKey(
   '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG',
 );
 
-const rpcEndpoint = clusterApiUrl('devnet');
+//const rpcEndpoint = clusterApiUrl('devnet');
+
+const governanceProgramId = new PublicKey(
+  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
+);
+const rpcEndpoint = 'http://127.0.0.1:8899';
+
 const connection = new Connection(rpcEndpoint, 'recent');
 
 test('postProposalComment', async () => {
@@ -113,7 +116,7 @@ test('postProposalComment', async () => {
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   });
@@ -121,6 +124,7 @@ test('postProposalComment', async () => {
   const governancePk = await withCreateMintGovernance(
     instructions,
     governanceProgramId,
+    programVersion,
     realmPk,
     mintPk,
     config,

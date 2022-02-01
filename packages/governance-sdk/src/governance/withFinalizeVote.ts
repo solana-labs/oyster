@@ -6,28 +6,35 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { FinalizeVoteArgs } from './instructions';
+import { PROGRAM_VERSION_V1 } from '../registry/constants';
+import { withRealmConfigAccounts } from './withRealmConfigAccounts';
 
 export const withFinalizeVote = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   proposalOwnerRecord: PublicKey,
   governingTokenMint: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   const args = new FinalizeVoteArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
+  const [realmIsWritable, governanceIsWritable] =
+    programVersion === PROGRAM_VERSION_V1 ? [false, false] : [true, true];
+
   let keys = [
     {
       pubkey: realm,
-      isWritable: false,
+      isWritable: realmIsWritable,
       isSigner: false,
     },
     {
       pubkey: governance,
-      isWritable: false,
+      isWritable: governanceIsWritable,
       isSigner: false,
     },
     {
@@ -45,12 +52,22 @@ export const withFinalizeVote = async (
       isWritable: false,
       isSigner: false,
     },
-    {
+  ];
+  if (programVersion === PROGRAM_VERSION_V1) {
+    keys.push({
       pubkey: SYSVAR_CLOCK_PUBKEY,
       isSigner: false,
       isWritable: false,
-    },
-  ];
+    });
+  }
+
+  await withRealmConfigAccounts(
+    keys,
+    programId,
+    realm,
+    undefined,
+    maxVoterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({

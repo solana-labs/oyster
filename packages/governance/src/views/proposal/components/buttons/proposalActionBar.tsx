@@ -40,12 +40,16 @@ export function ProposalActionBar({
 
   return (
     <div className="proposal-actions">
-      <CancelButton proposal={proposal}></CancelButton>
+      <CancelButton
+        proposal={proposal}
+        realm={governance.account.realm}
+      ></CancelButton>
 
       {signatoryRecord &&
         (proposal.account.state === ProposalState.Draft ||
           proposal.account.state === ProposalState.SigningOff) && (
           <SignOffButton
+            realm={governance.account.realm}
             signatoryRecord={signatoryRecord}
             proposal={proposal}
           />
