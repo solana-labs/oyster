@@ -60,7 +60,7 @@ test('setupRealm', async () => {
 
   await requestAirdrop(connection, walletPk);
 
-  await new Promise(f => setTimeout(f, 500));
+  await new Promise(f => setTimeout(f, 1000));
 
   // options
   const useSignatory = true;
@@ -155,7 +155,7 @@ test('setupRealm', async () => {
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteTipping.Strict,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   });
@@ -238,6 +238,7 @@ test('setupRealm', async () => {
     walletPk,
     0,
     0,
+    0,
     [instructionData],
     walletPk,
   );
@@ -264,6 +265,7 @@ test('setupRealm', async () => {
     proposalPk,
     tokenOwnerRecordPk,
     walletPk,
+    0,
     0,
     0,
     [instructionData],
@@ -379,7 +381,7 @@ test('setupRealm', async () => {
       governancePk,
       proposalPk,
       transactionPk,
-      instructionData,
+      [instructionData],
     );
   }
 
@@ -402,15 +404,6 @@ test('setupRealm', async () => {
   await sendTransaction(connection, instructions, signers, wallet);
 
   // Assert
-  // const realm = await getRealm(connection, realmPk);
-  // expect(realm.account.name).toBe(name);
-
-  // const results = await getTokenOwnerRecordsByOwner(
-  //   connection,
-  //   programId,
-  //   walletPk,
-  // );
-
-  // expect(results.length).toBe(1);
-  // expect(results[0].account.governingTokenOwner).toEqual(walletPk);
+  const realm = await getRealm(connection, realmPk);
+  expect(realm.account.name).toBe(name);
 });
