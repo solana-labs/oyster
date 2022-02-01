@@ -38,7 +38,7 @@ import {
   InstructionData,
   MintMaxVoteWeightSource,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   Realm,
   RealmConfig,
   SignatoryRecord,
@@ -492,7 +492,8 @@ function createGovernanceSchema(programVersion: number) {
         kind: 'struct',
         fields: [
           ['useCommunityVoterWeightAddin', 'u8'],
-          ['reserved', [7]],
+          ['useMaxCommunityVoterWeightAddin', 'u8'],
+          ['reserved', [6]],
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           ['councilMint', { kind: 'option', type: 'pubkey' }],
@@ -507,7 +508,8 @@ function createGovernanceSchema(programVersion: number) {
           ['accountType', 'u8'],
           ['communityMint', 'pubkey'],
           ['config', RealmConfig],
-          ['reserved', [8]],
+          ['reserved', [6]],
+          ['votingProposalCount', 'u16'],
           ['authority', { kind: 'option', type: 'pubkey' }],
           ['name', 'string'],
         ],
@@ -521,6 +523,7 @@ function createGovernanceSchema(programVersion: number) {
           ['accountType', 'u8'],
           ['realm', 'pubkey'],
           ['communityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['maxCommunityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
         ],
       },
     ],
@@ -534,7 +537,8 @@ function createGovernanceSchema(programVersion: number) {
           ['governedAccount', 'pubkey'],
           ['proposalCount', 'u32'],
           ['config', GovernanceConfig],
-          ['reserved', [8]],
+          ['reserved', [6]],
+          ['votingProposalCount', 'u16'],
         ],
       },
     ],
@@ -620,6 +624,9 @@ function createGovernanceSchema(programVersion: number) {
                 ['voteType', 'voteType'],
                 ['options', [ProposalOption]],
                 ['denyVoteWeight', { kind: 'option', type: 'u64' }],
+                ['vetoVoteWeight', { kind: 'option', type: 'u64' }],
+                ['abstainVoteWeight', { kind: 'option', type: 'u64' }],
+                ['startVotingAt', { kind: 'option', type: 'u64' }],
               ]),
 
           ['draftAt', 'u64'],
@@ -631,6 +638,11 @@ function createGovernanceSchema(programVersion: number) {
           ['closedAt', { kind: 'option', type: 'u64' }],
           ['executionFlags', 'u8'],
           ['maxVoteWeight', { kind: 'option', type: 'u64' }],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? []
+            : [['maxVotingTime', { kind: 'option', type: 'u32' }]]),
+
           [
             'voteThresholdPercentage',
             { kind: 'option', type: VoteThresholdPercentage },
@@ -682,18 +694,20 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
-      ProposalInstruction,
+      ProposalTransaction,
       {
         kind: 'struct',
         fields: [
           ['accountType', 'u8'],
           ['proposal', 'pubkey'],
           programVersion > PROGRAM_VERSION_V1
-            ? ['optionIndex', 'u16']
+            ? ['optionIndex', 'u8']
             : undefined,
           ['instructionIndex', 'u16'],
           ['holdUpTime', 'u32'],
-          ['instruction', InstructionData],
+          programVersion > PROGRAM_VERSION_V1
+            ? ['instructions', [InstructionData]]
+            : ['instruction', InstructionData],
           ['executedAt', { kind: 'option', type: 'u64' }],
           ['executionStatus', 'u8'],
         ].filter(Boolean),

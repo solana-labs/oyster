@@ -9,21 +9,28 @@ export const GOVERNANCE_PROGRAM_SEED = 'governance';
 
 export enum GovernanceAccountType {
   Uninitialized = 0,
-  Realm = 1,
-  TokenOwnerRecord = 2,
-  AccountGovernance = 3,
-  ProgramGovernance = 4,
+  RealmV1 = 1,
+  TokenOwnerRecordV1 = 2,
+  GovernanceV1 = 3,
+  ProgramGovernanceV1 = 4,
   ProposalV1 = 5,
-  SignatoryRecord = 6,
+  SignatoryRecordV1 = 6,
   VoteRecordV1 = 7,
   ProposalInstructionV1 = 8,
-  MintGovernance = 9,
-  TokenGovernance = 10,
+  MintGovernanceV1 = 9,
+  TokenGovernanceV1 = 10,
   RealmConfig = 11,
   VoteRecordV2 = 12,
-  ProposalInstructionV2 = 13,
+  ProposalTransactionV2 = 13,
   ProposalV2 = 14,
-  ProgramMetadata = 14,
+  ProgramMetadata = 15,
+  RealmV2 = 16,
+  TokenOwnerRecordV2 = 17,
+  GovernanceV2 = 18,
+  ProgramGovernanceV2 = 19,
+  MintGovernanceV2 = 20,
+  TokenGovernanceV2 = 21,
+  SignatoryRecordV2 = 22,
 }
 
 export interface GovernanceAccount {
@@ -37,41 +44,51 @@ export type GovernanceAccountClass =
   | typeof Proposal
   | typeof SignatoryRecord
   | typeof VoteRecord
-  | typeof ProposalInstruction
+  | typeof ProposalTransaction
   | typeof RealmConfigAccount
   | typeof ProgramMetadata;
 
 export function getAccountTypes(accountClass: GovernanceAccountClass) {
   switch (accountClass) {
     case Realm:
-      return [GovernanceAccountType.Realm];
+      return [GovernanceAccountType.RealmV1, GovernanceAccountType.RealmV2];
     case TokenOwnerRecord:
-      return [GovernanceAccountType.TokenOwnerRecord];
+      return [
+        GovernanceAccountType.TokenOwnerRecordV1,
+        GovernanceAccountType.TokenOwnerRecordV2,
+      ];
     case Proposal:
       return [
         GovernanceAccountType.ProposalV1,
         GovernanceAccountType.ProposalV2,
       ];
     case SignatoryRecord:
-      return [GovernanceAccountType.SignatoryRecord];
+      return [
+        GovernanceAccountType.SignatoryRecordV1,
+        GovernanceAccountType.SignatoryRecordV2,
+      ];
     case VoteRecord:
       return [
         GovernanceAccountType.VoteRecordV1,
         GovernanceAccountType.VoteRecordV2,
       ];
-    case ProposalInstruction:
+    case ProposalTransaction:
       return [
         GovernanceAccountType.ProposalInstructionV1,
-        GovernanceAccountType.ProposalInstructionV2,
+        GovernanceAccountType.ProposalTransactionV2,
       ];
     case RealmConfigAccount:
       return [GovernanceAccountType.RealmConfig];
     case Governance:
       return [
-        GovernanceAccountType.AccountGovernance,
-        GovernanceAccountType.ProgramGovernance,
-        GovernanceAccountType.MintGovernance,
-        GovernanceAccountType.TokenGovernance,
+        GovernanceAccountType.GovernanceV1,
+        GovernanceAccountType.ProgramGovernanceV1,
+        GovernanceAccountType.MintGovernanceV1,
+        GovernanceAccountType.TokenGovernanceV1,
+        GovernanceAccountType.GovernanceV2,
+        GovernanceAccountType.ProgramGovernanceV2,
+        GovernanceAccountType.MintGovernanceV2,
+        GovernanceAccountType.TokenGovernanceV2,
       ];
     case ProgramMetadata:
       return [GovernanceAccountType.ProgramMetadata];
@@ -83,7 +100,7 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
 export function getAccountProgramVersion(accountType: GovernanceAccountType) {
   switch (accountType) {
     case GovernanceAccountType.VoteRecordV2:
-    case GovernanceAccountType.ProposalInstructionV2:
+    case GovernanceAccountType.ProposalTransactionV2:
     case GovernanceAccountType.ProposalV2:
       return PROGRAM_VERSION_V2;
     default:
@@ -228,6 +245,7 @@ export class RealmConfig {
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
   useCommunityVoterWeightAddin: boolean;
+  useMaxCommunityVoterWeightAddin: boolean;
   reserved: Uint8Array;
 
   constructor(args: {
@@ -236,6 +254,7 @@ export class RealmConfig {
     minCommunityTokensToCreateGovernance: BN;
     reserved: Uint8Array;
     useCommunityVoterWeightAddin: boolean;
+    useMaxCommunityVoterWeightAddin: boolean;
   }) {
     this.councilMint = args.councilMint;
     this.communityMintMaxVoteWeightSource =
@@ -243,18 +262,21 @@ export class RealmConfig {
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
     this.useCommunityVoterWeightAddin = !!args.useCommunityVoterWeightAddin;
+    this.useMaxCommunityVoterWeightAddin = !!args.useMaxCommunityVoterWeightAddin;
     this.reserved = args.reserved;
   }
 }
 
 export class Realm {
-  accountType = GovernanceAccountType.Realm;
+  accountType = GovernanceAccountType.RealmV1;
 
   communityMint: PublicKey;
 
   config: RealmConfig;
 
   reserved: Uint8Array;
+
+  votingProposalCount: number;
 
   authority: PublicKey | undefined;
 
@@ -264,13 +286,14 @@ export class Realm {
     communityMint: PublicKey;
     reserved: Uint8Array;
     config: RealmConfig;
+    votingProposalCount: number;
     authority: PublicKey | undefined;
     name: string;
   }) {
     this.communityMint = args.communityMint;
     this.config = args.config;
     this.reserved = args.reserved;
-
+    this.votingProposalCount = args.votingProposalCount;
     this.authority = args.authority;
     this.name = args.name;
   }
@@ -298,13 +321,16 @@ export class RealmConfigAccount {
 
   realm: PublicKey;
   communityVoterWeightAddin: PublicKey | undefined;
+  maxCommunityVoterWeightAddin: PublicKey | undefined;
 
   constructor(args: {
     realm: PublicKey;
     communityVoterWeightAddin: PublicKey | undefined;
+    maxCommunityVoterWeightAddin: PublicKey | undefined;
   }) {
     this.realm = args.realm;
     this.communityVoterWeightAddin = args.communityVoterWeightAddin;
+    this.maxCommunityVoterWeightAddin = args.maxCommunityVoterWeightAddin;
   }
 }
 
@@ -357,6 +383,7 @@ export class Governance {
   config: GovernanceConfig;
   proposalCount: number;
   reserved?: Uint8Array;
+  votingProposalCount: number;
 
   constructor(args: {
     realm: PublicKey;
@@ -365,6 +392,7 @@ export class Governance {
     config: GovernanceConfig;
     reserved?: Uint8Array;
     proposalCount: number;
+    votingProposalCount: number;
   }) {
     this.accountType = args.accountType;
     this.realm = args.realm;
@@ -372,27 +400,28 @@ export class Governance {
     this.config = args.config;
     this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
+    this.votingProposalCount = args.votingProposalCount;
   }
 
   isProgramGovernance() {
-    return this.accountType === GovernanceAccountType.ProgramGovernance;
+    return this.accountType === GovernanceAccountType.ProgramGovernanceV1;
   }
 
   isAccountGovernance() {
-    return this.accountType === GovernanceAccountType.AccountGovernance;
+    return this.accountType === GovernanceAccountType.GovernanceV1;
   }
 
   isMintGovernance() {
-    return this.accountType === GovernanceAccountType.MintGovernance;
+    return this.accountType === GovernanceAccountType.MintGovernanceV1;
   }
 
   isTokenGovernance() {
-    return this.accountType === GovernanceAccountType.TokenGovernance;
+    return this.accountType === GovernanceAccountType.TokenGovernanceV1;
   }
 }
 
 export class TokenOwnerRecord {
-  accountType = GovernanceAccountType.TokenOwnerRecord;
+  accountType = GovernanceAccountType.TokenOwnerRecordV1;
 
   realm: PublicKey;
 
@@ -531,6 +560,10 @@ export class Proposal {
   voteType: VoteType;
   options: ProposalOption[];
   denyVoteWeight: BN | undefined;
+  vetoVoteWeight: BN | undefined;
+  abstainVoteWeight: BN | undefined;
+  startVotingAt: BN | null;
+  maxVotingTime: number | null;
   // --------------------------------
 
   draftAt: BN;
@@ -578,6 +611,10 @@ export class Proposal {
     voteType: VoteType;
     options: ProposalOption[];
     denyVoteWeight: BN | undefined;
+    vetoVoteWeight: BN | undefined;
+    abstainVoteWeight: BN | undefined;
+    startVotingAt: BN | null;
+    maxVotingTime: number | null;
     //
 
     draftAt: BN;
@@ -614,6 +651,11 @@ export class Proposal {
     this.voteType = args.voteType;
     this.options = args.options;
     this.denyVoteWeight = args.denyVoteWeight;
+    this.vetoVoteWeight = args.vetoVoteWeight;
+    this.abstainVoteWeight = args.abstainVoteWeight;
+
+    this.startVotingAt = args.startVotingAt;
+    this.maxVotingTime = args.maxVotingTime;
 
     this.draftAt = args.draftAt;
     this.signingOffAt = args.signingOffAt;
@@ -778,7 +820,7 @@ export class Proposal {
 }
 
 export class SignatoryRecord {
-  accountType: GovernanceAccountType = GovernanceAccountType.SignatoryRecord;
+  accountType: GovernanceAccountType = GovernanceAccountType.SignatoryRecordV1;
   proposal: PublicKey;
   signatory: PublicKey;
   signedOff: boolean;
@@ -952,15 +994,20 @@ export class InstructionData {
   }
 }
 
-export class ProposalInstruction {
+export class ProposalTransaction {
   accountType = GovernanceAccountType.ProposalInstructionV1;
   proposal: PublicKey;
   instructionIndex: number;
+
+  // V1
+  instruction: InstructionData;
+
   // V2
   optionIndex: number;
+  instructions: InstructionData[];
 
   holdUpTime: number;
-  instruction: InstructionData;
+
   executedAt: BN | null;
   executionStatus: InstructionExecutionStatus;
 
@@ -972,6 +1019,7 @@ export class ProposalInstruction {
     instruction: InstructionData;
     executedAt: BN | null;
     executionStatus: InstructionExecutionStatus;
+    instructions: InstructionData[];
   }) {
     this.proposal = args.proposal;
     this.instructionIndex = args.instructionIndex;
@@ -980,6 +1028,7 @@ export class ProposalInstruction {
     this.instruction = args.instruction;
     this.executedAt = args.executedAt;
     this.executionStatus = args.executionStatus;
+    this.instructions = args.instructions;
   }
 }
 

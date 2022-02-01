@@ -60,6 +60,8 @@ test('setupRealm', async () => {
 
   await requestAirdrop(connection, walletPk);
 
+  await new Promise(f => setTimeout(f, 500));
+
   // options
   const useSignatory = true;
   const cancelProposal = false;
@@ -141,6 +143,10 @@ test('setupRealm', async () => {
     new BN(1),
   );
 
+  await sendTransaction(connection, instructions, signers, wallet);
+  instructions = [];
+  signers = [];
+
   // Crate governance over the the governance token mint
   const config = new GovernanceConfig({
     voteThresholdPercentage: new VoteThresholdPercentage({
@@ -168,8 +174,6 @@ test('setupRealm', async () => {
     walletPk,
     undefined,
   );
-
-  console.log('SET AUTHORITY');
 
   // Set realm authority to the created governance
   withSetRealmAuthority(
@@ -397,18 +401,16 @@ test('setupRealm', async () => {
   // Act
   await sendTransaction(connection, instructions, signers, wallet);
 
-  return;
-
   // Assert
-  const realm = await getRealm(connection, realmPk);
-  expect(realm.account.name).toBe(name);
+  // const realm = await getRealm(connection, realmPk);
+  // expect(realm.account.name).toBe(name);
 
-  const results = await getTokenOwnerRecordsByOwner(
-    connection,
-    programId,
-    walletPk,
-  );
+  // const results = await getTokenOwnerRecordsByOwner(
+  //   connection,
+  //   programId,
+  //   walletPk,
+  // );
 
-  expect(results.length).toBe(1);
-  expect(results[0].account.governingTokenOwner).toEqual(walletPk);
+  // expect(results.length).toBe(1);
+  // expect(results[0].account.governingTokenOwner).toEqual(walletPk);
 });
