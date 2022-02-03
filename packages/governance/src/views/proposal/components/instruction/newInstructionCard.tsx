@@ -7,7 +7,6 @@ import { LABELS } from '../../../../constants';
 import {
   Governance,
   InstructionData,
-  PROGRAM_VERSION_V1,
   Proposal,
   Realm,
 } from '@solana/spl-governance';
@@ -52,12 +51,12 @@ export function NewInstructionCard({
     holdUpTime: number;
   }) => {
 
-    let { programVersion } = rpcContext;
+
     let optionIndex = 0; // default to first option
 
-    let index = programVersion === PROGRAM_VERSION_V1
-      ? proposal.account.instructionsNextIndex
-      : proposal.account.options[optionIndex].instructionsNextIndex;
+    // If instructionsNextIndex exists then we have V1 account and otherwise V2
+    let index = proposal.account.instructionsNextIndex ??
+      proposal.account.options[optionIndex].instructionsNextIndex;
 
     try {
       const instructionData = getInstructionDataFromBase64(values.instruction);
