@@ -15,7 +15,7 @@ export const finalizeVote = async (
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  withFinalizeVote(
+  await withFinalizeVote(
     instructions,
     programId,
     programVersion,
