@@ -185,7 +185,7 @@ export function GovernanceConfigFormItem({
         rules={[{ required: true }]}
         initialValue={getDaysFromTimestamp(governanceConfig.maxVotingTime)}
       >
-        <InputNumber min={1} />
+        <InputNumber min={0.01} />
       </Form.Item>
       <Form.Item
         name={configNameOf('voteThresholdPercentage')}
