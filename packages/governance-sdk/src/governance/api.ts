@@ -144,7 +144,7 @@ export async function getProposal(connection: Connection, proposal: PublicKey) {
  * @param governancePk
  * @returns
  */
-export async function getProposalByGovernance(
+export async function getProposalsByGovernance(
   connection: Connection,
   programId: PublicKey,
   governancePk: PublicKey,
@@ -169,7 +169,7 @@ export async function getAllProposals(
 ) {
   return getAllGovernances(connection, programId, realmPk).then(gs =>
     Promise.all(
-      gs.map(g => getProposalByGovernance(connection, programId, g.pubkey)),
+      gs.map(g => getProposalsByGovernance(connection, programId, g.pubkey)),
     ),
   );
 }
