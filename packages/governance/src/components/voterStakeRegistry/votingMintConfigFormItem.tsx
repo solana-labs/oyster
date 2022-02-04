@@ -1,22 +1,26 @@
 import { ProgramAccount, Realm } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
-import { Form, InputNumber } from 'antd';
+import { Form, InputNumber, Select } from 'antd';
 import BN from 'bn.js';
 
 import React from 'react';
+import { useGovernancesByRealm } from '../../hooks/apiHooks';
 
 import { getNameOf } from '../../tools/script';
 import { getSecondsFromYears } from '../../tools/units';
 import { getScaledFactor } from '../../tools/voterStakeRegistry/voterStakeRegistry';
 import { MintFormItem } from '../MintFormItem/mintFormItem';
 
+
 export interface VotingMintConfigValues {
   mint: string;
+  mintIndex: number;
   digitShift: number;
   unlockedFactor: number;
   maxVotingTime: number;
   lockupFactor: number;
   lockupSaturationYears: number;
+  grantAuthority: string;
 }
 
 export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
@@ -27,6 +31,8 @@ export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
     getSecondsFromYears(values.lockupSaturationYears).toString(),
   );
   const mint = new PublicKey(values.mint);
+  const mintIndex = values.mintIndex;
+  const grantAuthority = new PublicKey(values.grantAuthority);
 
   return {
     digitShift,
@@ -34,6 +40,8 @@ export function getVotingMintConfigApiValues(values: VotingMintConfigValues) {
     lockupScaledFactor,
     lockupSaturationSecs,
     mint,
+    grantAuthority,
+    mintIndex
   };
 }
 
@@ -44,6 +52,9 @@ export function VotingMintConfigFormItem({
 }: {
   realm: ProgramAccount<Realm>;
 }) {
+
+  const governances = useGovernancesByRealm(realm?.pubkey);
+
   return (
     <>
       <MintFormItem
@@ -51,6 +62,32 @@ export function VotingMintConfigFormItem({
         label="mint"
         initialValue={realm.account.communityMint}
       ></MintFormItem>
+
+      <Form.Item
+        name={configNameOf('mintIndex')}
+        label={'mint index'}
+        rules={[{ required: true }]}
+        initialValue={0}
+      >
+        <InputNumber min={0} />
+      </Form.Item>
+
+      <Form.Item
+        name={configNameOf('grantAuthority')}
+        label="grant authority (governance)"
+        rules={[{ required: true }]}
+      >
+        <Select>
+          {governances.map(g => (
+            <Select.Option
+              value={g.pubkey.toBase58()}
+              key={g.pubkey.toBase58()}
+            >
+              {g.account.governedAccount.toBase58()}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
 
       <Form.Item
         name={configNameOf('digitShift')}

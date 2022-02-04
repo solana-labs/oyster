@@ -41,8 +41,9 @@ export const VoterStakeConfigureMintForm = ({
       unlockedScaledFactor,
       lockupScaledFactor,
       lockupSaturationSecs,
-      mint
-
+      mint,
+      mintIndex,
+      grantAuthority
     } = getVotingMintConfigApiValues(values);
 
     const { registrarPda } = await getRegistrarAddress(
@@ -51,7 +52,6 @@ export const VoterStakeConfigureMintForm = ({
       realm.account.communityMint,
     );
 
-    let mintIndex = 0;
     let remainingAccounts = [{
       pubkey: mint,
       isSigner: false,
@@ -72,11 +72,15 @@ export const VoterStakeConfigureMintForm = ({
         }
       });
 
-      mintIndex = remainingAccounts.length
+
       remainingAccounts = remainingAccounts.concat(registrarMints)
     }
     catch (ex) {
       console.info("Can't fetch registrar", ex)
+    }
+
+    if (mintIndex > remainingAccounts.length) {
+      throw new Error(`Invalid mint index. Mint index: ${mintIndex}. Remaining accounts: ${remainingAccounts}`)
     }
 
     console.log("REMAINING", { remainingAccounts, mintIndex })
@@ -88,7 +92,7 @@ export const VoterStakeConfigureMintForm = ({
         unlockedScaledFactor, // unlocked_scaled_factor
         lockupScaledFactor, // lockup_scaled_factor
         lockupSaturationSecs, // lockup_saturation_secs
-        realm.account.authority!,
+        grantAuthority, // grant_authority
         {
           accounts: {
             registrar: registrarPda,
