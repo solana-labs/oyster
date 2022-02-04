@@ -69,7 +69,7 @@ export async function getTokenOwnerRecordForRealm(
  * Returns TokenOwnerRecords for the given token owner (voter)
  * Note: The function returns TokenOwnerRecords for both council and community token holders
  *
- * @param rpcEndpoint
+ * @param connection
  * @param programId
  * @param governingTokenOwner
  * @returns
