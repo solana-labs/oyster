@@ -66,12 +66,12 @@ export async function getTokenOwnerRecordForRealm(
 }
 
 /**
- * Returns TokenOwnerRecords for given token owner 
-
- * 
- * @param rpcEndpoint 
- * @param programId 
- * @param governingTokenOwner 
+ * Returns TokenOwnerRecords for the given token owner (voter)
+ * Note: The function returns TokenOwnerRecords for both council and community token holders
+ *
+ * @param connection
+ * @param programId
+ * @param governingTokenOwner
  * @returns
  */
 export async function getTokenOwnerRecordsByOwner(
@@ -84,6 +84,25 @@ export async function getTokenOwnerRecordsByOwner(
   ]);
 }
 
+/**
+ * Returns all TokenOwnerRecords for all members for the given Realm
+ * Note: The function returns TokenOwnerRecords for both council and community token holders
+ *
+ * @param connection
+ * @param programId
+ * @param realmPk
+ * @returns
+ */
+export async function getAllTokenOwnerRecords(
+  connection: Connection,
+  programId: PublicKey,
+  realmPk: PublicKey,
+) {
+  return getGovernanceAccounts(connection, programId, TokenOwnerRecord, [
+    pubkeyFilter(1, realmPk)!,
+  ]);
+}
+
 // Governances
 
 export async function getGovernance(
@@ -93,10 +112,66 @@ export async function getGovernance(
   return getGovernanceAccount(connection, governance, Governance);
 }
 
+/**
+ * Returns all governances for the given program instance and realm
+ *
+ * @param connection
+ * @param programId
+ * @param realmPk
+ * @returns
+ */
+export async function getAllGovernances(
+  connection: Connection,
+  programId: PublicKey,
+  realmPk: PublicKey,
+) {
+  return getGovernanceAccounts(connection, programId, Governance, [
+    pubkeyFilter(1, realmPk)!,
+  ]);
+}
+
 // Proposal
 
 export async function getProposal(connection: Connection, proposal: PublicKey) {
   return getGovernanceAccount(connection, proposal, Proposal);
+}
+
+/**
+ * Returns all Proposals for the given Governance
+ *
+ * @param connection
+ * @param programId
+ * @param governancePk
+ * @returns
+ */
+export async function getProposalsByGovernance(
+  connection: Connection,
+  programId: PublicKey,
+  governancePk: PublicKey,
+) {
+  return getGovernanceAccounts(connection, programId, Proposal, [
+    pubkeyFilter(1, governancePk)!,
+  ]);
+}
+
+/**
+ * Returns all Proposals for the given Realm
+ *
+ * @param connection
+ * @param programId
+ * @param realmPk
+ * @returns
+ */
+export async function getAllProposals(
+  connection: Connection,
+  programId: PublicKey,
+  realmPk: PublicKey,
+) {
+  return getAllGovernances(connection, programId, realmPk).then(gs =>
+    Promise.all(
+      gs.map(g => getProposalsByGovernance(connection, programId, g.pubkey)),
+    ),
+  );
 }
 
 // Generic API

@@ -36,6 +36,9 @@ import {
   withWithdrawGoverningTokens,
   withUpdateProgramMetadata,
   withRelinquishVote,
+  getAllGovernances,
+  getAllProposals,
+  getAllTokenOwnerRecords,
 } from '../../src';
 
 import { withSetRealmConfig } from '../../src/governance/withSetRealmConfig';
@@ -406,4 +409,43 @@ test('setupRealm', async () => {
   // Assert
   const realm = await getRealm(connection, realmPk);
   expect(realm.account.name).toBe(name);
+});
+
+test('getAllGovernances', async () => {
+  // Arrange
+  const realmPk = new PublicKey("9BrZiMXAVocFj7wgUaAbt1sMcKUEzHKbMmhgrojUvM9G")
+
+  // Act
+  const governances = await getAllGovernances(connection, programId, realmPk);
+
+  // Arrange
+  expect(governances.length).toBeGreaterThan(0);
+
+
+});
+
+test('getAllProposals', async () => {
+  // Arrange
+  const realmPk = new PublicKey("EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu")
+
+  // Act
+  const proposals = await getAllProposals(connection, programId, realmPk);
+
+  // Arrange
+  expect(proposals.length).toBeGreaterThan(0);
+
+
+});
+
+test('getAllTokenOwnerRecords', async () => {
+  // Arrange
+  const realmPk = new PublicKey("EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu")
+
+  // Act
+  const tokenOwnerRecords = await getAllTokenOwnerRecords(connection, programId, realmPk);
+
+  // Arrange
+  expect(tokenOwnerRecords.length).toBeGreaterThan(0);
+
+
 });

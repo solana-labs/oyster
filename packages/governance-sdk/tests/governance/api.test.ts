@@ -212,3 +212,5 @@ test('createRealmWithGovernanceAndProposal', async () => {
   expect(results.length).toBe(1);
   expect(results[0].account.governingTokenOwner).toEqual(walletPk);
 });
+
+
