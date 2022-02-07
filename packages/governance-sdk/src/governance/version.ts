@@ -79,7 +79,7 @@ export async function getGovernanceProgramVersion(
       'recent',
     );
 
-    if (!getVersion.value.err && getVersion.value.logs) {
+    if (getVersion.value.logs) {
       const prefix = 'PROGRAM-VERSION:"';
 
       const simVersion = getVersion.value.logs
@@ -105,5 +105,6 @@ export async function getGovernanceProgramVersion(
     return PROGRAM_VERSION;
   }
 
+  // Default to V1 because it's not possible to detect its version
   return PROGRAM_VERSION_V1;
 }

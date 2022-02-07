@@ -6,7 +6,7 @@
     "@blockworks-foundation/voter-stake-registry-client": "^0.1.6",
     "@oyster/common": "0.0.2",
     "@project-serum/borsh": "^0.2.2",
-    "@solana/spl-governance": "0.0.26",
+    "@solana/spl-governance": "0.0.27",
     "@solana/spl-token": "0.1.3",
     "@solana/web3.js": "^1.22.0",
     "antd": "^4.6.6",
