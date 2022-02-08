@@ -1,4 +1,4 @@
-import { ProgramAccount, Realm } from '@solana/spl-governance';
+import { Governance, ProgramAccount, Realm } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
 import { Form, InputNumber, Select } from 'antd';
 import BN from 'bn.js';
@@ -49,8 +49,10 @@ const configNameOf = getNameOf<VotingMintConfigValues>();
 
 export function VotingMintConfigFormItem({
   realm,
+  governance,
 }: {
   realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
 }) {
 
   const governances = useGovernancesByRealm(realm?.pubkey);
@@ -76,6 +78,7 @@ export function VotingMintConfigFormItem({
         name={configNameOf('grantAuthority')}
         label="grant authority (governance)"
         rules={[{ required: true }]}
+        initialValue={governance.pubkey.toBase58()}
       >
         <Select>
           {governances.map(g => (
