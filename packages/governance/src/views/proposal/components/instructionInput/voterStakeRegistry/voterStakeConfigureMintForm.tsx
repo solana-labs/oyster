@@ -114,7 +114,7 @@ export const VoterStakeConfigureMintForm = ({
       <Form.Item label="realm">
         <ExplorerLink address={realm.pubkey} type="address" />
       </Form.Item>
-      <VotingMintConfigFormItem realm={realm}></VotingMintConfigFormItem>
+      <VotingMintConfigFormItem realm={realm} governance={governance}></VotingMintConfigFormItem>
     </Form>
   );
 };
