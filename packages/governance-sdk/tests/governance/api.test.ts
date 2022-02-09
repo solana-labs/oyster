@@ -31,7 +31,7 @@ import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedT
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
 
-const programId = new PublicKey('BfFUxwBiJLhD1wL36xGXWRe7RXAFL4QKircHydAHS3wt');
+const programId = new PublicKey('GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP');
 const rpcEndpoint = clusterApiUrl('devnet');
 
 // const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
@@ -170,6 +170,10 @@ test('createRealmWithGovernanceAndProposal', async () => {
     walletPk,
   );
 
+  await sendTransaction(connection, instructions, signers, wallet);
+  instructions = [];
+  signers = [];
+
   const instruction = Token.createMintToInstruction(
     TOKEN_PROGRAM_ID,
     mintPk,
@@ -192,7 +196,7 @@ test('createRealmWithGovernanceAndProposal', async () => {
     0,
     0,
     0,
-    [instructionData],
+    [instructionData, instructionData],
     walletPk,
   );
 
