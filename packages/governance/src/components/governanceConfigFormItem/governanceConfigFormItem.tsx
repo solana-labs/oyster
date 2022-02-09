@@ -1,4 +1,4 @@
-import { Form, InputNumber, Space, Spin, Typography } from 'antd';
+import { Form, InputNumber, Select, Space, Spin, Typography } from 'antd';
 import BN from 'bn.js';
 import React, { useState } from 'react';
 import { contexts, constants } from '@oyster/common';
@@ -35,6 +35,7 @@ export interface GovernanceConfigValues {
   maxVotingTime: number;
   voteThresholdPercentage: number;
   mintDecimals: number;
+  voteTipping: VoteTipping;
 }
 
 export function getGovernanceConfig(values: GovernanceConfigValues) {
@@ -58,6 +59,7 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
+    voteTipping: values.voteTipping
   });
 }
 
@@ -194,6 +196,18 @@ export function GovernanceConfigFormItem({
         initialValue={governanceConfig.voteThresholdPercentage.value}
       >
         <InputNumber maxLength={3} min={1} max={100} />
+      </Form.Item>
+
+      <Form.Item
+        name={configNameOf('voteTipping')}
+        label={LABELS.VOTE_TIPPING}
+        rules={[{ required: true }]}
+        initialValue={VoteTipping[governanceConfig.voteTipping]}
+      >
+        <Select>{Object.keys(VoteTipping)
+          .filter(vt => typeof VoteTipping[vt as any] === "string")
+          .map(vt => (<Select.Option value={vt}>{VoteTipping[vt as any]} </Select.Option>))}
+        </Select>
       </Form.Item>
 
       <Form.Item

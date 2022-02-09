@@ -139,6 +139,7 @@ export const LABELS = {
   NAME_LABEL: 'name',
 
   YES_VOTE_THRESHOLD_PERCENTAGE: 'yes vote threshold (%)',
+  VOTE_TIPPING: 'vote tipping',
 
   SELECT_PROPOSAL_TYPE: 'Select the type of proposals this app will generate',
   SELECT_EXECUTION_TYPE: 'Select how transactions will be executed',
