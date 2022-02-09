@@ -10,6 +10,7 @@ import { NativeTransferForm } from './nativeTokenTransferForm';
 import { ProgramAccount } from '@solana/spl-governance';
 import { VoterStakeSetRegistrarForm } from './voterStakeRegistry/voterStakeSetRegistrarForm';
 import { VoterStakeConfigureMintForm } from './voterStakeRegistry/voterStakeConfigureMintForm';
+import { SetRealmAuthorityForm } from './setRealmAuthority';
 
 export function getGovernanceInstructions(
   programVersion: number,
@@ -20,6 +21,7 @@ export function getGovernanceInstructions(
 
   if (governance.pubkey.toBase58() === realm.account.authority?.toBase58()) {
     instructions.push(InstructionType.SetRealmConfig);
+    instructions.push(InstructionType.SetRealmAuthority);
 
     if (programVersion > PROGRAM_VERSION_V1) {
       instructions.push(InstructionType.VoterStakeSetRegistrar);
@@ -67,6 +69,14 @@ export function GovernanceInstructionForm({
           governance={governance}
           onCreateInstruction={onCreateInstruction}
         ></RealmConfigForm>
+      )}
+      {instruction === InstructionType.SetRealmAuthority && (
+        <SetRealmAuthorityForm
+          form={form}
+          realm={realm}
+          governance={governance}
+          onCreateInstruction={onCreateInstruction}
+        ></SetRealmAuthorityForm>
       )}
       {instruction === InstructionType.VoterStakeSetRegistrar && (
         <VoterStakeSetRegistrarForm
