@@ -14,29 +14,31 @@ import {
   Typography,
 } from 'antd';
 import React, { useState } from 'react';
-import { utils, useWallet } from '@oyster/common';
-import {
-  InstructionData,
-  Proposal,
-  ProposalState,
-  ProgramAccount,
-  RpcContext,
-} from '@solana/spl-governance';
-import { dryRunInstruction } from '../../../../../actions/dryRunInstruction';
+
+import { useWallet } from '@oyster/common';
+import { dryRunInstructions } from '../../../../../actions/dryRunInstruction';
 import { useRpcContext } from '../../../../../hooks/useRpcContext';
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
 import { BaseType } from 'antd/lib/typography/Base';
+import { utils } from '@oyster/common';
+import {
+  ProgramAccount,
+  Proposal,
+  ProposalState,
+  ProposalTransaction,
+  RpcContext,
+} from '@solana/spl-governance';
 
 const { getExplorerInspectorUrl } = utils;
 
 const { Text } = Typography;
 
-export function DryRunInstructionButton({
+export function DryRunProposalButton({
   proposal,
-  instructionData,
+  instructions,
 }: {
   proposal: ProgramAccount<Proposal>;
-  instructionData: InstructionData | undefined;
+  instructions: ProgramAccount<ProposalTransaction>[];
 }) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
@@ -56,7 +58,8 @@ export function DryRunInstructionButton({
       ProposalState.SigningOff,
       ProposalState.Voting,
     ].includes(proposal.account.state) ||
-    !instructionData
+    !instructions ||
+    instructions.length === 0
   ) {
     return null;
   }
@@ -65,7 +68,10 @@ export function DryRunInstructionButton({
     setIsModalVisible(true);
     setIsPending(true);
     try {
-      const result = await dryRunInstruction(rpcContext, instructionData);
+      const result = await dryRunInstructions(
+        rpcContext,
+        instructions.flatMap(ins => ins.account.instructions),
+      );
       setResult(result);
     } catch (ex: any) {
       setError(ex);
@@ -80,29 +86,34 @@ export function DryRunInstructionButton({
 
   return (
     <>
-      <Tooltip title="simulate instruction execution">
-        <Button onClick={onDryRun}>
-          <PlayCircleOutlined style={{ color: 'orange' }} key="play" />
-        </Button>
-      </Tooltip>
-      <Modal
-        title="Instruction simulation results"
-        visible={isModalVisible}
-        onCancel={onClose}
-        width={1000}
-        footer={[
-          <Button key="close" onClick={onClose} type="primary">
-            Close
-          </Button>,
-        ]}
-      >
-        <DryRunStatus
-          isPending={isPending}
-          result={result}
-          rpcContext={rpcContext}
-          error={error}
-        ></DryRunStatus>
-      </Modal>
+      <Col>
+        <span>Simulate all instructions in proposal together&nbsp;</span>
+      </Col>
+      <Col>
+        <Tooltip title="simulate proposal execution">
+          <Button onClick={onDryRun}>
+            <PlayCircleOutlined style={{ color: 'orange' }} key="play" />
+          </Button>
+        </Tooltip>
+        <Modal
+          title="Proposal simulation results"
+          visible={isModalVisible}
+          onCancel={onClose}
+          width={1000}
+          footer={[
+            <Button key="close" onClick={onClose} type="primary">
+              Close
+            </Button>,
+          ]}
+        >
+          <DryRunStatus
+            isPending={isPending}
+            result={result}
+            rpcContext={rpcContext}
+            error={error}
+          ></DryRunStatus>
+        </Modal>
+      </Col>
     </>
   );
 }

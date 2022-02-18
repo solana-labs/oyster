@@ -43,6 +43,7 @@ import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
 import { ProgramAccount } from '@solana/spl-governance';
+import { DryRunProposalButton } from './components/instruction/buttons/dryRunProposalButton';
 
 const { TabPane } = Tabs;
 
@@ -445,6 +446,16 @@ function InnerProposalView({
                 </TabPane>
               )}
               <TabPane tab={LABELS.INSTRUCTIONS} key="instructions">
+                <Row
+                  align="middle"
+                  justify="end"
+                  style={{ paddingBottom: '1em' }}
+                >
+                  <DryRunProposalButton
+                    proposal={proposal}
+                    instructions={instructions}
+                  />
+                </Row>
                 <Row
                   gutter={[
                     { xs: 8, sm: 16, md: 24, lg: 32 },
