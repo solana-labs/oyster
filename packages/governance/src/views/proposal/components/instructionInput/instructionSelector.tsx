@@ -14,7 +14,7 @@ export enum InstructionType {
   SplTokenMintTo,
   SetRealmConfig,
   SetRealmAuthority,
-  VoterStakeSetRegistrar,
+  VoterStakeCreateRegistrar,
   VoterStakeConfigureMint,
   NativeTransfer,
 }
@@ -32,7 +32,7 @@ const instructionNames = [
   'spl-token mint-to',
   'set-realm-config',
   'set-realm-authority',
-  'voter-stake set-registrar',
+  'voter-stake create-registrar',
   'voter-stake config-mint',
   'SOL-transfer',
 ];

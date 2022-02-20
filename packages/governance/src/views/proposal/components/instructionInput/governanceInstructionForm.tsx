@@ -8,7 +8,7 @@ import { TransactionInstruction } from '@solana/web3.js';
 import { RealmConfigForm } from './realmConfigForm';
 import { NativeTransferForm } from './nativeTokenTransferForm';
 import { ProgramAccount } from '@solana/spl-governance';
-import { VoterStakeSetRegistrarForm } from './voterStakeRegistry/voterStakeSetRegistrarForm';
+import { VoterStakeCreateRegistrarForm } from './voterStakeRegistry/voterStakeCreateRegistrarForm';
 import { VoterStakeConfigureMintForm } from './voterStakeRegistry/voterStakeConfigureMintForm';
 import { SetRealmAuthorityForm } from './setRealmAuthority';
 
@@ -24,7 +24,7 @@ export function getGovernanceInstructions(
     instructions.push(InstructionType.SetRealmAuthority);
 
     if (programVersion > PROGRAM_VERSION_V1) {
-      instructions.push(InstructionType.VoterStakeSetRegistrar);
+      instructions.push(InstructionType.VoterStakeCreateRegistrar);
       instructions.push(InstructionType.VoterStakeConfigureMint);
     }
   }
@@ -78,13 +78,13 @@ export function GovernanceInstructionForm({
           onCreateInstruction={onCreateInstruction}
         ></SetRealmAuthorityForm>
       )}
-      {instruction === InstructionType.VoterStakeSetRegistrar && (
-        <VoterStakeSetRegistrarForm
+      {instruction === InstructionType.VoterStakeCreateRegistrar && (
+        <VoterStakeCreateRegistrarForm
           form={form}
           realm={realm}
           governance={governance}
           onCreateInstruction={onCreateInstruction}
-        ></VoterStakeSetRegistrarForm>
+        ></VoterStakeCreateRegistrarForm>
       )}
       {instruction === InstructionType.VoterStakeConfigureMint && (
         <VoterStakeConfigureMintForm

@@ -11,7 +11,7 @@ import { formDefaults } from '../../../../../tools/forms';
 import { useVoterStakeRegistryClient } from '../../../../../hooks/useVoterStakeRegistryClient';
 import { getRegistrarAddress } from '../../../../../tools/voterStakeRegistry/accounts';
 
-export const VoterStakeSetRegistrarForm = ({
+export const VoterStakeCreateRegistrarForm = ({
   form,
   realm,
   governance,
@@ -37,7 +37,7 @@ export const VoterStakeSetRegistrarForm = ({
       realm.account.communityMint,
     );
 
-    const setRegistrarIx = await vsrClient?.program.instruction.createRegistrar(
+    const createRegistrarIx = await vsrClient?.program.instruction.createRegistrar(
       registrarBump,
       {
         accounts: {
@@ -53,7 +53,7 @@ export const VoterStakeSetRegistrarForm = ({
       },
     )!;
 
-    onCreateInstruction(setRegistrarIx);
+    onCreateInstruction(createRegistrarIx);
   };
 
   return (
