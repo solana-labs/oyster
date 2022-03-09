@@ -61,7 +61,7 @@ export const withCreateGovernance = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {
