@@ -81,7 +81,7 @@ export const withDepositGoverningTokens = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

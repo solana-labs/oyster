@@ -69,7 +69,7 @@ export const withCreateTokenGovernance = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

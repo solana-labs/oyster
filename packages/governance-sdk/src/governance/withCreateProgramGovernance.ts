@@ -79,7 +79,7 @@ export const withCreateProgramGovernance = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

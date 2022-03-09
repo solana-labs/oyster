@@ -77,7 +77,7 @@ export const withInsertTransaction = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

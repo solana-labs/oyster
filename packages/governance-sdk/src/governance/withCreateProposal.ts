@@ -96,7 +96,7 @@ export const withCreateProposal = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

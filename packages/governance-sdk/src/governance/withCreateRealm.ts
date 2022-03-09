@@ -88,7 +88,7 @@ export async function withCreateRealm(
     {
       pubkey: payer,
       isSigner: true,
-      isWritable: false,
+      isWritable: true,
     },
     {
       pubkey: SYSTEM_PROGRAM_ID,
