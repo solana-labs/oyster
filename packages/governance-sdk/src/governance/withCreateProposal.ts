@@ -22,7 +22,6 @@ export const withCreateProposal = async (
   programVersion: number,
   realm: PublicKey,
   governance: PublicKey,
-  tokenOwnerRecord: PublicKey,
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
@@ -72,11 +71,6 @@ export const withCreateProposal = async (
     },
     {
       pubkey: governance,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: tokenOwnerRecord,
       isWritable: true,
       isSigner: false,
     },

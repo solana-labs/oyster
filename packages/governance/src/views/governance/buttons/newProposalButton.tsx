@@ -83,19 +83,10 @@ export function NewProposalButton({
         : realm!.account.config.councilMint!;
     const proposalIndex = governance.account.proposalCount;
 
-    // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord
-    // When governance delegates are not used it doesn't make any difference
-    // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
-    // because user might have different delegates for council and community
-    const tokenOwnerRecord = canCreateProposalUsingCommunityTokens
-      ? communityTokenOwnerRecord
-      : councilTokenOwnerRecord;
-
     return await createProposal(
       rpcContext,
       governance.account.realm,
       governance.pubkey,
-      tokenOwnerRecord!.pubkey,
       values.name,
       values.descriptionLink ?? '',
       governingTokenMint,
@@ -116,7 +107,7 @@ export function NewProposalButton({
       label={LABELS.ADD_NEW_PROPOSAL}
       buttonProps={{
         ...buttonProps,
-        disabled: !canCreateProposal,
+        disabled: false,
         type: 'primary',
       }}
       formTitle={LABELS.ADD_NEW_PROPOSAL}

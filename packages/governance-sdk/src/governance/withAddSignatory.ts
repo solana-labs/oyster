@@ -15,7 +15,6 @@ export const withAddSignatory = async (
   programId: PublicKey,
   programVersion: number,
   proposal: PublicKey,
-  tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
   signatory: PublicKey,
   payer: PublicKey,
@@ -33,11 +32,6 @@ export const withAddSignatory = async (
     {
       pubkey: proposal,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: tokenOwnerRecord,
-      isWritable: false,
       isSigner: false,
     },
     {
