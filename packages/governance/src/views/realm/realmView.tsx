@@ -22,8 +22,6 @@ import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
 
-import { RealmActionBar } from './buttons/realmActionBar';
-
 const { Text } = Typography;
 
 export const RealmView = () => {
@@ -112,17 +110,6 @@ export const RealmView = () => {
                   </Space>
                 </Col>
               </Row>
-            </Col>
-            <Col
-              md={12}
-              xs={24}
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-              }}
-            >
-              <RealmActionBar realm={realm}></RealmActionBar>
             </Col>
           </Row>
         </Col>
