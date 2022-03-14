@@ -14,6 +14,8 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteRecord,
+  RealmConfigAccount,
+  getRealmConfigAddress,
 } from './accounts';
 
 import {
@@ -32,6 +34,16 @@ export async function getRealm(connection: Connection, realm: PublicKey) {
 
 export async function getRealms(connection: Connection, programId: PublicKey) {
   return getGovernanceAccounts(connection, programId, Realm);
+}
+
+// Realm config
+export async function tryGetRealmConfig(
+  connection: Connection,
+  programId: PublicKey,
+  realmPk: PublicKey,
+) {
+  const realmConfigPk = await getRealmConfigAddress(programId, realmPk);
+  return getGovernanceAccount(connection, realmConfigPk, RealmConfigAccount);
 }
 
 // VoteRecords
@@ -221,4 +233,21 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
     accountPk,
     accountInfo,
   ) as ProgramAccount<TAccount>;
+}
+
+export async function tryGetGovernanceAccount<
+  TAccount extends GovernanceAccount
+>(
+  connection: Connection,
+  accountPk: PublicKey,
+  accountClass: new (args: any) => TAccount | undefined,
+) {
+  const accountInfo = await connection.getAccountInfo(accountPk);
+
+  if (accountInfo) {
+    return GovernanceAccountParser(accountClass as any)(
+      accountPk,
+      accountInfo,
+    ) as ProgramAccount<TAccount>;
+  }
 }

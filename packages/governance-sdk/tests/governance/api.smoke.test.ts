@@ -31,7 +31,6 @@ import {
   Vote,
   YesNoVote,
   withCancelProposal,
-  withExecuteInstruction,
   withFlagTransactionError,
   withWithdrawGoverningTokens,
   withUpdateProgramMetadata,
@@ -39,6 +38,12 @@ import {
   getAllGovernances,
   getAllProposals,
   getAllTokenOwnerRecords,
+  getRealmConfig,
+  getRealmConfigAddress,
+  tryGetGovernanceAccount,
+  RealmConfigAccount,
+  tryGetRealmConfig,
+  getRealms,
 } from '../../src';
 
 import { withSetRealmConfig } from '../../src/governance/withSetRealmConfig';
@@ -447,5 +452,18 @@ test('getAllTokenOwnerRecords', async () => {
   // Arrange
   expect(tokenOwnerRecords.length).toBeGreaterThan(0);
 
+
+});
+
+test('tryGetRealmConfig', async () => {
+  // Arrange
+  const realmPk = new PublicKey("A98TAf9KwCMMd9GmXogc9D3Lj9diYGkAZctUZZPXEf41")
+  const programId = new PublicKey("AuetJrDq4USDLibT83abUB9pniWFQuPsZa3YNYtrqUWP")
+
+  // Act
+  const realmConfig = await tryGetRealmConfig(connection,programId,realmPk);
+
+  // Assert
+  expect(realmConfig.account.realm).toEqual(realmPk);
 
 });
