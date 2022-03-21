@@ -463,6 +463,7 @@ export class TokenOwnerRecord {
     totalVotesCount: number;
     outstandingProposalCount: number;
     reserved: Uint8Array;
+    governanceDelegate: PublicKey | undefined;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
@@ -472,6 +473,7 @@ export class TokenOwnerRecord {
     this.totalVotesCount = args.totalVotesCount;
     this.outstandingProposalCount = args.outstandingProposalCount;
     this.reserved = args.reserved;
+    this.governanceDelegate = args.governanceDelegate;
   }
 }
 

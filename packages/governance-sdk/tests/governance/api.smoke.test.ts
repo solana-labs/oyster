@@ -11,7 +11,6 @@ import {
   createInstructionData,
   getGovernanceProgramVersion,
   getRealm,
-  getTokenOwnerRecordsByOwner,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
@@ -38,12 +37,11 @@ import {
   getAllGovernances,
   getAllProposals,
   getAllTokenOwnerRecords,
-  getRealmConfig,
-  getRealmConfigAddress,
-  tryGetGovernanceAccount,
-  RealmConfigAccount,
   tryGetRealmConfig,
-  getRealms,
+  withExecuteTransaction,
+  withSetGovernanceDelegate,
+  getTokenOwnerRecordForRealm,
+  getTokenOwnerRecord,
 } from '../../src';
 
 import { withSetRealmConfig } from '../../src/governance/withSetRealmConfig';
@@ -382,7 +380,7 @@ test('setupRealm', async () => {
       transactionPk,
     );
 
-    await withExecuteInstruction(
+    await withExecuteTransaction(
       instructions,
       programId,
       programVersion,
@@ -467,3 +465,95 @@ test('tryGetRealmConfig', async () => {
   expect(realmConfig.account.realm).toEqual(realmPk);
 
 });
+
+
+test('setGovernanceDelegate', async () => {
+  // Arrange
+  const wallet = Keypair.generate();
+  const walletPk = wallet.publicKey;
+
+  await requestAirdrop(connection, walletPk);
+
+  await new Promise(f => setTimeout(f, 1000));
+
+  // Get governance program version
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId,
+  );
+
+  let instructions: TransactionInstruction[] = [];
+  let signers: Keypair[] = [];
+
+  // Create and mint governance token
+  let mintPk = await withCreateMint(
+    connection,
+    instructions,
+    signers,
+    walletPk,
+    walletPk,
+    0,
+    walletPk,
+  );
+
+  let ataPk = await withCreateAssociatedTokenAccount(
+    instructions,
+    mintPk,
+    walletPk,
+    walletPk,
+  );
+  await withMintTo(instructions, mintPk, ataPk, walletPk, 1);
+
+  // Create Realm
+  const name = `Realm-${new Keypair().publicKey.toBase58().slice(0, 6)}`;
+  const realmAuthorityPk = walletPk;
+  const communityMintMaxVoteWeightSource =
+    MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
+  const councilMintPk = undefined;
+
+  const realmPk = await withCreateRealm(
+    instructions,
+    programId,
+    programVersion,
+    name,
+    realmAuthorityPk,
+    mintPk,
+    walletPk,
+    councilMintPk,
+    communityMintMaxVoteWeightSource,
+    new BN(1),
+  );
+
+  // Deposit governance tokens
+  const tokenOwnerRecordPk = await withDepositGoverningTokens(
+    instructions,
+    programId,
+    programVersion,
+    realmPk,
+    ataPk,
+    mintPk,
+    walletPk,
+    walletPk,
+    walletPk,
+    new BN(1),
+  );
+
+  await sendTransaction(connection, instructions, signers, wallet);
+  instructions = [];
+  signers = [];
+
+
+  const delegatePk = Keypair.generate().publicKey;
+
+  // Act
+  await withSetGovernanceDelegate(instructions,programId,programVersion,realmPk,mintPk,walletPk,walletPk,delegatePk);
+  await sendTransaction(connection, instructions, signers, wallet);
+
+  // Assert
+  let tokenOwnerRecord = await getTokenOwnerRecord(connection,tokenOwnerRecordPk)
+
+  expect(tokenOwnerRecord.account.governanceDelegate).toEqual(delegatePk);
+
+});
+
+

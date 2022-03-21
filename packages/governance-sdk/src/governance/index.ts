@@ -27,6 +27,7 @@ export * from './withInsertTransaction';
 export * from './withRelinquishVote';
 export * from './withRemoveTransaction';
 export * from './withSetRealmAuthority';
+export * from './withSetGovernanceDelegate';
 export * from './withSignOffProposal';
 export * from './withUpdateProgramMetadata';
 export * from './withWithdrawGoverningTokens';
