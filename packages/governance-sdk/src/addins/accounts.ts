@@ -1,7 +1,10 @@
+import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
-export class Realm {
-  accountDiscriminator: Uint8Array;
+export type GovernanceAddinAccountClass = typeof MaxVoterWeightRecord;
+
+export class MaxVoterWeightRecord {
+  accountDiscriminator = new Uint8Array([57, 100, 53, 102, 102, 50, 57, 55]);
 
   realm: PublicKey;
 
@@ -9,27 +12,38 @@ export class Realm {
 
   maxVoterWeight: BN;
 
-  reserved: Uint8Array;
-
-  votingProposalCount: number;
-
-  authority: PublicKey | undefined;
-
-  name: string;
+  maxVoterWeightExpiry: BN;
 
   constructor(args: {
-    communityMint: PublicKey;
-    reserved: Uint8Array;
-    config: RealmConfig;
-    votingProposalCount: number;
-    authority: PublicKey | undefined;
-    name: string;
+    realm: PublicKey;
+    governingTokenMint: PublicKey;
+    maxVoterWeight: BN;
+    maxVoterWeightExpiry: BN;
   }) {
-    this.communityMint = args.communityMint;
-    this.config = args.config;
-    this.reserved = args.reserved;
-    this.votingProposalCount = args.votingProposalCount;
-    this.authority = args.authority;
-    this.name = args.name;
+    this.realm = args.realm;
+    this.governingTokenMint = args.governingTokenMint;
+    this.maxVoterWeight = args.maxVoterWeight;
+    this.maxVoterWeightExpiry = args.maxVoterWeightExpiry;
   }
+}
+
+/**
+ * Returns the default address for MaxVoterWeightRecord
+ * Note: individual addins are not required to use the default address and it can vary between different implementations
+ **/
+export async function getMaxVoterWeightRecordAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+) {
+  const [maxVoterWeightRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('max-voter-weight-record'),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+    ],
+    programId,
+  );
+
+  return maxVoterWeightRecordAddress;
 }
