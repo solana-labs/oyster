@@ -77,6 +77,13 @@ export async function getTokenOwnerRecordForRealm(
   return getGovernanceAccount(connection, tokenOwnerRecordPk, TokenOwnerRecord);
 }
 
+export async function getTokenOwnerRecord(
+  connection: Connection,
+  tokenOwnerRecordPk: PublicKey,
+) {
+  return getGovernanceAccount(connection, tokenOwnerRecordPk, TokenOwnerRecord);
+}
+
 /**
  * Returns TokenOwnerRecords for the given token owner (voter)
  * Note: The function returns TokenOwnerRecords for both council and community token holders

@@ -21,6 +21,7 @@ import {
   RelinquishVoteArgs,
   RemoveTransactionArgs,
   SetGovernanceConfigArgs,
+  SetGovernanceDelegateArgs,
   SetRealmAuthorityArgs,
   SetRealmConfigArgs,
   SignOffProposalArgs,
@@ -236,6 +237,16 @@ function createGovernanceSchema(programVersion: number) {
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      SetGovernanceDelegateArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['instruction', 'u8'],
+          ['newGovernanceDelegate', { kind: 'option', type: 'pubkey' }],
+        ],
       },
     ],
     [

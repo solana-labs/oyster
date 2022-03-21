@@ -362,3 +362,14 @@ export class CreateNativeTreasuryArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.CreateNativeTreasury;
 }
+
+export class SetGovernanceDelegateArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.SetGovernanceDelegate;
+
+  newGovernanceDelegate: PublicKey | undefined;
+
+  constructor(args: { newGovernanceDelegate: PublicKey | undefined }) {
+    this.newGovernanceDelegate = args.newGovernanceDelegate;
+  }
+}
