@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { ProgramAccount } from '../tools/sdk/runtime';
-import { MaxVoterWeightRecord } from './accounts';
+import { MaxVoterWeightRecord, VoterWeightRecord } from './accounts';
 import { GovernanceAddinAccountParser } from './serialisation';
 
 export async function getMaxVoterWeightRecord(
@@ -11,6 +11,17 @@ export async function getMaxVoterWeightRecord(
     connection,
     maxVoterWeightRecordPk,
     MaxVoterWeightRecord,
+  );
+}
+
+export async function getVoterWeightRecord(
+  connection: Connection,
+  voterWeightRecordPk: PublicKey,
+) {
+  return getGovernanceAddinAccount(
+    connection,
+    voterWeightRecordPk,
+    VoterWeightRecord,
   );
 }
 
