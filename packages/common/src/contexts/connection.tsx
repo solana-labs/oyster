@@ -32,6 +32,13 @@ export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet';
 
 export const ENDPOINTS = [
   {
+    name: 'devnet' as ENV,
+    endpoint:
+      process.env.REACT_APP_DEVNET_RPC ||
+      'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
+    ChainId: ChainId.Devnet,
+  },
+  {
     name: 'mainnet-beta' as ENV,
     endpoint:
       process.env.REACT_APP_MAINNET_RPC || 'https://ssc-dao.genesysgo.net',
@@ -42,13 +49,7 @@ export const ENDPOINTS = [
     endpoint: clusterApiUrl('testnet'),
     ChainId: ChainId.Testnet,
   },
-  {
-    name: 'devnet' as ENV,
-    endpoint:
-      process.env.REACT_APP_DEVNET_RPC ||
-      'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
-    ChainId: ChainId.Devnet,
-  },
+
   {
     name: 'localnet' as ENV,
     endpoint: 'http://127.0.0.1:8899',

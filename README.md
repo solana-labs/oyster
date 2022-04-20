@@ -24,6 +24,18 @@ yarn start lending
 npm run start-gov
 ```
 
+### Build
+```sh
+nvm install 12.16.2
+nvm use 12.16.2
+
+npm install yarn@1.22.10 -g
+npm install lerna@3.4.3 -g
+
+yarn install --ignore-engines
+yarn build-gov
+```
+
 ## Setup
 
 Be sure to be running Node v12.16.2 and yarn version 1.22.10.
