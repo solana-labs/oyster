@@ -1,3 +1,29 @@
+## Quick start
+- Install [nvm](https://github.com/nvm-sh/nvm)
+- Use Node.js v12.16.2:
+```sh
+nvm install 12.16.2
+nvm use 12.16.2
+```
+- Install [yarn](https://yarnpkg.com/) and [lerna](https://github.com/lerna/lerna) globally:
+```sh
+npm install yarn@1.22.10 -g
+npm install lerna@3.4.3 -g
+```
+- Install dependencies:
+```sh
+yarn install --ignore-engines
+yarn bootstrap
+```
+- Run lending:
+```sh
+yarn start lending
+```
+- Run governance-ui:
+```sh
+npm run start-gov
+```
+
 ## Setup
 
 Be sure to be running Node v12.16.2 and yarn version 1.22.10.

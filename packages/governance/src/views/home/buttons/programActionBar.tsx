@@ -2,7 +2,6 @@ import { Button, Popover, Space } from 'antd';
 import React, { useRef } from 'react';
 
 import { MoreOutlined } from '@ant-design/icons';
-import { RegisterRealmButton } from './registerRealmButton';
 import { UpdateProgramMetadataButton } from './updateProgramMetadataButton';
 
 export function ProgramActionBar() {
@@ -11,9 +10,6 @@ export function ProgramActionBar() {
   return (
     <div className="proposals-action-bar">
       <Space>
-        <RegisterRealmButton
-          buttonProps={{ style: { marginLeft: 'auto', marginRight: 0 } }}
-        />
         <div ref={parentRef} className="realm-popup-action-container">
           <Popover
             title="Program Options"

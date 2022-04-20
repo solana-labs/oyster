@@ -122,7 +122,7 @@ export const RealmView = () => {
                 alignItems: 'flex-end',
               }}
             >
-              <RealmActionBar realm={realm}></RealmActionBar>
+              <RealmActionBar realm={realm} showSettings={false}></RealmActionBar>
             </Col>
           </Row>
         </Col>
