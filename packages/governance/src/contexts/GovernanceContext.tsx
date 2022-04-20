@@ -117,7 +117,7 @@ export default function GovernanceProvider({ children = null as any }) {
   const programId = useMemo(() => {
     const params = new URLSearchParams(location.search);
 
-    console.log(
+    console.debug(
       'DEFAULT_GOVERNANCE_PROGRAM_ID',
       process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID,
     );
@@ -181,7 +181,7 @@ export default function GovernanceProvider({ children = null as any }) {
   useEffect(() => {
     getGovernanceProgramVersion(connection, new PublicKey(programId), env).then(
       pVersion => {
-        console.log('PROGRAM VERSION', { pVersion, env });
+        console.debug('PROGRAM VERSION', { pVersion, env });
         setProgramVersion(pVersion);
       },
     );

@@ -364,6 +364,7 @@ function InnerProposalView({
                 .filter(s => s.account.signedOff)
                 .map(s => (
                   <ExplorerLink
+                    key={s.account.signatory.toString()}
                     address={s.account.signatory}
                     type="address"
                     short

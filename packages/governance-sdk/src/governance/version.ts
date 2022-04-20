@@ -92,7 +92,7 @@ export async function getGovernanceProgramVersion(
           );
         })[0];
 
-      console.log('Program version (simulation)', simVersion);
+      console.debug('Program version (simulation)', simVersion);
 
       return simVersion.major;
     }
