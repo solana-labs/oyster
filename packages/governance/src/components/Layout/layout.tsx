@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { components } from '@oyster/common';
 import { Content, Header } from 'antd/lib/layout/layout';
-import Logo from './dark-horizontal-combined-rainbow.inline.svg';
+import Logo from './neon_logo_w.svg';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getHomeUrl } from '../../tools/routeTools';
 
@@ -46,7 +46,7 @@ export const AppLayout = React.memo((props: any) => {
         <Header className="App-Bar">
           <div className="app-title">
             <HomeLink></HomeLink>
-            <a href="https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md">
+            <a href="https://docs.neon-labs.org/docs/governance/governance_overview/" target="_blank" rel="noopener noreferrer">
               Docs
             </a>
           </div>
@@ -66,7 +66,7 @@ const HomeLink = () => {
 
   return (
     <Link to={getHomeUrl(programId)}>
-      <img alt={`Solana Logo`} src={Logo} style={{ height: 40 }} />
+      <img alt="Neon EVM Logo" src={Logo} style={{ height: 30, marginRight: 15 }} />
     </Link>
   );
 };
