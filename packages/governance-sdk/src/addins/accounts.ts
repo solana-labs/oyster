@@ -3,7 +3,7 @@ import BN from 'bn.js';
 
 export type GovernanceAddinAccountClass =
   | typeof VoterWeightRecord
-  | MaxVoterWeightRecord;
+  | typeof MaxVoterWeightRecord;
 
 export enum VoterWeightAction {
   CastVote,

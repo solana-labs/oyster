@@ -25,7 +25,10 @@ import {
   useGovernanceAccountsByFilter,
 } from './accountHooks';
 import { useRpcContext } from './useRpcContext';
-import { getVoterWeightProgramAccount } from './governance-sdk';
+import {
+  getVoterWeightProgramAccount,
+  AccountVoterWeightRecord,
+} from './governance-sdk';
 
 // ----- Realm Config ---------
 
@@ -193,10 +196,7 @@ export function useVoterWeightRecord(
   const realmConfig = useRealmConfig(governance?.account.realm);
   const programId = realmConfig?.account.communityVoterWeightAddin;
   const isVoterWeightAddin = realm?.account.config.useCommunityVoterWeightAddin;
-  const [result, setResult] = useState<
-    | { voterWeight: ProgramAccount<any>; maxVoterWeight: ProgramAccount<any> }
-    | undefined
-  >();
+  const [result, setResult] = useState<AccountVoterWeightRecord | undefined>();
 
   useEffect(() => {
     async function main() {

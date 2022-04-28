@@ -8,6 +8,11 @@ import {
 } from '@solana/spl-governance';
 import bs58 from 'bs58';
 
+export type AccountVoterWeightRecord = {
+  voterWeight: ProgramAccount<VoterWeightRecord>;
+  maxVoterWeight: ProgramAccount<MaxVoterWeightRecord>;
+};
+
 export async function getVoterWeightProgramAccount(
   realm: ProgramAccount<Realm>,
   connection: Connection,
