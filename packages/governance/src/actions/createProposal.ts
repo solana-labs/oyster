@@ -15,6 +15,8 @@ export const createProposal = async (
   descriptionLink: string,
   governingTokenMint: PublicKey,
   proposalIndex: number,
+  voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
@@ -44,6 +46,8 @@ export const createProposal = async (
     options,
     useDenyOption,
     payer,
+    voterWeightRecord,
+    maxVoterWeightRecord,
   );
 
   // Add the proposal creator as the default signatory

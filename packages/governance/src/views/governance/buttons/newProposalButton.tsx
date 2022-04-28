@@ -11,7 +11,7 @@ import { Redirect } from 'react-router';
 import { GoverningTokenType } from '@solana/spl-governance';
 import { Governance, Realm } from '@solana/spl-governance';
 
-import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
+import { useWalletTokenOwnerRecord, useVoterWeightRecord } from '../../../hooks/apiHooks';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
@@ -35,12 +35,15 @@ export function NewProposalButton({
     governance?.account.realm,
     realm?.account.communityMint,
   );
+
   const councilTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.account.realm,
     realm?.account.config.councilMint,
   );
 
   const communityMint = useMint(realm?.account.communityMint);
+
+  const voterWeightRecord = useVoterWeightRecord(realm, governance);
 
   if (!governance || !communityMint || !realm) {
     return null;
@@ -58,9 +61,13 @@ export function NewProposalButton({
       new BN(governance?.account.config.minCouncilTokensToCreateProposal),
     ) >= 0;
 
+  const canCreateProposalUsingVoterWeight =
+    voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.toNumber() > 0;
+
   const canCreateProposal =
     canCreateProposalUsingCommunityTokens ||
-    canCreateProposalUsingCouncilTokens;
+    canCreateProposalUsingCouncilTokens ||
+    canCreateProposalUsingVoterWeight;
 
   const defaultGoverningTokenType = !communityMint.supply.isZero()
     ? GoverningTokenType.Community
@@ -87,9 +94,7 @@ export function NewProposalButton({
     // When governance delegates are not used it doesn't make any difference
     // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
     // because user might have different delegates for council and community
-    const tokenOwnerRecord = canCreateProposalUsingCommunityTokens
-      ? communityTokenOwnerRecord
-      : councilTokenOwnerRecord;
+    const tokenOwnerRecord = communityTokenOwnerRecord;
 
     return await createProposal(
       rpcContext,
@@ -100,6 +105,8 @@ export function NewProposalButton({
       values.descriptionLink ?? '',
       governingTokenMint,
       proposalIndex,
+      voterWeightRecord?.voterWeight.pubkey,
+      voterWeightRecord?.maxVoterWeight.pubkey,
     );
   };
 

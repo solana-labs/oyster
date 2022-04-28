@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useWallet } from '@oyster/common';
+import { useWallet, useConnection } from '@oyster/common';
 import {
   getNativeTreasuryAddress,
   getRealmConfigAddress,
@@ -7,14 +8,16 @@ import {
   getTokenOwnerRecordAddress,
   getVoteRecordAddress,
   Governance,
+  ProgramAccount,
   Proposal,
   ProposalTransaction,
+  Realm,
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
+  pubkeyFilter,
 } from '@solana/spl-governance';
-import { pubkeyFilter } from '@solana/spl-governance';
 import {
   useAccountByPda,
   useGovernanceAccountByPda,
@@ -22,10 +25,11 @@ import {
   useGovernanceAccountsByFilter,
 } from './accountHooks';
 import { useRpcContext } from './useRpcContext';
+import { getVoterWeightProgramAccount } from './governance-sdk';
 
 // ----- Realm Config ---------
 
-export function useRealmConfig(realm: PublicKey) {
+export function useRealmConfig(realm: PublicKey | undefined) {
   const { programId } = useRpcContext();
 
   return useGovernanceAccountByPda<RealmConfigAccount>(
@@ -177,6 +181,46 @@ export function useInstructionsByProposal(proposal: PublicKey | undefined) {
     ProposalTransaction,
     [pubkeyFilter(1, proposal)],
   );
+}
+
+// ----- VoterWeightRecord -----
+export function useVoterWeightRecord(
+  realm?: ProgramAccount<Realm>,
+  governance?: ProgramAccount<Governance>,
+) {
+  const connection = useConnection();
+  const { wallet } = useRpcContext();
+  const realmConfig = useRealmConfig(governance?.account.realm);
+  const programId = realmConfig?.account.communityVoterWeightAddin;
+  const isVoterWeightAddin = realm?.account.config.useCommunityVoterWeightAddin;
+  const [result, setResult] = useState<
+    | { voterWeight: ProgramAccount<any>; maxVoterWeight: ProgramAccount<any> }
+    | undefined
+  >();
+
+  useEffect(() => {
+    async function main() {
+      if (
+        !programId ||
+        !connection ||
+        !realm ||
+        !isVoterWeightAddin ||
+        !wallet.publicKey
+      )
+        return;
+
+      const account = await getVoterWeightProgramAccount(
+        realm,
+        connection,
+        programId,
+        wallet.publicKey,
+      );
+      setResult(account);
+    }
+    main();
+  }, [connection, realm, realmConfig, programId, isVoterWeightAddin, wallet]);
+
+  return result;
 }
 
 // ----- VoteRecord -----

@@ -33,6 +33,7 @@ export const withCreateProposal = async (
   useDenyOption: boolean,
   payer: PublicKey,
   voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   const args = new CreateProposalArgs({
     name,
@@ -119,7 +120,13 @@ export const withCreateProposal = async (
     });
   }
 
-  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
+  await withRealmConfigAccounts(
+    keys,
+    programId,
+    realm,
+    voterWeightRecord,
+    maxVoterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({
