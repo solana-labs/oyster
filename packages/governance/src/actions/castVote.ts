@@ -13,6 +13,8 @@ export const castVote = async (
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
+  voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -33,6 +35,8 @@ export const castVote = async (
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
     payer,
+    voterWeightRecord,
+    maxVoterWeightRecord,
   );
 
   await sendTransactionWithNotifications(

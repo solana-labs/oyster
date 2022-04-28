@@ -22,12 +22,14 @@ import { castVote } from '../../../../actions/castVote';
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Option } from '../../../../tools/option';
 import { ProgramAccount } from '@solana/spl-governance';
+import { AccountVoterWeightRecord } from '../../../../hooks/governance-sdk';
 
 const { confirm } = Modal;
 export function CastVoteButton({
   proposal,
   governance,
   tokenOwnerRecord,
+  voterWeightRecord,
   vote,
   voteRecord,
   hasVoteTimeExpired,
@@ -35,17 +37,21 @@ export function CastVoteButton({
   proposal: ProgramAccount<Proposal>;
   governance: ProgramAccount<Governance>;
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
+  voterWeightRecord?: AccountVoterWeightRecord;
   vote: YesNoVote;
   voteRecord: Option<ProgramAccount<VoteRecord>> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
   const rpcContext = useRpcContext();
 
+  const canVote =
+    !tokenOwnerRecord?.account.governingTokenDepositAmount.isZero()
+    || (voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.toNumber() > 0);
+
   const isVisible =
     hasVoteTimeExpired === false &&
     voteRecord?.isNone() &&
-    tokenOwnerRecord &&
-    !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() &&
+    canVote &&
     proposal.account.state === ProposalState.Voting;
 
   const [btnLabel, title, msg, icon] =
@@ -87,6 +93,8 @@ export function CastVoteButton({
               proposal,
               tokenOwnerRecord.pubkey,
               vote,
+              voterWeightRecord?.voterWeight.pubkey,
+              voterWeightRecord?.maxVoterWeight.pubkey
             );
           },
         })

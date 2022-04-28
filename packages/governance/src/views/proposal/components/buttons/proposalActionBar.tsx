@@ -19,17 +19,20 @@ import {
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
 import { ProgramAccount } from '@solana/spl-governance';
 import CancelButton from './cancelButton';
+import { AccountVoterWeightRecord } from '../../../../hooks/governance-sdk';
 
 export function ProposalActionBar({
   governance,
   tokenOwnerRecord,
+  voterWeightRecord,
   proposal,
 }: {
   governance: ProgramAccount<Governance>;
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
+  tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>;
+  voterWeightRecord?: AccountVoterWeightRecord;
   proposal: ProgramAccount<Proposal>;
 }) {
-  let signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
+  const signatoryRecord = useWalletSignatoryRecord(proposal.pubkey);
 
   const voteRecord = useTokenOwnerVoteRecord(
     proposal.pubkey,
@@ -72,6 +75,7 @@ export function ProposalActionBar({
             governance={governance}
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
+            voterWeightRecord={voterWeightRecord}
             vote={YesNoVote.Yes}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
@@ -81,6 +85,7 @@ export function ProposalActionBar({
             proposal={proposal}
             vote={YesNoVote.No}
             tokenOwnerRecord={tokenOwnerRecord}
+            voterWeightRecord={voterWeightRecord}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
