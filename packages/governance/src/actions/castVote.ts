@@ -11,10 +11,12 @@ export const castVote = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: PublicKey,
+  tokenOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
+  votePercentage: number,
   voterWeightRecord?: PublicKey,
   maxVoterWeightRecord?: PublicKey,
+  communityVoterWeightAddin?: PublicKey,
 ) => {
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -30,13 +32,15 @@ export const castVote = async (
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord,
+    tokenOwnerRecord,
     governanceAuthority,
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
+    votePercentage,
     payer,
     voterWeightRecord,
     maxVoterWeightRecord,
+    communityVoterWeightAddin,
   );
 
   await sendTransactionWithNotifications(

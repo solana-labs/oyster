@@ -1,5 +1,5 @@
-import { Button, Col, Modal, Row } from 'antd';
-import React from 'react';
+import { Button, Col, Modal, Row, Radio } from 'antd';
+import React, { useState } from 'react';
 
 import { LABELS } from '../../../../constants';
 
@@ -13,23 +13,29 @@ import {
   ProposalState,
   TokenOwnerRecord,
   VoteRecord,
+  YesNoVote,
+  ProgramAccount,
 } from '@solana/spl-governance';
-
-import { YesNoVote } from '@solana/spl-governance';
 
 import { castVote } from '../../../../actions/castVote';
 
 import { useRpcContext } from '../../../../hooks/useRpcContext';
 import { Option } from '../../../../tools/option';
-import { ProgramAccount } from '@solana/spl-governance';
 import { AccountVoterWeightRecord } from '../../../../hooks/governance-sdk';
+import { PublicKey } from '@solana/web3.js';
 
-const { confirm } = Modal;
+const options = [
+  { label: '15%', value: 1_500 },
+  { label: '30%', value: 3_000 },
+  { label: '100%', value: 10_000 },
+];
+
 export function CastVoteButton({
   proposal,
   governance,
   tokenOwnerRecord,
   voterWeightRecord,
+  communityVoterWeightAddin,
   vote,
   voteRecord,
   hasVoteTimeExpired,
@@ -38,11 +44,13 @@ export function CastVoteButton({
   governance: ProgramAccount<Governance>;
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
   voterWeightRecord?: AccountVoterWeightRecord;
+  communityVoterWeightAddin?: PublicKey;
   vote: YesNoVote;
   voteRecord: Option<ProgramAccount<VoteRecord>> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
   const rpcContext = useRpcContext();
+  const [votePercentage, setVotePercentage] = useState(options[0].value)
 
   const canVote =
     !tokenOwnerRecord?.account.governingTokenDepositAmount.isZero()
@@ -69,18 +77,29 @@ export function CastVoteButton({
         <CloseOutlined />,
       ];
 
-  return isVisible ? (
+  if (!isVisible) return null
+
+  return (
     <Button
       type="primary"
       icon={icon}
       onClick={() =>
-        confirm({
-          title: title,
-          icon: icon,
+        Modal.confirm({
+          title,
+          icon,
           content: (
             <Row>
               <Col span={24}>
                 <p>{msg}</p>
+                {vote === YesNoVote.Yes ? <Radio.Group
+                  options={options}
+                  value={votePercentage}
+                  onChange={(ev) => {
+                    setVotePercentage(ev.target.value)
+                  }}
+                  optionType="button"
+                  buttonStyle="solid"
+                /> : null}
               </Col>
             </Row>
           ),
@@ -93,8 +112,10 @@ export function CastVoteButton({
               proposal,
               tokenOwnerRecord.pubkey,
               vote,
+              votePercentage,
               voterWeightRecord?.voterWeight.pubkey,
-              voterWeightRecord?.maxVoterWeight.pubkey
+              voterWeightRecord?.maxVoterWeight.pubkey,
+              communityVoterWeightAddin,
             );
           },
         })
@@ -102,5 +123,5 @@ export function CastVoteButton({
     >
       {btnLabel}
     </Button>
-  ) : null;
+  );
 }

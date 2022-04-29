@@ -4,17 +4,18 @@ import {
   Proposal,
   ProposalState,
   TokenOwnerRecord,
+  YesNoVote,
 } from '@solana/spl-governance';
 
 import SignOffButton from './signOffButton';
 import { FinalizeVoteButton } from './finalizeVoteButton';
 import { RelinquishVoteButton } from './relinquishVoteButton';
-import { YesNoVote } from '@solana/spl-governance';
 import { CastVoteButton } from './castVoteButton';
 
 import {
   useWalletSignatoryRecord,
   useTokenOwnerVoteRecord,
+  useRealmConfig,
 } from '../../../../hooks/apiHooks';
 import { useHasVoteTimeExpired } from '../../../../hooks/useHasVoteTimeExpired';
 import { ProgramAccount } from '@solana/spl-governance';
@@ -40,6 +41,9 @@ export function ProposalActionBar({
   );
 
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal);
+
+  const realmConfig = useRealmConfig(governance?.account.realm);
+  const communityVoterWeightAddin = realmConfig?.account.communityVoterWeightAddin;
 
   return (
     <div className="proposal-actions">
@@ -76,6 +80,7 @@ export function ProposalActionBar({
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
             voterWeightRecord={voterWeightRecord}
+            communityVoterWeightAddin={communityVoterWeightAddin}
             vote={YesNoVote.Yes}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
@@ -86,6 +91,7 @@ export function ProposalActionBar({
             vote={YesNoVote.No}
             tokenOwnerRecord={tokenOwnerRecord}
             voterWeightRecord={voterWeightRecord}
+            communityVoterWeightAddin={communityVoterWeightAddin}
             voteRecord={voteRecord}
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
