@@ -36,7 +36,7 @@ export function CreateTreasuryAccountButton({
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
-  const { programId } = rpcContext;
+  const { programId, programVersion } = rpcContext;
 
   const realmKey = useKeyParam();
 
@@ -75,7 +75,7 @@ export function CreateTreasuryAccountButton({
       mintAddress: string;
     } & GovernanceConfigValues,
   ) => {
-    const config = getGovernanceConfig(values);
+    const config = getGovernanceConfig(programVersion,values);
 
     return await createTreasuryAccount(
       rpcContext,

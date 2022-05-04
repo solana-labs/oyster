@@ -36,7 +36,7 @@ export function RegisterGovernanceButton({
 }) {
   const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
-  const { programId } = rpcContext;
+  const { programId, programVersion } = rpcContext;
 
   const realmKey = useKeyParam();
   const [governanceType, setGovernanceType] = useState(GovernanceType.Account);
@@ -78,7 +78,7 @@ export function RegisterGovernanceButton({
       transferAuthority: boolean;
     } & GovernanceConfigValues,
   ) => {
-    const config = getGovernanceConfig(values);
+    const config = getGovernanceConfig(programVersion,values);
 
     return await registerGovernance(
       rpcContext,

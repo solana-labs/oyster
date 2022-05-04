@@ -9,13 +9,16 @@ import {
 import { BN } from 'bn.js';
 import {
   createInstructionData,
+  getGovernance,
   getGovernanceProgramVersion,
+  getProposal,
   getRealm,
   getTokenOwnerRecordsByOwner,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   SetRealmAuthorityAction,
-  VoteThresholdPercentage,
+  VoteThreshold,
+  VoteThresholdType,
   VoteTipping,
   VoteType,
   withCreateMintGovernance,
@@ -26,16 +29,11 @@ import {
   withSetRealmAuthority,
 } from '../../src';
 import { requestAirdrop, sendTransaction } from '../tools/sdk';
+import { programId, rpcEndpoint } from '../tools/setup';
 import { getTimestampFromDays } from '../tools/units';
 import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedTokenAccount';
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
-
-const programId = new PublicKey('GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP');
-const rpcEndpoint = clusterApiUrl('devnet');
-
-// const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
-// const rpcEndpoint = 'http://127.0.0.1:8899';
 
 const connection = new Connection(rpcEndpoint, 'recent');
 
@@ -108,14 +106,17 @@ test('createRealmWithGovernanceAndProposal', async () => {
 
   // Crate governance over the the governance token mint
   const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
+    communityVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
       value: 60,
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
+    councilVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.Disabled,
+    }),
     minCouncilTokensToCreateProposal: new BN(1),
   });
 
@@ -215,6 +216,14 @@ test('createRealmWithGovernanceAndProposal', async () => {
 
   expect(results.length).toBe(1);
   expect(results[0].account.governingTokenOwner).toEqual(walletPk);
+
+  // check governance 
+  const governance = await getGovernance(connection,governancePk);
+  expect(governance.account.config.communityVoteThreshold).toEqual(config.communityVoteThreshold);
+  // expect(governance.account.config.councilVoteThreshold).toEqual(config.councilVoteThreshold);
+
+  // check proposal 
+  const proposal = await getProposal(connection,proposalPk);
 });
 
 

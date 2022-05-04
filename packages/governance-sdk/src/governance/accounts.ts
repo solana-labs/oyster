@@ -108,16 +108,21 @@ export function getAccountProgramVersion(accountType: GovernanceAccountType) {
   }
 }
 
-export enum VoteThresholdPercentageType {
-  YesVote = 0,
-  Quorum = 1,
+export enum VoteThresholdType {
+  // Approval Quorum
+  YesVotePercentage = 0,
+  // Not supported in the current version
+  QuorumPercentage = 1,
+  // Supported for VERSION >= 3
+  Disabled = 2,
 }
 
-export class VoteThresholdPercentage {
-  type = VoteThresholdPercentageType.YesVote;
-  value: number;
+export class VoteThreshold {
+  type: VoteThresholdType;
+  value: number | undefined;
 
-  constructor(args: { value: number }) {
+  constructor(args: { type: VoteThresholdType; value?: number | undefined }) {
+    this.type = args.type;
     this.value = args.value;
   }
 }
@@ -347,32 +352,41 @@ export async function getRealmConfigAddress(
 }
 
 export class GovernanceConfig {
-  voteThresholdPercentage: VoteThresholdPercentage;
+  communityVoteThreshold: VoteThreshold;
+
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
   voteTipping: VoteTipping;
-  proposalCoolOffTime: number;
   minCouncilTokensToCreateProposal: BN;
 
+  // VERSION >= 3
+  councilVoteThreshold: VoteThreshold;
+  reserved = [0, 0];
+
   constructor(args: {
-    voteThresholdPercentage: VoteThresholdPercentage;
+    communityVoteThreshold: VoteThreshold;
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
     voteTipping?: VoteTipping;
-    proposalCoolOffTime?: number;
     minCouncilTokensToCreateProposal: BN;
+
+    // VERSION >= 3
+    // For versions < 3 must be set to YesVotePercentage(0)
+    councilVoteThreshold: VoteThreshold;
   }) {
-    this.voteThresholdPercentage = args.voteThresholdPercentage;
+    this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
     this.voteTipping = args.voteTipping ?? VoteTipping.Strict;
-    this.proposalCoolOffTime = args.proposalCoolOffTime ?? 0;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
+
+    // VERSION >= 3
+    this.councilVoteThreshold = args.councilVoteThreshold;
   }
 }
 
@@ -597,7 +611,7 @@ export class Proposal {
   executionFlags: InstructionExecutionFlags;
 
   maxVoteWeight: BN | null;
-  voteThresholdPercentage: VoteThresholdPercentage | null;
+  voteThreshold: VoteThreshold | null;
 
   name: string;
 
@@ -641,7 +655,7 @@ export class Proposal {
 
     executionFlags: InstructionExecutionFlags;
     maxVoteWeight: BN | null;
-    voteThresholdPercentage: VoteThresholdPercentage | null;
+    voteThreshold: VoteThreshold | null;
   }) {
     this.accountType = args.accountType;
     this.governance = args.governance;
@@ -681,7 +695,7 @@ export class Proposal {
 
     this.executionFlags = args.executionFlags;
     this.maxVoteWeight = args.maxVoteWeight;
-    this.voteThresholdPercentage = args.voteThresholdPercentage;
+    this.voteThreshold = args.voteThreshold;
   }
 
   /// Returns true if Proposal is in state when no voting can happen any longer

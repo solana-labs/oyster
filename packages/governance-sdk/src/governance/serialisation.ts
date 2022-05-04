@@ -45,7 +45,7 @@ import {
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
-  VoteThresholdPercentage,
+  VoteThreshold,
   VoteWeight,
   RealmConfigAccount,
   GovernanceAccountClass,
@@ -55,6 +55,7 @@ import {
   GovernanceAccountType,
   getAccountProgramVersion,
   ProgramMetadata,
+  VoteThresholdType,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
@@ -153,6 +154,51 @@ import { deserializeBorsh } from '../tools/borsh';
   }
 };
 
+// ------------ VoteThreshold ------------
+
+(BinaryReader.prototype as any).readVoteThreshold = function () {
+  const reader = (this as unknown) as BinaryReader;
+
+  // Read VoteThreshold and advance the reader by 1
+  const type = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+
+  // Read VoteThresholds with u8 value
+  if (
+    type === VoteThresholdType.YesVotePercentage ||
+    type === VoteThresholdType.QuorumPercentage
+  ) {
+    const percentage = reader.buf.readUInt8(reader.offset);
+    reader.offset += 1;
+    return new VoteThreshold({ type: type, value: percentage });
+  }
+
+  // Read VoteThresholds without value
+  if (type === VoteThresholdType.Disabled) {
+    return new VoteThreshold({ type: type, value: undefined });
+  }
+
+  throw new Error(`VoteThresholdType ${type} is not supported`);
+};
+
+(BinaryWriter.prototype as any).writeVoteThreshold = function (
+  value: VoteThreshold,
+) {
+  const writer = (this as unknown) as BinaryWriter;
+  writer.maybeResize();
+  writer.buf.writeUInt8(value.type, writer.length);
+  writer.length += 1;
+
+  // Write value for VoteThresholds with u8 value
+  if (
+    value.type === VoteThresholdType.YesVotePercentage ||
+    value.type === VoteThresholdType.QuorumPercentage
+  ) {
+    writer.buf.writeUInt8(value.value!, writer.length);
+    writer.length += 1;
+  }
+};
+
 // Serializes sdk instruction into InstructionData and encodes it as base64 which then can be entered into the UI form
 export const serializeInstructionToBase64 = (
   instruction: TransactionInstruction,
@@ -179,7 +225,13 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
 };
 
 export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);
-export const GOVERNANCE_SCHEMA = createGovernanceSchema(2);
+export const GOVERNANCE_SCHEMA_V2 = createGovernanceSchema(2);
+
+// V3 schema is backward compatible with V2
+export const GOVERNANCE_SCHEMA_V3 = GOVERNANCE_SCHEMA_V2;
+
+// The most recent version of spl-gov
+export const GOVERNANCE_SCHEMA = GOVERNANCE_SCHEMA_V3;
 
 export function getGovernanceSchema(programVersion: number) {
   switch (programVersion) {
@@ -554,26 +606,17 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
-      VoteThresholdPercentage,
-      {
-        kind: 'struct',
-        fields: [
-          ['type', 'u8'],
-          ['value', 'u8'],
-        ],
-      },
-    ],
-    [
       GovernanceConfig,
       {
         kind: 'struct',
         fields: [
-          ['voteThresholdPercentage', VoteThresholdPercentage],
+          ['communityVoteThreshold', 'VoteThreshold'],
           ['minCommunityTokensToCreateProposal', 'u64'],
           ['minInstructionHoldUpTime', 'u32'],
           ['maxVotingTime', 'u32'],
           ['voteTipping', 'u8'],
-          ['proposalCoolOffTime', 'u32'],
+          ['councilVoteThreshold', 'VoteThreshold'],
+          ['reserved', [2]],
           ['minCouncilTokensToCreateProposal', 'u64'],
         ],
       },
@@ -654,10 +697,7 @@ function createGovernanceSchema(programVersion: number) {
             ? []
             : [['maxVotingTime', { kind: 'option', type: 'u32' }]]),
 
-          [
-            'voteThresholdPercentage',
-            { kind: 'option', type: VoteThresholdPercentage },
-          ],
+          ['voteThreshold', { kind: 'option', type: 'VoteThreshold' }],
 
           ...(programVersion === PROGRAM_VERSION_V1
             ? []

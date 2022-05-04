@@ -13,7 +13,8 @@ import {
   getGovernanceProgramVersion,
   GovernanceConfig,
   MintMaxVoteWeightSource,
-  VoteThresholdPercentage,
+  VoteThreshold,
+  VoteThresholdType,
   VoteTipping,
   VoteType,
   withCreateMintGovernance,
@@ -110,14 +111,17 @@ test('postProposalComment', async () => {
 
   // Crate governance over the the governance token mint
   const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
+    communityVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
       value: 60,
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
+    councilVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.Disabled,
+    }),
     minCouncilTokensToCreateProposal: new BN(1),
   });
 

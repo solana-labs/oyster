@@ -1,6 +1,6 @@
 import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
-  clusterApiUrl,
+
   Connection,
   Keypair,
   PublicKey,
@@ -13,7 +13,7 @@ import {
   getRealm,
   GovernanceConfig,
   MintMaxVoteWeightSource,
-  VoteThresholdPercentage,
+  VoteThreshold,
   VoteType,
   VoteTipping,
   withCreateMintGovernance,
@@ -40,22 +40,18 @@ import {
   tryGetRealmConfig,
   withExecuteTransaction,
   withSetGovernanceDelegate,
-  getTokenOwnerRecordForRealm,
   getTokenOwnerRecord,
+  VoteThresholdType,
 } from '../../src';
 
 import { withSetRealmConfig } from '../../src/governance/withSetRealmConfig';
 import { requestAirdrop, sendTransaction } from '../tools/sdk';
+import { programId, rpcEndpoint } from '../tools/setup';
 import { getTimestampFromDays } from '../tools/units';
 import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedTokenAccount';
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
 
-const programId = new PublicKey('BfFUxwBiJLhD1wL36xGXWRe7RXAFL4QKircHydAHS3wt');
-const rpcEndpoint = clusterApiUrl('devnet');
-
-// const programId = new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw');
-// const rpcEndpoint = 'http://127.0.0.1:8899';
 
 const connection = new Connection(rpcEndpoint, 'recent');
 
@@ -155,14 +151,18 @@ test('setupRealm', async () => {
 
   // Crate governance over the the governance token mint
   const config = new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
+    communityVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
       value: 60,
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
-    proposalCoolOffTime: 0,
+    councilVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
+      value: 60,
+    }),
     minCouncilTokensToCreateProposal: new BN(1),
   });
 
