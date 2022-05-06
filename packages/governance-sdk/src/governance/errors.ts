@@ -61,7 +61,7 @@ export const GovernanceError = [
   'Current token owner must sign transaction', // TokenOwnerMustSign
   'Given VoteThresholdType is not supported', //VoteThresholdTypeNotSupported
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
-  'PGoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
+  'GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
   'Governance PDA must sign', // GovernancePdaMustSign
   'Instruction already flagged with error', // InstructionAlreadyFlaggedWithError
   'Invalid Realm for Governance', // InvalidRealmForGovernance
@@ -96,7 +96,7 @@ export const GovernanceError = [
   'Cannot execute defeated option', // MaxVoterWeightRecordExpired
   'Not supported VoteType', // NotSupportedVoteType
   'RealmConfig change not allowed', // RealmConfigChangeNotAllowed
-  "All vote thresholds can't be disabled", // AllVoteThresholdsDisabled
+  'At least one VoteThreshold is required', // AtLeastOneVoteThresholdRequired
   'Reserved buffer must be empty', // ReservedBufferMustBeEmpty
 ] as const;
 
