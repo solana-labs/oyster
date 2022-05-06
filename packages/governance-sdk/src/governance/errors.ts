@@ -59,9 +59,9 @@ export const GovernanceError = [
   'Given program is not upgradable', //ProgramNotUpgradable
   'Invalid token owner', //InvalidTokenOwner
   'Current token owner must sign transaction', // TokenOwnerMustSign
-  'Given VoteThresholdPercentageType is not supported', //VoteThresholdPercentageTypeNotSupported
+  'Given VoteThresholdType is not supported', //VoteThresholdTypeNotSupported
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
-  'Proposal cool off time is not supported', // ProposalCoolOffTimeNotSupported
+  'GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
   'Governance PDA must sign', // GovernancePdaMustSign
   'Instruction already flagged with error', // InstructionAlreadyFlaggedWithError
   'Invalid Realm for Governance', // InvalidRealmForGovernance
@@ -96,7 +96,8 @@ export const GovernanceError = [
   'Cannot execute defeated option', // MaxVoterWeightRecordExpired
   'Not supported VoteType', // NotSupportedVoteType
   'RealmConfig change not allowed', // RealmConfigChangeNotAllowed
-  'GovernanceConfig change not allowed', // GovernanceConfigChangeNotAllowed
+  'At least one VoteThreshold is required', // AtLeastOneVoteThresholdRequired
+  'Reserved buffer must be empty', // ReservedBufferMustBeEmpty
 ] as const;
 
 export const TokenError = [

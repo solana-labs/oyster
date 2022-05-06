@@ -5,8 +5,10 @@ import { contexts, constants } from '@oyster/common';
 import { LABELS } from '../../constants';
 import {
   GovernanceConfig,
+  PROGRAM_VERSION_V3,
   Realm,
-  VoteThresholdPercentage,
+  VoteThreshold,
+  VoteThresholdType,
   VoteTipping,
 } from '@solana/spl-governance';
 import { getNameOf } from '../../tools/script';
@@ -38,16 +40,29 @@ export interface GovernanceConfigValues {
   voteTipping: VoteTipping;
 }
 
-export function getGovernanceConfig(values: GovernanceConfigValues) {
+export function getGovernanceConfig(programVersion: number, values: GovernanceConfigValues) {
   const minTokensToCreateProposal = parseMinTokensToCreate(
     values.minTokensToCreateProposal,
     values.mintDecimals,
   );
 
+  const communityVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    value: values.voteThresholdPercentage,
+  });
+
+ 
+  const councilVoteThreshold =  programVersion >= PROGRAM_VERSION_V3 
+   // For VERSION >-3 use the same threshold as for community (until supported in the UI)
+  ? communityVoteThreshold 
+  // For older versions set to 0
+  : new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    value: 0,
+  });
+
   return new GovernanceConfig({
-    voteThresholdPercentage: new VoteThresholdPercentage({
-      value: values.voteThresholdPercentage,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(
       minTokensToCreateProposal.toString(),
     ),
@@ -59,7 +74,8 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
-    voteTipping: values.voteTipping
+    voteTipping: values.voteTipping,
+    councilVoteThreshold:councilVoteThreshold,
   });
 }
 
@@ -113,13 +129,19 @@ export function GovernanceConfigFormItem({
 
   if (!governanceConfig) {
     governanceConfig = new GovernanceConfig({
-      voteThresholdPercentage: new VoteThresholdPercentage({ value: 60 }),
+      communityVoteThreshold: new VoteThreshold({
+        type: VoteThresholdType.YesVotePercentage,
+        value: 60,
+      }),
       minCommunityTokensToCreateProposal: ZERO,
       minInstructionHoldUpTime: getTimestampFromDays(0),
       maxVotingTime: getTimestampFromDays(3),
       voteTipping: VoteTipping.Strict,
-      proposalCoolOffTime: 0,
       minCouncilTokensToCreateProposal: ZERO,
+      councilVoteThreshold: new VoteThreshold({
+        type: VoteThresholdType.YesVotePercentage,
+        value: 60,
+      }),
     });
   } else {
     minTokensToCreateProposal = getMintDecimalAmountFromNatural(
@@ -193,7 +215,7 @@ export function GovernanceConfigFormItem({
         name={configNameOf('voteThresholdPercentage')}
         label={LABELS.YES_VOTE_THRESHOLD_PERCENTAGE}
         rules={[{ required: true }]}
-        initialValue={governanceConfig.voteThresholdPercentage.value}
+        initialValue={governanceConfig.communityVoteThreshold.value}
       >
         <InputNumber maxLength={3} min={1} max={100} />
       </Form.Item>

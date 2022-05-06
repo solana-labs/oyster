@@ -524,7 +524,7 @@ function getYesVoteThreshold(
 ) {
   return proposal.account.isVoteFinalized() &&
     // Note Canceled state is also final but we currently don't capture vote threshold at the cancellation time
-    proposal.account.voteThresholdPercentage
-    ? proposal.account.voteThresholdPercentage.value
-    : governance.account.config.voteThresholdPercentage.value;
+    proposal.account.voteThreshold
+    ? proposal.account.voteThreshold.value!
+    : governance.account.config.communityVoteThreshold.value!;
 }

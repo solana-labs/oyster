@@ -135,7 +135,7 @@ export const GovernanceView = () => {
                     <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
                       governance.account.config.maxVotingTime,
                     )} days`}</Text>
-                    <Text type="secondary">{`yes vote threshold: ${governance.account.config.voteThresholdPercentage.value}%`}</Text>
+                    <Text type="secondary">{`yes vote threshold: ${governance.account.config.communityVoteThreshold.value}%`}</Text>
                   </Space>
 
                   <Space direction="vertical" size={0}>
