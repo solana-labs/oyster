@@ -1,0 +1,39 @@
+name: Update QA Stand
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.16.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Use Node ${{ matrix.node-version}}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version}}
+      - name: Install necessary versions of tools
+        run: |
+          npm install yarn@1.22.10 -g
+          npm install lerna@3.4.3 -g
+      - name: Install modules
+        run: |
+          yarn install --ignore-engines
+      - name: Build
+        run: |
+          yarn build-gov
+      - name: Deploy to s3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --delete
+        env:
+          AWS_S3_BUCKET: ${{secrets.AWS_S3_BUCKET}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: ${{secrets.AWS_REGION}}
+          SOURCE_DIR: "build/governance"
