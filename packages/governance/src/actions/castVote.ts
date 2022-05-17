@@ -1,25 +1,46 @@
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '@solana/spl-governance';
+import { Governance, Proposal, Realm } from '@solana/spl-governance';
 import { withCastVote } from '@solana/spl-governance';
 import { Vote, YesNoVote } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import { RpcContext } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 
-export const castVote = async (
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
-  proposal: ProgramAccount<Proposal>,
-  tokenOwnerRecord: PublicKey,
-  yesNoVote: YesNoVote,
-  votePercentage: number,
-  voterWeightRecord?: PublicKey,
-  maxVoterWeightRecord?: PublicKey,
-  communityVoterWeightAddin?: PublicKey,
-) => {
+type Props = {
+  rpcContext: RpcContext;
+  realm: ProgramAccount<Realm>;
+  governance: ProgramAccount<Governance>;
+  proposal: ProgramAccount<Proposal>;
+  tokenOwnerRecord: PublicKey;
+  vote: YesNoVote;
+  votePercentage: number;
+  voterWeightRecord?: PublicKey;
+  maxVoterWeightRecord?: PublicKey;
+  communityVoterWeightAddin?: PublicKey;
+};
+
+export const castVote = async ({
+  rpcContext,
+  realm,
+  governance,
+  proposal,
+  tokenOwnerRecord,
+  vote,
+  votePercentage,
+  voterWeightRecord,
+  maxVoterWeightRecord,
+  communityVoterWeightAddin,
+}: Props) => {
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
+  const {
+    connection,
+    wallet,
+    programId,
+    programVersion,
+    walletPubkey,
+  } = rpcContext;
 
   let governanceAuthority = walletPubkey;
   let payer = walletPubkey;
@@ -28,14 +49,16 @@ export const castVote = async (
     instructions,
     programId,
     programVersion,
-    realm,
+    governance.account.realm,
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     tokenOwnerRecord,
     governanceAuthority,
     proposal.account.governingTokenMint,
-    Vote.fromYesNoVote(yesNoVote),
+    realm.account.communityMint,
+    realm.pubkey,
+    Vote.fromYesNoVote(vote),
     votePercentage,
     payer,
     voterWeightRecord,

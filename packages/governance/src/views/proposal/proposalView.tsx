@@ -299,6 +299,7 @@ function InnerProposalView({
           </Col>
           <Col md={12} xs={24}>
             <ProposalActionBar
+              realm={realm}
               governance={governance}
               proposal={proposal}
               tokenOwnerRecord={tokenOwnerRecord}

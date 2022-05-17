@@ -3,6 +3,7 @@ import {
   Governance,
   Proposal,
   ProposalState,
+  Realm,
   TokenOwnerRecord,
   YesNoVote,
 } from '@solana/spl-governance';
@@ -23,11 +24,13 @@ import CancelButton from './cancelButton';
 import { AccountVoterWeightRecord } from '../../../../hooks/governance-sdk';
 
 export function ProposalActionBar({
+  realm,
   governance,
   tokenOwnerRecord,
   voterWeightRecord,
   proposal,
 }: {
+  realm: ProgramAccount<Realm>;
   governance: ProgramAccount<Governance>;
   tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>;
   voterWeightRecord?: AccountVoterWeightRecord;
@@ -76,6 +79,7 @@ export function ProposalActionBar({
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
           <CastVoteButton
+            realm={realm}
             governance={governance}
             proposal={proposal}
             tokenOwnerRecord={tokenOwnerRecord}
@@ -86,6 +90,7 @@ export function ProposalActionBar({
             hasVoteTimeExpired={hasVoteTimeExpired}
           />
           <CastVoteButton
+            realm={realm}
             governance={governance}
             proposal={proposal}
             vote={YesNoVote.No}

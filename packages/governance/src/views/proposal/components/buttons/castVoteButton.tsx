@@ -15,6 +15,7 @@ import {
   VoteRecord,
   YesNoVote,
   ProgramAccount,
+  Realm,
 } from '@solana/spl-governance';
 
 import { castVote } from '../../../../actions/castVote';
@@ -25,12 +26,14 @@ import { AccountVoterWeightRecord } from '../../../../hooks/governance-sdk';
 import { PublicKey } from '@solana/web3.js';
 
 const options = [
-  { label: '15%', value: 1_500 },
-  { label: '30%', value: 3_000 },
+  { label: '25%', value: 2_500 },
+  { label: '50%', value: 5_000 },
+  { label: '75%', value: 7_500 },
   { label: '100%', value: 10_000 },
 ];
 
 export function CastVoteButton({
+  realm,
   proposal,
   governance,
   tokenOwnerRecord,
@@ -40,6 +43,7 @@ export function CastVoteButton({
   voteRecord,
   hasVoteTimeExpired,
 }: {
+  realm: ProgramAccount<Realm>;
   proposal: ProgramAccount<Proposal>;
   governance: ProgramAccount<Governance>;
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
@@ -107,15 +111,18 @@ export function CastVoteButton({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             castVote(
-              rpcContext,
-              governance.account.realm,
-              proposal,
-              tokenOwnerRecord.pubkey,
-              vote,
-              votePercentage,
-              voterWeightRecord?.voterWeight.pubkey,
-              voterWeightRecord?.maxVoterWeight.pubkey,
-              communityVoterWeightAddin,
+              {
+                rpcContext,
+                governance,
+                realm,
+                proposal,
+                tokenOwnerRecord: tokenOwnerRecord.pubkey,
+                vote,
+                votePercentage,
+                voterWeightRecord: voterWeightRecord?.voterWeight.pubkey,
+                maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight.pubkey,
+                communityVoterWeightAddin,
+              }
             );
           },
         })
