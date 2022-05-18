@@ -81,13 +81,7 @@ export function NewProposalButton({
     descriptionLink: string;
     governingTokenType: GoverningTokenType;
   }) => {
-    const governingTokenType =
-      values.governingTokenType ?? defaultGoverningTokenType;
-
-    const governingTokenMint =
-      governingTokenType === GoverningTokenType.Community
-        ? realm!.account.communityMint
-        : realm!.account.config.councilMint!;
+    const governingTokenMint = realm!.account.communityMint;
     const proposalIndex = governance.account.proposalCount;
 
     // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord

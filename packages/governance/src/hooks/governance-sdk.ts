@@ -19,13 +19,22 @@ export async function getVoterWeightProgramAccount(
   programId: PublicKey,
   walletPublicKey: PublicKey,
 ) {
-  const discriminatorVoterWeightRecord = [50, 101, 102, 57, 57, 98, 52, 98];
+  const discriminatorVoterWeightRecord = [46, 249, 155, 75, 153, 248, 116, 9];
   const voterWeightBytes = discriminatorVoterWeightRecord
     .concat(...realm.pubkey.toBytes())
     .concat(...realm.account.communityMint.toBytes())
     .concat(...walletPublicKey.toBytes());
 
-  const discriminatorMaxVoterWeightRecord = [57, 100, 53, 102, 102, 50, 57, 55];
+  const discriminatorMaxVoterWeightRecord = [
+    157,
+    95,
+    242,
+    151,
+    16,
+    98,
+    26,
+    118,
+  ];
   const maxVoterWeightBytes = discriminatorMaxVoterWeightRecord
     .concat(...realm.pubkey.toBytes())
     .concat(...realm.account.communityMint.toBytes());
