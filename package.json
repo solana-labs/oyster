@@ -12,7 +12,7 @@
   },
   "scripts": {
     "bootstrap": "lerna link && lerna bootstrap",
-    "build": "lerna run build",
+    "build": "REACT_APP_BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ') lerna run build",
     "start": "CI=true lerna run start --scope @oyster/common --stream --parallel --scope ",
     "start-gov": "CI=true lerna run start --scope @solana/spl-governance --scope @oyster/common --stream --parallel --scope governance",
     "build-gov": "yarn && yarn bootstrap && yarn build --scope @oyster/common --scope @solana/spl-governance --scope governance",

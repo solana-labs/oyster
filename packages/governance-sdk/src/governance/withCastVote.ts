@@ -192,7 +192,10 @@ export const withCastVote = async (
       new TransactionInstruction({
         keys: addinKeys,
         programId: communityVoterWeightAddin,
-        data: Buffer.from(serialize(VOTE_PERCENTAGE_SCHEMA, addinValue)),
+        data: Buffer.from([
+          2,
+          ...serialize(VOTE_PERCENTAGE_SCHEMA, addinValue),
+        ]),
       }),
     );
   }
