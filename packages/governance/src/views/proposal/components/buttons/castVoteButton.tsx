@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Radio } from 'antd';
+import { Button, Col, Modal, Row, Radio, InputNumber } from 'antd';
 import React, { useState } from 'react';
 
 import { LABELS } from '../../../../constants';
@@ -55,6 +55,7 @@ export function CastVoteButton({
 }) {
   const rpcContext = useRpcContext();
   const [votePercentage, setVotePercentage] = useState(options[0].value)
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const canVote =
     !tokenOwnerRecord?.account.governingTokenDepositAmount.isZero()
@@ -84,51 +85,62 @@ export function CastVoteButton({
   if (!isVisible) return null
 
   return (
-    <Button
-      type="primary"
-      icon={icon}
-      onClick={() =>
-        Modal.confirm({
-          title,
-          icon,
-          content: (
-            <Row>
-              <Col span={24}>
-                <p>{msg}</p>
-                {vote === YesNoVote.Yes ? <Radio.Group
-                  options={options}
-                  value={votePercentage}
-                  onChange={(ev) => {
-                    setVotePercentage(ev.target.value)
-                  }}
-                  optionType="button"
-                  buttonStyle="solid"
-                /> : null}
-              </Col>
-            </Row>
-          ),
-          okText: LABELS.CONFIRM,
-          cancelText: LABELS.CANCEL,
-          onOk: async () => {
-            castVote(
-              {
-                rpcContext,
-                governance,
-                realm,
-                proposal,
-                tokenOwnerRecord: tokenOwnerRecord.pubkey,
-                vote,
-                votePercentage,
-                voterWeightRecord: voterWeightRecord?.voterWeight.pubkey,
-                maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight.pubkey,
-                communityVoterWeightAddin,
-              }
-            );
-          },
-        })
-      }
-    >
-      {btnLabel}
-    </Button>
+    <>
+      <Modal
+        visible={isModalVisible}
+        title={title}
+        cancelText={LABELS.CANCEL}
+        onCancel={() => setIsModalVisible(false)}
+        okText={LABELS.CONFIRM}
+        onOk={() => {
+          castVote(
+            {
+              rpcContext,
+              governance,
+              realm,
+              proposal,
+              tokenOwnerRecord: tokenOwnerRecord.pubkey,
+              vote,
+              votePercentage,
+              voterWeightRecord: voterWeightRecord?.voterWeight.pubkey,
+              maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight.pubkey,
+              communityVoterWeightAddin,
+            }
+          );
+          setIsModalVisible(false);
+        }}>
+        <Row>
+          <Col span={24}>
+            <p>{msg}</p>
+            {vote === YesNoVote.Yes ? <>
+              <Radio.Group
+                options={options}
+                value={votePercentage}
+                onChange={(ev) => {
+                  setVotePercentage(ev.target.value)
+                }}
+                optionType="button"
+                buttonStyle="solid"
+              /><br /><br />
+              Custom voter weight: <InputNumber
+                defaultValue={0}
+                min={0}
+                max={100}
+                formatter={value => `${value}%`}
+                parser={(value: any) => value.replace('%', '')}
+                onChange={(value) => setVotePercentage(Number(value) * 100)}
+              />
+            </> : null}
+          </Col>
+        </Row>
+      </Modal>
+      <Button
+        type="primary"
+        icon={icon}
+        onClick={() => setIsModalVisible(true)}
+      >
+        {btnLabel}
+      </Button>
+    </>
   );
 }

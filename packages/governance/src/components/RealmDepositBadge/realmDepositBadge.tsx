@@ -11,7 +11,12 @@ import { ProgramAccount } from '@solana/spl-governance';
 
 const { useMint } = contexts.Accounts;
 
-export function RealmDepositBadge({
+// TODO:
+export function RealmDepositBadge(props: any) {
+  return null;
+}
+
+export function RealmDepositBadgeOyster({
   councilTokenOwnerRecord,
   communityTokenOwnerRecord,
   showVoteWeights,
