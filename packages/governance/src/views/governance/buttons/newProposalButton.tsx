@@ -62,7 +62,7 @@ export function NewProposalButton({
     ) >= 0;
 
   const canCreateProposalUsingVoterWeight =
-    voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.toNumber() > 0;
+    voterWeightRecord && !voterWeightRecord.voterWeight.account.voterWeight.isZero();
 
   const canCreateProposal =
     canCreateProposalUsingCommunityTokens ||

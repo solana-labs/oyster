@@ -59,7 +59,7 @@ export function CastVoteButton({
 
   const canVote =
     !tokenOwnerRecord?.account.governingTokenDepositAmount.isZero()
-    || (voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.toNumber() > 0);
+    || (voterWeightRecord && !voterWeightRecord.voterWeight.account.voterWeight.isZero());
 
   const isVisible =
     hasVoteTimeExpired === false &&
