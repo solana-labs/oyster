@@ -68,6 +68,7 @@ export function ProposalActionBar({
         proposal={proposal}
         governance={governance}
         hasVoteTimeExpired={hasVoteTimeExpired}
+        voterWeightRecord={voterWeightRecord}
       ></FinalizeVoteButton>
 
       {tokenOwnerRecord && (

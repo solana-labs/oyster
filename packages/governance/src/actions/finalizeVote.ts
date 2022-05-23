@@ -1,6 +1,6 @@
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { Proposal } from '@solana/spl-governance';
+import { MaxVoterWeightRecord, Proposal } from '@solana/spl-governance';
 
 import { withFinalizeVote } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
@@ -11,6 +11,7 @@ export const finalizeVote = async (
   { connection, wallet, programId, programVersion }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
+  maxVoterWeightRecord?: ProgramAccount<MaxVoterWeightRecord>,
 ) => {
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
@@ -24,6 +25,7 @@ export const finalizeVote = async (
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     proposal.account.governingTokenMint,
+    maxVoterWeightRecord?.pubkey,
   );
 
   await sendTransactionWithNotifications(
