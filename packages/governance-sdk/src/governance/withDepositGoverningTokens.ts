@@ -1,4 +1,5 @@
 import {
+  AccountMeta,
   PublicKey,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
@@ -15,6 +16,18 @@ import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
+const shortMeta = (
+  pubkey: PublicKey,
+  isWriteble = false,
+  isSigner = false,
+): AccountMeta => {
+  return {
+    pubkey: pubkey,
+    isSigner: isSigner,
+    isWritable: isWriteble,
+  };
+};
+
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
@@ -27,7 +40,7 @@ export const withDepositGoverningTokens = async (
   payer: PublicKey,
   amount: BN,
 ) => {
-  const args = new DepositGoverningTokensArgs({ amount });
+  const args = new DepositGoverningTokensArgs({ amount, release_time: 0 });
   const data = Buffer.from(
     serialize(getGovernanceSchema(programVersion), args),
   );
@@ -48,52 +61,17 @@ export const withDepositGoverningTokens = async (
     programId,
   );
 
+  // According to schema https://github.com/neonlabsorg/neon-spl-governance/blob/main/addin-vesting/program/src/instruction.rs#L21-L44
   const keys = [
-    {
-      pubkey: realm,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenHoldingAddress,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenSource,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenOwner,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: transferAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: tokenOwnerRecordAddress,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: SYSTEM_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
+    shortMeta(SYSTEM_PROGRAM_ID), // The system program account
+    shortMeta(TOKEN_PROGRAM_ID), // The spl-token program account
+    shortMeta(governingTokenHoldingAddress, true), // The vesting account. PDA seeds: [vesting spl-token account]
+    shortMeta(transferAuthority, true), // The vesting spl-token account
+    shortMeta(governingTokenOwner, false, true), // The source spl-token account owner
+    shortMeta(governingTokenSource, true), // The source spl-token account
+    shortMeta(tokenOwnerRecordAddress), // The Vesting Owner account
+    shortMeta(realm), // Realm
+    shortMeta(payer, false, true), // Payer
   ];
 
   if (programVersion === PROGRAM_VERSION_V1) {

@@ -55,9 +55,11 @@ export class DepositGoverningTokensArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.DepositGoverningTokens;
   amount: BN;
+  release_time: number;
 
-  constructor(args: { amount: BN }) {
+  constructor(args: { amount: BN; release_time: number }) {
     this.amount = args.amount;
+    this.release_time = args.release_time;
   }
 }
 

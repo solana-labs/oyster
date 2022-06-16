@@ -229,6 +229,9 @@ function createGovernanceSchema(programVersion: number) {
           ['instruction', 'u8'],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
           programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
+          programVersion > PROGRAM_VERSION_V1
+            ? ['release_time', 'u64']
+            : undefined,
         ].filter(Boolean),
       },
     ],
