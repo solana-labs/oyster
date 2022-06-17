@@ -1,5 +1,4 @@
 import {
-  AccountMeta,
   PublicKey,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,

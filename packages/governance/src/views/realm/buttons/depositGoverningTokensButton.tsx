@@ -1,20 +1,21 @@
 import { Button, Col, Modal, Row } from 'antd';
-import React from 'react';
-import { Realm } from '@solana/spl-governance';
+import React, { useMemo, useState } from 'react';
+import { ProgramAccount, Realm } from '@solana/spl-governance';
 import { LABELS } from '../../../constants';
 import { hooks } from '@oyster/common';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { depositGoverningTokens } from '../../../actions/depositGoverningTokens';
+import {
+  depositGoverningTokens,
+} from '../../../actions/depositGoverningTokens';
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
-import { ProgramAccount } from '@solana/spl-governance';
 import BN from 'bn.js';
 
 const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
 
-export function DepositGoverningTokensButton({
+export function DepositGoverningTokensButton ({
   realm,
   governingTokenMint,
   tokenName,
@@ -24,59 +25,70 @@ export function DepositGoverningTokensButton({
   tokenName?: string;
 }) {
   const rpcContext = useRpcContext();
-
   const governingTokenAccount = useAccountByMint(governingTokenMint);
+
+  const availableBalance = new BN(
+    (governingTokenAccount?.info.amount as BN) || 0);
+  const [depositableAmount] = useState<BN>(availableBalance.divn(500));
+
+  const depositConfirmation = useMemo(() => {
+    const amountPercentage = availableBalance.isZero()
+      ? 0 : (depositableAmount.muln(10000).div(availableBalance).toNumber() /
+        100);
+
+    return <div>
+      <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
+      <Row>
+        <Col flex={1}>{LABELS.WALLET_BALANCE}:</Col>
+        <Col flex={1} style={{ textAlign: 'right' }}>{availableBalance.toNumber()}</Col>
+      </Row>
+      <Row>
+        <Col flex={1}>
+          Amount to deposit:
+        </Col>
+        <Col flex={1} style={{ textAlign: 'right' }}>
+          {depositableAmount.toString()}
+          <br />
+          ( {amountPercentage > 0.001
+          ? amountPercentage.toFixed(2)
+          : '< 0.001'}% of total )
+        </Col>
+      </Row>
+    </div>;
+  }, [availableBalance, depositableAmount]);
 
   if (!realm) {
     return null;
   }
 
-  const isVisible = true;
+  const isVisible = !availableBalance.isZero();
 
-  const actionButton = isVisible ? (
+  return isVisible ? (
     <Button
       type="primary"
-      onClick={() =>
+      onClick={() => {
         confirm({
-          title: LABELS.DEPOSIT_TOKENS,
+          title: LABELS.DEPOSIT_TOKENS(tokenName),
           icon: <ExclamationCircleOutlined />,
-          content: (
-            <Row>
-              <Col span={24}>
-                <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
-              </Col>
-            </Row>
-          ),
+          // Modal.confirm content not reactive, so we can't provide inputbox
+          content: depositConfirmation,
           okText: LABELS.DEPOSIT,
           cancelText: LABELS.CANCEL,
-          onOk: async () => {
+          onOk: async() => {
             if (governingTokenAccount) {
-              // todo: implement UI element for entering amount
-              const amount = new BN(10000);
-              //full amount: governingTokenSource.info.amount;
-
               await depositGoverningTokens(
                 rpcContext,
                 realm!.pubkey,
                 governingTokenAccount,
                 governingTokenMint!,
-                amount,
+                depositableAmount,
               );
             }
           },
-        })
-      }
+        });
+      }}
     >
       {LABELS.DEPOSIT_TOKENS(tokenName)}
     </Button>
   ) : null;
-
-  return <>
-    {governingTokenAccount &&
-      <span>Balance: {
-        governingTokenAccount?.info.amount.toString() || 'null'
-      }</span>
-    }
-    {actionButton}
-  </>;
 }
