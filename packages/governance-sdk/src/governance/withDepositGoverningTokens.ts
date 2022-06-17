@@ -15,18 +15,7 @@ import BN from 'bn.js';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-
-const shortMeta = (
-  pubkey: PublicKey,
-  isWriteble = false,
-  isSigner = false,
-): AccountMeta => {
-  return {
-    pubkey: pubkey,
-    isSigner: isSigner,
-    isWritable: isWriteble,
-  };
-};
+import { shortMeta } from '../tools';
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
@@ -63,15 +52,28 @@ export const withDepositGoverningTokens = async (
 
   // According to schema https://github.com/neonlabsorg/neon-spl-governance/blob/main/addin-vesting/program/src/instruction.rs#L21-L44
   const keys = [
-    shortMeta(SYSTEM_PROGRAM_ID), // The system program account
-    shortMeta(TOKEN_PROGRAM_ID), // The spl-token program account
-    shortMeta(governingTokenHoldingAddress, true), // The vesting account. PDA seeds: [vesting spl-token account]
-    shortMeta(transferAuthority, true), // The vesting spl-token account
-    shortMeta(governingTokenOwner, false, true), // The source spl-token account owner
-    shortMeta(governingTokenSource, true), // The source spl-token account
-    shortMeta(tokenOwnerRecordAddress), // The Vesting Owner account
-    shortMeta(realm), // Realm
-    shortMeta(payer, false, true), // Payer
+    // 0. `[]` The system program account
+    shortMeta(SYSTEM_PROGRAM_ID),
+    // 1. `[]` The spl-token program account
+    shortMeta(TOKEN_PROGRAM_ID),
+    // 2. `[writable]` The vesting account. PDA seeds: [vesting spl-token account]
+    shortMeta(governingTokenHoldingAddress, true),
+    // 3. `[writable]` The vesting spl-token account TODO: check
+    shortMeta(transferAuthority, true),
+    // 4. `[signer]` The source spl-token account owner
+    shortMeta(governingTokenOwner, false, true),
+    // 5. `[writable]` The source spl-token account
+    shortMeta(governingTokenSource, true),
+    // 6. `[]` The Vesting Owner account
+    shortMeta(tokenOwnerRecordAddress),
+    // 7. `[signer]` Payer
+    shortMeta(payer, false, true),
+    // 8. `[]` The Governance program account
+    shortMeta(programId),
+    // 9. `[]` The Realm account
+    shortMeta(realm),
+    // 10. `[writable]` The VoterWeightRecord. PDA seeds: ['voter_weight', realm, token_mint, token_owner]
+    // 11. `[writable]` The MaxVoterWeightRecord. PDA seeds: ['max_voter_weight', realm, token_mint]
   ];
 
   if (programVersion === PROGRAM_VERSION_V1) {

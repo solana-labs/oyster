@@ -8,10 +8,12 @@ import { depositGoverningTokens } from '../../../actions/depositGoverningTokens'
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { ProgramAccount } from '@solana/spl-governance';
+import BN from 'bn.js';
 
 const { useAccountByMint } = hooks;
 
 const { confirm } = Modal;
+
 export function DepositGoverningTokensButton({
   realm,
   governingTokenMint,
@@ -29,12 +31,9 @@ export function DepositGoverningTokensButton({
     return null;
   }
 
-  const isVisible =
-    realm != null &&
-    governingTokenAccount &&
-    !governingTokenAccount.info.amount.isZero();
+  const isVisible = true;
 
-  return isVisible ? (
+  const actionButton = isVisible ? (
     <Button
       type="primary"
       onClick={() =>
@@ -52,11 +51,16 @@ export function DepositGoverningTokensButton({
           cancelText: LABELS.CANCEL,
           onOk: async () => {
             if (governingTokenAccount) {
+              // todo: implement UI element for entering amount
+              const amount = new BN(10000);
+              //full amount: governingTokenSource.info.amount;
+
               await depositGoverningTokens(
                 rpcContext,
                 realm!.pubkey,
                 governingTokenAccount,
                 governingTokenMint!,
+                amount,
               );
             }
           },
@@ -66,4 +70,13 @@ export function DepositGoverningTokensButton({
       {LABELS.DEPOSIT_TOKENS(tokenName)}
     </Button>
   ) : null;
+
+  return <>
+    {governingTokenAccount &&
+      <span>Balance: {
+        governingTokenAccount?.info.amount.toString() || 'null'
+      }</span>
+    }
+    {actionButton}
+  </>;
 }

@@ -12,11 +12,10 @@ export const depositGoverningTokens = async (
   realm: PublicKey,
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
+  amount: BN,
 ) => {
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
-
-  const amount = governingTokenSource.info.amount;
 
   const transferAuthority = approve(
     instructions,
