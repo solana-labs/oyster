@@ -1,8 +1,7 @@
-import { PublicKey, TransactionInstruction, Keypair } from '@solana/web3.js';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { models, TokenAccount } from '@oyster/common';
-import { withDepositGoverningTokens } from '@solana/spl-governance';
+import { RpcContext, withDepositGoverningTokens } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/spl-governance';
 import BN from 'bn.js';
 
 const { approve } = models;
@@ -13,6 +12,9 @@ export const depositGoverningTokens = async (
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
   amount: BN,
+  vestingProgramId?: PublicKey,
+  voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
@@ -38,6 +40,9 @@ export const depositGoverningTokens = async (
     transferAuthority.publicKey,
     walletPubkey,
     amount as BN,
+    vestingProgramId,
+    voterWeightRecord,
+    maxVoterWeightRecord,
   );
 
   await sendTransactionWithNotifications(

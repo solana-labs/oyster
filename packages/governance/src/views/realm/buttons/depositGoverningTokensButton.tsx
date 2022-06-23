@@ -10,6 +10,7 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import BN from 'bn.js';
+import { useRealmConfig, useVoterWeightRecord } from '../../../hooks/apiHooks';
 
 const { useAccountByMint } = hooks;
 
@@ -26,10 +27,15 @@ export function DepositGoverningTokensButton ({
 }) {
   const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
+  const realmConfig = useRealmConfig(realm?.pubkey);
+  const vestingProgramId = realmConfig?.account.communityVoterWeightAddin;
+  const voterWeightRecord = useVoterWeightRecord(realm);
 
   const availableBalance = new BN(
     (governingTokenAccount?.info.amount as BN) || 0);
-  const [depositableAmount] = useState<BN>(availableBalance.divn(500));
+  //const [depositableAmount] = useState<BN>(availableBalance.divn(500));
+  // HACK: stick with 100k for debug
+  const [depositableAmount] = useState<BN>(new BN(100000));
 
   const depositConfirmation = useMemo(() => {
     const amountPercentage = availableBalance.isZero()
@@ -82,6 +88,9 @@ export function DepositGoverningTokensButton ({
                 governingTokenAccount,
                 governingTokenMint!,
                 depositableAmount,
+                vestingProgramId,
+                voterWeightRecord?.voterWeight.pubkey,
+                voterWeightRecord?.maxVoterWeight.pubkey,
               );
             }
           },
