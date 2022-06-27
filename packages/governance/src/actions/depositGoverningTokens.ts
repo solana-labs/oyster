@@ -1,10 +1,13 @@
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { models, TokenAccount } from '@oyster/common';
-import { RpcContext, withDepositGoverningTokens } from '@solana/spl-governance';
+import { TokenAccount } from '@oyster/common';
+import {
+  createVestingAccount,
+  RpcContext,
+  withDepositGoverningTokens,
+} from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 import BN from 'bn.js';
-
-const { approve } = models;
+import { AccountLayout } from '@solana/spl-token';
 
 export const depositGoverningTokens = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
@@ -19,15 +22,21 @@ export const depositGoverningTokens = async (
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
 
-  const transferAuthority = approve(
-    instructions,
-    [],
-    governingTokenSource.pubkey,
-    walletPubkey,
-    amount,
+  // calculate size of new account
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
   );
 
-  signers.push((transferAuthority as any) as Keypair);
+  // create target address on which deposit will be transferred
+  const { vestingToken, vestingOwnerPubkey } = await createVestingAccount(
+    instructions,
+    vestingProgramId || programId,
+    governingTokenMint,
+    walletPubkey,
+    accountRentExempt,
+  );
+
+  signers.push(vestingToken);
 
   await withDepositGoverningTokens(
     instructions,
@@ -37,12 +46,13 @@ export const depositGoverningTokens = async (
     governingTokenSource.pubkey,
     governingTokenMint,
     walletPubkey,
-    transferAuthority.publicKey,
     walletPubkey,
     amount as BN,
     vestingProgramId,
     voterWeightRecord,
     maxVoterWeightRecord,
+    vestingToken.publicKey,
+    vestingOwnerPubkey,
   );
 
   await sendTransactionWithNotifications(

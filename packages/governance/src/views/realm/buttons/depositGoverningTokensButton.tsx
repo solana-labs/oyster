@@ -33,9 +33,7 @@ export function DepositGoverningTokensButton ({
 
   const availableBalance = new BN(
     (governingTokenAccount?.info.amount as BN) || 0);
-  //const [depositableAmount] = useState<BN>(availableBalance.divn(500));
-  // HACK: stick with 100k for debug
-  const [depositableAmount] = useState<BN>(new BN(100000));
+  const [depositableAmount] = useState<BN>(availableBalance.divn(2500));
 
   const depositConfirmation = useMemo(() => {
     const amountPercentage = availableBalance.isZero()
@@ -81,7 +79,7 @@ export function DepositGoverningTokensButton ({
           okText: LABELS.DEPOSIT,
           cancelText: LABELS.CANCEL,
           onOk: async() => {
-            if (governingTokenAccount) {
+            if (governingTokenAccount && voterWeightRecord) {
               await depositGoverningTokens(
                 rpcContext,
                 realm!.pubkey,
@@ -89,8 +87,8 @@ export function DepositGoverningTokensButton ({
                 governingTokenMint!,
                 depositableAmount,
                 vestingProgramId,
-                voterWeightRecord?.voterWeight.pubkey,
-                voterWeightRecord?.maxVoterWeight.pubkey,
+                voterWeightRecord!.voterWeight.pubkey,
+                voterWeightRecord!.maxVoterWeight.pubkey,
               );
             }
           },
