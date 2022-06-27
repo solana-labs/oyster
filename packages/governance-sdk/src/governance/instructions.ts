@@ -62,15 +62,31 @@ export class CreateRealmArgs {
 }
 
 export class DepositGoverningTokensArgs {
-  instruction: VestingInstruction = VestingInstruction.Deposit;
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.DepositGoverningTokens;
+  amount: BN;
+
+  constructor(args: { amount: BN }) {
+    this.amount = args.amount;
+  }
+}
+
+export class DepositGoverningTokensEntry {
   amount: BN;
   release_time: number;
-  vector_count: number;
 
   constructor(args: { amount: BN; release_time: number }) {
     this.amount = args.amount;
     this.release_time = args.release_time;
-    this.vector_count = 1;
+  }
+}
+
+export class DepositGoverningTokensMultiArgs {
+  instruction: VestingInstruction = VestingInstruction.Deposit;
+  entries: Array<DepositGoverningTokensEntry> = [];
+
+  constructor(args: { amount: BN; release_time: number }[]) {
+    this.entries = args.map(e => new DepositGoverningTokensEntry(e));
   }
 }
 
