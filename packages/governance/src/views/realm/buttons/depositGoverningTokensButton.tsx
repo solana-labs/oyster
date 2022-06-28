@@ -10,7 +10,8 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import BN from 'bn.js';
-import { useRealmConfig, useVoterWeightRecord } from '../../../hooks/apiHooks';
+import { useVoterWeightRecord } from '../../../hooks/apiHooks';
+import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
 
 const { useAccountByMint } = hooks;
 
@@ -27,13 +28,16 @@ export function DepositGoverningTokensButton ({
 }) {
   const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
-  const realmConfig = useRealmConfig(realm?.pubkey);
-  const vestingProgramId = realmConfig?.account.communityVoterWeightAddin;
+  const vestingProgramId = useVestingProgramId(realm);
   const voterWeightRecord = useVoterWeightRecord(realm);
 
   const availableBalance = new BN(
-    (governingTokenAccount?.info.amount as BN) || 0);
-  const [depositableAmount] = useState<BN>(availableBalance.divn(2500));
+    (governingTokenAccount?.info.amount as BN) || 0
+  );
+  const [depositableAmount] = useState<BN>(
+    availableBalance.isZero()
+      ? new BN(100_000) : availableBalance.divn(2500)
+  );
 
   const depositConfirmation = useMemo(() => {
     const amountPercentage = availableBalance.isZero()
@@ -44,7 +48,7 @@ export function DepositGoverningTokensButton ({
       <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
       <Row>
         <Col flex={1}>{LABELS.WALLET_BALANCE}:</Col>
-        <Col flex={1} style={{ textAlign: 'right' }}>{availableBalance.toNumber()}</Col>
+        <Col flex={1} style={{ textAlign: 'right' }}>{availableBalance.toString()}</Col>
       </Row>
       <Row>
         <Col flex={1}>
