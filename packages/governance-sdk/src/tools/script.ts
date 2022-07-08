@@ -1,3 +1,5 @@
+import { AccountMeta, PublicKey } from '@solana/web3.js';
+
 export function getErrorMessage(ex: any) {
   if (ex instanceof Error) {
     return ex.message;
@@ -5,3 +7,9 @@ export function getErrorMessage(ex: any) {
 
   return JSON.stringify(ex);
 }
+
+export const shortMeta = (
+  pubkey: PublicKey,
+  isWritable = false,
+  isSigner = false,
+): AccountMeta => ({ pubkey, isSigner, isWritable });

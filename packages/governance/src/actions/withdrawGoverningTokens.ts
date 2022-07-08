@@ -9,6 +9,11 @@ export const withdrawGoverningTokens = async (
   realm: PublicKey,
   governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
+  vestingProgramId?: PublicKey,
+  voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
+  vestingTokenAccount?: PublicKey,
+  vestingTokenAddress?: PublicKey,
 ) => {
   let instructions: TransactionInstruction[] = [];
 
@@ -19,6 +24,11 @@ export const withdrawGoverningTokens = async (
     governingTokenDestination,
     governingTokenMint,
     walletPubkey,
+    vestingProgramId,
+    voterWeightRecord,
+    maxVoterWeightRecord,
+    vestingTokenAddress,
+    vestingTokenAccount,
   );
 
   await sendTransactionWithNotifications(

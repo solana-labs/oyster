@@ -1,32 +1,42 @@
-import { PublicKey, TransactionInstruction, Keypair } from '@solana/web3.js';
-import { models, TokenAccount } from '@oyster/common';
-import { withDepositGoverningTokens } from '@solana/spl-governance';
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { TokenAccount } from '@oyster/common';
+import {
+  createVestingAccount,
+  RpcContext,
+  withDepositGoverningTokens,
+} from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/spl-governance';
 import BN from 'bn.js';
-
-const { approve } = models;
+import { AccountLayout } from '@solana/spl-token';
 
 export const depositGoverningTokens = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   governingTokenSource: TokenAccount,
   governingTokenMint: PublicKey,
+  amount: BN,
+  vestingProgramId?: PublicKey,
+  voterWeightRecord?: PublicKey,
+  maxVoterWeightRecord?: PublicKey,
 ) => {
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
 
-  const amount = governingTokenSource.info.amount;
-
-  const transferAuthority = approve(
-    instructions,
-    [],
-    governingTokenSource.pubkey,
-    walletPubkey,
-    amount,
+  // calculate size of new account
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
   );
 
-  signers.push((transferAuthority as any) as Keypair);
+  // create target address on which deposit will be transferred
+  const { vestingToken, vestingOwnerPubkey } = await createVestingAccount(
+    instructions,
+    vestingProgramId || programId,
+    governingTokenMint,
+    walletPubkey,
+    accountRentExempt,
+  );
+
+  signers.push(vestingToken);
 
   await withDepositGoverningTokens(
     instructions,
@@ -36,9 +46,13 @@ export const depositGoverningTokens = async (
     governingTokenSource.pubkey,
     governingTokenMint,
     walletPubkey,
-    transferAuthority.publicKey,
     walletPubkey,
     amount as BN,
+    vestingProgramId,
+    voterWeightRecord,
+    maxVoterWeightRecord,
+    vestingToken.publicKey,
+    vestingOwnerPubkey,
   );
 
   await sendTransactionWithNotifications(

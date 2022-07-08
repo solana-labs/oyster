@@ -14,6 +14,8 @@ import {
   CreateTokenGovernanceArgs,
   CreateTokenOwnerRecordArgs,
   DepositGoverningTokensArgs,
+  DepositGoverningTokensEntry,
+  DepositGoverningTokensMultiArgs,
   ExecuteTransactionArgs,
   FinalizeVoteArgs,
   FlagTransactionErrorArgs,
@@ -230,6 +232,26 @@ function createGovernanceSchema(programVersion: number) {
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
           programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
         ].filter(Boolean),
+      },
+    ],
+    [
+      DepositGoverningTokensEntry,
+      {
+        kind: 'struct',
+        fields: [
+          ['release_time', 'u64'],
+          ['amount', 'u64'],
+        ],
+      },
+    ],
+    [
+      DepositGoverningTokensMultiArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['instruction', 'u8'],
+          ['entries', [DepositGoverningTokensEntry]],
+        ],
       },
     ],
     [

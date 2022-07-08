@@ -8,6 +8,16 @@ import {
   VoteType,
 } from './accounts';
 
+// Vesting enum for addin-vesting
+// ref: https://github.com/neonlabsorg/neon-spl-governance/blob/main/addin-vesting/program/src/instruction.rs
+export enum VestingInstruction {
+  Deposit = 0,
+  Withdraw,
+  SetVotePercentage,
+  ChangeOwner = 3,
+  CreateVoterWeightRecord,
+}
+
 export enum GovernanceInstruction {
   CreateRealm = 0,
   DepositGoverningTokens = 1,
@@ -61,9 +71,27 @@ export class DepositGoverningTokensArgs {
   }
 }
 
+export class DepositGoverningTokensEntry {
+  amount: BN;
+  release_time: number;
+
+  constructor(args: { amount: BN; release_time: number }) {
+    this.amount = args.amount;
+    this.release_time = args.release_time;
+  }
+}
+
+export class DepositGoverningTokensMultiArgs {
+  instruction: VestingInstruction = VestingInstruction.Deposit;
+  entries: Array<DepositGoverningTokensEntry> = [];
+
+  constructor(args: { amount: BN; release_time: number }[]) {
+    this.entries = args.map(e => new DepositGoverningTokensEntry(e));
+  }
+}
+
 export class WithdrawGoverningTokensArgs {
-  instruction: GovernanceInstruction =
-    GovernanceInstruction.WithdrawGoverningTokens;
+  instruction: VestingInstruction = VestingInstruction.Withdraw;
 }
 
 export class CreateGovernanceArgs {

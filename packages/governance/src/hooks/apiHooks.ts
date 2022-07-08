@@ -193,7 +193,9 @@ export function useVoterWeightRecord(
 ) {
   const connection = useConnection();
   const { wallet } = useRpcContext();
-  const realmConfig = useRealmConfig(governance?.account.realm);
+  const realmConfig = useRealmConfig(
+    governance?.account.realm || realm?.pubkey,
+  );
   const programId = realmConfig?.account.communityVoterWeightAddin;
   const isVoterWeightAddin = realm?.account.config.useCommunityVoterWeightAddin;
   const [result, setResult] = useState<AccountVoterWeightRecord | undefined>();
