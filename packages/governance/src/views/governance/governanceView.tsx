@@ -1,4 +1,4 @@
-import { Badge, Col, List, Row, Space, Typography } from 'antd';
+import { Badge, Button, Col, List, Row, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -21,7 +21,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '@solana/spl-governance';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
-import { getProposalUrl } from '../../tools/routeTools';
+import { getProposalUrl, getRealmUrl } from '../../tools/routeTools';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import {
   formatMintNaturalAmountAsDecimal,
@@ -30,6 +30,7 @@ import {
 } from '../../tools/units';
 import { GovernanceActionBar } from './buttons/governanceActionBar';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useGovernanceMeta } from '../../hooks/useGovernanceMeta';
 
 const { Text } = Typography;
 
@@ -91,6 +92,14 @@ export const GovernanceView = () => {
       }));
   }, [proposals, programIdBase58]);
 
+  const realmLink = useMemo(() => {
+    if (realm?.pubkey) {
+      return '#' + getRealmUrl(realm.pubkey, programIdBase58);
+    }
+    return '#';
+  }, [realm, programIdBase58]);
+  const governanceMeta = useGovernanceMeta(governance?.pubkey);
+
   return (
     <Row
       style={{
@@ -111,62 +120,75 @@ export const GovernanceView = () => {
             ></GovernanceBadge>
           )}
 
-          <div>
-            <h1>{realm?.account.name}</h1>
+          <Space direction="vertical">
             <h2>
+              {governanceMeta.name}
+            </h2>
+            <Space>
               {governance && (
                 <ExplorerLink
+                  short
                   address={governance.account.governedAccount}
                   type="address"
                 />
               )}
-            </h2>
-            <a
-              href={tokenMap.get(communityMint)?.extensions?.website}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {tokenMap.get(communityMint)?.extensions?.website}
-            </a>
-            {governance && communityMintInfo && (
-              <Space direction="vertical">
-                <Space size="large">
-                  <Space direction="vertical" size={0}>
-                    <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
-                      governance.account.config.maxVotingTime,
-                    )} days`}</Text>
-                    <Text type="secondary">{`yes vote threshold: ${governance.account.config.voteThresholdPercentage.value}%`}</Text>
-                  </Space>
+              {realmLink && (
+                <Button
+                  type="dashed"
+                  href={realmLink}
+                  onClick={() => history.push(realmLink)}
+                >
+                  Realm: {realm?.account.name}
+                </Button>
+              )}
+            </Space>
+            <Space>
+              <a
+                href={tokenMap.get(communityMint)?.extensions?.website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {tokenMap.get(communityMint)?.extensions?.website}
+              </a>
+              {governance && communityMintInfo && (
+                <Space direction="vertical">
+                  <Space size="large">
+                    <Space direction="vertical" size={0}>
+                      <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
+                        governance.account.config.maxVotingTime,
+                      )} days`}</Text>
+                      <Text type="secondary">{`yes vote threshold: ${governance.account.config.voteThresholdPercentage.value}%`}</Text>
+                    </Space>
 
-                  <Space direction="vertical" size={0}>
-                    <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
-                      governance.account.config.minInstructionHoldUpTime,
-                    )} days`}</Text>
-                    <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
-                      communityMintInfo,
-                      governance.account.config
-                        .minCommunityTokensToCreateProposal,
-                    )} (${formatMintSupplyFractionAsDecimalPercentage(
-                      communityMintInfo,
-                      governance.account.config
-                        .minCommunityTokensToCreateProposal,
-                    )})`}</Text>
+                    <Space direction="vertical" size={0}>
+                      <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
+                        governance.account.config.minInstructionHoldUpTime,
+                      )} days`}</Text>
+                      <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
+                        communityMintInfo,
+                        governance.account.config.minCommunityTokensToCreateProposal,
+                      )} (${formatMintSupplyFractionAsDecimalPercentage(
+                        communityMintInfo,
+                        governance.account.config.minCommunityTokensToCreateProposal,
+                      )})`}</Text>
+                    </Space>
                   </Space>
-                </Space>
-                {nativeTreasury && (
-                  <div>
-                    {`SOL: ${nativeTreasury.account.lamports / LAMPORTS_PER_SOL
+                  {nativeTreasury && (
+                    <div>
+                      {`SOL: ${nativeTreasury.account.lamports /
+                      LAMPORTS_PER_SOL
                       }`}{' '}
-                    <ExplorerLink
-                      address={nativeTreasury.pubkey}
-                      type="address"
-                      length={3}
-                    ></ExplorerLink>{' '}
-                  </div>
-                )}
-              </Space>
-            )}
-          </div>
+                      <ExplorerLink
+                        address={nativeTreasury.pubkey}
+                        type="address"
+                        length={3}
+                      ></ExplorerLink>{' '}
+                    </div>
+                  )}
+                </Space>
+              )}
+            </Space>
+          </Space>
 
           <GovernanceActionBar
             governance={governance}

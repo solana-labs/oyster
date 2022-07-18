@@ -8,7 +8,7 @@ const SECONDS_PER_DAY = 86400;
 const DAYS_PER_YEAR = 365;
 
 export function getDaysFromTimestamp(unixTimestamp: number) {
-  return unixTimestamp / SECONDS_PER_DAY;
+  return (unixTimestamp / SECONDS_PER_DAY).toFixed(3);
 }
 
 export function getTimestampFromDays(days: number) {
@@ -106,9 +106,12 @@ export function getAmountFractionAsDecimalPercentage(
   totalNaturalAmount: BN | number,
   naturalAmount: BN | number,
 ) {
+  const totalAmount = new BigNumber(getBigNumberAmount(totalNaturalAmount));
+  if (totalAmount.isZero())
+    return 0;
   return getBigNumberAmount(naturalAmount)
     .multipliedBy(100)
-    .dividedBy(new BigNumber(getBigNumberAmount(totalNaturalAmount)))
+    .dividedBy(totalAmount)
     .toNumber();
 }
 
@@ -121,7 +124,7 @@ export function getBigNumberAmount(amount: BN | number) {
 
 // Formats percentage value showing it in human readable form
 export function formatPercentage(percentage: number) {
-  if (percentage === 0 || percentage === Infinity) {
+  if (percentage === 0 || percentage === Infinity || isNaN(percentage)) {
     return '0%';
   }
 

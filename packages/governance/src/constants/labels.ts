@@ -65,14 +65,14 @@ export const LABELS = {
   ADD_COUNCIL_TOKENS: 'Add Council Tokens',
   ACTIONS: 'Actions',
 
-  VOTE_YEAH: 'Yeah',
-  VOTE_YEAH_QUESTION: 'Vote Yeah?',
+  VOTE_YEAH: 'Positive',
+  VOTE_YEAH_QUESTION: 'Vote positive?',
   VOTE_YEAH_MSG: 'Vote in favour of the proposal.',
   VOTING_YEAH: 'Voting for the proposal',
   VOTED_YEAH: 'Voted for the proposal',
 
-  VOTE_NAY: 'Nay',
-  VOTE_NAY_QUESTION: 'Vote Nay?',
+  VOTE_NAY: 'Negative',
+  VOTE_NAY_QUESTION: 'Vote negative?',
   VOTE_NAY_MSG: 'Vote against the proposal.',
   VOTING_NAY: 'Voting against the proposal',
   VOTED_NAY: 'Voted against the proposal',

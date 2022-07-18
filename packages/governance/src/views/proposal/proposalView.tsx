@@ -1,4 +1,4 @@
-import { Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
+import { Button, Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
 import { TokenIcon, constants, ExplorerLink } from '@oyster/common';
@@ -45,6 +45,8 @@ import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
 import { ProgramAccount } from '@solana/spl-governance';
 import { DryRunProposalButton } from './components/instruction/buttons/dryRunProposalButton';
+import { useGovernanceMeta } from '../../hooks/useGovernanceMeta';
+import { useHistory } from 'react-router-dom';
 
 const { TabPane } = Tabs;
 
@@ -278,6 +280,9 @@ function InnerProposalView({
     proposal: proposal,
   });
 
+  const history = useHistory();
+  const governanceInfo = useGovernanceMeta(proposal.account.governance);
+
   return (
     <Row>
       <Col flex="auto" xxl={15} xs={24} className="proposal-container">
@@ -294,6 +299,13 @@ function InnerProposalView({
                   proposal={proposal}
                   governance={governance}
                 />
+                <Button
+                  type="dashed"
+                  href={governanceInfo.href}
+                  onClick={() => history.push(governanceInfo.href)}
+                >
+                  Governance: {governanceInfo.name}
+                </Button>
               </Col>
             </Row>
           </Col>

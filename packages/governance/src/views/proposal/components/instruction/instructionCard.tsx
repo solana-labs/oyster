@@ -26,6 +26,7 @@ import {
 } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
 import { ProgramAccount } from '@solana/spl-governance';
+import { getDaysFromTimestamp } from '../../../../tools/units';
 
 export function InstructionCard({
   proposalInstruction,
@@ -74,7 +75,7 @@ export function InstructionCard({
             <p>{`${LABELS.INSTRUCTION}: ${instructionDetails.dataBase64}`}</p>
             <p>
               {LABELS.HOLD_UP_TIME_DAYS}:{' '}
-              {proposalInstruction.account.holdUpTime / 86400}
+              {getDaysFromTimestamp(proposalInstruction.account.holdUpTime)}
             </p>
           </>
         }
