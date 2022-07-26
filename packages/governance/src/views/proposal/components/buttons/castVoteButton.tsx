@@ -112,7 +112,7 @@ export function CastVoteButton({
         <Row>
           <Col span={24}>
             <p>{msg}</p>
-            {vote === YesNoVote.Yes ? <>
+            {vote ? <>
               <Radio.Group
                 options={options}
                 value={votePercentage}
