@@ -26,20 +26,16 @@ export const withCreateMintGovernance = async (
   governanceAuthority: PublicKey,
   voterWeightRecord?: PublicKey,
 ) => {
-  console.log(governedMint);
-  console.log(realm);
   const args = new CreateMintGovernanceArgs({
     config,
     transferMintAuthorities: transferMintAuthorities,
   });
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
-  const [governanceAddress, bump] = await PublicKey.findProgramAddress(
+  const [governanceAddress] = await PublicKey.findProgramAddress(
     [Buffer.from('mint-governance'), realm.toBuffer(), governedMint.toBuffer()],
     programId,
   );
-
-  console.log(governanceAddress);
 
   const keys = [
     {
