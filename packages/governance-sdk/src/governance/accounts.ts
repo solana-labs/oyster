@@ -267,7 +267,8 @@ export class RealmConfig {
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
     this.useCommunityVoterWeightAddin = !!args.useCommunityVoterWeightAddin;
-    this.useMaxCommunityVoterWeightAddin = !!args.useMaxCommunityVoterWeightAddin;
+    this.useMaxCommunityVoterWeightAddin =
+      !!args.useMaxCommunityVoterWeightAddin;
     this.reserved = args.reserved;
   }
 }
@@ -362,7 +363,8 @@ export class GovernanceConfig {
 
   // VERSION >= 3
   councilVoteThreshold: VoteThreshold;
-  reserved = [0, 0];
+  councilVetoVoteThreshold: VoteThreshold;
+  // reserved = [0, 0];
 
   constructor(args: {
     communityVoteThreshold: VoteThreshold;
@@ -375,6 +377,7 @@ export class GovernanceConfig {
     // VERSION >= 3
     // For versions < 3 must be set to YesVotePercentage(0)
     councilVoteThreshold: VoteThreshold;
+    councilVetoVoteThreshold: VoteThreshold;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
@@ -387,6 +390,7 @@ export class GovernanceConfig {
 
     // VERSION >= 3
     this.councilVoteThreshold = args.councilVoteThreshold;
+    this.councilVetoVoteThreshold = args.councilVetoVoteThreshold;
   }
 }
 

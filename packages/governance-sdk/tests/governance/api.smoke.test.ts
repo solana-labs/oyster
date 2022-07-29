@@ -6,7 +6,7 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import {
   createInstructionData,
   getGovernanceProgramVersion,
@@ -164,6 +164,9 @@ test('setupRealm', async () => {
       value: 60,
     }),
     minCouncilTokensToCreateProposal: new BN(1),
+    councilVetoVoteThreshold : new VoteThreshold({
+      type: VoteThresholdType.Disabled,
+    })
   });
 
   const governancePk = await withCreateMintGovernance(

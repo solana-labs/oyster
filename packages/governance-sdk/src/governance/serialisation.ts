@@ -66,7 +66,7 @@ import { deserializeBorsh } from '../tools/borsh';
 
 // Temp. workaround to support u16.
 (BinaryReader.prototype as any).readU16 = function () {
-  const reader = (this as unknown) as BinaryReader;
+  const reader = this as unknown as BinaryReader;
   const value = reader.buf.readUInt16LE(reader.offset);
   reader.offset += 2;
   return value;
@@ -74,7 +74,7 @@ import { deserializeBorsh } from '../tools/borsh';
 
 // Temp. workaround to support u16.
 (BinaryWriter.prototype as any).writeU16 = function (value: number) {
-  const writer = (this as unknown) as BinaryWriter;
+  const writer = this as unknown as BinaryWriter;
   writer.maybeResize();
   writer.buf.writeUInt16LE(value, writer.length);
   writer.length += 2;
@@ -83,7 +83,7 @@ import { deserializeBorsh } from '../tools/borsh';
 // ------------ VoteType ------------
 
 (BinaryReader.prototype as any).readVoteType = function () {
-  const reader = (this as unknown) as BinaryReader;
+  const reader = this as unknown as BinaryReader;
   const value = reader.buf.readUInt8(reader.offset);
   reader.offset += 1;
 
@@ -96,7 +96,7 @@ import { deserializeBorsh } from '../tools/borsh';
 };
 
 (BinaryWriter.prototype as any).writeVoteType = function (value: VoteType) {
-  const writer = (this as unknown) as BinaryWriter;
+  const writer = this as unknown as BinaryWriter;
   writer.maybeResize();
   writer.buf.writeUInt8(value.type, writer.length);
   writer.length += 1;
@@ -110,7 +110,7 @@ import { deserializeBorsh } from '../tools/borsh';
 // ------------ Vote ------------
 
 (BinaryReader.prototype as any).readVote = function () {
-  const reader = (this as unknown) as BinaryReader;
+  const reader = this as unknown as BinaryReader;
   const value = reader.buf.readUInt8(reader.offset);
   reader.offset += 1;
 
@@ -139,7 +139,7 @@ import { deserializeBorsh } from '../tools/borsh';
 };
 
 (BinaryWriter.prototype as any).writeVote = function (value: Vote) {
-  const writer = (this as unknown) as BinaryWriter;
+  const writer = this as unknown as BinaryWriter;
   writer.maybeResize();
   writer.buf.writeUInt8(value.voteType, writer.length);
   writer.length += 1;
@@ -157,7 +157,7 @@ import { deserializeBorsh } from '../tools/borsh';
 // ------------ VoteThreshold ------------
 
 (BinaryReader.prototype as any).readVoteThreshold = function () {
-  const reader = (this as unknown) as BinaryReader;
+  const reader = this as unknown as BinaryReader;
 
   // Read VoteThreshold and advance the reader by 1
   const type = reader.buf.readUInt8(reader.offset);
@@ -184,7 +184,7 @@ import { deserializeBorsh } from '../tools/borsh';
 (BinaryWriter.prototype as any).writeVoteThreshold = function (
   value: VoteThreshold,
 ) {
-  const writer = (this as unknown) as BinaryWriter;
+  const writer = this as unknown as BinaryWriter;
   writer.maybeResize();
   writer.buf.writeUInt8(value.type, writer.length);
   writer.length += 1;
@@ -616,7 +616,8 @@ function createGovernanceSchema(programVersion: number) {
           ['maxVotingTime', 'u32'],
           ['voteTipping', 'u8'],
           ['councilVoteThreshold', 'VoteThreshold'],
-          ['reserved', [2]],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
+
           ['minCouncilTokensToCreateProposal', 'u64'],
         ],
       },
