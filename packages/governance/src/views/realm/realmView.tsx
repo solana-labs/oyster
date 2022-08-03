@@ -23,16 +23,19 @@ import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
 
 import { RealmActionBar } from './buttons/realmActionBar';
+import { getGovernanceMeta } from '../../hooks/useGovernanceMeta';
+import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
 
 const { Text } = Typography;
 
 export const RealmView = () => {
   const history = useHistory();
   let realmKey = useKeyParam();
-  const { programIdBase58 } = useRpcContext();
+  const { programIdBase58, connection } = useRpcContext();
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);
+  const isGovernancesLoading = useArrayLengthWatcher(governances);
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
@@ -54,7 +57,9 @@ export const RealmView = () => {
       .map(g => ({
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
-        title: g.account.governedAccount.toBase58(),
+        title: getGovernanceMeta(
+          g.pubkey, programIdBase58
+        ).name,
         badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>,
       }));
@@ -131,6 +136,7 @@ export const RealmView = () => {
         <Col flex="auto" xxl={15} xs={24} className="realm-container">
           <h1 className="governances-list-title">Governances</h1>
           <List
+            loading={isGovernancesLoading}
             itemLayout="vertical"
             size="large"
             pagination={false}

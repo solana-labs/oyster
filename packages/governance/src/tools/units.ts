@@ -124,7 +124,7 @@ export function getBigNumberAmount(amount: BN | number) {
 
 // Formats percentage value showing it in human readable form
 export function formatPercentage(percentage: number) {
-  if (percentage === 0 || percentage === Infinity || isNaN(percentage)) {
+  if (percentage === 0 || percentage === Infinity || Number.isNaN(percentage)) {
     return '0%';
   }
 

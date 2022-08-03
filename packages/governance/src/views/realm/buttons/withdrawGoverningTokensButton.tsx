@@ -32,8 +32,9 @@ export function WithdrawGoverningTokensButton ({
   const governingTokenAccount = useAccountByMint(governingTokenMint);
   const vestingProgramId = useVestingProgramId(realm);
   const voterWeightRecord = useVoterWeightRecord(realm);
+  let ownerPubkey = rpcContext.wallet?.publicKey || undefined;
   const activeDeposits = useDepositedAccounts(
-    rpcContext, vestingProgramId, rpcContext.walletPubkey,
+    rpcContext, vestingProgramId, ownerPubkey,
     governingTokenMint,
   );
 

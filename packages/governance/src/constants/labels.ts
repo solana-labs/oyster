@@ -8,6 +8,8 @@ export const LABELS = {
   ADD_NEW_PROPOSAL: 'Add new proposal',
   ADD_PROPOSAL: 'Add proposal',
   ADDING_PROPOSAL: 'Adding proposal',
+  PROPOSAL_CANT_ADD_BELOW_LIMIT: 'Community tokens amount less than required minimum',
+  PROPOSAL_CANT_ADD_EMPTY: 'Not enough voter tokens to create a proposal',
 
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Governance',
@@ -17,7 +19,7 @@ export const LABELS = {
   SETTINGS_TOOLTIP: 'Settings',
   DASHBOARD_INFO: 'Connect to a wallet to view proposals.',
   DESCRIPTION: 'Description',
-  DESCRIPTION_LABEL: 'description',
+  DESCRIPTION_LABEL: 'Description',
   PROPOSAL: 'Proposal',
   NO_LOAD: 'Unable to load markdown. Click to view.',
   SIGNATORIES: 'Signatories',
@@ -120,8 +122,8 @@ export const LABELS = {
   ACCOUNT_ADDRESS: 'account address',
   TOKEN_ACCOUNT_ADDRESS: 'token account address',
 
-  MIN_TOKENS_TO_CREATE_PROPOSAL: 'min community tokens to create proposal',
-  MIN_INSTRUCTION_HOLD_UP_TIME_DAYS: 'min instruction hold up time (days)',
+  MIN_TOKENS_TO_CREATE_PROPOSAL: 'Min. community tokens to create proposal',
+  MIN_INSTRUCTION_HOLD_UP_TIME_DAYS: 'Min. instruction hold up time (days)',
   MAX_VOTING_TIME_DAYS: 'max voting time (days)',
 
   UPGRADE_AUTHORITY: 'upgrade authority',
@@ -136,7 +138,7 @@ export const LABELS = {
   COMMUNITY_TOKEN_MINT: 'community token mint',
   USE_COUNCIL_TOKEN: 'use council token',
   COUNCIL_TOKEN_MINT: 'council token mint',
-  NAME_LABEL: 'name',
+  NAME_LABEL: 'Name',
 
   YES_VOTE_THRESHOLD_PERCENTAGE: 'yes vote threshold (%)',
   VOTE_TIPPING: 'vote tipping',

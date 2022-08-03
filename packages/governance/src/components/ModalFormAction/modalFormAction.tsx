@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, Button, ButtonProps, Modal, Space, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  ButtonProps,
+  Modal,
+  Space,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { Form } from 'antd';
 import './style.less';
 import { ExplorerLink, isTransactionTimeoutError } from '@oyster/common';
@@ -26,6 +34,7 @@ export function ModalFormAction<TResult>({
   formPendingAction,
   isWalletRequired = true,
   buttonProps,
+  buttonTooltip,
   onSubmit,
   onComplete,
   onReset,
@@ -38,6 +47,7 @@ export function ModalFormAction<TResult>({
   formPendingAction: string;
   isWalletRequired?: boolean;
   buttonProps?: ButtonProps;
+  buttonTooltip?: string;
   onSubmit: (values: any) => Promise<TResult>;
   onComplete?: (result: TResult) => void;
   onReset?: () => void;
@@ -55,15 +65,25 @@ export function ModalFormAction<TResult>({
     setIsModalVisible(false);
   };
 
+  const triggerButton = <Button
+    onClick={() => setIsModalVisible(true)}
+    disabled={isWalletRequired && !connected}
+    {...buttonProps}
+  >
+    {label}
+  </Button>
+
   return (
     <>
-      <Button
-        onClick={() => setIsModalVisible(true)}
-        disabled={isWalletRequired && !connected}
-        {...buttonProps}
-      >
-        {label}
-      </Button>
+      { buttonTooltip ? (
+        <Tooltip
+          color="orange"
+          placement="left"
+          title={buttonTooltip}
+        >{
+          triggerButton
+        }</Tooltip>
+      ) : triggerButton }
       <ActionForm
         onFormSubmit={onFormSubmit}
         onFormCancel={onFormCancel}

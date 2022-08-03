@@ -299,13 +299,13 @@ function InnerProposalView({
                   proposal={proposal}
                   governance={governance}
                 />
-                <Button
+                {governanceInfo && <Button
                   type="dashed"
                   href={governanceInfo.href}
                   onClick={() => history.push(governanceInfo.href)}
                 >
                   Governance: {governanceInfo.name}
-                </Button>
+                </Button>}
               </Col>
             </Row>
           </Col>

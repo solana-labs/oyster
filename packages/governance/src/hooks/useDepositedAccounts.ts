@@ -24,7 +24,7 @@ export type DepositedAccountInfo = {
 export const useDepositedAccounts = (
   rpcContext: RpcContext,
   vestingProgramId: PublicKey | undefined,
-  ownerPubkey: PublicKey,
+  ownerPubkey: PublicKey | undefined,
   mint: PublicKey | undefined,
 ) => {
   const [accounts, setAccounts] = useState<DepositedAccountInfo[] | null>(null);
@@ -89,7 +89,7 @@ export const useDepositedAccounts = (
     } else {
       setAccounts(null);
     }
-  }, [isFetching, rpcContext, vestingProgramId, ownerPubkey]);
+  }, [isFetching, rpcContext, vestingProgramId, ownerPubkey, mint]);
 
   useEffect(() => {
     fetch();

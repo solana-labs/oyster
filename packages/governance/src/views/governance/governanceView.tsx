@@ -1,4 +1,4 @@
-import { Badge, Button, Col, List, Row, Space, Typography } from 'antd';
+import { Badge, Button, Col, List, Row, Space, Spin, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
@@ -31,6 +31,7 @@ import {
 import { GovernanceActionBar } from './buttons/governanceActionBar';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useGovernanceMeta } from '../../hooks/useGovernanceMeta';
+import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
 
 const { Text } = Typography;
 
@@ -92,6 +93,8 @@ export const GovernanceView = () => {
       }));
   }, [proposals, programIdBase58]);
 
+  const isProposalsLoading = useArrayLengthWatcher(proposals);
+
   const realmLink = useMemo(() => {
     if (realm?.pubkey) {
       return '#' + getRealmUrl(realm.pubkey, programIdBase58);
@@ -110,8 +113,8 @@ export const GovernanceView = () => {
       }}
     >
       <Col flex="auto" xxl={15} xs={24} className="proposals-container">
-        <div className="proposals-header">
-          {governance && (
+        {governance ? <div className="proposals-header">
+          {(
             <GovernanceBadge
               size={60}
               realm={realm}
@@ -122,17 +125,17 @@ export const GovernanceView = () => {
 
           <Space direction="vertical">
             <h2>
-              {governanceMeta.name}
+              {governanceMeta?.name}
             </h2>
             <Space>
-              {governance && (
+              {(
                 <ExplorerLink
                   short
                   address={governance.account.governedAccount}
                   type="address"
                 />
               )}
-              {realmLink && (
+              {(realmLink && realm?.account.name) && (
                 <Button
                   type="dashed"
                   href={realmLink}
@@ -150,7 +153,7 @@ export const GovernanceView = () => {
               >
                 {tokenMap.get(communityMint)?.extensions?.website}
               </a>
-              {governance && communityMintInfo && (
+              {communityMintInfo && (
                 <Space direction="vertical">
                   <Space size="large">
                     <Space direction="vertical" size={0}>
@@ -194,17 +197,18 @@ export const GovernanceView = () => {
             governance={governance}
             realm={realm}
           ></GovernanceActionBar>
-        </div>
+        </div> : <Spin /> }
         <h1 className="proposals-list-title">Proposals</h1>
         <List
+          loading={isProposalsLoading}
           itemLayout="vertical"
           size="large"
-          pagination={{
+          pagination={ proposals.length >= PAGE_SIZE ? {
             onChange: page => {
               setPage(page);
             },
             pageSize: PAGE_SIZE,
-          }}
+          } : false }
           dataSource={proposalItems}
           renderItem={item => (
             <List.Item

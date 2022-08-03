@@ -69,6 +69,15 @@ export function NewProposalButton({
     canCreateProposalUsingCouncilTokens ||
     canCreateProposalUsingVoterWeight;
 
+  // human readable reason why proposal can't be created
+  let creationDisabledReason = undefined;
+  if (!canCreateProposal) {
+    creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_BELOW_LIMIT;
+    if (voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.isZero()){
+      creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_EMPTY;
+    }
+  }
+
   const defaultGoverningTokenType = !communityMint.supply.isZero()
     ? GoverningTokenType.Community
     : GoverningTokenType.Council;
@@ -120,6 +129,7 @@ export function NewProposalButton({
         disabled: !canCreateProposal,
         type: 'primary',
       }}
+      buttonTooltip={creationDisabledReason}
       formTitle={LABELS.ADD_NEW_PROPOSAL}
       formAction={LABELS.ADD_PROPOSAL}
       formPendingAction={LABELS.ADDING_PROPOSAL}
