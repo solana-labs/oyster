@@ -31,7 +31,7 @@ const { Text } = Typography;
 export const RealmView = () => {
   const history = useHistory();
   let realmKey = useKeyParam();
-  const { programIdBase58, connection } = useRpcContext();
+  const { programIdBase58 } = useRpcContext();
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);

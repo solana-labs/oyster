@@ -15,6 +15,7 @@ export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
   const [isFilled, setIsFilled] = useState(false);
   const [cleanupTimer, setCleanupTimer] = useState(0);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (target.length !== lastLength) {
       setLastLength(target.length);
@@ -34,6 +35,7 @@ export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
       }
     }
   }, [target, timeout]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return !isFilled;
 };
