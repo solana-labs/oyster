@@ -5,7 +5,11 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
-import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/constants';
+import {
+  PROGRAM_VERSION,
+  PROGRAM_VERSION_V1,
+  PROGRAM_VERSION_V2,
+} from '../registry/constants';
 import { BN_ZERO } from '../tools/numbers';
 import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader';
 import { ProgramAccount, simulateTransaction } from '../tools/sdk/runtime';
@@ -105,6 +109,6 @@ export async function getGovernanceProgramVersion(
     return PROGRAM_VERSION;
   }
 
-  // Default to V1 because it's not possible to detect its version
-  return PROGRAM_VERSION_V1;
+  // Default to V2 which is the most common version being used
+  return PROGRAM_VERSION_V2;
 }
