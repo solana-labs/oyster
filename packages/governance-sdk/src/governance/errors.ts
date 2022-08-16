@@ -98,6 +98,16 @@ export const GovernanceError = [
   'RealmConfig change not allowed', // RealmConfigChangeNotAllowed
   'At least one VoteThreshold is required', // AtLeastOneVoteThresholdRequired
   'Reserved buffer must be empty', // ReservedBufferMustBeEmpty
+
+  'Cannot Relinquish in Finalizing state', // CannotRelinquishInFinalizingState
+
+  'Invalid RealmConfig account address', // InvalidRealmConfigAddress
+  'Cannot deposit dormant tokens', // CannotDepositDormantTokens
+  'Cannot withdraw membership tokens', // CannotWithdrawMembershipTokens
+  'Cannot revoke GoverningTokens', // CannotRevokeGoverningTokens
+  'Invalid Revoke amount', // InvalidRevokeAmount
+  'Invalid GoverningToken source', // InvalidGoverningTokenSource
+  'Cannot change community TokenType to Memebership', // CannotChangeCommunityTokenTypeToMemebership
 ] as const;
 
 export const TokenError = [
