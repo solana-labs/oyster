@@ -1,8 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
 import { useMemo } from 'react';
 import { getGovernanceUrl } from '../tools/routeTools';
-import { useRpcContext } from './useRpcContext';
 import { GovernanceMetaMap } from '../constants/governanceMeta';
+import { useProgramInfo } from '../contexts/GovernanceContext';
 
 export type GovernanceMeta = {
   pubkey: PublicKey,
@@ -40,7 +40,7 @@ export const getGovernanceMeta = (
 export const useGovernanceMeta = (
   governance: PublicKey | undefined,
 ) => {
-  const { programIdBase58: programId } = useRpcContext();
+  const { programId } = useProgramInfo();
 
   return useMemo<GovernanceMeta | null>(() => {
     if (governance) {

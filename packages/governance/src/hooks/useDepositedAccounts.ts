@@ -10,6 +10,7 @@ export type DepositedAccountInfo = {
   account: AccountInfo<Buffer>;
   balance: BN;
   address: PublicKey;
+  label: string;
 };
 
 /**
@@ -79,6 +80,7 @@ export const useDepositedAccounts = (
             account: p.account,
             balance: new BN(tokenBalance.amount),
             address: address,
+            label: p.pubkey.toString()
           } as DepositedAccountInfo;
         }),
       );
