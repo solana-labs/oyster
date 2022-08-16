@@ -38,6 +38,7 @@ export enum GovernanceInstruction {
   CreateTokenOwnerRecord = 23,
   UpdateProgramMetadata = 24,
   CreateNativeTreasury = 25,
+  RevokeGoverningTokens = 26,
 }
 
 export class CreateRealmArgs {
@@ -371,5 +372,15 @@ export class SetGovernanceDelegateArgs {
 
   constructor(args: { newGovernanceDelegate: PublicKey | undefined }) {
     this.newGovernanceDelegate = args.newGovernanceDelegate;
+  }
+}
+
+export class RevokeGoverningTokensArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.RevokeGoverningTokens;
+  amount: BN;
+
+  constructor(args: { amount: BN }) {
+    this.amount = args.amount;
   }
 }

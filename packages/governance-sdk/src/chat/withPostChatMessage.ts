@@ -4,7 +4,7 @@ import { serialize } from 'borsh';
 import { PostChatMessageArgs } from './instructions';
 import { GOVERNANCE_CHAT_PROGRAM_ID, ChatMessageBody } from './accounts';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withRealmConfigAccounts } from '../governance/withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from '../governance/withRealmConfigPluginAccounts';
 
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],
@@ -86,7 +86,7 @@ export async function withPostChatMessage(
     });
   }
 
-  await withRealmConfigAccounts(
+  await withRealmConfigPluginAccounts(
     keys,
     governanceProgramId,
     realm,

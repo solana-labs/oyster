@@ -9,7 +9,7 @@ import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withCreateGovernance = async (
@@ -85,7 +85,12 @@ export const withCreateGovernance = async (
     isSigner: true,
   });
 
-  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
+  await withRealmConfigPluginAccounts(
+    keys,
+    programId,
+    realm,
+    voterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({

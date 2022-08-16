@@ -27,6 +27,7 @@ export * from './withFlagTransactionError';
 export * from './withInsertTransaction';
 export * from './withRelinquishVote';
 export * from './withRemoveTransaction';
+export * from './withRevokeGoverningTokens';
 export * from './withSetRealmAuthority';
 export * from './withSetGovernanceDelegate';
 export * from './withSignOffProposal';

@@ -4,10 +4,12 @@ import { serialize } from 'borsh';
 import { WithdrawGoverningTokensArgs } from './instructions';
 import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
+import { withV3RealmConfigAccount } from '.';
 
 export const withWithdrawGoverningTokens = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   realm: PublicKey,
   governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
@@ -64,6 +66,8 @@ export const withWithdrawGoverningTokens = async (
       isSigner: false,
     },
   ];
+
+  await withV3RealmConfigAccount(keys, programId, programVersion, realm);
 
   instructions.push(
     new TransactionInstruction({

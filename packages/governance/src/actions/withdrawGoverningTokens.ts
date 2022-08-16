@@ -5,7 +5,7 @@ import { RpcContext } from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const withdrawGoverningTokens = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   governingTokenDestination: PublicKey,
   governingTokenMint: PublicKey,
@@ -15,6 +15,7 @@ export const withdrawGoverningTokens = async (
   await withWithdrawGoverningTokens(
     instructions,
     programId,
+    programVersion,
     realm,
     governingTokenDestination,
     governingTokenMint,

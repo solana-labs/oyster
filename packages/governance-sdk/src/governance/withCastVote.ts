@@ -10,7 +10,7 @@ import { CastVoteArgs, Vote } from './instructions';
 import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
@@ -114,7 +114,7 @@ export const withCastVote = async (
     );
   }
 
-  await withRealmConfigAccounts(
+  await withRealmConfigPluginAccounts(
     keys,
     programId,
     realm,

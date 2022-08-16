@@ -1,8 +1,9 @@
 import { AccountMeta, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { GovernananceTokenKind } from '.';
-import { PROGRAM_VERSION_V2 } from '../registry/constants';
+import { PROGRAM_VERSION_V2, PROGRAM_VERSION_V3 } from '../registry/constants';
 import {
+  getRealmConfigAddress,
   GoverningTokenConfigAccountArgs,
   GoverningTokenConfigArgs,
   GoverningTokenType,
@@ -117,5 +118,22 @@ export function withTokenConfigAccounts(
       isWritable: false,
       isSigner: false,
     });
+  }
+}
+
+export async function withV3RealmConfigAccount(
+  keys: Array<AccountMeta>,
+  programId: PublicKey,
+  programVersion: number,
+  realm: PublicKey,
+) {
+  if (programVersion >= PROGRAM_VERSION_V3) {
+    const realmConfigMeta = {
+      pubkey: await getRealmConfigAddress(programId, realm),
+      isSigner: false,
+      isWritable: true,
+    };
+
+    keys.push(realmConfigMeta);
   }
 }

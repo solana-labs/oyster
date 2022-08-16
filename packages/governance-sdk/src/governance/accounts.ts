@@ -1210,3 +1210,20 @@ export async function getNativeTreasuryAddress(
 
   return signatoryRecordAddress;
 }
+
+export async function getGoverningTokenHoldingAddress(
+  programId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey,
+) {
+  const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      realm.toBuffer(),
+      governingTokenMint.toBuffer(),
+    ],
+    programId,
+  );
+
+  return governingTokenHoldingAddress;
+}

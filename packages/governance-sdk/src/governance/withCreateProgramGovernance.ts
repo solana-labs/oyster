@@ -9,7 +9,7 @@ import { GovernanceConfig } from './accounts';
 import { CreateProgramGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { BPF_UPGRADE_LOADER_ID } from '../tools/sdk/bpfUpgradeableLoader';
-import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withCreateProgramGovernance = async (
@@ -108,7 +108,12 @@ export const withCreateProgramGovernance = async (
     isSigner: true,
   });
 
-  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
+  await withRealmConfigPluginAccounts(
+    keys,
+    programId,
+    realm,
+    voterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({
