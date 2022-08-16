@@ -22,7 +22,7 @@ export const withCastVote = async (
   proposalOwnerRecord: PublicKey,
   tokenOwnerRecord: PublicKey,
   governanceAuthority: PublicKey,
-  governingTokenMint: PublicKey,
+  voteGoverningTokenMint: PublicKey,
   vote: Vote,
   payer: PublicKey,
   voterWeightRecord?: PublicKey,
@@ -83,7 +83,7 @@ export const withCastVote = async (
       isSigner: false,
     },
     {
-      pubkey: governingTokenMint,
+      pubkey: voteGoverningTokenMint,
       isWritable: false,
       isSigner: false,
     },

@@ -195,21 +195,26 @@ export class VoteChoice {
 export enum VoteKind {
   Approve,
   Deny,
+  Abstain,
+  Veto,
 }
 
 export class Vote {
   voteType: VoteKind;
   approveChoices: VoteChoice[] | undefined;
   deny: boolean | undefined;
+  veto: boolean | undefined;
 
   constructor(args: {
     voteType: VoteKind;
     approveChoices: VoteChoice[] | undefined;
     deny: boolean | undefined;
+    veto: boolean | undefined;
   }) {
     this.voteType = args.voteType;
     this.approveChoices = args.approveChoices;
     this.deny = args.deny;
+    this.veto = args.veto;
   }
 
   toYesNoVote() {
@@ -230,6 +235,7 @@ export class Vote {
           voteType: VoteKind.Approve,
           approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
           deny: undefined,
+          veto: undefined,
         });
       }
       case YesNoVote.No: {
@@ -237,6 +243,7 @@ export class Vote {
           voteType: VoteKind.Deny,
           approveChoices: undefined,
           deny: true,
+          veto: undefined,
         });
       }
     }

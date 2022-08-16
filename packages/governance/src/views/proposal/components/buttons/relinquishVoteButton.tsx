@@ -54,6 +54,7 @@ export function RelinquishVoteButton({
           try {
             await relinquishVote(
               rpcContext,
+              tokenOwnerRecord.account.realm,
               proposal,
               tokenOwnerRecord.pubkey,
               voteRecord!.pubkey,
@@ -82,6 +83,7 @@ export function RelinquishVoteButton({
             try {
               await relinquishVote(
                 rpcContext,
+                tokenOwnerRecord.account.realm,
                 proposal,
                 tokenOwnerRecord.pubkey,
                 voteRecord!.pubkey,

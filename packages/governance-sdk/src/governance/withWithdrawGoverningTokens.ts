@@ -59,7 +59,6 @@ export const withWithdrawGoverningTokens = async (
       isWritable: true,
       isSigner: false,
     },
-
     {
       pubkey: TOKEN_PROGRAM_ID,
       isWritable: false,

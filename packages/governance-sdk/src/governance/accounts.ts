@@ -437,6 +437,7 @@ export class GovernanceConfig {
 
   // VERSION >= 3
   councilVoteThreshold: VoteThreshold;
+  councilVetoVoteThreshold: VoteThreshold;
   reserved = [0, 0];
 
   constructor(args: {
@@ -450,6 +451,7 @@ export class GovernanceConfig {
     // VERSION >= 3
     // For versions < 3 must be set to YesVotePercentage(0)
     councilVoteThreshold: VoteThreshold;
+    councilVetoVoteThreshold: VoteThreshold;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
@@ -462,6 +464,7 @@ export class GovernanceConfig {
 
     // VERSION >= 3
     this.councilVoteThreshold = args.councilVoteThreshold;
+    this.councilVetoVoteThreshold = args.councilVetoVoteThreshold;
   }
 }
 
@@ -602,6 +605,8 @@ export enum ProposalState {
   Defeated,
 
   ExecutingWithErrors,
+
+  Vetoed,
 }
 
 export enum OptionVoteResult {
@@ -663,7 +668,7 @@ export class Proposal {
   voteType: VoteType;
   options: ProposalOption[];
   denyVoteWeight: BN | undefined;
-  vetoVoteWeight: BN | undefined;
+  reserved1: number;
   abstainVoteWeight: BN | undefined;
   startVotingAt: BN | null;
   maxVotingTime: number | null;
@@ -692,6 +697,9 @@ export class Proposal {
 
   descriptionLink: string;
 
+  // V3
+  vetoVoteWeight: BN;
+
   constructor(args: {
     accountType: GovernanceAccountType;
     governance: PublicKey;
@@ -714,7 +722,7 @@ export class Proposal {
     voteType: VoteType;
     options: ProposalOption[];
     denyVoteWeight: BN | undefined;
-    vetoVoteWeight: BN | undefined;
+    reserved1: number;
     abstainVoteWeight: BN | undefined;
     startVotingAt: BN | null;
     maxVotingTime: number | null;
@@ -731,6 +739,9 @@ export class Proposal {
     executionFlags: InstructionExecutionFlags;
     maxVoteWeight: BN | null;
     voteThreshold: VoteThreshold | null;
+
+    // V3
+    vetoVoteWeight: BN;
   }) {
     this.accountType = args.accountType;
     this.governance = args.governance;
@@ -754,7 +765,7 @@ export class Proposal {
     this.voteType = args.voteType;
     this.options = args.options;
     this.denyVoteWeight = args.denyVoteWeight;
-    this.vetoVoteWeight = args.vetoVoteWeight;
+    this.reserved1 = args.reserved1;
     this.abstainVoteWeight = args.abstainVoteWeight;
 
     this.startVotingAt = args.startVotingAt;
@@ -771,6 +782,9 @@ export class Proposal {
     this.executionFlags = args.executionFlags;
     this.maxVoteWeight = args.maxVoteWeight;
     this.voteThreshold = args.voteThreshold;
+
+    // V3
+    this.vetoVoteWeight = args.vetoVoteWeight;
   }
 
   /// Returns true if Proposal is in state when no voting can happen any longer
@@ -782,6 +796,7 @@ export class Proposal {
       case ProposalState.Cancelled:
       case ProposalState.Defeated:
       case ProposalState.ExecutingWithErrors:
+      case ProposalState.Vetoed:
         return true;
       case ProposalState.Draft:
       case ProposalState.SigningOff:
@@ -800,6 +815,7 @@ export class Proposal {
       case ProposalState.Cancelled:
       case ProposalState.Defeated:
       case ProposalState.ExecutingWithErrors:
+      case ProposalState.Vetoed:
         return true;
       case ProposalState.Succeeded:
         return this.instructionsCount === 0;
@@ -815,6 +831,7 @@ export class Proposal {
     switch (this.state) {
       case ProposalState.Succeeded:
       case ProposalState.Defeated:
+      case ProposalState.Vetoed:
         return this.votingCompletedAt ? this.votingCompletedAt.toNumber() : 0;
       case ProposalState.Completed:
       case ProposalState.Cancelled:

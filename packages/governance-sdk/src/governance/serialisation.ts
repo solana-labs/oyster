@@ -122,7 +122,21 @@ import { deserializeBorsh } from '../tools/borsh';
   reader.offset += 1;
 
   if (value === VoteKind.Deny) {
-    return new Vote({ voteType: value, approveChoices: undefined, deny: true });
+    return new Vote({
+      voteType: value,
+      approveChoices: undefined,
+      deny: true,
+      veto: false,
+    });
+  }
+
+  if (value === VoteKind.Veto) {
+    return new Vote({
+      voteType: value,
+      approveChoices: undefined,
+      deny: false,
+      veto: true,
+    });
   }
 
   let approveChoices: VoteChoice[] = [];
@@ -142,6 +156,7 @@ import { deserializeBorsh } from '../tools/borsh';
     voteType: value,
     approveChoices: approveChoices,
     deny: undefined,
+    veto: undefined,
   });
 };
 
@@ -664,7 +679,7 @@ function createGovernanceSchema(programVersion: number) {
           ['maxVotingTime', 'u32'],
           ['voteTipping', 'u8'],
           ['councilVoteThreshold', 'VoteThreshold'],
-          ['reserved', [2]],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
           ['minCouncilTokensToCreateProposal', 'u64'],
         ],
       },
@@ -726,7 +741,7 @@ function createGovernanceSchema(programVersion: number) {
                 ['voteType', 'voteType'],
                 ['options', [ProposalOption]],
                 ['denyVoteWeight', { kind: 'option', type: 'u64' }],
-                ['vetoVoteWeight', { kind: 'option', type: 'u64' }],
+                ['reserved1', 'u8'],
                 ['abstainVoteWeight', { kind: 'option', type: 'u64' }],
                 ['startVotingAt', { kind: 'option', type: 'u64' }],
               ]),
@@ -753,6 +768,7 @@ function createGovernanceSchema(programVersion: number) {
 
           ['name', 'string'],
           ['descriptionLink', 'string'],
+          ['vetoVoteWeight', 'u64'],
         ],
       },
     ],
