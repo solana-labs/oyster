@@ -7,6 +7,7 @@ export * from './enums';
 export * from './errors';
 export * from './instructions';
 export * from './serialisation';
+export * from './tools';
 export * from './withAddSignatory';
 export * from './version';
 export * from './withCancelProposal';

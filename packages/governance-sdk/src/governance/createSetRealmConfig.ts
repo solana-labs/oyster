@@ -1,5 +1,8 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { MintMaxVoteWeightSource } from './accounts';
+import {
+  GoverningTokenConfigAccountArgs,
+  MintMaxVoteWeightSource,
+} from './accounts';
 import BN from 'bn.js';
 import { withSetRealmConfig } from './withSetRealmConfig';
 
@@ -11,9 +14,9 @@ export async function createSetRealmConfig(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
-  communityVoterWeightAddin: PublicKey | undefined,
-  maxCommunityVoterWeightAddin: PublicKey | undefined,
-  payer: PublicKey,
+  communityTokenConfig: GoverningTokenConfigAccountArgs | undefined,
+  councilTokenConfig: GoverningTokenConfigAccountArgs | undefined,
+  payer: PublicKey | undefined,
 ) {
   const instructions: TransactionInstruction[] = [];
   await withSetRealmConfig(
@@ -25,8 +28,8 @@ export async function createSetRealmConfig(
     councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
-    communityVoterWeightAddin,
-    maxCommunityVoterWeightAddin,
+    communityTokenConfig,
+    councilTokenConfig,
     payer,
   );
 

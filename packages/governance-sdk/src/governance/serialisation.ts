@@ -56,10 +56,15 @@ import {
   getAccountProgramVersion,
   ProgramMetadata,
   VoteThresholdType,
+  GoverningTokenConfigArgs,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
+import {
+  PROGRAM_VERSION_V1,
+  PROGRAM_VERSION_V2,
+  PROGRAM_VERSION_V3,
+} from '../registry/constants';
 import { deserializeBorsh } from '../tools/borsh';
 
 // ------------ u16 ------------
@@ -226,9 +231,7 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
 
 export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);
 export const GOVERNANCE_SCHEMA_V2 = createGovernanceSchema(2);
-
-// V3 schema is backward compatible with V2
-export const GOVERNANCE_SCHEMA_V3 = GOVERNANCE_SCHEMA_V2;
+export const GOVERNANCE_SCHEMA_V3 = createGovernanceSchema(3);
 
 // The most recent version of spl-gov
 export const GOVERNANCE_SCHEMA = GOVERNANCE_SCHEMA_V3;
@@ -237,6 +240,10 @@ export function getGovernanceSchema(programVersion: number) {
   switch (programVersion) {
     case 1:
       return GOVERNANCE_SCHEMA_V1;
+    case 2:
+      return GOVERNANCE_SCHEMA_V2;
+    case 3:
+      return GOVERNANCE_SCHEMA_V3;
     default:
       return GOVERNANCE_SCHEMA;
   }
@@ -253,10 +260,15 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          ...(programVersion > PROGRAM_VERSION_V1
+          ...(programVersion == PROGRAM_VERSION_V2
             ? [
                 ['useCommunityVoterWeightAddin', 'u8'],
                 ['useMaxCommunityVoterWeightAddin', 'u8'],
+              ]
+            : programVersion >= PROGRAM_VERSION_V3
+            ? [
+                ['communityTokenConfigArgs', GoverningTokenConfigArgs],
+                ['councilTokenConfigArgs', GoverningTokenConfigArgs],
               ]
             : []),
         ],
@@ -270,6 +282,17 @@ function createGovernanceSchema(programVersion: number) {
           ['instruction', 'u8'],
           ['name', 'string'],
           ['configArgs', RealmConfigArgs],
+        ],
+      },
+    ],
+    [
+      GoverningTokenConfigArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['useVoterWeightAddin', 'u8'],
+          ['useMaxVoterWeightAddin', 'u8'],
+          ['tokenType', 'u8'],
         ],
       },
     ],

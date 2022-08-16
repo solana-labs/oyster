@@ -220,9 +220,13 @@ export class RealmConfigArgs {
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
 
-  // Versions >= 2
+  // Version == 2
   useCommunityVoterWeightAddin: boolean;
   useMaxCommunityVoterWeightAddin: boolean;
+
+  // Versions >= 3
+  communityTokenConfigArgs: GoverningTokenConfigArgs;
+  councilTokenConfigArgs: GoverningTokenConfigArgs;
 
   constructor(args: {
     useCouncilMint: boolean;
@@ -230,18 +234,63 @@ export class RealmConfigArgs {
     minCommunityTokensToCreateGovernance: BN;
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
 
+    // Version == 2
     useCommunityVoterWeightAddin: boolean;
     useMaxCommunityVoterWeightAddin: boolean;
+
+    // Versions >= 3
+    communityTokenConfigArgs: GoverningTokenConfigArgs;
+    councilTokenConfigArgs: GoverningTokenConfigArgs;
   }) {
     this.useCouncilMint = !!args.useCouncilMint;
-
     this.communityMintMaxVoteWeightSource =
       args.communityMintMaxVoteWeightSource;
-
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance;
+
     this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin;
     this.useMaxCommunityVoterWeightAddin = args.useMaxCommunityVoterWeightAddin;
+
+    this.communityTokenConfigArgs = args.communityTokenConfigArgs;
+    this.councilTokenConfigArgs = args.councilTokenConfigArgs;
+  }
+}
+
+export enum GoverningTokenType {
+  Liquid = 0,
+  Membership = 1,
+  Dormant = 2,
+}
+
+export class GoverningTokenConfigArgs {
+  useVoterWeightAddin: boolean;
+  useMaxVoterWeightAddin: boolean;
+  tokenType: GoverningTokenType;
+
+  constructor(args: {
+    useVoterWeightAddin: boolean;
+    useMaxVoterWeightAddin: boolean;
+    tokenType: GoverningTokenType;
+  }) {
+    this.useVoterWeightAddin = args.useVoterWeightAddin;
+    this.useMaxVoterWeightAddin = args.useMaxVoterWeightAddin;
+    this.tokenType = args.tokenType;
+  }
+}
+
+export class GoverningTokenConfigAccountArgs {
+  voterWeightAddin: PublicKey | undefined;
+  maxVoterWeightAddin: PublicKey | undefined;
+  tokenType: GoverningTokenType;
+
+  constructor(args: {
+    voterWeightAddin: PublicKey | undefined;
+    maxVoterWeightAddin: PublicKey | undefined;
+    tokenType: GoverningTokenType;
+  }) {
+    this.voterWeightAddin = args.voterWeightAddin;
+    this.maxVoterWeightAddin = args.maxVoterWeightAddin;
+    this.tokenType = args.tokenType;
   }
 }
 

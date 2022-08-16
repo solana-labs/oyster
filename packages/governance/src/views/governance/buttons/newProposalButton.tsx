@@ -8,7 +8,7 @@ import { useMint } from '@oyster/common';
 import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
-import { GoverningTokenType } from '@solana/spl-governance';
+import { GovernananceTokenKind } from '@solana/spl-governance';
 import { Governance, Realm } from '@solana/spl-governance';
 
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
@@ -63,8 +63,8 @@ export function NewProposalButton({
     canCreateProposalUsingCouncilTokens;
 
   const defaultGoverningTokenType = !communityMint.supply.isZero()
-    ? GoverningTokenType.Community
-    : GoverningTokenType.Council;
+    ? GovernananceTokenKind.Community
+    : GovernananceTokenKind.Council;
 
   const showTokenChoice =
     !communityMint.supply.isZero() && realm?.account.config.councilMint;
@@ -72,13 +72,13 @@ export function NewProposalButton({
   const onSubmit = async (values: {
     name: string;
     descriptionLink: string;
-    governingTokenType: GoverningTokenType;
+    governingTokenType: GovernananceTokenKind;
   }) => {
     const governingTokenType =
       values.governingTokenType ?? defaultGoverningTokenType;
 
     const governingTokenMint =
-      governingTokenType === GoverningTokenType.Community
+      governingTokenType === GovernananceTokenKind.Community
         ? realm!.account.communityMint
         : realm!.account.config.councilMint!;
     const proposalIndex = governance.account.proposalCount;
@@ -135,12 +135,12 @@ export function NewProposalButton({
           rules={[{ required: true }]}
         >
           <Radio.Group>
-            <Radio.Button value={GoverningTokenType.Community}>
+            <Radio.Button value={GovernananceTokenKind.Community}>
               {LABELS.COMMUNITY_TOKEN_HOLDERS}
             </Radio.Button>
 
             {realm.account.config.councilMint && (
-              <Radio.Button value={GoverningTokenType.Council}>
+              <Radio.Button value={GovernananceTokenKind.Council}>
                 {LABELS.COUNCIL}
               </Radio.Button>
             )}
