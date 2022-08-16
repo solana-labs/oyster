@@ -298,8 +298,11 @@ export class RealmConfig {
   councilMint: PublicKey | undefined;
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource;
   minCommunityTokensToCreateGovernance: BN;
+
+  // VERSION == 2
   useCommunityVoterWeightAddin: boolean;
   useMaxCommunityVoterWeightAddin: boolean;
+
   reserved: Uint8Array;
 
   constructor(args: {
@@ -370,21 +373,44 @@ export async function getTokenHoldingAddress(
   return tokenHoldingAddress;
 }
 
+export class GoverningTokenConfig {
+  voterWeightAddin: PublicKey | undefined;
+  maxVoterWeightAddin: PublicKey | undefined;
+  tokenType: GoverningTokenType;
+  reserved: Uint8Array;
+
+  constructor(args: {
+    voterWeightAddin: PublicKey | undefined;
+    maxVoterWeightAddin: PublicKey | undefined;
+    tokenType: GoverningTokenType;
+    reserved: Uint8Array;
+  }) {
+    this.voterWeightAddin = args.voterWeightAddin;
+    this.maxVoterWeightAddin = args.maxVoterWeightAddin;
+    this.tokenType = args.tokenType;
+    this.reserved = args.reserved;
+  }
+}
+
 export class RealmConfigAccount {
   accountType = GovernanceAccountType.RealmConfig;
 
   realm: PublicKey;
-  communityVoterWeightAddin: PublicKey | undefined;
-  maxCommunityVoterWeightAddin: PublicKey | undefined;
+  communityTokenConfig: GoverningTokenConfig;
+  councilTokenConfig: GoverningTokenConfig;
+
+  reserved: Uint8Array;
 
   constructor(args: {
     realm: PublicKey;
-    communityVoterWeightAddin: PublicKey | undefined;
-    maxCommunityVoterWeightAddin: PublicKey | undefined;
+    communityTokenConfig: GoverningTokenConfig;
+    councilTokenConfig: GoverningTokenConfig;
+    reserved: Uint8Array;
   }) {
     this.realm = args.realm;
-    this.communityVoterWeightAddin = args.communityVoterWeightAddin;
-    this.maxCommunityVoterWeightAddin = args.maxCommunityVoterWeightAddin;
+    this.communityTokenConfig = args.communityTokenConfig;
+    this.councilTokenConfig = args.councilTokenConfig;
+    this.reserved = args.reserved;
   }
 }
 

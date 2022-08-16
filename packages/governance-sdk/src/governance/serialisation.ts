@@ -58,6 +58,7 @@ import {
   ProgramMetadata,
   VoteThresholdType,
   GoverningTokenConfigArgs,
+  GoverningTokenConfig,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
@@ -619,8 +620,21 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['accountType', 'u8'],
           ['realm', 'pubkey'],
-          ['communityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
-          ['maxCommunityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['communityTokenConfig', GoverningTokenConfig],
+          ['councilTokenConfig', GoverningTokenConfig],
+          ['reserved', [110]],
+        ],
+      },
+    ],
+    [
+      GoverningTokenConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['voterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['maxVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['tokenType', 'u8'],
+          ['reserved', [8]],
         ],
       },
     ],
