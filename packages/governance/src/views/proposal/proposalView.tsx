@@ -1,12 +1,11 @@
 import { Button, Card, Col, Row, Spin, Statistic, Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { LABELS } from '../../constants';
-import { TokenIcon, constants, ExplorerLink } from '@oyster/common';
+import { constants, contexts, ExplorerLink, TokenIcon } from '@oyster/common';
 
 import ReactMarkdown from 'react-markdown';
 
 import { ProposalStateBadge } from './components/header/proposalStateBadge';
-import { contexts } from '@oyster/common';
 import { MintInfo } from '@solana/spl-token';
 import { InstructionCard } from './components/instruction/instructionCard';
 import { NewInstructionCard } from './components/instruction/newInstructionCard';
@@ -17,6 +16,7 @@ import { VoterBubbleGraph } from './components/vote/voterBubbleGraph';
 import { VoterTable } from './components/vote/voterTable';
 import {
   Governance,
+  ProgramAccount,
   Proposal,
   ProposalState,
   Realm,
@@ -27,13 +27,13 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 
 import {
   useGovernance,
-  useProposal,
-  useTokenOwnerRecords,
-  useWalletTokenOwnerRecord,
-  useVoterWeightRecord,
   useInstructionsByProposal,
-  useVoteRecordsByProposal,
+  useProposal,
   useSignatoriesByProposal,
+  useTokenOwnerRecords,
+  useVoteRecordsByProposal,
+  useVoterWeightRecord,
+  useWalletTokenOwnerRecord,
 } from '../../hooks/apiHooks';
 import BN from 'bn.js';
 
@@ -43,10 +43,8 @@ import { VoteCountdown } from './components/header/voteCountdown';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { getMintMaxVoteWeight } from '../../tools/units';
 import { ProposalActionBar } from './components/buttons/proposalActionBar';
-import { ProgramAccount } from '@solana/spl-governance';
 import { DryRunProposalButton } from './components/instruction/buttons/dryRunProposalButton';
 import { useGovernanceMeta } from '../../hooks/useGovernanceMeta';
-import { useHistory } from 'react-router-dom';
 
 const { TabPane } = Tabs;
 
@@ -280,7 +278,6 @@ function InnerProposalView({
     proposal: proposal,
   });
 
-  const history = useHistory();
   const governanceInfo = useGovernanceMeta(proposal.account.governance);
 
   return (
@@ -302,7 +299,6 @@ function InnerProposalView({
                 {governanceInfo && <Button
                   type="dashed"
                   href={governanceInfo.href}
-                  onClick={() => history.push(governanceInfo.href)}
                 >
                   Governance: {governanceInfo.name}
                 </Button>}
