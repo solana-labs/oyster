@@ -48,7 +48,7 @@ export function DepositGoverningTokensButton ({
     return null;
   }
 
-  const isVisible = !availableBalance.isZero();
+  const isVisible = governingTokenAccount && voterWeightRecord && !availableBalance.isZero();
 
   return isVisible ? <>
     <Button

@@ -43,7 +43,8 @@ export function WithdrawGoverningTokensButton ({
     return null;
   }
 
-  const isVisible = activeDeposits.length;
+  const isVisible = governingTokenAccount && activeDeposits.length;
+
   return isVisible ? <>
     <Button
       type="ghost"
@@ -85,6 +86,10 @@ export function WithdrawGoverningTokensButton ({
               depositToWithdraw!.address,
             );
           } catch (e) {
+            Modal.error({
+              title: 'Cannot withdraw tokens',
+              content: `Probably you have tokens staked in proposals. Please release your tokens before withdrawing the tokens from the realm.`,
+            });
             // rejection = noop
           }
         }
@@ -93,7 +98,7 @@ export function WithdrawGoverningTokensButton ({
       <Row>
         <Col span={24}>
           <p>{LABELS.WITHDRAW_TOKENS_QUESTION}</p>
-          {activeDeposits?.length > 1 && <>
+          {activeDeposits?.length >= 1 && <>
             <p>Select a deposit to withdraw from:</p>
             <Radio.Group
               onChange={(e) => {

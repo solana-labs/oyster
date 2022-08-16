@@ -18,5 +18,6 @@ export declare class WalletNotConnectedError extends WalletError {
 export function isWalletNotConnectedError(
   error: any,
 ): error is WalletNotConnectedError {
-  return error instanceof WalletNotConnectedError;
+  // fixes Unhandled Rejection (ReferenceError): WalletNotConnectedError is not defined
+  return error instanceof Error;
 }

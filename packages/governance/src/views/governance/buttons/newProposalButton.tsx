@@ -98,12 +98,14 @@ export function NewProposalButton({
     // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
     // because user might have different delegates for council and community
     const tokenOwnerRecord = communityTokenOwnerRecord;
+    console.log('tokenOwnerRecord', tokenOwnerRecord?.pubkey || 'null')
 
     return await createProposal(
       rpcContext,
       governance.account.realm,
       governance.pubkey,
-      tokenOwnerRecord!.pubkey,
+      // todo: investigate case when tokenOwnerRecord is null
+      tokenOwnerRecord?.pubkey ?? governance.pubkey,
       values.name,
       values.descriptionLink ?? '',
       governingTokenMint,
