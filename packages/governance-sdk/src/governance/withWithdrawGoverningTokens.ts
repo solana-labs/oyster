@@ -4,7 +4,7 @@ import { serialize } from 'borsh';
 import { WithdrawGoverningTokensArgs } from './instructions';
 import { GOVERNANCE_PROGRAM_SEED } from './accounts';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { withV3RealmConfigAccount } from '.';
+import { withV3RealmConfigAccount } from './tools';
 
 export const withWithdrawGoverningTokens = async (
   instructions: TransactionInstruction[],

@@ -2,7 +2,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { RelinquishVoteArgs } from './instructions';
-import { PROGRAM_VERSION_V3 } from '..';
+import { PROGRAM_VERSION_V3 } from '../registry/constants';
 
 export const withRelinquishVote = async (
   instructions: TransactionInstruction[],

@@ -1,6 +1,5 @@
 import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
-
   Connection,
   Keypair,
   PublicKey,
@@ -52,7 +51,6 @@ import { withCreateAssociatedTokenAccount } from '../tools/withCreateAssociatedT
 import { withCreateMint } from '../tools/withCreateMint';
 import { withMintTo } from '../tools/withMintTo';
 
-
 const connection = new Connection(rpcEndpoint, 'recent');
 
 test('setupRealm', async () => {
@@ -61,7 +59,6 @@ test('setupRealm', async () => {
   const walletPk = wallet.publicKey;
 
   await requestAirdrop(connection, walletPk);
-
   await new Promise(f => setTimeout(f, 1000));
 
   // options
@@ -73,6 +70,8 @@ test('setupRealm', async () => {
     connection,
     programId,
   );
+
+  console.log('SETUP', { programVersion, walletPk: walletPk.toBase58() });
 
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
@@ -150,20 +149,33 @@ test('setupRealm', async () => {
   signers = [];
 
   // Crate governance over the the governance token mint
+
+  let communityVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    value: 60,
+  });
+
+  let councilVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    // For VERSION < 3 we have to pass 0
+    value: programVersion >= 3 ? 10 : 0,
+  });
+
+  let councilVetoVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    // For VERSION < 3 we have to pass 0
+    value: programVersion >= 3 ? 10 : 0,
+  });
+
   const config = new GovernanceConfig({
-    communityVoteThreshold: new VoteThreshold({
-      type: VoteThresholdType.YesVotePercentage,
-      value: 60,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
-    councilVoteThreshold: new VoteThreshold({
-      type: VoteThresholdType.YesVotePercentage,
-      value: 60,
-    }),
     minCouncilTokensToCreateProposal: new BN(1),
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
   });
 
   const governancePk = await withCreateMintGovernance(
@@ -355,6 +367,8 @@ test('setupRealm', async () => {
     withRelinquishVote(
       instructions,
       programId,
+      programVersion,
+      realmPk,
       governancePk,
       proposalPk,
       tokenOwnerRecordPk,
@@ -398,6 +412,7 @@ test('setupRealm', async () => {
   withWithdrawGoverningTokens(
     instructions,
     programId,
+    programVersion,
     realmPk,
     ataPk,
     mintPk,
@@ -416,56 +431,54 @@ test('setupRealm', async () => {
 
 test('getAllGovernances', async () => {
   // Arrange
-  const realmPk = new PublicKey("9BrZiMXAVocFj7wgUaAbt1sMcKUEzHKbMmhgrojUvM9G")
+  const realmPk = new PublicKey('9BrZiMXAVocFj7wgUaAbt1sMcKUEzHKbMmhgrojUvM9G');
 
   // Act
   const governances = await getAllGovernances(connection, programId, realmPk);
 
   // Arrange
   expect(governances.length).toBeGreaterThan(0);
-
-
 });
 
 test('getAllProposals', async () => {
   // Arrange
-  const realmPk = new PublicKey("EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu")
+  const realmPk = new PublicKey('EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu');
 
   // Act
   const proposals = await getAllProposals(connection, programId, realmPk);
 
   // Arrange
   expect(proposals.length).toBeGreaterThan(0);
-
-
 });
 
 test('getAllTokenOwnerRecords', async () => {
   // Arrange
-  const realmPk = new PublicKey("EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu")
+  const realmPk = new PublicKey('EDJ6Uc1U51x1SemSygLEjkvtzNMUWMm1wMf4tANQz9Qu');
 
   // Act
-  const tokenOwnerRecords = await getAllTokenOwnerRecords(connection, programId, realmPk);
+  const tokenOwnerRecords = await getAllTokenOwnerRecords(
+    connection,
+    programId,
+    realmPk,
+  );
 
   // Arrange
   expect(tokenOwnerRecords.length).toBeGreaterThan(0);
-
-
 });
 
 test('tryGetRealmConfig', async () => {
   // Arrange
-  const realmPk = new PublicKey("A98TAf9KwCMMd9GmXogc9D3Lj9diYGkAZctUZZPXEf41")
-  const programId = new PublicKey("AuetJrDq4USDLibT83abUB9pniWFQuPsZa3YNYtrqUWP")
+  const realmPk = new PublicKey('A98TAf9KwCMMd9GmXogc9D3Lj9diYGkAZctUZZPXEf41');
+  const programId = new PublicKey(
+    'AuetJrDq4USDLibT83abUB9pniWFQuPsZa3YNYtrqUWP',
+  );
 
   // Act
-  const realmConfig = await tryGetRealmConfig(connection,programId,realmPk);
+  const realmConfig = await tryGetRealmConfig(connection, programId, realmPk);
 
   // Assert
   expect(realmConfig.account.realm).toEqual(realmPk);
-
 });
-
 
 test('setGovernanceDelegate', async () => {
   // Arrange
@@ -486,7 +499,7 @@ test('setGovernanceDelegate', async () => {
   let signers: Keypair[] = [];
 
   // Create and mint governance token
-  let mintPk = await withCreateMint(
+  let communityMintPk = await withCreateMint(
     connection,
     instructions,
     signers,
@@ -498,11 +511,11 @@ test('setGovernanceDelegate', async () => {
 
   let ataPk = await withCreateAssociatedTokenAccount(
     instructions,
-    mintPk,
+    communityMintPk,
     walletPk,
     walletPk,
   );
-  await withMintTo(instructions, mintPk, ataPk, walletPk, 1);
+  await withMintTo(instructions, communityMintPk, ataPk, walletPk, 1);
 
   // Create Realm
   const name = `Realm-${new Keypair().publicKey.toBase58().slice(0, 6)}`;
@@ -517,7 +530,7 @@ test('setGovernanceDelegate', async () => {
     programVersion,
     name,
     realmAuthorityPk,
-    mintPk,
+    communityMintPk,
     walletPk,
     councilMintPk,
     communityMintMaxVoteWeightSource,
@@ -531,7 +544,7 @@ test('setGovernanceDelegate', async () => {
     programVersion,
     realmPk,
     ataPk,
-    mintPk,
+    communityMintPk,
     walletPk,
     walletPk,
     walletPk,
@@ -542,18 +555,26 @@ test('setGovernanceDelegate', async () => {
   instructions = [];
   signers = [];
 
-
   const delegatePk = Keypair.generate().publicKey;
 
   // Act
-  await withSetGovernanceDelegate(instructions,programId,programVersion,realmPk,mintPk,walletPk,walletPk,delegatePk);
+  await withSetGovernanceDelegate(
+    instructions,
+    programId,
+    programVersion,
+    realmPk,
+    communityMintPk,
+    walletPk,
+    walletPk,
+    delegatePk,
+  );
   await sendTransaction(connection, instructions, signers, wallet);
 
   // Assert
-  let tokenOwnerRecord = await getTokenOwnerRecord(connection,tokenOwnerRecordPk)
+  let tokenOwnerRecord = await getTokenOwnerRecord(
+    connection,
+    tokenOwnerRecordPk,
+  );
 
   expect(tokenOwnerRecord.account.governanceDelegate).toEqual(delegatePk);
-
 });
-
-

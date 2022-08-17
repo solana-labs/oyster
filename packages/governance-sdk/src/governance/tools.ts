@@ -1,6 +1,5 @@
 import { AccountMeta, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
-import { GovernananceTokenKind } from '.';
 import { PROGRAM_VERSION_V2, PROGRAM_VERSION_V3 } from '../registry/constants';
 import {
   getRealmConfigAddress,
@@ -10,6 +9,7 @@ import {
   MintMaxVoteWeightSource,
   RealmConfigArgs,
 } from './accounts';
+import { GovernananceTokenKind } from './enums';
 
 function assertValidTokenConfigArgs(
   programVersion: number,

@@ -105,19 +105,33 @@ test('createRealmWithGovernanceAndProposal', async () => {
   );
 
   // Crate governance over the the governance token mint
+
+  let communityVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    value: 60,
+  });
+
+  let councilVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    // For VERSION < 3 we have to pass 0
+    value: programVersion >= 3 ? 10 : 0,
+  });
+
+  let councilVetoVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    // For VERSION < 3 we have to pass 0
+    value: programVersion >= 3 ? 10 : 0,
+  });
+
   const config = new GovernanceConfig({
-    communityVoteThreshold: new VoteThreshold({
-      type: VoteThresholdType.YesVotePercentage,
-      value: 60,
-    }),
+    communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
-    councilVoteThreshold: new VoteThreshold({
-      type: VoteThresholdType.Disabled,
-    }),
     minCouncilTokensToCreateProposal: new BN(1),
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
   });
 
   const governancePk = await withCreateMintGovernance(
@@ -217,13 +231,13 @@ test('createRealmWithGovernanceAndProposal', async () => {
   expect(results.length).toBe(1);
   expect(results[0].account.governingTokenOwner).toEqual(walletPk);
 
-  // check governance 
-  const governance = await getGovernance(connection,governancePk);
-  expect(governance.account.config.communityVoteThreshold).toEqual(config.communityVoteThreshold);
+  // check governance
+  const governance = await getGovernance(connection, governancePk);
+  expect(governance.account.config.communityVoteThreshold).toEqual(
+    config.communityVoteThreshold,
+  );
   // expect(governance.account.config.councilVoteThreshold).toEqual(config.councilVoteThreshold);
 
-  // check proposal 
-  const proposal = await getProposal(connection,proposalPk);
+  // check proposal
+  const proposal = await getProposal(connection, proposalPk);
 });
-
-

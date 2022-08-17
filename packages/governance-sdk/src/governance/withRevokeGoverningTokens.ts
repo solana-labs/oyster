@@ -6,11 +6,14 @@ import {
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { RevokeGoverningTokensArgs } from './instructions';
-import { getRealmConfigAddress, getTokenOwnerRecordAddress } from './accounts';
+import {
+  getGoverningTokenHoldingAddress,
+  getRealmConfigAddress,
+  getTokenOwnerRecordAddress,
+} from './accounts';
 import BN from 'bn.js';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { getGoverningTokenHoldingAddress } from '.';
 
 export const withRevokeGoverningTokens = async (
   instructions: TransactionInstruction[],
