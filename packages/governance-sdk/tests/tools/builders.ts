@@ -181,7 +181,10 @@ export class RealmBuilder {
     return this;
   }
 
-  async setRealmConfig(communityTokenConfig?: GoverningTokenConfigAccountArgs) {
+  async setRealmConfig(
+    communityTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+    councilTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+  ) {
     const communityMintMaxVoteWeightSource =
       MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
 
@@ -203,7 +206,7 @@ export class RealmBuilder {
       communityMintMaxVoteWeightSource,
       new BN(1),
       communityTokenConfig,
-      undefined,
+      councilTokenConfig,
       this.bench.walletPk,
     );
 

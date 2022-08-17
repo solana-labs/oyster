@@ -1,6 +1,9 @@
+import { Keypair } from '@solana/web3.js';
 import BN from 'bn.js';
 import {
   GovernanceConfig,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   VoteThreshold,
   VoteThresholdType,
   VoteTipping,
@@ -53,5 +56,54 @@ test('createGovernanceWithCouncilThresholds', async () => {
 
   expect(governance.account.config.councilVetoVoteThreshold).toEqual(
     config.councilVetoVoteThreshold,
+  );
+});
+
+test('setRealmConfigWithTokenConfigs', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.sendTx());
+
+  const communityTokenConfig = new GoverningTokenConfigAccountArgs({
+    voterWeightAddin: Keypair.generate().publicKey,
+    maxVoterWeightAddin: Keypair.generate().publicKey,
+    tokenType: GoverningTokenType.Dormant,
+  });
+  const councilTokenConfig = new GoverningTokenConfigAccountArgs({
+    voterWeightAddin: Keypair.generate().publicKey,
+    maxVoterWeightAddin: Keypair.generate().publicKey,
+    tokenType: GoverningTokenType.Membership,
+  });
+
+  // Act
+  await realm.setRealmConfig(communityTokenConfig, councilTokenConfig);
+
+  // Assert
+  const realmConfig = await realm.getRealmConfig();
+
+  expect(realmConfig.account.realm).toEqual(realm.realmPk);
+
+  // communityTokenConfig
+  expect(realmConfig.account.communityTokenConfig.tokenType).toEqual(
+    communityTokenConfig.tokenType,
+  );
+  expect(realmConfig.account.communityTokenConfig.voterWeightAddin).toEqual(
+    communityTokenConfig.voterWeightAddin,
+  );
+  expect(realmConfig.account.communityTokenConfig.maxVoterWeightAddin).toEqual(
+    communityTokenConfig.maxVoterWeightAddin,
+  );
+
+  // councilTokenConfig
+  expect(realmConfig.account.councilTokenConfig.tokenType).toEqual(
+    GoverningTokenType.Membership,
+  );
+  expect(realmConfig.account.councilTokenConfig.voterWeightAddin).toEqual(
+    councilTokenConfig.voterWeightAddin,
+  );
+  expect(realmConfig.account.councilTokenConfig.maxVoterWeightAddin).toEqual(
+    councilTokenConfig.maxVoterWeightAddin,
   );
 });
