@@ -14,7 +14,9 @@ import { getTimestampFromDays } from '../tools/units';
 
 test('createRealmWithTokenConfigs', async () => {
   // Arrange
-  const bench = await BenchBuilder.withConnection().then(b => b.withWallet());
+  const bench = await BenchBuilder.withConnection(PROGRAM_VERSION_V3).then(b =>
+    b.withWallet(),
+  );
 
   const communityTokenConfig = new GoverningTokenConfigAccountArgs({
     voterWeightAddin: Keypair.generate().publicKey,
@@ -109,7 +111,7 @@ test('createGovernanceWithCouncilThresholds', async () => {
 
 test('setRealmConfigWithTokenConfigs', async () => {
   // Arrange
-  const realm = await BenchBuilder.withConnection()
+  const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)
     .then(b => b.withWallet())
     .then(b => b.withRealm())
     .then(b => b.sendTx());
@@ -154,4 +156,32 @@ test('setRealmConfigWithTokenConfigs', async () => {
   expect(realmConfig.account.councilTokenConfig.maxVoterWeightAddin).toEqual(
     councilTokenConfig.maxVoterWeightAddin,
   );
+});
+
+test('revokeGoverningToken', async () => {
+  // Arrange
+
+  const communityTokenConfig = new GoverningTokenConfigAccountArgs({
+    voterWeightAddin: undefined,
+    maxVoterWeightAddin: undefined,
+    tokenType: GoverningTokenType.Membership,
+  });
+
+  const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)
+    .then(b => b.withWallet())
+    .then(b => b.withRealm(communityTokenConfig))
+    .then(b => b.withCommunityMember())
+    .then(b => b.sendTx());
+
+  // Act
+  await realm.revokeGoverningTokens();
+
+  // Assert
+  const tokenOwnerRecord = await realm.getTokenOwnerRecord(
+    realm.communityOwnerRecordPk,
+  );
+
+  expect(
+    tokenOwnerRecord.account.governingTokenDepositAmount.toNumber(),
+  ).toEqual(0);
 });

@@ -13,16 +13,17 @@ import BN from 'bn.js';
 import {
   getGovernance,
   getProposal,
+  getRealm,
   getRealmConfig,
   getTokenOwnerRecord,
   getVoteRecord,
-  tryGetRealmConfig,
   Vote,
   withCastVote,
   withCreateGovernance,
   withCreateProposal,
   withDepositGoverningTokens,
   withRelinquishVote,
+  withRevokeGoverningTokens,
   withSignOffProposal,
   withWithdrawGoverningTokens,
   YesNoVote,
@@ -192,6 +193,10 @@ export class RealmBuilder {
     return this;
   }
 
+  async getRealm() {
+    return getRealm(this.bench.connection, this.realmPk);
+  }
+
   async setRealmConfig(
     communityTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
     councilTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
@@ -279,6 +284,22 @@ export class RealmBuilder {
       ataPk,
       this.communityMintPk,
       this.bench.walletPk,
+    );
+
+    await this.sendTx();
+  }
+
+  async revokeGoverningTokens() {
+    await withRevokeGoverningTokens(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+
+      this.realmPk,
+      this.bench.walletPk,
+      this.communityMintPk,
+      this.bench.walletPk,
+      new BN(1),
     );
 
     await this.sendTx();
