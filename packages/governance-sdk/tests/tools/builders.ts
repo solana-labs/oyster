@@ -14,6 +14,7 @@ import {
   withCreateGovernance,
   withCreateProposal,
   withDepositGoverningTokens,
+  withRelinquishVote,
   withSignOffProposal,
   YesNoVote,
 } from '../../src';
@@ -337,6 +338,24 @@ export class RealmBuilder {
 
   async getVoteRecord(proposalPk: PublicKey) {
     return getVoteRecord(this.bench.connection, proposalPk);
+  }
+
+  async relinquishVote() {
+    withRelinquishVote(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      this.governancePk,
+      this.proposalPk,
+      this.communityOwnerRecordPk,
+      this.communityMintPk,
+      this.voteRecordPk,
+      this.bench.walletPk,
+      this.bench.walletPk,
+    );
+
+    await this.sendTx();
   }
 
   async sendTx() {

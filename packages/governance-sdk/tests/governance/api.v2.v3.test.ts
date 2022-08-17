@@ -37,3 +37,24 @@ test('castVote', async () => {
 
   expect(voteRecord.account.proposal).toEqual(realm.proposalPk);
 });
+
+test('relinquishVote', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.withProposal())
+    .then(b => b.withProposalSignOff())
+    .then(b => b.withCastVote())
+    .then(b => b.sendTx());
+
+  // Act
+  await realm.relinquishVote();
+
+  // Assert
+  const voteRecord = await realm.getVoteRecord(realm.voteRecordPk);
+
+  expect(voteRecord.account.isRelinquished).toBe(true);
+});
