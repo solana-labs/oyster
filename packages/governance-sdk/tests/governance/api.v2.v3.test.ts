@@ -46,6 +46,27 @@ test('setRealmConfig', async () => {
   );
 });
 
+test('withdrawGoverningTokens', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.sendTx());
+
+  // Act
+  await realm.withdrawGoverningTokens();
+
+  // Assert
+  const tokenOwnerRecord = await realm.getTokenOwnerRecord(
+    realm.communityOwnerRecordPk,
+  );
+
+  expect(
+    tokenOwnerRecord.account.governingTokenDepositAmount.toNumber(),
+  ).toEqual(0);
+});
+
 test('createProposal', async () => {
   // Arrange
   const realm = await BenchBuilder.withConnection()

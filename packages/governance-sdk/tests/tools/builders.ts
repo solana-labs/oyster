@@ -1,4 +1,9 @@
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
+import {
   Connection,
   Keypair,
   PublicKey,
@@ -9,6 +14,7 @@ import {
   getGovernance,
   getProposal,
   getRealmConfig,
+  getTokenOwnerRecord,
   getVoteRecord,
   tryGetRealmConfig,
   Vote,
@@ -18,6 +24,7 @@ import {
   withDepositGoverningTokens,
   withRelinquishVote,
   withSignOffProposal,
+  withWithdrawGoverningTokens,
   YesNoVote,
 } from '../../src';
 import {
@@ -240,6 +247,31 @@ export class RealmBuilder {
     );
 
     return this;
+  }
+
+  async withdrawGoverningTokens() {
+    const ataPk = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      this.communityMintPk,
+      this.bench.walletPk,
+    );
+
+    await withWithdrawGoverningTokens(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      ataPk,
+      this.communityMintPk,
+      this.bench.walletPk,
+    );
+
+    await this.sendTx();
+  }
+
+  async getTokenOwnerRecord(tokenOwnerRecordPk: PublicKey) {
+    return getTokenOwnerRecord(this.bench.connection, tokenOwnerRecordPk);
   }
 
   async withGovernance(config?: GovernanceConfig | undefined) {
