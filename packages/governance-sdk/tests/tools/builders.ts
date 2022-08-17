@@ -8,7 +8,9 @@ import BN from 'bn.js';
 import {
   getGovernance,
   getProposal,
+  getRealmConfig,
   getVoteRecord,
+  tryGetRealmConfig,
   Vote,
   withCastVote,
   withCreateGovernance,
@@ -19,7 +21,10 @@ import {
   YesNoVote,
 } from '../../src';
 import {
+  getRealmConfigAddress,
   GovernanceConfig,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   MintMaxVoteWeightSource,
   VoteThreshold,
   VoteThresholdType,
@@ -28,6 +33,7 @@ import {
 } from '../../src/governance/accounts';
 import { getGovernanceProgramVersion } from '../../src/governance/version';
 import { withCreateRealm } from '../../src/governance/withCreateRealm';
+import { withSetRealmConfig } from '../../src/governance/withSetRealmConfig';
 import { requestAirdrop, sendTransaction } from './sdk';
 import { rpcEndpoint, rpcProgramId } from './setup';
 import { getTimestampFromDays } from './units';
@@ -112,6 +118,7 @@ export class RealmBuilder {
   realmPk: PublicKey;
   realmAuthorityPk: PublicKey;
   communityMintPk: PublicKey;
+  councilMintPk: PublicKey;
 
   communityOwnerRecordPk: PublicKey;
   governancePk: PublicKey;
@@ -126,8 +133,19 @@ export class RealmBuilder {
     const name = `Realm-${new Keypair().publicKey.toBase58().slice(0, 6)}`;
     this.realmAuthorityPk = this.bench.walletPk;
 
-    // Create and mint governance token
+    // Create community token
     this.communityMintPk = await withCreateMint(
+      this.bench.connection,
+      this.bench.instructions,
+      this.bench.signers,
+      this.bench.walletPk,
+      this.bench.walletPk,
+      0,
+      this.bench.walletPk,
+    );
+
+    // Create council
+    this.councilMintPk = await withCreateMint(
       this.bench.connection,
       this.bench.instructions,
       this.bench.signers,
@@ -139,7 +157,6 @@ export class RealmBuilder {
 
     const communityMintMaxVoteWeightSource =
       MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
-    const councilMintPk = undefined;
 
     this.realmPk = await withCreateRealm(
       this.bench.instructions,
@@ -149,12 +166,49 @@ export class RealmBuilder {
       this.realmAuthorityPk,
       this.communityMintPk,
       this.bench.walletPk,
-      councilMintPk,
+      this.councilMintPk,
       communityMintMaxVoteWeightSource,
       new BN(1),
     );
 
     return this;
+  }
+
+  async setRealmConfig(communityTokenConfig?: GoverningTokenConfigAccountArgs) {
+    const communityMintMaxVoteWeightSource =
+      MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
+
+    communityTokenConfig =
+      communityTokenConfig ??
+      new GoverningTokenConfigAccountArgs({
+        voterWeightAddin: Keypair.generate().publicKey,
+        maxVoterWeightAddin: Keypair.generate().publicKey,
+        tokenType: GoverningTokenType.Liquid,
+      });
+
+    await withSetRealmConfig(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      this.bench.walletPk,
+      this.councilMintPk,
+      communityMintMaxVoteWeightSource,
+      new BN(1),
+      communityTokenConfig,
+      undefined,
+      this.bench.walletPk,
+    );
+
+    await this.sendTx();
+  }
+
+  async getRealmConfig() {
+    const realmConfigPk = await getRealmConfigAddress(
+      this.bench.programId,
+      this.realmPk,
+    );
+    return getRealmConfig(this.bench.connection, realmConfigPk);
   }
 
   async withCommunityMember() {
