@@ -62,6 +62,7 @@ test('createProposal', async () => {
   const proposal = await realm.getProposal(proposalPk);
 
   expect(proposal.account.name).toEqual('proposal 1');
+  expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
 });
 
 test('castVote', async () => {
@@ -93,6 +94,7 @@ test('relinquishVote', async () => {
     .then(b => b.withGovernance())
     .then(b => b.withProposal())
     .then(b => b.withProposalSignOff())
+    .then(b => b.sendTx())
     .then(b => b.withCastVote())
     .then(b => b.sendTx());
 
