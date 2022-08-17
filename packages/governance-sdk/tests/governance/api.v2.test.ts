@@ -1,17 +1,18 @@
 import BN from 'bn.js';
+import { PROGRAM_VERSION_V2 } from '../../src';
 import {
   GovernanceConfig,
   VoteThreshold,
   VoteThresholdType,
   VoteTipping,
 } from '../../src/governance/accounts';
-import { PROGRAM_VERSION_V3 } from '../../src/registry/constants';
 import { BenchBuilder } from '../tools/builders';
+import { programId } from '../tools/setup';
 import { getTimestampFromDays } from '../tools/units';
 
-test('createGovernanceWithCouncilThresholds', async () => {
+test('createGovernanceWithConfig', async () => {
   // Arrange
-  const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)
+  const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V2)
     .then(b => b.withWallet())
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
@@ -29,11 +30,11 @@ test('createGovernanceWithCouncilThresholds', async () => {
     minCouncilTokensToCreateProposal: new BN(1),
     councilVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
-      value: 60,
+      value: 0,
     }),
     councilVetoVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
-      value: 80,
+      value: 0,
     }),
   });
 

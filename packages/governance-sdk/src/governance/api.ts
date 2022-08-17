@@ -48,6 +48,13 @@ export async function tryGetRealmConfig(
 
 // VoteRecords
 
+export async function getVoteRecord(
+  connection: Connection,
+  voteRecordPk: PublicKey,
+) {
+  return getGovernanceAccount(connection, voteRecordPk, VoteRecord);
+}
+
 export async function getVoteRecordsByVoter(
   connection: Connection,
   programId: PublicKey,

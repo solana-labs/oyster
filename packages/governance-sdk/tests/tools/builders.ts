@@ -7,9 +7,15 @@ import {
 import BN from 'bn.js';
 import {
   getGovernance,
-  getGovernanceAccount,
+  getProposal,
+  getVoteRecord,
+  Vote,
+  withCastVote,
   withCreateGovernance,
+  withCreateProposal,
   withDepositGoverningTokens,
+  withSignOffProposal,
+  YesNoVote,
 } from '../../src';
 import {
   GovernanceConfig,
@@ -17,6 +23,7 @@ import {
   VoteThreshold,
   VoteThresholdType,
   VoteTipping,
+  VoteType,
 } from '../../src/governance/accounts';
 import { getGovernanceProgramVersion } from '../../src/governance/version';
 import { withCreateRealm } from '../../src/governance/withCreateRealm';
@@ -49,6 +56,7 @@ export class BenchBuilder {
   }
 
   static async withConnection(
+    requiredProgramVersion?: number | undefined,
     connection?: Connection | undefined,
     programId?: PublicKey | undefined,
   ) {
@@ -59,6 +67,12 @@ export class BenchBuilder {
       connection,
       programId,
     );
+
+    if (requiredProgramVersion && programVersion != requiredProgramVersion) {
+      throw new Error(
+        `Program VERSION: ${programVersion} detected while VERSION: ${requiredProgramVersion} is required for the test`,
+      );
+    }
 
     return new BenchBuilder(connection, programId, programVersion);
   }
@@ -99,6 +113,9 @@ export class RealmBuilder {
   communityMintPk: PublicKey;
 
   communityOwnerRecordPk: PublicKey;
+  governancePk: PublicKey;
+  proposalPk: PublicKey;
+  voteRecordPk: PublicKey;
 
   constructor(bench: BenchBuilder) {
     this.bench = bench;
@@ -208,7 +225,7 @@ export class RealmBuilder {
 
     const governedAccountPk = Keypair.generate().publicKey;
 
-    const governancePk = await withCreateGovernance(
+    this.governancePk = await withCreateGovernance(
       this.bench.instructions,
       this.bench.programId,
       this.bench.programVersion,
@@ -221,11 +238,105 @@ export class RealmBuilder {
       undefined,
     );
 
-    return governancePk;
+    return this.governancePk;
   }
 
   async getGovernance(governancePk: PublicKey) {
     return getGovernance(this.bench.connection, governancePk);
+  }
+
+  async withProposal(name?: string) {
+    await this._createProposal(name);
+    return this;
+  }
+
+  async createProposal(name?: string) {
+    const proposalPk = await this._createProposal(name);
+    await this.sendTx();
+    return proposalPk;
+  }
+
+  async _createProposal(name?: string) {
+    // Create single choice Approve/Deny proposal with instruction to mint more governance tokens
+    const voteType = VoteType.SINGLE_CHOICE;
+    const options = ['Approve'];
+    const useDenyOption = true;
+
+    this.proposalPk = await withCreateProposal(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      this.governancePk,
+      this.communityOwnerRecordPk,
+      name ?? 'proposal 1',
+      '',
+      this.communityMintPk,
+      this.bench.walletPk,
+      0,
+      voteType,
+      options,
+      useDenyOption,
+      this.bench.walletPk,
+    );
+
+    return this.proposalPk;
+  }
+
+  async getProposal(proposalPk: PublicKey) {
+    return getProposal(this.bench.connection, proposalPk);
+  }
+
+  async withProposalSignOff() {
+    withSignOffProposal(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      this.governancePk,
+      this.proposalPk,
+      this.bench.walletPk,
+      undefined,
+      this.communityOwnerRecordPk,
+    );
+
+    return this;
+  }
+
+  async withCastVote() {
+    await this._castVote();
+    return this;
+  }
+
+  async castVote() {
+    const voteRecordPk = await this._castVote();
+    await this.sendTx();
+    return voteRecordPk;
+  }
+
+  async _castVote() {
+    const vote = Vote.fromYesNoVote(YesNoVote.Yes);
+
+    this.voteRecordPk = await withCastVote(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.realmPk,
+      this.governancePk,
+      this.proposalPk,
+      this.communityOwnerRecordPk,
+      this.communityOwnerRecordPk,
+      this.bench.walletPk,
+      this.communityMintPk,
+      vote,
+      this.bench.walletPk,
+    );
+
+    return this.voteRecordPk;
+  }
+
+  async getVoteRecord(proposalPk: PublicKey) {
+    return getVoteRecord(this.bench.connection, proposalPk);
   }
 
   async sendTx() {
