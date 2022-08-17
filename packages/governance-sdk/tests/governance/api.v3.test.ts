@@ -12,6 +12,54 @@ import { PROGRAM_VERSION_V3 } from '../../src/registry/constants';
 import { BenchBuilder } from '../tools/builders';
 import { getTimestampFromDays } from '../tools/units';
 
+test('createRealmWithTokenConfigs', async () => {
+  // Arrange
+  const bench = await BenchBuilder.withConnection().then(b => b.withWallet());
+
+  const communityTokenConfig = new GoverningTokenConfigAccountArgs({
+    voterWeightAddin: Keypair.generate().publicKey,
+    maxVoterWeightAddin: Keypair.generate().publicKey,
+    tokenType: GoverningTokenType.Dormant,
+  });
+  const councilTokenConfig = new GoverningTokenConfigAccountArgs({
+    voterWeightAddin: Keypair.generate().publicKey,
+    maxVoterWeightAddin: Keypair.generate().publicKey,
+    tokenType: GoverningTokenType.Membership,
+  });
+
+  // Act
+  const realm = await bench
+    .withRealm(communityTokenConfig, councilTokenConfig)
+    .then(b => b.sendTx());
+
+  // Assert
+  const realmConfig = await realm.getRealmConfig();
+
+  expect(realmConfig.account.realm).toEqual(realm.realmPk);
+
+  // communityTokenConfig
+  expect(realmConfig.account.communityTokenConfig.tokenType).toEqual(
+    communityTokenConfig.tokenType,
+  );
+  expect(realmConfig.account.communityTokenConfig.voterWeightAddin).toEqual(
+    communityTokenConfig.voterWeightAddin,
+  );
+  expect(realmConfig.account.communityTokenConfig.maxVoterWeightAddin).toEqual(
+    communityTokenConfig.maxVoterWeightAddin,
+  );
+
+  // councilTokenConfig
+  expect(realmConfig.account.councilTokenConfig.tokenType).toEqual(
+    GoverningTokenType.Membership,
+  );
+  expect(realmConfig.account.councilTokenConfig.voterWeightAddin).toEqual(
+    councilTokenConfig.voterWeightAddin,
+  );
+  expect(realmConfig.account.councilTokenConfig.maxVoterWeightAddin).toEqual(
+    councilTokenConfig.maxVoterWeightAddin,
+  );
+});
+
 test('createGovernanceWithCouncilThresholds', async () => {
   // Arrange
   const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)

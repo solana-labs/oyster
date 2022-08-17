@@ -114,8 +114,14 @@ export class BenchBuilder {
     return this;
   }
 
-  async withRealm() {
-    return new RealmBuilder(this).withRealm();
+  async withRealm(
+    communityTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+    councilTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+  ) {
+    return new RealmBuilder(this).withRealm(
+      communityTokenConfig,
+      councilTokenConfig,
+    );
   }
 }
 
@@ -136,7 +142,10 @@ export class RealmBuilder {
     this.bench = bench;
   }
 
-  async withRealm() {
+  async withRealm(
+    communityTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+    councilTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+  ) {
     const name = `Realm-${new Keypair().publicKey.toBase58().slice(0, 6)}`;
     this.realmAuthorityPk = this.bench.walletPk;
 
@@ -176,6 +185,8 @@ export class RealmBuilder {
       this.councilMintPk,
       communityMintMaxVoteWeightSource,
       new BN(1),
+      communityTokenConfig,
+      councilTokenConfig,
     );
 
     return this;
