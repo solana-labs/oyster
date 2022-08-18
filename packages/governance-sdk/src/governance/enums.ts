@@ -1,4 +1,4 @@
-export enum GoverningTokenType {
+export enum GovernananceTokenKind {
   Community,
   Council,
 }

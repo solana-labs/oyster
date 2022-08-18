@@ -2,10 +2,13 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { RelinquishVoteArgs } from './instructions';
+import { PROGRAM_VERSION_V3 } from '../registry/constants';
 
 export const withRelinquishVote = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
+  realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -16,6 +19,17 @@ export const withRelinquishVote = async (
 ) => {
   const args = new RelinquishVoteArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+
+  let v3Keys =
+    programVersion >= PROGRAM_VERSION_V3
+      ? [
+          {
+            pubkey: realm,
+            isWritable: false,
+            isSigner: false,
+          },
+        ]
+      : [];
 
   let keys = [
     {
@@ -63,7 +77,7 @@ export const withRelinquishVote = async (
 
   instructions.push(
     new TransactionInstruction({
-      keys: [...keys, ...existingVoteKeys],
+      keys: [...v3Keys, ...keys, ...existingVoteKeys],
       programId,
       data,
     }),

@@ -38,6 +38,7 @@ export enum GovernanceInstruction {
   CreateTokenOwnerRecord = 23,
   UpdateProgramMetadata = 24,
   CreateNativeTreasury = 25,
+  RevokeGoverningTokens = 26,
 }
 
 export class CreateRealmArgs {
@@ -194,21 +195,26 @@ export class VoteChoice {
 export enum VoteKind {
   Approve,
   Deny,
+  Abstain,
+  Veto,
 }
 
 export class Vote {
   voteType: VoteKind;
   approveChoices: VoteChoice[] | undefined;
   deny: boolean | undefined;
+  veto: boolean | undefined;
 
   constructor(args: {
     voteType: VoteKind;
     approveChoices: VoteChoice[] | undefined;
     deny: boolean | undefined;
+    veto: boolean | undefined;
   }) {
     this.voteType = args.voteType;
     this.approveChoices = args.approveChoices;
     this.deny = args.deny;
+    this.veto = args.veto;
   }
 
   toYesNoVote() {
@@ -229,6 +235,7 @@ export class Vote {
           voteType: VoteKind.Approve,
           approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
           deny: undefined,
+          veto: undefined,
         });
       }
       case YesNoVote.No: {
@@ -236,6 +243,7 @@ export class Vote {
           voteType: VoteKind.Deny,
           approveChoices: undefined,
           deny: true,
+          veto: undefined,
         });
       }
     }
@@ -371,5 +379,15 @@ export class SetGovernanceDelegateArgs {
 
   constructor(args: { newGovernanceDelegate: PublicKey | undefined }) {
     this.newGovernanceDelegate = args.newGovernanceDelegate;
+  }
+}
+
+export class RevokeGoverningTokensArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.RevokeGoverningTokens;
+  amount: BN;
+
+  constructor(args: { amount: BN }) {
+    this.amount = args.amount;
   }
 }

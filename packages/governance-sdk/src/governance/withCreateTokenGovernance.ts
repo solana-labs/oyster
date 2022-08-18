@@ -9,7 +9,7 @@ import { GovernanceConfig } from './accounts';
 import { CreateTokenGovernanceArgs } from './instructions';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withCreateTokenGovernance = async (
@@ -98,7 +98,12 @@ export const withCreateTokenGovernance = async (
     isSigner: true,
   });
 
-  await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
+  await withRealmConfigPluginAccounts(
+    keys,
+    programId,
+    realm,
+    voterWeightRecord,
+  );
 
   instructions.push(
     new TransactionInstruction({

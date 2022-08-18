@@ -7,7 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { FinalizeVoteArgs } from './instructions';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 
 export const withFinalizeVote = async (
   instructions: TransactionInstruction[],
@@ -61,7 +61,7 @@ export const withFinalizeVote = async (
     });
   }
 
-  await withRealmConfigAccounts(
+  await withRealmConfigPluginAccounts(
     keys,
     programId,
     realm,

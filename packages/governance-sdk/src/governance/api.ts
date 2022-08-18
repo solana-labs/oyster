@@ -46,7 +46,21 @@ export async function tryGetRealmConfig(
   return getGovernanceAccount(connection, realmConfigPk, RealmConfigAccount);
 }
 
+export async function getRealmConfig(
+  connection: Connection,
+  realmConfigPk: PublicKey,
+) {
+  return getGovernanceAccount(connection, realmConfigPk, RealmConfigAccount);
+}
+
 // VoteRecords
+
+export async function getVoteRecord(
+  connection: Connection,
+  voteRecordPk: PublicKey,
+) {
+  return getGovernanceAccount(connection, voteRecordPk, VoteRecord);
+}
 
 export async function getVoteRecordsByVoter(
   connection: Connection,

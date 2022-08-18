@@ -12,10 +12,14 @@ import {
   MintMaxVoteWeightSource,
   getTokenHoldingAddress,
   getRealmConfigAddress,
+  GoverningTokenConfigArgs,
+  GoverningTokenType,
+  GoverningTokenConfigAccountArgs,
 } from './accounts';
 import BN from 'bn.js';
-import { PROGRAM_VERSION_V2 } from '../registry/constants';
+import { PROGRAM_VERSION_V2, PROGRAM_VERSION_V3 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools/sdk';
+import { createRealmConfigArgs, withTokenConfigAccounts } from './tools';
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
@@ -28,22 +32,17 @@ export async function withCreateRealm(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityWeightToCreateGovernance: BN,
-  communityVoterWeightAddin?: PublicKey | undefined,
-  maxCommunityVoterWeightAddin?: PublicKey | undefined,
+  communityTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
+  councilTokenConfig?: GoverningTokenConfigAccountArgs | undefined,
 ) {
-  if (communityVoterWeightAddin && programVersion < PROGRAM_VERSION_V2) {
-    throw new Error(
-      `Voter weight addin is not supported in version ${programVersion}`,
-    );
-  }
-
-  const configArgs = new RealmConfigArgs({
-    useCouncilMint: councilMint !== undefined,
-    minCommunityTokensToCreateGovernance: minCommunityWeightToCreateGovernance,
+  const configArgs = createRealmConfigArgs(
+    programVersion,
+    councilMint,
     communityMintMaxVoteWeightSource,
-    useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
-    useMaxCommunityVoterWeightAddin: maxCommunityVoterWeightAddin !== undefined,
-  });
+    minCommunityWeightToCreateGovernance,
+    communityTokenConfig,
+    councilTokenConfig,
+  );
 
   const args = new CreateRealmArgs({
     configArgs,
@@ -129,33 +128,24 @@ export async function withCreateRealm(
     ];
   }
 
-  if (communityVoterWeightAddin) {
-    keys.push({
-      pubkey: communityVoterWeightAddin,
-      isWritable: false,
-      isSigner: false,
-    });
+  const realmConfigMeta = {
+    pubkey: await getRealmConfigAddress(programId, realmAddress),
+    isSigner: false,
+    isWritable: true,
+  };
+
+  if (programVersion >= PROGRAM_VERSION_V3) {
+    keys.push(realmConfigMeta);
   }
 
-  if (maxCommunityVoterWeightAddin) {
-    keys.push({
-      pubkey: maxCommunityVoterWeightAddin,
-      isWritable: false,
-      isSigner: false,
-    });
-  }
+  withTokenConfigAccounts(keys, communityTokenConfig, councilTokenConfig);
 
-  if (communityVoterWeightAddin || maxCommunityVoterWeightAddin) {
-    const realmConfigAddress = await getRealmConfigAddress(
-      programId,
-      realmAddress,
-    );
-
-    keys.push({
-      pubkey: realmConfigAddress,
-      isSigner: false,
-      isWritable: true,
-    });
+  if (
+    programVersion == PROGRAM_VERSION_V2 &&
+    (communityTokenConfig?.voterWeightAddin ||
+      communityTokenConfig?.maxVoterWeightAddin)
+  ) {
+    keys.push(realmConfigMeta);
   }
 
   instructions.push(

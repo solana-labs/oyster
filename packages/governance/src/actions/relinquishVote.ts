@@ -7,7 +7,8 @@ import { RpcContext } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const relinquishVote = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
@@ -22,6 +23,8 @@ export const relinquishVote = async (
   withRelinquishVote(
     instructions,
     programId,
+    programVersion,
+    realm,
     proposal.account.governance,
     proposal.pubkey,
     tokenOwnerRecord,

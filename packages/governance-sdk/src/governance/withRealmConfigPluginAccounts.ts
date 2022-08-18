@@ -1,7 +1,7 @@
 import { AccountMeta, PublicKey } from '@solana/web3.js';
 import { getRealmConfigAddress } from './accounts';
 
-export async function withRealmConfigAccounts(
+export async function withRealmConfigPluginAccounts(
   keys: AccountMeta[],
   programId: PublicKey,
   realm: PublicKey,

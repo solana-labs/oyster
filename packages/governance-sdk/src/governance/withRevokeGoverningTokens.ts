@@ -5,30 +5,27 @@ import {
 } from '@solana/web3.js';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
-import { DepositGoverningTokensArgs } from './instructions';
+import { RevokeGoverningTokensArgs } from './instructions';
 import {
+  getGoverningTokenHoldingAddress,
+  getRealmConfigAddress,
   getTokenOwnerRecordAddress,
-  GOVERNANCE_PROGRAM_SEED,
 } from './accounts';
 import BN from 'bn.js';
-import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { withV3RealmConfigAccount } from './tools';
 
-export const withDepositGoverningTokens = async (
+export const withRevokeGoverningTokens = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
   realm: PublicKey,
-  governingTokenSource: PublicKey,
+  realmAuthority: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
-  governingTokenSourceAuthority: PublicKey,
-  payer: PublicKey,
   amount: BN,
 ) => {
-  const args = new DepositGoverningTokensArgs({ amount });
+  const args = new RevokeGoverningTokensArgs({ amount });
   const data = Buffer.from(
     serialize(getGovernanceSchema(programVersion), args),
   );
@@ -40,14 +37,13 @@ export const withDepositGoverningTokens = async (
     governingTokenOwner,
   );
 
-  const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      realm.toBuffer(),
-      governingTokenMint.toBuffer(),
-    ],
+  const governingTokenHoldingAddress = await getGoverningTokenHoldingAddress(
     programId,
+    realm,
+    governingTokenMint,
   );
+
+  const realmConfigAddress = await getRealmConfigAddress(programId, realm);
 
   const keys = [
     {
@@ -56,24 +52,14 @@ export const withDepositGoverningTokens = async (
       isSigner: false,
     },
     {
+      pubkey: realmAuthority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
       pubkey: governingTokenHoldingAddress,
       isWritable: true,
       isSigner: false,
-    },
-    {
-      pubkey: governingTokenSource,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: governingTokenOwner,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: governingTokenSourceAuthority,
-      isWritable: false,
-      isSigner: true,
     },
     {
       pubkey: tokenOwnerRecordAddress,
@@ -81,14 +67,14 @@ export const withDepositGoverningTokens = async (
       isSigner: false,
     },
     {
-      pubkey: payer,
+      pubkey: governingTokenMint,
       isWritable: true,
-      isSigner: true,
+      isSigner: false,
     },
     {
-      pubkey: SYSTEM_PROGRAM_ID,
-      isWritable: false,
+      pubkey: realmConfigAddress,
       isSigner: false,
+      isWritable: false,
     },
     {
       pubkey: TOKEN_PROGRAM_ID,
@@ -105,8 +91,6 @@ export const withDepositGoverningTokens = async (
     });
   }
 
-  await withV3RealmConfigAccount(keys, programId, programVersion, realm);
-
   instructions.push(
     new TransactionInstruction({
       keys,
@@ -114,6 +98,4 @@ export const withDepositGoverningTokens = async (
       data,
     }),
   );
-
-  return tokenOwnerRecordAddress;
 };

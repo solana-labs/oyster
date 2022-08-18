@@ -20,6 +20,7 @@ import {
   InsertTransactionArgs,
   RelinquishVoteArgs,
   RemoveTransactionArgs,
+  RevokeGoverningTokensArgs,
   SetGovernanceConfigArgs,
   SetGovernanceDelegateArgs,
   SetRealmAuthorityArgs,
@@ -56,10 +57,16 @@ import {
   getAccountProgramVersion,
   ProgramMetadata,
   VoteThresholdType,
+  GoverningTokenConfigArgs,
+  GoverningTokenConfig,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
+import {
+  PROGRAM_VERSION_V1,
+  PROGRAM_VERSION_V2,
+  PROGRAM_VERSION_V3,
+} from '../registry/constants';
 import { deserializeBorsh } from '../tools/borsh';
 
 // ------------ u16 ------------
@@ -115,7 +122,21 @@ import { deserializeBorsh } from '../tools/borsh';
   reader.offset += 1;
 
   if (value === VoteKind.Deny) {
-    return new Vote({ voteType: value, approveChoices: undefined, deny: true });
+    return new Vote({
+      voteType: value,
+      approveChoices: undefined,
+      deny: true,
+      veto: false,
+    });
+  }
+
+  if (value === VoteKind.Veto) {
+    return new Vote({
+      voteType: value,
+      approveChoices: undefined,
+      deny: false,
+      veto: true,
+    });
   }
 
   let approveChoices: VoteChoice[] = [];
@@ -135,6 +156,7 @@ import { deserializeBorsh } from '../tools/borsh';
     voteType: value,
     approveChoices: approveChoices,
     deny: undefined,
+    veto: undefined,
   });
 };
 
@@ -226,9 +248,7 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
 
 export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);
 export const GOVERNANCE_SCHEMA_V2 = createGovernanceSchema(2);
-
-// V3 schema is backward compatible with V2
-export const GOVERNANCE_SCHEMA_V3 = GOVERNANCE_SCHEMA_V2;
+export const GOVERNANCE_SCHEMA_V3 = createGovernanceSchema(3);
 
 // The most recent version of spl-gov
 export const GOVERNANCE_SCHEMA = GOVERNANCE_SCHEMA_V3;
@@ -237,6 +257,10 @@ export function getGovernanceSchema(programVersion: number) {
   switch (programVersion) {
     case 1:
       return GOVERNANCE_SCHEMA_V1;
+    case 2:
+      return GOVERNANCE_SCHEMA_V2;
+    case 3:
+      return GOVERNANCE_SCHEMA_V3;
     default:
       return GOVERNANCE_SCHEMA;
   }
@@ -253,10 +277,15 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateGovernance', 'u64'],
           ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          ...(programVersion > PROGRAM_VERSION_V1
+          ...(programVersion == PROGRAM_VERSION_V2
             ? [
                 ['useCommunityVoterWeightAddin', 'u8'],
                 ['useMaxCommunityVoterWeightAddin', 'u8'],
+              ]
+            : programVersion >= PROGRAM_VERSION_V3
+            ? [
+                ['communityTokenConfigArgs', GoverningTokenConfigArgs],
+                ['councilTokenConfigArgs', GoverningTokenConfigArgs],
               ]
             : []),
         ],
@@ -274,6 +303,17 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
+      GoverningTokenConfigArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['useVoterWeightAddin', 'u8'],
+          ['useMaxVoterWeightAddin', 'u8'],
+          ['tokenType', 'u8'],
+        ],
+      },
+    ],
+    [
       DepositGoverningTokensArgs,
       {
         kind: 'struct',
@@ -282,6 +322,16 @@ function createGovernanceSchema(programVersion: number) {
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
           programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
         ].filter(Boolean),
+      },
+    ],
+    [
+      RevokeGoverningTokensArgs,
+      {
+        kind: 'struct',
+        fields: [
+          ['instruction', 'u8'],
+          ['amount', 'u64'],
+        ],
       },
     ],
     [
@@ -585,8 +635,21 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['accountType', 'u8'],
           ['realm', 'pubkey'],
-          ['communityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
-          ['maxCommunityVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['communityTokenConfig', GoverningTokenConfig],
+          ['councilTokenConfig', GoverningTokenConfig],
+          ['reserved', [110]],
+        ],
+      },
+    ],
+    [
+      GoverningTokenConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['voterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['maxVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['tokenType', 'u8'],
+          ['reserved', [8]],
         ],
       },
     ],
@@ -616,7 +679,7 @@ function createGovernanceSchema(programVersion: number) {
           ['maxVotingTime', 'u32'],
           ['voteTipping', 'u8'],
           ['councilVoteThreshold', 'VoteThreshold'],
-          ['reserved', [2]],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
           ['minCouncilTokensToCreateProposal', 'u64'],
         ],
       },
@@ -678,7 +741,7 @@ function createGovernanceSchema(programVersion: number) {
                 ['voteType', 'voteType'],
                 ['options', [ProposalOption]],
                 ['denyVoteWeight', { kind: 'option', type: 'u64' }],
-                ['vetoVoteWeight', { kind: 'option', type: 'u64' }],
+                ['reserved1', 'u8'],
                 ['abstainVoteWeight', { kind: 'option', type: 'u64' }],
                 ['startVotingAt', { kind: 'option', type: 'u64' }],
               ]),
@@ -705,6 +768,7 @@ function createGovernanceSchema(programVersion: number) {
 
           ['name', 'string'],
           ['descriptionLink', 'string'],
+          ['vetoVoteWeight', 'u64'],
         ],
       },
     ],

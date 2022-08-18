@@ -53,9 +53,17 @@ export function getGovernanceConfig(programVersion: number, values: GovernanceCo
 
  
   const councilVoteThreshold =  programVersion >= PROGRAM_VERSION_V3 
-   // For VERSION >-3 use the same threshold as for community (until supported in the UI)
+   // For VERSION >=3 use the same threshold as for community (until supported in the UI)
   ? communityVoteThreshold 
   // For older versions set to 0
+  : new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    value: 0,
+  });
+
+  // 
+  const councilVetoVoteThreshold  = programVersion >= PROGRAM_VERSION_V3 
+  ? councilVoteThreshold
   : new VoteThreshold({
     type: VoteThresholdType.YesVotePercentage,
     value: 0,
@@ -76,6 +84,7 @@ export function getGovernanceConfig(programVersion: number, values: GovernanceCo
     minCouncilTokensToCreateProposal: new BN(1),
     voteTipping: values.voteTipping,
     councilVoteThreshold:councilVoteThreshold,
+    councilVetoVoteThreshold:councilVetoVoteThreshold,
   });
 }
 
@@ -139,6 +148,10 @@ export function GovernanceConfigFormItem({
       voteTipping: VoteTipping.Strict,
       minCouncilTokensToCreateProposal: ZERO,
       councilVoteThreshold: new VoteThreshold({
+        type: VoteThresholdType.YesVotePercentage,
+        value: 60,
+      }),
+      councilVetoVoteThreshold: new VoteThreshold({
         type: VoteThresholdType.YesVotePercentage,
         value: 60,
       }),

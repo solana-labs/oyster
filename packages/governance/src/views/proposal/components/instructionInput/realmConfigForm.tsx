@@ -1,6 +1,6 @@
 import { Form, FormInstance, Input, InputNumber } from 'antd';
 import { ExplorerLink, useMint, useWallet } from '@oyster/common';
-import { Governance, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance';
+import { Governance, GoverningTokenConfigAccountArgs, GoverningTokenType, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import React from 'react';
 
@@ -78,9 +78,13 @@ export const RealmConfigForm = ({
       values.communityMintDecimals,
     );
 
-    const communityVoterWeightAddin = values.communityVoterWeightAddin
-      ? new PublicKey(values.communityVoterWeightAddin)
-      : undefined;
+    const communityTokenConfig = values.communityVoterWeightAddin
+    ? new GoverningTokenConfigAccountArgs({
+      voterWeightAddin: new PublicKey(values.communityVoterWeightAddin),
+      maxVoterWeightAddin: undefined,
+      tokenType: GoverningTokenType.Liquid
+    })
+    : undefined;
 
     const setRealmConfigIx = await createSetRealmConfig(
       programId,
@@ -93,7 +97,7 @@ export const RealmConfigForm = ({
       parseMintSupplyFraction(values.communityMintMaxVoteWeightFraction),
       // Use minCommunityTokensToCreateGovernance.toString() in case the number is larger than number
       new BN(minCommunityTokensToCreateGovernance.toString()),
-      communityVoterWeightAddin,
+      communityTokenConfig,
       undefined,
       // TODO: Once current wallet placeholder is supported to execute instruction using the wallet which executes the instruction replace it with the placeholder
       wallet.publicKey!,

@@ -1,5 +1,6 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { SetRealmAuthorityAction, withSetRealmAuthority } from '.';
+import { SetRealmAuthorityAction } from './instructions';
+import { withSetRealmAuthority } from './withSetRealmAuthority';
 
 export function createSetRealmAuthority(
   programId: PublicKey,
