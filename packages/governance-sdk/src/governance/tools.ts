@@ -9,12 +9,12 @@ import {
   MintMaxVoteWeightSource,
   RealmConfigArgs,
 } from './accounts';
-import { GovernananceTokenKind } from './enums';
+import { GovernanceTokenKind } from './enums';
 
 function assertValidTokenConfigArgs(
   programVersion: number,
   tokenConfigArgs: GoverningTokenConfigAccountArgs | undefined,
-  tokenKind: GovernananceTokenKind,
+  tokenKind: GovernanceTokenKind,
 ) {
   if (tokenConfigArgs) {
     if (programVersion < PROGRAM_VERSION_V2) {
@@ -22,7 +22,7 @@ function assertValidTokenConfigArgs(
         `Governing token config is not supported in version ${programVersion}`,
       );
     } else if (programVersion == PROGRAM_VERSION_V2) {
-      if (tokenKind == GovernananceTokenKind.Council) {
+      if (tokenKind == GovernanceTokenKind.Council) {
         throw new Error(
           `Council token config is not supported in version ${programVersion}`,
         );
@@ -48,12 +48,12 @@ export function createRealmConfigArgs(
   assertValidTokenConfigArgs(
     programVersion,
     communityTokenConfig,
-    GovernananceTokenKind.Community,
+    GovernanceTokenKind.Community,
   );
   assertValidTokenConfigArgs(
     programVersion,
     councilTokenConfig,
-    GovernananceTokenKind.Council,
+    GovernanceTokenKind.Council,
   );
 
   return new RealmConfigArgs({
