@@ -109,6 +109,6 @@ export async function getGovernanceProgramVersion(
     return PROGRAM_VERSION;
   }
 
-  // Default to V2 which is the most common version being used
-  return PROGRAM_VERSION_V2;
+  // Default to V1 which doesn't support ProgramMetadata
+  return PROGRAM_VERSION_V1;
 }
