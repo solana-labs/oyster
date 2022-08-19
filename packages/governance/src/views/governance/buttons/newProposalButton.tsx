@@ -8,7 +8,7 @@ import { useMint } from '@oyster/common';
 import { createProposal } from '../../../actions/createProposal';
 import { Redirect } from 'react-router';
 
-import { GovernanceTokenKind } from '@solana/spl-governance';
+import { GoverningTokenRole } from '@solana/spl-governance';
 import { Governance, Realm } from '@solana/spl-governance';
 
 import { useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
@@ -63,8 +63,8 @@ export function NewProposalButton({
     canCreateProposalUsingCouncilTokens;
 
   const defaultGoverningTokenType = !communityMint.supply.isZero()
-    ? GovernanceTokenKind.Community
-    : GovernanceTokenKind.Council;
+    ? GoverningTokenRole.Community
+    : GoverningTokenRole.Council;
 
   const showTokenChoice =
     !communityMint.supply.isZero() && realm?.account.config.councilMint;
@@ -72,13 +72,13 @@ export function NewProposalButton({
   const onSubmit = async (values: {
     name: string;
     descriptionLink: string;
-    governingTokenType: GovernanceTokenKind;
+    governingTokenType: GoverningTokenRole;
   }) => {
     const governingTokenType =
       values.governingTokenType ?? defaultGoverningTokenType;
 
     const governingTokenMint =
-      governingTokenType === GovernanceTokenKind.Community
+      governingTokenType === GoverningTokenRole.Community
         ? realm!.account.communityMint
         : realm!.account.config.councilMint!;
     const proposalIndex = governance.account.proposalCount;
@@ -135,12 +135,12 @@ export function NewProposalButton({
           rules={[{ required: true }]}
         >
           <Radio.Group>
-            <Radio.Button value={GovernanceTokenKind.Community}>
+            <Radio.Button value={GoverningTokenRole.Community}>
               {LABELS.COMMUNITY_TOKEN_HOLDERS}
             </Radio.Button>
 
             {realm.account.config.councilMint && (
-              <Radio.Button value={GovernanceTokenKind.Council}>
+              <Radio.Button value={GoverningTokenRole.Council}>
                 {LABELS.COUNCIL}
               </Radio.Button>
             )}
