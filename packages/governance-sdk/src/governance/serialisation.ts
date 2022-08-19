@@ -768,7 +768,12 @@ function createGovernanceSchema(programVersion: number) {
 
           ['name', 'string'],
           ['descriptionLink', 'string'],
-          ['vetoVoteWeight', 'u64'],
+
+          ...(programVersion === PROGRAM_VERSION_V1
+            ? []
+            : [['vetoVoteWeight', 'u64']]),
+
+          ,
         ],
       },
     ],
