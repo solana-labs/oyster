@@ -772,8 +772,6 @@ function createGovernanceSchema(programVersion: number) {
           ...(programVersion === PROGRAM_VERSION_V1
             ? []
             : [['vetoVoteWeight', 'u64']]),
-
-          ,
         ],
       },
     ],
