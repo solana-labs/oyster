@@ -17,16 +17,20 @@ import {
   GovernanceConfig,
   MintMaxVoteWeightSource,
   SetRealmAuthorityAction,
+  Vote,
   VoteThreshold,
   VoteThresholdType,
   VoteTipping,
   VoteType,
+  withCastVote,
   withCreateMintGovernance,
   withCreateProposal,
   withCreateRealm,
   withDepositGoverningTokens,
   withInsertTransaction,
   withSetRealmAuthority,
+  withSignOffProposal,
+  YesNoVote,
 } from '../../src';
 import { requestAirdrop, sendTransaction } from '../tools/sdk';
 import { programId, rpcEndpoint } from '../tools/setup';
@@ -215,8 +219,44 @@ test('createRealmWithGovernanceAndProposal', async () => {
     walletPk,
   );
 
-  // Act
+  withSignOffProposal(
+    instructions,
+    programId,
+    programVersion,
+    realmPk,
+    governancePk,
+    proposalPk,
+    walletPk,
+    undefined,
+    tokenOwnerRecordPk,
+  );
+
   await sendTransaction(connection, instructions, signers, wallet);
+
+  // Cast Vote
+  instructions = [];
+  signers = [];
+
+  const vote = Vote.fromYesNoVote(YesNoVote.Yes);
+
+  const votePk = await withCastVote(
+    instructions,
+    programId,
+    programVersion,
+    realmPk,
+    governancePk,
+    proposalPk,
+    tokenOwnerRecordPk, // Proposal owner TokenOwnerRecord
+    tokenOwnerRecordPk, // Voter TokenOwnerRecord
+    walletPk, // Voter wallet or delegate
+    mintPk,
+    vote,
+    walletPk,
+  );
+
+  await sendTransaction(connection, instructions, signers, wallet);
+
+  // Act
 
   // Assert
   const realm = await getRealm(connection, realmPk);
