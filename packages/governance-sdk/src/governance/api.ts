@@ -42,8 +42,16 @@ export async function tryGetRealmConfig(
   programId: PublicKey,
   realmPk: PublicKey,
 ) {
-  const realmConfigPk = await getRealmConfigAddress(programId, realmPk);
-  return getGovernanceAccount(connection, realmConfigPk, RealmConfigAccount);
+  try {
+    const realmConfigPk = await getRealmConfigAddress(programId, realmPk);
+    return await getGovernanceAccount(
+      connection,
+      realmConfigPk,
+      RealmConfigAccount,
+    );
+  } catch {
+    // RealmConfigAccount didn't exist in V1 and was optional in V2 and hence it doesn't have to exist
+  }
 }
 
 export async function getRealmConfig(
