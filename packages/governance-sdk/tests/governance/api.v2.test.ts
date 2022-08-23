@@ -7,7 +7,6 @@ import {
   VoteTipping,
 } from '../../src/governance/accounts';
 import { BenchBuilder } from '../tools/builders';
-import { programId } from '../tools/setup';
 import { getTimestampFromDays } from '../tools/units';
 
 test('createGovernanceWithConfig', async () => {
@@ -26,13 +25,18 @@ test('createGovernanceWithConfig', async () => {
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteTipping: VoteTipping.Strict,
+    communityVoteTipping: VoteTipping.Strict,
+    councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
     councilVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
       value: 0,
     }),
     councilVetoVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
+      value: 0,
+    }),
+    communityVetoVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
       value: 0,
     }),

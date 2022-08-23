@@ -18,6 +18,7 @@ import {
   getTokenOwnerRecord,
   getVoteRecord,
   Vote,
+  withAddSignatory,
   withCastVote,
   withCreateGovernance,
   withCreateProposal,
@@ -137,6 +138,7 @@ export class RealmBuilder {
   communityOwnerRecordPk: PublicKey;
   governancePk: PublicKey;
   proposalPk: PublicKey;
+  signatoryPk: PublicKey | undefined;
   voteRecordPk: PublicKey;
 
   constructor(bench: BenchBuilder) {
@@ -414,6 +416,21 @@ export class RealmBuilder {
     return getProposal(this.bench.connection, proposalPk);
   }
 
+  async withSignatory() {
+    this.signatoryPk = await withAddSignatory(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.proposalPk,
+      this.communityOwnerRecordPk,
+      this.bench.walletPk,
+      this.bench.walletPk,
+      this.bench.walletPk,
+    );
+
+    return this;
+  }
+
   async withProposalSignOff() {
     withSignOffProposal(
       this.bench.instructions,
@@ -423,7 +440,7 @@ export class RealmBuilder {
       this.governancePk,
       this.proposalPk,
       this.bench.walletPk,
-      undefined,
+      this.signatoryPk,
       this.communityOwnerRecordPk,
     );
 
