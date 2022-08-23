@@ -78,13 +78,18 @@ test('createGovernanceWithCouncilThresholds', async () => {
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteTipping: VoteTipping.Strict,
+    communityVoteTipping: VoteTipping.Strict,
+    councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
     councilVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
       value: 60,
     }),
     councilVetoVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.YesVotePercentage,
+      value: 80,
+    }),
+    communityVetoVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.YesVotePercentage,
       value: 80,
     }),

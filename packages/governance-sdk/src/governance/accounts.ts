@@ -432,12 +432,15 @@ export class GovernanceConfig {
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
   maxVotingTime: number;
-  voteTipping: VoteTipping;
+  communityVoteTipping: VoteTipping;
   minCouncilTokensToCreateProposal: BN;
 
   // VERSION >= 3
   councilVoteThreshold: VoteThreshold;
   councilVetoVoteThreshold: VoteThreshold;
+  communityVetoVoteThreshold: VoteThreshold;
+  councilVoteTipping: VoteTipping;
+
   reserved = [0, 0];
 
   constructor(args: {
@@ -445,26 +448,37 @@ export class GovernanceConfig {
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
     maxVotingTime: number;
-    voteTipping?: VoteTipping;
+    communityVoteTipping?: VoteTipping;
     minCouncilTokensToCreateProposal: BN;
 
     // VERSION >= 3
     // For versions < 3 must be set to YesVotePercentage(0)
     councilVoteThreshold: VoteThreshold;
     councilVetoVoteThreshold: VoteThreshold;
+    communityVetoVoteThreshold: VoteThreshold;
+    councilVoteTipping: VoteTipping;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
     this.maxVotingTime = args.maxVotingTime;
-    this.voteTipping = args.voteTipping ?? VoteTipping.Strict;
+    this.communityVoteTipping = args.communityVoteTipping ?? VoteTipping.Strict;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
 
     // VERSION >= 3
-    this.councilVoteThreshold = args.councilVoteThreshold;
-    this.councilVetoVoteThreshold = args.councilVetoVoteThreshold;
+    this.councilVoteThreshold =
+      args.councilVoteThreshold ?? args.communityVoteThreshold;
+    this.councilVetoVoteThreshold =
+      args.councilVetoVoteThreshold ?? args.communityVoteThreshold;
+
+    this.communityVetoVoteThreshold =
+      args.communityVetoVoteThreshold ??
+      new VoteThreshold({ type: VoteThresholdType.Disabled });
+
+    this.councilVoteTipping =
+      args.councilVoteTipping ?? this.communityVoteTipping;
   }
 }
 

@@ -67,6 +67,23 @@ test('withdrawGoverningTokens', async () => {
   ).toEqual(0);
 });
 
+test('createGovernance', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.sendTx());
+
+  // Act
+  const governancePk = await realm.createGovernance();
+
+  // // Assert
+  const governance = await realm.getGovernance(governancePk);
+
+  expect(governance.account.realm).toEqual(realm.realmPk);
+});
+
 test('createProposal', async () => {
   // Arrange
   const realm = await BenchBuilder.withConnection()

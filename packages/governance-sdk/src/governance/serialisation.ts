@@ -663,7 +663,9 @@ function createGovernanceSchema(programVersion: number) {
           ['governedAccount', 'pubkey'],
           ['proposalCount', 'u32'],
           ['config', GovernanceConfig],
-          ['reserved', [6]],
+          ...(programVersion >= PROGRAM_VERSION_V2
+            ? [['reserved', [3]]]
+            : [['reserved', [6]]]),
           ['votingProposalCount', 'u16'],
         ],
       },
@@ -677,10 +679,16 @@ function createGovernanceSchema(programVersion: number) {
           ['minCommunityTokensToCreateProposal', 'u64'],
           ['minInstructionHoldUpTime', 'u32'],
           ['maxVotingTime', 'u32'],
-          ['voteTipping', 'u8'],
+          ['communityVoteTipping', 'u8'],
           ['councilVoteThreshold', 'VoteThreshold'],
           ['councilVetoVoteThreshold', 'VoteThreshold'],
           ['minCouncilTokensToCreateProposal', 'u64'],
+          ...(programVersion >= PROGRAM_VERSION_V2
+            ? [
+                ['councilVoteTipping', 'u8'],
+                ['communityVetoVoteThreshold', 'VoteThreshold'],
+              ]
+            : []),
         ],
       },
     ],
