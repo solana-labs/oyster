@@ -11,7 +11,7 @@ import { Redirect } from 'react-router';
 import { GoverningTokenType } from '@solana/spl-governance';
 import { Governance, Realm } from '@solana/spl-governance';
 
-import { useWalletTokenOwnerRecord, useVoterWeightRecord } from '../../../hooks/apiHooks';
+import { useWalletTokenOwnerRecord, useVoterWeightRecord, useRealmConfig } from '../../../hooks/apiHooks';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
@@ -40,6 +40,9 @@ export function NewProposalButton({
     governance?.account.realm,
     realm?.account.config.councilMint,
   );
+
+  const realmConfig = useRealmConfig(governance?.account.realm);
+  const communityVoterWeightAddin = realmConfig?.account.communityVoterWeightAddin;
 
   const communityMint = useMint(realm?.account.communityMint);
 
@@ -102,7 +105,7 @@ export function NewProposalButton({
 
     return await createProposal(
       rpcContext,
-      governance.account.realm,
+      realm,
       governance.pubkey,
       // todo: investigate case when tokenOwnerRecord is null
       tokenOwnerRecord?.pubkey ?? governance.pubkey,
@@ -112,6 +115,7 @@ export function NewProposalButton({
       proposalIndex,
       voterWeightRecord?.voterWeight.pubkey,
       voterWeightRecord?.maxVoterWeight.pubkey,
+      communityVoterWeightAddin,
     );
   };
 

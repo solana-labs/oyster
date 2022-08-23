@@ -112,7 +112,7 @@ export function CastVoteButton({
         <Row>
           <Col span={24}>
             <p>{msg}</p>
-            {vote ? <>
+            <>
               <Radio.Group
                 options={options}
                 value={votePercentage}
@@ -130,7 +130,7 @@ export function CastVoteButton({
                 parser={(value: any) => value.replace('%', '')}
                 onChange={(value) => setVotePercentage(Number(value) * 100)}
               />
-            </> : null}
+            </>
           </Col>
         </Row>
       </Modal>

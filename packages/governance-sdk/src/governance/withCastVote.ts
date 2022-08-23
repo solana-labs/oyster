@@ -4,17 +4,14 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import {
-  CreateVotePercentage,
-  getGovernanceSchema,
-  VOTE_PERCENTAGE_SCHEMA,
-} from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CastVoteArgs, Vote } from './instructions';
-import { getTokenOwnerRecordAddress, getVoteRecordAddress } from './accounts';
+import { getVoteRecordAddress } from './accounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { withVotePercentage } from './withVotePercentage';
 
 export const withCastVote = async (
   instructions: TransactionInstruction[],
@@ -130,73 +127,17 @@ export const withCastVote = async (
     maxVoterWeightRecord,
   );
 
-  if (communityVoterWeightAddin) {
-    const addinValue = new CreateVotePercentage({
-      vote_percentage: votePercentage,
-    });
-
-    const governingOwnerRecord = await getTokenOwnerRecordAddress(
+  if (communityVoterWeightAddin && voterWeightRecord) {
+    await withVotePercentage(
+      instructions,
       programId,
-      realmPublicKey,
       governingTokenMint,
+      realmPublicKey,
+      communityMint,
       payer,
-    );
-
-    // fixed_weight_addin
-    const addinKeys = [
-      // 0. `[]` Governing Token mint
-      {
-        pubkey: communityMint,
-        isWritable: false,
-        isSigner: false,
-      },
-      // 1. `[]` Governing token owner
-      {
-        pubkey: payer,
-        isWritable: false,
-        isSigner: false,
-      },
-      // 2. `[signer]` Authority account
-      {
-        pubkey: payer,
-        isWritable: false,
-        isSigner: true,
-      },
-      // 3. `[]` The Governance program account
-      {
-        pubkey: programId,
-        isWritable: false,
-        isSigner: false,
-      },
-      // 4. `[]` Realm account
-      {
-        pubkey: realmPublicKey,
-        isWritable: false,
-        isSigner: false,
-      },
-      // 5. `[]` Governing Owner Record. PDA seeds (governance program): ['governance', realm, token_mint, token_owner]
-      {
-        pubkey: governingOwnerRecord,
-        isWritable: false,
-        isSigner: false,
-      },
-      // 6. `[writable]` VoterWeightRecord
-      {
-        pubkey: voterWeightRecord!,
-        isWritable: true,
-        isSigner: false,
-      },
-    ];
-
-    instructions.push(
-      new TransactionInstruction({
-        keys: addinKeys,
-        programId: communityVoterWeightAddin,
-        data: Buffer.from([
-          2,
-          ...serialize(VOTE_PERCENTAGE_SCHEMA, addinValue),
-        ]),
-      }),
+      voterWeightRecord!,
+      communityVoterWeightAddin,
+      votePercentage,
     );
   }
 
