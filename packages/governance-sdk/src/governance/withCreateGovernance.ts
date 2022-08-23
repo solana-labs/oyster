@@ -4,7 +4,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateGovernanceArgs } from './instructions';
@@ -25,7 +25,10 @@ export const withCreateGovernance = async (
   voterWeightRecord?: PublicKey,
 ) => {
   const args = new CreateGovernanceArgs({ config });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   governedAccount = governedAccount ?? new Keypair().publicKey;
 

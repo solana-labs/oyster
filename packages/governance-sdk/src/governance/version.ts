@@ -96,9 +96,10 @@ export async function getGovernanceProgramVersion(
           );
         })[0];
 
-      console.log('Program version (simulation)', simVersion);
-
-      return simVersion.major;
+      if (simVersion) {
+        console.log('Program version (simulation)', simVersion);
+        return simVersion.major;
+      }
     }
   } catch (ex) {
     console.log("Can't determine program version", ex);
@@ -110,5 +111,6 @@ export async function getGovernanceProgramVersion(
   }
 
   // Default to V1 which doesn't support ProgramMetadata
+  console.log('Program version (default)', PROGRAM_VERSION_V1);
   return PROGRAM_VERSION_V1;
 }

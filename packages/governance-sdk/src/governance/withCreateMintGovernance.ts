@@ -3,7 +3,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateMintGovernanceArgs } from './instructions';
@@ -30,7 +30,10 @@ export const withCreateMintGovernance = async (
     config,
     transferMintAuthorities: transferMintAuthorities,
   });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+
+  const data = Buffer.from(
+    serialize(getGovernanceSchema(programVersion), args),
+  );
 
   const [governanceAddress] = await PublicKey.findProgramAddress(
     [Buffer.from('mint-governance'), realm.toBuffer(), governedMint.toBuffer()],
