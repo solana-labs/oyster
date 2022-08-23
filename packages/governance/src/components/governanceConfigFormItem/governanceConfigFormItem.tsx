@@ -40,7 +40,10 @@ export interface GovernanceConfigValues {
   voteTipping: VoteTipping;
 }
 
-export function getGovernanceConfig(programVersion: number, values: GovernanceConfigValues) {
+export function getGovernanceConfig(
+  programVersion: number,
+  values: GovernanceConfigValues,
+) {
   const minTokensToCreateProposal = parseMinTokensToCreate(
     values.minTokensToCreateProposal,
     values.mintDecimals,
@@ -51,23 +54,24 @@ export function getGovernanceConfig(programVersion: number, values: GovernanceCo
     value: values.voteThresholdPercentage,
   });
 
- 
-  const councilVoteThreshold =  programVersion >= PROGRAM_VERSION_V3 
-   // For VERSION >=3 use the same threshold as for community (until supported in the UI)
-  ? communityVoteThreshold 
-  // For older versions set to 0
-  : new VoteThreshold({
-    type: VoteThresholdType.YesVotePercentage,
-    value: 0,
-  });
+  const councilVoteThreshold =
+    programVersion >= PROGRAM_VERSION_V3
+      ? // For VERSION >=3 use the same threshold as for community (until supported in the UI)
+        communityVoteThreshold
+      : // For older versions set to 0
+        new VoteThreshold({
+          type: VoteThresholdType.YesVotePercentage,
+          value: 0,
+        });
 
-  // 
-  const councilVetoVoteThreshold  = programVersion >= PROGRAM_VERSION_V3 
-  ? councilVoteThreshold
-  : new VoteThreshold({
-    type: VoteThresholdType.YesVotePercentage,
-    value: 0,
-  });
+  //
+  const councilVetoVoteThreshold =
+    programVersion >= PROGRAM_VERSION_V3
+      ? councilVoteThreshold
+      : new VoteThreshold({
+          type: VoteThresholdType.YesVotePercentage,
+          value: 0,
+        });
 
   return new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
@@ -82,9 +86,13 @@ export function getGovernanceConfig(programVersion: number, values: GovernanceCo
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
-    voteTipping: values.voteTipping,
-    councilVoteThreshold:councilVoteThreshold,
-    councilVetoVoteThreshold:councilVetoVoteThreshold,
+    communityVoteTipping: values.voteTipping,
+    councilVoteTipping: values.voteTipping,
+    councilVoteThreshold: councilVoteThreshold,
+    councilVetoVoteThreshold: councilVetoVoteThreshold,
+    communityVetoVoteThreshold: new VoteThreshold({
+      type: VoteThresholdType.Disabled,
+    }),
   });
 }
 
@@ -145,7 +153,8 @@ export function GovernanceConfigFormItem({
       minCommunityTokensToCreateProposal: ZERO,
       minInstructionHoldUpTime: getTimestampFromDays(0),
       maxVotingTime: getTimestampFromDays(3),
-      voteTipping: VoteTipping.Strict,
+      communityVoteTipping: VoteTipping.Strict,
+      councilVoteTipping: VoteTipping.Strict,
       minCouncilTokensToCreateProposal: ZERO,
       councilVoteThreshold: new VoteThreshold({
         type: VoteThresholdType.YesVotePercentage,
@@ -154,6 +163,9 @@ export function GovernanceConfigFormItem({
       councilVetoVoteThreshold: new VoteThreshold({
         type: VoteThresholdType.YesVotePercentage,
         value: 60,
+      }),
+      communityVetoVoteThreshold: new VoteThreshold({
+        type: VoteThresholdType.Disabled,
       }),
     });
   } else {
@@ -237,11 +249,16 @@ export function GovernanceConfigFormItem({
         name={configNameOf('voteTipping')}
         label={LABELS.VOTE_TIPPING}
         rules={[{ required: true }]}
-        initialValue={VoteTipping[governanceConfig.voteTipping]}
+        initialValue={VoteTipping[governanceConfig.communityVoteTipping]}
       >
-        <Select>{Object.keys(VoteTipping)
-          .filter(vt => typeof VoteTipping[vt as any] === "string")
-          .map(vt => (<Select.Option value={vt}>{VoteTipping[vt as any]} </Select.Option>))}
+        <Select>
+          {Object.keys(VoteTipping)
+            .filter(vt => typeof VoteTipping[vt as any] === 'string')
+            .map(vt => (
+              <Select.Option value={vt}>
+                {VoteTipping[vt as any]}{' '}
+              </Select.Option>
+            ))}
         </Select>
       </Form.Item>
 
