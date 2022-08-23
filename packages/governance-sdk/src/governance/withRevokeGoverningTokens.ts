@@ -1,8 +1,4 @@
-import {
-  PublicKey,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { RevokeGoverningTokensArgs } from './instructions';
@@ -13,15 +9,14 @@ import {
 } from './accounts';
 import BN from 'bn.js';
 import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
 export const withRevokeGoverningTokens = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
   realm: PublicKey,
-  realmAuthority: PublicKey,
   governingTokenMint: PublicKey,
+  governingTokenMintAuthrority: PublicKey,
   governingTokenOwner: PublicKey,
   amount: BN,
 ) => {
@@ -52,11 +47,6 @@ export const withRevokeGoverningTokens = async (
       isSigner: false,
     },
     {
-      pubkey: realmAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
       pubkey: governingTokenHoldingAddress,
       isWritable: true,
       isSigner: false,
@@ -72,6 +62,11 @@ export const withRevokeGoverningTokens = async (
       isSigner: false,
     },
     {
+      pubkey: governingTokenMintAuthrority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
       pubkey: realmConfigAddress,
       isSigner: false,
       isWritable: false,
@@ -82,14 +77,6 @@ export const withRevokeGoverningTokens = async (
       isSigner: false,
     },
   ];
-
-  if (programVersion === PROGRAM_VERSION_V1) {
-    keys.push({
-      pubkey: SYSVAR_RENT_PUBKEY,
-      isWritable: false,
-      isSigner: false,
-    });
-  }
 
   instructions.push(
     new TransactionInstruction({

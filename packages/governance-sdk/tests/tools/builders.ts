@@ -296,8 +296,8 @@ export class RealmBuilder {
       this.bench.programVersion,
 
       this.realmPk,
-      this.bench.walletPk,
       this.communityMintPk,
+      this.bench.walletPk,
       this.bench.walletPk,
       new BN(1),
     );
@@ -331,7 +331,8 @@ export class RealmBuilder {
         minCommunityTokensToCreateProposal: new BN(1),
         minInstructionHoldUpTime: 0,
         maxVotingTime: getTimestampFromDays(3),
-        voteTipping: VoteTipping.Strict,
+        communityVoteTipping: VoteTipping.Strict,
+        councilVoteTipping: VoteTipping.Strict,
         minCouncilTokensToCreateProposal: new BN(1),
         councilVoteThreshold: new VoteThreshold({
           type: VoteThresholdType.YesVotePercentage,
@@ -342,6 +343,10 @@ export class RealmBuilder {
           type: VoteThresholdType.YesVotePercentage,
           // For VERSION < 3 we have to pass 0
           value: this.bench.programVersion >= 3 ? 10 : 0,
+        }),
+        communityVetoVoteThreshold: new VoteThreshold({
+          type: VoteThresholdType.YesVotePercentage,
+          value: 80,
         }),
       });
 
