@@ -277,6 +277,84 @@ export function getGovernanceInstructionSchema(programVersion: number) {
   }
 }
 
+/// Creates serialisation schema for spl-gov structs used for instructions and accounts
+function createGovernanceStructSchema(
+  programVersion: number | undefined,
+  accountVersion: number | undefined,
+) {
+  return new Map<Function, any>([
+    [
+      VoteChoice,
+      {
+        kind: 'struct',
+        fields: [
+          ['rank', 'u8'],
+          ['weightPercentage', 'u8'],
+        ],
+      },
+    ],
+    [
+      InstructionData,
+      {
+        kind: 'struct',
+        fields: [
+          ['programId', 'pubkey'],
+          ['accounts', [AccountMetaData]],
+          ['data', ['u8']],
+        ],
+      },
+    ],
+    [
+      AccountMetaData,
+      {
+        kind: 'struct',
+        fields: [
+          ['pubkey', 'pubkey'],
+          ['isSigner', 'u8'],
+          ['isWritable', 'u8'],
+        ],
+      },
+    ],
+    [
+      MintMaxVoteWeightSource,
+      {
+        kind: 'struct',
+        fields: [
+          ['type', 'u8'],
+          ['value', 'u64'],
+        ],
+      },
+    ],
+    [
+      GovernanceConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['communityVoteThreshold', 'VoteThreshold'],
+          ['minCommunityTokensToCreateProposal', 'u64'],
+          ['minInstructionHoldUpTime', 'u32'],
+          ['maxVotingTime', 'u32'],
+          ['communityVoteTipping', 'u8'],
+          ['councilVoteThreshold', 'VoteThreshold'],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
+          ['minCouncilTokensToCreateProposal', 'u64'],
+          // Pass the extra fields to instruction if programVersion >= 3
+          // The additional fields can't be passed to instructions for programVersion <= 2  because they were added in V3
+          // and would override the transferAuhtority param which follows it
+          ...((programVersion && programVersion >= PROGRAM_VERSION_V3) ||
+          // The account layout is backward compatible and we can read the extra fields for accountVersion >= 2
+          (accountVersion && accountVersion >= ACCOUNT_VERSION_V2)
+            ? [
+                ['councilVoteTipping', 'u8'],
+                ['communityVetoVoteThreshold', 'VoteThreshold'],
+              ]
+            : []),
+        ],
+      },
+    ],
+  ]);
+}
+
 /// Creates serialisation schema for spl-gov instructions for the given program version number
 function createGovernanceInstructionSchema(programVersion: number) {
   return new Map<Function, any>([
@@ -332,7 +410,7 @@ function createGovernanceInstructionSchema(programVersion: number) {
         fields: [
           ['instruction', 'u8'],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
+          programVersion >= PROGRAM_VERSION_V2 ? ['amount', 'u64'] : undefined,
         ].filter(Boolean),
       },
     ],
@@ -474,16 +552,6 @@ function createGovernanceInstructionSchema(programVersion: number) {
       },
     ],
     [
-      VoteChoice, // Shared 1
-      {
-        kind: 'struct',
-        fields: [
-          ['rank', 'u8'],
-          ['weightPercentage', 'u8'],
-        ],
-      },
-    ],
-    [
       CastVoteArgs,
       {
         kind: 'struct',
@@ -501,13 +569,13 @@ function createGovernanceInstructionSchema(programVersion: number) {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
-          programVersion > PROGRAM_VERSION_V1
+          programVersion >= PROGRAM_VERSION_V2
             ? ['optionIndex', 'u8']
             : undefined,
           ['index', 'u16'],
           ['holdUpTime', 'u32'],
 
-          programVersion > PROGRAM_VERSION_V1
+          programVersion >= PROGRAM_VERSION_V2
             ? ['instructions', [InstructionData]]
             : ['instructionData', InstructionData],
         ].filter(Boolean),
@@ -577,60 +645,7 @@ function createGovernanceInstructionSchema(programVersion: number) {
         fields: [['instruction', 'u8']],
       },
     ],
-    [
-      InstructionData, // Shared 2
-      {
-        kind: 'struct',
-        fields: [
-          ['programId', 'pubkey'],
-          ['accounts', [AccountMetaData]],
-          ['data', ['u8']],
-        ],
-      },
-    ],
-    [
-      AccountMetaData, // Shared 3
-      {
-        kind: 'struct',
-        fields: [
-          ['pubkey', 'pubkey'],
-          ['isSigner', 'u8'],
-          ['isWritable', 'u8'],
-        ],
-      },
-    ],
-    [
-      MintMaxVoteWeightSource, // Shared 4
-      {
-        kind: 'struct',
-        fields: [
-          ['type', 'u8'],
-          ['value', 'u64'],
-        ],
-      },
-    ],
-    [
-      GovernanceConfig, // Shared 5
-      {
-        kind: 'struct',
-        fields: [
-          ['communityVoteThreshold', 'VoteThreshold'],
-          ['minCommunityTokensToCreateProposal', 'u64'],
-          ['minInstructionHoldUpTime', 'u32'],
-          ['maxVotingTime', 'u32'],
-          ['communityVoteTipping', 'u8'],
-          ['councilVoteThreshold', 'VoteThreshold'],
-          ['councilVetoVoteThreshold', 'VoteThreshold'],
-          ['minCouncilTokensToCreateProposal', 'u64'],
-          ...(programVersion >= PROGRAM_VERSION_V3
-            ? [
-                ['councilVoteTipping', 'u8'],
-                ['communityVetoVoteThreshold', 'VoteThreshold'],
-              ]
-            : []),
-        ],
-      },
-    ],
+    ...createGovernanceStructSchema(programVersion, undefined),
   ]);
 }
 
@@ -654,48 +669,6 @@ export function getGovernanceAccountSchema(accountVersion: number) {
 /// Creates serialisation schema for spl-gov accounts for the given account version number
 function createGovernanceAccountSchema(accountVersion: number) {
   return new Map<Function, any>([
-    [
-      VoteChoice, // Shared 1
-      {
-        kind: 'struct',
-        fields: [
-          ['rank', 'u8'],
-          ['weightPercentage', 'u8'],
-        ],
-      },
-    ],
-    [
-      InstructionData, // Shared 2
-      {
-        kind: 'struct',
-        fields: [
-          ['programId', 'pubkey'],
-          ['accounts', [AccountMetaData]],
-          ['data', ['u8']],
-        ],
-      },
-    ],
-    [
-      AccountMetaData, // Shared 3
-      {
-        kind: 'struct',
-        fields: [
-          ['pubkey', 'pubkey'],
-          ['isSigner', 'u8'],
-          ['isWritable', 'u8'],
-        ],
-      },
-    ],
-    [
-      MintMaxVoteWeightSource, // Shared 4
-      {
-        kind: 'struct',
-        fields: [
-          ['type', 'u8'],
-          ['value', 'u64'],
-        ],
-      },
-    ],
     [
       RealmConfig,
       {
@@ -764,28 +737,6 @@ function createGovernanceAccountSchema(accountVersion: number) {
             ? [['reserved', [3]]]
             : [['reserved', [6]]]),
           ['votingProposalCount', 'u16'],
-        ],
-      },
-    ],
-    [
-      GovernanceConfig, // Shared 5
-      {
-        kind: 'struct',
-        fields: [
-          ['communityVoteThreshold', 'VoteThreshold'],
-          ['minCommunityTokensToCreateProposal', 'u64'],
-          ['minInstructionHoldUpTime', 'u32'],
-          ['maxVotingTime', 'u32'],
-          ['communityVoteTipping', 'u8'],
-          ['councilVoteThreshold', 'VoteThreshold'],
-          ['councilVetoVoteThreshold', 'VoteThreshold'],
-          ['minCouncilTokensToCreateProposal', 'u64'],
-          ...(accountVersion >= ACCOUNT_VERSION_V2
-            ? [
-                ['councilVoteTipping', 'u8'],
-                ['communityVetoVoteThreshold', 'VoteThreshold'],
-              ]
-            : []),
         ],
       },
     ],
@@ -953,6 +904,7 @@ function createGovernanceAccountSchema(accountVersion: number) {
         ],
       },
     ],
+    ...createGovernanceStructSchema(undefined, accountVersion),
   ]);
 }
 
