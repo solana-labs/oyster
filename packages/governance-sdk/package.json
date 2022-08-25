@@ -1,6 +1,6 @@
 {
   "name": "@solana/spl-governance",
-  "version": "0.3.10",
+  "version": "0.3.12",
   "description": "SPL Governance Client API",
   "author": "Solana Maintainers <maintainers@solana.foundation>",
   "homepage": "https://github.com/solana-labs/oyster/blob/main/packages/governance-sdk/README.md",

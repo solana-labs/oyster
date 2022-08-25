@@ -683,7 +683,7 @@ function createGovernanceSchema(programVersion: number) {
           ['councilVoteThreshold', 'VoteThreshold'],
           ['councilVetoVoteThreshold', 'VoteThreshold'],
           ['minCouncilTokensToCreateProposal', 'u64'],
-          ...(programVersion >= PROGRAM_VERSION_V2
+          ...(programVersion >= PROGRAM_VERSION_V3
             ? [
                 ['councilVoteTipping', 'u8'],
                 ['communityVetoVoteThreshold', 'VoteThreshold'],
