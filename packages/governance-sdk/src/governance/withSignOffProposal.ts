@@ -4,7 +4,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { SignOffProposalArgs } from './instructions';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
@@ -21,7 +21,9 @@ export const withSignOffProposal = (
   proposalOwnerRecord: PublicKey | undefined,
 ) => {
   const args = new SignOffProposalArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceInstructionSchema(programVersion), args),
+  );
 
   let keys: AccountMeta[] = [];
 

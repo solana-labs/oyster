@@ -229,9 +229,9 @@ export const serializeInstructionToBase64 = (
 ) => {
   let data = createInstructionData(instruction);
 
-  return Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, data)).toString(
-    'base64',
-  );
+  return Buffer.from(
+    serialize(GOVERNANCE_INSTRUCTION_SCHEMA_V1, data),
+  ).toString('base64');
 };
 
 // Converts TransactionInstruction to InstructionData format
@@ -261,9 +261,6 @@ export const GOVERNANCE_INSTRUCTION_SCHEMA_V3 = createGovernanceInstructionSchem
   3,
 );
 
-// The most recent version of spl-gov
-export const GOVERNANCE_INSTRUCTION_SCHEMA = GOVERNANCE_INSTRUCTION_SCHEMA_V3;
-
 export function getGovernanceInstructionSchema(programVersion: number) {
   switch (programVersion) {
     case 1:
@@ -273,7 +270,9 @@ export function getGovernanceInstructionSchema(programVersion: number) {
     case 3:
       return GOVERNANCE_INSTRUCTION_SCHEMA_V3;
     default:
-      return GOVERNANCE_INSTRUCTION_SCHEMA;
+      throw new Error(
+        `Account schema for program version: ${programVersion} doesn't exist`,
+      );
   }
 }
 
@@ -922,7 +921,7 @@ export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
   const instructionData: InstructionData = deserializeBorsh(
-    GOVERNANCE_INSTRUCTION_SCHEMA,
+    GOVERNANCE_INSTRUCTION_SCHEMA_V1,
     InstructionData,
     instructionDataBin,
   );

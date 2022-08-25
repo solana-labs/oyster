@@ -3,7 +3,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { ExecuteTransactionArgs } from './instructions';
 import {
@@ -23,7 +23,9 @@ export const withExecuteTransaction = async (
   transactionInstructions: InstructionData[],
 ) => {
   const args = new ExecuteTransactionArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceInstructionSchema(programVersion), args),
+  );
 
   const nativeTreasury = await getNativeTreasuryAddress(programId, governance);
 

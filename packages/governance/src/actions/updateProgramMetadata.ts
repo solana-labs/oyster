@@ -9,12 +9,18 @@ export const updateProgramMetadata = async ({
   connection,
   wallet,
   programId,
+  programVersion,
   walletPubkey,
 }: RpcContext) => {
   let signers: Keypair[] = [];
   let instructions: TransactionInstruction[] = [];
 
-  await withUpdateProgramMetadata(instructions, programId, walletPubkey);
+  await withUpdateProgramMetadata(
+    instructions,
+    programId,
+    programVersion,
+    walletPubkey,
+  );
 
   await sendTransactionWithNotifications(
     connection,

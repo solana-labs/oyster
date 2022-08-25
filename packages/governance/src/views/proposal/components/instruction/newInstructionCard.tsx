@@ -50,12 +50,11 @@ export function NewInstructionCard({
     instruction: string;
     holdUpTime: number;
   }) => {
-
-
     let optionIndex = 0; // default to first option
 
     // If instructionsNextIndex exists then we have V1 account and otherwise V2
-    let index = proposal.account.instructionsNextIndex ??
+    let index =
+      proposal.account.instructionsNextIndex ??
       proposal.account.options[optionIndex].instructionsNextIndex;
 
     try {

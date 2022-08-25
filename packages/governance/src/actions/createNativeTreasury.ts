@@ -9,7 +9,7 @@ import { withCreateNativeTreasury } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const createNativeTreasury = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
 
   governance: ProgramAccount<Governance>,
 ) => {
@@ -19,6 +19,7 @@ export const createNativeTreasury = async (
   await withCreateNativeTreasury(
     instructions,
     programId,
+    programVersion,
     governance.pubkey,
     walletPubkey,
   );

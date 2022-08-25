@@ -3,7 +3,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { FlagTransactionErrorArgs } from './instructions';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
@@ -18,7 +18,9 @@ export const withFlagTransactionError = (
   proposalTransaction: PublicKey,
 ) => {
   const args = new FlagTransactionErrorArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceInstructionSchema(programVersion), args),
+  );
 
   const keys = [
     {
