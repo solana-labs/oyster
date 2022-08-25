@@ -3,7 +3,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { DepositGoverningTokensArgs } from './instructions';
 import {
@@ -30,7 +30,7 @@ export const withDepositGoverningTokens = async (
 ) => {
   const args = new DepositGoverningTokensArgs({ amount });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(

@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { UpdateProgramMetadataArgs } from './instructions';
 import { getProgramMetadataAddress } from './accounts';
@@ -12,7 +12,7 @@ export const withUpdateProgramMetadata = async (
   payer: PublicKey,
 ) => {
   const args = new UpdateProgramMetadataArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   const programMetadataAddress = await getProgramMetadataAddress(programId);
 

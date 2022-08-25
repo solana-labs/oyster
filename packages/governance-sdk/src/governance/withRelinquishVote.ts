@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { RelinquishVoteArgs } from './instructions';
 import { PROGRAM_VERSION_V3 } from '../registry/constants';
@@ -18,7 +18,7 @@ export const withRelinquishVote = async (
   beneficiary: PublicKey | undefined,
 ) => {
   const args = new RelinquishVoteArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   let v3Keys =
     programVersion >= PROGRAM_VERSION_V3

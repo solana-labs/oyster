@@ -227,7 +227,9 @@ export const serializeInstructionToBase64 = (
 ) => {
   let data = createInstructionData(instruction);
 
-  return Buffer.from(serialize(GOVERNANCE_SCHEMA, data)).toString('base64');
+  return Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, data)).toString(
+    'base64',
+  );
 };
 
 // Converts TransactionInstruction to InstructionData format
@@ -246,27 +248,34 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
   });
 };
 
-export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);
-export const GOVERNANCE_SCHEMA_V2 = createGovernanceSchema(2);
-export const GOVERNANCE_SCHEMA_V3 = createGovernanceSchema(3);
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V1 = createGovernanceInstructionSchema(
+  1,
+);
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V2 = createGovernanceInstructionSchema(
+  2,
+);
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V3 = createGovernanceInstructionSchema(
+  3,
+);
 
 // The most recent version of spl-gov
-export const GOVERNANCE_SCHEMA = GOVERNANCE_SCHEMA_V3;
+export const GOVERNANCE_INSTRUCTION_SCHEMA = GOVERNANCE_INSTRUCTION_SCHEMA_V3;
 
-export function getGovernanceSchema(programVersion: number) {
+export function getGovernanceInstructionSchema(programVersion: number) {
   switch (programVersion) {
     case 1:
-      return GOVERNANCE_SCHEMA_V1;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V1;
     case 2:
-      return GOVERNANCE_SCHEMA_V2;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V2;
     case 3:
-      return GOVERNANCE_SCHEMA_V3;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V3;
     default:
-      return GOVERNANCE_SCHEMA;
+      return GOVERNANCE_INSTRUCTION_SCHEMA;
   }
 }
 
-function createGovernanceSchema(programVersion: number) {
+/// Creates serialisation schema for spl-gov instructions for the given program version number
+function createGovernanceInstructionSchema(programVersion: number) {
   return new Map<Function, any>([
     [
       RealmConfigArgs,
@@ -862,7 +871,7 @@ function createGovernanceSchema(programVersion: number) {
 export function getGovernanceSchemaForAccount(
   accountType: GovernanceAccountType,
 ) {
-  return getGovernanceSchema(getAccountProgramVersion(accountType));
+  return getGovernanceInstructionSchema(getAccountProgramVersion(accountType));
 }
 
 export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
@@ -873,7 +882,7 @@ export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
   const instructionData: InstructionData = deserializeBorsh(
-    GOVERNANCE_SCHEMA,
+    GOVERNANCE_INSTRUCTION_SCHEMA,
     InstructionData,
     instructionDataBin,
   );

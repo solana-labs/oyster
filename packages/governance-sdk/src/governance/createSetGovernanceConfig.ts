@@ -1,7 +1,7 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { GovernanceConfig } from './accounts';
 import { SetGovernanceConfigArgs } from './instructions';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 
 export function createSetGovernanceConfig(
@@ -10,7 +10,7 @@ export function createSetGovernanceConfig(
   governanceConfig: GovernanceConfig,
 ) {
   const args = new SetGovernanceConfigArgs({ config: governanceConfig });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   const keys = [
     {

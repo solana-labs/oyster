@@ -3,7 +3,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateRealmArgs } from './instructions';
 import {
@@ -49,7 +49,7 @@ export async function withCreateRealm(
     name,
   });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   const [realmAddress] = await PublicKey.findProgramAddress(

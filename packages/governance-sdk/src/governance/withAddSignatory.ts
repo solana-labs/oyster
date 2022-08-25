@@ -3,7 +3,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { AddSignatoryArgs } from './instructions';
 import { getSignatoryRecordAddress } from './accounts';
@@ -21,7 +21,7 @@ export const withAddSignatory = async (
   payer: PublicKey,
 ) => {
   const args = new AddSignatoryArgs({ signatory });
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,

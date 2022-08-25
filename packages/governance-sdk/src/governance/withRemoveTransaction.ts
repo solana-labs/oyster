@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { RemoveTransactionArgs } from './instructions';
 
@@ -13,7 +13,7 @@ export const withRemoveTransaction = async (
   beneficiary: PublicKey,
 ) => {
   const args = new RemoveTransactionArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   const keys = [
     {

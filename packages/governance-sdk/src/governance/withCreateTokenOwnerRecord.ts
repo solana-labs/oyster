@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { GOVERNANCE_INSTRUCTION_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateTokenOwnerRecordArgs } from './instructions';
 import { getTokenOwnerRecordAddress } from './accounts';
@@ -14,7 +14,7 @@ export const withCreateTokenOwnerRecord = async (
   payer: PublicKey,
 ) => {
   const args = new CreateTokenOwnerRecordArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(serialize(GOVERNANCE_INSTRUCTION_SCHEMA, args));
 
   const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
     programId,
