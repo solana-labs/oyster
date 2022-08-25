@@ -167,15 +167,23 @@ test('setupRealm', async () => {
     value: programVersion >= 3 ? 10 : 0,
   });
 
+  let communityVetoVoteThreshold = new VoteThreshold({
+    type: VoteThresholdType.YesVotePercentage,
+    // For VERSION < 3 we have to pass 0
+    value: programVersion >= 3 ? 10 : 0,
+  });
+
   const config = new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
     maxVotingTime: getTimestampFromDays(3),
-    voteTipping: VoteTipping.Strict,
+    communityVoteTipping: VoteTipping.Strict,
+    councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
+    communityVetoVoteThreshold: communityVetoVoteThreshold,
   });
 
   const governancePk = await withCreateMintGovernance(
@@ -264,6 +272,7 @@ test('setupRealm', async () => {
   await withRemoveTransaction(
     instructions,
     programId,
+    programVersion,
     proposalPk,
     tokenOwnerRecordPk,
     walletPk,
@@ -419,7 +428,12 @@ test('setupRealm', async () => {
     tokenOwnerRecordPk,
   );
 
-  await withUpdateProgramMetadata(instructions, programId, walletPk);
+  await withUpdateProgramMetadata(
+    instructions,
+    programId,
+    programVersion,
+    walletPk,
+  );
 
   // Act
   await sendTransaction(connection, instructions, signers, wallet);
