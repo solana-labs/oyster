@@ -4,7 +4,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CancelProposalArgs } from './instructions';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
@@ -20,7 +20,9 @@ export const withCancelProposal = (
   governanceAuthority: PublicKey,
 ) => {
   const args = new CancelProposalArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceInstructionSchema(programVersion), args),
+  );
 
   let keys: AccountMeta[] = [];
 

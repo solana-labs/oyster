@@ -8,7 +8,7 @@ import { RpcContext } from '@solana/spl-governance';
 import { ProgramAccount } from '@solana/spl-governance';
 
 export const removeInstruction = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   proposal: ProgramAccount<Proposal>,
   proposalInstruction: PublicKey,
 ) => {
@@ -21,6 +21,7 @@ export const removeInstruction = async (
   await withRemoveTransaction(
     instructions,
     programId,
+    programVersion,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     governanceAuthority,

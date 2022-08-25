@@ -71,7 +71,7 @@ export async function getGovernanceProgramVersion(
       'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk',
     );
 
-    await withUpdateProgramMetadata(instructions, programId, walletPk);
+    await withUpdateProgramMetadata(instructions, programId, 2, walletPk);
 
     const transaction = new Transaction({ feePayer: walletPk });
     transaction.add(...instructions);

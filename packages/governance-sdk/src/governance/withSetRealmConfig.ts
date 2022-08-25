@@ -3,13 +3,10 @@ import {
   getRealmConfigAddress,
   getTokenHoldingAddress,
   GoverningTokenConfigAccountArgs,
-  GoverningTokenConfigArgs,
-  GoverningTokenType,
   MintMaxVoteWeightSource,
-  RealmConfigArgs,
 } from './accounts';
 import { SetRealmConfigArgs } from './instructions';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import BN from 'bn.js';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
@@ -40,7 +37,7 @@ export async function withSetRealmConfig(
 
   const args = new SetRealmConfigArgs({ configArgs });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   let keys = [

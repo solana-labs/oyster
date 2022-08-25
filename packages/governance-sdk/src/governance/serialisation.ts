@@ -54,7 +54,7 @@ import {
   VoteTypeKind,
   ProposalOption,
   GovernanceAccountType,
-  getAccountProgramVersion,
+  getGovernanceAccountVersion,
   ProgramMetadata,
   VoteThresholdType,
   GoverningTokenConfigArgs,
@@ -63,6 +63,8 @@ import {
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
 import {
+  ACCOUNT_VERSION_V1,
+  ACCOUNT_VERSION_V2,
   PROGRAM_VERSION_V1,
   PROGRAM_VERSION_V2,
   PROGRAM_VERSION_V3,
@@ -227,7 +229,9 @@ export const serializeInstructionToBase64 = (
 ) => {
   let data = createInstructionData(instruction);
 
-  return Buffer.from(serialize(GOVERNANCE_SCHEMA, data)).toString('base64');
+  return Buffer.from(
+    serialize(GOVERNANCE_INSTRUCTION_SCHEMA_V1, data),
+  ).toString('base64');
 };
 
 // Converts TransactionInstruction to InstructionData format
@@ -246,27 +250,112 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
   });
 };
 
-export const GOVERNANCE_SCHEMA_V1 = createGovernanceSchema(1);
-export const GOVERNANCE_SCHEMA_V2 = createGovernanceSchema(2);
-export const GOVERNANCE_SCHEMA_V3 = createGovernanceSchema(3);
+// Instruction schemas
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V1 = createGovernanceInstructionSchema(
+  1,
+);
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V2 = createGovernanceInstructionSchema(
+  2,
+);
+export const GOVERNANCE_INSTRUCTION_SCHEMA_V3 = createGovernanceInstructionSchema(
+  3,
+);
 
-// The most recent version of spl-gov
-export const GOVERNANCE_SCHEMA = GOVERNANCE_SCHEMA_V3;
-
-export function getGovernanceSchema(programVersion: number) {
+export function getGovernanceInstructionSchema(programVersion: number) {
   switch (programVersion) {
     case 1:
-      return GOVERNANCE_SCHEMA_V1;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V1;
     case 2:
-      return GOVERNANCE_SCHEMA_V2;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V2;
     case 3:
-      return GOVERNANCE_SCHEMA_V3;
+      return GOVERNANCE_INSTRUCTION_SCHEMA_V3;
     default:
-      return GOVERNANCE_SCHEMA;
+      throw new Error(
+        `Account schema for program version: ${programVersion} doesn't exist`,
+      );
   }
 }
 
-function createGovernanceSchema(programVersion: number) {
+/// Creates serialisation schema for spl-gov structs used for instructions and accounts
+function createGovernanceStructSchema(
+  programVersion: number | undefined,
+  accountVersion: number | undefined,
+) {
+  return new Map<Function, any>([
+    [
+      VoteChoice,
+      {
+        kind: 'struct',
+        fields: [
+          ['rank', 'u8'],
+          ['weightPercentage', 'u8'],
+        ],
+      },
+    ],
+    [
+      InstructionData,
+      {
+        kind: 'struct',
+        fields: [
+          ['programId', 'pubkey'],
+          ['accounts', [AccountMetaData]],
+          ['data', ['u8']],
+        ],
+      },
+    ],
+    [
+      AccountMetaData,
+      {
+        kind: 'struct',
+        fields: [
+          ['pubkey', 'pubkey'],
+          ['isSigner', 'u8'],
+          ['isWritable', 'u8'],
+        ],
+      },
+    ],
+    [
+      MintMaxVoteWeightSource,
+      {
+        kind: 'struct',
+        fields: [
+          ['type', 'u8'],
+          ['value', 'u64'],
+        ],
+      },
+    ],
+    [
+      GovernanceConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['communityVoteThreshold', 'VoteThreshold'],
+          ['minCommunityTokensToCreateProposal', 'u64'],
+          ['minInstructionHoldUpTime', 'u32'],
+          ['maxVotingTime', 'u32'],
+          ['communityVoteTipping', 'u8'],
+          ['councilVoteThreshold', 'VoteThreshold'],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
+          ['minCouncilTokensToCreateProposal', 'u64'],
+          // Pass the extra fields to instruction if programVersion >= 3
+          // The additional fields can't be passed to instructions for programVersion <= 2  because they were added in V3
+          // and would override the transferAuhtority param which follows it
+          ...((programVersion && programVersion >= PROGRAM_VERSION_V3) ||
+          // The account layout is backward compatible and we can read the extra fields for accountVersion >= 2
+          (accountVersion && accountVersion >= ACCOUNT_VERSION_V2)
+            ? [
+                ['councilVoteTipping', 'u8'],
+                ['communityVetoVoteThreshold', 'VoteThreshold'],
+              ]
+            : []),
+        ],
+      },
+    ],
+  ]);
+}
+
+/// Creates serialisation schema for spl-gov instructions for the given program version number
+function createGovernanceInstructionSchema(programVersion: number) {
   return new Map<Function, any>([
     [
       RealmConfigArgs,
@@ -320,7 +409,7 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['instruction', 'u8'],
           // V1 of the program used restrictive instruction deserialisation which didn't allow additional data
-          programVersion > PROGRAM_VERSION_V1 ? ['amount', 'u64'] : undefined,
+          programVersion >= PROGRAM_VERSION_V2 ? ['amount', 'u64'] : undefined,
         ].filter(Boolean),
       },
     ],
@@ -462,16 +551,6 @@ function createGovernanceSchema(programVersion: number) {
       },
     ],
     [
-      VoteChoice,
-      {
-        kind: 'struct',
-        fields: [
-          ['rank', 'u8'],
-          ['weightPercentage', 'u8'],
-        ],
-      },
-    ],
-    [
       CastVoteArgs,
       {
         kind: 'struct',
@@ -489,13 +568,13 @@ function createGovernanceSchema(programVersion: number) {
         kind: 'struct',
         fields: [
           ['instruction', 'u8'],
-          programVersion > PROGRAM_VERSION_V1
+          programVersion >= PROGRAM_VERSION_V2
             ? ['optionIndex', 'u8']
             : undefined,
           ['index', 'u16'],
           ['holdUpTime', 'u32'],
 
-          programVersion > PROGRAM_VERSION_V1
+          programVersion >= PROGRAM_VERSION_V2
             ? ['instructions', [InstructionData]]
             : ['instructionData', InstructionData],
         ].filter(Boolean),
@@ -565,40 +644,30 @@ function createGovernanceSchema(programVersion: number) {
         fields: [['instruction', 'u8']],
       },
     ],
-    [
-      InstructionData,
-      {
-        kind: 'struct',
-        fields: [
-          ['programId', 'pubkey'],
-          ['accounts', [AccountMetaData]],
-          ['data', ['u8']],
-        ],
-      },
-    ],
-    [
-      AccountMetaData,
-      {
-        kind: 'struct',
-        fields: [
-          ['pubkey', 'pubkey'],
-          ['isSigner', 'u8'],
-          ['isWritable', 'u8'],
-        ],
-      },
-    ],
+    ...createGovernanceStructSchema(programVersion, undefined),
+  ]);
+}
 
-    [
-      MintMaxVoteWeightSource,
-      {
-        kind: 'struct',
-        fields: [
-          ['type', 'u8'],
-          ['value', 'u64'],
-        ],
-      },
-    ],
+// Accounts schemas
+export const GOVERNANCE_ACCOUNT_SCHEMA_V1 = createGovernanceAccountSchema(1);
+export const GOVERNANCE_ACCOUNT_SCHEMA_V2 = createGovernanceAccountSchema(2);
 
+export function getGovernanceAccountSchema(accountVersion: number) {
+  switch (accountVersion) {
+    case 1:
+      return GOVERNANCE_ACCOUNT_SCHEMA_V1;
+    case 2:
+      return GOVERNANCE_ACCOUNT_SCHEMA_V2;
+    default:
+      throw new Error(
+        `Account schema for account version: ${accountVersion} doesn't exist`,
+      );
+  }
+}
+
+/// Creates serialisation schema for spl-gov accounts for the given account version number
+function createGovernanceAccountSchema(accountVersion: number) {
+  return new Map<Function, any>([
     [
       RealmConfig,
       {
@@ -663,32 +732,10 @@ function createGovernanceSchema(programVersion: number) {
           ['governedAccount', 'pubkey'],
           ['proposalCount', 'u32'],
           ['config', GovernanceConfig],
-          ...(programVersion >= PROGRAM_VERSION_V2
+          ...(accountVersion >= ACCOUNT_VERSION_V2
             ? [['reserved', [3]]]
             : [['reserved', [6]]]),
           ['votingProposalCount', 'u16'],
-        ],
-      },
-    ],
-    [
-      GovernanceConfig,
-      {
-        kind: 'struct',
-        fields: [
-          ['communityVoteThreshold', 'VoteThreshold'],
-          ['minCommunityTokensToCreateProposal', 'u64'],
-          ['minInstructionHoldUpTime', 'u32'],
-          ['maxVotingTime', 'u32'],
-          ['communityVoteTipping', 'u8'],
-          ['councilVoteThreshold', 'VoteThreshold'],
-          ['councilVetoVoteThreshold', 'VoteThreshold'],
-          ['minCouncilTokensToCreateProposal', 'u64'],
-          ...(programVersion >= PROGRAM_VERSION_V3
-            ? [
-                ['councilVoteTipping', 'u8'],
-                ['communityVetoVoteThreshold', 'VoteThreshold'],
-              ]
-            : []),
         ],
       },
     ],
@@ -737,7 +784,7 @@ function createGovernanceSchema(programVersion: number) {
           ['signatoriesCount', 'u8'],
           ['signatoriesSignedOffCount', 'u8'],
 
-          ...(programVersion === PROGRAM_VERSION_V1
+          ...(accountVersion === ACCOUNT_VERSION_V1
             ? [
                 ['yesVotesCount', 'u64'],
                 ['noVotesCount', 'u64'],
@@ -764,20 +811,20 @@ function createGovernanceSchema(programVersion: number) {
           ['executionFlags', 'u8'],
           ['maxVoteWeight', { kind: 'option', type: 'u64' }],
 
-          ...(programVersion === PROGRAM_VERSION_V1
+          ...(accountVersion === ACCOUNT_VERSION_V1
             ? []
             : [['maxVotingTime', { kind: 'option', type: 'u32' }]]),
 
           ['voteThreshold', { kind: 'option', type: 'VoteThreshold' }],
 
-          ...(programVersion === PROGRAM_VERSION_V1
+          ...(accountVersion === ACCOUNT_VERSION_V1
             ? []
             : [['reserved', [64]]]),
 
           ['name', 'string'],
           ['descriptionLink', 'string'],
 
-          ...(programVersion === PROGRAM_VERSION_V1
+          ...(accountVersion === ACCOUNT_VERSION_V1
             ? []
             : [['vetoVoteWeight', 'u64']]),
         ],
@@ -815,7 +862,7 @@ function createGovernanceSchema(programVersion: number) {
           ['governingTokenOwner', 'pubkey'],
           ['isRelinquished', 'u8'],
 
-          ...(programVersion === PROGRAM_VERSION_V1
+          ...(accountVersion === ACCOUNT_VERSION_V1
             ? [['voteWeight', VoteWeight]]
             : [
                 ['voterWeight', 'u64'],
@@ -831,12 +878,12 @@ function createGovernanceSchema(programVersion: number) {
         fields: [
           ['accountType', 'u8'],
           ['proposal', 'pubkey'],
-          programVersion > PROGRAM_VERSION_V1
+          accountVersion >= ACCOUNT_VERSION_V2
             ? ['optionIndex', 'u8']
             : undefined,
           ['instructionIndex', 'u16'],
           ['holdUpTime', 'u32'],
-          programVersion > PROGRAM_VERSION_V1
+          accountVersion >= ACCOUNT_VERSION_V2
             ? ['instructions', [InstructionData]]
             : ['instruction', InstructionData],
           ['executedAt', { kind: 'option', type: 'u64' }],
@@ -856,13 +903,14 @@ function createGovernanceSchema(programVersion: number) {
         ],
       },
     ],
+    ...createGovernanceStructSchema(undefined, accountVersion),
   ]);
 }
 
 export function getGovernanceSchemaForAccount(
   accountType: GovernanceAccountType,
 ) {
-  return getGovernanceSchema(getAccountProgramVersion(accountType));
+  return getGovernanceAccountSchema(getGovernanceAccountVersion(accountType));
 }
 
 export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
@@ -873,7 +921,7 @@ export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64');
   const instructionData: InstructionData = deserializeBorsh(
-    GOVERNANCE_SCHEMA,
+    GOVERNANCE_INSTRUCTION_SCHEMA_V1,
     InstructionData,
     instructionDataBin,
   );

@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { GOVERNANCE_SCHEMA } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateNativeTreasuryArgs } from './instructions';
 import { getNativeTreasuryAddress } from './accounts';
@@ -8,11 +8,14 @@ import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 export const withCreateNativeTreasury = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: number,
   governancePk: PublicKey,
   payer: PublicKey,
 ) => {
   const args = new CreateNativeTreasuryArgs();
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
+  const data = Buffer.from(
+    serialize(getGovernanceInstructionSchema(programVersion), args),
+  );
 
   const nativeTreasuryAddress = await getNativeTreasuryAddress(
     programId,

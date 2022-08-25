@@ -3,7 +3,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { InsertTransactionArgs } from './instructions';
 import { getProposalTransactionAddress, InstructionData } from './accounts';
@@ -38,7 +38,7 @@ export const withInsertTransaction = async (
         : undefined,
   });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   const proposalTransactionAddress = await getProposalTransactionAddress(

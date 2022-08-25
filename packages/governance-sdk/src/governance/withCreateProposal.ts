@@ -4,7 +4,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateProposalArgs } from './instructions';
 import {
@@ -43,7 +43,7 @@ export const withCreateProposal = async (
     useDenyOption,
   });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   let proposalIndexBuffer = Buffer.alloc(4);

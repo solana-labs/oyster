@@ -1,5 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { RevokeGoverningTokensArgs } from './instructions';
 import {
@@ -22,7 +22,7 @@ export const withRevokeGoverningTokens = async (
 ) => {
   const args = new RevokeGoverningTokensArgs({ amount });
   const data = Buffer.from(
-    serialize(getGovernanceSchema(programVersion), args),
+    serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
   const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(

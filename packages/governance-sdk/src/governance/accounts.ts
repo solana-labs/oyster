@@ -2,7 +2,11 @@ import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
-import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
+import {
+  ACCOUNT_VERSION_V1,
+  ACCOUNT_VERSION_V2,
+  PROGRAM_VERSION_V1,
+} from '../registry/constants';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -97,14 +101,17 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
   }
 }
 
-export function getAccountProgramVersion(accountType: GovernanceAccountType) {
+export function getGovernanceAccountVersion(
+  accountType: GovernanceAccountType,
+) {
   switch (accountType) {
+    case GovernanceAccountType.GovernanceV2:
     case GovernanceAccountType.VoteRecordV2:
     case GovernanceAccountType.ProposalTransactionV2:
     case GovernanceAccountType.ProposalV2:
-      return PROGRAM_VERSION_V2;
+      return ACCOUNT_VERSION_V2;
     default:
-      return PROGRAM_VERSION_V1;
+      return ACCOUNT_VERSION_V1;
   }
 }
 

@@ -31,10 +31,11 @@ export const GovernanceConfigForm = ({
   const realm = useRealm(governance.account.realm);
 
   const onCreate = async (values: GovernanceConfigValues) => {
-    const config = getGovernanceConfig(programVersion,values);
+    const config = getGovernanceConfig(programVersion, values);
 
     const setGovernanceConfigIx = createSetGovernanceConfig(
       programId,
+      programVersion,
       governance.pubkey,
       config,
     );

@@ -9,8 +9,8 @@ import {
   Proposal,
   ProposalTransaction,
   ProposalState,
+  getGovernanceInstructionSchema,
 } from '@solana/spl-governance';
-import { GOVERNANCE_SCHEMA } from '@solana/spl-governance';
 import { serialize } from 'borsh';
 
 import '../style.less';
@@ -54,7 +54,7 @@ export function InstructionCard({
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(
       serialize(
-        GOVERNANCE_SCHEMA,
+        getGovernanceInstructionSchema(rpcContext.programVersion),
         proposalInstruction.account.getSingleInstruction(),
       ),
     ).toString('base64');
@@ -63,7 +63,7 @@ export function InstructionCard({
       programId: proposalInstruction.account.getSingleInstruction().programId,
       dataBase64: dataBase64,
     };
-  }, [proposalInstruction]);
+  }, [proposalInstruction, rpcContext.programVersion]);
 
   const contentList: Record<string, JSX.Element> = {
     info: (
