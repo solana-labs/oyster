@@ -54,7 +54,7 @@ import {
   VoteTypeKind,
   ProposalOption,
   GovernanceAccountType,
-  getAccountProgramVersion,
+  getGovernanceAccountVersion,
   ProgramMetadata,
   VoteThresholdType,
   GoverningTokenConfigArgs,
@@ -63,6 +63,8 @@ import {
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
 import {
+  ACCOUNT_VERSION_V1,
+  ACCOUNT_VERSION_V2,
   PROGRAM_VERSION_V1,
   PROGRAM_VERSION_V2,
   PROGRAM_VERSION_V3,
@@ -248,6 +250,7 @@ export const createInstructionData = (instruction: TransactionInstruction) => {
   });
 };
 
+// Instruction schemas
 export const GOVERNANCE_INSTRUCTION_SCHEMA_V1 = createGovernanceInstructionSchema(
   1,
 );
@@ -868,10 +871,332 @@ function createGovernanceInstructionSchema(programVersion: number) {
   ]);
 }
 
+// Accounts schemas
+export const GOVERNANCE_ACCOUNT_SCHEMA_V1 = createGovernanceAccountSchema(1);
+export const GOVERNANCE_ACCOUNT_SCHEMA_V2 = createGovernanceAccountSchema(2);
+
+export function getGovernanceAccountSchema(accountVersion: number) {
+  switch (accountVersion) {
+    case 1:
+      return GOVERNANCE_ACCOUNT_SCHEMA_V1;
+    case 2:
+      return GOVERNANCE_ACCOUNT_SCHEMA_V2;
+    default:
+      throw new Error(
+        `Account schema for account version: ${accountVersion} doesn't exist`,
+      );
+  }
+}
+
+/// Creates serialisation schema for spl-gov accounts for the given account version number
+function createGovernanceAccountSchema(accountVersion: number) {
+  return new Map<Function, any>([
+    [
+      VoteChoice, // Shared
+      {
+        kind: 'struct',
+        fields: [
+          ['rank', 'u8'],
+          ['weightPercentage', 'u8'],
+        ],
+      },
+    ],
+    [
+      InstructionData, // Shared
+      {
+        kind: 'struct',
+        fields: [
+          ['programId', 'pubkey'],
+          ['accounts', [AccountMetaData]],
+          ['data', ['u8']],
+        ],
+      },
+    ],
+    [
+      AccountMetaData, // Shared
+      {
+        kind: 'struct',
+        fields: [
+          ['pubkey', 'pubkey'],
+          ['isSigner', 'u8'],
+          ['isWritable', 'u8'],
+        ],
+      },
+    ],
+    [
+      MintMaxVoteWeightSource, // Shared
+      {
+        kind: 'struct',
+        fields: [
+          ['type', 'u8'],
+          ['value', 'u64'],
+        ],
+      },
+    ],
+    [
+      RealmConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['useCommunityVoterWeightAddin', 'u8'],
+          ['useMaxCommunityVoterWeightAddin', 'u8'],
+          ['reserved', [6]],
+          ['minCommunityTokensToCreateGovernance', 'u64'],
+          ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+          ['councilMint', { kind: 'option', type: 'pubkey' }],
+        ],
+      },
+    ],
+    [
+      Realm,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['communityMint', 'pubkey'],
+          ['config', RealmConfig],
+          ['reserved', [6]],
+          ['votingProposalCount', 'u16'],
+          ['authority', { kind: 'option', type: 'pubkey' }],
+          ['name', 'string'],
+        ],
+      },
+    ],
+    [
+      RealmConfigAccount,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['realm', 'pubkey'],
+          ['communityTokenConfig', GoverningTokenConfig],
+          ['councilTokenConfig', GoverningTokenConfig],
+          ['reserved', [110]],
+        ],
+      },
+    ],
+    [
+      GoverningTokenConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['voterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['maxVoterWeightAddin', { kind: 'option', type: 'pubkey' }],
+          ['tokenType', 'u8'],
+          ['reserved', [8]],
+        ],
+      },
+    ],
+    [
+      Governance,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['realm', 'pubkey'],
+          ['governedAccount', 'pubkey'],
+          ['proposalCount', 'u32'],
+          ['config', GovernanceConfig],
+          ...(accountVersion >= ACCOUNT_VERSION_V2
+            ? [['reserved', [3]]]
+            : [['reserved', [6]]]),
+          ['votingProposalCount', 'u16'],
+        ],
+      },
+    ],
+    [
+      GovernanceConfig,
+      {
+        kind: 'struct',
+        fields: [
+          ['communityVoteThreshold', 'VoteThreshold'],
+          ['minCommunityTokensToCreateProposal', 'u64'],
+          ['minInstructionHoldUpTime', 'u32'],
+          ['maxVotingTime', 'u32'],
+          ['communityVoteTipping', 'u8'],
+          ['councilVoteThreshold', 'VoteThreshold'],
+          ['councilVetoVoteThreshold', 'VoteThreshold'],
+          ['minCouncilTokensToCreateProposal', 'u64'],
+          ...(accountVersion >= ACCOUNT_VERSION_V2
+            ? [
+                ['councilVoteTipping', 'u8'],
+                ['communityVetoVoteThreshold', 'VoteThreshold'],
+              ]
+            : []),
+        ],
+      },
+    ],
+    [
+      TokenOwnerRecord,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['realm', 'pubkey'],
+          ['governingTokenMint', 'pubkey'],
+          ['governingTokenOwner', 'pubkey'],
+          ['governingTokenDepositAmount', 'u64'],
+          ['unrelinquishedVotesCount', 'u32'],
+          ['totalVotesCount', 'u32'],
+          ['outstandingProposalCount', 'u8'],
+          ['reserved', [7]],
+          ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
+        ],
+      },
+    ],
+    [
+      ProposalOption,
+      {
+        kind: 'struct',
+        fields: [
+          ['label', 'string'],
+          ['voteWeight', 'u64'],
+          ['voteResult', 'u8'],
+          ['instructionsExecutedCount', 'u16'],
+          ['instructionsCount', 'u16'],
+          ['instructionsNextIndex', 'u16'],
+        ],
+      },
+    ],
+    [
+      Proposal,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['governance', 'pubkey'],
+          ['governingTokenMint', 'pubkey'],
+          ['state', 'u8'],
+          ['tokenOwnerRecord', 'pubkey'],
+          ['signatoriesCount', 'u8'],
+          ['signatoriesSignedOffCount', 'u8'],
+
+          ...(accountVersion === ACCOUNT_VERSION_V1
+            ? [
+                ['yesVotesCount', 'u64'],
+                ['noVotesCount', 'u64'],
+                ['instructionsExecutedCount', 'u16'],
+                ['instructionsCount', 'u16'],
+                ['instructionsNextIndex', 'u16'],
+              ]
+            : [
+                ['voteType', 'voteType'],
+                ['options', [ProposalOption]],
+                ['denyVoteWeight', { kind: 'option', type: 'u64' }],
+                ['reserved1', 'u8'],
+                ['abstainVoteWeight', { kind: 'option', type: 'u64' }],
+                ['startVotingAt', { kind: 'option', type: 'u64' }],
+              ]),
+
+          ['draftAt', 'u64'],
+          ['signingOffAt', { kind: 'option', type: 'u64' }],
+          ['votingAt', { kind: 'option', type: 'u64' }],
+          ['votingAtSlot', { kind: 'option', type: 'u64' }],
+          ['votingCompletedAt', { kind: 'option', type: 'u64' }],
+          ['executingAt', { kind: 'option', type: 'u64' }],
+          ['closedAt', { kind: 'option', type: 'u64' }],
+          ['executionFlags', 'u8'],
+          ['maxVoteWeight', { kind: 'option', type: 'u64' }],
+
+          ...(accountVersion === ACCOUNT_VERSION_V1
+            ? []
+            : [['maxVotingTime', { kind: 'option', type: 'u32' }]]),
+
+          ['voteThreshold', { kind: 'option', type: 'VoteThreshold' }],
+
+          ...(accountVersion === ACCOUNT_VERSION_V1
+            ? []
+            : [['reserved', [64]]]),
+
+          ['name', 'string'],
+          ['descriptionLink', 'string'],
+
+          ...(accountVersion === ACCOUNT_VERSION_V1
+            ? []
+            : [['vetoVoteWeight', 'u64']]),
+        ],
+      },
+    ],
+    [
+      SignatoryRecord,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['proposal', 'pubkey'],
+          ['signatory', 'pubkey'],
+          ['signedOff', 'u8'],
+        ],
+      },
+    ],
+    [
+      VoteWeight,
+      {
+        kind: 'enum',
+        values: [
+          ['yes', 'u64'],
+          ['no', 'u64'],
+        ],
+      },
+    ],
+    [
+      VoteRecord,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['proposal', 'pubkey'],
+          ['governingTokenOwner', 'pubkey'],
+          ['isRelinquished', 'u8'],
+
+          ...(accountVersion === ACCOUNT_VERSION_V1
+            ? [['voteWeight', VoteWeight]]
+            : [
+                ['voterWeight', 'u64'],
+                ['vote', 'vote'],
+              ]),
+        ],
+      },
+    ],
+    [
+      ProposalTransaction,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['proposal', 'pubkey'],
+          accountVersion >= ACCOUNT_VERSION_V2
+            ? ['optionIndex', 'u8']
+            : undefined,
+          ['instructionIndex', 'u16'],
+          ['holdUpTime', 'u32'],
+          accountVersion >= ACCOUNT_VERSION_V2
+            ? ['instructions', [InstructionData]]
+            : ['instruction', InstructionData],
+          ['executedAt', { kind: 'option', type: 'u64' }],
+          ['executionStatus', 'u8'],
+        ].filter(Boolean),
+      },
+    ],
+    [
+      ProgramMetadata,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['updatedAt', 'u64'],
+          ['version', 'string'],
+          ['reserved', [64]],
+        ],
+      },
+    ],
+  ]);
+}
+
 export function getGovernanceSchemaForAccount(
   accountType: GovernanceAccountType,
 ) {
-  return getGovernanceInstructionSchema(getAccountProgramVersion(accountType));
+  return getGovernanceAccountSchema(getGovernanceAccountVersion(accountType));
 }
 
 export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>

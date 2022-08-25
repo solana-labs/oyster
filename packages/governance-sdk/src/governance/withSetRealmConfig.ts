@@ -3,10 +3,7 @@ import {
   getRealmConfigAddress,
   getTokenHoldingAddress,
   GoverningTokenConfigAccountArgs,
-  GoverningTokenConfigArgs,
-  GoverningTokenType,
   MintMaxVoteWeightSource,
-  RealmConfigArgs,
 } from './accounts';
 import { SetRealmConfigArgs } from './instructions';
 import { getGovernanceInstructionSchema } from './serialisation';
