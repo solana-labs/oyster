@@ -1,14 +1,20 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import { withCreateProposal } from '@solana/spl-governance';
-import { withAddSignatory } from '@solana/spl-governance';
+import {
+  ProgramAccount,
+  Realm,
+  RpcContext,
+  VOTE_PERCENTAGE_MAX,
+  VoteType,
+  withAddSignatory,
+  withCreateProposal,
+  withVotePercentage,
+} from '@solana/spl-governance';
 import { sendTransactionWithNotifications } from '../tools/transactions';
-import { RpcContext } from '@solana/spl-governance';
-import { VoteType } from '@solana/spl-governance';
 
 export const createProposal = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
   name: string,
@@ -17,6 +23,7 @@ export const createProposal = async (
   proposalIndex: number,
   voterWeightRecord?: PublicKey,
   maxVoterWeightRecord?: PublicKey,
+  communityVoterWeightAddin?: PublicKey,
 ): Promise<PublicKey> => {
   let instructions: TransactionInstruction[] = [];
 
@@ -33,7 +40,7 @@ export const createProposal = async (
     instructions,
     programId,
     programVersion,
-    realm,
+    realm.pubkey,
     governance,
     tokenOwnerRecord,
     name,
@@ -49,6 +56,22 @@ export const createProposal = async (
     voterWeightRecord,
     maxVoterWeightRecord,
   );
+
+  // NDEV-510: change vote power to 100% before proposal creation
+  if (voterWeightRecord && communityVoterWeightAddin) {
+    await withVotePercentage(
+      instructions,
+      programId,
+      governingTokenMint,
+      realm.pubkey,
+      realm.account.communityMint,
+      payer,
+      voterWeightRecord,
+      communityVoterWeightAddin,
+      VOTE_PERCENTAGE_MAX,
+    );
+  }
+
 
   // Add the proposal creator as the default signatory
   await withAddSignatory(

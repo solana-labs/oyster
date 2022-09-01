@@ -11,7 +11,7 @@ import { Redirect } from 'react-router';
 import { GoverningTokenType } from '@solana/spl-governance';
 import { Governance, Realm } from '@solana/spl-governance';
 
-import { useWalletTokenOwnerRecord, useVoterWeightRecord } from '../../../hooks/apiHooks';
+import { useWalletTokenOwnerRecord, useVoterWeightRecord, useRealmConfig } from '../../../hooks/apiHooks';
 import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
 import BN from 'bn.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
@@ -40,6 +40,9 @@ export function NewProposalButton({
     governance?.account.realm,
     realm?.account.config.councilMint,
   );
+
+  const realmConfig = useRealmConfig(governance?.account.realm);
+  const communityVoterWeightAddin = realmConfig?.account.communityVoterWeightAddin;
 
   const communityMint = useMint(realm?.account.communityMint);
 
@@ -98,18 +101,21 @@ export function NewProposalButton({
     // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
     // because user might have different delegates for council and community
     const tokenOwnerRecord = communityTokenOwnerRecord;
+    console.log('tokenOwnerRecord', tokenOwnerRecord?.pubkey || 'null')
 
     return await createProposal(
       rpcContext,
-      governance.account.realm,
+      realm,
       governance.pubkey,
-      tokenOwnerRecord!.pubkey,
+      // todo: investigate case when tokenOwnerRecord is null
+      tokenOwnerRecord?.pubkey ?? governance.pubkey,
       values.name,
       values.descriptionLink ?? '',
       governingTokenMint,
       proposalIndex,
       voterWeightRecord?.voterWeight.pubkey,
       voterWeightRecord?.maxVoterWeight.pubkey,
+      communityVoterWeightAddin,
     );
   };
 

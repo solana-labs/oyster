@@ -1,23 +1,19 @@
-import { Button, Col, Modal, Row } from 'antd';
-import React from 'react';
+import { Button, Col, Modal, Radio, Row, Space } from 'antd';
+import React, { useState } from 'react';
 import { ProgramAccount, Realm } from '@solana/spl-governance';
 import { LABELS } from '../../../constants';
 import { hooks } from '@oyster/common';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-import {
-  withdrawGoverningTokens,
-} from '../../../actions/withdrawGoverningTokens';
+import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningTokens';
 
 import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
 import { useDepositedAccounts } from '../../../hooks/useDepositedAccounts';
 import { useVoterWeightRecord } from '../../../hooks/apiHooks';
+import { useMintFormatter } from '../../../hooks/useMintFormatter';
 
 const { useAccountByMint } = hooks;
-
-const { confirm } = Modal;
 
 export function WithdrawGoverningTokensButton ({
   realm,
@@ -30,6 +26,7 @@ export function WithdrawGoverningTokensButton ({
 }) {
   const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
+  const { formatValue } = useMintFormatter(governingTokenMint);
   const vestingProgramId = useVestingProgramId(realm);
   const voterWeightRecord = useVoterWeightRecord(realm);
   let ownerPubkey = rpcContext.wallet?.publicKey || undefined;
@@ -37,19 +34,22 @@ export function WithdrawGoverningTokensButton ({
     rpcContext, vestingProgramId, ownerPubkey,
     governingTokenMint,
   );
+  const [depositToWithdraw, setDepositToWithdraw] = useState(() => {
+    return activeDeposits && activeDeposits.length ? activeDeposits[activeDeposits.length - 1] : null;
+  });
+  const [isConfirmationVisible, setConfirmationVisible] = useState(false);
 
   if (!governingTokenMint || !activeDeposits) {
     return null;
   }
 
-  const isVisible = activeDeposits.length;
-  const depositToWithdraw = activeDeposits.length
-    ? activeDeposits[activeDeposits.length - 1] : null;
+  const isVisible = governingTokenAccount && activeDeposits.length;
 
-  return isVisible ? (
+  return isVisible ? <>
     <Button
       type="ghost"
       onClick={() => {
+        setConfirmationVisible(true);
         /* // TODO: add check for vote-locked deposits
         if (tokenOwnerRecord.account.unrelinquishedVotesCount > 0) {
           error({
@@ -59,52 +59,64 @@ export function WithdrawGoverningTokensButton ({
           return;
         }
         */
-        confirm({
-          title: LABELS.WITHDRAW_TOKENS,
-          icon: <ExclamationCircleOutlined />,
-          content: (
-            <Row>
-              <Col span={24}>
-                <p>{LABELS.WITHDRAW_TOKENS_QUESTION}</p>
-                {activeDeposits?.length > 1 &&
-                  <>
-                    <p>There is total {activeDeposits?.length} deposits:</p>
-                    <p>{activeDeposits.map(d =>
-                      <span key={d.pubkey.toString()}>
-                        <code>{d.pubkey.toBase58()} of value {d.balance.toString()}</code><br />
-                      </span>,
-                    )}</p>
-                    <p>
-                      Now withdrawing deposit:<br />
-                      <code>{depositToWithdraw!.pubkey.toBase58()}</code>
-                    </p>
-                  </>
-                }
-              </Col>
-            </Row>
-          ),
-          okText: LABELS.WITHDRAW,
-          cancelText: LABELS.CANCEL,
-          onOk: async () => {
-            if (governingTokenAccount) {
-              // TODO: after successful withdraw reload list of deposited accounts
-              await withdrawGoverningTokens(
-                rpcContext,
-                realm!.pubkey,
-                governingTokenAccount.pubkey,
-                governingTokenMint,
-                vestingProgramId,
-                voterWeightRecord!.voterWeight.pubkey,
-                voterWeightRecord!.maxVoterWeight.pubkey,
-                depositToWithdraw!.pubkey,
-                depositToWithdraw!.address,
-              );
-            }
-          },
-        });
       }}
     >
       {LABELS.WITHDRAW_TOKENS(tokenName)}
     </Button>
-  ) : null;
+    <Modal
+      visible={isConfirmationVisible}
+      title={LABELS.WITHDRAW_TOKENS(tokenName)}
+      destroyOnClose
+      cancelText={LABELS.CANCEL}
+      onCancel={() => setConfirmationVisible(false)}
+      okText={LABELS.WITHDRAW}
+      onOk={async () => {
+        if (governingTokenAccount && depositToWithdraw) {
+          // TODO: after successful withdraw reload list of deposited accounts
+          try {
+            await withdrawGoverningTokens(
+              rpcContext,
+              realm!.pubkey,
+              governingTokenAccount.pubkey,
+              governingTokenMint,
+              vestingProgramId,
+              voterWeightRecord!.voterWeight.pubkey,
+              voterWeightRecord!.maxVoterWeight.pubkey,
+              depositToWithdraw!.pubkey,
+              depositToWithdraw!.address,
+            );
+          } catch (e) {
+            Modal.error({
+              title: 'Cannot withdraw tokens',
+              content: `Probably you have tokens staked in proposals. Please release your tokens before withdrawing the tokens from the realm.`,
+            });
+            // rejection = noop
+          }
+        }
+      }}
+    >
+      <Row>
+        <Col span={24}>
+          <p>{LABELS.WITHDRAW_TOKENS_QUESTION}</p>
+          {activeDeposits?.length >= 1 && <>
+            <p>Select a deposit to withdraw from:</p>
+            <Radio.Group
+              onChange={(e) => {
+                setDepositToWithdraw(activeDeposits.find(d => d.label === e.target.value) || null);
+              }}
+              value={depositToWithdraw?.label}
+            >
+              <Space direction="vertical">{
+                activeDeposits.map(d =>
+                  <Radio value={d.label} key={d.label}>
+                    {d.label}<br />Amount: {formatValue(d.balance)}
+                  </Radio>,
+                )
+              }</Space>
+            </Radio.Group>
+          </>}
+        </Col>
+      </Row>
+    </Modal>
+  </> : null;
 }

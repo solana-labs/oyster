@@ -139,7 +139,6 @@ export const GovernanceView = () => {
                 <Button
                   type="dashed"
                   href={realmLink}
-                  onClick={() => history.push(realmLink)}
                 >
                   Realm: {realm?.account.name}
                 </Button>

@@ -34,6 +34,12 @@ export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
         });
       }
     }
+
+    return () => {
+      if (cleanupTimer) {
+        window.clearTimeout(cleanupTimer);
+      }
+    }
   }, [target, timeout]);
   /* eslint-enable react-hooks/exhaustive-deps */
 

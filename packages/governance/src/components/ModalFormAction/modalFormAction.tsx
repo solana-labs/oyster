@@ -244,15 +244,15 @@ function ActionForm<TResult>({
       visible={isModalVisible}
       onCancel={() => closeForm(false)}
       footer={[
-        <Button onClick={() => closeForm(!loading)}>
+        <Button key="negative" onClick={() => closeForm(!loading)}>
           {loading ? 'Close' : 'Cancel'}
         </Button>,
-        <Button onClick={form.submit} loading={loading} type="primary">
+        <Button key="positive" onClick={form.submit} loading={loading} type="primary">
           {loading ? `${formPendingAction}...` : formAction}
         </Button>,
       ]}
     >
-      {error && <ErrorMessageBanner></ErrorMessageBanner>}
+      {error && <ErrorMessageBanner />}
 
       <Form
         {...formDefaults}
