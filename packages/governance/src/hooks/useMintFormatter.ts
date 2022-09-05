@@ -9,7 +9,10 @@ interface IMintFormatter {
   parseValue: (value: string) => BN;
 }
 
-const formatLamports = (value: string | number | BN | BigNumber, decimals: number) => {
+const formatLamports = (
+  value: string | number | BN | BigNumber,
+  decimals: number,
+): BigNumber => {
   let v = value;
   if (v instanceof BN) {
     v = v.toString();
@@ -17,7 +20,9 @@ const formatLamports = (value: string | number | BN | BigNumber, decimals: numbe
   return new BigNumber(v).shiftedBy(-decimals);
 };
 
-export const useMintFormatter = (mint: PublicKey | undefined) => {
+export const useMintFormatter = (
+  mint: PublicKey | undefined,
+): IMintFormatter => {
   const mintInfo = useMint(mint);
   const decimals = mintInfo?.decimals || 9;
 
@@ -26,14 +31,17 @@ export const useMintFormatter = (mint: PublicKey | undefined) => {
       const bn = formatLamports(value, decimals);
       return asRaw ? bn.toString() : bn.toFormat();
     },
-    parseValue: (value) => {
-      return new BN(formatLamports(value.replace(',', ''), -decimals).toString());
+    parseValue: value => {
+      return new BN(
+        formatLamports(value.replace(',', ''), -decimals).toString(),
+      );
     },
-    closestNumber: (value) => {
+    closestNumber: value => {
       const bn = formatLamports(
-        formatLamports(value, decimals).integerValue(BigNumber.ROUND_CEIL), -decimals,
+        formatLamports(value, decimals).integerValue(BigNumber.ROUND_CEIL),
+        -decimals,
       );
       return new BN(bn.toString());
     },
-  } as IMintFormatter;
+  };
 };

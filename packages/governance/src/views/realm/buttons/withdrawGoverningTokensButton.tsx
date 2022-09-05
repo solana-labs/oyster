@@ -88,7 +88,8 @@ export function WithdrawGoverningTokensButton ({
           } catch (e) {
             Modal.error({
               title: 'Cannot withdraw tokens',
-              content: `Probably you have tokens staked in proposals. Please release your tokens before withdrawing the tokens from the realm.`,
+              content: `Probably you have tokens staked in proposals (including draft proposals, active proposals etc).
+              Please, release your tokens from all proposals before withdrawing the tokens from the realm`,
             });
             // rejection = noop
           }
