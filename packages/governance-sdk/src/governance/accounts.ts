@@ -2,7 +2,12 @@ import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import { Vote, VoteKind } from './instructions';
-import { PROGRAM_VERSION_V1, PROGRAM_VERSION_V2 } from '../registry/constants';
+import {
+  ACCOUNT_VERSION_V1,
+  ACCOUNT_VERSION_V2,
+  PROGRAM_VERSION_V1,
+  PROGRAM_VERSION_V2,
+} from '../registry/constants';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';
@@ -481,7 +486,7 @@ export async function getTokenOwnerRecordAddress(
   realm: PublicKey,
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
-) {
+): Promise<PublicKey> {
   const [tokenOwnerRecordAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
@@ -1146,4 +1151,78 @@ export async function getNativeTreasuryAddress(
   );
 
   return signatoryRecordAddress;
+}
+
+export function getGovernanceAccountVersion(
+  accountType: GovernanceAccountType,
+) {
+  switch (accountType) {
+    case GovernanceAccountType.GovernanceV2:
+    case GovernanceAccountType.VoteRecordV2:
+    case GovernanceAccountType.ProposalTransactionV2:
+    case GovernanceAccountType.ProposalV2:
+      return ACCOUNT_VERSION_V2;
+    default:
+      return ACCOUNT_VERSION_V1;
+  }
+}
+
+export enum VoteThresholdType {
+  // Approval Quorum
+  YesVotePercentage = 0,
+  // Not supported in the current version
+  QuorumPercentage = 1,
+  // Supported for VERSION >= 3
+  Disabled = 2,
+}
+
+export class VoteThreshold {
+  type: VoteThresholdType;
+  value: number | undefined;
+
+  constructor(args: { type: VoteThresholdType; value?: number | undefined }) {
+    this.type = args.type;
+    this.value = args.value;
+  }
+}
+
+enum GoverningTokenType {
+  Liquid = 0,
+  Membership = 1,
+  Dormant = 2,
+}
+
+export class GoverningTokenConfigArgs {
+  useVoterWeightAddin: boolean;
+  useMaxVoterWeightAddin: boolean;
+  tokenType: GoverningTokenType;
+
+  constructor(args: {
+    useVoterWeightAddin: boolean;
+    useMaxVoterWeightAddin: boolean;
+    tokenType: GoverningTokenType;
+  }) {
+    this.useVoterWeightAddin = args.useVoterWeightAddin;
+    this.useMaxVoterWeightAddin = args.useMaxVoterWeightAddin;
+    this.tokenType = args.tokenType;
+  }
+}
+
+export class GoverningTokenConfig {
+  voterWeightAddin: PublicKey | undefined;
+  maxVoterWeightAddin: PublicKey | undefined;
+  tokenType: GoverningTokenType;
+  reserved: Uint8Array;
+
+  constructor(args: {
+    voterWeightAddin: PublicKey | undefined;
+    maxVoterWeightAddin: PublicKey | undefined;
+    tokenType: GoverningTokenType;
+    reserved: Uint8Array;
+  }) {
+    this.voterWeightAddin = args.voterWeightAddin;
+    this.maxVoterWeightAddin = args.maxVoterWeightAddin;
+    this.tokenType = args.tokenType;
+    this.reserved = args.reserved;
+  }
 }

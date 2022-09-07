@@ -72,7 +72,6 @@ export const createProposal = async (
     );
   }
 
-
   // Add the proposal creator as the default signatory
   await withAddSignatory(
     instructions,

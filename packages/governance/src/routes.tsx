@@ -3,11 +3,10 @@ import React from 'react';
 import { contexts } from '@oyster/common';
 import { AppLayout } from './components/Layout/layout';
 import GovernanceProvider from './contexts/GovernanceContext';
-import { HomeView } from './views';
+import { HomeView, RealmView } from './views';
 import { ProposalView } from './views/proposal/proposalView';
 import { GovernanceView } from './views/governance/governanceView';
 import { DevToolsView } from './views/devtools/DevToolsView';
-import { RealmView } from './views/realm/realmView';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -32,28 +31,12 @@ export function Routes() {
                 <GovernanceProvider>
                   <AppLayout>
                     <Switch>
-                      <Route exact path="/" component={() => <HomeView />} />
-                      <Route
-                        path="/proposal/:key"
-                        children={<ProposalView />}
-                      />
-                      <Route
-                        path="/governance/:key"
-                        children={<GovernanceView />}
-                      />
-                      <Route path="/realm/:key" children={<RealmView />} />
-
-                      <Route
-                        exact
-                        path="/member/:key"
-                        children={<MemberView />}
-                      />
-
-                      <Route
-                        exact
-                        path="/devtools"
-                        children={<DevToolsView />}
-                      />
+                      <Route exact path='/' component={() => <HomeView />} />
+                      <Route path='/proposal/:key' children={<ProposalView />} />
+                      <Route path='/governance/:key' children={<GovernanceView />} />
+                      <Route path='/realm/:key' children={<RealmView />} />
+                      <Route exact path='/member/:key' children={<MemberView />} />
+                      <Route exact path='/devtools' children={<DevToolsView />} />
                     </Switch>
                   </AppLayout>
                 </GovernanceProvider>

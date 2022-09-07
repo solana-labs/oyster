@@ -7,10 +7,9 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { GovernanceConfig } from './accounts';
 import { CreateTokenGovernanceArgs } from './instructions';
-import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools';
 import { withRealmConfigAccounts } from './withRealmConfigAccounts';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
+import { PROGRAM_VERSION_V1 } from '../registry';
 
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
@@ -42,46 +41,14 @@ export const withCreateTokenGovernance = async (
   );
 
   const keys = [
-    {
-      pubkey: realm,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: governanceAddress,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: governedToken,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: tokenOwner,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: tokenOwnerRecord,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: SYSTEM_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
+    { pubkey: realm, isWritable: false, isSigner: false },
+    { pubkey: governanceAddress, isWritable: true, isSigner: false },
+    { pubkey: governedToken, isWritable: true, isSigner: false },
+    { pubkey: tokenOwner, isWritable: false, isSigner: true },
+    { pubkey: tokenOwnerRecord, isWritable: false, isSigner: false },
+    { pubkey: payer, isWritable: true, isSigner: true },
+    { pubkey: TOKEN_PROGRAM_ID, isWritable: false, isSigner: false },
+    { pubkey: SYSTEM_PROGRAM_ID, isWritable: false, isSigner: false },
   ];
 
   if (programVersion === PROGRAM_VERSION_V1) {
@@ -92,21 +59,11 @@ export const withCreateTokenGovernance = async (
     });
   }
 
-  keys.push({
-    pubkey: governanceAuthority,
-    isWritable: false,
-    isSigner: true,
-  });
+  keys.push({ pubkey: governanceAuthority, isWritable: false, isSigner: true });
 
   await withRealmConfigAccounts(keys, programId, realm, voterWeightRecord);
 
-  instructions.push(
-    new TransactionInstruction({
-      keys,
-      programId,
-      data,
-    }),
-  );
+  instructions.push(new TransactionInstruction({ keys, programId, data }));
 
   return governanceAddress;
 };

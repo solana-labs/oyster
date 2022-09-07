@@ -39,6 +39,7 @@ export const RealmView = () => {
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
+
     realm?.account.communityMint,
   );
 

@@ -2,20 +2,11 @@ import { Badge, Button, Col, List, Row, Space, Spin, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 import { useRealm } from '../../contexts/GovernanceContext';
 
-import {
-  useGovernance,
-  useNativeTreasury,
-  useProposalsByGovernance,
-} from '../../hooks/apiHooks';
+import { useGovernance, useNativeTreasury, useProposalsByGovernance } from '../../hooks/apiHooks';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 import { ProposalStateBadge } from '../proposal/components/header/proposalStateBadge';
 import { useHistory } from 'react-router-dom';
-import {
-  ExplorerLink,
-  TokenIcon,
-  useConnectionConfig,
-  useMint,
-} from '@oyster/common';
+import { ExplorerLink, TokenIcon, useConnectionConfig, useMint } from '@oyster/common';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
 import { Proposal, ProposalState } from '@solana/spl-governance';
@@ -26,7 +17,7 @@ import { useRpcContext } from '../../hooks/useRpcContext';
 import {
   formatMintNaturalAmountAsDecimal,
   formatMintSupplyFractionAsDecimalPercentage,
-  getDaysFromTimestamp,
+  getDaysFromTimestamp
 } from '../../tools/units';
 import { GovernanceActionBar } from './buttons/governanceActionBar';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -89,7 +80,7 @@ export const GovernanceView = () => {
           ) : (
             <TokenIcon mintAddress={p.account.governingTokenMint} size={30} />
           ),
-        proposal: p,
+        proposal: p
       }));
   }, [proposals, programIdBase58]);
 
@@ -109,11 +100,11 @@ export const GovernanceView = () => {
         background: `url(${tokenBackground})`,
         minHeight: '100%',
         backgroundRepeat: 'repeat-y',
-        backgroundSize: 'cover',
+        backgroundSize: 'cover'
       }}
     >
-      <Col flex="auto" xxl={15} xs={24} className="proposals-container">
-        {governance ? <div className="proposals-header">
+      <Col flex='auto' xxl={15} xs={24} className='proposals-container'>
+        {governance ? <div className='proposals-header'>
           {(
             <GovernanceBadge
               size={60}
@@ -123,7 +114,7 @@ export const GovernanceView = () => {
             ></GovernanceBadge>
           )}
 
-          <Space direction="vertical">
+          <Space direction='vertical'>
             <h2>
               {governanceMeta?.name}
             </h2>
@@ -132,12 +123,12 @@ export const GovernanceView = () => {
                 <ExplorerLink
                   short
                   address={governance.account.governedAccount}
-                  type="address"
+                  type='address'
                 />
               )}
               {(realmLink && realm?.account.name) && (
                 <Button
-                  type="dashed"
+                  type='dashed'
                   href={realmLink}
                 >
                   Realm: {realm?.account.name}
@@ -147,31 +138,32 @@ export const GovernanceView = () => {
             <Space>
               <a
                 href={tokenMap.get(communityMint)?.extensions?.website}
-                target="_blank"
-                rel="noopener noreferrer"
+                target='_blank'
+                rel='noopener noreferrer'
               >
                 {tokenMap.get(communityMint)?.extensions?.website}
               </a>
               {communityMintInfo && (
-                <Space direction="vertical">
-                  <Space size="large">
-                    <Space direction="vertical" size={0}>
-                      <Text type="secondary">{`max voting time: ${getDaysFromTimestamp(
-                        governance.account.config.maxVotingTime,
+                <Space direction='vertical'>
+                  <Space size='large'>
+                    <Space direction='vertical' size={0}>
+                      <Text type='secondary'>{`max voting time: ${getDaysFromTimestamp(
+                        governance.account.config.maxVotingTime
                       )} days`}</Text>
-                      <Text type="secondary">{`yes vote threshold: ${governance.account.config.voteThresholdPercentage.value}%`}</Text>
+                      <Text
+                        type='secondary'>{`yes vote threshold: ${governance.account.config.voteThresholdPercentage.value}%`}</Text>
                     </Space>
 
-                    <Space direction="vertical" size={0}>
-                      <Text type="secondary">{`min instruction hold up time: ${getDaysFromTimestamp(
-                        governance.account.config.minInstructionHoldUpTime,
+                    <Space direction='vertical' size={0}>
+                      <Text type='secondary'>{`min instruction hold up time: ${getDaysFromTimestamp(
+                        governance.account.config.minInstructionHoldUpTime
                       )} days`}</Text>
-                      <Text type="secondary">{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
+                      <Text type='secondary'>{`min tokens to create proposal: ${formatMintNaturalAmountAsDecimal(
                         communityMintInfo,
-                        governance.account.config.minCommunityTokensToCreateProposal,
+                        governance.account.config.minCommunityTokensToCreateProposal
                       )} (${formatMintSupplyFractionAsDecimalPercentage(
                         communityMintInfo,
-                        governance.account.config.minCommunityTokensToCreateProposal,
+                        governance.account.config.minCommunityTokensToCreateProposal
                       )})`}</Text>
                     </Space>
                   </Space>
@@ -182,7 +174,7 @@ export const GovernanceView = () => {
                       }`}{' '}
                       <ExplorerLink
                         address={nativeTreasury.pubkey}
-                        type="address"
+                        type='address'
                         length={3}
                       ></ExplorerLink>{' '}
                     </div>
@@ -192,27 +184,24 @@ export const GovernanceView = () => {
             </Space>
           </Space>
 
-          <GovernanceActionBar
-            governance={governance}
-            realm={realm}
-          ></GovernanceActionBar>
-        </div> : <Spin /> }
-        <h1 className="proposals-list-title">Proposals</h1>
+          <GovernanceActionBar governance={governance} realm={realm} />
+        </div> : <Spin />}
+        <h1 className='proposals-list-title'>Proposals</h1>
         <List
           loading={isProposalsLoading}
-          itemLayout="vertical"
-          size="large"
-          pagination={ proposals.length >= PAGE_SIZE ? {
+          itemLayout='vertical'
+          size='large'
+          pagination={proposals.length >= PAGE_SIZE ? {
             onChange: page => {
               setPage(page);
             },
-            pageSize: PAGE_SIZE,
-          } : false }
+            pageSize: PAGE_SIZE
+          } : false}
           dataSource={proposalItems}
           renderItem={item => (
             <List.Item
               key={item.key}
-              className="proposal-item"
+              className='proposal-item'
               onClick={() => history.push(item.href)}
             >
               <List.Item.Meta

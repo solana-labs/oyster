@@ -10,7 +10,10 @@
  **/
 import { useEffect, useState } from 'react';
 
-export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
+export const useArrayLengthWatcher = (
+  target: Array<any>,
+  timeout = 5000,
+): boolean => {
   const [lastLength, setLastLength] = useState(target.length);
   const [isFilled, setIsFilled] = useState(false);
   const [cleanupTimer, setCleanupTimer] = useState(0);
@@ -26,7 +29,7 @@ export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
     } else {
       // stale value - schedule trailing cleanup
       if (!cleanupTimer) {
-        setCleanupTimer((timer) => {
+        setCleanupTimer(timer => {
           window.clearTimeout(timer);
           return window.setTimeout(() => {
             setIsFilled(true);
@@ -39,7 +42,7 @@ export const useArrayLengthWatcher = (target: Array<any>, timeout = 5000) => {
       if (cleanupTimer) {
         window.clearTimeout(cleanupTimer);
       }
-    }
+    };
   }, [target, timeout]);
   /* eslint-enable react-hooks/exhaustive-deps */
 

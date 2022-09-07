@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useWallet, useConnection } from '@oyster/common';
+import { useConnection, useWallet } from '@oyster/common';
 import {
   getNativeTreasuryAddress,
   getRealmConfigAddress,
@@ -11,12 +11,12 @@ import {
   ProgramAccount,
   Proposal,
   ProposalTransaction,
+  pubkeyFilter,
   Realm,
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
-  pubkeyFilter,
 } from '@solana/spl-governance';
 import {
   useAccountByPda,
@@ -26,8 +26,8 @@ import {
 } from './accountHooks';
 import { useRpcContext } from './useRpcContext';
 import {
-  getVoterWeightProgramAccount,
   AccountVoterWeightRecord,
+  getVoterWeightProgramAccount,
 } from './governance-sdk';
 
 // ----- Realm Config ---------
@@ -219,6 +219,7 @@ export function useVoterWeightRecord(
       );
       setResult(account);
     }
+
     main();
   }, [connection, realm, realmConfig, programId, isVoterWeightAddin, wallet]);
 
