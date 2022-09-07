@@ -16,10 +16,8 @@ import {
   GOVERNANCE_PROGRAM_SEED,
 } from './accounts';
 import BN from 'bn.js';
-import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
-import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { shortMeta } from '../tools';
+import { shortMeta, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools';
+import { PROGRAM_VERSION_V1 } from '../registry';
 import { AccountLayout, Token } from '@solana/spl-token';
 
 /**

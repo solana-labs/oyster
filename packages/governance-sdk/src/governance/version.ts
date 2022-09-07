@@ -5,11 +5,14 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
-import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry/constants';
-import { BN_ZERO } from '../tools/numbers';
-import { getProgramDataAccount } from '../tools/sdk/bpfUpgradeableLoader';
-import { ProgramAccount, simulateTransaction } from '../tools/sdk/runtime';
-import { parseVersion } from '../tools/version';
+import { PROGRAM_VERSION, PROGRAM_VERSION_V1 } from '../registry';
+import {
+  BN_ZERO,
+  getProgramDataAccount,
+  parseVersion,
+  ProgramAccount,
+  simulateTransaction,
+} from '../tools';
 import { getProgramMetadataAddress, ProgramMetadata } from './accounts';
 import { GovernanceAccountParser } from './serialisation';
 import { withUpdateProgramMetadata } from './withUpdateProgramMetadata';

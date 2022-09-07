@@ -1,4 +1,4 @@
-import { SendTransactionError } from '../tools/sdk/runtime';
+import { SendTransactionError } from '../tools';
 
 export const GovernanceError = [
   'Invalid instruction passed to program', // InvalidInstruction
@@ -134,7 +134,6 @@ const governanceToolsErrorOffset = 1100;
 export function getTransactionErrorMsg(error: SendTransactionError) {
   try {
     const instructionError = (error.txError as any).InstructionError[1];
-
     if (instructionError.Custom !== undefined) {
       if (instructionError.Custom >= governanceToolsErrorOffset) {
         return GovernanceToolsError[
@@ -149,7 +148,7 @@ export function getTransactionErrorMsg(error: SendTransactionError) {
         return `Possible error: ${TokenError[instructionError.Custom]}`;
       }
     } else {
-      return instructionError;
+      return JSON.stringify(instructionError);
     }
   } catch {
     return JSON.stringify(error);
