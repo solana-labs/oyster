@@ -5,20 +5,34 @@ import {
   RpcContext,
   withDepositGoverningTokens,
 } from '@solana/spl-governance';
-import { sendTransactionWithNotifications } from '../tools/transactions';
 import BN from 'bn.js';
 import { AccountLayout } from '@solana/spl-token';
+import { sendTransactionWithNotifications } from '../tools/transactions';
+
+export interface DepositGoverningTokenContext {
+  realm: PublicKey;
+  governingTokenSource: TokenAccount;
+  governingTokenMint: PublicKey;
+  depositableAmount: BN;
+  vestingProgramId?: PublicKey;
+  voterWeightRecord?: PublicKey;
+  maxVoterWeightRecord?: PublicKey;
+}
 
 export const depositGoverningTokens = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
-  governingTokenSource: TokenAccount,
-  governingTokenMint: PublicKey,
-  amount: BN,
-  vestingProgramId?: PublicKey,
-  voterWeightRecord?: PublicKey,
-  maxVoterWeightRecord?: PublicKey,
+  governanceContext: DepositGoverningTokenContext,
 ) => {
+  const {
+    realm,
+    governingTokenSource,
+    governingTokenMint,
+    depositableAmount,
+    vestingProgramId,
+    voterWeightRecord,
+    maxVoterWeightRecord,
+  } = governanceContext;
+
   let instructions: TransactionInstruction[] = [];
   let signers: Keypair[] = [];
 
@@ -47,7 +61,7 @@ export const depositGoverningTokens = async (
     governingTokenMint,
     walletPubkey,
     walletPubkey,
-    amount as BN,
+    depositableAmount as BN,
     vestingProgramId,
     voterWeightRecord,
     maxVoterWeightRecord,

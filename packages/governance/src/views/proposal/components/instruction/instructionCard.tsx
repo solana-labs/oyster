@@ -60,10 +60,10 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
   }, [proposalInstruction]);
 
   const instructionDetails = useMemo(() => {
-    let dataBase64 = Buffer.from(serialize(getGovernanceInstructionSchema(rpcContext.programVersion), instructionData)).toString('base64');
-    let programId = instructionData!.programId;
+    const dataBase64 = Buffer.from(serialize(getGovernanceInstructionSchema(rpcContext.programVersion), instructionData)).toString('base64');
+    const programId = instructionData!.programId;
     return { programId, dataBase64 };
-  }, [instructionData]);
+  }, [instructionData, rpcContext.programVersion]);
 
   const contentList: Record<string, JSX.Element> = {
     info: (

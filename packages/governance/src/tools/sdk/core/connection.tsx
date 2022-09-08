@@ -77,6 +77,7 @@ export async function signTransaction({
   ).blockhash;
   transaction.setSigners(publicKey, ...signers.map(s => s.publicKey));
   if (signers.length > 0) {
+    console.log(signers);
     transaction.partialSign(...signers);
   }
   try {

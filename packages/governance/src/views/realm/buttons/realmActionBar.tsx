@@ -20,12 +20,9 @@ export function RealmActionBar({
   const parentRef = useRef<HTMLDivElement>(null);
   const { publicKey, connected } = useWallet();
 
-
   if (!realm) {
     return null;
   }
-
-
 
   const showCreateNewGovernance = connected;
 

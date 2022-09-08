@@ -1,33 +1,29 @@
 import { Button, Col, InputNumber, Modal, Row } from 'antd';
 import React, { useState } from 'react';
 import { ProgramAccount, Realm } from '@solana/spl-governance';
-import { LABELS } from '../../../constants';
+import { PublicKey } from '@solana/web3.js';
 import { hooks } from '@oyster/common';
+import BN from 'bn.js';
+
+import { LABELS } from '../../../constants';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { depositGoverningTokens } from '../../../actions/depositGoverningTokens';
-import { PublicKey } from '@solana/web3.js';
 import { useRpcContext } from '../../../hooks/useRpcContext';
-import BN from 'bn.js';
 import { useVoterWeightRecord } from '../../../hooks/apiHooks';
 import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
 import { useMintFormatter } from '../../../hooks/useMintFormatter';
 
 const { useAccountByMint } = hooks;
-
 const { confirm } = Modal;
 
-export function DepositGoverningTokensButton ({
-  realm,
-  governingTokenMint,
-  tokenName,
-}: {
+export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenName }: {
   realm: ProgramAccount<Realm> | undefined;
   governingTokenMint: PublicKey | undefined;
   tokenName?: string;
 }) {
   const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
-  const { closestNumber, formatValue, parseValue } = useMintFormatter(governingTokenMint) || {}
+  const { closestNumber, formatValue, parseValue } = useMintFormatter(governingTokenMint) || {};
   const vestingProgramId = useVestingProgramId(realm);
   const voterWeightRecord = useVoterWeightRecord(realm);
 
@@ -36,7 +32,7 @@ export function DepositGoverningTokensButton ({
   const availableBalance = new BN(governingTokenAccount?.info.amount as BN || 0);
 
   const defaultDepositableAmount = availableBalance.isZero()
-      ? closestNumber(100_000) : closestNumber(availableBalance.divn(4));
+    ? closestNumber(100_000) : closestNumber(availableBalance.divn(4));
 
   const [depositableAmount, setDepositableAmount] = useState<BN>(defaultDepositableAmount);
 
@@ -48,24 +44,27 @@ export function DepositGoverningTokensButton ({
     return null;
   }
 
-  const isVisible = governingTokenAccount && voterWeightRecord && !availableBalance.isZero();
+  const isVisible = governingTokenAccount && !availableBalance.isZero();
 
   return isVisible ? <>
-    <Button
-      type="primary"
-      onClick={() => setConfirmationVisible(true)}
-      onAbort={() => {
-        confirm({
-          title: LABELS.DEPOSIT_TOKENS(tokenName),
-          icon: <ExclamationCircleOutlined />,
-          // Modal.confirm content not reactive, so we can't provide inputbox
-          okText: LABELS.DEPOSIT,
-          cancelText: LABELS.CANCEL,
-        });
-      }}
-    >
-      {LABELS.DEPOSIT_TOKENS(tokenName)}
-    </Button>
+    <div>
+      <span style={{ marginRight: '10px' }}>Available: {formatValue(availableBalance)}</span>
+      <Button
+        type='primary'
+        onClick={() => setConfirmationVisible(true)}
+        onAbort={() => {
+          confirm({
+            title: LABELS.DEPOSIT_TOKENS(tokenName),
+            icon: <ExclamationCircleOutlined />,
+            // Modal.confirm content not reactive, so we can't provide inputbox
+            okText: LABELS.DEPOSIT,
+            cancelText: LABELS.CANCEL
+          });
+        }}
+      >
+        {LABELS.DEPOSIT_TOKENS(tokenName)}
+      </Button>
+    </div>
     <Modal
       visible={isConfirmationVisible}
       title={LABELS.DEPOSIT_TOKENS(tokenName)}
@@ -78,20 +77,23 @@ export function DepositGoverningTokensButton ({
       }}
       okText={LABELS.DEPOSIT}
       onOk={async () => {
-        if (governingTokenAccount && voterWeightRecord) {
+        if (governingTokenAccount) {
           try {
             await depositGoverningTokens(
               rpcContext,
-              realm!.pubkey,
-              governingTokenAccount,
-              governingTokenMint!,
-              depositableAmount,
-              vestingProgramId,
-              voterWeightRecord!.voterWeight.pubkey,
-              voterWeightRecord!.maxVoterWeight.pubkey,
+              {
+                realm: realm!.pubkey,
+                governingTokenSource: governingTokenAccount,
+                governingTokenMint: governingTokenMint!,
+                depositableAmount: depositableAmount,
+                vestingProgramId: vestingProgramId,
+                voterWeightRecord: voterWeightRecord ? voterWeightRecord.voterWeight.pubkey : undefined,
+                maxVoterWeightRecord: voterWeightRecord ? voterWeightRecord.maxVoterWeight.pubkey : undefined
+              }
             );
           } catch (e) {
             // user rejected transaction, noop
+            console.log(e);
           }
         }
       }

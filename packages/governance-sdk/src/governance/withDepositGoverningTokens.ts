@@ -162,6 +162,8 @@ export const withDepositGoverningTokens = async (
     });
   }
 
+  console.log(keys);
+
   instructions.push(
     new TransactionInstruction({
       keys,

@@ -1,37 +1,32 @@
 import React from 'react';
 import { contexts } from '@oyster/common';
-import { TokenOwnerRecord } from '@solana/spl-governance';
-
-import {
-  formatMintNaturalAmountAsDecimal,
-  formatMintVoteWeight,
-} from '../../tools/units';
+import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance';
 import { MintInfo } from '@solana/spl-token';
-import { ProgramAccount } from '@solana/spl-governance';
+
+import { formatMintNaturalAmountAsDecimal, formatMintVoteWeight } from '../../tools/units';
 
 const { useMint } = contexts.Accounts;
 
-// TODO:
-export function RealmDepositBadge(props: any) {
-  return null;
-}
-
-export function RealmDepositBadgeOyster({
-  councilTokenOwnerRecord,
-  communityTokenOwnerRecord,
-  showVoteWeights,
-}: {
+export interface RealmDepositBadgeProps {
   councilTokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
   communityTokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined;
   showVoteWeights?: boolean;
-}) {
-  const communityMint = useMint(
-    communityTokenOwnerRecord?.account.governingTokenMint,
-  );
+}
 
-  const councilMint = useMint(
-    councilTokenOwnerRecord?.account.governingTokenMint,
-  );
+// TODO:
+export function RealmDepositBadge(props: RealmDepositBadgeProps) {
+  return null;
+}
+
+export function RealmDepositBadgeOyster(props: RealmDepositBadgeProps) {
+  const {
+    councilTokenOwnerRecord,
+    communityTokenOwnerRecord,
+    showVoteWeights
+  } = props;
+  const communityMint = useMint(communityTokenOwnerRecord?.account.governingTokenMint);
+
+  const councilMint = useMint(councilTokenOwnerRecord?.account.governingTokenMint);
 
   if (!councilTokenOwnerRecord && !communityTokenOwnerRecord) {
     return null;
@@ -42,7 +37,7 @@ export function RealmDepositBadgeOyster({
       <span>deposited </span>
       {communityTokenOwnerRecord && communityMint && (
         <TokenDepositStatistics
-          label="tokens"
+          label='tokens'
           mint={communityMint}
           tokenOwnerRecord={communityTokenOwnerRecord}
           showVoteWeights={showVoteWeights}
@@ -51,7 +46,7 @@ export function RealmDepositBadgeOyster({
       {communityTokenOwnerRecord && councilTokenOwnerRecord && ' | '}
       {councilTokenOwnerRecord && councilMint && (
         <TokenDepositStatistics
-          label="council tokens"
+          label='council tokens'
           mint={councilMint}
           tokenOwnerRecord={councilTokenOwnerRecord}
           showVoteWeights={showVoteWeights}
@@ -61,12 +56,7 @@ export function RealmDepositBadgeOyster({
   );
 }
 
-function TokenDepositStatistics({
-  label,
-  mint,
-  tokenOwnerRecord,
-  showVoteWeights,
-}: {
+function TokenDepositStatistics({ label, mint, tokenOwnerRecord, showVoteWeights }: {
   label: string;
   mint: MintInfo;
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>;
@@ -76,13 +66,13 @@ function TokenDepositStatistics({
     <>
       <span>{`${label}: ${formatMintNaturalAmountAsDecimal(
         mint,
-        tokenOwnerRecord.account.governingTokenDepositAmount,
+        tokenOwnerRecord.account.governingTokenDepositAmount
       )}`}</span>
       {showVoteWeights &&
         !tokenOwnerRecord.account.governingTokenDepositAmount.isZero() && (
           <span>{` (${formatMintVoteWeight(
             mint,
-            tokenOwnerRecord.account.governingTokenDepositAmount,
+            tokenOwnerRecord.account.governingTokenDepositAmount
           )})`}</span>
         )}
     </>
