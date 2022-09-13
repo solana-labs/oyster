@@ -5,8 +5,10 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { getGovernanceSchema } from './serialisation';
+import { AccountLayout, Token } from '@solana/spl-token';
 import { serialize } from 'borsh';
+import BN from 'bn.js';
+import { getGovernanceSchema } from './serialisation';
 import {
   DepositGoverningTokensArgs,
   DepositGoverningTokensMultiArgs,
@@ -15,32 +17,31 @@ import {
   getTokenOwnerRecordAddress,
   GOVERNANCE_PROGRAM_SEED,
 } from './accounts';
-import BN from 'bn.js';
 import { shortMeta, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools';
 import { PROGRAM_VERSION_V1 } from '../registry';
-import { AccountLayout, Token } from '@solana/spl-token';
 
 /**
  * Instructions to create and initialise vesting spl-token account
  * ref:https://github.com/neonlabsorg/neon-spl-governance/blob/f13d7e7c1507819306797688ce0bb1f6950a5038/addin-vesting/cli/src/main.rs#L58-L82
  */
-export const createVestingAccount = async (
+export async function createVestingAccount(
   instructions: TransactionInstruction[],
   vestingProgramId: PublicKey,
   governingTokenMint: PublicKey,
   payer: PublicKey,
   amount: number,
-) => {
-  const vestingToken = Keypair.generate();
-  const [vestingOwnerPubkey] = await PublicKey.findProgramAddress(
-    [vestingToken.publicKey.toBuffer()],
+) {
+  const vestingTokenKeypair = Keypair.generate();
+  const vestingTokenPubkey = vestingTokenKeypair.publicKey;
+  const [vestingPubkey] = await PublicKey.findProgramAddress(
+    [vestingTokenPubkey.toBuffer()],
     vestingProgramId,
   );
 
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payer,
-      newAccountPubkey: vestingToken.publicKey,
+      newAccountPubkey: vestingTokenPubkey,
       lamports: amount,
       space: AccountLayout.span,
       programId: TOKEN_PROGRAM_ID,
@@ -51,19 +52,23 @@ export const createVestingAccount = async (
     Token.createInitAccountInstruction(
       TOKEN_PROGRAM_ID,
       governingTokenMint,
-      vestingToken.publicKey,
-      vestingOwnerPubkey,
+      vestingTokenPubkey,
+      vestingPubkey,
     ),
   );
 
-  return {
-    vestingToken,
-    vestingTokenAccount: vestingToken.publicKey,
-    vestingOwnerPubkey,
-  };
-};
+  instructions.forEach(instruction => {
+    console.log(instruction.data);
+    console.log(instruction.programId.toBase58());
+    console.log(
+      instruction.keys.map(key => ({ ...key, pubkey: key.pubkey.toBase58() })),
+    );
+  });
 
-export const withDepositGoverningTokens = async (
+  return { vestingTokenPubkey, vestingPubkey, vestingTokenKeypair };
+}
+
+export async function withDepositGoverningTokens(
   instructions: TransactionInstruction[],
   programId: PublicKey,
   programVersion: number,
@@ -76,10 +81,12 @@ export const withDepositGoverningTokens = async (
   vestingProgramId?: PublicKey,
   voterWeightRecord?: PublicKey,
   maxVoterWeightRecord?: PublicKey,
-  vestingTokenAddress?: PublicKey,
-  vestingTokenAccount?: PublicKey,
-) => {
+  vestingTokenPubkey?: PublicKey,
+  vestingPubkey?: PublicKey,
+) {
   let data;
+
+  // console.log(arguments);
 
   if (!vestingProgramId) {
     // obsolete governance workflow
@@ -106,8 +113,8 @@ export const withDepositGoverningTokens = async (
       programId,
     );
 
-    vestingTokenAddress = tokenOwnerRecordAddress;
-    vestingTokenAccount = governingTokenHoldingAddress;
+    vestingTokenPubkey = tokenOwnerRecordAddress;
+    vestingPubkey = governingTokenHoldingAddress;
   } else {
     // generate correct deposit payload
     data = Buffer.from(
@@ -125,10 +132,10 @@ export const withDepositGoverningTokens = async (
     // 1. `[]` The spl-token program account
     shortMeta(TOKEN_PROGRAM_ID),
     // 2. `[writable]` The vesting account. PDA seeds: [vesting spl-token account]
-    shortMeta(vestingTokenAccount!, true),
+    shortMeta(vestingPubkey!, true),
     // 3. `[writable]` The vesting spl-token account
     // + signer, it's new account
-    shortMeta(vestingTokenAddress!, true, true),
+    shortMeta(vestingTokenPubkey!, true, true),
     // 4. `[signer]` The source spl-token account owner
     // + writable
     shortMeta(governingTokenOwner, true, true),
@@ -145,7 +152,7 @@ export const withDepositGoverningTokens = async (
     // + writable
     shortMeta(payer, true, true),
     // 8. `[]` The Governance program account
-    shortMeta(programId),
+    // shortMeta(programId),
     // 9. `[]` The Realm account
     shortMeta(realm),
     // 10. `[writable]` The VoterWeightRecord. PDA seeds: ['voter_weight', realm, token_mint, token_owner]
@@ -162,15 +169,11 @@ export const withDepositGoverningTokens = async (
     });
   }
 
-  console.log(keys);
+  console.log(keys.map(key => ({ ...key, pubkey: key.pubkey?.toBase58() })));
 
   instructions.push(
-    new TransactionInstruction({
-      keys,
-      programId: vestingProgramId || programId,
-      data,
-    }),
+    new TransactionInstruction({ programId: vestingProgramId!, keys, data }),
   );
 
-  return vestingTokenAddress;
-};
+  return vestingTokenPubkey;
+}

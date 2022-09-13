@@ -40,7 +40,9 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const communityMint = useMint(realm?.account.communityMint);
 
-  const voterWeightRecord = useVoterWeightRecord(realm, governance);
+  const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm, governance);
+
+  // console.log(voterWeight?.pubkey.toBase58(), maxVoterWeight?.pubkey.toBase58());
 
   if (!governance || !communityMint || !realm) {
     return null;
@@ -58,8 +60,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
       new BN(governance?.account.config.minCouncilTokensToCreateProposal)
     ) >= 0;
 
-  const canCreateProposalUsingVoterWeight =
-    voterWeightRecord && !voterWeightRecord.voterWeight.account.voterWeight.isZero();
+  const canCreateProposalUsingVoterWeight = !voterWeight?.account.voterWeight.isZero();
 
   const canCreateProposal =
     canCreateProposalUsingCommunityTokens ||
@@ -70,7 +71,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
   let creationDisabledReason = undefined;
   if (!canCreateProposal) {
     creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_BELOW_LIMIT;
-    if (voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.isZero()) {
+    if (voterWeight?.account.voterWeight.isZero()) {
       creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_EMPTY;
     }
   }
@@ -107,8 +108,8 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
       values.descriptionLink ?? '',
       governingTokenMint,
       proposalIndex,
-      voterWeightRecord?.voterWeight.pubkey,
-      voterWeightRecord?.maxVoterWeight.pubkey,
+      voterWeight?.pubkey,
+      maxVoterWeight?.pubkey,
       communityVoterWeightAddin
     );
   };

@@ -2,6 +2,7 @@ import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { TokenAccount } from '@oyster/common';
 import {
   createVestingAccount,
+  createVoterWeightRecordByVestingAddin,
   RpcContext,
   withDepositGoverningTokens,
 } from '@solana/spl-governance';
@@ -41,20 +42,37 @@ export const depositGoverningTokens = async (
     AccountLayout.span,
   );
 
+  if (!voterWeightRecord) {
+    const instruction = await createVoterWeightRecordByVestingAddin(
+      programId,
+      vestingProgramId!,
+      realm,
+      governingTokenMint,
+      walletPubkey,
+      walletPubkey,
+    );
+    // @ts-ignore
+    instructions.push(instruction);
+  }
+
   // create target address on which deposit will be transferred
-  const { vestingToken, vestingOwnerPubkey } = await createVestingAccount(
+  const {
+    vestingTokenPubkey,
+    vestingPubkey,
+    vestingTokenKeypair,
+  } = await createVestingAccount(
     instructions,
-    vestingProgramId || programId,
+    vestingProgramId!,
     governingTokenMint,
     walletPubkey,
     accountRentExempt,
   );
 
-  signers.push(vestingToken);
+  signers.push(vestingTokenKeypair);
 
   await withDepositGoverningTokens(
     instructions,
-    programId,
+    vestingProgramId!, // programId,
     programVersion,
     realm,
     governingTokenSource.pubkey,
@@ -65,8 +83,8 @@ export const depositGoverningTokens = async (
     vestingProgramId,
     voterWeightRecord,
     maxVoterWeightRecord,
-    vestingToken.publicKey,
-    vestingOwnerPubkey,
+    vestingTokenPubkey,
+    vestingPubkey,
   );
 
   await sendTransactionWithNotifications(

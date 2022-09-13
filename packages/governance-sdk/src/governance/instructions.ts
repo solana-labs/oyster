@@ -7,6 +7,7 @@ import {
   InstructionData,
   VoteType,
 } from './accounts';
+import { createVoterWeightRecordByVestingAddin } from './createVoterWeightRecord';
 
 // Vesting enum for addin-vesting
 // ref: https://github.com/neonlabsorg/neon-spl-governance/blob/main/addin-vesting/program/src/instruction.rs
@@ -16,6 +17,13 @@ export enum VestingInstruction {
   SetVotePercentage,
   ChangeOwner = 3,
   CreateVoterWeightRecord,
+}
+
+// ref: https://github.com/neonlabsorg/neon-spl-governance/blob/be99feed8d0143ad3a77f9f50e25c97015ace3d2/addin-fixed-weights/program/src/instruction.rs
+export enum VoterWeightInstruction {
+  SetupMaxVoterWeightRecord,
+  SetupVoterWeightRecord,
+  SetVotePercentage,
 }
 
 export enum GovernanceInstruction {
@@ -413,4 +421,13 @@ export class RevokeGoverningTokensArgs {
   constructor(args: { amount: BN }) {
     this.amount = args.amount;
   }
+}
+
+export class CreateVoterWeightRecordVestingArgs {
+  instruction: VestingInstruction = VestingInstruction.CreateVoterWeightRecord;
+}
+
+export class CreateVoterWeightRecordFixedArgs {
+  instruction: VoterWeightInstruction =
+    VoterWeightInstruction.SetupVoterWeightRecord;
 }

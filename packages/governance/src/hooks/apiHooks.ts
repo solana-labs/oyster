@@ -198,7 +198,7 @@ export function useVoterWeightRecord(
   );
   const programId = realmConfig?.account.communityVoterWeightAddin;
   const isVoterWeightAddin = realm?.account.config.useCommunityVoterWeightAddin;
-  const [result, setResult] = useState<AccountVoterWeightRecord | undefined>();
+  const [result, setResult] = useState<AccountVoterWeightRecord>({});
 
   useEffect(() => {
     async function main() {
@@ -220,7 +220,7 @@ export function useVoterWeightRecord(
       setResult(account);
     }
 
-    main();
+    main().catch(console.log);
   }, [connection, realm, realmConfig, programId, isVoterWeightAddin, wallet]);
 
   return result;

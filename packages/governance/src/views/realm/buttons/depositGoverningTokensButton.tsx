@@ -1,7 +1,7 @@
 import { Button, Col, InputNumber, Modal, Row } from 'antd';
 import React, { useState } from 'react';
-import { ProgramAccount, Realm } from '@solana/spl-governance';
-import { PublicKey } from '@solana/web3.js';
+import { createVoterWeightRecordByVestingAddin, ProgramAccount, Realm, RpcContext } from '@solana/spl-governance';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { hooks } from '@oyster/common';
 import BN from 'bn.js';
 
@@ -12,6 +12,7 @@ import { useRpcContext } from '../../../hooks/useRpcContext';
 import { useVoterWeightRecord } from '../../../hooks/apiHooks';
 import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
 import { useMintFormatter } from '../../../hooks/useMintFormatter';
+import { sendTransactionWithNotifications } from '../../../tools/transactions';
 
 const { useAccountByMint } = hooks;
 const { confirm } = Modal;
@@ -25,11 +26,15 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
   const governingTokenAccount = useAccountByMint(governingTokenMint);
   const { closestNumber, formatValue, parseValue } = useMintFormatter(governingTokenMint) || {};
   const vestingProgramId = useVestingProgramId(realm);
-  const voterWeightRecord = useVoterWeightRecord(realm);
+  const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm);
+
+  // console.log(voterWeight?.pubkey.toBase58(), voterWeight?.owner.toBase58());
 
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
 
   const availableBalance = new BN(governingTokenAccount?.info.amount as BN || 0);
+
+  // console.log('governingTokenAccount', governingTokenAccount?.pubkey.toBase58());
 
   const defaultDepositableAmount = availableBalance.isZero()
     ? closestNumber(100_000) : closestNumber(availableBalance.divn(4));
@@ -46,9 +51,32 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
 
   const isVisible = governingTokenAccount && !availableBalance.isZero();
 
+  const onDepositGoverningTokens = async (): Promise<void> => {
+    if (governingTokenAccount) {
+      try {
+        await depositGoverningTokens(
+          rpcContext,
+          {
+            realm: realm!.pubkey,
+            governingTokenSource: governingTokenAccount,
+            vestingProgramId: vestingProgramId,
+            governingTokenMint: governingTokenMint!,
+            depositableAmount: depositableAmount,
+            voterWeightRecord: voterWeight?.pubkey,
+            maxVoterWeightRecord: maxVoterWeight?.pubkey
+          }
+        );
+        setConfirmationVisible(false);
+      } catch (e) {
+        // user rejected transaction, noop
+        console.log(e);
+      }
+    }
+  };
+
   return isVisible ? <>
     <div>
-      <span style={{ marginRight: '10px' }}>Available: {formatValue(availableBalance)}</span>
+      {/*<span style={{ marginRight: '10px' }}>Available: {formatValue(availableBalance)}</span>*/}
       <Button
         type='primary'
         onClick={() => setConfirmationVisible(true)}
@@ -64,6 +92,13 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
       >
         {LABELS.DEPOSIT_TOKENS(tokenName)}
       </Button>
+      {/*<Button type={'primary'} onClick={async () => {*/}
+      {/*  try {*/}
+      {/*    await createVoterWeight(rpcContext, vestingProgramId!, realm!.pubkey, governingTokenMint!);*/}
+      {/*  } catch (e) {*/}
+      {/*    console.log(e);*/}
+      {/*  }*/}
+      {/*}}>create</Button>*/}
     </div>
     <Modal
       visible={isConfirmationVisible}
@@ -76,29 +111,7 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
         setDepositableAmount(defaultDepositableAmount);
       }}
       okText={LABELS.DEPOSIT}
-      onOk={async () => {
-        if (governingTokenAccount) {
-          try {
-            await depositGoverningTokens(
-              rpcContext,
-              {
-                realm: realm!.pubkey,
-                governingTokenSource: governingTokenAccount,
-                governingTokenMint: governingTokenMint!,
-                depositableAmount: depositableAmount,
-                vestingProgramId: vestingProgramId,
-                voterWeightRecord: voterWeightRecord ? voterWeightRecord.voterWeight.pubkey : undefined,
-                maxVoterWeightRecord: voterWeightRecord ? voterWeightRecord.maxVoterWeight.pubkey : undefined
-              }
-            );
-          } catch (e) {
-            // user rejected transaction, noop
-            console.log(e);
-          }
-        }
-      }
-      }
-    >
+      onOk={onDepositGoverningTokens}>
       <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
       <Row>
         <Col flex={1}>{LABELS.WALLET_BALANCE}:</Col>
@@ -125,4 +138,24 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
       </Row>
     </Modal>
   </> : null;
+}
+
+export async function createVoterWeight(
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  vestingProgramId: PublicKey,
+  realm: PublicKey,
+  governingTokenMint: PublicKey
+  // governingTokenOwner: PublicKey
+) {
+  const instructions = await createVoterWeightRecordByVestingAddin(programId, vestingProgramId, realm, governingTokenMint, walletPubkey, walletPubkey);
+  const signers: Keypair[] = [];
+
+  await sendTransactionWithNotifications(
+    connection,
+    wallet,
+    [instructions],
+    signers,
+    'Create voter weight record',
+    'Voter weight record created successful'
+  );
 }

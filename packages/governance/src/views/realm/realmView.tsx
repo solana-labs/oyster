@@ -12,7 +12,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import AccountDescription from './components/accountDescription';
-import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
+import { RealmDepositBadge, RealmDepositBadgeOyster } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
@@ -62,7 +62,7 @@ export const RealmView = () => {
       }));
   }, [governances, programIdBase58, realm]);
 
-  console.log(realm);
+  // console.log(realm);
 
   return (
     <>
@@ -93,11 +93,11 @@ export const RealmView = () => {
                       <h3><ExplorerLink short address={realm.account.communityMint} type='address' /></h3>
                     </Space>
                     <Text type='secondary'>
-                      <RealmDepositBadge
+                      <RealmDepositBadgeOyster
                         communityTokenOwnerRecord={communityTokenOwnerRecord}
                         councilTokenOwnerRecord={councilTokenOwnerRecord}
                         showVoteWeights
-                      ></RealmDepositBadge>
+                      ></RealmDepositBadgeOyster>
                     </Text>
                   </Space>
                   }

@@ -84,7 +84,7 @@ export const GovernanceView = () => {
       }));
   }, [proposals, programIdBase58]);
 
-  const isProposalsLoading = useArrayLengthWatcher(proposals);
+  // const isProposalsLoading = useArrayLengthWatcher(proposals);
 
   const realmLink = useMemo(() => {
     if (realm?.pubkey) {
@@ -188,7 +188,7 @@ export const GovernanceView = () => {
         </div> : <Spin />}
         <h1 className='proposals-list-title'>Proposals</h1>
         <List
-          loading={isProposalsLoading}
+          // loading={isProposalsLoading}
           itemLayout='vertical'
           size='large'
           pagination={proposals.length >= PAGE_SIZE ? {

@@ -59,7 +59,7 @@ export function CastVoteButton({
 
   const canVote =
     !tokenOwnerRecord?.account.governingTokenDepositAmount.isZero()
-    || (voterWeightRecord && !voterWeightRecord.voterWeight.account.voterWeight.isZero());
+    || (voterWeightRecord && !voterWeightRecord.voterWeight?.account.voterWeight.isZero());
 
   const isVisible =
     hasVoteTimeExpired === false &&
@@ -102,8 +102,8 @@ export function CastVoteButton({
               tokenOwnerRecord: tokenOwnerRecord.pubkey,
               vote,
               votePercentage,
-              voterWeightRecord: voterWeightRecord?.voterWeight.pubkey,
-              maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight.pubkey,
+              voterWeightRecord: voterWeightRecord?.voterWeight?.pubkey,
+              maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight?.pubkey,
               communityVoterWeightAddin,
             }
           );
