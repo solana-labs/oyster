@@ -2,7 +2,9 @@ import * as d3 from 'd3';
 import React, { useEffect, useState } from 'react';
 import { VoterDisplayData, VoteType } from '../../proposalView';
 import { utils } from '@oyster/common';
+
 const { getExplorerUrl } = utils;
+
 //https://observablehq.com/d/86d91b23534992ff
 
 interface IVoterBubbleGraph {
@@ -26,7 +28,7 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
     name:
       d.name.slice(0, 3) +
       '...' +
-      d.name.slice(d.name.length - 3, d.name.length),
+      d.name.slice(d.name.length - 3, d.name.length)
   }));
   //console.log('Data', limitedData);
 
@@ -43,9 +45,9 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
           .pack()
           .size([width - 2, height - 2])
           .padding(3)(
-          //@ts-ignore
-          d3.hierarchy({ children: data }).sum(d => (d.value ? d.value : 0)),
-        );
+            //@ts-ignore
+            d3.hierarchy({ children: data }).sum(d => (d.value ? d.value : 0))
+          );
       };
 
       ref.innerHTML = '';
@@ -65,12 +67,13 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
         .data(root.leaves())
         .join('g')
         .attr('transform', d => `translate(${d.x + 1},${d.y + 1})`);
+
       //@ts-ignore
       leaf
         .append('circle')
         //@ts-ignore
         .attr('id', d => (d.leafUid = { id: d.name }).id)
-        .attr('r', d => d.r)
+        .attr('r', d => Number.isNaN(d.r) ? 30 : d.r)
         .attr('fill-opacity', 0.7)
         //@ts-ignore
         .attr('fill', d => color(d.data.group));
@@ -86,8 +89,8 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
               //@ts-ignore
               id: d.name,
               //@ts-ignore
-              href: getExplorerUrl(d.title, endpoint),
-            }).id,
+              href: getExplorerUrl(d.title, endpoint)
+            }).id
         )
         .append('use')
         //@ts-ignore
@@ -98,14 +101,14 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
         .append('svg:a')
         .attr('xlink:href', d =>
           //@ts-ignore
-          getExplorerUrl(d.data.title, endpoint),
+          getExplorerUrl(d.data.title, endpoint)
         )
         .append('svg:text')
         //@ts-ignore
         .attr('clip-path', d => d.clipUid)
         .selectAll('tspan')
         //@ts-ignore
-        .data(d => d.data.name.split(/(?=[A-Z][a-z])|\s+/g))
+        .data(d => (d.data.name || '').split(/(?=[A-Z][a-z])|\s+/g))
         .join('tspan')
         .attr('x', 0)
         .attr('y', (d, i, nodes) => `${i - nodes.length / 2 + 0.8}em`)
@@ -119,9 +122,8 @@ export function VoterBubbleGraph(props: IVoterBubbleGraph) {
             d.data.title === undefined
               ? ''
               : //@ts-ignore
-                `${d.data.title}
-  ` //@ts-ignore
-          }${format(d.value)}`,
+              `${d.data.title}` //@ts-ignore
+          }${format(d.value)}`
       );
     }
   }, [ref, limitedData, height, width, endpoint]);

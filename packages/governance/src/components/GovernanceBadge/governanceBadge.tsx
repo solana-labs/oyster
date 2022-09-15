@@ -29,7 +29,7 @@ export function GovernanceBadge({
     governance.account.isProgramGovernance() ||
     governance.account.isAccountGovernance();
 
-  const tokenMint = tokenAccount ? tokenAccount.info.mint : undefined;
+  const tokenMint = tokenAccount?.info?.mint;
 
   return (
     <Badge

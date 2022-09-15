@@ -374,9 +374,9 @@ function InnerProposalView({
               />
               {signatories
                 .filter(s => s.account.signedOff)
-                .map(s => (
+                .map((s, key) => (
                   <ExplorerLink
-                    key={s.account.signatory.toString()}
+                    key={`${s.account.signatory.toString()}${key}`}
                     address={s.account.signatory}
                     type="address"
                     short
@@ -491,7 +491,7 @@ function InnerProposalView({
                       </Col>
                     ))}
                   {proposal.account.state === ProposalState.Draft && (
-                    <Col xs={24} sm={24} md={12} lg={8}>
+                    <Col xs={24} sm={24} md={12} lg={8} key={'new'}>
                       <NewInstructionCard
                         proposal={proposal}
                         realm={realm}

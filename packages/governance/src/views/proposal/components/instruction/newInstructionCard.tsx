@@ -120,6 +120,7 @@ export function NewInstructionCard({
         <DryRunInstructionButton
           proposal={proposal}
           instructionData={instructionData}
+          key='run'
         ></DryRunInstructionButton>,
       ]}
     >

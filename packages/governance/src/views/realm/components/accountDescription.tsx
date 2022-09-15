@@ -25,7 +25,7 @@ export default function AccountDescription({
   const [mintAccount, setMintAccount] = useState<MintInfo | null>();
 
   const tokenAccount = useAccount(governance.account.governedAccount);
-  const tokenAccountMint = useMint(tokenAccount?.info.mint);
+  const tokenAccountMint = useMint(tokenAccount?.info?.mint);
   const nativeTreasury = useNativeTreasury(governance?.pubkey);
 
   useEffect(() => {

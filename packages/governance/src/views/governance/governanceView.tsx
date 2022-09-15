@@ -1,5 +1,8 @@
 import { Badge, Button, Col, List, Row, Space, Spin, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Proposal, ProposalState } from '@solana/spl-governance';
+import { ClockCircleOutlined } from '@ant-design/icons';
 import { useRealm } from '../../contexts/GovernanceContext';
 
 import { useGovernance, useNativeTreasury, useProposalsByGovernance } from '../../hooks/apiHooks';
@@ -9,8 +12,6 @@ import { useHistory } from 'react-router-dom';
 import { ExplorerLink, TokenIcon, useConnectionConfig, useMint } from '@oyster/common';
 
 import { useKeyParam } from '../../hooks/useKeyParam';
-import { Proposal, ProposalState } from '@solana/spl-governance';
-import { ClockCircleOutlined } from '@ant-design/icons';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import { getProposalUrl, getRealmUrl } from '../../tools/routeTools';
 import { useRpcContext } from '../../hooks/useRpcContext';
@@ -20,9 +21,7 @@ import {
   getDaysFromTimestamp
 } from '../../tools/units';
 import { GovernanceActionBar } from './buttons/governanceActionBar';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useGovernanceMeta } from '../../hooks/useGovernanceMeta';
-import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
 
 const { Text } = Typography;
 
@@ -84,7 +83,7 @@ export const GovernanceView = () => {
       }));
   }, [proposals, programIdBase58]);
 
-  const isProposalsLoading = useArrayLengthWatcher(proposals);
+  // const isProposalsLoading = useArrayLengthWatcher(proposals);
 
   const realmLink = useMemo(() => {
     if (realm?.pubkey) {
@@ -188,7 +187,7 @@ export const GovernanceView = () => {
         </div> : <Spin />}
         <h1 className='proposals-list-title'>Proposals</h1>
         <List
-          loading={isProposalsLoading}
+          // loading={isProposalsLoading}
           itemLayout='vertical'
           size='large'
           pagination={proposals.length >= PAGE_SIZE ? {

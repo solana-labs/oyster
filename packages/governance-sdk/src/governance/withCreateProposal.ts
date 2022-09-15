@@ -7,14 +7,10 @@ import {
 import { getGovernanceSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateProposalArgs } from './instructions';
-import {
-  getRealmConfigAddress,
-  GOVERNANCE_PROGRAM_SEED,
-  VoteType,
-} from './accounts';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
-import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
+import { GOVERNANCE_PROGRAM_SEED, VoteType } from './accounts';
 import { withRealmConfigAccounts } from './withRealmConfigAccounts';
+import { PROGRAM_VERSION_V1 } from '../registry';
+import { SYSTEM_PROGRAM_ID } from '../tools';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
@@ -47,64 +43,36 @@ export const withCreateProposal = async (
     serialize(getGovernanceSchema(programVersion), args),
   );
 
-  let proposalIndexBuffer = Buffer.alloc(4);
+  const proposalIndexBuffer = Buffer.alloc(4);
   proposalIndexBuffer.writeInt32LE(proposalIndex, 0);
 
+  const seeds = [
+    Buffer.from(GOVERNANCE_PROGRAM_SEED),
+    governance.toBuffer(),
+    governingTokenMint.toBuffer(),
+    proposalIndexBuffer,
+  ];
   const [proposalAddress] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GOVERNANCE_PROGRAM_SEED),
-      governance.toBuffer(),
-      governingTokenMint.toBuffer(),
-      proposalIndexBuffer,
-    ],
+    seeds,
     programId,
   );
 
-  let keys = [
-    {
-      pubkey: realm,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: proposalAddress,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: governance,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: tokenOwnerRecord,
-      isWritable: true,
-      isSigner: false,
-    },
-    ...(programVersion > PROGRAM_VERSION_V1
-      ? [
-          {
-            pubkey: governingTokenMint,
-            isWritable: false,
-            isSigner: false,
-          },
-        ]
-      : []),
-    {
-      pubkey: governanceAuthority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: SYSTEM_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
+  console.log('proposalAddress', proposalAddress.toBase58());
+
+  const programKey =
+    programVersion > PROGRAM_VERSION_V1
+      ? [{ pubkey: governingTokenMint, isWritable: false, isSigner: false }]
+      : [];
+
+  const keys = [
+    { pubkey: realm, isWritable: false, isSigner: false },
+    { pubkey: proposalAddress, isWritable: true, isSigner: false },
+    { pubkey: governance, isWritable: true, isSigner: false },
+    { pubkey: tokenOwnerRecord, isWritable: true, isSigner: false },
+    ...programKey,
+    { pubkey: governanceAuthority, isWritable: false, isSigner: true },
+    { pubkey: payer, isWritable: true, isSigner: true },
+    { pubkey: SYSTEM_PROGRAM_ID, isWritable: false, isSigner: false },
   ];
 
   if (programVersion === PROGRAM_VERSION_V1) {
@@ -128,13 +96,12 @@ export const withCreateProposal = async (
     maxVoterWeightRecord,
   );
 
-  instructions.push(
-    new TransactionInstruction({
-      keys,
-      programId,
-      data,
-    }),
-  );
+  console.log('voterWeightRecord', voterWeightRecord?.toBase58());
+  console.log('maxVoterWeightRecord', maxVoterWeightRecord?.toBase58());
 
+  console.log(`function: withCreateProposal`);
+  console.log(keys.map(key => ({ ...key, pubkey: key.pubkey?.toBase58() })));
+
+  instructions.push(new TransactionInstruction({ programId, keys, data }));
   return proposalAddress;
 };

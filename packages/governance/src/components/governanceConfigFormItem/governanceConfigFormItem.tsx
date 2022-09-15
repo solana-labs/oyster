@@ -1,28 +1,22 @@
-import { Form, InputNumber, Select, Space, Spin, Typography } from 'antd';
+import { Form, Input, InputNumber, Select, Space, Spin, Typography } from 'antd';
 import BN from 'bn.js';
 import React, { useState } from 'react';
-import { contexts, constants } from '@oyster/common';
+import { constants, contexts } from '@oyster/common';
 import { LABELS } from '../../constants';
-import {
-  GovernanceConfig,
-  Realm,
-  VoteThresholdPercentage,
-  VoteTipping,
-} from '@solana/spl-governance';
+import { GovernanceConfig, ProgramAccount, Realm, VoteThresholdPercentage, VoteTipping } from '@solana/spl-governance';
 import { getNameOf } from '../../tools/script';
 import {
-  getDaysFromTimestamp,
-  getMintNaturalAmountFromDecimal,
-  getMintDecimalAmountFromNatural,
-  getMintSupplyPercentageAsDecimal,
-  getMintMinAmountAsDecimal,
-  getTimestampFromDays,
-  parseMintNaturalAmountFromDecimal,
-  getMintSupplyFractionAsDecimalPercentage,
-  getMintSupplyAsDecimal,
   formatPercentage,
+  getDaysFromTimestamp,
+  getMintDecimalAmountFromNatural,
+  getMintMinAmountAsDecimal,
+  getMintNaturalAmountFromDecimal,
+  getMintSupplyAsDecimal,
+  getMintSupplyFractionAsDecimalPercentage,
+  getMintSupplyPercentageAsDecimal,
+  getTimestampFromDays,
+  parseMintNaturalAmountFromDecimal
 } from '../../tools/units';
-import { ProgramAccount } from '@solana/spl-governance';
 
 const { ZERO } = constants;
 
@@ -41,18 +35,18 @@ export interface GovernanceConfigValues {
 export function getGovernanceConfig(values: GovernanceConfigValues) {
   const minTokensToCreateProposal = parseMinTokensToCreate(
     values.minTokensToCreateProposal,
-    values.mintDecimals,
+    values.mintDecimals
   );
 
   return new GovernanceConfig({
     voteThresholdPercentage: new VoteThresholdPercentage({
-      value: values.voteThresholdPercentage,
+      value: values.voteThresholdPercentage
     }),
     minCommunityTokensToCreateProposal: new BN(
-      minTokensToCreateProposal.toString(),
+      minTokensToCreateProposal.toString()
     ),
     minInstructionHoldUpTime: getTimestampFromDays(
-      values.minInstructionHoldUpTime,
+      values.minInstructionHoldUpTime
     ),
     maxVotingTime: getTimestampFromDays(values.maxVotingTime),
     // Use 1 as default for council tokens.
@@ -66,7 +60,7 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
 // Parses min tokens to create (proposal or governance)
 export function parseMinTokensToCreate(
   value: string | number,
-  mintDecimals: number,
+  mintDecimals: number
 ) {
   return typeof value === 'string'
     ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
@@ -75,17 +69,14 @@ export function parseMinTokensToCreate(
 
 const configNameOf = getNameOf<GovernanceConfigValues>();
 
-export function GovernanceConfigFormItem({
-  governanceConfig,
-  realm,
-}: {
+export interface GovernanceConfigFormItemProps {
   governanceConfig?: GovernanceConfig;
   realm: ProgramAccount<Realm> | undefined;
-}) {
+}
+
+export function GovernanceConfigFormItem({ governanceConfig, realm }: GovernanceConfigFormItemProps) {
   const communityMintInfo = useMint(realm?.account.communityMint);
-  const [minTokensPercentage, setMinTokensPercentage] = useState<
-    number | undefined
-  >();
+  const [minTokensPercentage, setMinTokensPercentage] = useState<number | undefined>();
 
   if (!communityMintInfo) {
     return <Spin></Spin>;
@@ -96,7 +87,7 @@ export function GovernanceConfigFormItem({
   // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
   let mintSupply1Percent = getMintSupplyPercentageAsDecimal(
     communityMintInfo,
-    1,
+    1
   );
 
   let minTokenAmount = getMintMinAmountAsDecimal(communityMintInfo);
@@ -119,12 +110,12 @@ export function GovernanceConfigFormItem({
       maxVotingTime: getTimestampFromDays(3),
       voteTipping: VoteTipping.Strict,
       proposalCoolOffTime: 0,
-      minCouncilTokensToCreateProposal: ZERO,
+      minCouncilTokensToCreateProposal: ZERO
     });
   } else {
     minTokensToCreateProposal = getMintDecimalAmountFromNatural(
       communityMintInfo,
-      governanceConfig.minCommunityTokensToCreateProposal as BN,
+      governanceConfig.minCommunityTokensToCreateProposal as BN
     ).toNumber();
   }
 
@@ -134,7 +125,7 @@ export function GovernanceConfigFormItem({
   const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
     const minTokens = parseMinTokensToCreate(
       minTokensToCreateProposal,
-      mintDecimals,
+      mintDecimals
     );
     setMinTokensPercentage(getMinTokensPercentage(minTokens));
   };
@@ -146,7 +137,7 @@ export function GovernanceConfigFormItem({
   return (
     <>
       <Form.Item label={LABELS.MIN_TOKENS_TO_CREATE_PROPOSAL}>
-        <Space align="end">
+        <Space align='end'>
           <Form.Item
             name={configNameOf('minTokensToCreateProposal')}
             rules={[{ required: true }]}
@@ -163,8 +154,8 @@ export function GovernanceConfigFormItem({
             />
           </Form.Item>
           {maxTokenAmount && minTokensPercentage && (
-            <Text type="secondary">{`${formatPercentage(
-              minTokensPercentage,
+            <Text type='secondary'>{`${formatPercentage(
+              minTokensPercentage
             )} of token supply`}</Text>
           )}
         </Space>
@@ -175,7 +166,7 @@ export function GovernanceConfigFormItem({
         label={LABELS.MIN_INSTRUCTION_HOLD_UP_TIME_DAYS}
         rules={[{ required: true }]}
         initialValue={getDaysFromTimestamp(
-          governanceConfig.minInstructionHoldUpTime,
+          governanceConfig.minInstructionHoldUpTime
         )}
       >
         <InputNumber min={0} />
@@ -205,16 +196,15 @@ export function GovernanceConfigFormItem({
         initialValue={VoteTipping[governanceConfig.voteTipping]}
       >
         <Select>{Object.keys(VoteTipping)
-          .filter(vt => typeof VoteTipping[vt as any] === "string")
-          .map(vt => (<Select.Option value={vt}>{VoteTipping[vt as any]} </Select.Option>))}
+          .filter(vt => typeof VoteTipping[vt as any] === 'string')
+          .map((vt, key) => (<Select.Option value={vt} key={key}>{VoteTipping[vt as any]}</Select.Option>))}
         </Select>
       </Form.Item>
 
       <Form.Item
         hidden
         name={configNameOf('mintDecimals')}
-        initialValue={mintDecimals}
-      ></Form.Item>
+        initialValue={mintDecimals}><Input/></Form.Item>
     </>
   );
 }

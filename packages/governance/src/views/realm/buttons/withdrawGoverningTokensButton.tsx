@@ -1,12 +1,10 @@
 import { Button, Col, Modal, Radio, Row, Space } from 'antd';
 import React, { useState } from 'react';
 import { ProgramAccount, Realm } from '@solana/spl-governance';
-import { LABELS } from '../../../constants';
 import { hooks } from '@oyster/common';
-
-import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningTokens';
-
 import { PublicKey } from '@solana/web3.js';
+import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningTokens';
+import { LABELS } from '../../../constants';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
 import { useDepositedAccounts } from '../../../hooks/useDepositedAccounts';
@@ -15,24 +13,21 @@ import { useMintFormatter } from '../../../hooks/useMintFormatter';
 
 const { useAccountByMint } = hooks;
 
-export function WithdrawGoverningTokensButton ({
-  realm,
-  governingTokenMint,
-  tokenName,
-}: {
+export function WithdrawGoverningTokensButton(props: {
   realm: ProgramAccount<Realm>;
   governingTokenMint?: PublicKey;
   tokenName?: string;
 }) {
+  const { realm, governingTokenMint, tokenName } = props;
   const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(governingTokenMint);
   const { formatValue } = useMintFormatter(governingTokenMint);
   const vestingProgramId = useVestingProgramId(realm);
-  const voterWeightRecord = useVoterWeightRecord(realm);
+  const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm);
   let ownerPubkey = rpcContext.wallet?.publicKey || undefined;
   const activeDeposits = useDepositedAccounts(
     rpcContext, vestingProgramId, ownerPubkey,
-    governingTokenMint,
+    governingTokenMint
   );
   const [depositToWithdraw, setDepositToWithdraw] = useState(() => {
     return activeDeposits && activeDeposits.length ? activeDeposits[activeDeposits.length - 1] : null;
@@ -47,7 +42,7 @@ export function WithdrawGoverningTokensButton ({
 
   return isVisible ? <>
     <Button
-      type="ghost"
+      type='ghost'
       onClick={() => {
         setConfirmationVisible(true);
         /* // TODO: add check for vote-locked deposits
@@ -59,8 +54,7 @@ export function WithdrawGoverningTokensButton ({
           return;
         }
         */
-      }}
-    >
+      }}>
       {LABELS.WITHDRAW_TOKENS(tokenName)}
     </Button>
     <Modal
@@ -80,16 +74,17 @@ export function WithdrawGoverningTokensButton ({
               governingTokenAccount.pubkey,
               governingTokenMint,
               vestingProgramId,
-              voterWeightRecord!.voterWeight.pubkey,
-              voterWeightRecord!.maxVoterWeight.pubkey,
+              voterWeight!.pubkey,
+              maxVoterWeight!.pubkey,
               depositToWithdraw!.pubkey,
-              depositToWithdraw!.address,
+              depositToWithdraw!.address
             );
+            setConfirmationVisible(false);
           } catch (e) {
-            Modal.error({
+            e.code !== 4001 && Modal.error({
               title: 'Cannot withdraw tokens',
               content: `Probably you have tokens staked in proposals (including draft proposals, active proposals etc).
-              Please, release your tokens from all proposals before withdrawing the tokens from the realm`,
+              Please, release your tokens from all proposals before withdrawing the tokens from the realm`
             });
             // rejection = noop
           }
@@ -107,11 +102,11 @@ export function WithdrawGoverningTokensButton ({
               }}
               value={depositToWithdraw?.label}
             >
-              <Space direction="vertical">{
+              <Space direction='vertical'>{
                 activeDeposits.map(d =>
                   <Radio value={d.label} key={d.label}>
                     {d.label}<br />Amount: {formatValue(d.balance)}
-                  </Radio>,
+                  </Radio>
                 )
               }</Space>
             </Radio.Group>

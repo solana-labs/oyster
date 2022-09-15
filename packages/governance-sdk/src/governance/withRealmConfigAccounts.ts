@@ -10,11 +10,7 @@ export async function withRealmConfigAccounts(
 ) {
   const realmConfigAddress = await getRealmConfigAddress(programId, realm);
 
-  keys.push({
-    pubkey: realmConfigAddress,
-    isWritable: false,
-    isSigner: false,
-  });
+  keys.push({ pubkey: realmConfigAddress, isWritable: false, isSigner: false });
 
   if (voterWeightRecord) {
     keys.push({

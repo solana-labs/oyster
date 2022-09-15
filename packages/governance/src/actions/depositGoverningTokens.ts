@@ -14,6 +14,7 @@ export interface DepositGoverningTokenContext {
   governingTokenSource: TokenAccount;
   governingTokenMint: PublicKey;
   depositableAmount: BN;
+  instructions: TransactionInstruction[];
   vestingProgramId?: PublicKey;
   voterWeightRecord?: PublicKey;
   maxVoterWeightRecord?: PublicKey;
@@ -25,6 +26,7 @@ export const depositGoverningTokens = async (
 ) => {
   const {
     realm,
+    instructions,
     governingTokenSource,
     governingTokenMint,
     depositableAmount,
@@ -33,8 +35,7 @@ export const depositGoverningTokens = async (
     maxVoterWeightRecord,
   } = governanceContext;
 
-  let instructions: TransactionInstruction[] = [];
-  let signers: Keypair[] = [];
+  const signers: Keypair[] = [];
 
   // calculate size of new account
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -42,19 +43,23 @@ export const depositGoverningTokens = async (
   );
 
   // create target address on which deposit will be transferred
-  const { vestingToken, vestingOwnerPubkey } = await createVestingAccount(
+  const {
+    vestingTokenPubkey,
+    vestingPubkey,
+    vestingTokenKeypair,
+  } = await createVestingAccount(
     instructions,
-    vestingProgramId || programId,
+    vestingProgramId!,
     governingTokenMint,
     walletPubkey,
     accountRentExempt,
   );
 
-  signers.push(vestingToken);
+  signers.push(vestingTokenKeypair);
 
   await withDepositGoverningTokens(
     instructions,
-    programId,
+    vestingProgramId!, // programId,
     programVersion,
     realm,
     governingTokenSource.pubkey,
@@ -65,8 +70,8 @@ export const depositGoverningTokens = async (
     vestingProgramId,
     voterWeightRecord,
     maxVoterWeightRecord,
-    vestingToken.publicKey,
-    vestingOwnerPubkey,
+    vestingTokenPubkey,
+    vestingPubkey,
   );
 
   await sendTransactionWithNotifications(

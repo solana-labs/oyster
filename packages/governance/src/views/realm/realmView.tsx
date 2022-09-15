@@ -12,7 +12,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import AccountDescription from './components/accountDescription';
-import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
+import { RealmDepositBadge, RealmDepositBadgeOyster } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
@@ -62,8 +62,6 @@ export const RealmView = () => {
       }));
   }, [governances, programIdBase58, realm]);
 
-  console.log(realm);
-
   return (
     <>
       <Background />
@@ -74,9 +72,9 @@ export const RealmView = () => {
               <Row>
                 <Col>
                   {realm && <Popover content={<RealmPopUpDetails realm={realm}></RealmPopUpDetails>}
-                           title={realm.account.name}
-                           trigger='click'
-                           placement='topLeft'>
+                                     title={realm.account.name}
+                                     trigger='click'
+                                     placement='topLeft'>
                     <span>
                       <RealmBadge
                         size={60}
@@ -94,6 +92,7 @@ export const RealmView = () => {
                     </Space>
                     <Text type='secondary'>
                       <RealmDepositBadge
+                        realm={realm}
                         communityTokenOwnerRecord={communityTokenOwnerRecord}
                         councilTokenOwnerRecord={councilTokenOwnerRecord}
                         showVoteWeights

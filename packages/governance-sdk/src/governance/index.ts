@@ -2,6 +2,7 @@ export * from './accounts';
 export * from './api';
 export * from './createSetGovernanceConfig';
 export * from './createSetRealmConfig';
+export * from './createVoterWeightRecord';
 export * from './createSetRealmAuthority';
 export * from './enums';
 export * from './errors';

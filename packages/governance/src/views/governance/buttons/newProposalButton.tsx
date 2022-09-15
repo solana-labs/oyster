@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { ButtonProps, Form, Input, Radio } from 'antd';
-import { PublicKey } from '@solana/web3.js';
-import { Governance, GoverningTokenType, ProgramAccount, Realm } from '@solana/spl-governance';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import {
+  Governance,
+  GoverningTokenType,
+  ProgramAccount,
+  Realm,
+  withCreateTokenOwnerRecord
+} from '@solana/spl-governance';
 import { useMint } from '@oyster/common';
 import { Redirect } from 'react-router';
 import BN from 'bn.js';
@@ -40,7 +46,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const communityMint = useMint(realm?.account.communityMint);
 
-  const voterWeightRecord = useVoterWeightRecord(realm, governance);
+  const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm, governance);
 
   if (!governance || !communityMint || !realm) {
     return null;
@@ -58,8 +64,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
       new BN(governance?.account.config.minCouncilTokensToCreateProposal)
     ) >= 0;
 
-  const canCreateProposalUsingVoterWeight =
-    voterWeightRecord && !voterWeightRecord.voterWeight.account.voterWeight.isZero();
+  const canCreateProposalUsingVoterWeight = !voterWeight?.account.voterWeight.isZero();
 
   const canCreateProposal =
     canCreateProposalUsingCommunityTokens ||
@@ -70,7 +75,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
   let creationDisabledReason = undefined;
   if (!canCreateProposal) {
     creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_BELOW_LIMIT;
-    if (voterWeightRecord && voterWeightRecord.voterWeight.account.voterWeight.isZero()) {
+    if (voterWeight?.account.voterWeight.isZero()) {
       creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_EMPTY;
     }
   }
@@ -89,26 +94,36 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
   }) => {
     const governingTokenMint = realm!.account.communityMint;
     const proposalIndex = governance.account.proposalCount;
+    const instructions: TransactionInstruction[] = [];
 
     // By default we select communityTokenOwnerRecord as the proposal owner and it doesn't exist then councilTokenOwnerRecord
     // When governance delegates are not used it doesn't make any difference
     // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
     // because user might have different delegates for council and community
-    const tokenOwnerRecord = communityTokenOwnerRecord;
-    console.log('tokenOwnerRecord', tokenOwnerRecord?.pubkey || 'null');
+    let tokenOwnerRecord = communityTokenOwnerRecord?.pubkey;
+    if (!tokenOwnerRecord) {
+      tokenOwnerRecord = await withCreateTokenOwnerRecord(
+        instructions,
+        programId,
+        realm?.pubkey,
+        rpcContext.walletPubkey,
+        governingTokenMint,
+        rpcContext.walletPubkey
+      );
+    }
 
     return await createProposal(
+      instructions,
       rpcContext,
       realm,
       governance.pubkey,
-      // todo: investigate case when tokenOwnerRecord is null
-      tokenOwnerRecord?.pubkey ?? governance.pubkey,
+      tokenOwnerRecord ?? governance.pubkey,
       values.name,
       values.descriptionLink ?? '',
       governingTokenMint,
       proposalIndex,
-      voterWeightRecord?.voterWeight.pubkey,
-      voterWeightRecord?.maxVoterWeight.pubkey,
+      voterWeight?.pubkey,
+      maxVoterWeight?.pubkey,
       communityVoterWeightAddin
     );
   };

@@ -3,7 +3,7 @@ import {
   MaxVoterWeightRecord,
   VoterWeightRecord,
 } from './accounts';
-import { BorshAccountParser } from '../core/serialisation';
+import { BorshAccountParser } from '../core';
 
 export const GOVERNANCE_ADDINS_SCHEMA = new Map<any, any>([
   [

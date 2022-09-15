@@ -12,6 +12,7 @@ import {
   CreateProposalArgs,
   CreateRealmArgs,
   CreateTokenGovernanceArgs,
+  CreateVoterWeightRecordVestingArgs,
   CreateTokenOwnerRecordArgs,
   DepositGoverningTokensArgs,
   DepositGoverningTokensEntry,
@@ -32,6 +33,7 @@ import {
   VoteChoice,
   VoteKind,
   WithdrawGoverningTokensArgs,
+  CreateVoterWeightRecordFixedArgs,
 } from './instructions';
 import {
   AccountMetaData,
@@ -466,6 +468,20 @@ function createGovernanceSchema(programVersion: number) {
     ],
     [
       CreateTokenOwnerRecordArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      CreateVoterWeightRecordVestingArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      CreateVoterWeightRecordFixedArgs,
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],
