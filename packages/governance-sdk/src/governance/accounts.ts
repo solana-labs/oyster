@@ -7,7 +7,7 @@ import {
   ACCOUNT_VERSION_V2,
   PROGRAM_VERSION_V1,
   PROGRAM_VERSION_V2,
-} from '../registry/constants';
+} from '../registry';
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance';

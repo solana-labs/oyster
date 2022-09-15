@@ -3,8 +3,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation';
 import { serialize } from 'borsh';
 import { WithdrawGoverningTokensArgs } from './instructions';
 import { GOVERNANCE_PROGRAM_SEED } from './accounts';
-import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
-import { shortMeta } from '../tools';
+import { shortMeta, TOKEN_PROGRAM_ID } from '../tools';
 
 export const withWithdrawGoverningTokens = async (
   instructions: TransactionInstruction[],

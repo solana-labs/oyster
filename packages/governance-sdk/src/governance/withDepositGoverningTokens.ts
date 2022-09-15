@@ -19,6 +19,7 @@ import {
 } from './accounts';
 import { shortMeta, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools';
 import { PROGRAM_VERSION_V1 } from '../registry';
+import { withCreateTokenOwnerRecord } from './withCreateTokenOwnerRecord';
 
 /**
  * Instructions to create and initialise vesting spl-token account
@@ -87,6 +88,9 @@ export async function withDepositGoverningTokens(
   let data;
 
   // console.log(arguments);
+
+  // const tokenOwnerRecord = await withCreateTokenOwnerRecord(instructions, programId, realm, governingTokenOwner, governingTokenMint, payer);
+  // console.log(tokenOwnerRecord, tokenOwnerRecord.toBase58());
 
   if (!vestingProgramId) {
     // obsolete governance workflow

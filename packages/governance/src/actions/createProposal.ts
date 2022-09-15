@@ -13,6 +13,7 @@ import {
 import { sendTransactionWithNotifications } from '../tools/transactions';
 
 export const createProposal = async (
+  instructions: TransactionInstruction[],
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   governance: PublicKey,
@@ -25,8 +26,6 @@ export const createProposal = async (
   maxVoterWeightRecord?: PublicKey,
   communityVoterWeightAddin?: PublicKey,
 ): Promise<PublicKey> => {
-  let instructions: TransactionInstruction[] = [];
-
   let governanceAuthority = walletPubkey;
   let signatory = walletPubkey;
   let payer = walletPubkey;

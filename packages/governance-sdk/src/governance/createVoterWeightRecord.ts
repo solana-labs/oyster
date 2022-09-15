@@ -10,22 +10,23 @@ import {
 } from './instructions';
 
 export async function createVoterWeightRecordByVestingAddin(
+  instructions: TransactionInstruction[],
   programId: PublicKey,
   addinId: PublicKey,
   // Accounts
   realm: PublicKey,
-  governing_token_mint: PublicKey,
+  governingTokenMint: PublicKey,
   wallet: PublicKey,
   payer: PublicKey,
-): Promise<TransactionInstruction> {
-  const voter_weight_record = await getVoterWeightRecordAddress(
+): Promise<PublicKey> {
+  const voterWeightRecord = await getVoterWeightRecordAddress(
     addinId,
     realm,
-    governing_token_mint,
+    governingTokenMint,
     wallet,
   );
 
-  console.log(voter_weight_record.toBase58());
+  console.log(voterWeightRecord.toBase58());
 
   const args = new CreateVoterWeightRecordVestingArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
@@ -36,17 +37,21 @@ export async function createVoterWeightRecordByVestingAddin(
     { pubkey: wallet, isWritable: false, isSigner: false },
     { pubkey: payer, isWritable: false, isSigner: true },
     { pubkey: realm, isWritable: false, isSigner: false },
-    { pubkey: governing_token_mint, isWritable: false, isSigner: false },
-    { pubkey: voter_weight_record, isWritable: true, isSigner: false },
+    { pubkey: governingTokenMint, isWritable: false, isSigner: false },
+    { pubkey: voterWeightRecord, isWritable: true, isSigner: false },
   ];
 
-  console.log(keys.map(k => ({ ...k, pubkey: k.pubkey.toBase58() })));
+  // console.log(keys.map(k => ({ ...k, pubkey: k.pubkey.toBase58() })));
 
-  return new TransactionInstruction({
-    keys,
-    programId: addinId,
-    data: Buffer.from(data),
-  });
+  instructions.push(
+    new TransactionInstruction({
+      programId: addinId,
+      keys,
+      data: Buffer.from(data),
+    }),
+  );
+
+  return voterWeightRecord;
 }
 
 export async function createVoterWeightRecordByFixedAddin(

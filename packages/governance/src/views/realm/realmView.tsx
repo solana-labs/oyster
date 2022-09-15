@@ -62,8 +62,6 @@ export const RealmView = () => {
       }));
   }, [governances, programIdBase58, realm]);
 
-  // console.log(realm);
-
   return (
     <>
       <Background />
@@ -74,9 +72,9 @@ export const RealmView = () => {
               <Row>
                 <Col>
                   {realm && <Popover content={<RealmPopUpDetails realm={realm}></RealmPopUpDetails>}
-                           title={realm.account.name}
-                           trigger='click'
-                           placement='topLeft'>
+                                     title={realm.account.name}
+                                     trigger='click'
+                                     placement='topLeft'>
                     <span>
                       <RealmBadge
                         size={60}
@@ -93,11 +91,12 @@ export const RealmView = () => {
                       <h3><ExplorerLink short address={realm.account.communityMint} type='address' /></h3>
                     </Space>
                     <Text type='secondary'>
-                      <RealmDepositBadgeOyster
+                      <RealmDepositBadge
+                        realm={realm}
                         communityTokenOwnerRecord={communityTokenOwnerRecord}
                         councilTokenOwnerRecord={councilTokenOwnerRecord}
                         showVoteWeights
-                      ></RealmDepositBadgeOyster>
+                      ></RealmDepositBadge>
                     </Text>
                   </Space>
                   }

@@ -11,7 +11,6 @@ import { GOVERNANCE_PROGRAM_SEED, VoteType } from './accounts';
 import { withRealmConfigAccounts } from './withRealmConfigAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry';
 import { SYSTEM_PROGRAM_ID } from '../tools';
-import * as Console from 'console';
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
@@ -96,6 +95,9 @@ export const withCreateProposal = async (
     voterWeightRecord,
     maxVoterWeightRecord,
   );
+
+  console.log('voterWeightRecord', voterWeightRecord?.toBase58());
+  console.log('maxVoterWeightRecord', maxVoterWeightRecord?.toBase58());
 
   console.log(`function: withCreateProposal`);
   console.log(keys.map(key => ({ ...key, pubkey: key.pubkey?.toBase58() })));

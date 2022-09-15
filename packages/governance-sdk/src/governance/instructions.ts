@@ -7,7 +7,6 @@ import {
   InstructionData,
   VoteType,
 } from './accounts';
-import { createVoterWeightRecordByVestingAddin } from './createVoterWeightRecord';
 
 // Vesting enum for addin-vesting
 // ref: https://github.com/neonlabsorg/neon-spl-governance/blob/main/addin-vesting/program/src/instruction.rs
