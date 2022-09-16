@@ -7,11 +7,7 @@ import { Input, Modal } from 'antd';
 import { useEthereum } from '../../contexts';
 import { TokenDisplay } from '../TokenDisplay';
 import { ASSET_CHAIN } from '../../utils/assets';
-import {
-  useConnectionConfig,
-  useUserAccounts,
-  useWallet
-} from '@oyster/common';
+import { useConnectionConfig, useUserAccounts, useWallet } from '@oyster/common';
 import { TokenInfo } from '@solana/spl-token-registry';
 
 export const TokenSelectModal = (props: {
@@ -23,8 +19,8 @@ export const TokenSelectModal = (props: {
 }) => {
   const { tokenMap: ethTokenMap } = useEthereum();
   const { connected } = useWallet();
-  const { tokenMap } = useConnectionConfig()
-  const {userAccounts} = useUserAccounts()
+  const { tokenMap } = useConnectionConfig();
+  const { userAccounts } = useUserAccounts();
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
 
@@ -34,23 +30,23 @@ export const TokenSelectModal = (props: {
     const tokens: any [] = [];
     if (connected && userAccounts.length) {
       userAccounts.forEach(async acc => {
-        const token = tokenMap.get(acc.info.mint.toBase58())
+        const token = tokenMap.get(acc.info.mint.toBase58());
         if (token) {
-          if (!token.name.toLowerCase().includes("wormhole")){
-            tokens.push({token, chain: ASSET_CHAIN.Ethereum})
+          if (!token.name.toLowerCase().includes('wormhole')) {
+            tokens.push({ token, chain: ASSET_CHAIN.Ethereum });
           } else {
             if (token.extensions?.address) {
-              const ethToken = ethTokenMap.get(token.extensions.address.toLowerCase())
-              if (ethToken){
+              const ethToken = ethTokenMap.get(token.extensions.address.toLowerCase());
+              if (ethToken) {
                 const name = `${ethToken.name} (Wormhole)`;
-                tokens.push({token: {...ethToken, name}, chain: ASSET_CHAIN.Solana})
+                tokens.push({ token: { ...ethToken, name }, chain: ASSET_CHAIN.Solana });
               } else {
-                console.log("Wormhole token without contract info: ", token)
+                console.log('Wormhole token without contract info: ', token);
               }
             }
           }
         }
-      })
+      });
     }
     return tokens;
   }, [connected, userAccounts.length]);
@@ -77,18 +73,18 @@ export const TokenSelectModal = (props: {
     let name = token?.name || '';
     let symbol = token?.symbol || '';
     return { name, symbol };
-  }
+  };
 
   const rowRender = (rowProps: { index: number; key: string; style: any }) => {
-    const tokenObject = tokenList[rowProps.index]
+    const tokenObject = tokenList[rowProps.index];
     const token = tokenObject.token;
     const mint = token.address;
-    const chain = tokenObject.chain
-    const { name , symbol } = getTokenInfo(token, chain);
+    const chain = tokenObject.chain;
+    const { name, symbol } = getTokenInfo(token, chain);
     return (
       <div
         key={rowProps.key + mint + chain}
-        className="multichain-option"
+        className='multichain-option'
         title={name}
         onClick={() => {
           props.onSelectToken(mint);
@@ -99,16 +95,16 @@ export const TokenSelectModal = (props: {
           ...rowProps.style,
           cursor: 'pointer',
           height: '70px',
-          top: `${rowProps.style.top}px`,
+          top: `${rowProps.style.top}px`
         }}
       >
         <div
-          className="multichain-option-content"
+          className='multichain-option-content'
           style={{ position: 'relative' }}
         >
           <TokenDisplay asset={props.asset} token={token} chain={chain} />
           <div
-            className="multichain-option-name"
+            className='multichain-option-name'
             style={{ marginLeft: '20px' }}
           >
             <em className={'token-symbol'}>{symbol}</em>
@@ -119,16 +115,16 @@ export const TokenSelectModal = (props: {
     );
   };
 
-  const { name , symbol } = getTokenInfo(firstToken?.token, props.chain);
+  const { name, symbol } = getTokenInfo(firstToken?.token, props.chain);
   return (
     <>
       <div
-        className="multichain-option"
+        className='multichain-option'
         title={name}
         onClick={() => showModal()}
         style={{ cursor: 'pointer' }}
       >
-        <div className="multichain-option-content">
+        <div className='multichain-option-content'>
           <TokenDisplay
             asset={props.asset}
             token={firstToken?.token}
@@ -159,7 +155,7 @@ export const TokenSelectModal = (props: {
           <AutoSizer>
             {({ width, height }) => (
               <List
-                ref="List"
+                ref='List'
                 height={height}
                 rowHeight={70}
                 rowCount={tokenList.length || 0}

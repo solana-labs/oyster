@@ -1,42 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  notify,
-  programIds,
-  TokenAccount,
-  useConnection,
-  useConnectionConfig,
-  useUserAccounts,
-} from '@oyster/common';
-import {
-  POSTVAA_INSTRUCTION,
-  TRANSFER_ASSETS_OUT_INSTRUCTION,
-  WORMHOLE_PROGRAM_ID,
-} from '../utils/ids';
+import { notify, programIds, TokenAccount, useConnection, useConnectionConfig } from '@oyster/common';
+import { POSTVAA_INSTRUCTION, TRANSFER_ASSETS_OUT_INSTRUCTION, WORMHOLE_PROGRAM_ID } from '../utils/ids';
 import { ASSET_CHAIN } from '../utils/assets';
 import { useEthereum } from '../contexts';
-import {
-  AccountInfo,
-  Connection,
-  ParsedAccountData,
-  PartiallyDecodedInstruction,
-  PublicKey,
-  RpcResponseAndContext,
-} from '@solana/web3.js';
+import { Connection, PartiallyDecodedInstruction, PublicKey } from '@solana/web3.js';
 import {
   bridgeAuthorityKey,
   LockupStatus,
   LockupWithStatus,
   SolanaBridge,
   TransferOutProposalLayout,
-  WormholeFactory,
+  WormholeFactory
 } from '@solana/bridge-sdk';
 
 import bs58 from 'bs58';
-import {
-  COINGECKO_COIN_PRICE_API,
-  COINGECKO_POOL_INTERVAL,
-  useCoingecko,
-} from '../contexts/coingecko';
+import { COINGECKO_COIN_PRICE_API, COINGECKO_POOL_INTERVAL, useCoingecko } from '../contexts/coingecko';
 import { BigNumber } from 'bignumber.js';
 import { ethers } from 'ethers';
 import { useBridge } from '../contexts/bridge';
@@ -71,7 +49,7 @@ const queryOwnWrappedMetaTransactions = async (
   setTransfers: (arr: WrappedTransferMeta[]) => void,
   provider: ethers.providers.Web3Provider,
   tokenAccounts: TokenAccount[],
-  bridge?: SolanaBridge,
+  bridge?: SolanaBridge
 ) => {
   if (tokenAccounts && tokenAccounts.length > 0 && bridge) {
     const transfers = new Map<string, WrappedTransferMeta>();
@@ -84,9 +62,9 @@ const queryOwnWrappedMetaTransactions = async (
         ...accLockups.map(v => {
           return {
             status: LockupStatus.AWAITING_VAA,
-            ...v,
+            ...v
           };
-        }),
+        })
       );
       for (let lockup of lockups) {
         if (lockup.vaaTime === undefined || lockup.vaaTime === 0) continue;
@@ -131,8 +109,8 @@ const queryOwnWrappedMetaTransactions = async (
           ls.status === LockupStatus.UNCLAIMED_VAA
             ? 'Failed'
             : ls.status === LockupStatus.AWAITING_VAA
-            ? 'In Process'
-            : 'Completed',
+              ? 'In Process'
+              : 'Completed'
       });
     }
     setTransfers([...transfers.values()]);
@@ -144,12 +122,12 @@ const queryWrappedMetaTransactions = async (
   connection: Connection,
   setTransfers: (arr: WrappedTransferMeta[]) => void,
   provider: ethers.providers.Web3Provider,
-  bridge?: SolanaBridge,
+  bridge?: SolanaBridge
 ) => {
   const filters = [
     {
-      dataSize: TransferOutProposalLayout.span,
-    },
+      dataSize: TransferOutProposalLayout.span
+    }
   ];
 
   let wh = WormholeFactory.connect(programIds().wormhole.bridge, provider);
@@ -157,8 +135,8 @@ const queryWrappedMetaTransactions = async (
     WORMHOLE_PROGRAM_ID.toBase58(),
     {
       commitment: connection.commitment,
-      filters,
-    },
+      filters
+    }
   ]);
 
   const transfers = new Map<string, WrappedTransferMeta>();
@@ -170,8 +148,8 @@ const queryWrappedMetaTransactions = async (
         data: bs58.decode(acc.account.data),
         executable: acc.account.executable,
         owner: new PublicKey(acc.account.owner),
-        lamports: acc.account.lamports,
-      },
+        lamports: acc.account.lamports
+      }
     }))
     .map((acc: any) => {
       if (acc.account.data.length === TransferOutProposalLayout.span) {
@@ -179,17 +157,17 @@ const queryWrappedMetaTransactions = async (
         let assetAddress: string = '';
         if (metaTransfer.assetChain !== ASSET_CHAIN.Solana) {
           assetAddress = Buffer.from(
-            metaTransfer.assetAddress.slice(12),
+            metaTransfer.assetAddress.slice(12)
           ).toString('hex');
         } else {
           assetAddress = new PublicKey(metaTransfer.assetAddress).toBase58();
         }
 
         const dec = new BigNumber(10).pow(
-          new BigNumber(metaTransfer.assetDecimals),
+          new BigNumber(metaTransfer.assetDecimals)
         );
         const rawAmount = new BigNumber(
-          new BN(metaTransfer.amount, 2, 'le').toString(),
+          new BN(metaTransfer.amount, 2, 'le').toString()
         );
         const amount = rawAmount.div(dec).toNumber();
         const txhash = acc.publicKey.toBase58();
@@ -203,7 +181,7 @@ const queryWrappedMetaTransactions = async (
           decimals: 9,
           txhash,
           explorer: `https://explorer.solana.com/address/${txhash}`,
-          lockup: metaTransfer,
+          lockup: metaTransfer
         });
       }
       return null;
@@ -219,13 +197,13 @@ const queryWrappedMetaTransactions = async (
       } else {
         const resp = await (connection as any)._rpcRequest(
           'getConfirmedSignaturesForAddress2',
-          [transfer.publicKey.toBase58()],
+          [transfer.publicKey.toBase58()]
         );
 
         for (const sig of resp.result) {
           const confirmedTx = await connection.getParsedConfirmedTransaction(
             sig.signature,
-            'finalized',
+            'finalized'
           );
           if (!confirmedTx) continue;
           const instructions = confirmedTx.transaction?.message?.instructions;
@@ -235,7 +213,7 @@ const queryWrappedMetaTransactions = async (
           if (filteredInstructions && filteredInstructions?.length > 0) {
             for (const ins of filteredInstructions) {
               const data = bs58.decode(
-                (ins as PartiallyDecodedInstruction).data,
+                (ins as PartiallyDecodedInstruction).data
               );
               if (data[0] === TRANSFER_ASSETS_OUT_INSTRUCTION) {
                 try {
@@ -261,7 +239,7 @@ const queryWrappedMetaTransactions = async (
                 }
                 try {
                   let signatures = await bridge.fetchSignatureStatus(
-                    lockup.signatureAccount,
+                    lockup.signatureAccount
                   );
                   let sigData = Buffer.of(
                     ...signatures.reduce((previousValue, currentValue) => {
@@ -269,14 +247,14 @@ const queryWrappedMetaTransactions = async (
                       previousValue.push(...currentValue.signature);
 
                       return previousValue;
-                    }, new Array<number>()),
+                    }, new Array<number>())
                   );
 
                   vaa = Buffer.concat([
                     vaa.slice(0, 5),
                     Buffer.of(signatures.length),
                     sigData,
-                    vaa.slice(6),
+                    vaa.slice(6)
                   ]);
                   try {
                     if (vaa?.length) {
@@ -307,7 +285,7 @@ const queryWrappedMetaTransactions = async (
           }
         }
       }
-    }),
+    })
   );
 
   setTransfers([...transfers.values()]);
@@ -333,12 +311,12 @@ export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
       if ((window as any).ethereum === undefined) {
         notify({
           message: 'Metamask Error',
-          description: 'Please install metamask wallet extension',
+          description: 'Please install metamask wallet extension'
         });
         setLoading(false);
       } else {
         const provider = new ethers.providers.Web3Provider(
-          (window as any).ethereum,
+          (window as any).ethereum
         );
         // query wrapped assets that were imported to solana from other chains
         queryOwnWrappedMetaTransactions(
@@ -347,7 +325,7 @@ export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
           setTransfers,
           provider,
           tokenAccounts,
-          bridge,
+          bridge
         ).then(() => setLoading(false));
       }
     })();
@@ -381,8 +359,8 @@ export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
             }
             return '';
           })
-          .filter(a => a?.length),
-      ),
+          .filter(a => a?.length)
+      )
     ];
 
     if (ids.length === 0) return;
@@ -402,7 +380,7 @@ export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
 
     coingeckoTimer.current = window.setTimeout(
       () => dataSourcePriceQuery(),
-      COINGECKO_POOL_INTERVAL,
+      COINGECKO_POOL_INTERVAL
     );
   }, [transfers, setAmountInUSD, coinList]);
 
@@ -419,6 +397,6 @@ export const useWormholeTransactions = (tokenAccounts: TokenAccount[]) => {
   return {
     loading,
     transfers,
-    totalInUSD: amountInUSD,
+    totalInUSD: amountInUSD
   };
 };

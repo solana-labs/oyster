@@ -386,11 +386,6 @@ export function useNativeAccount() {
   };
 }
 
-export function useUserAccounts(): { userAccounts: TokenAccount[] } {
-  const { userAccounts } = useContext(AccountsContext);
-  return { userAccounts };
-}
-
 export const getMultipleAccounts = async (
   connection: any,
   keys: string[],

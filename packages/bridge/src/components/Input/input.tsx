@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  ConnectButton,
-  CurrentUserBadge,
-  NumericInput,
-  useMint,
-  useUserAccounts,
-  useWallet,
-} from '@oyster/common';
+import React, { useState } from 'react';
+import { ConnectButton, NumericInput, useWallet } from '@oyster/common';
 import './style.less';
 import { TokenSelectModal } from '../TokenSelectModal';
 import { ASSET_CHAIN, chainToName } from '../../utils/assets';
@@ -30,12 +23,12 @@ export function Input(props: {
 
   return (
     <div className={`dashed-input-container ${props.className}`}>
-      <div className="input-header">{props.title}</div>
-      <div className="input-chain">
+      <div className='input-header'>{props.title}</div>
+      <div className='input-chain'>
         <TokenChain chain={props.chain} className={'input-icon'} />
         {chainToName(props.chain)}
         <div
-          className="balance"
+          className='balance'
           onClick={() =>
             props.onInputChange && props.onInputChange(props.balance)
           }
@@ -43,7 +36,7 @@ export function Input(props: {
           {props.balance?.toFixed(6)}
         </div>
       </div>
-      <div className="input-container">
+      <div className='input-container'>
         <NumericInput
           className={'input'}
           value={
@@ -61,11 +54,11 @@ export function Input(props: {
           style={{
             boxShadow: 'none',
             borderColor: 'transparent',
-            outline: 'transparent',
+            outline: 'transparent'
           }}
-          placeholder="0.00"
+          placeholder='0.00'
         />
-        <div className="input-select">
+        <div className='input-select'>
           <TokenSelectModal
             onSelectToken={token => props.setAsset(token)}
             onChain={(chain: ASSET_CHAIN) => props.onChain(chain)}
@@ -80,7 +73,7 @@ export function Input(props: {
       ) : connected ? (
         <CurrentUserWalletBadge showDisconnect={true} />
       ) : (
-        <ConnectButton type="text" size="large" allowWalletChange={true} />
+        <ConnectButton type='text' size='large' allowWalletChange={true} />
       )}
     </div>
   );
