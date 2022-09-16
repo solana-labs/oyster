@@ -57,8 +57,6 @@ export const withCreateProposal = async (
     programId,
   );
 
-  console.log('proposalAddress', proposalAddress.toBase58());
-
   const programKey =
     programVersion > PROGRAM_VERSION_V1
       ? [{ pubkey: governingTokenMint, isWritable: false, isSigner: false }]
@@ -95,12 +93,6 @@ export const withCreateProposal = async (
     voterWeightRecord,
     maxVoterWeightRecord,
   );
-
-  console.log('voterWeightRecord', voterWeightRecord?.toBase58());
-  console.log('maxVoterWeightRecord', maxVoterWeightRecord?.toBase58());
-
-  console.log(`function: withCreateProposal`);
-  console.log(keys.map(key => ({ ...key, pubkey: key.pubkey?.toBase58() })));
 
   instructions.push(new TransactionInstruction({ programId, keys, data }));
   return proposalAddress;

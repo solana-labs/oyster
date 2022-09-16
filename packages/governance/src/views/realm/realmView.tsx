@@ -1,26 +1,23 @@
 import { Col, List, Popover, Row, Space, Typography } from 'antd';
 import React, { useMemo } from 'react';
-import { useRealm } from '../../contexts/GovernanceContext';
-
-import { useGovernancesByRealm, useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
-import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-import { Background } from '../../components/Background';
+import { ExplorerLink } from '@oyster/common';
 import { useHistory } from 'react-router-dom';
-
+import { useRealm } from '../../contexts/GovernanceContext';
+import { useGovernancesByRealm, useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
+import { Background } from '../../components/Background';
 import { useKeyParam } from '../../hooks/useKeyParam';
-
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
-import AccountDescription from './components/accountDescription';
 import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
-import { ExplorerLink } from '@oyster/common';
 import { RealmPopUpDetails } from './components/realmPopUpDetails';
-
 import { RealmActionBar } from './buttons/realmActionBar';
 import { getGovernanceMeta } from '../../hooks/useGovernanceMeta';
 import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
+import { DepositsProvider } from '../../components/RealmDepositBadge/realmDepositProvider';
+import AccountDescription from './components/accountDescription';
+import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 
 const { Text } = Typography;
 
@@ -35,7 +32,6 @@ export const RealmView = () => {
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     realm?.pubkey,
-
     realm?.account.communityMint
   );
 
@@ -45,25 +41,19 @@ export const RealmView = () => {
   );
 
   const governanceItems = useMemo(() => {
-    return governances
-      .sort((g1, g2) =>
-        g1.account.governedAccount
-          .toBase58()
-          .localeCompare(g2.account.governedAccount.toBase58())
-      )
+    return governances.sort((g1, g2) => g1.account.governedAccount
+      .toBase58().localeCompare(g2.account.governedAccount.toBase58()))
       .map(g => ({
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
-        title: getGovernanceMeta(
-          g.pubkey, programIdBase58
-        ).name,
+        title: getGovernanceMeta(g.pubkey, programIdBase58).name,
         badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
         description: <AccountDescription governance={g}></AccountDescription>
       }));
   }, [governances, programIdBase58, realm]);
 
   return (
-    <>
+    <DepositsProvider realm={realm}>
       <Background />
       <Row>
         <Col flex='auto' xxl={15} xs={24} className='realm-container'>
@@ -138,6 +128,6 @@ export const RealmView = () => {
           />
         </Col>
       </Row>
-    </>
+    </DepositsProvider>
   );
 };

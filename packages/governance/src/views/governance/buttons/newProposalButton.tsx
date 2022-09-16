@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ButtonProps, Form, Input, Radio } from 'antd';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
@@ -8,7 +8,7 @@ import {
   Realm,
   withCreateTokenOwnerRecord
 } from '@solana/spl-governance';
-import { useMint } from '@oyster/common';
+import { useMint, useNativeAccount } from '@oyster/common';
 import { Redirect } from 'react-router';
 import BN from 'bn.js';
 
@@ -27,9 +27,10 @@ export interface NeonProposalButtonProps {
 
 export function NewProposalButton(props: NeonProposalButtonProps) {
   const { realm, governance, buttonProps } = props;
-  const [redirectTo, setRedirectTo] = useState('');
   const rpcContext = useRpcContext();
   const { programId } = rpcContext;
+  const [redirectTo, setRedirectTo] = useState('');
+  const { account } = useNativeAccount();
 
   const communityTokenOwnerRecord = useWalletTokenOwnerRecord(
     governance?.account.realm,
@@ -48,28 +49,38 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm, governance);
 
-  if (!governance || !communityMint || !realm) {
-    return null;
-  }
+  const canCreateProposalUsingCommunityTokens = useMemo(() => {
+    if (communityTokenOwnerRecord && governance) {
+      const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
+      return communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(mint) >= 0;
+    }
+    return false;
+  }, [communityTokenOwnerRecord, governance]);
 
-  const canCreateProposalUsingCommunityTokens =
-    communityTokenOwnerRecord &&
-    communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(
-      new BN(governance?.account.config.minCommunityTokensToCreateProposal)
-    ) >= 0;
+  const canCreateProposalUsingCouncilTokens = useMemo(() => {
+    if (councilTokenOwnerRecord && governance) {
+      const mint = new BN(governance?.account.config.minCouncilTokensToCreateProposal);
+      return councilTokenOwnerRecord.account.governingTokenDepositAmount.cmp(mint) >= 0;
+    }
+    return false;
+  }, [councilTokenOwnerRecord, governance]);
 
-  const canCreateProposalUsingCouncilTokens =
-    councilTokenOwnerRecord &&
-    councilTokenOwnerRecord.account.governingTokenDepositAmount.cmp(
-      new BN(governance?.account.config.minCouncilTokensToCreateProposal)
-    ) >= 0;
+  const hasLamports = useMemo(() => {
+    if (account) {
+      return !new BN(account.lamports ?? 0).isZero();
+    }
+    return false;
+  }, [account]);
 
   const canCreateProposalUsingVoterWeight = !voterWeight?.account.voterWeight.isZero();
 
-  const canCreateProposal =
-    canCreateProposalUsingCommunityTokens ||
+  const canCreateProposal = hasLamports && (canCreateProposalUsingCommunityTokens ||
     canCreateProposalUsingCouncilTokens ||
-    canCreateProposalUsingVoterWeight;
+    canCreateProposalUsingVoterWeight);
+
+  if (!governance || !communityMint || !realm) {
+    return null;
+  }
 
   // human readable reason why proposal can't be created
   let creationDisabledReason = undefined;
@@ -101,7 +112,7 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
     // However once the delegates are introduced in the UI then user should choose the proposal owner in the ui
     // because user might have different delegates for council and community
     let tokenOwnerRecord = communityTokenOwnerRecord?.pubkey;
-    if (!tokenOwnerRecord) {
+    if (!tokenOwnerRecord && canCreateProposalUsingVoterWeight) {
       tokenOwnerRecord = await withCreateTokenOwnerRecord(
         instructions,
         programId,

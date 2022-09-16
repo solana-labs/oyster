@@ -19,7 +19,6 @@ import {
 } from './accounts';
 import { shortMeta, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '../tools';
 import { PROGRAM_VERSION_V1 } from '../registry';
-import { withCreateTokenOwnerRecord } from './withCreateTokenOwnerRecord';
 
 /**
  * Instructions to create and initialise vesting spl-token account
@@ -58,14 +57,6 @@ export async function createVestingAccount(
     ),
   );
 
-  instructions.forEach(instruction => {
-    console.log(instruction.data);
-    console.log(instruction.programId.toBase58());
-    console.log(
-      instruction.keys.map(key => ({ ...key, pubkey: key.pubkey.toBase58() })),
-    );
-  });
-
   return { vestingTokenPubkey, vestingPubkey, vestingTokenKeypair };
 }
 
@@ -86,11 +77,6 @@ export async function withDepositGoverningTokens(
   vestingPubkey?: PublicKey,
 ) {
   let data;
-
-  // console.log(arguments);
-
-  // const tokenOwnerRecord = await withCreateTokenOwnerRecord(instructions, programId, realm, governingTokenOwner, governingTokenMint, payer);
-  // console.log(tokenOwnerRecord, tokenOwnerRecord.toBase58());
 
   if (!vestingProgramId) {
     // obsolete governance workflow
@@ -172,8 +158,6 @@ export async function withDepositGoverningTokens(
       isSigner: false,
     });
   }
-
-  console.log(keys.map(key => ({ ...key, pubkey: key.pubkey?.toBase58() })));
 
   instructions.push(
     new TransactionInstruction({ programId: vestingProgramId!, keys, data }),

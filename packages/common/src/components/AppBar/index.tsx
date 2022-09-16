@@ -20,7 +20,7 @@ export const AppBar = (props: {
     <div className="App-Bar-right">
       {props.left}
       {connected ? (
-        <CurrentUserBadge />
+        <CurrentUserBadge showBalance={true} />
       ) : (
         <ConnectButton
           type="text"

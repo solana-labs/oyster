@@ -6,9 +6,7 @@ import BN from 'bn.js';
 
 import { formatMintNaturalAmountAsDecimal, formatMintVoteWeight } from '../../tools/units';
 import { useMintFormatter } from '../../hooks/useMintFormatter';
-import { useDepositedAccounts } from '../../hooks/useDepositedAccounts';
-import { useRpcContext } from '../../hooks/useRpcContext';
-import { useVestingProgramId } from '../../hooks/useVestingProgramId';
+import { useDepositedAccountsContext } from './realmDepositProvider';
 
 const { useMint } = contexts.Accounts;
 
@@ -22,23 +20,19 @@ export interface RealmDepositBadgeProps {
 // TODO:
 export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const { realm } = props;
-  const rpcContext = useRpcContext();
   const governingTokenAccount = useAccountByMint(realm?.account.communityMint);
-  const vestingProgramId = useVestingProgramId(realm);
-
   const { formatValue } = useMintFormatter(realm?.account.communityMint) || {};
-  const depositedAccounts = useDepositedAccounts(rpcContext, vestingProgramId, rpcContext.wallet?.publicKey!, realm?.account.communityMint);
+  const { depositedAccounts } = useDepositedAccountsContext();
 
   const deposited = useMemo(() => {
-    console.log(depositedAccounts?.reduce((p, c) => p.add(c.balance), new BN(0)).toNumber());
-    return 0;
-  }, [depositedAccounts]);
+    return formatValue(depositedAccounts?.reduce((p, c) => p.add(c.balance), new BN(0)) ?? new BN(0));
+  }, [depositedAccounts, formatValue]);
 
   const availableBalance = new BN(governingTokenAccount?.info.amount as BN || 0);
 
   return !availableBalance.isZero() ? <>
     <div>Available: {formatValue(availableBalance)}</div>
-    <div>Deposited: {deposited}</div>
+    {deposited.length > 0 && <div>Deposited: {deposited}</div>}
   </> : null;
 }
 

@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer';
 import { RpcContext } from '@solana/spl-governance';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
+import { TokenAccount } from '@oyster/common';
 
 export type DepositedAccountInfo = {
   pubkey: PublicKey;
@@ -19,24 +20,35 @@ export type DepositedAccountInfo = {
  * @param vestingProgramId
  * @param ownerPubkey
  * @param mint
+ * @param tokenAccount
+ * @param userAccounts
  *
  * @return null|Account[]   List of related accounts
  */
 export const useDepositedAccounts = (
   rpcContext: RpcContext,
-  vestingProgramId: PublicKey | undefined,
-  ownerPubkey: PublicKey | undefined,
-  mint: PublicKey | undefined,
+  vestingProgramId?: PublicKey,
+  ownerPubkey?: PublicKey,
+  mint?: PublicKey,
+  tokenAccount?: TokenAccount,
+  userAccounts?: TokenAccount[],
 ) => {
   const [accounts, setAccounts] = useState<DepositedAccountInfo[] | null>(null);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const fetch = useCallback(async () => {
-    if (!rpcContext || !vestingProgramId || !ownerPubkey) return;
-    if (isFetching) return;
+    if (
+      !rpcContext ||
+      !vestingProgramId ||
+      !ownerPubkey ||
+      !mint ||
+      !tokenAccount ||
+      isFetching ||
+      userAccounts?.length === 0
+    ) {
+      return;
+    }
     setIsFetching(true);
-
-    console.info(`fetching program accounts for ${ownerPubkey.toBase58()}`);
 
     const programAccounts = await rpcContext.connection.getProgramAccounts(
       vestingProgramId,
@@ -56,9 +68,6 @@ export const useDepositedAccounts = (
       // TODO: potential blockchain rate limit issue, set concurrency or make sequential
       const filledAccounts = await Promise.all(
         programAccounts.map(async p => {
-          if (!mint) {
-            return null;
-          }
           // get address holding that mint token
           const {
             value: addresses,
@@ -80,7 +89,7 @@ export const useDepositedAccounts = (
             account: p.account,
             balance: new BN(tokenBalance.amount),
             address: address,
-            label: p.pubkey.toString()
+            label: p.pubkey.toString(),
           } as DepositedAccountInfo;
         }),
       );
@@ -88,13 +97,22 @@ export const useDepositedAccounts = (
       setAccounts(
         filledAccounts.filter(p => p !== null) as DepositedAccountInfo[],
       );
+      setIsFetching(false);
     } else {
-      setAccounts(null);
+      setAccounts([]);
     }
-  }, [isFetching, rpcContext, vestingProgramId, ownerPubkey, mint]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    rpcContext,
+    vestingProgramId,
+    ownerPubkey,
+    mint,
+    tokenAccount,
+    userAccounts,
+  ]);
 
   useEffect(() => {
-    fetch();
+    fetch().then();
   }, [fetch]);
 
   return accounts;

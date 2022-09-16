@@ -373,12 +373,7 @@ export function AccountsProvider({ children = null as any }) {
   }, [connection, publicKey, selectUserAccounts]);
 
   return (
-    <AccountsContext.Provider
-      value={{
-        userAccounts,
-        nativeAccount
-      }}
-    >
+    <AccountsContext.Provider value={{ userAccounts, nativeAccount }}>
       {children}
     </AccountsContext.Provider>
   );
@@ -389,6 +384,11 @@ export function useNativeAccount() {
   return {
     account: context.nativeAccount as AccountInfo<Buffer>
   };
+}
+
+export function useUserAccounts(): { userAccounts: TokenAccount[] } {
+  const { userAccounts } = useContext(AccountsContext);
+  return { userAccounts };
 }
 
 export const getMultipleAccounts = async (
