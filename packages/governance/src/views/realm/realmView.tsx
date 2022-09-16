@@ -12,7 +12,7 @@ import { useKeyParam } from '../../hooks/useKeyParam';
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
 import { GovernanceBadge } from '../../components/GovernanceBadge/governanceBadge';
 import AccountDescription from './components/accountDescription';
-import { RealmDepositBadge, RealmDepositBadgeOyster } from '../../components/RealmDepositBadge/realmDepositBadge';
+import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getGovernanceUrl } from '../../tools/routeTools';
 import { ExplorerLink } from '@oyster/common';
