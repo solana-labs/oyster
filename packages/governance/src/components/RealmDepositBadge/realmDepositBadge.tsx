@@ -30,7 +30,7 @@ export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const depositedAccounts = useDepositedAccounts(rpcContext, vestingProgramId, rpcContext.wallet?.publicKey!, realm?.account.communityMint);
 
   const deposited = useMemo(() => {
-    // console.log(depositedAccounts?.reduce((p, c) => p.add(c.balance), new BN(0)).toNumber());
+    console.log(depositedAccounts?.reduce((p, c) => p.add(c.balance), new BN(0)).toNumber());
     return 0;
   }, [depositedAccounts]);
 
