@@ -38,16 +38,16 @@ const getMintInfo = async (connection: Connection, pubKey: PublicKey) => {
   return deserializeMint(data);
 };
 
-export function MintParser(pubKey: PublicKey, info: AccountInfo<Buffer>): ParsedAccountBase {
-  const buffer = Buffer.from(info.data);
-  const data = deserializeMint(buffer);
-  return { pubkey: pubKey, account: { ...info }, info: data };
+export function MintParser(pubKey: PublicKey, account: AccountInfo<Buffer>): ParsedAccountBase {
+  const buffer = Buffer.from(account.data);
+  const info = deserializeMint(buffer);
+  return { pubkey: pubKey, account, info };
 }
 
-export function TokenAccountParser(pubKey: PublicKey, info: AccountInfo<Buffer>): TokenAccount {
-  const buffer = Buffer.from(info.data);
-  const data = deserializeAccount(buffer);
-  return { pubkey: pubKey, account: { ...info }, info: data };
+export function TokenAccountParser(pubkey: PublicKey, account: AccountInfo<Buffer>): TokenAccount {
+  const buffer = Buffer.from(account.data);
+  const info = deserializeAccount(buffer);
+  return { pubkey, account, info };
 }
 
 export function GenericAccountParser(pubKey: PublicKey, info: AccountInfo<Buffer>): ParsedAccountBase {
@@ -309,7 +309,7 @@ export function AccountsProvider({ children = null as any }) {
     return cache
       .byParser(TokenAccountParser)
       .map(id => cache.get(id))
-      .filter(a => a && a?.info.owner.toBase58() === publicKey?.toBase58())
+      .filter(a => a && a?.info?.owner.toBase58() === publicKey?.toBase58())
       .map(a => a as TokenAccount);
   }, [publicKey]);
 
@@ -356,10 +356,13 @@ export function AccountsProvider({ children = null as any }) {
           // TODO: do we need a better way to identify layout (maybe a enum identifing type?)
           if (info.accountInfo.data.length === AccountLayout.span) {
             const data = deserializeAccount(info.accountInfo.data);
-
-            if (PRECACHED_OWNERS.has(data.owner.toBase58())) {
-              cache.add(id, info.accountInfo, TokenAccountParser);
-              setTokenAccounts(selectUserAccounts());
+            try {
+              if (PRECACHED_OWNERS.has(data?.owner.toBase58())) {
+                cache.add(id, info.accountInfo, TokenAccountParser);
+                setTokenAccounts(selectUserAccounts());
+              }
+            } catch (e) {
+              console.log(e);
             }
           }
         },
@@ -487,7 +490,7 @@ export function useAccount(pubKey?: PublicKey) {
 
         const acc = await cache
           .query(connection, key, TokenAccountParser)
-          .catch(err => console.log(err));
+          .catch(err => console.log('!', err));
         if (acc) {
           setAccount(acc);
         }
@@ -514,6 +517,7 @@ export function useAccount(pubKey?: PublicKey) {
 
 // TODO: expose in spl package
 export const deserializeAccount = (data: Buffer) => {
+  if (AccountLayout.span > data.length) return;
   const accountInfo = AccountLayout.decode(data);
   accountInfo.mint = new PublicKey(accountInfo.mint);
   accountInfo.owner = new PublicKey(accountInfo.owner);

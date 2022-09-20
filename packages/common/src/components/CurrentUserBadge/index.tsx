@@ -6,11 +6,13 @@ import { formatNumber } from '../../utils';
 import { Settings } from '../Settings';
 import './styles.css';
 
-export const CurrentUserBadge = (props: {
+export interface CurrentUserBadgeProps {
   showBalance?: boolean;
   showAddress?: boolean;
   iconSize?: number;
-}) => {
+}
+
+export const CurrentUserBadge = (props: CurrentUserBadgeProps) => {
   const { wallet, publicKey } = useWallet();
   const { account } = useNativeAccount();
 
@@ -47,7 +49,6 @@ export const CurrentUserBadge = (props: {
   const walletKeyStyle: React.CSSProperties = props.showAddress
     ? baseWalletKey
     : { ...baseWalletKey, paddingLeft: 0 };
-
 
   return (
     <div className='wallet-wrapper'>

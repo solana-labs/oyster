@@ -7,6 +7,7 @@ import { LABELS } from '../../constants/labels';
 import { ConnectButton } from '../ConnectButton';
 import { useWallet } from '../../contexts';
 import './style.css';
+import { TokenAmount } from '../TokenAmount';
 
 export const AppBar = (props: {
   left?: JSX.Element;
@@ -19,9 +20,10 @@ export const AppBar = (props: {
   const TopBar = (
     <div className="App-Bar-right">
       {props.left}
-      {connected ? (
-        <CurrentUserBadge showBalance={true} />
-      ) : (
+      {connected ? <>
+          <TokenAmount/>
+        <CurrentUserBadge showBalance={false} />
+        </> : (
         <ConnectButton
           type="text"
           size="large"
