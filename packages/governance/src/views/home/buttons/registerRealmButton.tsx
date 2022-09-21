@@ -15,6 +15,7 @@ import { useRpcContext } from '../../../hooks/useRpcContext';
 import { getRealmUrl } from '../../../tools/routeTools';
 import {
   MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
   PROGRAM_VERSION_V1,
 } from '@solana/spl-governance';
 
@@ -43,6 +44,7 @@ const parseMintSupplyFraction = (fraction: string) => {
     .toNumber();
 
   return new MintMaxVoteWeightSource({
+    type: MintMaxVoteWeightSourceType.SupplyFraction,
     value: new BN(fractionValue),
   });
 };
