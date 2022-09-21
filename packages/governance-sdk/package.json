@@ -5,8 +5,15 @@
   "author": "Solana Maintainers <maintainers@solana.foundation>",
   "homepage": "https://github.com/solana-labs/oyster/blob/main/packages/governance-sdk/README.md",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/cjs/index.js",
+  "browser": "lib/cjs/index.js",
+  "module": "lib/mjs/index.js",
+  "types": "lib/mjs/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    "import": "./lib/mjs/index.js",
+    "require": "./lib/cjs/index.js"
+  },
   "directories": {
     "lib": "lib"
   },
@@ -19,7 +26,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf lib && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && ./bin/after-build.sh",
     "test": "jest",
     "start": "npm-run-all --parallel watch",
     "watch": "tsc --watch"
@@ -36,11 +43,12 @@
     "superstruct": "^0.15.2"
   },
   "devDependencies": {
+    "@solana/spl-token": "0.1.3",
     "esbuild": "^0.14.11",
     "esbuild-jest": "^0.5.0",
     "jest": "^27.4.7",
-    "typescript": "^4.5.4",
-    "@solana/spl-token": "0.1.3"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.4"
   },
   "jest": {
     "testTimeout": 20000,
