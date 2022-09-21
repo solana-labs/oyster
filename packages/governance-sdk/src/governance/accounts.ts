@@ -158,10 +158,11 @@ export enum MintMaxVoteWeightSourceType {
 }
 
 export class MintMaxVoteWeightSource {
-  type = MintMaxVoteWeightSourceType.SupplyFraction;
+  type: MintMaxVoteWeightSourceType;
   value: BN;
 
-  constructor(args: { value: BN }) {
+  constructor(args: { type: MintMaxVoteWeightSourceType; value: BN }) {
+    this.type = args.type;
     this.value = args.value;
   }
 
@@ -169,6 +170,7 @@ export class MintMaxVoteWeightSource {
   static SUPPLY_FRACTION_DECIMALS = 10;
 
   static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
+    type: MintMaxVoteWeightSourceType.SupplyFraction,
     value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
   });
 

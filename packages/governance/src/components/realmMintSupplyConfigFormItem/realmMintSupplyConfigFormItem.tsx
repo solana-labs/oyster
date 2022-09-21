@@ -64,6 +64,7 @@ export const parseMintSupplyFraction = (fraction: string) => {
     .toNumber();
 
   return new MintMaxVoteWeightSource({
+    type: MintMaxVoteWeightSourceType.SupplyFraction,
     value: new BN(fractionValue),
   });
 };
@@ -120,10 +121,11 @@ export function RealmMintSupplyConfigFormItem({
 
         {supplyFraction && (
           <Text type="secondary">
-            {`${communityMint
+            {`${
+              communityMint
                 ? formatMintSupplyFraction(communityMint, supplyFraction)
                 : ''
-              } (${formatMintSupplyPercentage(supplyFraction)})`}
+            } (${formatMintSupplyPercentage(supplyFraction)})`}
           </Text>
         )}
       </Space>
