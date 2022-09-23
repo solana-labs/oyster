@@ -31,8 +31,8 @@ export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const availableBalance = new BN(governingTokenAccount?.info.amount as BN || 0);
 
   return !availableBalance.isZero() ? <>
-    <div>Available: {formatValue(availableBalance)}</div>
-    {deposited.length > 0 && <div>Deposited: {deposited}</div>}
+    <div>Available: {formatValue(availableBalance)} NEON</div>
+    {deposited !== '0' && <div>Deposited: {deposited} NEON</div>}
   </> : null;
 }
 

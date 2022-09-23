@@ -517,7 +517,6 @@ export function useAccount(pubKey?: PublicKey) {
 
 // TODO: expose in spl package
 export const deserializeAccount = (data: Buffer) => {
-  if (AccountLayout.span > data.length) return;
   const accountInfo = AccountLayout.decode(data);
   accountInfo.mint = new PublicKey(accountInfo.mint);
   accountInfo.owner = new PublicKey(accountInfo.owner);

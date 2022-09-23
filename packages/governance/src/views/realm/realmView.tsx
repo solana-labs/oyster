@@ -16,7 +16,6 @@ import { RealmActionBar } from './buttons/realmActionBar';
 import { getGovernanceMeta } from '../../hooks/useGovernanceMeta';
 import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
 import { DepositsProvider } from '../../components/RealmDepositBadge/realmDepositProvider';
-import AccountDescription from './components/accountDescription';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
 
 const { Text } = Typography;
@@ -47,8 +46,7 @@ export const RealmView = () => {
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
         title: getGovernanceMeta(g.pubkey, programIdBase58).name,
-        badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>,
-        description: <AccountDescription governance={g}></AccountDescription>
+        badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>
       }));
   }, [governances, programIdBase58, realm]);
 
@@ -121,7 +119,6 @@ export const RealmView = () => {
                 <List.Item.Meta
                   title={item.title}
                   avatar={item.badge}
-                  description={item.description}
                 ></List.Item.Meta>
               </List.Item>
             )}

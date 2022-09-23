@@ -13,7 +13,7 @@ export const AmountItem = ({ account }: { account: TokenAccount }) => {
   }, [account]);
 
   return <>
-    <span style={{ marginRight: 4 }}>{amount}</span>
+    <span style={{ marginRight: 4 }}>{amount} NEON</span>
   </>;
 };
 
