@@ -2,15 +2,12 @@ import { Col, List, Row } from 'antd';
 import React, { useMemo } from 'react';
 import { useRealms } from '../../contexts/GovernanceContext';
 import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
-
 import { Background } from '../../components/Background';
 import { useHistory } from 'react-router-dom';
 
 import { LABELS } from '../../constants';
 
 import { RealmBadge } from '../../components/RealmBadge/realmBadge';
-import { useWalletTokenOwnerRecords } from '../../hooks/apiHooks';
-import { RealmDepositBadge } from '../../components/RealmDepositBadge/realmDepositBadge';
 import { useRpcContext } from '../../hooks/useRpcContext';
 import { getRealmUrl } from '../../tools/routeTools';
 
@@ -20,26 +17,11 @@ export const HomeView = () => {
   const history = useHistory();
   const realms = useRealms();
   const { programIdBase58 } = useRpcContext();
-  const tokenOwnerRecords = useWalletTokenOwnerRecords();
 
   const realmItems = useMemo(() => {
     return realms
       .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
       .map(r => {
-        const communityTokenOwnerRecord = tokenOwnerRecords.find(
-          tor =>
-            tor.account.governingTokenMint.toBase58() ===
-            r.account.communityMint.toBase58(),
-        );
-
-        const councilTokenOwnerRecord =
-          r.account.config.councilMint &&
-          tokenOwnerRecords.find(
-            tor =>
-              tor.account.governingTokenMint.toBase58() ===
-              r.account.config.councilMint!.toBase58(),
-          );
-
         return {
           href: getRealmUrl(r.pubkey, programIdBase58),
           title: r.account.name,
@@ -50,29 +32,29 @@ export const HomeView = () => {
             ></RealmBadge>
           ),
           key: r.pubkey.toBase58(),
-          description: '',
+          description: ''
         };
       });
-  }, [realms, tokenOwnerRecords, programIdBase58]);
+  }, [realms, programIdBase58]);
 
   return (
     <>
       <Background />
       <Row>
-        <Col flex="auto" xxl={15} xs={24} className="governance-container">
-          <div className="governance-title">
+        <Col flex='auto' xxl={15} xs={24} className='governance-container'>
+          <div className='governance-title'>
             <h1>{LABELS.REALMS}</h1>
             <ProgramActionBar></ProgramActionBar>
           </div>
           <List
-            itemLayout="vertical"
-            size="large"
+            itemLayout='vertical'
+            size='large'
             pagination={false}
             dataSource={realmItems}
             renderItem={item => (
               <List.Item
                 key={item.key}
-                className="governance-item"
+                className='governance-item'
                 onClick={() => history.push(item.href)}
               >
                 <List.Item.Meta

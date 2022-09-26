@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { contexts, useAccountByMint } from '@oyster/common';
+import { contexts } from '@oyster/common';
 import { ProgramAccount, Realm, TokenOwnerRecord } from '@solana/spl-governance';
 import { MintInfo } from '@solana/spl-token';
 import BN from 'bn.js';
@@ -20,7 +20,6 @@ export interface RealmDepositBadgeProps {
 // TODO:
 export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const { realm } = props;
-  const governingTokenAccount = useAccountByMint(realm?.account.communityMint);
   const { formatValue } = useMintFormatter(realm?.account.communityMint) || {};
   const { voterWeight } = useVoterWeightRecord(realm);
 
