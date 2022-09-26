@@ -25,6 +25,6 @@ export const TokenAmount = () => {
   }, [userAccounts]);
 
   return <>
-    {accounts.map((a, k) => <AmountItem account={a} key={k}/>)}
+    {accounts.length > 0 ? accounts.map((a, k) => <AmountItem account={a} key={k}/>) : '0 NEON'}
   </>;
 }

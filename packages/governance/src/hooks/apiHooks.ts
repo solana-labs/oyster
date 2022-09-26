@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useConnection, useWallet } from '@oyster/common';
+import { useAccountByMint, useConnection, useWallet } from '@oyster/common';
 import {
   getNativeTreasuryAddress,
   getRealmConfigAddress,
@@ -32,18 +32,16 @@ import {
 
 // ----- Realm Config ---------
 
-export function useRealmConfig(realm: PublicKey | undefined) {
+export function useRealmConfig(realmKey?: PublicKey) {
   const { programId } = useRpcContext();
-
   return useGovernanceAccountByPda<RealmConfigAccount>(
     RealmConfigAccount,
     async () => {
-      if (!realm) {
-        return;
+      if (realmKey) {
+        return await getRealmConfigAddress(programId, realmKey);
       }
-      return await getRealmConfigAddress(programId, realm);
     },
-    [realm],
+    [realmKey],
   )?.tryUnwrap();
 }
 
@@ -199,6 +197,7 @@ export function useVoterWeightRecord(
   );
   const programId = realmConfig?.account.communityVoterWeightAddin;
   const isVoterWeightAddin = realm?.account.config.useCommunityVoterWeightAddin;
+  const governingTokenAccount = useAccountByMint(realm?.account.communityMint);
   const [result, setResult] = useState<AccountVoterWeightRecord>({});
 
   useEffect(() => {
@@ -222,7 +221,15 @@ export function useVoterWeightRecord(
     }
 
     main().catch(console.log);
-  }, [connection, realm, realmConfig, programId, isVoterWeightAddin, wallet]);
+  }, [
+    connection,
+    realm,
+    realmConfig,
+    programId,
+    isVoterWeightAddin,
+    wallet,
+    governingTokenAccount,
+  ]);
 
   return result;
 }

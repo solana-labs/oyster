@@ -16,7 +16,7 @@ import { RealmActionBar } from './buttons/realmActionBar';
 import { getGovernanceMeta } from '../../hooks/useGovernanceMeta';
 import { useArrayLengthWatcher } from '../../hooks/useArrayLengthWatcher';
 import { DepositsProvider } from '../../components/RealmDepositBadge/realmDepositProvider';
-import './style.less'; // Don't remove this line, it will break dark mode if you do due to weird transpiling conditions
+import './style.less';
 
 const { Text } = Typography;
 

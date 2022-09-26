@@ -3,7 +3,7 @@ import { ProgramAccount, Realm } from '@solana/spl-governance';
 import { useAccountByMint, useUserAccounts } from '@oyster/common';
 import { DepositedAccountInfo, useDepositedAccounts } from '../../hooks/useDepositedAccounts';
 import { useRpcContext } from '../../hooks/useRpcContext';
-import { useVestingProgramId } from '../../hooks/useVestingProgramId';
+import { useRealmConfig } from '../../hooks/apiHooks';
 
 const DepositsContext = React.createContext<any>({});
 
@@ -13,7 +13,8 @@ export function useDepositedAccountsContext(): { depositedAccounts: DepositedAcc
 
 export function DepositsProvider({ children, realm }: { children: any, realm?: ProgramAccount<Realm> }) {
   const rpcContext = useRpcContext();
-  const vestingProgramId = useVestingProgramId(realm);
+  const realmConfig = useRealmConfig(realm?.pubkey);
+  const vestingProgramId = realmConfig?.account.communityVoterWeightAddin;
   const governingTokenAccount = useAccountByMint(realm?.account.communityMint);
   const { userAccounts } = useUserAccounts();
   const depositedAccounts = useDepositedAccounts(

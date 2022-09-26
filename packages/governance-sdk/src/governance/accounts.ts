@@ -347,7 +347,6 @@ export async function getRealmConfigAddress(
     [Buffer.from('realm-config'), realm.toBuffer()],
     programId,
   );
-
   return realmConfigAddress;
 }
 

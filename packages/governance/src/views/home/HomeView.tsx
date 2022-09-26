@@ -50,12 +50,7 @@ export const HomeView = () => {
             ></RealmBadge>
           ),
           key: r.pubkey.toBase58(),
-          description: (
-            <RealmDepositBadge
-              communityTokenOwnerRecord={communityTokenOwnerRecord}
-              councilTokenOwnerRecord={councilTokenOwnerRecord}
-            ></RealmDepositBadge>
-          ),
+          description: '',
         };
       });
   }, [realms, tokenOwnerRecords, programIdBase58]);
