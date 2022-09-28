@@ -1,6 +1,6 @@
 import { Col, List, Popover, Row, Space, Typography } from 'antd';
 import React, { useMemo } from 'react';
-import { ExplorerLink } from '@oyster/common';
+import { ExplorerLink, useConnectionConfig } from '@oyster/common';
 import { useHistory } from 'react-router-dom';
 import { useRealm } from '../../contexts/GovernanceContext';
 import { useGovernancesByRealm, useWalletTokenOwnerRecord } from '../../hooks/apiHooks';
@@ -24,6 +24,7 @@ export const RealmView = () => {
   const history = useHistory();
   let realmKey = useKeyParam();
   const { programIdBase58 } = useRpcContext();
+  const { env } = useConnectionConfig();
 
   const realm = useRealm(realmKey);
   const governances = useGovernancesByRealm(realmKey);
@@ -45,10 +46,10 @@ export const RealmView = () => {
       .map(g => ({
         key: g.pubkey.toBase58(),
         href: getGovernanceUrl(g.pubkey, programIdBase58),
-        title: getGovernanceMeta(g.pubkey, programIdBase58).name,
+        title: getGovernanceMeta(env, g.pubkey, programIdBase58)?.name,
         badge: <GovernanceBadge governance={g} realm={realm}></GovernanceBadge>
       }));
-  }, [governances, programIdBase58, realm]);
+  }, [env, governances, programIdBase58, realm]);
 
   return (
     <DepositsProvider realm={realm}>

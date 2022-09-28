@@ -1,4 +1,4 @@
-import { sleep, useLocalStorageState } from '../utils/utils';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Account,
   BlockhashAndFeeCalculator,
@@ -10,23 +10,20 @@ import {
   SimulatedTransactionResponse,
   Transaction,
   TransactionInstruction,
-  TransactionSignature,
+  TransactionSignature
 } from '@solana/web3.js';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { notify } from '../utils/notifications';
-import { ExplorerLink } from '../components/ExplorerLink';
-import { setProgramIds } from '../utils/ids';
+import { ENV as ChainId, TokenInfo, TokenListProvider } from '@solana/spl-token-registry';
+import { ExplorerLink } from '../components';
 import {
-  TokenInfo,
-  TokenListProvider,
-  ENV as ChainId,
-} from '@solana/spl-token-registry';
-import {
+  notify,
   SendTransactionError,
+  setProgramIds,
   SignTransactionError,
+  sleep,
   TransactionTimeoutError,
-} from '../utils/errors';
-import { WalletSigner, WalletNotConnectedError } from './wallet';
+  useLocalStorageState
+} from '../utils';
+import { WalletNotConnectedError, WalletSigner } from './wallet';
 
 export type ENV = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet';
 
@@ -36,23 +33,23 @@ export const ENDPOINTS = [
     endpoint:
       process.env.REACT_APP_DEVNET_RPC ||
       'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
-    ChainId: ChainId.Devnet,
+    ChainId: ChainId.Devnet
   },
   {
     name: 'mainnet-beta' as ENV,
     endpoint:
       process.env.REACT_APP_MAINNET_RPC || 'https://ssc-dao.genesysgo.net',
-    ChainId: ChainId.MainnetBeta,
+    ChainId: ChainId.MainnetBeta
   },
   {
     name: 'testnet' as ENV,
     endpoint: clusterApiUrl('testnet'),
-    ChainId: ChainId.Testnet,
+    ChainId: ChainId.Testnet
   },
   {
     name: 'localnet' as ENV,
     endpoint: 'http://127.0.0.1:8899',
-    ChainId: ChainId.Devnet,
+    ChainId: ChainId.Devnet
   }
 ];
 
@@ -73,14 +70,16 @@ interface ConnectionConfig {
 
 const ConnectionContext = React.createContext<ConnectionConfig>({
   endpoint: DEFAULT,
-  setEndpoint: () => { },
+  setEndpoint: () => {
+  },
   slippage: DEFAULT_SLIPPAGE,
-  setSlippage: (val: number) => { },
+  setSlippage: (val: number) => {
+  },
   connection: new Connection(DEFAULT, 'recent'),
   sendConnection: new Connection(DEFAULT, 'recent'),
   env: ENDPOINTS[0].name,
   tokens: [],
-  tokenMap: new Map<string, TokenInfo>(),
+  tokenMap: new Map<string, TokenInfo>()
 });
 
 enum ASSET_CHAIN {
@@ -91,21 +90,21 @@ enum ASSET_CHAIN {
 export function ConnectionProvider({ children = undefined as any }) {
   const [endpoint, setEndpoint] = useLocalStorageState(
     'connectionEndpoint',
-    ENDPOINTS[0].endpoint,
+    ENDPOINTS[0].endpoint
   );
 
   const [slippage, setSlippage] = useLocalStorageState(
     'slippage',
-    DEFAULT_SLIPPAGE.toString(),
+    DEFAULT_SLIPPAGE.toString()
   );
 
   const connection = useMemo(
     () => new Connection(endpoint, 'recent'),
-    [endpoint],
+    [endpoint]
   );
   const sendConnection = useMemo(
     () => new Connection(endpoint, 'recent'),
-    [endpoint],
+    [endpoint]
   );
 
   const env =
@@ -120,7 +119,7 @@ export function ConnectionProvider({ children = undefined as any }) {
         .excludeByTag('nft')
         .filterByChainId(
           ENDPOINTS.find(end => end.endpoint === endpoint)?.ChainId ||
-          ChainId.MainnetBeta,
+          ChainId.MainnetBeta
         )
         .getList();
 
@@ -134,8 +133,8 @@ export function ConnectionProvider({ children = undefined as any }) {
         name: 'Interest Bearing Bitcoin (Wormhole)',
         symbol: 'IBBTC',
         extensions: {
-          address: '0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f',
-        },
+          address: '0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f'
+        }
       });
       const knownMints = [...list].reduce((map, item) => {
         map.set(item.address, item);
@@ -153,7 +152,8 @@ export function ConnectionProvider({ children = undefined as any }) {
   // is empty after opening its first time, preventing subsequent subscriptions from receiving responses.
   // This is a hack to prevent the list from every getting empty
   useEffect(() => {
-    const id = connection.onAccountChange(new Account().publicKey, () => { });
+    const id = connection.onAccountChange(new Account().publicKey, () => {
+    });
     return () => {
       connection.removeAccountChangeListener(id);
     };
@@ -169,7 +169,8 @@ export function ConnectionProvider({ children = undefined as any }) {
   useEffect(() => {
     const id = sendConnection.onAccountChange(
       new Account().publicKey,
-      () => { },
+      () => {
+      }
     );
     return () => {
       sendConnection.removeAccountChangeListener(id);
@@ -194,7 +195,7 @@ export function ConnectionProvider({ children = undefined as any }) {
         sendConnection,
         tokens,
         tokenMap,
-        env,
+        env
       }}
     >
       {children}
@@ -217,7 +218,7 @@ export function useConnectionConfig() {
     setEndpoint: context.setEndpoint,
     env: context.env,
     tokens: context.tokens,
-    tokenMap: context.tokenMap,
+    tokenMap: context.tokenMap
   };
 }
 
@@ -228,7 +229,7 @@ export function useSlippageConfig() {
 
 export const getErrorForTransaction = async (
   connection: Connection,
-  txid: string,
+  txid: string
 ) => {
   // wait for all confirmation before geting transaction
 
@@ -270,9 +271,10 @@ export const sendTransactions = async (
   signersSet: Account[][],
   sequenceType: SequenceType = SequenceType.Parallel,
   commitment: Commitment = 'singleGossip',
-  successCallback: (txid: string, ind: number) => void = (txid, ind) => { },
+  successCallback: (txid: string, ind: number) => void = (txid, ind) => {
+  },
   failCallback: (reason: string, ind: number) => boolean = (txid, ind) => false,
-  block?: BlockhashAndFeeCalculator,
+  block?: BlockhashAndFeeCalculator
 ): Promise<number> => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
@@ -296,7 +298,7 @@ export const sendTransactions = async (
     transaction.setSigners(
       // fee payed by the wallet owner
       wallet.publicKey,
-      ...signers.map(s => s.publicKey),
+      ...signers.map(s => s.publicKey)
     );
 
     if (signers.length > 0) {
@@ -314,7 +316,7 @@ export const sendTransactions = async (
   for (let i = 0; i < signedTxns.length; i++) {
     const signedTxnPromise = sendSignedTransaction({
       connection,
-      signedTransaction: signedTxns[i],
+      signedTransaction: signedTxns[i]
     });
 
     signedTxnPromise
@@ -354,7 +356,7 @@ export const sendTransaction = async (
   awaitConfirmation = true,
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
-  block?: BlockhashAndFeeCalculator,
+  block?: BlockhashAndFeeCalculator
 ) => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
@@ -370,7 +372,7 @@ export const sendTransaction = async (
     transaction.setSigners(
       // fee payed by the wallet owner
       wallet.publicKey,
-      ...signers.map(s => s.publicKey),
+      ...signers.map(s => s.publicKey)
     );
   }
 
@@ -389,7 +391,7 @@ export const sendTransaction = async (
   const rawTransaction = transaction.serialize();
   let options = {
     skipPreflight: true,
-    commitment,
+    commitment
   };
 
   const txid = await connection.sendRawTransaction(rawTransaction, options);
@@ -400,7 +402,7 @@ export const sendTransaction = async (
       txid,
       DEFAULT_TIMEOUT,
       connection,
-      commitment,
+      commitment
     );
 
     slot = confirmationStatus?.slot || 0;
@@ -418,18 +420,18 @@ export const sendTransaction = async (
       if ('timeout' in (confirmationStatus.err as any)) {
         notify({
           message: `Transaction hasn't been confirmed within ${DEFAULT_TIMEOUT / 1000
-            }s. Please check on Solana Explorer`,
+          }s. Please check on Solana Explorer`,
           description: (
             <>
               <ExplorerLink
                 address={txid}
-                type="transaction"
+                type='transaction'
                 short
                 connection={connection}
               />
             </>
           ),
-          type: 'warn',
+          type: 'warn'
         });
         throw new TransactionTimeoutError(txid);
       }
@@ -443,19 +445,19 @@ export const sendTransaction = async (
             ))}
             <ExplorerLink
               address={txid}
-              type="transaction"
+              type='transaction'
               short
               connection={connection}
             />
           </>
         ),
-        type: 'error',
+        type: 'error'
       });
 
       throw new SendTransactionError(
         `Transaction ${txid} failed (${JSON.stringify(confirmationStatus)})`,
         txid,
-        confirmationStatus.err,
+        confirmationStatus.err
       );
     }
   }
@@ -471,7 +473,7 @@ export const sendTransactionWithRetry = async (
   commitment: Commitment = 'singleGossip',
   includesFeePayer: boolean = false,
   block?: BlockhashAndFeeCalculator,
-  beforeSend?: () => void,
+  beforeSend?: () => void
 ) => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
@@ -487,7 +489,7 @@ export const sendTransactionWithRetry = async (
     transaction.setSigners(
       // fee payed by the wallet owner
       wallet.publicKey,
-      ...signers.map(s => s.publicKey),
+      ...signers.map(s => s.publicKey)
     );
   }
 
@@ -504,7 +506,7 @@ export const sendTransactionWithRetry = async (
 
   const { txid, slot } = await sendSignedTransaction({
     connection,
-    signedTransaction: transaction,
+    signedTransaction: transaction
   });
 
   return { txid, slot };
@@ -534,8 +536,8 @@ export async function sendSignedTransaction({
   const txid: TransactionSignature = await connection.sendRawTransaction(
     rawTransaction,
     {
-      skipPreflight: true,
-    },
+      skipPreflight: true
+    }
   );
 
   console.log('Started awaiting confirmation for', txid);
@@ -544,7 +546,7 @@ export async function sendSignedTransaction({
   (async () => {
     while (!done && getUnixTs() - startTime < timeout) {
       connection.sendRawTransaction(rawTransaction, {
-        skipPreflight: true,
+        skipPreflight: true
       });
       await sleep(500);
     }
@@ -555,7 +557,7 @@ export async function sendSignedTransaction({
       timeout,
       connection,
       'recent',
-      true,
+      true
     );
 
     if (confirmation.err) {
@@ -570,17 +572,16 @@ export async function sendSignedTransaction({
     }
     let simulateResult: SimulatedTransactionResponse | null = null;
     try {
-      simulateResult = (
-        await simulateTransaction(connection, signedTransaction, 'single')
-      ).value;
-    } catch (e) { }
+      simulateResult = (await simulateTransaction(connection, signedTransaction, 'single')).value;
+    } catch (e) {
+    }
     if (simulateResult && simulateResult.err) {
       if (simulateResult.logs) {
         for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
           const line = simulateResult.logs[i];
           if (line.startsWith('Program log: ')) {
             throw new Error(
-              'Transaction failed: ' + line.slice('Program log: '.length),
+              'Transaction failed: ' + line.slice('Program log: '.length)
             );
           }
         }
@@ -599,12 +600,12 @@ export async function sendSignedTransaction({
 export async function simulateTransaction(
   connection: Connection,
   transaction: Transaction,
-  commitment: Commitment,
+  commitment: Commitment
 ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
   // @ts-ignore
   transaction.recentBlockhash = await connection._recentBlockhash(
     // @ts-ignore
-    connection._disableBlockhashCaching,
+    connection._disableBlockhashCaching
   );
 
   const signData = transaction.serializeMessage();
@@ -627,13 +628,13 @@ async function awaitTransactionSignatureConfirmation(
   timeout: number,
   connection: Connection,
   commitment: Commitment = 'recent',
-  queryStatus = false,
+  queryStatus = false
 ) {
   let done = false;
   let status: SignatureStatus | null = {
     slot: 0,
     confirmations: 0,
-    err: null,
+    err: null
   };
   let subId = 0;
   await new Promise((resolve, reject) => {
@@ -653,7 +654,7 @@ async function awaitTransactionSignatureConfirmation(
             status = {
               err: result.err,
               slot: context.slot,
-              confirmations: 0,
+              confirmations: 0
             };
             if (result.err) {
               console.log('Rejected via websocket', result.err);
@@ -663,7 +664,7 @@ async function awaitTransactionSignatureConfirmation(
               resolve(result);
             }
           },
-          commitment,
+          commitment
         );
       } catch (e) {
         done = true;
@@ -674,7 +675,7 @@ async function awaitTransactionSignatureConfirmation(
         (async () => {
           try {
             const signatureStatuses = await connection.getSignatureStatuses([
-              txid,
+              txid
             ]);
             status = signatureStatuses && signatureStatuses.value[0];
             if (!done) {
