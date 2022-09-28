@@ -52,7 +52,7 @@ const { ZERO } = constants;
 
 export const urlRegex =
   // eslint-disable-next-line
-  /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+  /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&\/=]*)/;
 const { useMint } = contexts.Accounts;
 const { useConnectionConfig } = contexts.Connection;
 
@@ -224,11 +224,7 @@ function mapVoterDisplayData(
       ),
   ];
 
-  const data = [...undecidedData, ...yesVoteData, ...noVoteData].sort((a, b) =>
-    b.value.cmp(a.value),
-  );
-
-  return data;
+  return [...undecidedData, ...yesVoteData, ...noVoteData].sort((a, b) => b.value.cmp(a.value));
 }
 
 function InnerProposalView({
@@ -536,7 +532,7 @@ function getYesVoteThreshold(
   governance: ProgramAccount<Governance>,
 ) {
   return proposal.account.isVoteFinalized() &&
-    // Note Canceled state is also final but we currently don't capture vote threshold at the cancellation time
+    // Note Canceled state is also final, but we currently don't capture vote threshold at the cancellation time
     proposal.account.voteThresholdPercentage
     ? proposal.account.voteThresholdPercentage.value
     : governance.account.config.voteThresholdPercentage.value;

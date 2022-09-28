@@ -4,7 +4,7 @@ import {
   AccountInfo,
   Connection,
   KeyedAccountInfo,
-  PublicKey,
+  PublicKey
 } from '@solana/web3.js';
 
 import { useConnection, useConnectionConfig } from '@oyster/common';
@@ -18,14 +18,14 @@ import { PROGRAM_VERSION } from '@solana/spl-governance';
 
 import {
   getGovernanceProgramVersion,
-  ProgramAccount,
+  ProgramAccount
 } from '@solana/spl-governance';
 import { arrayToRecord } from '../tools/script';
 
 export interface GovernanceContextState {
   realms: Record<string, ProgramAccount<Realm>>;
   changeTracker: AccountChangeTracker;
-  programId: string;
+  programId: PublicKey;
   programVersion: number;
 }
 
@@ -48,7 +48,7 @@ class AccountUpdatedEventArgs {
   constructor(
     pubkey: string,
     accountType: GovernanceAccountType,
-    accountInfo: AccountInfo<Buffer>,
+    accountInfo: AccountInfo<Buffer>
   ) {
     this.pubkey = pubkey;
     this.accountType = accountType;
@@ -72,7 +72,7 @@ class AccountChangeTracker {
   notifyAccountRemoved(pubkey: string, accountType: GovernanceAccountType) {
     this.removeEmitter.emit(
       AccountRemovedEventArgs.name,
-      new AccountRemovedEventArgs(pubkey, accountType),
+      new AccountRemovedEventArgs(pubkey, accountType)
     );
   }
 
@@ -85,17 +85,17 @@ class AccountChangeTracker {
   notifyAccountUpdated(
     pubkey: string,
     accountType: GovernanceAccountType,
-    accountInfo: AccountInfo<Buffer>,
+    accountInfo: AccountInfo<Buffer>
   ) {
     this.updateEmitter.emit(
       AccountUpdatedEventArgs.name,
-      new AccountUpdatedEventArgs(pubkey, accountType, accountInfo),
+      new AccountUpdatedEventArgs(pubkey, accountType, accountInfo)
     );
   }
 
   async fetchAndNotifyAccountUpdated(
     connection: Connection,
-    pubkey: PublicKey,
+    pubkey: PublicKey
   ) {
     const info = await connection.getAccountInfo(pubkey, 'recent');
     if (info) {
@@ -114,19 +114,18 @@ export default function GovernanceProvider({ children = null as any }) {
   const { endpoint, env } = useConnectionConfig();
   const location = useLocation();
 
-  const programId = useMemo(() => {
+  const programId = useMemo<PublicKey>(() => {
     const params = new URLSearchParams(location.search);
-
-    console.debug(
-      'DEFAULT_GOVERNANCE_PROGRAM_ID',
-      process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID,
-    );
-
-    return (
-      params.get('programId') ??
-      process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID ??
-      'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
-    );
+    let programId: PublicKey;
+    const govProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw';
+    try {
+      const paramsId = params.get('programId');
+      programId = new PublicKey(paramsId ?? process.env.REACT_APP_DEFAULT_GOVERNANCE_PROGRAM_ID ?? govProgramId);
+    } catch (e) {
+      programId = new PublicKey(govProgramId);
+    }
+    console.debug('CURRENT_PROGRAM_ID', programId.toBase58());
+    return programId;
   }, [location]);
 
   const [realms, setRealms] = useState({});
@@ -141,7 +140,7 @@ export default function GovernanceProvider({ children = null as any }) {
         const loadedRealms = await getRealms(connection, programPk);
         setRealms(arrayToRecord(loadedRealms, r => r.pubkey.toBase58()));
       } catch (ex) {
-        console.error("Can't load Realms", ex);
+        console.error('Can\'t load Realms', ex);
         setRealms({});
       }
 
@@ -157,19 +156,19 @@ export default function GovernanceProvider({ children = null as any }) {
           ) {
             const realm = GovernanceAccountParser(Realm)(
               info.accountId,
-              info.accountInfo,
+              info.accountInfo
             );
             setRealms((objs: any) => ({
               ...objs,
-              [info.accountId.toBase58()]: realm,
+              [info.accountId.toBase58()]: realm
             }));
           }
           changeTracker.notifyAccountUpdated(
             info.accountId.toBase58(),
             info.accountInfo.data[0],
-            info.accountInfo,
+            info.accountInfo
           );
-        },
+        }
       );
     })();
 
@@ -183,7 +182,7 @@ export default function GovernanceProvider({ children = null as any }) {
       pVersion => {
         console.debug('PROGRAM VERSION', { pVersion, env });
         setProgramVersion(pVersion);
-      },
+      }
     );
   }, [env, connection, programId]);
 
@@ -193,7 +192,7 @@ export default function GovernanceProvider({ children = null as any }) {
         realms,
         changeTracker,
         programVersion,
-        programId,
+        programId
       }}
     >
       {children}
@@ -210,7 +209,7 @@ export function useProgramInfo() {
   const context = useGovernanceContext();
   return {
     programVersion: context.programVersion,
-    programId: context.programId,
+    programId: context.programId
   };
 }
 
