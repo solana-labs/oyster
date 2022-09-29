@@ -25,12 +25,12 @@ GovernanceMetaEnvMap.set('localnet', [
     name: 'Development Assembly',
   },
   {
-    programId: '',
-    address: '',
+    programId: '82pQHEmBbW6CQS8GzLP3WE2pCgMUPSW2XzpuSih3aFDk',
+    address: 'ojtWRf7eVy29bBaCcXCxkczf8XcmAFxc4K4AZewGDgQ',
     name: 'EVM Emergency Assembly',
   },
   {
-    programId: '',
+    programId: '82pQHEmBbW6CQS8GzLP3WE2pCgMUPSW2XzpuSih3aFDk',
     address: '',
     name: 'Grants Assembly',
   },
@@ -48,17 +48,17 @@ GovernanceMetaEnvMap.set('testnet', [
     name: 'Treasury Watchdog',
   },
   {
-    programId: '',
+    programId: 'GuY7y4k7s4bicCymTSeAQtgzsx1G461s1swYvBFNCKgT',
     address: '',
     name: 'Development Assembly',
   },
   {
-    programId: '',
+    programId: 'GuY7y4k7s4bicCymTSeAQtgzsx1G461s1swYvBFNCKgT',
     address: '',
     name: 'EVM Emergency Assembly',
   },
   {
-    programId: '',
+    programId: 'GuY7y4k7s4bicCymTSeAQtgzsx1G461s1swYvBFNCKgT',
     address: '',
     name: 'Grants Assembly',
   },
@@ -76,17 +76,17 @@ GovernanceMetaEnvMap.set('devnet', [
     name: 'Treasury Watchdog',
   },
   {
-    programId: '',
+    programId: '5oLTQBvjQjvsZqRNHsdE6pn8nW13Mw6EEMvQfjQ8C6pN',
     address: '',
     name: 'Development Assembly',
   },
   {
-    programId: '',
+    programId: '5oLTQBvjQjvsZqRNHsdE6pn8nW13Mw6EEMvQfjQ8C6pN',
     address: '',
     name: 'EVM Emergency Assembly',
   },
   {
-    programId: '',
+    programId: '5oLTQBvjQjvsZqRNHsdE6pn8nW13Mw6EEMvQfjQ8C6pN',
     address: '',
     name: 'Grants Assembly',
   },
