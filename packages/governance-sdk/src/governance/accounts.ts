@@ -450,7 +450,7 @@ export class GovernanceConfig {
   communityVetoVoteThreshold: VoteThreshold;
   councilVoteTipping: VoteTipping;
 
-  reserved = [0, 0];
+  reserved?: Uint8Array;
 
   constructor(args: {
     communityVoteThreshold: VoteThreshold;
@@ -466,6 +466,7 @@ export class GovernanceConfig {
     councilVetoVoteThreshold: VoteThreshold;
     communityVetoVoteThreshold: VoteThreshold;
     councilVoteTipping: VoteTipping;
+    reserved?: Uint8Array;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
@@ -488,6 +489,8 @@ export class GovernanceConfig {
 
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
+
+    this.reserved = args.reserved ?? new Uint8Array(3);
   }
 }
 
