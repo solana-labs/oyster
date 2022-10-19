@@ -75,9 +75,4 @@ test('createProposal', async () => {
   // Act
   const proposalPk = await realm.createProposal('proposal 1', true);
 
-  // Assert
-  const proposal = await realm.getProposal(proposalPk);
-
-  expect(proposal.account.name).toEqual('proposal 1');
-  expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
 });
