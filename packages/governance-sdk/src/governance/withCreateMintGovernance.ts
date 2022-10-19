@@ -68,7 +68,7 @@ export const withCreateMintGovernance = async (
     },
     {
       pubkey: payer, // 5
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {
