@@ -379,17 +379,23 @@ export class RealmBuilder {
     return this;
   }
 
-  async createProposal(name?: string) {
-    const proposalPk = await this._createProposal(name);
+  async createProposal(name?: string, multiple?: boolean) {
+    const proposalPk = await this._createProposal(name, multiple);
     await this.sendTx();
     return proposalPk;
   }
 
-  async _createProposal(name?: string) {
+  async _createProposal(name?: string, multiple?: boolean) {
     // Create single choice Approve/Deny proposal with instruction to mint more governance tokens
-    const voteType = VoteType.SINGLE_CHOICE;
-    const options = ['Approve'];
-    const useDenyOption = true;
+    let voteType = VoteType.SINGLE_CHOICE;
+    let options = ['Approve'];
+    let useDenyOption = true;
+
+    if (multiple) {
+      voteType = VoteType.MULTI_CHOICE(4);
+      options = ['One', 'Two', 'Three', 'four']
+      useDenyOption = false
+    }
 
     this.proposalPk = await withCreateProposal(
       this.bench.instructions,
@@ -408,7 +414,6 @@ export class RealmBuilder {
       useDenyOption,
       this.bench.walletPk,
     );
-
     return this.proposalPk;
   }
 
