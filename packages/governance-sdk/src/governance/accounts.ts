@@ -201,11 +201,13 @@ export enum VoteTypeKind {
 
 export class VoteType {
   type: VoteTypeKind;
-  choiceCount: number | undefined;
+  maxVoterOptions: number | undefined;
+  maxWinningOptions: number | undefined;
 
   constructor(args: { type: VoteTypeKind; choiceCount: number | undefined }) {
     this.type = args.type;
-    this.choiceCount = args.choiceCount;
+    this.maxVoterOptions = args.choiceCount;
+    this.maxWinningOptions = args.choiceCount;
   }
 
   static SINGLE_CHOICE = new VoteType({
