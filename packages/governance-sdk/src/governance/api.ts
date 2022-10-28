@@ -23,10 +23,11 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from '../core/api';
-
 import { ProgramAccount } from '../tools/sdk/runtime';
-
-// Realms
+import bs58 from 'bs58';
+import axios from 'axios';
+import { deserializeBorsh } from '../tools/borsh';
+import { getErrorMessage } from '../tools';
 
 export async function getRealm(connection: Connection, realm: PublicKey) {
   return getGovernanceAccount(connection, realm, Realm);
@@ -34,6 +35,85 @@ export async function getRealm(connection: Connection, realm: PublicKey) {
 
 export async function getRealms(connection: Connection, programId: PublicKey) {
   return getGovernanceAccounts(connection, programId, Realm);
+}
+
+export async function getBatchedRealms(
+  connection: Connection,
+  endpoint: string,
+  programIds: PublicKey[],
+) {
+  const filters: MemcmpFilter[] = [];
+  const accountTypes = getAccountTypes(Realm as any as GovernanceAccountClass);
+
+  const programAccounts = [];
+  for (const accountType of accountTypes) {
+    const programAccountsJson = await axios.request({
+      url: endpoint,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify([
+        ...programIds.map(x => {
+          return {
+            jsonrpc: '2.0',
+            id: x.toBase58(),
+            method: 'getProgramAccounts',
+            params: [
+              x.toBase58(),
+              {
+                commitment: connection.commitment,
+                encoding: 'base64',
+                filters: [
+                  {
+                    memcmp: {
+                      offset: 0,
+                      bytes: bs58.encode([accountType]),
+                    },
+                  },
+                  ...filters.map(f => ({
+                    memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
+                  })),
+                ],
+              },
+            ],
+          };
+        }),
+      ]),
+    });
+
+    programAccounts.push(
+      ...programAccountsJson?.data
+        ?.filter((x: any) => x.result)
+        .flatMap((x: any) => x.result),
+    );
+  }
+  let accounts: ProgramAccount<Realm>[] = [];
+
+  for (let rawAccount of programAccounts) {
+    try {
+      const data = Buffer.from(rawAccount.account.data[0], 'base64');
+      const accountType = data[0];
+
+      const account: ProgramAccount<Realm> = {
+        pubkey: new PublicKey(rawAccount.pubkey),
+        account: deserializeBorsh(
+          getGovernanceSchemaForAccount(accountType),
+          Realm,
+          data,
+        ),
+        owner: rawAccount.account.owner,
+      };
+
+      accounts.push(account);
+    } catch (ex) {
+      console.info(
+        `Can't deserialize Realm @ ${rawAccount.pubkey}.`,
+        getErrorMessage(ex),
+      );
+    }
+  }
+  return accounts;
 }
 
 // Realm config
@@ -224,7 +304,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   filters: MemcmpFilter[] = [],
 ) {
   const accountTypes = getAccountTypes(
-    (accountClass as any) as GovernanceAccountClass,
+    accountClass as any as GovernanceAccountClass,
   );
 
   let all: ProgramAccount<TAccount>[] = [];
@@ -265,7 +345,7 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
 }
 
 export async function tryGetGovernanceAccount<
-  TAccount extends GovernanceAccount
+  TAccount extends GovernanceAccount,
 >(
   connection: Connection,
   accountPk: PublicKey,
