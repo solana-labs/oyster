@@ -42,10 +42,10 @@ export async function getBatchedRealms(
   endpoint: string,
   programIds: PublicKey[],
 ) {
-  const filters: MemcmpFilter[] = [];
   const accountTypes = getAccountTypes(Realm as any as GovernanceAccountClass);
 
-  const programAccounts = [];
+  const rawProgramAccounts = [];
+
   for (const accountType of accountTypes) {
     const programAccountsJson = await axios.request({
       url: endpoint,
@@ -71,9 +71,6 @@ export async function getBatchedRealms(
                       bytes: bs58.encode([accountType]),
                     },
                   },
-                  ...filters.map(f => ({
-                    memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
-                  })),
                 ],
               },
             ],
@@ -82,15 +79,16 @@ export async function getBatchedRealms(
       ]),
     });
 
-    programAccounts.push(
+    rawProgramAccounts.push(
       ...programAccountsJson?.data
         ?.filter((x: any) => x.result)
         .flatMap((x: any) => x.result),
     );
   }
+
   let accounts: ProgramAccount<Realm>[] = [];
 
-  for (let rawAccount of programAccounts) {
+  for (let rawAccount of rawProgramAccounts) {
     try {
       const data = Buffer.from(rawAccount.account.data[0], 'base64');
       const accountType = data[0];
