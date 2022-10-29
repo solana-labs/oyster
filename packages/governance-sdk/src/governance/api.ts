@@ -33,11 +33,16 @@ export async function getRealm(connection: Connection, realm: PublicKey) {
   return getGovernanceAccount(connection, realm, Realm);
 }
 
-export async function getRealms(connection: Connection, programId: PublicKey) {
-  return getGovernanceAccounts(connection, programId, Realm);
+export async function getRealms(
+  connection: Connection,
+  programId: PublicKey | PublicKey[],
+) {
+  if (programId instanceof PublicKey) {
+    return getGovernanceAccounts(connection, programId, Realm);
+  }
 }
 
-export async function getBatchedRealms(
+export async function getMultipleRealms(
   connection: Connection,
   endpoint: string,
   programIds: PublicKey[],
