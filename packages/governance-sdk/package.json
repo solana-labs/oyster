@@ -1,6 +1,6 @@
 {
   "name": "@solana/spl-governance",
-  "version": "0.3.16",
+  "version": "0.3.17",
   "description": "SPL Governance Client API",
   "author": "Solana Maintainers <maintainers@solana.foundation>",
   "homepage": "https://github.com/solana-labs/oyster/blob/main/packages/governance-sdk/README.md",
@@ -33,7 +33,8 @@
     "bn.js": "^5.1.3",
     "borsh": "^0.3.1",
     "bs58": "^4.0.1",
-    "superstruct": "^0.15.2"
+    "superstruct": "^0.15.2",
+    "axios": "^1.1.3"
   },
   "devDependencies": {
     "esbuild": "^0.14.11",
