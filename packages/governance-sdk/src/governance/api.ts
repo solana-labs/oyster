@@ -33,22 +33,28 @@ export async function getRealm(connection: Connection, realm: PublicKey) {
   return getGovernanceAccount(connection, realm, Realm);
 }
 
-export async function getRealms(connection: Connection, programId: PublicKey) {
-  return getGovernanceAccounts(connection, programId, Realm);
+export async function getRealms(
+  connection: Connection,
+  programIds: PublicKey | PublicKey[],
+) {
+  if (programIds instanceof PublicKey) {
+    return getGovernanceAccounts(connection, programIds, Realm);
+  }
+
+  return _getRealms(connection, programIds);
 }
 
-export async function getMultipleRealms(
-  connection: Connection,
-  endpoint: string,
-  programIds: PublicKey[],
-) {
-  const accountTypes = getAccountTypes(Realm as any as GovernanceAccountClass);
+async function _getRealms(connection: Connection, programIds: PublicKey[]) {
+  const accountTypes = getAccountTypes(
+    (Realm as any) as GovernanceAccountClass,
+  );
+  const rpcEndpoint = (connection as any)._rpcEndpoint;
 
   const rawProgramAccounts = [];
 
   for (const accountType of accountTypes) {
     const programAccountsJson = await axios.request({
-      url: endpoint,
+      url: rpcEndpoint,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -302,7 +308,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   filters: MemcmpFilter[] = [],
 ) {
   const accountTypes = getAccountTypes(
-    accountClass as any as GovernanceAccountClass,
+    (accountClass as any) as GovernanceAccountClass,
   );
 
   let all: ProgramAccount<TAccount>[] = [];
@@ -343,7 +349,7 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
 }
 
 export async function tryGetGovernanceAccount<
-  TAccount extends GovernanceAccount,
+  TAccount extends GovernanceAccount
 >(
   connection: Connection,
   accountPk: PublicKey,

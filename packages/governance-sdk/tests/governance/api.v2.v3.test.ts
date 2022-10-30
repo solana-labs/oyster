@@ -1,5 +1,9 @@
 import { Keypair } from '@solana/web3.js';
-import { GoverningTokenConfigAccountArgs, GoverningTokenType } from '../../src';
+import {
+  getRealms,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '../../src';
 import { BenchBuilder } from '../tools/builders';
 
 test('setRealmConfig', async () => {
@@ -143,4 +147,21 @@ test('relinquishVote', async () => {
   const voteRecord = await realm.getVoteRecord(realm.voteRecordPk);
 
   expect(voteRecord.account.isRelinquished).toBe(true);
+});
+
+test('getRealmsForMultiplePrograms', async () => {
+  // Arrange
+  const bench = await BenchBuilder.withConnection().then(b => b.withWallet());
+
+  const realm = await bench.withRealm().then(b => b.sendTx());
+
+  // Act
+
+  const realms = await getRealms(bench.connection, [bench.programId]);
+
+  // Assert
+
+  expect(realms.map(r => r.pubkey.toBase58())).toContainEqual(
+    realm.realmPk.toBase58(),
+  );
 });
