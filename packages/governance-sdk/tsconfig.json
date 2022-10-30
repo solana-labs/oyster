@@ -4,10 +4,7 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "target": "es6",
-    "lib": [
-      "es2019"
-    ],
+    "target": "ES5",
     "module": "commonjs",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -18,11 +15,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
+    "downlevelIteration": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
