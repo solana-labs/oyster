@@ -4,11 +4,9 @@ import {
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
-
 import { AccountInfo as TokenAccountInfo, Token, u64 } from '@solana/spl-token';
-import { TOKEN_PROGRAM_ID } from '../utils/ids';
+import { TOKEN_PROGRAM_ID } from '../utils';
 import BufferLayout from 'buffer-layout';
-import BN from 'bn.js';
 
 export interface TokenAccount {
   pubkey: PublicKey;
@@ -56,7 +54,6 @@ export function approve(
   owner: PublicKey,
   amount: number | u64,
   autoRevoke = true,
-
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey,
   existingTransferAuthority?: Account,
@@ -90,4 +87,13 @@ export function approve(
   }
 
   return transferAuthority;
+}
+
+export interface SPLToken {
+  address: string;
+  address_spl: string;
+  chainId: number;
+  decimals: number;
+  name: string;
+  symbol: string;
 }

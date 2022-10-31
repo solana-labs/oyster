@@ -135,12 +135,7 @@ export async function sendSignedTransaction({
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
 
-  const txid: TransactionSignature = await connection.sendRawTransaction(
-    rawTransaction,
-    {
-      skipPreflight: true,
-    },
-  );
+  const txid: TransactionSignature = await connection.sendRawTransaction( rawTransaction, { skipPreflight: true });
 
   console.log('Started awaiting confirmation for', txid);
 

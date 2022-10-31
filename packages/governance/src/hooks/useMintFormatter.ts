@@ -33,7 +33,7 @@ export const useMintFormatter = (
     },
     parseValue: value => {
       return new BN(
-        formatLamports(value.replace(',', ''), -decimals).toString(),
+        formatLamports(value?.replace(',', '') ?? 0, -decimals).toString(),
       );
     },
     closestNumber: value => {

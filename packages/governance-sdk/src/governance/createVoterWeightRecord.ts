@@ -26,8 +26,6 @@ export async function createVoterWeightRecordByVestingAddin(
     wallet,
   );
 
-  console.log(voterWeightRecord.toBase58());
-
   const args = new CreateVoterWeightRecordVestingArgs();
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args));
 
@@ -40,8 +38,6 @@ export async function createVoterWeightRecordByVestingAddin(
     { pubkey: governingTokenMint, isWritable: false, isSigner: false },
     { pubkey: voterWeightRecord, isWritable: true, isSigner: false },
   ];
-
-  // console.log(keys.map(k => ({ ...k, pubkey: k.pubkey.toBase58() })));
 
   instructions.push(
     new TransactionInstruction({

@@ -81,5 +81,6 @@ export const depositGoverningTokens = async (
     signers,
     'Depositing governing tokens',
     'Tokens have been deposited',
+    accountRentExempt,
   );
 };

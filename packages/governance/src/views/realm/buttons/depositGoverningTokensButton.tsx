@@ -27,6 +27,7 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
   const vestingProgramId = useVestingProgramId(realm);
   const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm);
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const availableBalance = new BN(governingTokenAccount?.info.amount as BN || 0);
   const defaultDepositableAmount = availableBalance.isZero()
@@ -42,6 +43,7 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
 
   const onDepositGoverningTokens = async (): Promise<void> => {
     if (governingTokenAccount) {
+      setLoading(true);
       try {
         let voterWeightRecord = voterWeight?.pubkey;
         const { walletPubkey } = rpcContext;
@@ -74,6 +76,8 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
       } catch (e) {
         // user rejected transaction, noop
         console.log(e);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -91,8 +95,7 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
             okText: LABELS.DEPOSIT,
             cancelText: LABELS.CANCEL
           });
-        }}
-      >
+        }}>
         {LABELS.DEPOSIT_TOKENS(tokenName)}
       </Button>
     </div>
@@ -107,7 +110,8 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
         setDepositableAmount(defaultDepositableAmount);
       }}
       okText={LABELS.DEPOSIT}
-      onOk={onDepositGoverningTokens}>
+      onOk={onDepositGoverningTokens}
+      confirmLoading={loading}>
       <p>{LABELS.DEPOSIT_TOKENS_QUESTION}</p>
       <Row>
         <Col flex={1}>{LABELS.WALLET_BALANCE}:</Col>
@@ -124,7 +128,7 @@ export function DepositGoverningTokensButton({ realm, governingTokenMint, tokenN
             value={formatValue(depositableAmount, true)}
             min={'0'}
             max={formatValue(availableBalance, true)}
-            onChange={(v) => setDepositableAmount(parseValue(v.toString()))}
+            onChange={(v) => setDepositableAmount(parseValue(v?.toString()))}
           />
           <br />
           ( {amountPercentage > 0.001

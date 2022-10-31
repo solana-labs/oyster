@@ -1,20 +1,22 @@
-import {
-  TransactionInstruction,
-  Connection,
-  Transaction,
-  Keypair
-} from '@solana/web3.js';
-import {
-  ExplorerLink,
-  isSendTransactionError,
-  isTransactionTimeoutError,
-  utils,
-  WalletSigner,
-} from '@oyster/common';
+import { Connection, Keypair, LAMPORTS_PER_SOL, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ExplorerLink, isSendTransactionError, isTransactionTimeoutError, utils, WalletSigner } from '@oyster/common';
 import React from 'react';
 import { DEFAULT_TX_TIMEOUT, sendTransaction2 } from './sdk/core/connection';
 
 const { notify } = utils;
+
+export async function checkMinimumBalanceForRentExpression(connection: Connection, wallet: WalletSigner, instructions: TransactionInstruction[], currentRent = 0): Promise<number> {
+  const dataLength = instructions.reduce((p, c) => p + c.data.length, 0);
+  const accountRentExempt = await connection.getMinimumBalanceForRentExemption(dataLength);
+  const rent = accountRentExempt + currentRent;
+  if (wallet.publicKey) {
+    const balance = await connection.getBalance(wallet.publicKey, connection.commitment);
+    if (rent > balance) {
+      throw new Error(`You don't have enough SOL for this transaction. Needs minimum balance ${rent / LAMPORTS_PER_SOL} SOL`);
+    }
+  }
+  return rent;
+}
 
 export async function sendTransactionWithNotifications(
   connection: Connection,
@@ -23,77 +25,59 @@ export async function sendTransactionWithNotifications(
   signers: Keypair[],
   pendingMessage: string,
   successMessage: string,
+  currentRent = 0
 ) {
-  notify({
-    message: `${pendingMessage}...`,
-    description: 'Please wait...',
-    type: 'warn',
-  });
-
   try {
     const transaction = new Transaction();
     transaction.add(...instructions);
+    await checkMinimumBalanceForRentExpression(connection, wallet, instructions, currentRent);
 
     try {
-      let txid = await sendTransaction2({
+      notify({
+        message: `${pendingMessage}...`,
+        description: 'Please wait...',
+        type: 'warn'
+      });
+      const txid = await sendTransaction2({
         transaction,
         wallet,
         signers,
-        connection,
+        connection
       });
 
       notify({
         message: successMessage,
         type: 'success',
-        description: (
-          <>
-            {'Transaction: '}
-            <ExplorerLink
-              address={txid}
-              type="transaction"
-              short
-              connection={connection}
-            />
-          </>
-        ),
+        description: <>
+          <span>Transaction:</span>
+          <ExplorerLink address={txid} type='transaction' short connection={connection} />
+        </>
       });
     } catch (txError) {
       if (isTransactionTimeoutError(txError)) {
         notify({
-          message: `Transaction hasn't been confirmed within ${DEFAULT_TX_TIMEOUT / 1000
-            }s. Please check on Solana Explorer`,
-          description: (
-            <>
-              <ExplorerLink
-                address={txError.txId}
-                type="transaction"
-                short
-                connection={connection}
-              />
-            </>
-          ),
-          type: 'warn',
+          message: `Transaction hasn't been confirmed within ${DEFAULT_TX_TIMEOUT / 1000}s. Please check on Solana Explorer`,
+          description: <ExplorerLink address={txError.txId} type='transaction' short connection={connection} />,
+          type: 'warn'
         });
       } else if (isSendTransactionError(txError)) {
         notify({
           message: 'Transaction error',
-          description: (
-            <>
-              <ExplorerLink
-                address={txError.txId}
-                type="transaction"
-                short
-                connection={connection}
-              />
-            </>
-          ),
-          type: 'error',
+          description: <ExplorerLink address={txError.txId} type='transaction' short connection={connection} />,
+          type: 'error'
         });
       }
       throw txError;
     }
-  } catch (ex) {
-    console.error(ex);
-    throw ex;
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      notify({
+        message: `Transaction error`,
+        description: e.message ?? ``,
+        type: 'error'
+      });
+    } else {
+      console.error(e);
+    }
   }
 }
