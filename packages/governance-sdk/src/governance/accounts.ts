@@ -490,7 +490,7 @@ export class GovernanceConfig {
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
 
-    this.reserved = args.reserved ?? new Uint8Array(3);
+    this.reserved = args.reserved ?? new Uint8Array(5);
   }
 }
 
@@ -501,7 +501,6 @@ export class Governance {
   config: GovernanceConfig;
   proposalCount: number;
   reserved?: Uint8Array;
-  votingProposalCount: number;
 
   constructor(args: {
     realm: PublicKey;
@@ -510,7 +509,6 @@ export class Governance {
     config: GovernanceConfig;
     reserved?: Uint8Array;
     proposalCount: number;
-    votingProposalCount: number;
   }) {
     this.accountType = args.accountType;
     this.realm = args.realm;
@@ -518,7 +516,6 @@ export class Governance {
     this.config = args.config;
     this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
-    this.votingProposalCount = args.votingProposalCount;
   }
 
   isProgramGovernance() {
