@@ -68,7 +68,6 @@ export function useGovernanceAccountByPubkey<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getByPubkey, connection, endpoint]);
-
   return account;
 }
 
@@ -89,7 +88,6 @@ export function useGovernanceAccountByPda<TAccount extends GovernanceAccount>(
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdaArgsKey]);
-
   return useGovernanceAccountByPubkey<TAccount>(accountClass, pda);
 }
 

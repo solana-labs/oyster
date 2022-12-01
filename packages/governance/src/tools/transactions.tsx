@@ -79,5 +79,6 @@ export async function sendTransactionWithNotifications(
     } else {
       console.error(e);
     }
+    throw e;
   }
 }

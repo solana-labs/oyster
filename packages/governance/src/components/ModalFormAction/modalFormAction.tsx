@@ -21,7 +21,7 @@ export interface ModalFormActionProps<TResult> {
   isWalletRequired?: boolean;
   buttonProps?: ButtonProps;
   buttonTooltip?: string;
-  onSubmit: (values: any) => Promise<TResult>;
+  onSubmit: (values: any) => Promise<TResult | undefined>;
   onComplete?: (result: TResult) => void;
   onReset?: () => void;
   children?: any;
@@ -32,7 +32,7 @@ export interface ActionFormProps<TResult> {
   onFormSubmit: (a: TResult) => void;
   onFormCancel: () => void;
   isModalVisible: boolean;
-  onSubmit: (values: any) => Promise<TResult>;
+  onSubmit: (values: any) => Promise<TResult | undefined>;
   onReset?: () => void;
   formTitle: string;
   formAction: string;
@@ -122,8 +122,7 @@ function ActionForm<TResult>(props: ActionFormProps<TResult>) {
       setError(null);
 
       const result = await onSubmit(values);
-      onFormSubmit(result);
-      closeForm();
+      if (result) onFormSubmit(result);
     } catch (ex) {
       console.log('Submit error', ex);
 
@@ -161,6 +160,7 @@ function ActionForm<TResult>(props: ActionFormProps<TResult>) {
       }
     } finally {
       setLoading(false);
+      closeForm();
     }
   };
 
