@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { ButtonProps, Form, Input, Radio } from 'antd';
-import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import React, {useMemo, useState} from 'react';
+import {ButtonProps, Form, Input, Radio} from 'antd';
+import {PublicKey, TransactionInstruction} from '@solana/web3.js';
 import {
   Governance,
   GoverningTokenType,
@@ -8,16 +8,21 @@ import {
   Realm,
   withCreateTokenOwnerRecord
 } from '@solana/spl-governance';
-import { useMint, useNativeAccount } from '@oyster/common';
-import { Redirect } from 'react-router';
+import {useMint, useNativeAccount} from '@oyster/common';
+import {Redirect} from 'react-router';
 import BN from 'bn.js';
 
-import { LABELS } from '../../../constants';
-import { createProposal } from '../../../actions/createProposal';
-import { useRealmConfig, useVoterWeightRecord, useWalletTokenOwnerRecord } from '../../../hooks/apiHooks';
-import { ModalFormAction } from '../../../components/ModalFormAction/modalFormAction';
-import { useRpcContext } from '../../../hooks/useRpcContext';
-import { getProposalUrl } from '../../../tools/routeTools';
+import {LABELS} from '../../../constants';
+import {createProposal} from '../../../actions/createProposal';
+import {
+  useRealmConfig,
+  useVoterWeightRecord,
+  useWalletTokenOwnerRecord
+} from '../../../hooks/apiHooks';
+import {ModalFormAction} from '../../../components/ModalFormAction/modalFormAction';
+import {useRpcContext} from '../../../hooks/useRpcContext';
+import {getProposalUrl} from '../../../tools/routeTools';
+
 
 export interface NeonProposalButtonProps {
   realm: ProgramAccount<Realm> | undefined;
@@ -49,14 +54,25 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm, governance);
 
+  // const canCreateProposalUsingCommunityTokens = useMemo(() => {
+  //   if (communityTokenOwnerRecord && governance) {
+  //     const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
+  //
+  //     return communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(mint) >= 0;
+  //   }
+  //   return false;
+  // }, [communityTokenOwnerRecord, governance]);
+
   const canCreateProposalUsingCommunityTokens = useMemo(() => {
-    if (communityTokenOwnerRecord && governance) {
+    if (voterWeight && governance) {
       const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
-      return communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(mint) >= 0;
+
+      return voterWeight.account.voterWeight.cmp(mint) >= 0;
     }
     return false;
-  }, [communityTokenOwnerRecord, governance]);
+  }, [voterWeight, governance]);
 
+  //TODO: refactor in right mode
   const canCreateProposalUsingCouncilTokens = useMemo(() => {
     if (councilTokenOwnerRecord && governance) {
       const mint = new BN(governance?.account.config.minCouncilTokensToCreateProposal);
@@ -74,9 +90,8 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const canCreateProposalUsingVoterWeight = !voterWeight?.account.voterWeight.isZero();
 
-  const canCreateProposal = hasLamports && (canCreateProposalUsingCommunityTokens ||
-    canCreateProposalUsingCouncilTokens ||
-    canCreateProposalUsingVoterWeight);
+  const canCreateProposal = hasLamports && canCreateProposalUsingVoterWeight && (canCreateProposalUsingCommunityTokens ||
+    canCreateProposalUsingCouncilTokens);
 
   if (!governance || !communityMint || !realm) {
     return null;
@@ -123,20 +138,20 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
       );
     }
 
-    return await createProposal(
-      instructions,
-      rpcContext,
-      realm,
-      governance.pubkey,
-      tokenOwnerRecord ?? governance.pubkey,
-      values.name,
-      values.descriptionLink ?? '',
-      governingTokenMint,
-      proposalIndex,
-      voterWeight?.pubkey,
-      maxVoterWeight?.pubkey,
-      communityVoterWeightAddin
-    );
+      return await createProposal(
+        instructions,
+        rpcContext,
+        realm,
+        governance.pubkey,
+        tokenOwnerRecord ?? governance.pubkey,
+        values.name,
+        values.descriptionLink ?? '',
+        governingTokenMint,
+        proposalIndex,
+        voterWeight?.pubkey,
+        maxVoterWeight?.pubkey,
+        communityVoterWeightAddin
+      );
   };
 
   const onComplete = (pk: PublicKey) => {

@@ -495,7 +495,6 @@ export async function getTokenOwnerRecordAddress(
     ],
     programId,
   );
-
   return tokenOwnerRecordAddress;
 }
 

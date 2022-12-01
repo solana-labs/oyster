@@ -99,7 +99,6 @@ export function useWalletTokenOwnerRecord(
   governingTokenMint: PublicKey | undefined,
 ) {
   const { wallet, programId } = useRpcContext();
-  // console.log(realm, governingTokenMint);
 
   return useGovernanceAccountByPda<TokenOwnerRecord>(
     TokenOwnerRecord,

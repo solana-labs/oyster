@@ -156,7 +156,7 @@ function useLoadGist({
         .catch(_ => {
           setFailed(true);
           setLoading(false);
-        });
+        })
     }
   }, [loading]); //eslint-disable-line
 }
