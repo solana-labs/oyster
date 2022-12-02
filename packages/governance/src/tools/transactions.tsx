@@ -79,6 +79,7 @@ export async function sendTransactionWithNotifications(
     } else {
       console.error(e);
     }
+    //Fix cancel transaction error
     throw e;
   }
 }
