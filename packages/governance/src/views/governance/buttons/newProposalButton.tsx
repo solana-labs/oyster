@@ -64,15 +64,17 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
   // }, [communityTokenOwnerRecord, governance]);
 
   const canCreateProposalUsingCommunityTokens = useMemo(() => {
-    if (voterWeight && governance) {
+    //If communityVoterWeightAddin exist we should check voterWeight for community token amount
+    const governingTokenAmount = realmConfig && realmConfig.account.communityVoterWeightAddin && voterWeight ? voterWeight.account.voterWeight : communityTokenOwnerRecord?.account.governingTokenDepositAmount;
+    if (governingTokenAmount && governance) {
       const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
 
-      return voterWeight.account.voterWeight.cmp(mint) >= 0;
+      return governingTokenAmount.cmp(mint) >= 0;
     }
     return false;
-  }, [voterWeight, governance]);
+  }, [voterWeight, governance, communityTokenOwnerRecord, realmConfig]);
 
-  //TODO: refactor in right mode
+  //Not used for NEON realms
   const canCreateProposalUsingCouncilTokens = useMemo(() => {
     if (councilTokenOwnerRecord && governance) {
       const mint = new BN(governance?.account.config.minCouncilTokensToCreateProposal);

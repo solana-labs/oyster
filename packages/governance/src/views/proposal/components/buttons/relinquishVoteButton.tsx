@@ -1,6 +1,6 @@
 import { useWallet } from '@oyster/common';
 import { Button, Col, Modal, Row } from 'antd';
-import React from 'react';
+import React, {useState} from 'react';
 import { LABELS } from '../../../../constants';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import {
@@ -27,6 +27,8 @@ export function RelinquishVoteButton({
   voteRecord: ProgramAccount<VoteRecord> | undefined;
   hasVoteTimeExpired: boolean | undefined;
 }) {
+  const [hideWithdrawCTA, setHideWithdrawCTA] = useState<boolean>(false);
+
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
 
@@ -36,6 +38,7 @@ export function RelinquishVoteButton({
     connected &&
     voteRecord &&
     !voteRecord?.account.isRelinquished &&
+    !hideWithdrawCTA &&
     (proposal.account.state === ProposalState.Voting ||
       proposal.account.state === ProposalState.Completed ||
       proposal.account.state === ProposalState.Cancelled ||
@@ -87,6 +90,8 @@ export function RelinquishVoteButton({
                 voteRecord!.pubkey,
                 true,
               );
+
+              setHideWithdrawCTA(true);
 
               accountChangeTracker.notifyAccountRemoved(
                 voteRecord!.pubkey.toBase58(),
