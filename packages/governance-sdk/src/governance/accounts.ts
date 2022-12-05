@@ -569,6 +569,7 @@ export class TokenOwnerRecord {
 
   unrelinquishedVotesCount: number;
 
+  // Not used in versions >= V3 / I'ts the upper 4 bytes of unrelinquishedVotesCount
   totalVotesCount: number;
 
   outstandingProposalCount: number;
@@ -576,6 +577,9 @@ export class TokenOwnerRecord {
   reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
+
+  // V3
+  version: number;
 
   constructor(args: {
     realm: PublicKey;
@@ -587,6 +591,7 @@ export class TokenOwnerRecord {
     outstandingProposalCount: number;
     reserved: Uint8Array;
     governanceDelegate: PublicKey | undefined;
+    version: number;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
@@ -597,6 +602,7 @@ export class TokenOwnerRecord {
     this.outstandingProposalCount = args.outstandingProposalCount;
     this.reserved = args.reserved;
     this.governanceDelegate = args.governanceDelegate;
+    this.version = args.version;
   }
 }
 

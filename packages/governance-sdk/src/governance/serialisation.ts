@@ -757,10 +757,12 @@ function createGovernanceAccountSchema(accountVersion: number) {
           ['governingTokenMint', 'pubkey'],
           ['governingTokenOwner', 'pubkey'],
           ['governingTokenDepositAmount', 'u64'],
+          // unrelinquishedVotesCount is u64 in V3 but for backward compatibility the sdk reads it as u32
           ['unrelinquishedVotesCount', 'u32'],
           ['totalVotesCount', 'u32'],
           ['outstandingProposalCount', 'u8'],
-          ['reserved', [7]],
+          ['version', 'u8'],
+          ['reserved', [6]],
           ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
         ],
       },
