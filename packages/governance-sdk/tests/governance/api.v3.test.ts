@@ -62,7 +62,7 @@ test('createRealmWithTokenConfigs', async () => {
   );
 });
 
-test('createGovernanceWithCouncilThresholds', async () => {
+test('createGovernanceWithConfig', async () => {
   // Arrange
   const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)
     .then(b => b.withWallet())
@@ -77,7 +77,7 @@ test('createGovernanceWithCouncilThresholds', async () => {
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
-    maxVotingTime: getTimestampFromDays(3),
+    baseVotingTime: getTimestampFromDays(3),
     communityVoteTipping: VoteTipping.Strict,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
@@ -113,6 +113,10 @@ test('createGovernanceWithCouncilThresholds', async () => {
 
   expect(governance.account.config.councilVetoVoteThreshold).toEqual(
     config.councilVetoVoteThreshold,
+  );
+
+  expect(governance.account.config.baseVotingTime).toEqual(
+    getTimestampFromDays(3),
   );
 
   expect(governance.account.config.votingCoolOffTime).toEqual(5000);
