@@ -93,8 +93,8 @@ test('createGovernanceWithCouncilThresholds', async () => {
       type: VoteThresholdType.YesVotePercentage,
       value: 80,
     }),
-    votingCoolOffTime: 0,
-    depositExemptProposalCount: 0,
+    votingCoolOffTime: 5000,
+    depositExemptProposalCount: 10,
   });
 
   // Act
@@ -114,6 +114,10 @@ test('createGovernanceWithCouncilThresholds', async () => {
   expect(governance.account.config.councilVetoVoteThreshold).toEqual(
     config.councilVetoVoteThreshold,
   );
+
+  expect(governance.account.config.votingCoolOffTime).toEqual(5000);
+
+  expect(governance.account.config.depositExemptProposalCount).toEqual(10);
 });
 
 test('setRealmConfigWithTokenConfigs', async () => {

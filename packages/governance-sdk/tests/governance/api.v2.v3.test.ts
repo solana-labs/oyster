@@ -80,7 +80,7 @@ test('createGovernance', async () => {
     .then(b => b.sendTx());
   // Act
   const governancePk = await realm.createGovernance();
-  // // Assert
+  // Assert
   const governance = await realm.getGovernance(governancePk);
   expect(governance.account.realm).toEqual(realm.realmPk);
 });
@@ -102,6 +102,9 @@ test('createProposal', async () => {
 
   expect(proposal.account.name).toEqual('proposal 1');
   expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
+
+  const governance = await realm.getGovernance(proposal.account.governance);
+  expect(governance.account.activeProposalCount.toNumber()).toEqual(1);
 });
 
 test('castVote', async () => {

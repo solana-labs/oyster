@@ -738,8 +738,12 @@ function createGovernanceAccountSchema(accountVersion: number) {
           ['governedAccount', 'pubkey'],
           ['proposalCount', 'u32'],
           ['config', GovernanceConfig],
-          ...(accountVersion >= ACCOUNT_VERSION_V2 ? [] : [['reserved', [6]]]),
-          ['votingProposalCount', 'u16'],
+          ...(accountVersion >= ACCOUNT_VERSION_V2
+            ? [
+                ['reserved', [120]],
+                ['activeProposalCount', 'u64'],
+              ]
+            : []),
         ],
       },
     ],

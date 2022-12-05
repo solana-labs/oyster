@@ -501,9 +501,12 @@ export class Governance {
   realm: PublicKey;
   governedAccount: PublicKey;
   config: GovernanceConfig;
+  // proposalCount is not used for  >= V3
   proposalCount: number;
   reserved?: Uint8Array;
-  votingProposalCount: number;
+
+  // V3
+  activeProposalCount: BN;
 
   constructor(args: {
     realm: PublicKey;
@@ -512,7 +515,7 @@ export class Governance {
     config: GovernanceConfig;
     reserved?: Uint8Array;
     proposalCount: number;
-    votingProposalCount: number;
+    activeProposalCount: BN;
   }) {
     this.accountType = args.accountType;
     this.realm = args.realm;
@@ -520,7 +523,7 @@ export class Governance {
     this.config = args.config;
     this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
-    this.votingProposalCount = args.votingProposalCount;
+    this.activeProposalCount = args.activeProposalCount;
   }
 
   isProgramGovernance() {
