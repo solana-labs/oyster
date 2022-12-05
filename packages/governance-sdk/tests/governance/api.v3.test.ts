@@ -77,7 +77,7 @@ test('createGovernanceWithConfig', async () => {
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
-    baseVotingTime: getTimestampFromDays(3),
+    maxVotingTime: getTimestampFromDays(3),
     communityVoteTipping: VoteTipping.Strict,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
@@ -115,7 +115,7 @@ test('createGovernanceWithConfig', async () => {
     config.councilVetoVoteThreshold,
   );
 
-  expect(governance.account.config.baseVotingTime).toEqual(
+  expect(governance.account.config.maxVotingTime).toEqual(
     getTimestampFromDays(3),
   );
 
