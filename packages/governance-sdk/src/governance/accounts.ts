@@ -342,6 +342,7 @@ export class Realm {
 
   reserved: Uint8Array;
 
+  // Not used in versions >= V3 / legacy1
   votingProposalCount: number;
 
   authority: PublicKey | undefined;
