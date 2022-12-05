@@ -78,13 +78,10 @@ test('createGovernance', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.sendTx());
-
   // Act
   const governancePk = await realm.createGovernance();
-
   // // Assert
   const governance = await realm.getGovernance(governancePk);
-
   expect(governance.account.realm).toEqual(realm.realmPk);
 });
 
@@ -114,9 +111,10 @@ test('castVote', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.withGovernance())
-    .then(b => b.withProposal())
     .then(b => b.sendTx())
-    .then(b => b.withProposalSignOff());
+    .then(b => b.withProposal())
+    .then(b => b.withProposalSignOff())
+    .then(b => b.sendTx());
 
   // Act
   const voteRecordPk = await realm.castVote();
@@ -134,8 +132,8 @@ test('relinquishVote', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.withGovernance())
-    .then(b => b.withProposal())
     .then(b => b.sendTx())
+    .then(b => b.withProposal())
     .then(b => b.withProposalSignOff())
     .then(b => b.withCastVote())
     .then(b => b.sendTx());

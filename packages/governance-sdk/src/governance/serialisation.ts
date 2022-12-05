@@ -339,14 +339,15 @@ function createGovernanceStructSchema(
           ['minCouncilTokensToCreateProposal', 'u64'],
           // Pass the extra fields to instruction if programVersion >= 3
           // The additional fields can't be passed to instructions for programVersion <= 2  because they were added in V3
-          // and would override the transferAuhtority param which follows it
+          // and would override the transferAuthority param which follows it
           ...((programVersion && programVersion >= PROGRAM_VERSION_V3) ||
           // The account layout is backward compatible and we can read the extra fields for accountVersion >= 2
           (accountVersion && accountVersion >= ACCOUNT_VERSION_V2)
             ? [
                 ['councilVoteTipping', 'u8'],
                 ['communityVetoVoteThreshold', 'VoteThreshold'],
-                ['reserved', [3]],
+                ['votingCoolOffTime', 'u32'],
+                ['depositExemptProposalCount', 'u8'],
               ]
             : []),
         ],
@@ -510,7 +511,11 @@ function createGovernanceInstructionSchema(programVersion: number) {
                 ['options', ['string']],
                 ['useDenyOption', 'u8'],
               ]),
-        ],
+
+          programVersion >= PROGRAM_VERSION_V3
+            ? ['proposalSeed', 'pubkey']
+            : undefined,
+        ].filter(Boolean),
       },
     ],
     [

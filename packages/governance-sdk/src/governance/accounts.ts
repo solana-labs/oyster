@@ -449,8 +449,8 @@ export class GovernanceConfig {
   councilVetoVoteThreshold: VoteThreshold;
   communityVetoVoteThreshold: VoteThreshold;
   councilVoteTipping: VoteTipping;
-
-  reserved?: Uint8Array;
+  votingCoolOffTime: number;
+  depositExemptProposalCount: number;
 
   constructor(args: {
     communityVoteThreshold: VoteThreshold;
@@ -466,7 +466,8 @@ export class GovernanceConfig {
     councilVetoVoteThreshold: VoteThreshold;
     communityVetoVoteThreshold: VoteThreshold;
     councilVoteTipping: VoteTipping;
-    reserved?: Uint8Array;
+    votingCoolOffTime: number;
+    depositExemptProposalCount: number;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
@@ -490,7 +491,8 @@ export class GovernanceConfig {
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
 
-    this.reserved = args.reserved ?? new Uint8Array(3);
+    this.votingCoolOffTime = args.votingCoolOffTime;
+    this.depositExemptProposalCount = args.depositExemptProposalCount;
   }
 }
 
@@ -1295,4 +1297,21 @@ export async function getGoverningTokenHoldingAddress(
   );
 
   return governingTokenHoldingAddress;
+}
+
+export async function getProposalDepositAddress(
+  programId: PublicKey,
+  proposal: PublicKey,
+  proposalDepositPayer: PublicKey,
+) {
+  const [proposalDepositAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('proposal-deposit'),
+      proposal.toBuffer(),
+      proposalDepositPayer.toBuffer(),
+    ],
+    programId,
+  );
+
+  return proposalDepositAddress;
 }

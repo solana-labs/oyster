@@ -93,6 +93,8 @@ test('createGovernanceWithCouncilThresholds', async () => {
       type: VoteThresholdType.YesVotePercentage,
       value: 80,
     }),
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 0,
   });
 
   // Act

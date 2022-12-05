@@ -143,6 +143,9 @@ export class CreateProposalArgs {
   useDenyOption: boolean;
   // --------------------------------
 
+  // V3 -----------------------------
+  proposalSeed: PublicKey;
+
   constructor(args: {
     name: string;
     descriptionLink: string;
@@ -150,6 +153,7 @@ export class CreateProposalArgs {
     voteType: VoteType;
     options: string[];
     useDenyOption: boolean;
+    proposalSeed: PublicKey;
   }) {
     this.name = args.name;
     this.descriptionLink = args.descriptionLink;
@@ -157,6 +161,7 @@ export class CreateProposalArgs {
     this.voteType = args.voteType;
     this.options = args.options;
     this.useDenyOption = args.useDenyOption;
+    this.proposalSeed = args.proposalSeed;
   }
 }
 

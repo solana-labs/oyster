@@ -350,6 +350,8 @@ export class RealmBuilder {
           type: VoteThresholdType.YesVotePercentage,
           value: 80,
         }),
+        votingCoolOffTime: 0,
+        depositExemptProposalCount: 0,
       });
 
     const governedAccountPk = Keypair.generate().publicKey;
