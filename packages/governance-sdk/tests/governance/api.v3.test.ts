@@ -200,3 +200,25 @@ test('revokeGoverningToken', async () => {
     tokenOwnerRecord.account.governingTokenDepositAmount.toNumber(),
   ).toEqual(0);
 });
+
+test('createProposal', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx());
+
+  // Act
+  const proposalPk = await realm.createProposal('proposal 1');
+
+  // Assert
+  const proposal = await realm.getProposal(proposalPk);
+
+  expect(proposal.account.name).toEqual('proposal 1');
+  expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
+
+  const governance = await realm.getGovernance(proposal.account.governance);
+  expect(governance.account.activeProposalCount.toNumber()).toEqual(1);
+});

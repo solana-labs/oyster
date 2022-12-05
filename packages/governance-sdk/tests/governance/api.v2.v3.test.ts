@@ -102,9 +102,6 @@ test('createProposal', async () => {
 
   expect(proposal.account.name).toEqual('proposal 1');
   expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
-
-  const governance = await realm.getGovernance(proposal.account.governance);
-  expect(governance.account.activeProposalCount.toNumber()).toEqual(1);
 });
 
 test('castVote', async () => {

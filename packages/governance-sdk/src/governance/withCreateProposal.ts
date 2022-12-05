@@ -59,12 +59,12 @@ export const withCreateProposal = async (
   let proposalSeedBuffer = proposalSeed.toBuffer();
 
   if (programVersion <= PROGRAM_VERSION_V2) {
-    if (!proposalIndex) {
+    if (proposalIndex === undefined) {
       throw new Error(
         `proposalIndex is required for version: ${programVersion}`,
       );
     }
-    let proposalSeedBuffer = Buffer.alloc(4);
+    proposalSeedBuffer = Buffer.alloc(4);
     proposalSeedBuffer.writeInt32LE(proposalIndex, 0);
   }
 
