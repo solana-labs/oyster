@@ -71,14 +71,17 @@ export async function sendTransactionWithNotifications(
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
+      //Hack to hide BorshIoError
+      const message = e.message?.indexOf('BorshIoError') > -1 ? 'Something went wrong' : e.message;
       notify({
         message: `Transaction error`,
-        description: e.message ?? ``,
+        description: message ?? ``,
         type: 'error'
       });
     } else {
       console.error(e);
     }
+    //Fix cancel transaction error
     throw e;
   }
 }

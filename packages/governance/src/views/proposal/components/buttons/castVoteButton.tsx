@@ -105,8 +105,7 @@ export function CastVoteButton({
               voterWeightRecord: voterWeightRecord?.voterWeight?.pubkey,
               maxVoterWeightRecord: voterWeightRecord?.maxVoterWeight?.pubkey,
               communityVoterWeightAddin,
-            }
-          );
+            });
           setIsModalVisible(false);
         }}>
         <Row>

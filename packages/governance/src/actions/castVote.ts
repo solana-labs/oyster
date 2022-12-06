@@ -66,12 +66,21 @@ export const castVote = async ({
     communityVoterWeightAddin,
   );
 
-  await sendTransactionWithNotifications(
-    connection,
-    wallet,
-    instructions,
-    signers,
-    'Voting on proposal',
-    'Proposal voted on',
-  );
+  try {
+    /*
+     * Should catch this error for the particular case:
+     * user sign a transaction after voting time ended
+     * ISSUE - NDEV-1033
+     */
+    await sendTransactionWithNotifications(
+      connection,
+      wallet,
+      instructions,
+      signers,
+      'Voting on proposal',
+      'Proposal voted on',
+    );
+  } catch (e: unknown) {
+    console.error(e);
+  }
 };
