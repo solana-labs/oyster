@@ -51,7 +51,8 @@ export function WithdrawGoverningTokensButton(props: {
           depositToWithdraw!.address
         );
         setDepositToWithdraw(null);
-        // setConfirmationVisible(false);
+        //Should clear previous state
+        setConfirmationVisible(false);
       } catch (e) {
         e.code !== 4001 && Modal.error({
           title: 'Cannot withdraw tokens',

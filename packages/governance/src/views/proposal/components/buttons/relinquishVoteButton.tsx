@@ -91,6 +91,7 @@ export function RelinquishVoteButton({
                 true,
               );
 
+              //TODO: have to be refactored
               setHideWithdrawCTA(true);
 
               accountChangeTracker.notifyAccountRemoved(
