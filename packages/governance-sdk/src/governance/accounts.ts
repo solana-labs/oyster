@@ -105,10 +105,16 @@ export function getGovernanceAccountVersion(
   accountType: GovernanceAccountType,
 ) {
   switch (accountType) {
-    case GovernanceAccountType.GovernanceV2:
     case GovernanceAccountType.VoteRecordV2:
     case GovernanceAccountType.ProposalTransactionV2:
     case GovernanceAccountType.ProposalV2:
+    case GovernanceAccountType.RealmV2:
+    case GovernanceAccountType.TokenOwnerRecordV2:
+    case GovernanceAccountType.GovernanceV2:
+    case GovernanceAccountType.ProgramGovernanceV2:
+    case GovernanceAccountType.MintGovernanceV2:
+    case GovernanceAccountType.TokenGovernanceV2:
+    case GovernanceAccountType.SignatoryRecordV2:
       return ACCOUNT_VERSION_V2;
     default:
       return ACCOUNT_VERSION_V1;
