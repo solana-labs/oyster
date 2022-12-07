@@ -24,7 +24,7 @@ export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const { formatValue } = useMintFormatter(realm?.account.communityMint) || {};
   // const { voterWeight } = useVoterWeightRecord(realm);
   const { depositedAccounts } = useDepositedAccountsContext();
-  const deposit = depositedAccounts?.length ? depositedAccounts[0].balance : depositedAccounts?.reduce((acc, current) => acc.add(current.balance), new BN(0));
+  const deposit = depositedAccounts?.length === 1 ? depositedAccounts[0].balance : depositedAccounts?.reduce((acc, current) => acc.add(current.balance), new BN(0));
 
   // const deposited = useMemo(() => {
   //   return formatValue(voterWeight?.account.voterWeight ?? new BN(0));
