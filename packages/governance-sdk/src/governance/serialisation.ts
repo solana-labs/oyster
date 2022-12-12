@@ -339,14 +339,15 @@ function createGovernanceStructSchema(
           ['minCouncilTokensToCreateProposal', 'u64'],
           // Pass the extra fields to instruction if programVersion >= 3
           // The additional fields can't be passed to instructions for programVersion <= 2  because they were added in V3
-          // and would override the transferAuhtority param which follows it
+          // and would override the transferAuthority param which follows it
           ...((programVersion && programVersion >= PROGRAM_VERSION_V3) ||
           // The account layout is backward compatible and we can read the extra fields for accountVersion >= 2
           (accountVersion && accountVersion >= ACCOUNT_VERSION_V2)
             ? [
                 ['councilVoteTipping', 'u8'],
                 ['communityVetoVoteThreshold', 'VoteThreshold'],
-                ['reserved', [3]],
+                ['votingCoolOffTime', 'u32'],
+                ['depositExemptProposalCount', 'u8'],
               ]
             : []),
         ],
@@ -510,7 +511,11 @@ function createGovernanceInstructionSchema(programVersion: number) {
                 ['options', ['string']],
                 ['useDenyOption', 'u8'],
               ]),
-        ],
+
+          programVersion >= PROGRAM_VERSION_V3
+            ? ['proposalSeed', 'pubkey']
+            : undefined,
+        ].filter(Boolean),
       },
     ],
     [
@@ -733,8 +738,12 @@ function createGovernanceAccountSchema(accountVersion: number) {
           ['governedAccount', 'pubkey'],
           ['proposalCount', 'u32'],
           ['config', GovernanceConfig],
-          ...(accountVersion >= ACCOUNT_VERSION_V2 ? [] : [['reserved', [6]]]),
-          ['votingProposalCount', 'u16'],
+          ...(accountVersion >= ACCOUNT_VERSION_V2
+            ? [
+                ['reserved', [120]],
+                ['activeProposalCount', 'u64'],
+              ]
+            : []),
         ],
       },
     ],
@@ -748,10 +757,12 @@ function createGovernanceAccountSchema(accountVersion: number) {
           ['governingTokenMint', 'pubkey'],
           ['governingTokenOwner', 'pubkey'],
           ['governingTokenDepositAmount', 'u64'],
+          // unrelinquishedVotesCount is u64 in V3 but for backward compatibility the sdk reads it as u32
           ['unrelinquishedVotesCount', 'u32'],
           ['totalVotesCount', 'u32'],
           ['outstandingProposalCount', 'u8'],
-          ['reserved', [7]],
+          ['version', 'u8'],
+          ['reserved', [6]],
           ['governanceDelegate', { kind: 'option', type: 'pubkey' }],
         ],
       },

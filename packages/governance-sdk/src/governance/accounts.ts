@@ -105,10 +105,16 @@ export function getGovernanceAccountVersion(
   accountType: GovernanceAccountType,
 ) {
   switch (accountType) {
-    case GovernanceAccountType.GovernanceV2:
     case GovernanceAccountType.VoteRecordV2:
     case GovernanceAccountType.ProposalTransactionV2:
     case GovernanceAccountType.ProposalV2:
+    case GovernanceAccountType.RealmV2:
+    case GovernanceAccountType.TokenOwnerRecordV2:
+    case GovernanceAccountType.GovernanceV2:
+    case GovernanceAccountType.ProgramGovernanceV2:
+    case GovernanceAccountType.MintGovernanceV2:
+    case GovernanceAccountType.TokenGovernanceV2:
+    case GovernanceAccountType.SignatoryRecordV2:
       return ACCOUNT_VERSION_V2;
     default:
       return ACCOUNT_VERSION_V1;
@@ -342,6 +348,7 @@ export class Realm {
 
   reserved: Uint8Array;
 
+  // Not used in versions >= V3 / legacy1
   votingProposalCount: number;
 
   authority: PublicKey | undefined;
@@ -449,8 +456,8 @@ export class GovernanceConfig {
   councilVetoVoteThreshold: VoteThreshold;
   communityVetoVoteThreshold: VoteThreshold;
   councilVoteTipping: VoteTipping;
-
-  reserved?: Uint8Array;
+  votingCoolOffTime: number;
+  depositExemptProposalCount: number;
 
   constructor(args: {
     communityVoteThreshold: VoteThreshold;
@@ -466,7 +473,8 @@ export class GovernanceConfig {
     councilVetoVoteThreshold: VoteThreshold;
     communityVetoVoteThreshold: VoteThreshold;
     councilVoteTipping: VoteTipping;
-    reserved?: Uint8Array;
+    votingCoolOffTime: number;
+    depositExemptProposalCount: number;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
@@ -490,7 +498,8 @@ export class GovernanceConfig {
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
 
-    this.reserved = args.reserved ?? new Uint8Array(3);
+    this.votingCoolOffTime = args.votingCoolOffTime;
+    this.depositExemptProposalCount = args.depositExemptProposalCount;
   }
 }
 
@@ -499,9 +508,12 @@ export class Governance {
   realm: PublicKey;
   governedAccount: PublicKey;
   config: GovernanceConfig;
+  // proposalCount is not used for  >= V3
   proposalCount: number;
   reserved?: Uint8Array;
-  votingProposalCount: number;
+
+  // V3
+  activeProposalCount: BN;
 
   constructor(args: {
     realm: PublicKey;
@@ -510,7 +522,7 @@ export class Governance {
     config: GovernanceConfig;
     reserved?: Uint8Array;
     proposalCount: number;
-    votingProposalCount: number;
+    activeProposalCount: BN;
   }) {
     this.accountType = args.accountType;
     this.realm = args.realm;
@@ -518,7 +530,7 @@ export class Governance {
     this.config = args.config;
     this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
-    this.votingProposalCount = args.votingProposalCount;
+    this.activeProposalCount = args.activeProposalCount;
   }
 
   isProgramGovernance() {
@@ -563,6 +575,7 @@ export class TokenOwnerRecord {
 
   unrelinquishedVotesCount: number;
 
+  // Not used in versions >= V3 / I'ts the upper 4 bytes of unrelinquishedVotesCount
   totalVotesCount: number;
 
   outstandingProposalCount: number;
@@ -570,6 +583,9 @@ export class TokenOwnerRecord {
   reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
+
+  // V3
+  version: number;
 
   constructor(args: {
     realm: PublicKey;
@@ -581,6 +597,7 @@ export class TokenOwnerRecord {
     outstandingProposalCount: number;
     reserved: Uint8Array;
     governanceDelegate: PublicKey | undefined;
+    version: number;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
@@ -591,6 +608,7 @@ export class TokenOwnerRecord {
     this.outstandingProposalCount = args.outstandingProposalCount;
     this.reserved = args.reserved;
     this.governanceDelegate = args.governanceDelegate;
+    this.version = args.version;
   }
 }
 
@@ -1295,4 +1313,21 @@ export async function getGoverningTokenHoldingAddress(
   );
 
   return governingTokenHoldingAddress;
+}
+
+export async function getProposalDepositAddress(
+  programId: PublicKey,
+  proposal: PublicKey,
+  proposalDepositPayer: PublicKey,
+) {
+  const [proposalDepositAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('proposal-deposit'),
+      proposal.toBuffer(),
+      proposalDepositPayer.toBuffer(),
+    ],
+    programId,
+  );
+
+  return proposalDepositAddress;
 }

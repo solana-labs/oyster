@@ -1,4 +1,5 @@
 import {
+  Keypair,
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
@@ -8,11 +9,16 @@ import { getGovernanceInstructionSchema } from './serialisation';
 import { serialize } from 'borsh';
 import { CreateProposalArgs } from './instructions';
 import {
+  getProposalDepositAddress,
   getRealmConfigAddress,
   GOVERNANCE_PROGRAM_SEED,
   VoteType,
 } from './accounts';
-import { PROGRAM_VERSION_V1 } from '../registry/constants';
+import {
+  PROGRAM_VERSION_V1,
+  PROGRAM_VERSION_V2,
+  PROGRAM_VERSION_V3,
+} from '../registry/constants';
 import { SYSTEM_PROGRAM_ID } from '../tools/sdk/runtime';
 import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 
@@ -27,13 +33,16 @@ export const withCreateProposal = async (
   descriptionLink: string,
   governingTokenMint: PublicKey,
   governanceAuthority: PublicKey,
-  proposalIndex: number,
+  // Proposal index is not used from V3
+  proposalIndex: number | undefined,
   voteType: VoteType,
   options: string[],
   useDenyOption: boolean,
   payer: PublicKey,
   voterWeightRecord?: PublicKey,
 ) => {
+  const proposalSeed = new Keypair().publicKey;
+
   const args = new CreateProposalArgs({
     name,
     descriptionLink,
@@ -41,20 +50,30 @@ export const withCreateProposal = async (
     voteType,
     options,
     useDenyOption,
+    proposalSeed,
   });
   const data = Buffer.from(
     serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
-  let proposalIndexBuffer = Buffer.alloc(4);
-  proposalIndexBuffer.writeInt32LE(proposalIndex, 0);
+  let proposalSeedBuffer = proposalSeed.toBuffer();
+
+  if (programVersion <= PROGRAM_VERSION_V2) {
+    if (proposalIndex === undefined) {
+      throw new Error(
+        `proposalIndex is required for version: ${programVersion}`,
+      );
+    }
+    proposalSeedBuffer = Buffer.alloc(4);
+    proposalSeedBuffer.writeInt32LE(proposalIndex, 0);
+  }
 
   const [proposalAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
       governance.toBuffer(),
       governingTokenMint.toBuffer(),
-      proposalIndexBuffer,
+      proposalSeedBuffer,
     ],
     programId,
   );
@@ -125,6 +144,19 @@ export const withCreateProposal = async (
     realm,
     voterWeightRecord,
   );
+
+  if (programVersion >= PROGRAM_VERSION_V3) {
+    const proposalDepositAddress = await getProposalDepositAddress(
+      programId,
+      proposalAddress,
+      payer,
+    );
+    keys.push({
+      pubkey: proposalDepositAddress,
+      isWritable: true,
+      isSigner: false,
+    });
+  }
 
   instructions.push(
     new TransactionInstruction({

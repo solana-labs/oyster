@@ -40,6 +40,8 @@ test('createGovernanceWithConfig', async () => {
       type: VoteThresholdType.YesVotePercentage,
       value: 0,
     }),
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 0,
   });
 
   // Act
