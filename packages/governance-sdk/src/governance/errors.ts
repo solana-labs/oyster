@@ -61,7 +61,7 @@ export const GovernanceError = [
   'Current token owner must sign transaction', // TokenOwnerMustSign
   'Given VoteThresholdType is not supported', //VoteThresholdTypeNotSupported
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
-  'GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
+  'Legacy1', // Legacy1
   'Governance PDA must sign', // GovernancePdaMustSign
   'Instruction already flagged with error', // InstructionAlreadyFlaggedWithError
   'Invalid Realm for Governance', // InvalidRealmForGovernance
@@ -112,7 +112,11 @@ export const GovernanceError = [
   'Voter weight threshold disabled', // VoterWeightThresholdDisabled
   'Vote not allowed in cool off time', // VoteNotAllowedInCoolOffTime
   'Cannot refund ProposalDeposit', // CannotRefundProposalDeposit
-  'Invalid ProposalDeposit account address', // InvalidProposalDepositAccountAddress
+
+  'Invalid Proposal for ProposalDeposit', // InvalidProposalForProposalDeposit
+  'Invalid deposit_exempt_proposal_count', // InvalidDepositExemptProposalCount
+  'Invalid GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
+  'Invalid deposit Payer for ProposalDeposit', // InvalidDepositPayerForProposalDeposit
 ] as const;
 
 export const TokenError = [
