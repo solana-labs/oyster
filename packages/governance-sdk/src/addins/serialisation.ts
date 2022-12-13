@@ -32,6 +32,7 @@ export const GOVERNANCE_ADDINS_SCHEMA = new Map<any, any>([
         ['voterWeightExpiry', { kind: 'option', type: 'u64' }],
         ['weightAction', { kind: 'option', type: 'u8' }],
         ['weightActionTarget', { kind: 'option', type: 'pubkey' }],
+        //TODO: add ExtendedVoterWeightRecord fields - use total_amount
       ],
     },
   ],

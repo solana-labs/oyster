@@ -68,7 +68,6 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
     const governingTokenAmount = realmConfig && realmConfig.account.communityVoterWeightAddin && voterWeight ? voterWeight.account.voterWeight : communityTokenOwnerRecord?.account.governingTokenDepositAmount;
     if (governingTokenAmount && governance) {
       const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
-
       return governingTokenAmount.cmp(mint) >= 0;
     }
     return false;

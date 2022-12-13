@@ -31,11 +31,20 @@ export interface InstructionCardProps {
   position: number;
 }
 
+export interface TransferInstruction {
+  source: string;
+  destination: string;
+  signer: string;
+  amount: string;
+}
+
 export function InstructionCard({ proposalInstruction, proposal, position }: InstructionCardProps) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
   const changeTracker = useAccountChangeTracker();
 
+  // console.log('Proposal Instruction ----->', proposalInstruction);
+  // console.log('Proposal ----->', proposal);
   const proposalAuthority = useProposalAuthority(
     proposal.account.tokenOwnerRecord
   );
@@ -59,6 +68,21 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
     return instruction;
   }, [proposalInstruction]);
 
+  const transferInstructionData = useMemo<TransferInstruction | undefined>(() => {
+    return instructionData
+    && instructionData.programId.toString().indexOf('Tokenkeg') >= 0
+    && instructionData.data[0] === 3
+      ?
+      {
+        source: instructionData!.accounts[0].pubkey,
+        destination: instructionData!.accounts[1]?.pubkey,
+        signer: (instructionData!.accounts.find(acc => acc.isSigner))?.pubkey,
+        amount: ''
+      } as unknown as TransferInstruction
+      :
+        undefined;
+  }, [proposalInstruction, instructionData]);
+
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(serialize(getGovernanceInstructionSchema(rpcContext.programVersion), instructionData)).toString('base64');
     const programId = instructionData!.programId;
@@ -76,6 +100,24 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
               {LABELS.HOLD_UP_TIME_DAYS}:{' '}
               {proposalInstruction.account.holdUpTime / 86400}
             </p>
+            {
+              transferInstructionData ?
+              <>
+                <p>
+                  {`${LABELS.ACCOUNT} 1 (${LABELS.TRANSFER_ACCOUNT_SOURCE}): ${transferInstructionData.source}`}
+                </p>
+                <p>
+                  {`${LABELS.ACCOUNT} 2 (${LABELS.TRANSFER_ACCOUNT_DESTINATION}): ${transferInstructionData.destination}`}
+                </p>
+                <p>
+                  {`${LABELS.ACCOUNT} 3 (${LABELS.TRANSFER_ACCOUNT_SIGNER}): ${transferInstructionData.signer}`}
+                </p>
+                <p>
+                  {`${LABELS.AMOUNT}: ${transferInstructionData.amount}`}
+                </p>
+              </> :
+                <></>
+            }
           </>
         }
       />
