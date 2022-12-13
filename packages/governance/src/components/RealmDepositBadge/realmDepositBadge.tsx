@@ -23,7 +23,7 @@ export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const { realm } = props;
   const { formatValue } = useMintFormatter(realm?.account.communityMint) || {};
   const { voterWeight } = useVoterWeightRecord(realm);
-  const { depositedAccounts } = useDepositedAccountsContext();
+  // const { depositedAccounts } = useDepositedAccountsContext();
   // console.log('---->', depositedAccounts);
   // const deposit = depositedAccounts?.length === 1 ? depositedAccounts[0].balance : depositedAccounts?.reduce((acc, current) => acc.add(current.balance), new BN(0));
 

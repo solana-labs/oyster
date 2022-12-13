@@ -81,7 +81,7 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
       } as unknown as TransferInstruction
       :
         undefined;
-  }, [proposalInstruction, instructionData]);
+  }, [instructionData]);
 
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(serialize(getGovernanceInstructionSchema(rpcContext.programVersion), instructionData)).toString('base64');
