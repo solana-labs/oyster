@@ -7,7 +7,7 @@ import BN from 'bn.js';
 import { formatMintNaturalAmountAsDecimal, formatMintVoteWeight } from '../../tools/units';
 import { useMintFormatter } from '../../hooks/useMintFormatter';
 import { useVoterWeightRecord } from '../../hooks/apiHooks';
-import {useDepositedAccountsContext} from "./realmDepositProvider";
+// import {useDepositedAccountsContext} from "./realmDepositProvider";
 
 const { useMint } = contexts.Accounts;
 
