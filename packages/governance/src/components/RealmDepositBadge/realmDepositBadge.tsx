@@ -7,7 +7,7 @@ import BN from 'bn.js';
 import { formatMintNaturalAmountAsDecimal, formatMintVoteWeight } from '../../tools/units';
 import { useMintFormatter } from '../../hooks/useMintFormatter';
 import { useVoterWeightRecord } from '../../hooks/apiHooks';
-// import {useDepositedAccountsContext} from "./realmDepositProvider";
+import {useDepositedAccountsContext} from "./realmDepositProvider";
 
 const { useMint } = contexts.Accounts;
 
@@ -23,19 +23,13 @@ export function RealmDepositBadge(props: RealmDepositBadgeProps) {
   const { realm } = props;
   const { formatValue } = useMintFormatter(realm?.account.communityMint) || {};
   const { voterWeight } = useVoterWeightRecord(realm);
-  // const { depositedAccounts } = useDepositedAccountsContext();
-  // console.log('---->', depositedAccounts);
-  // const deposit = depositedAccounts?.length === 1 ? depositedAccounts[0].balance : depositedAccounts?.reduce((acc, current) => acc.add(current.balance), new BN(0));
+  const { depositedAccounts } = useDepositedAccountsContext();
+  const deposit = depositedAccounts?.length === 1 ? depositedAccounts[0].balance : depositedAccounts?.reduce((acc, current) => acc.add(current.balance), new BN(0));
 
   const deposited = useMemo(() => {
-    return formatValue(voterWeight?.account.voterWeight ?? new BN(0)); //use total_amount
+    return formatValue(voterWeight?.account.voterWeight.add(deposit ?? new BN(0)) ?? new BN(0)); //use total_amount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [voterWeight, formatValue]);
-
-  // const deposited = useMemo(() => {
-  //   return formatValue(deposit ?? new BN(0));
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [deposit, formatValue]);
+  }, [voterWeight, formatValue, deposit]);
 
   return <>
     {<div>Deposited: {deposited} NEON</div>}
