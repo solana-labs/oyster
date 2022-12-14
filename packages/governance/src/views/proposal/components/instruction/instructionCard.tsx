@@ -42,9 +42,6 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
   const changeTracker = useAccountChangeTracker();
-
-  // console.log('Proposal Instruction ----->', proposalInstruction);
-  // console.log('Proposal ----->', proposal);
   const proposalAuthority = useProposalAuthority(
     proposal.account.tokenOwnerRecord
   );

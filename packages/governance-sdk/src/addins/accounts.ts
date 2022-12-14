@@ -16,8 +16,6 @@ export enum VoterWeightAction {
 export class VoterWeightRecord {
   accountDiscriminator = new Uint8Array([50, 101, 102, 57, 57, 98, 52, 98]);
 
-  totalAmount: BN;
-
   realm: PublicKey;
 
   governingTokenMint: PublicKey;
@@ -36,13 +34,11 @@ export class VoterWeightRecord {
     realm: PublicKey;
     governingTokenMint: PublicKey;
     governingTokenOwner: PublicKey;
-    totalAmount: BN;
     voterWeight: BN;
     voterWeightExpiry: BN;
     weightAction: VoterWeightAction | undefined;
     weightActionTarget: PublicKey | undefined;
   }) {
-    this.totalAmount = args.totalAmount;
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
     this.governingTokenOwner = args.governingTokenOwner;

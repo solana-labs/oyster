@@ -25,7 +25,6 @@ export const GOVERNANCE_ADDINS_SCHEMA = new Map<any, any>([
       kind: 'struct',
       fields: [
         ['accountDiscriminator', [8]],
-        ['totalAmount', 'u64'],
         ['realm', 'pubkey'],
         ['governingTokenMint', 'pubkey'],
         ['governingTokenOwner', 'pubkey'],
