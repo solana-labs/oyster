@@ -24,6 +24,7 @@ import { LABELS } from '../../../../constants';
 import { FlagInstructionErrorButton } from './buttons/flagInstructionErrorButton';
 import { ExecuteInstructionButton, PlayState } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
+import BN from "bn.js";
 
 export interface InstructionCardProps {
   proposalInstruction: ProgramAccount<ProposalTransaction>;
@@ -42,6 +43,7 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
   const changeTracker = useAccountChangeTracker();
+
   const proposalAuthority = useProposalAuthority(
     proposal.account.tokenOwnerRecord
   );
@@ -61,7 +63,6 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
     } else if (proposalInstruction.account.instruction) {
       instruction = proposalInstruction.account.getSingleInstruction();
     }
-
     return instruction;
   }, [proposalInstruction]);
 
@@ -74,7 +75,7 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
         source: instructionData!.accounts[0].pubkey,
         destination: instructionData!.accounts[1]?.pubkey,
         signer: (instructionData!.accounts.find(acc => acc.isSigner))?.pubkey,
-        amount: ''
+        amount: `${new BN(instructionData!.data.slice(1), 'le')} NEON`
       } as unknown as TransferInstruction
       :
         undefined;
