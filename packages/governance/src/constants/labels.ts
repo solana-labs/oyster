@@ -11,6 +11,7 @@ export const LABELS = {
   PROPOSAL_CANT_ADD_BELOW_LIMIT:
     'Community tokens amount less than required minimum',
   PROPOSAL_CANT_ADD_EMPTY: 'Not enough voter tokens to create a proposal',
+  PROPOSAL_CANT_ADD_LAMPORTS: 'Not enough Lamports to create a proposal',
 
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Governance',

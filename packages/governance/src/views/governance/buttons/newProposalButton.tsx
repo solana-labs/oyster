@@ -105,6 +105,9 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
     if (voterWeight?.account.voterWeight.isZero()) {
       creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_EMPTY;
     }
+    if(!hasLamports) {
+      creationDisabledReason = LABELS.PROPOSAL_CANT_ADD_LAMPORTS;
+    }
   }
 
   const defaultGoverningTokenType = !communityMint.supply.isZero()
