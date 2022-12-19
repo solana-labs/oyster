@@ -27,10 +27,6 @@ import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
 import BN from "bn.js";
 import {useTokenAccountByMint} from "../../../../hooks/useTokenAccountByMint";
 
-// Mint metadata for Well known tokens displayed on the instruction card
-export const MINT_METADATA: Record<string, Record<string, string>> = {
-  EjLGfD8mpxKLwGDi8AiTisAbGtWWM2L3htkJ6MpvS8Hk: { symbol: 'NEON' }
-}
 
 export interface InstructionCardProps {
   proposalInstruction: ProgramAccount<ProposalTransaction>;
@@ -77,7 +73,7 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
 
   const transferInstructionData = useMemo<TransferInstruction | undefined>( () => {
     const tokenName = tokenMint
-      ? tokens.find(t => t.address === tokenMint!.publicKey.toString())?.symbol ?? MINT_METADATA[tokenMint!.publicKey.toString()].symbol
+      ? tokens.find(t => t.address === tokenMint!.publicKey.toString())?.symbol ?? `${tokenMint!.publicKey.toString().substring(0, 5)}...`
       : undefined;
 
     return instructionData

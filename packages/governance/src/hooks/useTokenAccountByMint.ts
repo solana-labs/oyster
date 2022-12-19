@@ -113,7 +113,7 @@ export function useTokenAccountByMint(
     (async () => {
       const resolvedTokenAccount = await tryGetTokenAccount(
         connection,
-        proposalInstruction.accounts[0].pubkey,
+        proposalInstruction.accounts[0].pubkey, //token sender account
         proposalInstruction.programId,
       );
 

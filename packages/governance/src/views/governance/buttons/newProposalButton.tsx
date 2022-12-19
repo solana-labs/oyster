@@ -54,15 +54,6 @@ export function NewProposalButton(props: NeonProposalButtonProps) {
 
   const { voterWeight, maxVoterWeight } = useVoterWeightRecord(realm, governance);
 
-  // const canCreateProposalUsingCommunityTokens = useMemo(() => {
-  //   if (communityTokenOwnerRecord && governance) {
-  //     const mint = new BN(governance.account.config.minCommunityTokensToCreateProposal);
-  //
-  //     return communityTokenOwnerRecord.account.governingTokenDepositAmount.cmp(mint) >= 0;
-  //   }
-  //   return false;
-  // }, [communityTokenOwnerRecord, governance]);
-
   const canCreateProposalUsingCommunityTokens = useMemo(() => {
     //If communityVoterWeightAddin exist we should check voterWeight for community token amount
     const governingTokenAmount = realmConfig && realmConfig.account.communityVoterWeightAddin && voterWeight ? voterWeight.account.voterWeight : communityTokenOwnerRecord?.account.governingTokenDepositAmount;

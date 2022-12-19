@@ -12,6 +12,9 @@ export const LABELS = {
     'Community tokens amount less than required minimum',
   PROPOSAL_CANT_ADD_EMPTY: 'Not enough voter tokens to create a proposal',
   PROPOSAL_CANT_ADD_LAMPORTS: 'Not enough Lamports to create a proposal',
+  CANCEL_PROPOSAL_DISABLED_NOT_CONNECTED: 'Check your connection',
+  CANCEL_PROPOSAL_DISABLED_VOTE_EXPIRED:
+    "Voting time has ended, you can't cancel this proposal",
 
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Governance',
