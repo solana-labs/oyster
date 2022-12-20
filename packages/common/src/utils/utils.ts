@@ -61,6 +61,7 @@ export function getTokenName(
   }
 
   const knownSymbol = map.get(mintAddress)?.symbol;
+
   if (knownSymbol) {
     return knownSymbol;
   }

@@ -8,8 +8,13 @@ export const LABELS = {
   ADD_NEW_PROPOSAL: 'Add new proposal',
   ADD_PROPOSAL: 'Add proposal',
   ADDING_PROPOSAL: 'Adding proposal',
-  PROPOSAL_CANT_ADD_BELOW_LIMIT: 'Community tokens amount less than required minimum',
+  PROPOSAL_CANT_ADD_BELOW_LIMIT:
+    'Community tokens amount less than required minimum',
   PROPOSAL_CANT_ADD_EMPTY: 'Not enough voter tokens to create a proposal',
+  PROPOSAL_CANT_ADD_LAMPORTS: 'Not enough Lamports to create a proposal',
+  CANCEL_PROPOSAL_DISABLED_NOT_CONNECTED: 'Check your connection',
+  CANCEL_PROPOSAL_DISABLED_VOTE_EXPIRED:
+    "Voting time has ended, you can't cancel this proposal",
 
   MENU_DASHBOARD: 'Dashboard',
   APP_TITLE: 'Oyster Governance',
@@ -162,6 +167,10 @@ export const LABELS = {
   SLOT_MUST_BE_NUMERIC: 'Slot can only be numeric',
   SLOT_MUST_BE_GREATER_THAN: 'Slot must be greater than or equal to ',
   HOLD_UP_TIME_DAYS: 'hold up time (days)',
+  TRANSFER_ACCOUNT_SOURCE: 'Source',
+  TRANSFER_ACCOUNT_DESTINATION: 'Destination',
+  TRANSFER_ACCOUNT_SIGNER: 'Signer',
+  TRANSFER_DATA: 'Data',
 
   MIN_SLOT_MUST_BE_NUMERIC: 'Minimum Slot Waiting Period can only be numeric',
   TIME_LIMIT_MUST_BE_NUMERIC: 'Time Limit can only be numeric',

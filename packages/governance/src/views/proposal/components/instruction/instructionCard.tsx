@@ -1,5 +1,5 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { useWallet } from '@oyster/common';
+import {useConnectionConfig, useWallet} from '@oyster/common';
 import { Button, Card, Space } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import React, { useMemo, useState } from 'react';
@@ -24,6 +24,9 @@ import { LABELS } from '../../../../constants';
 import { FlagInstructionErrorButton } from './buttons/flagInstructionErrorButton';
 import { ExecuteInstructionButton, PlayState } from './buttons/executeInstructionButton';
 import { DryRunInstructionButton } from './buttons/dryRunInstructionButton';
+import BN from "bn.js";
+import {useTokenAccountByMint} from "../../../../hooks/useTokenAccountByMint";
+
 
 export interface InstructionCardProps {
   proposalInstruction: ProgramAccount<ProposalTransaction>;
@@ -31,10 +34,19 @@ export interface InstructionCardProps {
   position: number;
 }
 
+export interface TransferInstruction {
+  source: string;
+  destination: string;
+  signer: string;
+  amount: string;
+}
+
 export function InstructionCard({ proposalInstruction, proposal, position }: InstructionCardProps) {
   const { connected } = useWallet();
   const rpcContext = useRpcContext();
   const changeTracker = useAccountChangeTracker();
+  const { tokens } = useConnectionConfig();
+  const { tokenMint, tokenAmount } = useTokenAccountByMint(proposalInstruction.account.instructions[0]);
 
   const proposalAuthority = useProposalAuthority(
     proposal.account.tokenOwnerRecord
@@ -59,6 +71,25 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
     return instruction;
   }, [proposalInstruction]);
 
+  const transferInstructionData = useMemo<TransferInstruction | undefined>( () => {
+    const tokenName = tokenMint
+      ? tokens.find(t => t.address === tokenMint!.publicKey.toString())?.symbol ?? `${tokenMint!.publicKey.toString().substring(0, 5)}...`
+      : undefined;
+
+    return instructionData
+    && instructionData.programId.toString().indexOf('Tokenkeg') >= 0
+    && instructionData.data[0] === 3
+      ?
+      {
+        source: instructionData!.accounts[0].pubkey,
+        destination: instructionData!.accounts[1]?.pubkey,
+        signer: (instructionData!.accounts.find(acc => acc.isSigner))?.pubkey,
+        amount: `${tokenAmount?.toNumber().toLocaleString() ?? new BN(0)} ${tokenName ?? 'Unknown'}`
+      } as unknown as TransferInstruction
+      :
+        undefined;
+  }, [instructionData, tokens, tokenAmount, tokenMint]);
+
   const instructionDetails = useMemo(() => {
     const dataBase64 = Buffer.from(serialize(getGovernanceInstructionSchema(rpcContext.programVersion), instructionData)).toString('base64');
     const programId = instructionData!.programId;
@@ -76,6 +107,24 @@ export function InstructionCard({ proposalInstruction, proposal, position }: Ins
               {LABELS.HOLD_UP_TIME_DAYS}:{' '}
               {proposalInstruction.account.holdUpTime / 86400}
             </p>
+            {
+              transferInstructionData ?
+              <>
+                <p>
+                  {`${LABELS.ACCOUNT} 1 (${LABELS.TRANSFER_ACCOUNT_SOURCE}): ${transferInstructionData.source}`}
+                </p>
+                <p>
+                  {`${LABELS.ACCOUNT} 2 (${LABELS.TRANSFER_ACCOUNT_DESTINATION}): ${transferInstructionData.destination}`}
+                </p>
+                <p>
+                  {`${LABELS.ACCOUNT} 3 (${LABELS.TRANSFER_ACCOUNT_SIGNER}): ${transferInstructionData.signer}`}
+                </p>
+                <p>
+                  {`${LABELS.AMOUNT}: ${transferInstructionData.amount}`}
+                </p>
+              </> :
+                <></>
+            }
           </>
         }
       />

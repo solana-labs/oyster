@@ -7,7 +7,7 @@ import { withdrawGoverningTokens } from '../../../actions/withdrawGoverningToken
 import { LABELS } from '../../../constants';
 import { useRpcContext } from '../../../hooks/useRpcContext';
 import { useVestingProgramId } from '../../../hooks/useVestingProgramId';
-import { useVoterWeightRecord } from '../../../hooks/apiHooks';
+import {useVoterWeightRecord, useWalletTokenOwnerRecord} from '../../../hooks/apiHooks';
 import { useMintFormatter } from '../../../hooks/useMintFormatter';
 import { useDepositedAccountsContext } from '../../../components/RealmDepositBadge/realmDepositProvider';
 
@@ -29,6 +29,11 @@ export function WithdrawGoverningTokensButton(props: {
     return depositedAccounts?.length ? depositedAccounts[0] : null;
   });
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
+
+  const tokenOwnerRecord = useWalletTokenOwnerRecord(
+    realm?.pubkey,
+    governingTokenMint
+  );
 
   if (!governingTokenMint || !depositedAccounts?.length) {
     return null;
@@ -68,16 +73,16 @@ export function WithdrawGoverningTokensButton(props: {
   };
 
   const onWithdraw = () => {
-    setConfirmationVisible(true);
     // TODO: add check for vote-locked deposits
-    // if (tokenOwnerRecord.account.unrelinquishedVotesCount > 0) {
-    //   error({
-    //     title: 'Can\'t withdraw tokens',
-    //     content: `You have tokens staked in ${tokenOwnerRecord.account.unrelinquishedVotesCount} proposal(s).
-    //     Please release your tokens from the proposals before withdrawing the tokens from the realm.`
-    //   });
-    //   return;
-    // }
+    if (tokenOwnerRecord && tokenOwnerRecord.account?.unrelinquishedVotesCount > 0) {
+      Modal.error({
+        title: 'Can\'t withdraw tokens',
+        content: `You have tokens staked in ${tokenOwnerRecord?.account?.unrelinquishedVotesCount} proposal(s).
+        Please release your tokens from the proposals before withdrawing the tokens from the realm.`
+      });
+      return;
+    }
+    setConfirmationVisible(true);
   };
 
   return isVisible ? <>
