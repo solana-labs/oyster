@@ -13,6 +13,7 @@ import BN from 'bn.js';
 import {
   getGovernance,
   getProposal,
+  getProposalDepositsByDepositPayer,
   getRealm,
   getRealmConfig,
   getTokenOwnerRecord,
@@ -416,6 +417,14 @@ export class RealmBuilder {
 
   async getProposal(proposalPk: PublicKey) {
     return getProposal(this.bench.connection, proposalPk);
+  }
+
+  async getProposalDeposits(depositPayerPk: PublicKey) {
+    return getProposalDepositsByDepositPayer(
+      this.bench.connection,
+      this.bench.programId,
+      depositPayerPk,
+    );
   }
 
   async withSignatory() {

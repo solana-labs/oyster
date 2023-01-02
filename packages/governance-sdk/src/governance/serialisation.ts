@@ -59,6 +59,7 @@ import {
   VoteThresholdType,
   GoverningTokenConfigArgs,
   GoverningTokenConfig,
+  ProposalDeposit,
 } from './accounts';
 import { serialize } from 'borsh';
 import { BorshAccountParser } from '../core/serialisation';
@@ -837,6 +838,17 @@ function createGovernanceAccountSchema(accountVersion: number) {
           ...(accountVersion === ACCOUNT_VERSION_V1
             ? []
             : [['vetoVoteWeight', 'u64']]),
+        ],
+      },
+    ],
+    [
+      ProposalDeposit,
+      {
+        kind: 'struct',
+        fields: [
+          ['accountType', 'u8'],
+          ['proposal', 'pubkey'],
+          ['depositPayer', 'pubkey'],
         ],
       },
     ],

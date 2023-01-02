@@ -222,3 +222,24 @@ test('createProposal', async () => {
   const governance = await realm.getGovernance(proposal.account.governance);
   expect(governance.account.activeProposalCount.toNumber()).toEqual(1);
 });
+
+test('createProposalWithDeposit', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx());
+
+  // Act
+  const proposalPk = await realm.createProposal('proposal 1');
+
+  // Assert
+  const proposalDeposit = (
+    await realm.getProposalDeposits(realm.bench.walletPk)
+  )[0];
+
+  expect(proposalDeposit.account.proposal).toEqual(proposalPk);
+  expect(proposalDeposit.account.depositPayer).toEqual(realm.bench.walletPk);
+});
