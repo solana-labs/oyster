@@ -16,6 +16,7 @@ import {
   VoteRecord,
   RealmConfigAccount,
   getRealmConfigAddress,
+  ProposalDeposit,
 } from './accounts';
 
 import {
@@ -297,6 +298,25 @@ export async function getAllProposals(
       gs.map(g => getProposalsByGovernance(connection, programId, g.pubkey)),
     ),
   );
+}
+
+// ProposalDeposit api
+
+/**
+ * Returns all ProposalDeposits for the given deposit payer
+ * @param connection
+ * @param programId
+ * @param depositPayer
+ * @returns
+ */
+export async function getProposalDepositsByDepositPayer(
+  connection: Connection,
+  programId: PublicKey,
+  depositPayer: PublicKey,
+) {
+  return getGovernanceAccounts(connection, programId, ProposalDeposit, [
+    pubkeyFilter(1 + 32, depositPayer)!,
+  ]);
 }
 
 // Generic API

@@ -35,6 +35,7 @@ export enum GovernanceAccountType {
   MintGovernanceV2 = 20,
   TokenGovernanceV2 = 21,
   SignatoryRecordV2 = 22,
+  ProposalDeposit = 23,
 }
 
 export interface GovernanceAccount {
@@ -50,7 +51,8 @@ export type GovernanceAccountClass =
   | typeof VoteRecord
   | typeof ProposalTransaction
   | typeof RealmConfigAccount
-  | typeof ProgramMetadata;
+  | typeof ProgramMetadata
+  | typeof ProposalDeposit;
 
 export function getAccountTypes(accountClass: GovernanceAccountClass) {
   switch (accountClass) {
@@ -66,6 +68,8 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
         GovernanceAccountType.ProposalV1,
         GovernanceAccountType.ProposalV2,
       ];
+    case ProposalDeposit:
+      return [GovernanceAccountType.ProposalDeposit];
     case SignatoryRecord:
       return [
         GovernanceAccountType.SignatoryRecordV1,
@@ -980,6 +984,17 @@ export class Proposal {
       proposalOwner.governingTokenOwner.equals(walletPk) ||
       proposalOwner.governanceDelegate?.equals(walletPk)
     );
+  }
+}
+
+export class ProposalDeposit {
+  accountType: GovernanceAccountType = GovernanceAccountType.ProposalDeposit;
+  proposal: PublicKey;
+  depositPayer: PublicKey;
+
+  constructor(args: { proposal: PublicKey; depositPayer: PublicKey }) {
+    this.proposal = args.proposal;
+    this.depositPayer = args.depositPayer;
   }
 }
 
