@@ -299,8 +299,8 @@ export class RealmBuilder {
       this.bench.programVersion,
 
       this.realmPk,
-      this.communityMintPk,
       this.bench.walletPk,
+      this.communityMintPk,
       this.bench.walletPk,
       new BN(1),
     );

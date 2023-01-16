@@ -1,5 +1,6 @@
 export * from './accounts';
 export * from './api';
+export * from './createRevokeGoverningTokens';
 export * from './createSetGovernanceConfig';
 export * from './createSetRealmConfig';
 export * from './createSetRealmAuthority';

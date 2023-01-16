@@ -15,9 +15,9 @@ export const withRevokeGoverningTokens = async (
   programId: PublicKey,
   programVersion: number,
   realm: PublicKey,
-  governingTokenMint: PublicKey,
-  governingTokenMintAuthrority: PublicKey,
   governingTokenOwner: PublicKey,
+  governingTokenMint: PublicKey,
+  revokeAuthority: PublicKey,
   amount: BN,
 ) => {
   const args = new RevokeGoverningTokensArgs({ amount });
@@ -62,7 +62,7 @@ export const withRevokeGoverningTokens = async (
       isSigner: false,
     },
     {
-      pubkey: governingTokenMintAuthrority,
+      pubkey: revokeAuthority,
       isWritable: false,
       isSigner: true,
     },
