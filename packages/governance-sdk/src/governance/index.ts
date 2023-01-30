@@ -26,6 +26,7 @@ export * from './withExecuteTransaction';
 export * from './withFinalizeVote';
 export * from './withFlagTransactionError';
 export * from './withInsertTransaction';
+export * from './withRefundProposalDeposit';
 export * from './withRelinquishVote';
 export * from './withRemoveTransaction';
 export * from './withRevokeGoverningTokens';
