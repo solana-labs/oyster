@@ -27,6 +27,7 @@ export const withDepositGoverningTokens = async (
   governingTokenSourceAuthority: PublicKey,
   payer: PublicKey,
   amount: BN,
+  governingTokenOwnerIsSigner = true,
 ) => {
   const args = new DepositGoverningTokensArgs({ amount });
   const data = Buffer.from(
@@ -68,7 +69,7 @@ export const withDepositGoverningTokens = async (
     {
       pubkey: governingTokenOwner,
       isWritable: false,
-      isSigner: true,
+      isSigner: governingTokenOwnerIsSigner,
     },
     {
       pubkey: governingTokenSourceAuthority,
