@@ -18,6 +18,7 @@ import {
   FinalizeVoteArgs,
   FlagTransactionErrorArgs,
   InsertTransactionArgs,
+  RefundProposalDepositArgs,
   RelinquishVoteArgs,
   RemoveTransactionArgs,
   RevokeGoverningTokensArgs,
@@ -646,6 +647,13 @@ function createGovernanceInstructionSchema(programVersion: number) {
     ],
     [
       CreateNativeTreasuryArgs,
+      {
+        kind: 'struct',
+        fields: [['instruction', 'u8']],
+      },
+    ],
+    [
+      RefundProposalDepositArgs,
       {
         kind: 'struct',
         fields: [['instruction', 'u8']],

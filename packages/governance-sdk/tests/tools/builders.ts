@@ -24,6 +24,7 @@ import {
   withCreateGovernance,
   withCreateProposal,
   withDepositGoverningTokens,
+  withRefundProposalDeposit,
   withRelinquishVote,
   withRevokeGoverningTokens,
   withSignOffProposal,
@@ -424,6 +425,21 @@ export class RealmBuilder {
       this.bench.connection,
       this.bench.programId,
       depositPayerPk,
+    );
+  }
+
+  async refundProposalDeposit() {
+    await this._refundProposalDeposit();
+    await this.sendTx();
+  }
+
+  async _refundProposalDeposit() {
+    await withRefundProposalDeposit(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.proposalPk,
+      this.bench.walletPk,
     );
   }
 
