@@ -47,6 +47,4 @@ export const withRefundProposalDeposit = async (
       data,
     }),
   );
-
-  return proposalDepositAddress;
 };

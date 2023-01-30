@@ -243,3 +243,27 @@ test('createProposalWithDeposit', async () => {
   expect(proposalDeposit.account.proposal).toEqual(proposalPk);
   expect(proposalDeposit.account.depositPayer).toEqual(realm.bench.walletPk);
 });
+
+test('refundProposalDeposit', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx())
+    .then(b => b.withProposal())
+    .then(b => b.withProposalSignOff())
+    .then(b => b.withCastVote())
+    .then(b => b.sendTx());
+
+  // Act
+  await realm.refundProposalDeposit();
+
+  // Assert
+  const proposalDeposits = await realm.getProposalDeposits(
+    realm.bench.walletPk,
+  );
+
+  expect(proposalDeposits.length).toBe(0);
+});
