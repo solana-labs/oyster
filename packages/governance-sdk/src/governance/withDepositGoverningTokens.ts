@@ -41,7 +41,7 @@ export const withDepositGoverningTokens = async (
   );
 
   // If we are minting the tokens directly into the DAO then governingTokenOwner doesn't have to sign the tx
-  const governingTokenOwnerIsSigner = governingTokenSource.equals(
+  const governingTokenOwnerIsSigner = !governingTokenSource.equals(
     governingTokenMint,
   );
 
