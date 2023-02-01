@@ -27,6 +27,7 @@ export const withDepositGoverningTokens = async (
   governingTokenSourceAuthority: PublicKey,
   payer: PublicKey,
   amount: BN,
+  governingTokenOwnerIsSigner?: boolean,
 ) => {
   const args = new DepositGoverningTokensArgs({ amount });
   const data = Buffer.from(
@@ -40,10 +41,10 @@ export const withDepositGoverningTokens = async (
     governingTokenOwner,
   );
 
-  // If we are minting the tokens directly into the DAO then governingTokenOwner doesn't have to sign the tx
-  const governingTokenOwnerIsSigner = !governingTokenSource.equals(
-    governingTokenMint,
-  );
+  governingTokenOwnerIsSigner =
+    governingTokenOwnerIsSigner ??
+    // If we are minting the tokens directly into the DAO then governingTokenOwner doesn't have to sign the tx
+    !governingTokenSource.equals(governingTokenMint);
 
   const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(
     [
