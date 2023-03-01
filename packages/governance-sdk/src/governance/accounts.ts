@@ -946,12 +946,13 @@ export class Proposal {
     return this.isPreVotingState()
       ? governance.config.maxVotingTime
       : (this.votingAt?.toNumber() ?? 0) +
-          governance.config.maxVotingTime -
+          governance.config.maxVotingTime +
+          governance.config.votingCoolOffTime -
           unixTimestampInSeconds;
   }
 
   hasVoteTimeEnded(governance: Governance) {
-    return this.getTimeToVoteEnd(governance) <= 0;
+    return this.getTimeToVoteEnd(governance) < 0;
   }
 
   canCancel(governance: Governance) {
