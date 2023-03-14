@@ -12,6 +12,15 @@ import { PROGRAM_VERSION_V3 } from '../../src/registry/constants';
 import { BenchBuilder } from '../tools/builders';
 import { getTimestampFromDays } from '../tools/units';
 
+test('getGovernanceProgramVersion', async () => {
+  // Arrange
+  // Act
+  const builder = await BenchBuilder.withConnection();
+
+  // Assert
+  expect(builder.programVersion).toEqual(3);
+});
+
 test('createRealmWithTokenConfigs', async () => {
   // Arrange
   const bench = await BenchBuilder.withConnection(PROGRAM_VERSION_V3).then(b =>
