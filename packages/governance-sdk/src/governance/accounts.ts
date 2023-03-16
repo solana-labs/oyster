@@ -451,7 +451,7 @@ export class GovernanceConfig {
 
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
-  maxVotingTime: number;
+  baseVotingTime: number;
   communityVoteTipping: VoteTipping;
   minCouncilTokensToCreateProposal: BN;
 
@@ -467,24 +467,24 @@ export class GovernanceConfig {
     communityVoteThreshold: VoteThreshold;
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
-    maxVotingTime: number;
+    baseVotingTime: number;
     communityVoteTipping?: VoteTipping;
     minCouncilTokensToCreateProposal: BN;
 
     // VERSION >= 3
     // For versions < 3 must be set to YesVotePercentage(0)
-    councilVoteThreshold: VoteThreshold;
-    councilVetoVoteThreshold: VoteThreshold;
-    communityVetoVoteThreshold: VoteThreshold;
-    councilVoteTipping: VoteTipping;
-    votingCoolOffTime: number;
-    depositExemptProposalCount: number;
+    councilVoteThreshold?: VoteThreshold;
+    councilVetoVoteThreshold?: VoteThreshold;
+    communityVetoVoteThreshold?: VoteThreshold;
+    councilVoteTipping?: VoteTipping;
+    votingCoolOffTime?: number;
+    depositExemptProposalCount?: number;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
-    this.maxVotingTime = args.maxVotingTime;
+    this.baseVotingTime = args.baseVotingTime;
     this.communityVoteTipping = args.communityVoteTipping ?? VoteTipping.Strict;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
@@ -502,8 +502,12 @@ export class GovernanceConfig {
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
 
-    this.votingCoolOffTime = args.votingCoolOffTime;
-    this.depositExemptProposalCount = args.depositExemptProposalCount;
+    this.votingCoolOffTime = args.votingCoolOffTime ?? 0;
+    this.depositExemptProposalCount = args.depositExemptProposalCount ?? 0;
+  }
+
+  get maxVotingTime() {
+    return this.baseVotingTime + this.votingCoolOffTime;
   }
 }
 
@@ -947,7 +951,6 @@ export class Proposal {
       ? governance.config.maxVotingTime
       : (this.votingAt?.toNumber() ?? 0) +
           governance.config.maxVotingTime +
-          governance.config.votingCoolOffTime -
           unixTimestampInSeconds;
   }
 

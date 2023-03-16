@@ -334,7 +334,7 @@ function createGovernanceStructSchema(
           ['communityVoteThreshold', 'VoteThreshold'],
           ['minCommunityTokensToCreateProposal', 'u64'],
           ['minInstructionHoldUpTime', 'u32'],
-          ['maxVotingTime', 'u32'],
+          ['baseVotingTime', 'u32'],
           ['communityVoteTipping', 'u8'],
           ['councilVoteThreshold', 'VoteThreshold'],
           ['councilVetoVoteThreshold', 'VoteThreshold'],
@@ -832,7 +832,7 @@ function createGovernanceAccountSchema(accountVersion: number) {
 
           ...(accountVersion === ACCOUNT_VERSION_V1
             ? []
-            : [['maxVotingTime', { kind: 'option', type: 'u32' }]]),
+            : [['baseVotingTime', { kind: 'option', type: 'u32' }]]),
 
           ['voteThreshold', { kind: 'option', type: 'VoteThreshold' }],
 
