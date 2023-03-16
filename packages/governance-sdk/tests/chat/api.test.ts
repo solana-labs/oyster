@@ -117,7 +117,7 @@ test('postProposalComment', async () => {
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
-    maxVotingTime: getTimestampFromDays(3),
+    baseVotingTime: getTimestampFromDays(3),
     voteTipping: VoteTipping.Strict,
     councilVoteThreshold: new VoteThreshold({
       type: VoteThresholdType.Disabled,
