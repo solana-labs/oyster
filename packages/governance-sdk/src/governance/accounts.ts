@@ -451,7 +451,7 @@ export class GovernanceConfig {
 
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
-  maxVotingTime: number;
+  baseVotingTime: number;
   communityVoteTipping: VoteTipping;
   minCouncilTokensToCreateProposal: BN;
 
@@ -467,7 +467,7 @@ export class GovernanceConfig {
     communityVoteThreshold: VoteThreshold;
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
-    maxVotingTime: number;
+    baseVotingTime: number;
     communityVoteTipping?: VoteTipping;
     minCouncilTokensToCreateProposal: BN;
 
@@ -484,7 +484,7 @@ export class GovernanceConfig {
     this.minCommunityTokensToCreateProposal =
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
-    this.maxVotingTime = args.maxVotingTime;
+    this.baseVotingTime = args.baseVotingTime;
     this.communityVoteTipping = args.communityVoteTipping ?? VoteTipping.Strict;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
@@ -943,11 +943,13 @@ export class Proposal {
   getTimeToVoteEnd(governance: Governance) {
     const unixTimestampInSeconds = Date.now() / 1000;
 
-    return this.isPreVotingState()
-      ? governance.config.maxVotingTime
+    const baseVotingTime = this.isPreVotingState()
+      ? governance.config.baseVotingTime
       : (this.votingAt?.toNumber() ?? 0) +
-          governance.config.maxVotingTime -
-          unixTimestampInSeconds;
+        governance.config.baseVotingTime -
+        unixTimestampInSeconds;
+
+    return baseVotingTime + governance.config.votingCoolOffTime;
   }
 
   hasVoteTimeEnded(governance: Governance) {

@@ -131,13 +131,15 @@ test('createRealmWithGovernanceAndProposal', async () => {
     communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
-    maxVotingTime: getTimestampFromDays(3),
+    baseVotingTime: getTimestampFromDays(3),
     communityVoteTipping: VoteTipping.Strict,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: councilVetoVoteThreshold,
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 0,
   });
 
   const governancePk = await withCreateMintGovernance(
