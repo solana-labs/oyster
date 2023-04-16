@@ -1,5 +1,6 @@
 export * from './accounts';
 export * from './api';
+export * from './createRevokeGoverningTokens';
 export * from './createSetGovernanceConfig';
 export * from './createSetRealmConfig';
 export * from './createSetRealmAuthority';
@@ -25,6 +26,7 @@ export * from './withExecuteTransaction';
 export * from './withFinalizeVote';
 export * from './withFlagTransactionError';
 export * from './withInsertTransaction';
+export * from './withRefundProposalDeposit';
 export * from './withRelinquishVote';
 export * from './withRemoveTransaction';
 export * from './withRevokeGoverningTokens';

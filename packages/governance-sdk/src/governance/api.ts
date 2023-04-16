@@ -16,6 +16,7 @@ import {
   VoteRecord,
   RealmConfigAccount,
   getRealmConfigAddress,
+  ProposalDeposit,
 } from './accounts';
 
 import {
@@ -23,17 +24,101 @@ import {
   MemcmpFilter,
   pubkeyFilter,
 } from '../core/api';
-
 import { ProgramAccount } from '../tools/sdk/runtime';
-
-// Realms
+import bs58 from 'bs58';
+import axios from 'axios';
+import { deserializeBorsh } from '../tools/borsh';
+import { getErrorMessage } from '../tools';
 
 export async function getRealm(connection: Connection, realm: PublicKey) {
   return getGovernanceAccount(connection, realm, Realm);
 }
 
-export async function getRealms(connection: Connection, programId: PublicKey) {
-  return getGovernanceAccounts(connection, programId, Realm);
+export async function getRealms(
+  connection: Connection,
+  programIds: PublicKey | PublicKey[],
+) {
+  if (programIds instanceof PublicKey) {
+    return getGovernanceAccounts(connection, programIds, Realm);
+  }
+
+  return _getRealms(connection, programIds);
+}
+
+async function _getRealms(connection: Connection, programIds: PublicKey[]) {
+  const accountTypes = getAccountTypes(
+    (Realm as any) as GovernanceAccountClass,
+  );
+  const rpcEndpoint = (connection as any)._rpcEndpoint;
+
+  const rawProgramAccounts = [];
+
+  for (const accountType of accountTypes) {
+    const programAccountsJson = await axios.request({
+      url: rpcEndpoint,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify([
+        ...programIds.map(x => {
+          return {
+            jsonrpc: '2.0',
+            id: x.toBase58(),
+            method: 'getProgramAccounts',
+            params: [
+              x.toBase58(),
+              {
+                commitment: connection.commitment,
+                encoding: 'base64',
+                filters: [
+                  {
+                    memcmp: {
+                      offset: 0,
+                      bytes: bs58.encode([accountType]),
+                    },
+                  },
+                ],
+              },
+            ],
+          };
+        }),
+      ]),
+    });
+
+    rawProgramAccounts.push(
+      ...programAccountsJson?.data
+        ?.filter((x: any) => x.result)
+        .flatMap((x: any) => x.result),
+    );
+  }
+
+  let accounts: ProgramAccount<Realm>[] = [];
+
+  for (let rawAccount of rawProgramAccounts) {
+    try {
+      const data = Buffer.from(rawAccount.account.data[0], 'base64');
+      const accountType = data[0];
+
+      const account: ProgramAccount<Realm> = {
+        pubkey: new PublicKey(rawAccount.pubkey),
+        account: deserializeBorsh(
+          getGovernanceSchemaForAccount(accountType),
+          Realm,
+          data,
+        ),
+        owner: rawAccount.account.owner,
+      };
+
+      accounts.push(account);
+    } catch (ex) {
+      console.info(
+        `Can't deserialize Realm @ ${rawAccount.pubkey}.`,
+        getErrorMessage(ex),
+      );
+    }
+  }
+  return accounts;
 }
 
 // Realm config
@@ -213,6 +298,25 @@ export async function getAllProposals(
       gs.map(g => getProposalsByGovernance(connection, programId, g.pubkey)),
     ),
   );
+}
+
+// ProposalDeposit api
+
+/**
+ * Returns all ProposalDeposits for the given deposit payer
+ * @param connection
+ * @param programId
+ * @param depositPayer
+ * @returns
+ */
+export async function getProposalDepositsByDepositPayer(
+  connection: Connection,
+  programId: PublicKey,
+  depositPayer: PublicKey,
+) {
+  return getGovernanceAccounts(connection, programId, ProposalDeposit, [
+    pubkeyFilter(1 + 32, depositPayer)!,
+  ]);
 }
 
 // Generic API

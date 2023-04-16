@@ -61,7 +61,7 @@ export const GovernanceError = [
   'Current token owner must sign transaction', // TokenOwnerMustSign
   'Given VoteThresholdType is not supported', //VoteThresholdTypeNotSupported
   'Given VoteWeightSource is not supported', //VoteWeightSourceNotSupported
-  'GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
+  'Legacy1', // Legacy1
   'Governance PDA must sign', // GovernancePdaMustSign
   'Instruction already flagged with error', // InstructionAlreadyFlaggedWithError
   'Invalid Realm for Governance', // InvalidRealmForGovernance
@@ -107,7 +107,16 @@ export const GovernanceError = [
   'Cannot revoke GoverningTokens', // CannotRevokeGoverningTokens
   'Invalid Revoke amount', // InvalidRevokeAmount
   'Invalid GoverningToken source', // InvalidGoverningTokenSource
-  'Cannot change community TokenType to Memebership', // CannotChangeCommunityTokenTypeToMemebership
+  'Cannot change community TokenType to Membership', // CannotChangeCommunityTokenTypeToMembership
+
+  'Voter weight threshold disabled', // VoterWeightThresholdDisabled
+  'Vote not allowed in cool off time', // VoteNotAllowedInCoolOffTime
+  'Cannot refund ProposalDeposit', // CannotRefundProposalDeposit
+
+  'Invalid Proposal for ProposalDeposit', // InvalidProposalForProposalDeposit
+  'Invalid deposit_exempt_proposal_count', // InvalidDepositExemptProposalCount
+  'Invalid GoverningTokenMint not allowed to vote', // GoverningTokenMintNotAllowedToVote
+  'Invalid deposit Payer for ProposalDeposit', // InvalidDepositPayerForProposalDeposit
 ] as const;
 
 export const TokenError = [
@@ -136,7 +145,8 @@ export const GovernanceToolsError = [
   'Account already initialized', // AccountAlreadyInitialized
   "Account doesn't exist", // AccountDoesNotExist
   'Invalid account owner', // InvalidAccountOwner
-  'Invalid Account type', // InvalidAccountType
+  'Invalid account type', // InvalidAccountType
+  'Invalid new account size', // InvalidNewAccountSize
 ] as const;
 
 const governanceErrorOffset = 500;

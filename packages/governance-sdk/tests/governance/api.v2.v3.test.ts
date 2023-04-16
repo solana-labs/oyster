@@ -1,5 +1,9 @@
 import { Keypair } from '@solana/web3.js';
-import { GoverningTokenConfigAccountArgs, GoverningTokenType } from '../../src';
+import {
+  getRealms,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '../../src';
 import { BenchBuilder } from '../tools/builders';
 
 test('setRealmConfig', async () => {
@@ -74,13 +78,10 @@ test('createGovernance', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.sendTx());
-
   // Act
   const governancePk = await realm.createGovernance();
-
-  // // Assert
+  // Assert
   const governance = await realm.getGovernance(governancePk);
-
   expect(governance.account.realm).toEqual(realm.realmPk);
 });
 
@@ -110,9 +111,10 @@ test('castVote', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.withGovernance())
-    .then(b => b.withProposal())
     .then(b => b.sendTx())
-    .then(b => b.withProposalSignOff());
+    .then(b => b.withProposal())
+    .then(b => b.withProposalSignOff())
+    .then(b => b.sendTx());
 
   // Act
   const voteRecordPk = await realm.castVote();
@@ -130,8 +132,8 @@ test('relinquishVote', async () => {
     .then(b => b.withRealm())
     .then(b => b.withCommunityMember())
     .then(b => b.withGovernance())
-    .then(b => b.withProposal())
     .then(b => b.sendTx())
+    .then(b => b.withProposal())
     .then(b => b.withProposalSignOff())
     .then(b => b.withCastVote())
     .then(b => b.sendTx());
@@ -143,4 +145,21 @@ test('relinquishVote', async () => {
   const voteRecord = await realm.getVoteRecord(realm.voteRecordPk);
 
   expect(voteRecord.account.isRelinquished).toBe(true);
+});
+
+test('getRealmsForMultiplePrograms', async () => {
+  // Arrange
+  const bench = await BenchBuilder.withConnection().then(b => b.withWallet());
+
+  const realm = await bench.withRealm().then(b => b.sendTx());
+
+  // Act
+
+  const realms = await getRealms(bench.connection, [bench.programId]);
+
+  // Assert
+
+  expect(realms.map(r => r.pubkey.toBase58())).toContainEqual(
+    realm.realmPk.toBase58(),
+  );
 });

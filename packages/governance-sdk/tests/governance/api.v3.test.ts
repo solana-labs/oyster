@@ -12,6 +12,15 @@ import { PROGRAM_VERSION_V3 } from '../../src/registry/constants';
 import { BenchBuilder } from '../tools/builders';
 import { getTimestampFromDays } from '../tools/units';
 
+test('getGovernanceProgramVersion', async () => {
+  // Arrange
+  // Act
+  const builder = await BenchBuilder.withConnection();
+
+  // Assert
+  expect(builder.programVersion).toEqual(3);
+});
+
 test('createRealmWithTokenConfigs', async () => {
   // Arrange
   const bench = await BenchBuilder.withConnection(PROGRAM_VERSION_V3).then(b =>
@@ -62,7 +71,7 @@ test('createRealmWithTokenConfigs', async () => {
   );
 });
 
-test('createGovernanceWithCouncilThresholds', async () => {
+test('createGovernanceWithConfig', async () => {
   // Arrange
   const realm = await BenchBuilder.withConnection(PROGRAM_VERSION_V3)
     .then(b => b.withWallet())
@@ -77,7 +86,7 @@ test('createGovernanceWithCouncilThresholds', async () => {
     }),
     minCommunityTokensToCreateProposal: new BN(1),
     minInstructionHoldUpTime: 0,
-    maxVotingTime: getTimestampFromDays(3),
+    baseVotingTime: getTimestampFromDays(3),
     communityVoteTipping: VoteTipping.Strict,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(1),
@@ -93,6 +102,8 @@ test('createGovernanceWithCouncilThresholds', async () => {
       type: VoteThresholdType.YesVotePercentage,
       value: 80,
     }),
+    votingCoolOffTime: 5000,
+    depositExemptProposalCount: 10,
   });
 
   // Act
@@ -112,6 +123,14 @@ test('createGovernanceWithCouncilThresholds', async () => {
   expect(governance.account.config.councilVetoVoteThreshold).toEqual(
     config.councilVetoVoteThreshold,
   );
+
+  expect(governance.account.config.baseVotingTime).toEqual(
+    getTimestampFromDays(3),
+  );
+
+  expect(governance.account.config.votingCoolOffTime).toEqual(5000);
+
+  expect(governance.account.config.depositExemptProposalCount).toEqual(10);
 });
 
 test('setRealmConfigWithTokenConfigs', async () => {
@@ -189,4 +208,71 @@ test('revokeGoverningToken', async () => {
   expect(
     tokenOwnerRecord.account.governingTokenDepositAmount.toNumber(),
   ).toEqual(0);
+});
+
+test('createProposal', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx());
+
+  // Act
+  const proposalPk = await realm.createProposal('proposal 1');
+
+  // Assert
+  const proposal = await realm.getProposal(proposalPk);
+
+  expect(proposal.account.name).toEqual('proposal 1');
+  expect(proposal.account.vetoVoteWeight.toNumber()).toEqual(0);
+
+  const governance = await realm.getGovernance(proposal.account.governance);
+  expect(governance.account.activeProposalCount.toNumber()).toEqual(1);
+});
+
+test('createProposalWithDeposit', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx());
+
+  // Act
+  const proposalPk = await realm.createProposal('proposal 1');
+
+  // Assert
+  const proposalDeposit = (
+    await realm.getProposalDeposits(realm.bench.walletPk)
+  )[0];
+
+  expect(proposalDeposit.account.proposal).toEqual(proposalPk);
+  expect(proposalDeposit.account.depositPayer).toEqual(realm.bench.walletPk);
+});
+
+test('refundProposalDeposit', async () => {
+  // Arrange
+  const realm = await BenchBuilder.withConnection()
+    .then(b => b.withWallet())
+    .then(b => b.withRealm())
+    .then(b => b.withCommunityMember())
+    .then(b => b.withGovernance())
+    .then(b => b.sendTx())
+    .then(b => b.withProposal())
+    .then(b => b.withProposalSignOff())
+    .then(b => b.withCastVote())
+    .then(b => b.sendTx());
+
+  // Act
+  await realm.refundProposalDeposit();
+
+  // Assert
+  const proposalDeposits = await realm.getProposalDeposits(
+    realm.bench.walletPk,
+  );
+
+  expect(proposalDeposits.length).toBe(0);
 });

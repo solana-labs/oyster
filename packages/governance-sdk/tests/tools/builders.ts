@@ -13,6 +13,7 @@ import BN from 'bn.js';
 import {
   getGovernance,
   getProposal,
+  getProposalDepositsByDepositPayer,
   getRealm,
   getRealmConfig,
   getTokenOwnerRecord,
@@ -23,6 +24,7 @@ import {
   withCreateGovernance,
   withCreateProposal,
   withDepositGoverningTokens,
+  withRefundProposalDeposit,
   withRelinquishVote,
   withRevokeGoverningTokens,
   withSignOffProposal,
@@ -298,8 +300,8 @@ export class RealmBuilder {
       this.bench.programVersion,
 
       this.realmPk,
-      this.communityMintPk,
       this.bench.walletPk,
+      this.communityMintPk,
       this.bench.walletPk,
       new BN(1),
     );
@@ -332,7 +334,7 @@ export class RealmBuilder {
         }),
         minCommunityTokensToCreateProposal: new BN(1),
         minInstructionHoldUpTime: 0,
-        maxVotingTime: getTimestampFromDays(3),
+        baseVotingTime: getTimestampFromDays(3),
         communityVoteTipping: VoteTipping.Strict,
         councilVoteTipping: VoteTipping.Strict,
         minCouncilTokensToCreateProposal: new BN(1),
@@ -350,6 +352,8 @@ export class RealmBuilder {
           type: VoteThresholdType.YesVotePercentage,
           value: 80,
         }),
+        votingCoolOffTime: 0,
+        depositExemptProposalCount: 0,
       });
 
     const governedAccountPk = Keypair.generate().publicKey;
@@ -414,6 +418,29 @@ export class RealmBuilder {
 
   async getProposal(proposalPk: PublicKey) {
     return getProposal(this.bench.connection, proposalPk);
+  }
+
+  async getProposalDeposits(depositPayerPk: PublicKey) {
+    return getProposalDepositsByDepositPayer(
+      this.bench.connection,
+      this.bench.programId,
+      depositPayerPk,
+    );
+  }
+
+  async refundProposalDeposit() {
+    await this._refundProposalDeposit();
+    await this.sendTx();
+  }
+
+  async _refundProposalDeposit() {
+    await withRefundProposalDeposit(
+      this.bench.instructions,
+      this.bench.programId,
+      this.bench.programVersion,
+      this.proposalPk,
+      this.bench.walletPk,
+    );
   }
 
   async withSignatory() {

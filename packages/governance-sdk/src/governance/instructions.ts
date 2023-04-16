@@ -39,6 +39,7 @@ export enum GovernanceInstruction {
   UpdateProgramMetadata = 24,
   CreateNativeTreasury = 25,
   RevokeGoverningTokens = 26,
+  RefundProposalDeposit = 27,
 }
 
 export class CreateRealmArgs {
@@ -143,6 +144,9 @@ export class CreateProposalArgs {
   useDenyOption: boolean;
   // --------------------------------
 
+  // V3 -----------------------------
+  proposalSeed: PublicKey;
+
   constructor(args: {
     name: string;
     descriptionLink: string;
@@ -150,6 +154,7 @@ export class CreateProposalArgs {
     voteType: VoteType;
     options: string[];
     useDenyOption: boolean;
+    proposalSeed: PublicKey;
   }) {
     this.name = args.name;
     this.descriptionLink = args.descriptionLink;
@@ -157,6 +162,7 @@ export class CreateProposalArgs {
     this.voteType = args.voteType;
     this.options = args.options;
     this.useDenyOption = args.useDenyOption;
+    this.proposalSeed = args.proposalSeed;
   }
 }
 
@@ -390,4 +396,9 @@ export class RevokeGoverningTokensArgs {
   constructor(args: { amount: BN }) {
     this.amount = args.amount;
   }
+}
+
+export class RefundProposalDepositArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.RefundProposalDeposit;
 }

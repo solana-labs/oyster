@@ -35,6 +35,7 @@ export enum GovernanceAccountType {
   MintGovernanceV2 = 20,
   TokenGovernanceV2 = 21,
   SignatoryRecordV2 = 22,
+  ProposalDeposit = 23,
 }
 
 export interface GovernanceAccount {
@@ -50,7 +51,8 @@ export type GovernanceAccountClass =
   | typeof VoteRecord
   | typeof ProposalTransaction
   | typeof RealmConfigAccount
-  | typeof ProgramMetadata;
+  | typeof ProgramMetadata
+  | typeof ProposalDeposit;
 
 export function getAccountTypes(accountClass: GovernanceAccountClass) {
   switch (accountClass) {
@@ -66,6 +68,8 @@ export function getAccountTypes(accountClass: GovernanceAccountClass) {
         GovernanceAccountType.ProposalV1,
         GovernanceAccountType.ProposalV2,
       ];
+    case ProposalDeposit:
+      return [GovernanceAccountType.ProposalDeposit];
     case SignatoryRecord:
       return [
         GovernanceAccountType.SignatoryRecordV1,
@@ -105,10 +109,16 @@ export function getGovernanceAccountVersion(
   accountType: GovernanceAccountType,
 ) {
   switch (accountType) {
-    case GovernanceAccountType.GovernanceV2:
     case GovernanceAccountType.VoteRecordV2:
     case GovernanceAccountType.ProposalTransactionV2:
     case GovernanceAccountType.ProposalV2:
+    case GovernanceAccountType.RealmV2:
+    case GovernanceAccountType.TokenOwnerRecordV2:
+    case GovernanceAccountType.GovernanceV2:
+    case GovernanceAccountType.ProgramGovernanceV2:
+    case GovernanceAccountType.MintGovernanceV2:
+    case GovernanceAccountType.TokenGovernanceV2:
+    case GovernanceAccountType.SignatoryRecordV2:
       return ACCOUNT_VERSION_V2;
     default:
       return ACCOUNT_VERSION_V1;
@@ -158,10 +168,11 @@ export enum MintMaxVoteWeightSourceType {
 }
 
 export class MintMaxVoteWeightSource {
-  type = MintMaxVoteWeightSourceType.SupplyFraction;
+  type: MintMaxVoteWeightSourceType;
   value: BN;
 
-  constructor(args: { value: BN }) {
+  constructor(args: { type: MintMaxVoteWeightSourceType; value: BN }) {
+    this.type = args.type;
     this.value = args.value;
   }
 
@@ -169,6 +180,7 @@ export class MintMaxVoteWeightSource {
   static SUPPLY_FRACTION_DECIMALS = 10;
 
   static FULL_SUPPLY_FRACTION = new MintMaxVoteWeightSource({
+    type: MintMaxVoteWeightSourceType.SupplyFraction,
     value: MintMaxVoteWeightSource.SUPPLY_FRACTION_BASE,
   });
 
@@ -340,6 +352,7 @@ export class Realm {
 
   reserved: Uint8Array;
 
+  // Not used in versions >= V3 / legacy1
   votingProposalCount: number;
 
   authority: PublicKey | undefined;
@@ -438,7 +451,7 @@ export class GovernanceConfig {
 
   minCommunityTokensToCreateProposal: BN;
   minInstructionHoldUpTime: number;
-  maxVotingTime: number;
+  baseVotingTime: number;
   communityVoteTipping: VoteTipping;
   minCouncilTokensToCreateProposal: BN;
 
@@ -447,14 +460,14 @@ export class GovernanceConfig {
   councilVetoVoteThreshold: VoteThreshold;
   communityVetoVoteThreshold: VoteThreshold;
   councilVoteTipping: VoteTipping;
-
-  reserved = [0, 0];
+  votingCoolOffTime: number;
+  depositExemptProposalCount: number;
 
   constructor(args: {
     communityVoteThreshold: VoteThreshold;
     minCommunityTokensToCreateProposal: BN;
     minInstructionHoldUpTime: number;
-    maxVotingTime: number;
+    baseVotingTime: number;
     communityVoteTipping?: VoteTipping;
     minCouncilTokensToCreateProposal: BN;
 
@@ -464,12 +477,14 @@ export class GovernanceConfig {
     councilVetoVoteThreshold: VoteThreshold;
     communityVetoVoteThreshold: VoteThreshold;
     councilVoteTipping: VoteTipping;
+    votingCoolOffTime: number;
+    depositExemptProposalCount: number;
   }) {
     this.communityVoteThreshold = args.communityVoteThreshold;
     this.minCommunityTokensToCreateProposal =
       args.minCommunityTokensToCreateProposal;
     this.minInstructionHoldUpTime = args.minInstructionHoldUpTime;
-    this.maxVotingTime = args.maxVotingTime;
+    this.baseVotingTime = args.baseVotingTime;
     this.communityVoteTipping = args.communityVoteTipping ?? VoteTipping.Strict;
     this.minCouncilTokensToCreateProposal =
       args.minCouncilTokensToCreateProposal;
@@ -486,6 +501,9 @@ export class GovernanceConfig {
 
     this.councilVoteTipping =
       args.councilVoteTipping ?? this.communityVoteTipping;
+
+    this.votingCoolOffTime = args.votingCoolOffTime;
+    this.depositExemptProposalCount = args.depositExemptProposalCount;
   }
 }
 
@@ -494,9 +512,12 @@ export class Governance {
   realm: PublicKey;
   governedAccount: PublicKey;
   config: GovernanceConfig;
+  // proposalCount is not used for  >= V3
   proposalCount: number;
   reserved?: Uint8Array;
-  votingProposalCount: number;
+
+  // V3
+  activeProposalCount: BN;
 
   constructor(args: {
     realm: PublicKey;
@@ -505,7 +526,7 @@ export class Governance {
     config: GovernanceConfig;
     reserved?: Uint8Array;
     proposalCount: number;
-    votingProposalCount: number;
+    activeProposalCount: BN;
   }) {
     this.accountType = args.accountType;
     this.realm = args.realm;
@@ -513,7 +534,7 @@ export class Governance {
     this.config = args.config;
     this.reserved = args.reserved;
     this.proposalCount = args.proposalCount;
-    this.votingProposalCount = args.votingProposalCount;
+    this.activeProposalCount = args.activeProposalCount;
   }
 
   isProgramGovernance() {
@@ -558,6 +579,7 @@ export class TokenOwnerRecord {
 
   unrelinquishedVotesCount: number;
 
+  // Not used in versions >= V3 / I'ts the upper 4 bytes of unrelinquishedVotesCount
   totalVotesCount: number;
 
   outstandingProposalCount: number;
@@ -565,6 +587,9 @@ export class TokenOwnerRecord {
   reserved: Uint8Array;
 
   governanceDelegate?: PublicKey;
+
+  // V3
+  version: number;
 
   constructor(args: {
     realm: PublicKey;
@@ -576,6 +601,7 @@ export class TokenOwnerRecord {
     outstandingProposalCount: number;
     reserved: Uint8Array;
     governanceDelegate: PublicKey | undefined;
+    version: number;
   }) {
     this.realm = args.realm;
     this.governingTokenMint = args.governingTokenMint;
@@ -586,6 +612,7 @@ export class TokenOwnerRecord {
     this.outstandingProposalCount = args.outstandingProposalCount;
     this.reserved = args.reserved;
     this.governanceDelegate = args.governanceDelegate;
+    this.version = args.version;
   }
 }
 
@@ -916,11 +943,13 @@ export class Proposal {
   getTimeToVoteEnd(governance: Governance) {
     const unixTimestampInSeconds = Date.now() / 1000;
 
-    return this.isPreVotingState()
-      ? governance.config.maxVotingTime
+    const baseVotingTime = this.isPreVotingState()
+      ? governance.config.baseVotingTime
       : (this.votingAt?.toNumber() ?? 0) +
-          governance.config.maxVotingTime -
-          unixTimestampInSeconds;
+        governance.config.baseVotingTime -
+        unixTimestampInSeconds;
+
+    return baseVotingTime + governance.config.votingCoolOffTime;
   }
 
   hasVoteTimeEnded(governance: Governance) {
@@ -957,6 +986,17 @@ export class Proposal {
       proposalOwner.governingTokenOwner.equals(walletPk) ||
       proposalOwner.governanceDelegate?.equals(walletPk)
     );
+  }
+}
+
+export class ProposalDeposit {
+  accountType: GovernanceAccountType = GovernanceAccountType.ProposalDeposit;
+  proposal: PublicKey;
+  depositPayer: PublicKey;
+
+  constructor(args: { proposal: PublicKey; depositPayer: PublicKey }) {
+    this.proposal = args.proposal;
+    this.depositPayer = args.depositPayer;
   }
 }
 
@@ -1290,4 +1330,21 @@ export async function getGoverningTokenHoldingAddress(
   );
 
   return governingTokenHoldingAddress;
+}
+
+export async function getProposalDepositAddress(
+  programId: PublicKey,
+  proposal: PublicKey,
+  proposalDepositPayer: PublicKey,
+) {
+  const [proposalDepositAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('proposal-deposit'),
+      proposal.toBuffer(),
+      proposalDepositPayer.toBuffer(),
+    ],
+    programId,
+  );
+
+  return proposalDepositAddress;
 }

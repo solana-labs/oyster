@@ -23,11 +23,10 @@ export async function simulateTransaction(
   transaction: Transaction,
   commitment: Commitment,
 ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
-  // @ts-ignore
-  transaction.recentBlockhash = await connection._recentBlockhash(
-    // @ts-ignore
-    connection._disableBlockhashCaching,
-  );
+  const latestBlockhash = await connection.getRecentBlockhash();
+  //@ts-ignore
+  transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
+  transaction.recentBlockhash = latestBlockhash.blockhash;
 
   const signData = transaction.serializeMessage();
   // @ts-ignore

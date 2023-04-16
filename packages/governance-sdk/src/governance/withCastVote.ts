@@ -89,7 +89,7 @@ export const withCastVote = async (
     },
     {
       pubkey: payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {
