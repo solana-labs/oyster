@@ -15,6 +15,10 @@ export function createSetGovernanceConfig(
     serialize(getGovernanceInstructionSchema(programVersion), args),
   );
 
+  if (args.config.baseVotingTime < 3600) {
+    throw new Error('baseVotingTime should be at least 1 hour');
+  }
+
   const keys = [
     {
       pubkey: governance,

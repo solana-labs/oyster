@@ -26,6 +26,10 @@ export const withCreateGovernance = async (
 ) => {
   const args = new CreateGovernanceArgs({ config });
 
+  if (args.config.baseVotingTime < 3600) {
+    throw new Error('baseVotingTime should be at least 1 hour');
+  }
+
   const data = Buffer.from(
     serialize(getGovernanceInstructionSchema(programVersion), args),
   );
