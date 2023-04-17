@@ -113,8 +113,10 @@ import { deserializeBorsh } from '../tools/borsh';
   writer.length += 1;
 
   if (value.type === VoteTypeKind.MultiChoice) {
-    writer.buf.writeUInt16LE(value.choiceCount!, writer.length);
-    writer.length += 2;
+    writer.buf.writeUInt8(value.choiceCount!, writer.length);
+    writer.length += 1;
+    writer.buf.writeUInt8(value.choiceCount!, writer.length);
+    writer.length += 1;
   }
 };
 
