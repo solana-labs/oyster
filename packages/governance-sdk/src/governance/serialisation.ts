@@ -102,7 +102,8 @@ import { deserializeBorsh } from '../tools/borsh';
     return VoteType.SINGLE_CHOICE;
   }
 
-  const choiceCount = reader.buf.readUInt16LE(reader.offset);
+  const choiceCount = reader.buf.readUInt8(reader.offset);
+  reader.offset += 2; // skip two bytes
   return VoteType.MULTI_CHOICE(choiceCount);
 };
 
@@ -113,8 +114,11 @@ import { deserializeBorsh } from '../tools/borsh';
   writer.length += 1;
 
   if (value.type === VoteTypeKind.MultiChoice) {
-    writer.buf.writeUInt16LE(value.choiceCount!, writer.length);
-    writer.length += 2;
+    // maxVoterOptions and maxWinningOtions are not implemented at backend
+    writer.buf.writeUInt8(value.maxVoterOptions || 0, writer.length);
+    writer.length += 1;
+    writer.buf.writeUInt8(value.maxWinningOptions || 0, writer.length);
+    writer.length += 1;
   }
 };
 
