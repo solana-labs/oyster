@@ -12,6 +12,7 @@ import { BPF_UPGRADE_LOADER_ID } from '../tools/sdk/bpfUpgradeableLoader';
 import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
+/** @deprecated */
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,

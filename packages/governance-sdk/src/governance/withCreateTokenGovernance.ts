@@ -12,6 +12,7 @@ import { TOKEN_PROGRAM_ID } from '../tools/sdk/splToken';
 import { withRealmConfigPluginAccounts } from './withRealmConfigPluginAccounts';
 import { PROGRAM_VERSION_V1 } from '../registry/constants';
 
+/** @deprecated */
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
   programId: PublicKey,
