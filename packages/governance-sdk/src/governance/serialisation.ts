@@ -102,8 +102,21 @@ import { deserializeBorsh } from '../tools/borsh';
     return VoteType.SINGLE_CHOICE;
   }
 
-  const choiceCount = reader.buf.readUInt16LE(reader.offset);
-  return VoteType.MULTI_CHOICE(choiceCount);
+  const choiceType = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+  const minVoterOptions = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+  const maxVoterOptions = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+  const maxWinningOptions = reader.buf.readUInt8(reader.offset);
+  reader.offset += 1;
+
+  return VoteType.MULTI_CHOICE(
+    choiceType,
+    minVoterOptions,
+    maxVoterOptions,
+    maxWinningOptions,
+  );
 };
 
 (BinaryWriter.prototype as any).writeVoteType = function (value: VoteType) {
@@ -113,8 +126,14 @@ import { deserializeBorsh } from '../tools/borsh';
   writer.length += 1;
 
   if (value.type === VoteTypeKind.MultiChoice) {
-    writer.buf.writeUInt16LE(value.choiceCount!, writer.length);
-    writer.length += 2;
+    writer.buf.writeUInt8(value.choiceType!, writer.length);
+    writer.length += 1;
+    writer.buf.writeUInt8(value.minVoterOptions!, writer.length);
+    writer.length += 1;
+    writer.buf.writeUInt8(value.maxVoterOptions!, writer.length);
+    writer.length += 1;
+    writer.buf.writeUInt8(value.maxWinningOptions!, writer.length);
+    writer.length += 1;
   }
 };
 
