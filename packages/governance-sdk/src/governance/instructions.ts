@@ -175,6 +175,15 @@ export class AddSignatoryArgs {
   }
 }
 
+export class RemoveSignatoryArgs {
+  instruction: GovernanceInstruction = GovernanceInstruction.RemoveSignatory;
+  signatory: PublicKey;
+
+  constructor(args: { signatory: PublicKey }) {
+    this.signatory = args.signatory;
+  }
+}
+
 export class SignOffProposalArgs {
   instruction: GovernanceInstruction = GovernanceInstruction.SignOffProposal;
 }
