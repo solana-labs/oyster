@@ -77,10 +77,8 @@ export async function getGovernanceProgramVersion(
     transaction.add(...instructions);
 
     // TODO: Once return values are supported change the simulation call to the actual one
-    const getVersion = await simulateTransaction(
-      connection,
+    const getVersion = await connection.simulateTransaction(
       transaction,
-      'recent',
     );
 
     if (getVersion.value.logs) {
