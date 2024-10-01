@@ -771,7 +771,10 @@ function createGovernanceAccountSchema(accountVersion: number) {
                 ['reserved', [120]],
                 ['activeProposalCount', 'u64'],
               ]
-            : []),
+            : [
+                ['reserved', [6]],
+                ['activeProposalCount', 'u16'],
+              ]),
         ],
       },
     ],
