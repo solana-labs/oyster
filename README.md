@@ -1,3 +1,7 @@
+# oyster 
+
+This repo still exists in archived form, but the maintained version of `governance-sdk` package has now relocated to: https://github.com/Mythic-Project/oyster/tree/main/packages/governance-sdk
+
 ## Setup
 
 Be sure to be running Node v12.16.2 and yarn version 1.22.10.
